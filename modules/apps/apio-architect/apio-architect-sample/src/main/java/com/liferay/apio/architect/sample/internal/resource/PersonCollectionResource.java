@@ -49,8 +49,8 @@ public class PersonCollectionResource
 	implements CollectionResource<PersonModel, Long, PersonIdentifier> {
 
 	@Override
-	public CollectionRoutes<PersonModel> collectionRoutes(
-		CollectionRoutes.Builder<PersonModel> builder) {
+	public CollectionRoutes<PersonModel, Long> collectionRoutes(
+		CollectionRoutes.Builder<PersonModel, Long> builder) {
 
 		return builder.addGetter(
 			this::_getPageItems
@@ -106,14 +106,14 @@ public class PersonCollectionResource
 			).addString(
 				"streetAddress", PostalAddressModel::getStreetAddress
 			).build()
+		).addRelativeURL(
+			"image", PersonModel::getAvatarRelativeURL
 		).addString(
 			"email", PersonModel::getEmail
 		).addString(
 			"familyName", PersonModel::getLastName
 		).addString(
 			"givenName", PersonModel::getFirstName
-		).addString(
-			"image", PersonModel::getAvatar
 		).addStringList(
 			"jobTitle", PersonModel::getJobTitles
 		).addString(

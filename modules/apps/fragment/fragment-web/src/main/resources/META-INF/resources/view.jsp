@@ -22,11 +22,6 @@ List<FragmentCollection> fragmentCollections = FragmentCollectionServiceUtil.get
 
 <liferay-ui:error exception="<%= RequiredFragmentEntryException.class %>" message="the-collection-cannot-be-deleted-because-it-contains-a-fragment-required-by-one-or-more-templates" />
 
-<clay:navigation-bar
-	inverted="<%= true %>"
-	navigationItems="<%= fragmentDisplayContext.getNavigationItems() %>"
-/>
-
 <div class="container-fluid container-fluid-max-xl container-view">
 	<div class="row">
 		<div class="col-lg-3">
@@ -121,7 +116,7 @@ List<FragmentCollection> fragmentCollections = FragmentCollectionServiceUtil.get
 								<liferay-util:include page="/fragment_collection_action.jsp" servletContext="<%= application %>" />
 							</div>
 						</div>
-					</div>
+					</h3>
 
 					<div class="sheet-section">
 						<liferay-util:include page="/view_fragment_entries.jsp" servletContext="<%= application %>" />
