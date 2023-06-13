@@ -14,6 +14,7 @@
 
 import 'codemirror/addon/fold/foldgutter';
 import 'codemirror/addon/fold/foldgutter.css';
+import 'codemirror/addon/display/placeholder';
 import 'codemirror/lib/codemirror.css';
 import CodeMirror from 'codemirror';
 import React from 'react';
@@ -21,15 +22,19 @@ import './CodeMirrorEditor.scss';
 export default function CodeMirrorEditor({
 	className,
 	editorRef,
+	error,
 	fixed,
 	onChange,
 	options,
+	placeholder,
 }: IProps): JSX.Element;
 interface IProps {
 	className?: string;
 	editorRef?: React.MutableRefObject<CodeMirror.Editor | undefined>;
+	error?: string;
 	fixed?: boolean;
 	onChange: (value?: string) => void;
 	options?: CodeMirror.EditorConfiguration;
+	placeholder?: string;
 }
 export {};

@@ -53,6 +53,11 @@ import org.osgi.service.component.annotations.ServiceScope;
 public class RegionResourceImpl extends BaseRegionResourceImpl {
 
 	@Override
+	public void deleteRegion(Long regionId) throws Exception {
+		_regionService.deleteRegion(regionId);
+	}
+
+	@Override
 	public Region getCountryRegionByRegionCode(
 			Long countryId, String regionCode)
 		throws Exception {
@@ -111,15 +116,24 @@ public class RegionResourceImpl extends BaseRegionResourceImpl {
 	}
 
 	@Override
-	public Region postRegion(Region region) throws Exception {
-		com.liferay.portal.kernel.model.Region serviceBuilderRegion =
+	public Region postCountryRegion(Long countryId, Region region)
+		throws Exception {
+
+		return _toRegion(
 			_regionService.addRegion(
-				region.getCountryId(), GetterUtil.get(region.getActive(), true),
+				countryId, GetterUtil.get(region.getActive(), true),
 				region.getName(), region.getPosition(), region.getRegionCode(),
 				ServiceContextFactory.getInstance(
-					Region.class.getName(), contextHttpServletRequest));
+					Region.class.getName(), contextHttpServletRequest)));
+	}
 
-		return _toRegion(serviceBuilderRegion);
+	@Override
+	public Region putRegion(Long regionId, Region region) throws Exception {
+		return _toRegion(
+			_regionService.updateRegion(
+				regionId, GetterUtil.get(region.getActive(), true),
+				region.getName(), region.getPosition(),
+				region.getRegionCode()));
 	}
 
 	private OrderByComparator<com.liferay.portal.kernel.model.Region>

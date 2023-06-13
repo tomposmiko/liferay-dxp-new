@@ -71,6 +71,11 @@
 		<td></td>
 	</tr>
 	<tr>
+		<td>DEFAULT_SORT_SEARCH_BAR</td>
+		<td>//h3[(@class='lfr-objects__card-title') and text()='Default Sort']/../..//input[contains(@aria-label,'Search')]</td>
+		<td></td>
+	</tr>
+	<tr>
 		<td>VIEW_BUILDER_SEARCH_RESULT</td>
 		<td>//p[contains(@class,'list-group-title') and contains(text(),'${key_columnName}')]</td>
 		<td></td>
@@ -148,6 +153,11 @@
 	<tr>
 		<td>DEFAULT_SORT_COLUMN_OPTION</td>
 		<td>//button[(@class='dropdown-item') and contains(.,'${key_columnOption}')]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>DEFAULT_SORT_NO_COLUMN_OPTION</td>
+		<td>//span[(@class='dropdown-item') and contains(.,'There are no columns added in this view yet.')]</td>
 		<td></td>
 	</tr>
 	<tr>

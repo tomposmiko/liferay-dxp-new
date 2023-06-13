@@ -97,7 +97,6 @@ Checks are configured in the following files:
    - [Upgrade](src/main/resources/documentation/upgrade_checks.markdown#upgrade-checks)
 
 - ### By File Extensions:
-   - [](src/main/resources/documentation/tf_source_processor_checks.markdown#checks-for-)
    - [.action, .function, .jrxml, .macro, .pom, .project, .properties, .svg, .testcase, .toggle, .tpl, .wsdl, .xml or .xsd](src/main/resources/documentation/xml_source_processor_checks.markdown#checks-for-action-function-jrxml-macro-pom-project-properties-svg-testcase-toggle-tpl-wsdl-xml-or-xsd)
    - [.bnd](src/main/resources/documentation/bnd_source_processor_checks.markdown#checks-for-bnd)
    - [.bndrun](src/main/resources/documentation/bnd_run_source_processor_checks.markdown#checks-for-bndrun)
@@ -116,11 +115,13 @@ Checks are configured in the following files:
    - [.java](src/main/resources/documentation/java_source_processor_checks.markdown#checks-for-java)
    - [.js or .jsx](src/main/resources/documentation/js_source_processor_checks.markdown#checks-for-js-or-jsx)
    - [.jsp, .jspf, .jspx, .tag, .tpl or .vm](src/main/resources/documentation/jsp_source_processor_checks.markdown#checks-for-jsp-jspf-jspx-tag-tpl-or-vm)
+   - [.ldif](src/main/resources/documentation/ldif_source_processor_checks.markdown#checks-for-ldif)
    - [.lfrbuild-*](src/main/resources/documentation/lfr_build_source_processor_checks.markdown#checks-for-lfrbuild)
    - [.markdown or .md](src/main/resources/documentation/markdown_source_processor_checks.markdown#checks-for-markdown-or-md)
    - [.py](src/main/resources/documentation/python_source_processor_checks.markdown#checks-for-py)
    - [.soy](src/main/resources/documentation/soy_source_processor_checks.markdown#checks-for-soy)
    - [.sql](src/main/resources/documentation/sql_source_processor_checks.markdown#checks-for-sql)
+   - [.tf](src/main/resources/documentation/tf_source_processor_checks.markdown#checks-for-tf)
    - [.tld](src/main/resources/documentation/tld_source_processor_checks.markdown#checks-for-tld)
    - [.ts or .tsx](src/main/resources/documentation/ts_source_processor_checks.markdown#checks-for-ts-or-tsx)
    - [.txt](src/main/resources/documentation/txt_source_processor_checks.markdown#checks-for-txt)

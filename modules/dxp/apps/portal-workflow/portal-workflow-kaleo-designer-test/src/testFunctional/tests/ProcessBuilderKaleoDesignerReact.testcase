@@ -86,6 +86,7 @@ definition {
 	@description = "Verify that the user can add Nodes into diagram by drag&drop: Condition"
 	@priority = "5"
 	test CanAddConditionNode {
+		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#CanAddConditionNode";
 
 		Workflow.openWorkflowListView();
@@ -96,6 +97,8 @@ definition {
 			nodeLabel = "Condition",
 			nodePosition = "20,-100",
 			nodeType = "condition");
+
+		ProcessBuilderKaleoDesignerReact.viewPanelNodePresent(nodeType = "condition");
 	}
 
 	@description = "Verify that the user can add Nodes into diagram by drag&drop: End"
@@ -111,6 +114,8 @@ definition {
 			nodeLabel = "End",
 			nodePosition = "90,-300",
 			nodeType = "end");
+
+		ProcessBuilderKaleoDesignerReact.viewPanelNodePresent(nodeType = "end");
 	}
 
 	@description = "Verify that the user can add Nodes into diagram by drag&drop: Fork"
@@ -126,6 +131,8 @@ definition {
 			nodeLabel = "Fork",
 			nodePosition = "-20,-40",
 			nodeType = "fork");
+
+		ProcessBuilderKaleoDesignerReact.viewPanelNodePresent(nodeType = "fork");
 	}
 
 	@description = "Verify that the user can add Nodes into diagram by drag&drop: Join"
@@ -141,12 +148,14 @@ definition {
 			nodeLabel = "Join",
 			nodePosition = "-20,-40",
 			nodeType = "join");
+
+		ProcessBuilderKaleoDesignerReact.viewPanelNodePresent(nodeType = "join");
 	}
 
 	@description = "Verify that the user can add Nodes into diagram by drag&drop: Join XOR"
 	@priority = "5"
 	test CanAddJoinXorNode {
-		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#CanAddNotification";
+		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#CanAddJoinXorNode";
 
 		Workflow.openWorkflowListView();
 
@@ -156,6 +165,8 @@ definition {
 			nodeLabel = "Join XOR",
 			nodePosition = "-40,-200",
 			nodeType = "join-xor");
+
+		ProcessBuilderKaleoDesignerReact.viewPanelNodePresent(nodeType = "join-xor");
 	}
 
 	@description = "Verify that the user can add Multiple Actions to the same node"
@@ -243,6 +254,8 @@ definition {
 			nodeLabel = "Start",
 			nodePosition = "70,-200",
 			nodeType = "start");
+
+		ProcessBuilderKaleoDesignerReact.viewPanelNodePresent(nodeType = "start");
 	}
 
 	@description = "Verify that the user can add Nodes into diagram by drag&drop: State"
@@ -258,6 +271,8 @@ definition {
 			nodeLabel = "State",
 			nodePosition = "50,-420",
 			nodeType = "state");
+
+		ProcessBuilderKaleoDesignerReact.viewPanelNodePresent(nodeType = "state");
 	}
 
 	@description = "Verify that the user can add Nodes into diagram by drag&drop: Task"
@@ -273,15 +288,36 @@ definition {
 			nodeLabel = "Task",
 			nodePosition = "-20,-40",
 			nodeType = "task");
+
+		ProcessBuilderKaleoDesignerReact.viewPanelNodePresent(nodeType = "task");
 	}
 
 	@description = "Verify that Timers can be added"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanAddTimers {
+		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#CanAddTimers";
 
-		// TODO LRQA-72952 CanAddTimers pending implementation
+		Workflow.openWorkflowListView();
 
+		Workflow.addNewDefinition(workflowDefinitionTitle = "New Workflow Definition");
+
+		ProcessBuilderKaleoDesignerReact.dragSidebarNodeAndMove(
+			nodeLabel = "Task",
+			nodePosition = "-20,-40",
+			nodeType = "task");
+
+		ProcessBuilderKaleoDesignerReact.viewAndFillTimers(
+			actionName = "Liferay Timer",
+			actionsTemplateValue = "Timer Template",
+			durationValue = "2",
+			newTimer = "true",
+			scaleTypeOption = "Minute");
+
+		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
+
+		ProcessBuilderKaleoDesignerReact.viewPropertyValue(
+			propertyName = "Timer",
+			propertyValue = "Duration: 2 minute");
 	}
 
 	@description = "Verify that the user can add translations"
@@ -634,6 +670,7 @@ definition {
 	@description = "Verify that the user can delete Nodes of Condition"
 	@priority = "4"
 	test CanDeleteConditionNode {
+		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#CanDeleteConditionNode";
 
 		Workflow.openWorkflowListView();
@@ -673,12 +710,25 @@ definition {
 	}
 
 	@description = "Verify that the user can delete Nodes of Fork"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanDeleteForkNode {
+		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#CanDeleteForkNode";
 
-		// TODO CanDeleteForkNode pending implementation
+		Workflow.openWorkflowListView();
 
+		Workflow.addNewDefinition(workflowDefinitionTitle = "New Workflow Definition");
+
+		ProcessBuilderKaleoDesignerReact.dragSidebarNodeAndMove(
+			nodeLabel = "Fork",
+			nodePosition = "20,-500",
+			nodeType = "fork");
+
+		ProcessBuilderKaleoDesignerReact.deleteNodeOrConnection(
+			modalMessage = "Are you sure you want to delete the selected fork node?",
+			nodeType = "fork",
+			title = "Delete Fork Node");
+
+		ProcessBuilderKaleoDesignerReact.viewPanelNodeNotPresent(nodeType = "fork");
 	}
 
 	@description = "Verify that the user can delete Nodes of Join"
@@ -704,12 +754,25 @@ definition {
 	}
 
 	@description = "Verify that the user can delete Nodes of Join XOR"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanDeleteJoinXORNode {
+		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#CanDeleteJoinXORNode";
 
-		// TODO CanDeleteJoinXORNode pending implementation
+		Workflow.openWorkflowListView();
 
+		Workflow.addNewDefinition(workflowDefinitionTitle = "New Workflow Definition");
+
+		ProcessBuilderKaleoDesignerReact.dragSidebarNodeAndMove(
+			nodeLabel = "Join XOR",
+			nodePosition = "-40,-200",
+			nodeType = "join-xor");
+
+		ProcessBuilderKaleoDesignerReact.deleteNodeOrConnection(
+			modalMessage = "Are you sure you want to delete the selected join xor node?",
+			nodeType = "join-xor",
+			title = "Delete Join Xor Node");
+
+		ProcessBuilderKaleoDesignerReact.viewPanelNodeNotPresent(nodeType = "join-xor");
 	}
 
 	@description = "Verify that the user can delete all notifications configurations"
@@ -1228,6 +1291,7 @@ definition {
 	@description = "LPS-139387 - Verify that the user can hide/show the information area"
 	@priority = "2"
 	test CanHideShowInformationArea {
+		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#CanHideShowInformationArea";
 
 		Workflow.openWorkflowListView();
@@ -1295,6 +1359,7 @@ definition {
 	@description = "Verify that the user can move nodes in diagram by drag&drop in the middle of node"
 	@priority = "4"
 	test CanMoveNode {
+		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#CanMoveNode";
 
 		Workflow.openWorkflowListView();
@@ -2215,6 +2280,7 @@ definition {
 	@description = "Verify that default names for nodes are provided"
 	@priority = "4"
 	test DefaultLabelsAreProvided {
+		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#DefaultLabelsAreProvided";
 
 		Workflow.openWorkflowListView();
@@ -2276,21 +2342,39 @@ definition {
 	}
 
 	@description = "Publish workflow definition with no End Node And View Error Message"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test DefinitionRequiresEndNodeToPublish {
+		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#DefinitionRequiresEndNodeToPublish";
 
-		// TODO DefinitionRequiresEndNodeToPublish pending implementation
+		Workflow.openWorkflowListView();
 
+		Workflow.addNewDefinition(workflowDefinitionTitle = "New Workflow Definition");
+
+		ProcessBuilderKaleoDesignerReact.selectNode(nodeType = "end");
+
+		ProcessBuilderKaleoDesignerReact.deleteNodeOrConnection(title = "Delete End Node");
+
+		Button.clickPublish();
+
+		Alert.viewErrorMessage(errorMessage = "The item_0 node must have an outgoing transition");
 	}
 
 	@description = "Publish workflow definition with no start node and view error message"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test DefinitionRequiresStartNodeToPublish {
+		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#DefinitionRequiresStartNodeToPublish";
 
-		// TODO DefinitionRequiresStartNodeToPublish pending implementation
+		Workflow.openWorkflowListView();
 
+		Workflow.addNewDefinition(workflowDefinitionTitle = "New Workflow Definition");
+
+		ProcessBuilderKaleoDesignerReact.selectNode(nodeType = "start");
+
+		ProcessBuilderKaleoDesignerReact.deleteNodeOrConnection(title = "Delete Start Node");
+
+		Button.clickPublish();
+
+		Alert.viewErrorMessage(errorMessage = "You must define a start node");
 	}
 
 	@description = "Verify that, when the user deletes a translation, the action reflects in the language selector"
@@ -2326,12 +2410,38 @@ definition {
 	}
 
 	@description = "Verify that each fork node requires a join node"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test ForkNodeRequiresJoinNode {
+		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#ForkNodeRequiresJoinNode";
 
-		// TODO LRQA-72942 ForkNodeRequiresJoinNode pending implementation
+		Workflow.openWorkflowListView();
 
+		Workflow.addNewDefinition(workflowDefinitionTitle = "New Workflow Definition");
+
+		ProcessBuilderKaleoDesignerReact.dragSidebarNodeAndMove(
+			nodeLabel = "Fork",
+			nodePosition = "-20,-100",
+			nodeType = "fork");
+
+		ProcessBuilderKaleoDesignerReact.addConnector(
+			connectorIn = "fork",
+			connectorLabel = "Transition Label",
+			connectorOut = "start",
+			key_direction = "top");
+
+		ProcessBuilderKaleoDesignerReact.addConnector(
+			connectorIn = "end",
+			connectorLabel = "Transition Label",
+			connectorOut = "fork",
+			key_direction = "top");
+
+		Button.clickPublish();
+
+		Alert.viewErrorMessage(errorMessage = "Each fork node requires a join node. Make sure all forks and joins are properly paired");
+
+		Navigator.gotoBack();
+
+		Workflow.viewDefinitionNotPresent(workflowDefinitionTitle = "New Workflow Definition");
 	}
 
 	@description = "Verify that each type of Node has Actions property"
@@ -2407,6 +2517,7 @@ definition {
 	@description = "Verify that each type of Node has Description property"
 	@priority = "4"
 	test HasDescriptionProperty {
+		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#HasDescriptionProperty";
 
 		Workflow.openWorkflowListView();
@@ -2447,6 +2558,7 @@ definition {
 	@description = "Verify that each type of Node has Notifications property"
 	@priority = "4"
 	test HasNotificationsProperty {
+		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#HasNotificationsProperty";
 
 		Workflow.openWorkflowListView();
@@ -2511,6 +2623,7 @@ definition {
 	@description = "LPS-129928 - Verify that the node coordinates are updated in Source when node is moved in diagram"
 	@priority = "3"
 	test NodeCoordinatedAreUpdated {
+		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#NodeCoordinatedAreUpdated";
 
 		Workflow.openWorkflowListView();

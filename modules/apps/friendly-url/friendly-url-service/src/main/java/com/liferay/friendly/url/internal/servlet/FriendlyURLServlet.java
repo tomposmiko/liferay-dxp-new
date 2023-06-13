@@ -190,6 +190,36 @@ public class FriendlyURLServlet extends HttpServlet {
 						group.getGroupId(), _private, layoutFriendlyURL, params,
 						requestContext);
 
+			if (layoutFriendlyURLSeparatorComposite.isRedirect()) {
+				pos = path.indexOf(
+					layoutFriendlyURLSeparatorComposite.getURLSeparator());
+
+				if (pos != 1) {
+					HttpServletRequest originalHttpServletRequest =
+						portal.getOriginalServletRequest(httpServletRequest);
+
+					String requestURL = HttpComponentsUtil.getRequestURL(
+						originalHttpServletRequest);
+
+					int friendlyURLPos = requestURL.indexOf(layoutFriendlyURL);
+
+					String friendlyURL =
+						layoutFriendlyURLSeparatorComposite.getFriendlyURL();
+
+					String redirectURL =
+						PropsValues.LAYOUT_FRIENDLY_URL_PUBLIC_SERVLET_MAPPING +
+							path.substring(0, pos) + friendlyURL;
+
+					if (friendlyURLPos > 0) {
+						redirectURL =
+							requestURL.substring(0, friendlyURLPos) +
+								friendlyURL;
+					}
+
+					return new Redirect(redirectURL, true, false);
+				}
+			}
+
 			Layout layout = layoutFriendlyURLSeparatorComposite.getLayout();
 
 			if (layout != null) {
@@ -359,7 +389,7 @@ public class FriendlyURLServlet extends HttpServlet {
 					_log.debug(encryptorException);
 				}
 
-				return new Redirect(actualURL);
+				return new Redirect(actualURL, false, false);
 			}
 		}
 
@@ -373,7 +403,7 @@ public class FriendlyURLServlet extends HttpServlet {
 					params, !actualURL.contains(StringPool.QUESTION)));
 		}
 
-		return new Redirect(actualURL);
+		return new Redirect(actualURL, false, false);
 	}
 
 	@Override

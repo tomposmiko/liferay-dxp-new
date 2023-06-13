@@ -39,9 +39,11 @@ import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.model.impl.ObjectDefinitionImpl;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
+import com.liferay.object.service.ObjectActionLocalService;
 import com.liferay.object.service.ObjectDefinitionLocalServiceUtil;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.object.service.ObjectLayoutLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.ObjectValidationRuleLocalService;
 import com.liferay.object.service.ObjectViewLocalService;
@@ -279,10 +281,13 @@ public class ObjectDefinitionLocalServiceImpl
 		throws PortalException {
 
 		if (!CompanyThreadLocal.isDeleteInProcess() &&
-			!PortalRunMode.isTestMode() && objectDefinition.isApproved()) {
+			!PortalRunMode.isTestMode() && objectDefinition.isSystem()) {
 
 			throw new RequiredObjectDefinitionException();
 		}
+
+		_objectActionLocalService.deleteObjectActions(
+			objectDefinition.getObjectDefinitionId());
 
 		if (!objectDefinition.isSystem()) {
 			List<ObjectEntry> objectEntries =
@@ -295,6 +300,9 @@ public class ObjectDefinitionLocalServiceImpl
 		}
 
 		_objectFieldLocalService.deleteObjectFieldByObjectDefinitionId(
+			objectDefinition.getObjectDefinitionId());
+
+		_objectLayoutLocalService.deleteObjectLayouts(
 			objectDefinition.getObjectDefinitionId());
 
 		for (ObjectRelationship objectRelationship :
@@ -316,14 +324,15 @@ public class ObjectDefinitionLocalServiceImpl
 		_objectValidationRuleLocalService.deleteObjectValidationRules(
 			objectDefinition.getObjectDefinitionId());
 
+		_objectViewLocalService.deleteObjectViews(
+			objectDefinition.getObjectDefinitionId());
+
 		objectDefinitionPersistence.remove(objectDefinition);
 
 		_resourceLocalService.deleteResource(
 			objectDefinition.getCompanyId(), ObjectDefinition.class.getName(),
 			ResourceConstants.SCOPE_INDIVIDUAL,
 			objectDefinition.getObjectDefinitionId());
-
-		// TODO Delete object actions and layouts
 
 		if (objectDefinition.isSystem()) {
 			_dropTable(objectDefinition.getExtensionDBTableName());
@@ -440,6 +449,24 @@ public class ObjectDefinitionLocalServiceImpl
 	@Override
 	public List<ObjectDefinition> getSystemObjectDefinitions() {
 		return objectDefinitionPersistence.findBySystem(true);
+	}
+
+	@Override
+	public boolean hasObjectRelationship(long objectDefinitionId) {
+		int countByObjectDefinitionId1 =
+			_objectRelationshipPersistence.countByObjectDefinitionId1(
+				objectDefinitionId);
+		int countByObjectDefinitionId2 =
+			_objectRelationshipPersistence.countByObjectDefinitionId2(
+				objectDefinitionId);
+
+		if ((countByObjectDefinitionId1 > 0) ||
+			(countByObjectDefinitionId2 > 0)) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	@Override
@@ -1211,6 +1238,9 @@ public class ObjectDefinitionLocalServiceImpl
 	@Reference
 	private MultiVMPool _multiVMPool;
 
+	@Reference
+	private ObjectActionLocalService _objectActionLocalService;
+
 	private ServiceTracker<ObjectDefinitionDeployer, ObjectDefinitionDeployer>
 		_objectDefinitionDeployerServiceTracker;
 
@@ -1225,6 +1255,9 @@ public class ObjectDefinitionLocalServiceImpl
 
 	@Reference
 	private ObjectFieldPersistence _objectFieldPersistence;
+
+	@Reference
+	private ObjectLayoutLocalService _objectLayoutLocalService;
 
 	@Reference
 	private ObjectRelationshipLocalService _objectRelationshipLocalService;
