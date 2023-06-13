@@ -227,6 +227,13 @@ public class BatchEngineImportTaskWrapper
 		return wrap(model.cloneWithOriginalValues());
 	}
 
+	@Override
+	public java.util.List<BatchEngineImportTaskError>
+		getBatchEngineImportTaskErrors() {
+
+		return model.getBatchEngineImportTaskErrors();
+	}
+
 	/**
 	 * Returns the batch engine import task ID of this batch engine import task.
 	 *

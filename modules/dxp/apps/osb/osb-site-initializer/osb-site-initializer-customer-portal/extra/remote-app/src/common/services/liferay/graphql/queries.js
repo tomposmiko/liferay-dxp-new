@@ -280,8 +280,13 @@ export const getKoroneikiAccounts = gql`
 					region
 					slaCurrent
 					slaCurrentEndDate
+					slaCurrentStartDate
 					slaExpired
+					slaExpiredEndDate
+					slaExpiredStartDate
 					slaFuture
+					slaFutureEndDate
+					slaFutureStartDate
 				}
 			}
 		}
@@ -297,6 +302,28 @@ export const getListTypeDefinitions = gql`
 					name
 				}
 			}
+		}
+	}
+`;
+
+export const getAccounts = gql`
+	query getAccounts($pageSize: Long) {
+		accounts(pageSize: $pageSize) {
+			items {
+				externalReferenceCode
+				name
+			}
+		}
+	}
+`;
+
+export const getAccountByExternalReferenceCode = gql`
+	query getAccountByExternalReferenceCode($externalReferenceCode: String!) {
+		accountByExternalReferenceCode(
+			externalReferenceCode: $externalReferenceCode
+		) {
+			id
+			name
 		}
 	}
 `;
@@ -317,6 +344,9 @@ export const getUserAccount = gql`
 			id
 			image
 			name
+			roleBriefs {
+				name
+			}
 		}
 	}
 `;

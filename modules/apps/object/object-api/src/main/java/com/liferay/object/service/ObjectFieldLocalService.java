@@ -149,6 +149,10 @@ public interface ObjectFieldLocalService
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException;
 
+	@Indexable(type = IndexableType.DELETE)
+	public ObjectField deleteRelationshipTypeObjectField(long objectFieldId)
+		throws PortalException;
+
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public <T> T dslQuery(DSLQuery dslQuery);
 
@@ -347,7 +351,5 @@ public interface ObjectFieldLocalService
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	public ObjectField updateObjectField(ObjectField objectField);
-
-	public void validateDBType(String dbType) throws PortalException;
 
 }

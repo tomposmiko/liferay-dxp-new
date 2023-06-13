@@ -12,10 +12,9 @@
  * details.
  */
 
-import ClaySticker from '@clayui/sticker';
-
 import TestrayLogo from '../../images/testray-logo';
 import {Liferay} from '../../services/liferay/liferay';
+import {Avatar} from '../Avatar';
 import SidebarItem from './SidebarItem';
 
 const sidebarItems = [
@@ -65,16 +64,11 @@ const Sidebar = () => {
 				<div className="divider divider-full" />
 
 				<div className="testray-sidebar-item">
-					<ClaySticker size="lg">
-						<ClaySticker.Image
-							alt="placeholder"
-							src="https://clayui.com/images/long_user_image.png"
-						/>
-					</ClaySticker>
-
-					<span className="ml-2">
-						{Liferay.ThemeDisplay.getUserName()}
-					</span>
+					<Avatar
+						displayName
+						name={Liferay.ThemeDisplay.getUserName()}
+						url="https://clayui.com/images/long_user_image.png"
+					/>
 				</div>
 			</div>
 		</div>

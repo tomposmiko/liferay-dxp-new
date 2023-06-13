@@ -151,6 +151,13 @@ public class ObjectFieldLocalServiceUtil {
 		return getService().deletePersistedModel(persistedModel);
 	}
 
+	public static ObjectField deleteRelationshipTypeObjectField(
+			long objectFieldId)
+		throws PortalException {
+
+		return getService().deleteRelationshipTypeObjectField(objectFieldId);
+	}
+
 	public static <T> T dslQuery(DSLQuery dslQuery) {
 		return getService().dslQuery(dslQuery);
 	}
@@ -402,10 +409,6 @@ public class ObjectFieldLocalServiceUtil {
 	 */
 	public static ObjectField updateObjectField(ObjectField objectField) {
 		return getService().updateObjectField(objectField);
-	}
-
-	public static void validateDBType(String dbType) throws PortalException {
-		getService().validateDBType(dbType);
 	}
 
 	public static ObjectFieldLocalService getService() {

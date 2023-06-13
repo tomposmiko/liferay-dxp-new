@@ -8,16 +8,20 @@
  * permissions and limitations under the License, including but not limited to
  * distribution rights of the Software.
  */
+import DXPActivationKeysTable from '../../containers/DXPActivationKeysTable';
 import DeveloperKeysLayouts from '../../layouts/DeveloperKeysLayout';
 
 const DXP = ({project, sessionId}) => {
 	return (
 		<div className="mr-4">
+			<DXPActivationKeysTable project={project} sessionId={sessionId} />
+
 			<DeveloperKeysLayouts>
 				<DeveloperKeysLayouts.Inputs
 					accountKey={project.accountKey}
 					downloadTextHelper="Select the Liferay DXP version for which you want to download a developer key."
 					dxpVersion={project.dxpVersion}
+					projectName={project.name}
 					sessionId={sessionId}
 				></DeveloperKeysLayouts.Inputs>
 			</DeveloperKeysLayouts>

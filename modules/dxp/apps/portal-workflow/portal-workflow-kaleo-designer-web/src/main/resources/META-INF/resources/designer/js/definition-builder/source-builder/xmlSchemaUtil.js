@@ -71,9 +71,9 @@ function getLocationValue(field, context) {
 				for (const child of res.children) {
 					const childContent = {};
 
-					for (const item of child.children) {
+					if (!child.children.length) {
 						const childNodesAttributes = getChildAttributes(
-							item.childNodes
+							child.childNodes
 						);
 
 						let itemContent;
@@ -82,10 +82,54 @@ function getLocationValue(field, context) {
 							itemContent = childNodesAttributes;
 						}
 						else {
-							itemContent = item.textContent;
+							itemContent = child.textContent;
 						}
 
-						childContent[item.tagName] = itemContent;
+						childContent[child.tagName] = itemContent;
+					}
+					else {
+						for (const item of child.children) {
+							if (item.children.length) {
+								for (const itemChild of item.children) {
+									const childNodesAttributes = getChildAttributes(
+										itemChild.childNodes
+									);
+
+									let itemContent;
+
+									if (childNodesAttributes.length) {
+										itemContent = childNodesAttributes;
+									}
+									else {
+										itemContent = itemChild.textContent;
+									}
+
+									if (!childContent[itemChild.tagName]) {
+										childContent[itemChild.tagName] = [];
+									}
+
+									childContent[itemChild.tagName].push(
+										itemContent
+									);
+								}
+							}
+							else {
+								const childNodesAttributes = getChildAttributes(
+									item.childNodes
+								);
+
+								let itemContent;
+
+								if (childNodesAttributes.length) {
+									itemContent = childNodesAttributes;
+								}
+								else {
+									itemContent = item.textContent;
+								}
+
+								childContent[item.tagName] = itemContent;
+							}
+						}
 					}
 
 					content.push(childContent);

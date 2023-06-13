@@ -28,12 +28,24 @@
 	.sidebar-body {
 		overflow: hidden;
 
+		.delete-button {
+			& svg {
+				fill: #6b6c7e;
+				height: 16px;
+				width: 16px;
+			}
+		}
+
 		.panel .sheet-subtitle {
 			align-items: center;
 			cursor: pointer;
 			display: flex;
 			justify-content: space-between;
 			width: 100%;
+		}
+
+		.recipient-type-form-group {
+			margin-bottom: 0.5rem;
 		}
 
 		.section-buttons-area {
@@ -44,9 +56,28 @@
 
 			.delete-button {
 				align-items: flex-end;
+			}
+		}
 
-				& svg {
-					fill: #6b6c7e;
+		.current-node-data-area {
+			border: 1px solid #e7e7ed;
+			border-radius: 4px;
+			padding: 3px 15px 3px 30px;
+
+			.current-node-data-row {
+				align-items: center;
+
+				.truncate-container {
+					max-width: 200px;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					white-space: nowrap;
+				}
+
+				.delete-button {
+					& svg {
+						fill: #6b6c7e;
+					}
 				}
 			}
 		}
@@ -90,6 +121,10 @@
 			.custom-control {
 				margin-bottom: 0;
 			}
+		}
+
+		.delete-button {
+			align-items: flex-end;
 		}
 
 		.trash-button {

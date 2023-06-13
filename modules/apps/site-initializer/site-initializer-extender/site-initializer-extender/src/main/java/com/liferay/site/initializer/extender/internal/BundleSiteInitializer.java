@@ -179,7 +179,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.function.Supplier;
 
 import javax.servlet.ServletContext;
 
@@ -195,7 +194,6 @@ public class BundleSiteInitializer implements SiteInitializer {
 		AccountResource.Factory accountResourceFactory,
 		AssetCategoryLocalService assetCategoryLocalService,
 		AssetListEntryLocalService assetListEntryLocalService, Bundle bundle,
-		Supplier<CommerceReferencesHolder> commerceReferencesHolderSupplier,
 		DDMStructureLocalService ddmStructureLocalService,
 		DDMTemplateLocalService ddmTemplateLocalService,
 		DefaultDDMStructureHelper defaultDDMStructureHelper,
@@ -224,7 +222,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 		ResourcePermissionLocalService resourcePermissionLocalService,
 		RoleLocalService roleLocalService,
 		SAPEntryLocalService sapEntryLocalService,
-		ServletContext servletContext, SettingsFactory settingsFactory,
+		SettingsFactory settingsFactory,
 		SiteNavigationMenuItemLocalService siteNavigationMenuItemLocalService,
 		SiteNavigationMenuItemTypeRegistry siteNavigationMenuItemTypeRegistry,
 		SiteNavigationMenuLocalService siteNavigationMenuLocalService,
@@ -241,7 +239,6 @@ public class BundleSiteInitializer implements SiteInitializer {
 		_assetCategoryLocalService = assetCategoryLocalService;
 		_assetListEntryLocalService = assetListEntryLocalService;
 		_bundle = bundle;
-		_commerceReferencesHolderSupplier = commerceReferencesHolderSupplier;
 		_ddmStructureLocalService = ddmStructureLocalService;
 		_ddmTemplateLocalService = ddmTemplateLocalService;
 		_defaultDDMStructureHelper = defaultDDMStructureHelper;
@@ -273,7 +270,6 @@ public class BundleSiteInitializer implements SiteInitializer {
 		_resourcePermissionLocalService = resourcePermissionLocalService;
 		_roleLocalService = roleLocalService;
 		_sapEntryLocalService = sapEntryLocalService;
-		_servletContext = servletContext;
 		_settingsFactory = settingsFactory;
 		_siteNavigationMenuItemLocalService =
 			siteNavigationMenuItemLocalService;
@@ -325,8 +321,6 @@ public class BundleSiteInitializer implements SiteInitializer {
 
 	@Override
 	public void initialize(long groupId) throws InitializationException {
-		_commerceReferencesHolder = _commerceReferencesHolderSupplier.get();
-
 		if (_log.isDebugEnabled()) {
 			_log.debug(
 				"Commerce references holder " + _commerceReferencesHolder);
@@ -361,7 +355,20 @@ public class BundleSiteInitializer implements SiteInitializer {
 
 			_invoke(() -> _addAccounts(serviceContext));
 			_invoke(() -> _addDDMStructures(serviceContext));
-			_invoke(() -> _addFragmentEntries(serviceContext));
+
+			Map<String, String> assetListEntryIdsStringUtilReplaceValues =
+				_invoke(
+					() -> _addAssetListEntries(
+						_ddmStructureLocalService, serviceContext));
+			Map<String, String> documentsStringUtilReplaceValues = _invoke(
+				() -> _addDocuments(
+					serviceContext, siteNavigationMenuItemSettingsBuilder));
+
+			_invoke(
+				() -> _addFragmentEntries(
+					assetListEntryIdsStringUtilReplaceValues,
+					documentsStringUtilReplaceValues, serviceContext));
+
 			_invoke(() -> _addSAPEntries(serviceContext));
 			_invoke(() -> _addSiteConfiguration(serviceContext));
 			_invoke(() -> _addStyleBookEntries(serviceContext));
@@ -370,15 +377,6 @@ public class BundleSiteInitializer implements SiteInitializer {
 					serviceContext, siteNavigationMenuItemSettingsBuilder));
 			_invoke(() -> _addUserAccounts(serviceContext));
 			_invoke(() -> _updateLayoutSets(serviceContext));
-
-			Map<String, String> assetListEntryIdsStringUtilReplaceValues =
-				_invoke(
-					() -> _addAssetListEntries(
-						_ddmStructureLocalService, serviceContext));
-
-			Map<String, String> documentsStringUtilReplaceValues = _invoke(
-				() -> _addDocuments(
-					serviceContext, siteNavigationMenuItemSettingsBuilder));
 
 			_invoke(
 				() -> _addDDMTemplates(
@@ -449,6 +447,16 @@ public class BundleSiteInitializer implements SiteInitializer {
 	@Override
 	public boolean isActive(long companyId) {
 		return true;
+	}
+
+	protected void setCommerceReferencesHolder(
+		CommerceReferencesHolder commerceReferencesHolder) {
+
+		_commerceReferencesHolder = commerceReferencesHolder;
+	}
+
+	protected void setServletContext(ServletContext servletContext) {
+		_servletContext = servletContext;
 	}
 
 	private void _addAccounts(ServiceContext serviceContext) throws Exception {
@@ -581,7 +589,10 @@ public class BundleSiteInitializer implements SiteInitializer {
 		_assetListEntryLocalService.addDynamicAssetListEntry(
 			serviceContext.getUserId(), serviceContext.getScopeGroupId(),
 			assetListJSONObject.getString("title"),
-			String.valueOf(new UnicodeProperties(map, true)), serviceContext);
+			UnicodePropertiesBuilder.create(
+				map, true
+			).buildString(),
+			serviceContext);
 	}
 
 	private void _addCommerceCatalogs(
@@ -1326,18 +1337,69 @@ public class BundleSiteInitializer implements SiteInitializer {
 		).build();
 	}
 
-	private void _addFragmentEntries(ServiceContext serviceContext)
+	private void _addFragmentEntries(
+			Map<String, String> assetListEntryIdsStringUtilReplaceValues,
+			Map<String, String> documentsStringUtilReplaceValues,
+			ServiceContext serviceContext)
 		throws Exception {
 
-		URL url = _bundle.getEntry("/fragments.zip");
+		Enumeration<URL> enumeration = _bundle.findEntries(
+			"/site-initializer/fragments", StringPool.STAR, true);
 
-		if (url == null) {
+		if (enumeration == null) {
 			return;
+		}
+
+		ZipWriter zipWriter = ZipWriterFactoryUtil.getZipWriter();
+
+		while (enumeration.hasMoreElements()) {
+			URL url = enumeration.nextElement();
+
+			String fileName = url.getFile();
+
+			if (fileName.endsWith("/")) {
+				continue;
+			}
+
+			if (StringUtil.endsWith(
+					fileName, "fragment-composition-definition.json")) {
+
+				String json = StringUtil.read(url.openStream());
+
+				json = StringUtil.replace(
+					json, "\"[$", "$]\"",
+					HashMapBuilder.putAll(
+						assetListEntryIdsStringUtilReplaceValues
+					).putAll(
+						documentsStringUtilReplaceValues
+					).build());
+
+				Group scopeGroup = serviceContext.getScopeGroup();
+
+				json = StringUtil.replace(
+					json,
+					new String[] {"[$GROUP_FRIENDLY_URL$]", "[$GROUP_ID$]"},
+					new String[] {
+						scopeGroup.getFriendlyURL(),
+						String.valueOf(serviceContext.getScopeGroupId())
+					});
+
+				zipWriter.addEntry(
+					StringUtil.removeFirst(
+						fileName, "/site-initializer/fragments/"),
+					json);
+			}
+			else {
+				zipWriter.addEntry(
+					StringUtil.removeFirst(
+						fileName, "/site-initializer/fragments/"),
+					url.openStream());
+			}
 		}
 
 		_fragmentsImporter.importFragmentEntries(
 			serviceContext.getUserId(), serviceContext.getScopeGroupId(), 0,
-			FileUtil.createTempFile(url.openStream()), false);
+			zipWriter.getFile(), false);
 	}
 
 	private void _addJournalArticles(
@@ -2429,26 +2491,18 @@ public class BundleSiteInitializer implements SiteInitializer {
 						layout);
 			}
 			else if (type.equals(SiteNavigationMenuItemTypeConstants.NODE)) {
-				UnicodeProperties typeSettingsUnicodeProperties =
-					new UnicodeProperties();
-
-				typeSettingsUnicodeProperties.setProperty(
-					"name", menuItemJSONObject.getString("name"));
-
-				typeSettings = typeSettingsUnicodeProperties.toString();
+				typeSettings = UnicodePropertiesBuilder.put(
+					"name", menuItemJSONObject.getString("name")
+				).buildString();
 			}
 			else if (type.equals(SiteNavigationMenuItemTypeConstants.URL)) {
-				UnicodeProperties typeSettingsUnicodeProperties =
-					new UnicodeProperties();
-
-				typeSettingsUnicodeProperties.setProperty(
-					"name", menuItemJSONObject.getString("name"));
-				typeSettingsUnicodeProperties.setProperty(
-					"url", menuItemJSONObject.getString("url"));
-				typeSettingsUnicodeProperties.setProperty(
-					"useNewTab", menuItemJSONObject.getString("useNewTab"));
-
-				typeSettings = typeSettingsUnicodeProperties.toString();
+				typeSettings = UnicodePropertiesBuilder.put(
+					"name", menuItemJSONObject.getString("name")
+				).put(
+					"url", menuItemJSONObject.getString("url")
+				).put(
+					"useNewTab", menuItemJSONObject.getString("useNewTab")
+				).buildString();
 			}
 			else if (type.equals("display-page")) {
 				String key = menuItemJSONObject.getString("key");
@@ -3021,9 +3075,6 @@ public class BundleSiteInitializer implements SiteInitializer {
 				cpInstancePropertiesJSONObject.getJSONObject(
 					"subscriptionTypeSettings");
 
-			UnicodeProperties unicodeProperties = new UnicodeProperties(
-				JSONUtil.toStringMap(subscriptionTypeSettingsJSONObject), true);
-
 			_commerceReferencesHolder.cpInstanceLocalService.
 				updateSubscriptionInfo(
 					cpInstance.getCPInstanceId(),
@@ -3034,7 +3085,11 @@ public class BundleSiteInitializer implements SiteInitializer {
 					cpInstancePropertiesJSONObject.getInt("subscriptionLength"),
 					cpInstancePropertiesJSONObject.getString(
 						"subscriptionType"),
-					unicodeProperties,
+					UnicodePropertiesBuilder.create(
+						JSONUtil.toStringMap(
+							subscriptionTypeSettingsJSONObject),
+						true
+					).build(),
 					cpInstancePropertiesJSONObject.getLong(
 						"maxSubscriptionCycles"),
 					cpInstancePropertiesJSONObject.getBoolean(
@@ -3199,8 +3254,6 @@ public class BundleSiteInitializer implements SiteInitializer {
 	private final Bundle _bundle;
 	private final ClassLoader _classLoader;
 	private CommerceReferencesHolder _commerceReferencesHolder;
-	private final Supplier<CommerceReferencesHolder>
-		_commerceReferencesHolderSupplier;
 	private final DDMStructureLocalService _ddmStructureLocalService;
 	private final DDMTemplateLocalService _ddmTemplateLocalService;
 	private final DefaultDDMStructureHelper _defaultDDMStructureHelper;
@@ -3236,7 +3289,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 		_resourcePermissionLocalService;
 	private final RoleLocalService _roleLocalService;
 	private final SAPEntryLocalService _sapEntryLocalService;
-	private final ServletContext _servletContext;
+	private ServletContext _servletContext;
 	private final SettingsFactory _settingsFactory;
 	private final SiteNavigationMenuItemLocalService
 		_siteNavigationMenuItemLocalService;

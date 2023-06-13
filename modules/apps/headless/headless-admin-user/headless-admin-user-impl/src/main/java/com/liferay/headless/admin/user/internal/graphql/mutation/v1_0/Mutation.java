@@ -1217,6 +1217,34 @@ public class Mutation {
 	}
 
 	@GraphQLField
+	public UserGroup patchUserGroupByExternalReferenceCode(
+			@GraphQLName("externalReferenceCode") String externalReferenceCode,
+			@GraphQLName("userGroup") UserGroup userGroup)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_userGroupResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			userGroupResource ->
+				userGroupResource.patchUserGroupByExternalReferenceCode(
+					externalReferenceCode, userGroup));
+	}
+
+	@GraphQLField
+	public UserGroup updateUserGroupByExternalReferenceCode(
+			@GraphQLName("externalReferenceCode") String externalReferenceCode,
+			@GraphQLName("userGroup") UserGroup userGroup)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_userGroupResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			userGroupResource ->
+				userGroupResource.putUserGroupByExternalReferenceCode(
+					externalReferenceCode, userGroup));
+	}
+
+	@GraphQLField
 	public boolean deleteUserGroup(@GraphQLName("userGroupId") Long userGroupId)
 		throws Exception {
 

@@ -12,19 +12,57 @@
  * details.
  */
 
+import classNames from 'classnames';
 import {fetch, objectToFormData, runScriptsInElement} from 'frontend-js-web';
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useState} from 'react';
 
 export function VariationPreview({
 	fragmentEntryKey,
 	label,
 	namespace,
 	previewURL,
+	showLabel,
 	variation,
 }) {
-	const ref = useRef();
+	const [element, setElement] = useState(null);
+	const [visible, setVisible] = useState(false);
 
 	useEffect(() => {
+		setVisible(false);
+
+		if (!element) {
+			return;
+		}
+
+		const intersectionObserver = new IntersectionObserver((entries) => {
+			const visible = entries.some(
+				(entry) => entry.isIntersecting && entry.target === element
+			);
+
+			if (visible) {
+				setVisible(true);
+				intersectionObserver.disconnect();
+			}
+		});
+
+		intersectionObserver.observe(element);
+
+		return () => {
+			intersectionObserver.disconnect();
+		};
+	}, [element]);
+
+	useEffect(() => {
+		if (!element || !visible) {
+			return;
+		}
+
+		const loadingIndicator = document.createElement('span');
+		loadingIndicator.setAttribute('aria-hidden', 'true');
+		loadingIndicator.className = 'flex-grow-0 loading-animation m-0';
+
+		element.appendChild(loadingIndicator);
+
 		fetch(previewURL, {
 			body: objectToFormData({
 				[`_${namespace}_configurationValues`]: JSON.stringify(
@@ -41,25 +79,31 @@ export function VariationPreview({
 		})
 			.then((response) => response.text())
 			.then((data) => {
-				ref.current.innerHTML = data;
+				element.innerHTML = data;
 
-				runScriptsInElement(ref.current);
+				runScriptsInElement(element);
 			})
 			.catch((error) => {
 				console.error(error);
-				ref.current.innerHTML = '';
+				element.innerHTML = '';
 			});
-	}, [fragmentEntryKey, namespace, previewURL, variation]);
+	}, [element, fragmentEntryKey, namespace, previewURL, variation, visible]);
 
 	return (
 		<article className="d-flex flex-column-reverse">
 			<div className="cadmin">
-				<h4 className="mb-0 mt-2 text-secondary">{label}</h4>
+				<h4
+					className={classNames('mb-0 mt-2 text-secondary', {
+						'sr-only': !showLabel,
+					})}
+				>
+					{label}
+				</h4>
 			</div>
 
 			<div
 				className="align-items-center d-flex flex-grow-1 justify-content-center overflow-hidden p-4 variation-preview__content"
-				ref={ref}
+				ref={setElement}
 			/>
 		</article>
 	);

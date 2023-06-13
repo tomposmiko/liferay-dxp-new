@@ -122,7 +122,7 @@ public class ObjectEntryInfoItemFormProvider
 		).infoFieldSetEntry(
 			ObjectEntryInfoItemFields.userNameInfoField
 		).infoFieldSetEntry(
-			ObjectEntryInfoItemFields.userProfileImage
+			ObjectEntryInfoItemFields.userProfileImageInfoField
 		).labelInfoLocalizedValue(
 			InfoLocalizedValue.localize(getClass(), "basic-information")
 		).name(
@@ -162,6 +162,10 @@ public class ObjectEntryInfoItemFormProvider
 						_getObjectDefinitionInfoFieldSet(objectDefinitionId));
 				}
 			}
+		).infoFieldSetEntry(
+			_templateInfoItemFieldSetProvider.getInfoFieldSet(
+				"com.liferay.object.model.ObjectDefinition#" +
+					objectDefinitionId)
 		).infoFieldSetEntry(
 			_getDisplayPageInfoFieldSet()
 		).infoFieldSetEntry(
@@ -245,9 +249,6 @@ public class ObjectEntryInfoItemFormProvider
 						).build());
 				}
 			}
-		).infoFieldSetEntry(
-			_templateInfoItemFieldSetProvider.getInfoFieldSet(
-				ObjectEntry.class.getName(), String.valueOf(objectDefinitionId))
 		).labelInfoLocalizedValue(
 			InfoLocalizedValue.<String>builder(
 			).values(

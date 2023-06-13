@@ -36,6 +36,7 @@ import {isIdDuplicated} from './components/sidebar/utils';
 import edgeTypes from './components/transitions/Edge';
 import FloatingConnectionLine from './components/transitions/FloatingConnectionLine';
 import getCollidingElements from './util/collisionDetection';
+import populateAssignmentsData from './util/populateAssignmentData';
 
 let id = 2;
 const getId = () => `item_${id++}`;
@@ -297,18 +298,12 @@ export default function DiagramBuilder({version}) {
 
 			setElements(elements);
 
+			populateAssignmentsData(elements, setElements);
+
 			setDeserialize(false);
 		}
-	}, [
-		currentEditor,
-		definitionTitle,
-		deserialize,
-		setDefinitionDescription,
-		setDefinitionTitle,
-		setDeserialize,
-		setElements,
-		version,
-	]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [currentEditor, definitionTitle, deserialize, version]);
 
 	useEffect(() => {
 		if (version !== '0' && !deserialize) {
@@ -324,6 +319,8 @@ export default function DiagramBuilder({version}) {
 					const elements = deserializeUtil.getElements();
 
 					setElements(elements);
+
+					populateAssignmentsData(elements, setElements);
 				});
 		}
 

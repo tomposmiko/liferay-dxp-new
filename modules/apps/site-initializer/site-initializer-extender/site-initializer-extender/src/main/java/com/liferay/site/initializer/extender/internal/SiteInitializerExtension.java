@@ -48,15 +48,15 @@ import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ThemeLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.settings.SettingsFactory;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.security.service.access.policy.service.SAPEntryLocalService;
 import com.liferay.remote.app.service.RemoteAppEntryLocalService;
+import com.liferay.site.initializer.SiteInitializer;
 import com.liferay.site.navigation.service.SiteNavigationMenuItemLocalService;
 import com.liferay.site.navigation.service.SiteNavigationMenuLocalService;
 import com.liferay.site.navigation.type.SiteNavigationMenuItemTypeRegistry;
 import com.liferay.style.book.zip.processor.StyleBookEntryZipProcessor;
-
-import java.util.function.Supplier;
 
 import javax.servlet.ServletContext;
 
@@ -77,7 +77,6 @@ public class SiteInitializerExtension {
 		AssetCategoryLocalService assetCategoryLocalService,
 		AssetListEntryLocalService assetListEntryLocalService, Bundle bundle,
 		BundleContext bundleContext,
-		Supplier<CommerceReferencesHolder> commerceReferencesHolderSupplier,
 		DDMStructureLocalService ddmStructureLocalService,
 		DDMTemplateLocalService ddmTemplateLocalService,
 		DefaultDDMStructureHelper defaultDDMStructureHelper,
@@ -124,10 +123,9 @@ public class SiteInitializerExtension {
 		_component = _dependencyManager.createComponent();
 
 		_component.setImplementation(
-			new SiteInitializerRegistrar(
+			new BundleSiteInitializer(
 				accountResourceFactory, assetCategoryLocalService,
-				assetListEntryLocalService, bundle, bundleContext,
-				commerceReferencesHolderSupplier, ddmStructureLocalService,
+				assetListEntryLocalService, bundle, ddmStructureLocalService,
 				ddmTemplateLocalService, defaultDDMStructureHelper, dlURLHelper,
 				documentFolderResourceFactory, documentResourceFactory,
 				fragmentsImporter, groupLocalService,
@@ -149,9 +147,21 @@ public class SiteInitializerExtension {
 				styleBookEntryZipProcessor, taxonomyCategoryResourceFactory,
 				taxonomyVocabularyResourceFactory, themeLocalService,
 				userAccountResourceFactory, userLocalService));
+		_component.setInterface(
+			SiteInitializer.class,
+			MapUtil.singletonDictionary(
+				"site.initializer.key", bundle.getSymbolicName()));
 
 		ServiceDependency serviceDependency =
 			_dependencyManager.createServiceDependency();
+
+		serviceDependency.setCallbacks("setCommerceReferencesHolder", null);
+		serviceDependency.setRequired(false);
+		serviceDependency.setService(CommerceReferencesHolder.class);
+
+		_component.add(serviceDependency);
+
+		serviceDependency = _dependencyManager.createServiceDependency();
 
 		serviceDependency.setCallbacks("setServletContext", null);
 		serviceDependency.setRequired(true);
