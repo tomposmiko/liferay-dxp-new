@@ -32,7 +32,11 @@ definition {
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
-		Alert.viewErrorMessage(errorMessage = "Grace period which already ended");
+		Alert.viewErrorMessage(errorMessage = "The maximum number of 2 nodes licensed for this cluster has been exceeded. Please shut down excess nodes as soon as possible. An additional 2 nodes are temporarily permitted during the grace period");
+
+		Alert.viewErrorMessage(errorMessage = "This current node is within the licensed node count and will not be automatically deactivated nor shut down after the grace period expires.");
+
+		Clustering.waitForNodeShutdown(nodePort = "10080");
 
 		Navigator.openSpecificURL(url = "http://localhost:10080");
 
@@ -152,7 +156,7 @@ definition {
 
 		Clustering.waitForNodeShutdown(nodePort = "9080");
 
-		WaitForConsoleTextPresent(value1 = "Shutting down current node as it is the latest one");
+		WaitForConsoleTextPresent(value1 = "Finished shutting down overloaded nodes");
 
 		Clustering.viewTextPresentOnSpecificNode(
 			expectedText = "Shutting down current node as it is the latest one",

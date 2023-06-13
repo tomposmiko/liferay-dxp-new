@@ -16,6 +16,7 @@ import ClayIcon from '@clayui/icon';
 import ClayLayout from '@clayui/layout';
 import {ReactNode, useState} from 'react';
 import {Link, useOutletContext} from 'react-router-dom';
+import {KeyedMutator} from 'swr';
 
 import Avatar from '../../../../../../components/Avatar';
 import AssignToMe from '../../../../../../components/Avatar/AssigneToMe';
@@ -23,9 +24,9 @@ import Code from '../../../../../../components/Code';
 import Container from '../../../../../../components/Layout/Container';
 import StatusBadge from '../../../../../../components/StatusBadge';
 import QATable, {Orientation} from '../../../../../../components/Table/QATable';
-import {TestrayCaseResult} from '../../../../../../graphql/queries';
 import useAssignCaseResult from '../../../../../../hooks/useAssignCaseResult';
 import i18n from '../../../../../../i18n';
+import {TestrayCaseResult} from '../../../../../../services/rest';
 import {getStatusLabel} from '../../../../../../util/constants';
 import {getTimeFromNow} from '../../../../../../util/date';
 import CaseResultHeaderActions from './CaseResultHeaderActions';
@@ -65,15 +66,17 @@ const CollapsableItem: React.FC<CollapsableItemProps> = ({
 const CaseResult = () => {
 	const {
 		caseResult,
+		mutateCaseResult,
 		projectId,
 		refetch,
 	}: {
 		caseResult: TestrayCaseResult;
+		mutateCaseResult: KeyedMutator<any>;
 		projectId: string;
 		refetch: () => void;
 	} = useOutletContext();
 
-	const {onAssignToMe} = useAssignCaseResult();
+	const {onAssignToMeFetch} = useAssignCaseResult();
 
 	const getAttachments = (): TestrayAttachment[] => {
 		try {
@@ -90,7 +93,7 @@ const CaseResult = () => {
 		<>
 			<CaseResultHeaderActions
 				caseResult={caseResult}
-				refetch={refetch}
+				mutateCaseResult={mutateCaseResult}
 			/>
 			<ClayLayout.Row>
 				<ClayLayout.Col xs={9}>
@@ -125,7 +128,7 @@ const CaseResult = () => {
 									flexHeading: true,
 									title: i18n.sub(
 										'warnings-x',
-										caseResult.warnings.toString()
+										caseResult.warnings?.toString()
 									),
 									value: attachments.find(({name}) =>
 										name.toLowerCase().includes('warning')
@@ -222,7 +225,7 @@ const CaseResult = () => {
 						/>
 
 						<Link
-							to={`/project/${projectId}/cases/${caseResult.case.id}`}
+							to={`/project/${projectId}/cases/${caseResult.id}`}
 						>
 							{i18n.translate('view-case')}
 						</Link>
@@ -261,9 +264,9 @@ const CaseResult = () => {
 									) : (
 										<AssignToMe
 											onClick={() =>
-												onAssignToMe(caseResult).then(
-													refetch
-												)
+												onAssignToMeFetch(
+													caseResult
+												).then(refetch)
 											}
 										/>
 									),
@@ -275,7 +278,7 @@ const CaseResult = () => {
 								},
 								{
 									title: i18n.translate('comment'),
-									value: 'None',
+									value: caseResult.commentMBMessage,
 								},
 							]}
 							orientation={Orientation.VERTICAL}

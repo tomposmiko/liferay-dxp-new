@@ -14,21 +14,14 @@
 
 import ClayTabs from '@clayui/tabs';
 import {
+	API,
 	SidePanelContent,
 	invalidateRequired,
 	openToast,
 	saveAndReload,
 } from '@liferay/object-js-components-web';
-import {fetch} from 'frontend-js-web';
 import React, {useContext, useEffect, useState} from 'react';
 
-import {
-	fetchJSON,
-	getObjectFields,
-	getObjectRelationships,
-} from '../../utils/api';
-import {HEADERS} from '../../utils/constants';
-import {defaultLanguageId} from '../../utils/locale';
 import {TabsVisitor} from '../../utils/visitor';
 import InfoScreen from './InfoScreen/InfoScreen';
 import LayoutScreen from './LayoutScreen/LayoutScreen';
@@ -39,6 +32,8 @@ import {
 	TObjectLayoutTab,
 	TObjectRelationship,
 } from './types';
+
+const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
 
 const TABS = [
 	{
@@ -123,13 +118,13 @@ const Layout: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 				name,
 				objectDefinitionId,
 				objectLayoutTabs,
-			} = await fetchJSON<TObjectLayout>(
+			} = await API.fetchJSON<TObjectLayout>(
 				`/o/object-admin/v1.0/object-layouts/${objectLayoutId}`
 			);
 
-			const objectFields = await getObjectFields(objectDefinitionId);
+			const objectFields = await API.getObjectFields(objectDefinitionId);
 
-			const objectRelationships = await getObjectRelationships(
+			const objectRelationships = await API.getObjectRelationships(
 				objectDefinitionId
 			);
 
@@ -200,36 +195,20 @@ const Layout: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 			return;
 		}
 
-		const response = await fetch(
-			`/o/object-admin/v1.0/object-layouts/${objectLayoutId}`,
-			{
-				body: JSON.stringify(objectLayout),
-				headers: HEADERS,
-				method: 'PUT',
-			}
-		);
-
-		if (response.status === 401) {
-			window.location.reload();
-		}
-		else if (response.ok) {
+		try {
+			await API.save(
+				`/o/object-admin/v1.0/object-layouts/${objectLayoutId}`,
+				objectLayout
+			);
 			saveAndReload();
-
 			openToast({
 				message: Liferay.Language.get(
 					'the-object-layout-was-updated-successfully'
 				),
 			});
 		}
-		else {
-			const {
-				title = Liferay.Language.get('an-error-occurred'),
-			} = (await response.json()) as {title: any};
-
-			openToast({
-				message: title,
-				type: 'danger',
-			});
+		catch ({message}) {
+			openToast({message: message as string, type: 'danger'});
 		}
 	};
 

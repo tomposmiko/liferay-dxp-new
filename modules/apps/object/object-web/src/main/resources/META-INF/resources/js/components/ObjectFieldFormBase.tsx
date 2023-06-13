@@ -14,6 +14,7 @@
 
 import ClayForm, {ClayToggle} from '@clayui/form';
 import {
+	API,
 	AutoComplete,
 	FormCustomSelect,
 	FormError,
@@ -32,18 +33,12 @@ import React, {
 	useState,
 } from 'react';
 
-import {
-	getObjectFields,
-	getObjectRelationships,
-	getPickListItems,
-	getPickLists,
-} from '../utils/api';
 import {normalizeFieldSettings} from '../utils/fieldSettings';
-import {defaultLanguageId} from '../utils/locale';
 import {toCamelCase} from '../utils/string';
 
 import './ObjectFieldFormBase.scss';
 
+const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
 const REQUIRED_MSG = Liferay.Language.get('required');
 
 const attachmentSources = [
@@ -122,10 +117,10 @@ export default function ObjectFieldFormBase({
 
 	useEffect(() => {
 		if (values.businessType === 'Picklist') {
-			getPickLists().then(setPickLists);
+			API.getPickLists().then(setPickLists);
 
 			if (values.state) {
-				getPickListItems(values.listTypeDefinitionId!).then(
+				API.getPickListItems(values.listTypeDefinitionId!).then(
 					setPickListItems
 				);
 			}
@@ -140,7 +135,7 @@ export default function ObjectFieldFormBase({
 
 	const handleTypeChange = async (option: ObjectFieldType) => {
 		if (option.businessType === 'Picklist') {
-			setPickLists(await getPickLists());
+			setPickLists(await API.getPickLists());
 		}
 
 		let objectFieldSettings: ObjectFieldSetting[] | undefined;
@@ -315,7 +310,7 @@ export default function ObjectFieldFormBase({
 								if (state) {
 									setValues({required: state, state});
 									setPickListItems(
-										await getPickListItems(
+										await API.getPickListItems(
 											values.listTypeDefinitionId!
 										)
 									);
@@ -430,14 +425,16 @@ export function useObjectFieldForm({
 			errors.businessType = REQUIRED_MSG;
 		}
 		else if (field.businessType === 'Aggregation') {
-			if (!settings.relationship) {
-				errors.relationship = REQUIRED_MSG;
-			}
 			if (!settings.function) {
 				errors.function = REQUIRED_MSG;
 			}
-			if (settings.function !== 'COUNT' && !settings.summarizeField) {
-				errors.summarizeField = REQUIRED_MSG;
+
+			if (settings.function !== 'COUNT' && !settings.objectFieldName) {
+				errors.objectFieldName = REQUIRED_MSG;
+			}
+
+			if (!settings.objectRelationshipName) {
+				errors.objectRelationshipName = REQUIRED_MSG;
 			}
 		}
 		else if (field.businessType === 'Attachment') {
@@ -564,7 +561,7 @@ function AggregationSourceProperty({
 	useEffect(() => {
 		const makeFetch = async () => {
 			setObjectRelationships(
-				await getObjectRelationships(objectDefinitionId)
+				await API.getObjectRelationships(objectDefinitionId)
 			);
 		};
 
@@ -578,7 +575,7 @@ function AggregationSourceProperty({
 
 				const currentRelatedObjectRelationship = objectRelationships.find(
 					(relationship) =>
-						relationship.name === settings.relationship
+						relationship.name === settings.objectRelationshipName
 				) as ObjectRelationship;
 
 				const currentFunction = aggregationFunctions.find(
@@ -586,13 +583,13 @@ function AggregationSourceProperty({
 						aggregationFunction.value === settings.function
 				);
 
-				const relatedFields = await getObjectFields(
+				const relatedFields = await API.getObjectFields(
 					currentRelatedObjectRelationship.objectDefinitionId2
 				);
 
 				const currentSummarizeField = relatedFields.find(
 					(relatedField) =>
-						relatedField.name === settings.summarizeField
+						relatedField.name === settings.objectFieldName
 				) as ObjectField;
 
 				if (onRelationshipChange) {
@@ -639,7 +636,7 @@ function AggregationSourceProperty({
 		setSelectRelatedObjectRelationship(objectRelationship);
 		setSelectedSummarizeField('');
 
-		const relatedFields = await getObjectFields(
+		const relatedFields = await API.getObjectFields(
 			objectRelationship.objectDefinitionId2
 		);
 
@@ -655,15 +652,15 @@ function AggregationSourceProperty({
 
 		const fieldSettingWithoutSummarizeField = objectFieldSettings.filter(
 			(fieldSettings) =>
-				fieldSettings.name !== 'summarizeField' &&
+				fieldSettings.name !== 'objectFieldName' &&
 				fieldSettings.name !== 'filters' &&
-				fieldSettings.name !== 'relationship'
+				fieldSettings.name !== 'objectRelationshipName'
 		);
 
 		const newObjectFieldSettings: ObjectFieldSetting[] | undefined = [
 			...fieldSettingWithoutSummarizeField,
 			{
-				name: 'relationship',
+				name: 'objectRelationshipName',
 				value: objectRelationship.name,
 			},
 			{
@@ -700,7 +697,7 @@ function AggregationSourceProperty({
 			setSelectedSummarizeField('');
 
 			const fieldSettingWithoutSummarizeField = objectFieldSettings.filter(
-				(fieldSettings) => fieldSettings.name !== 'summarizeField'
+				(fieldSettings) => fieldSettings.name !== 'objectFieldName'
 			);
 
 			newObjectFieldSettings = [
@@ -740,10 +737,10 @@ function AggregationSourceProperty({
 
 		const newObjectFieldSettings: ObjectFieldSetting[] | undefined = [
 			...objectFieldSettings.filter(
-				(fieldSettings) => fieldSettings.name !== 'summarizeField'
+				(fieldSettings) => fieldSettings.name !== 'objectFieldName'
 			),
 			{
-				name: 'summarizeField',
+				name: 'objectFieldName',
 				value: objectField.name as string,
 			},
 		];
@@ -759,7 +756,7 @@ function AggregationSourceProperty({
 				emptyStateMessage={Liferay.Language.get(
 					'no-relationships-were-found'
 				)}
-				error={errors.relationship}
+				error={errors.objectRelationshipName}
 				items={objectRelationships ?? []}
 				label={Liferay.Language.get('relationship')}
 				onChangeQuery={setQuery}
@@ -794,9 +791,9 @@ function AggregationSourceProperty({
 					emptyStateMessage={Liferay.Language.get(
 						'no-fields-were-found'
 					)}
-					error={errors.summarizeField}
+					error={errors.objectFieldName}
 					items={objectRelationshipFields ?? []}
-					label={Liferay.Language.get('summarize-field')}
+					label={Liferay.Language.get('field')}
 					onChangeQuery={setQuery}
 					onSelectItem={(item: ObjectField) => {
 						handleSummarizeFieldChange(item);

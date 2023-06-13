@@ -55,7 +55,37 @@ export declare function normalizeFieldSettings(
 				objectStates: ObjectState[];
 		  }
 		| undefined;
+	filters?:
+		| string
+		| number
+		| boolean
+		| ObjectFieldFilterSetting[]
+		| {
+				id: number;
+				objectStates: ObjectState[];
+		  }
+		| undefined;
 	maximumFileSize?:
+		| string
+		| number
+		| boolean
+		| ObjectFieldFilterSetting[]
+		| {
+				id: number;
+				objectStates: ObjectState[];
+		  }
+		| undefined;
+	objectFieldName?:
+		| string
+		| number
+		| boolean
+		| ObjectFieldFilterSetting[]
+		| {
+				id: number;
+				objectStates: ObjectState[];
+		  }
+		| undefined;
+	objectRelationshipName?:
 		| string
 		| number
 		| boolean
@@ -85,47 +115,17 @@ export declare function normalizeFieldSettings(
 				objectStates: ObjectState[];
 		  }
 		| undefined;
-	storageDLFolderPath?:
-		| string
-		| number
-		| boolean
-		| ObjectFieldFilterSetting[]
-		| {
-				id: number;
-				objectStates: ObjectState[];
-		  }
-		| undefined;
-	relationship?:
-		| string
-		| number
-		| boolean
-		| ObjectFieldFilterSetting[]
-		| {
-				id: number;
-				objectStates: ObjectState[];
-		  }
-		| undefined;
-	summarizeField?:
-		| string
-		| number
-		| boolean
-		| ObjectFieldFilterSetting[]
-		| {
-				id: number;
-				objectStates: ObjectState[];
-		  }
-		| undefined;
-	filters?:
-		| string
-		| number
-		| boolean
-		| ObjectFieldFilterSetting[]
-		| {
-				id: number;
-				objectStates: ObjectState[];
-		  }
-		| undefined;
 	stateFlow?:
+		| string
+		| number
+		| boolean
+		| ObjectFieldFilterSetting[]
+		| {
+				id: number;
+				objectStates: ObjectState[];
+		  }
+		| undefined;
+	storageDLFolderPath?:
 		| string
 		| number
 		| boolean

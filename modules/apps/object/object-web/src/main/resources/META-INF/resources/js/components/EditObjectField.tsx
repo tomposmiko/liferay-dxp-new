@@ -15,6 +15,7 @@
 import ClayForm, {ClayRadio, ClayRadioGroup, ClayToggle} from '@clayui/form';
 import {useModal} from '@clayui/modal';
 import {
+	API,
 	BuilderScreen,
 	Card,
 	Input,
@@ -36,7 +37,6 @@ import {
 	normalizeFieldSettings,
 	updateFieldSettings,
 } from '../utils/fieldSettings';
-import {defaultLanguageId, defaultLocale} from '../utils/locale';
 import {ModalAddFilter} from './ModalAddFilter';
 import ObjectFieldFormBase, {
 	ObjectFieldErrors,
@@ -45,18 +45,9 @@ import ObjectFieldFormBase, {
 
 import './EditObjectField.scss';
 
-const locales: {label: string; symbol: string}[] = [];
-const languageLabels: string[] = [];
-const languages = Liferay.Language.available as LocalizedValue<string>;
-
-Object.entries(languages).forEach(([languageId, label]) => {
-	locales.push({
-		label: languageId,
-		symbol: languageId.replace('_', '-').toLocaleLowerCase(),
-	});
-
-	languageLabels.push(label);
-});
+const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
+const languages = Liferay.Language.available;
+const languageLabels = Object.values(languages);
 
 export default function EditObjectField({
 	forbiddenChars,
@@ -69,6 +60,7 @@ export default function EditObjectField({
 	objectFieldTypes,
 	objectName,
 	readOnly,
+	workflowStatusJSONArray,
 }: IProps) {
 	const [editingObjectFieldName, setEditingObjectFieldName] = useState('');
 	const [editingFilter, setEditingFilter] = useState(false);
@@ -107,9 +99,7 @@ export default function EditObjectField({
 			});
 		}
 		else {
-			const error = (await response.json()) as
-				| {type?: string}
-				| undefined;
+			const error: {type?: string} | undefined = await response.json();
 
 			const message =
 				(error?.type && ERRORS[error.type]) ??
@@ -138,13 +128,6 @@ export default function EditObjectField({
 		isApproved ||
 		values.relationshipType ||
 		values.system
-	);
-
-	const [locale, setSelectedLocale] = useState(
-		defaultLocale as {
-			label: string;
-			symbol: string;
-		}
 	);
 
 	const handleSettingsChange = ({name, value}: ObjectFieldSetting) =>
@@ -341,26 +324,7 @@ export default function EditObjectField({
 
 	useEffect(() => {
 		if (values.businessType === 'Aggregation' && objectDefinitionId2) {
-			const makeFetch = async () => {
-				const response = await fetch(
-					`/o/object-admin/v1.0/object-definitions/${objectDefinitionId2}/object-fields`,
-					{
-						headers: HEADERS,
-					}
-				);
-
-				const {
-					items: objectFields,
-				}: {
-					items: ObjectField[];
-				} = (await response.json()) as {
-					items: ObjectField[];
-				};
-
-				setObjectFields(objectFields);
-			};
-
-			makeFetch();
+			API.getObjectFields(objectDefinitionId2).then(setObjectFields);
 		}
 	}, [values.businessType, objectDefinitionId2]);
 
@@ -465,6 +429,36 @@ export default function EditObjectField({
 								return picklistAggregationFilter;
 							}
 
+							if (objectField.name === 'status') {
+								const statusFilterValues: number[] =
+
+									// @ts-ignore
+
+									parsedFilter.json[filterType];
+
+								const workflowStatusValueList = statusFilterValues.map(
+									(statusValue) => {
+										const currentStatus = workflowStatusJSONArray.find(
+											(workflowStatus) =>
+												Number(workflowStatus.value) ===
+												statusValue
+										);
+
+										return {
+											label: currentStatus?.label,
+											value: currentStatus?.label,
+										};
+									}
+								);
+
+								const statusAggregationFilter: AggregationFilters = {
+									...aggregationFilter,
+									valueList: workflowStatusValueList as LabelValueObject[],
+								};
+
+								return statusAggregationFilter;
+							}
+
 							return aggregationFilter;
 						}
 					}
@@ -492,7 +486,6 @@ export default function EditObjectField({
 		>
 			<Card title={Liferay.Language.get('basic-info')}>
 				<InputLocalized
-					defaultLanguageId={defaultLanguageId}
 					disabled={
 						values.system && objectName !== 'AccountEntry'
 							? disabled
@@ -500,11 +493,8 @@ export default function EditObjectField({
 					}
 					error={errors.label}
 					label={Liferay.Language.get('label')}
-					locales={locales}
-					onSelectedLocaleChange={setSelectedLocale}
-					onTranslationsChange={(label) => setValues({label})}
+					onChange={(label) => setValues({label})}
 					required
-					selectedLocale={locale}
 					translations={values.label as LocalizedValue<string>}
 				/>
 
@@ -586,10 +576,11 @@ export default function EditObjectField({
 					objectFields={
 						objectFields?.filter((objectField) => {
 							if (
-								objectField.businessType === 'Picklist' ||
+								objectField.businessType === 'Date' ||
 								objectField.businessType === 'Integer' ||
 								objectField.businessType === 'LongInteger' ||
-								objectField.businessType === 'Date'
+								objectField.businessType === 'Picklist' ||
+								objectField.name === 'status'
 							) {
 								return objectField;
 							}
@@ -598,7 +589,7 @@ export default function EditObjectField({
 					observer={observer}
 					onClose={onClose}
 					onSave={handleSaveFilterColumn}
-					workflowStatusJSONArray={[]}
+					workflowStatusJSONArray={workflowStatusJSONArray}
 				/>
 			)}
 
@@ -641,14 +632,12 @@ function SearchableContainer({
 			objectField.businessType === 'Attachment') &&
 		objectField.businessType !== 'Aggregation';
 
-	const selectedLanguage = useMemo(() => {
-		const selectedLabel =
+	const selectedLanguageIndex = useMemo(() => {
+		const label =
 			objectField.indexedLanguageId &&
 			languages[objectField.indexedLanguageId];
 
-		return selectedLabel
-			? languageLabels.indexOf(selectedLabel)
-			: undefined;
+		return label ? languageLabels.indexOf(label) : undefined;
 	}, [objectField.indexedLanguageId]);
 
 	return (
@@ -701,8 +690,11 @@ function SearchableContainer({
 					disabled={disabled}
 					label={Liferay.Language.get('language')}
 					name="indexedLanguageId"
-					onChange={({target: {value}}: any) => {
-						const selectedLabel = languageLabels[value];
+					onChange={({target: {value}}) => {
+						const selectedLabel =
+							languageLabels[
+								value as keyof typeof languageLabels
+							];
 						const [indexedLanguageId] = Object.entries(
 							languages
 						).find(([, label]) => selectedLabel === label) as [
@@ -713,7 +705,7 @@ function SearchableContainer({
 					}}
 					options={languageLabels}
 					required
-					value={selectedLanguage}
+					value={selectedLanguageIndex}
 				/>
 			)}
 		</Card>
@@ -923,6 +915,7 @@ interface IProps {
 	objectFieldTypes: ObjectFieldType[];
 	objectName: string;
 	readOnly: boolean;
+	workflowStatusJSONArray: LabelValueObject[];
 }
 
 interface ISearchableProps {

@@ -75,7 +75,7 @@ if (ListUtil.isEmpty(kbFolders) && ListUtil.isEmpty(kbArticles)) {
 		</div>
 
 		<%
-		KBAdminNavigationDisplayContext kbAdminNavigationDisplayContext = new KBAdminNavigationDisplayContext(request, liferayPortletResponse);
+		KBAdminNavigationDisplayContext kbAdminNavigationDisplayContext = new KBAdminNavigationDisplayContext(request, renderRequest, renderResponse);
 		%>
 
 		<clay:navigation-bar
@@ -201,7 +201,7 @@ if (ListUtil.isEmpty(kbFolders) && ListUtil.isEmpty(kbArticles)) {
 
 			<liferay-ui:section>
 				<div class="sidebar-body">
-					<liferay-util:include page="/admin/common/article_history.jsp" servletContext="<%= application %>" />
+					<liferay-util:include page="/admin/common/kb_article_history.jsp" servletContext="<%= application %>" />
 				</div>
 			</liferay-ui:section>
 		</liferay-ui:tabs>
@@ -216,7 +216,7 @@ if (ListUtil.isEmpty(kbFolders) && ListUtil.isEmpty(kbArticles)) {
 		</div>
 
 		<%
-		KBAdminNavigationDisplayContext kbAdminNavigationDisplayContext = new KBAdminNavigationDisplayContext(request, liferayPortletResponse);
+		KBAdminNavigationDisplayContext kbAdminNavigationDisplayContext = new KBAdminNavigationDisplayContext(request, renderRequest, renderResponse);
 		%>
 
 		<clay:navigation-bar

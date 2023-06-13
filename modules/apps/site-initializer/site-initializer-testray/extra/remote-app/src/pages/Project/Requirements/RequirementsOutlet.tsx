@@ -12,7 +12,6 @@
  * details.
  */
 
-import {useQuery} from '@apollo/client';
 import {useEffect} from 'react';
 import {
 	Outlet,
@@ -22,13 +21,14 @@ import {
 } from 'react-router-dom';
 
 import Loading from '../../../components/Loading';
+import {useHeader} from '../../../hooks';
+import {useFetch} from '../../../hooks/useFetch';
+import i18n from '../../../i18n';
 import {
 	TestrayProject,
-	TestrayRequirement,
-	getRequirement,
-} from '../../../graphql/queries';
-import {useHeader} from '../../../hooks';
-import i18n from '../../../i18n';
+	getRequirementQuery,
+	getRequirementTransformData,
+} from '../../../services/rest';
 
 const RequirementsOutlet = () => {
 	const {
@@ -38,16 +38,10 @@ const RequirementsOutlet = () => {
 	const {pathname} = useLocation();
 	const basePath = `/project/${projectId}/cases/${caseId}`;
 
-	const {data, loading} = useQuery<{requirement: TestrayRequirement}>(
-		getRequirement,
-		{
-			variables: {
-				requirementId,
-			},
-		}
+	const {data: testrayRequirement, loading} = useFetch(
+		getRequirementQuery(requirementId),
+		getRequirementTransformData
 	);
-
-	const testrayRequirement = data?.requirement;
 
 	const {setHeading, setTabs} = useHeader({
 		shouldUpdate: false,

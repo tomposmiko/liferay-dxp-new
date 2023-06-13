@@ -14,15 +14,13 @@
 
 import ClayButton from '@clayui/button';
 import {useNavigate} from 'react-router-dom';
+import {KeyedMutator} from 'swr';
 
-import {
-	TestrayCaseResult,
-	UserAccount,
-} from '../../../../../../graphql/queries';
 import useAssignCaseResult from '../../../../../../hooks/useAssignCaseResult';
 import useFormModal from '../../../../../../hooks/useFormModal';
 import i18n from '../../../../../../i18n';
 import {Liferay} from '../../../../../../services/liferay';
+import {TestrayCaseResult, UserAccount} from '../../../../../../services/rest';
 import {TEST_STATUS} from '../../../../../../util/constants';
 import CaseResultAssignModal from './CaseResultAssignModal';
 
@@ -30,13 +28,17 @@ const userId = Number(Liferay.ThemeDisplay.getUserId());
 
 const CaseResultHeaderActions: React.FC<{
 	caseResult: TestrayCaseResult;
-	refetch: () => void;
-}> = ({caseResult, refetch}) => {
-	const {onAssignTo, onAssignToMe, onRemoveAssign} = useAssignCaseResult();
+	mutateCaseResult: KeyedMutator<any>;
+}> = ({caseResult, mutateCaseResult}) => {
+	const {
+		onAssignToFetch,
+		onAssignToMeFetch,
+		onRemoveAssignFetch,
+	} = useAssignCaseResult(mutateCaseResult);
 	const {modal} = useFormModal({
-		onSave: (user: UserAccount) =>
-			onAssignTo(caseResult, user.id).then(refetch),
+		onSave: (user: UserAccount) => onAssignToFetch(caseResult, user.id),
 	});
+
 	const navigate = useNavigate();
 
 	const assignedUserId = caseResult.user?.id || 0;
@@ -79,10 +81,10 @@ const CaseResultHeaderActions: React.FC<{
 					displayType="secondary"
 					onClick={() => {
 						const assignFN = isCaseResultAssignedToMe
-							? onRemoveAssign
-							: onAssignToMe;
+							? onRemoveAssignFetch
+							: onAssignToMeFetch;
 
-						assignFN(caseResult).then(refetch);
+						assignFN(caseResult);
 					}}
 				>
 					{i18n.translate(
@@ -116,7 +118,7 @@ const CaseResultHeaderActions: React.FC<{
 					displayType={
 						buttonValidations.reopenTest ? 'unstyled' : 'primary'
 					}
-					onClick={() => onAssignToMe(caseResult).then(refetch)}
+					onClick={() => onAssignToMeFetch(caseResult)}
 				>
 					{i18n.translate('reopen-test')}
 				</ClayButton>
@@ -136,7 +138,7 @@ const CaseResultHeaderActions: React.FC<{
 				{caseResult.dueStatus === TEST_STATUS['In Progress'] && (
 					<ClayButton
 						displayType="secondary"
-						onClick={() => onRemoveAssign(caseResult).then(refetch)}
+						onClick={() => onRemoveAssignFetch(caseResult)}
 					>
 						{i18n.translate('reset-test')}
 					</ClayButton>

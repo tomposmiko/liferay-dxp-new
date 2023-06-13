@@ -70,7 +70,8 @@ export function ColorPicker({
 }) {
 	const activeItemId = useActiveItemId();
 	const colors = {};
-	const id = useId();
+	const inputId = useId();
+	const labelId = useId();
 	const deleteStyleError = useDeleteStyleError();
 	const setStyleError = useSetStyleError();
 	const styleErrors = useStyleErrors();
@@ -257,11 +258,12 @@ export function ColorPicker({
 
 	return (
 		<ClayForm.Group small>
-			<label className={classNames({'sr-only': !showLabel})}>
+			<label className={classNames({'sr-only': !showLabel})} id={labelId}>
 				{field.label}
 			</label>
 
 			<ClayInput.Group
+				aria-labelledby={labelId}
 				className={classNames('page-editor__color-picker', {
 					'has-error': error.value,
 					'hovered':
@@ -331,11 +333,12 @@ export function ColorPicker({
 								<FocusScope>
 									<ClayAutocomplete>
 										<ClayAutocomplete.Input
+											aria-autocomplete="list"
+											aria-controls={`${inputId}_listbox`}
 											aria-expanded={activeAutocomplete}
 											aria-invalid={error.label}
-											aria-owns={`${id}_listbox`}
 											className="page-editor__color-picker__autocomplete__input"
-											id={id}
+											id={inputId}
 											onBlur={(event) => {
 												if (!activeAutocomplete) {
 													onBlurAutocompleteInput(
@@ -367,7 +370,7 @@ export function ColorPicker({
 										>
 											<ul
 												className="list-unstyled"
-												id={`${id}_listbox`}
+												id={`${inputId}_listbox`}
 												ref={listboxRef}
 												role="listbox"
 											>
@@ -394,7 +397,7 @@ export function ColorPicker({
 															) =>
 																event.preventDefault()
 															}
-															roleItem="option"
+															role="option"
 															value={token.label}
 														/>
 													)

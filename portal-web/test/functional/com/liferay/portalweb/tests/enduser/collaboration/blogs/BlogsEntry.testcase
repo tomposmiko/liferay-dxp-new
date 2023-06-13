@@ -867,7 +867,9 @@ definition {
 			locator1 = "build-test.xml",
 			value1 = "rebuild-database -Ddatabase.type=mysql -Dsql.dir=sql/create-bare/ -Dsql.file=create-bare-mysql.sql");
 
-		Portlet.startServer();
+		Portlet.startServer(
+			deleteLiferayHome = "false",
+			keepOsGiState = "true");
 
 		Navigator.openURL();
 
@@ -967,7 +969,9 @@ definition {
 			locator1 = "build-test.xml",
 			value1 = "rebuild-database -Ddatabase.type=mysql -Dsql.dir=sql/create-bare/ -Dsql.file=create-bare-mysql.sql");
 
-		Portlet.startServer();
+		Portlet.startServer(
+			deleteLiferayHome = "false",
+			keepOsGiState = "true");
 
 		Navigator.openURL();
 
@@ -1552,6 +1556,8 @@ definition {
 	@description = "This ensures that an external video in the Blogs content field can be rendered correctly after moving it to a folder."
 	@priority = "4"
 	test CanViewInlineVideoAfterMovingToFolder {
+		property portal.acceptance = "false";
+
 		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
 		VideoShortcut.addCP(
@@ -1640,6 +1646,39 @@ definition {
 			embedVideo = "true",
 			entryContent = "Blogs Entry Content Edit",
 			entryTitle = "Blogs Entry Title");
+	}
+
+	@description = "This checks that an external video embedded in a blog content can be played correctly."
+	@priority = "3"
+	test ExternalVideoEmbeddedInBlogContentFieldCanBePlayed {
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Blogs Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Guest",
+			layoutName = "Blogs Page",
+			widgetName = "Blogs");
+
+		Navigator.gotoPage(pageName = "Blogs Page");
+
+		Blogs.addEntry(
+			embedVideo = "https://www.youtube.com/watch?v=2EPZxIC5ogU",
+			entryContent = "video",
+			entryTitle = "Blogs Entry Title",
+			navTab = "URL",
+			videoService = "youtube");
+
+		BlogsNavigator.openToBlogEntry(
+			entryTitle = "Blogs Entry Title",
+			layoutName = "Blogs Page",
+			siteURLKey = "guest");
+
+		YoutubePortlet.playEmbeddedVideo(
+			progressBarInitialization = "0 Minutes 0 Seconds of 0 Minutes 0 Seconds",
+			videoDuration = "3 Minutes 30 Seconds",
+			videoPlayNode = "0 Minutes 10 Seconds of 3 Minutes 30 Seconds");
 	}
 
 	@description = "This is a test for LPS-90966. It checks that the caption link will keep persisting."

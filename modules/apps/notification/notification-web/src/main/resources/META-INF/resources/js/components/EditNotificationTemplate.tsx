@@ -16,6 +16,7 @@ import ClayButton from '@clayui/button';
 import ClayForm from '@clayui/form';
 import ClayManagementToolbar from '@clayui/management-toolbar';
 import {
+	API,
 	Card,
 	FormCustomSelect,
 	Input,
@@ -27,11 +28,6 @@ import {
 import {fetch} from 'frontend-js-web';
 import React, {useEffect, useState} from 'react';
 
-import {
-	availableLocales,
-	defaultLanguageId,
-	defaultLocale,
-} from '../utils/locale';
 import {Attachments} from './Attachments';
 import {DefinitionOfTerms} from './DefinitionOfTerms';
 
@@ -41,6 +37,8 @@ const HEADERS = new Headers({
 	'Accept': 'application/json',
 	'Content-Type': 'application/json',
 });
+
+const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
 
 export default function EditNotificationTemplate({
 	baseResourceURL,
@@ -70,10 +68,7 @@ export default function EditNotificationTemplate({
 	};
 
 	const [selectedLocale, setSelectedLocale] = useState(
-		defaultLocale as {
-			label: string;
-			symbol: string;
-		}
+		Liferay.ThemeDisplay.getDefaultLanguageId
 	);
 
 	const validate = (values: any) => {
@@ -149,16 +144,8 @@ export default function EditNotificationTemplate({
 
 	useEffect(() => {
 		if (notificationTemplateId !== 0) {
-			const makeFetch = async () => {
-				const response = await fetch(
-					`/o/notification/v1.0/notification-templates/${notificationTemplateId}`,
-					{
-						headers: HEADERS,
-						method: 'GET',
-					}
-				);
-
-				const {
+			API.getNotificationTemplate(notificationTemplateId).then(
+				({
 					attachmentObjectFieldIds,
 					bcc,
 					body,
@@ -170,25 +157,22 @@ export default function EditNotificationTemplate({
 					objectDefinitionId,
 					subject,
 					to,
-				} = (await response.json()) as TNotificationTemplate;
-
-				setValues({
-					...values,
-					attachmentObjectFieldIds,
-					bcc,
-					body,
-					cc,
-					description,
-					from,
-					fromName,
-					name,
-					objectDefinitionId,
-					subject,
-					to,
-				});
-			};
-
-			makeFetch();
+				}) =>
+					setValues({
+						...values,
+						attachmentObjectFieldIds,
+						bcc,
+						body,
+						cc,
+						description,
+						from,
+						fromName,
+						name,
+						objectDefinitionId,
+						subject,
+						to,
+					})
+			);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [notificationTemplateId]);
@@ -259,12 +243,9 @@ export default function EditNotificationTemplate({
 						<div className="col-lg-6 lfr__notification-template-card">
 							<Card title={Liferay.Language.get('settings')}>
 								<InputLocalized
-									defaultLanguageId={defaultLanguageId}
 									label={Liferay.Language.get('to')}
-									locales={availableLocales}
 									name="to"
-									onSelectedLocaleChange={setSelectedLocale}
-									onTranslationsChange={(translation) => {
+									onChange={(translation) => {
 										setValues({
 											...values,
 											to: translation,
@@ -325,21 +306,12 @@ export default function EditNotificationTemplate({
 
 									<div className="col-lg-6">
 										<InputLocalized
-											defaultLanguageId={
-												defaultLanguageId
-											}
 											error={errors.fromName}
 											label={Liferay.Language.get(
 												'from-name'
 											)}
-											locales={availableLocales}
 											name="fromName"
-											onSelectedLocaleChange={
-												setSelectedLocale
-											}
-											onTranslationsChange={(
-												translation
-											) => {
+											onChange={(translation) => {
 												setValues({
 													...values,
 													fromName: translation,
@@ -357,12 +329,9 @@ export default function EditNotificationTemplate({
 
 					<Card title={Liferay.Language.get('content')}>
 						<InputLocalized
-							defaultLanguageId={defaultLanguageId}
 							label={Liferay.Language.get('subject')}
-							locales={availableLocales}
 							name="subject"
-							onSelectedLocaleChange={setSelectedLocale}
-							onTranslationsChange={(translation) => {
+							onChange={(translation) => {
 								setValues({
 									...values,
 									subject: translation,
@@ -375,9 +344,10 @@ export default function EditNotificationTemplate({
 						<RichTextLocalized
 							editorConfig={editorConfig}
 							label={Liferay.Language.get('body')}
-							locales={availableLocales}
 							name="body"
-							onSelectedLocaleChange={setSelectedLocale}
+							onSelectedLocaleChange={({label}) =>
+								setSelectedLocale(label)
+							}
 							onTranslationsChange={(translation) => {
 								setValues({
 									...values,

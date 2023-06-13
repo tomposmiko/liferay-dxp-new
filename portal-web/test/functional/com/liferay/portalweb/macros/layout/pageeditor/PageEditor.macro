@@ -349,7 +349,8 @@ definition {
 							key_fragmentName = "${fragmentName}",
 							key_targetFragmentName = "${targetElementName}",
 							locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_TAB_FRAGMENT",
-							locator2 = "PageEditor#ANY_FRAGMENT_DROP_TARGET");
+							locator2 = "PageEditor#ANY_FRAGMENT_DROP_TARGET",
+							ratio = "${ratio}");
 					}
 					else {
 						DragAndDrop.javaScriptDragAndDropObjectBelowTallNestedObject(
@@ -358,7 +359,8 @@ definition {
 							key_fragmentName = "${fragmentName}",
 							key_targetFragmentName = "${targetElementName}",
 							locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_TAB_FRAGMENT",
-							locator2 = "PageEditor#ANY_FRAGMENT_DROP_TARGET");
+							locator2 = "PageEditor#ANY_FRAGMENT_DROP_TARGET",
+							ratio = "${ratio}");
 					}
 				}
 
@@ -1370,7 +1372,7 @@ definition {
 				ariaLabel = "Margin Bottom",
 				locator1 = "Button#ANY_WITH_ARIA_LABEL");
 
-			DropdownMenuItem.click(menuItem = "${marginBottom}");
+			DropdownMenuItem.click(menuItem = "Spacer ${marginBottom}");
 
 			PageEditor.waitForAutoSave();
 		}
@@ -1380,7 +1382,7 @@ definition {
 				ariaLabel = "Margin Left",
 				locator1 = "Button#ANY_WITH_ARIA_LABEL");
 
-			DropdownMenuItem.click(menuItem = "${marginLeft}");
+			DropdownMenuItem.click(menuItem = "Spacer ${marginLeft}");
 
 			PageEditor.waitForAutoSave();
 		}
@@ -1390,7 +1392,7 @@ definition {
 				ariaLabel = "Margin Right",
 				locator1 = "Button#ANY_WITH_ARIA_LABEL");
 
-			DropdownMenuItem.click(menuItem = "${marginRight}");
+			DropdownMenuItem.click(menuItem = "Spacer ${marginRight}");
 
 			PageEditor.waitForAutoSave();
 		}
@@ -1400,7 +1402,7 @@ definition {
 				ariaLabel = "Margin Top",
 				locator1 = "Button#ANY_WITH_ARIA_LABEL");
 
-			DropdownMenuItem.click(menuItem = "${marginTop}");
+			DropdownMenuItem.click(menuItem = "Spacer ${marginTop}");
 
 			PageEditor.waitForAutoSave();
 		}
@@ -1459,7 +1461,7 @@ definition {
 				ariaLabel = "Padding Bottom",
 				locator1 = "Button#ANY_WITH_ARIA_LABEL");
 
-			DropdownMenuItem.click(menuItem = "${paddingBottom}");
+			DropdownMenuItem.click(menuItem = "Spacer ${paddingBottom}");
 
 			PageEditor.waitForAutoSave();
 		}
@@ -1469,7 +1471,7 @@ definition {
 				ariaLabel = "Padding Left",
 				locator1 = "Button#ANY_WITH_ARIA_LABEL");
 
-			DropdownMenuItem.click(menuItem = "${paddingLeft}");
+			DropdownMenuItem.click(menuItem = "Spacer ${paddingLeft}");
 
 			PageEditor.waitForAutoSave();
 		}
@@ -1479,7 +1481,7 @@ definition {
 				ariaLabel = "Padding Right",
 				locator1 = "Button#ANY_WITH_ARIA_LABEL");
 
-			DropdownMenuItem.click(menuItem = "${paddingRight}");
+			DropdownMenuItem.click(menuItem = "Spacer ${paddingRight}");
 
 			PageEditor.waitForAutoSave();
 		}
@@ -1489,7 +1491,7 @@ definition {
 				ariaLabel = "Padding Top",
 				locator1 = "Button#ANY_WITH_ARIA_LABEL");
 
-			DropdownMenuItem.click(menuItem = "${paddingTop}");
+			DropdownMenuItem.click(menuItem = "Spacer ${paddingTop}");
 
 			PageEditor.waitForAutoSave();
 		}
@@ -1809,6 +1811,8 @@ definition {
 				NavItem.click(navItem = "Collections");
 
 				LexiconCard.clickCard(card = "${assetListName}");
+
+				SelectFrameTop();
 
 				PageEditor.viewItemSelectorText(
 					fieldLabel = "Collection",
@@ -2224,6 +2228,8 @@ definition {
 
 				LexiconCard.clickCard(card = "${entryTitle}");
 
+				SelectFrameTop();
+
 				PageEditor.viewItemSelectorText(
 					fieldLabel = "Item",
 					text = "${entryTitle}");
@@ -2280,6 +2286,8 @@ definition {
 					LexiconCard.clickCard(card = "${webContentTitle}");
 				}
 
+				SelectFrameTop();
+
 				PageEditor.viewItemSelectorText(
 					fieldLabel = "Item",
 					text = "${webContentTitle}");
@@ -2306,6 +2314,8 @@ definition {
 					value1 = "${template}");
 			}
 		}
+
+		SelectFrameTop();
 	}
 
 	macro editDropdown {
@@ -2620,6 +2630,8 @@ definition {
 
 			Button.clickAdd();
 		}
+
+		SelectFrameTop();
 
 		PageEditor.waitForAutoSave();
 
@@ -3054,6 +3066,20 @@ definition {
 					key_fieldLabel = "Height",
 					locator1 = "TextInput#BORDER_BOTTOM_INPUT_FIELD",
 					value1 = "${height}");
+
+				Click(
+					key_sidebarButton = "Browser",
+					locator1 = "PageEditor#FRAGMENT_SIDEBAR_TITLE");
+
+				PageEditor.waitForAutoSave();
+			}
+
+			if (isSet(width)) {
+				Type(
+					key_borderBottom = "Frame",
+					key_fieldLabel = "Width",
+					locator1 = "TextInput#BORDER_BOTTOM_INPUT_FIELD",
+					value1 = "${width}");
 
 				Click(
 					key_sidebarButton = "Browser",
@@ -3616,7 +3642,7 @@ return	Array.from(getWebElement("(//div[@aria-label='${fragmentName}'])[${index}
 	}
 
 	macro gotoCommentList {
-		Click.pauseClickAt(locator1 = "PageEditor#FRAGMENT_SIDEBAR_BACK");
+		Click(locator1 = "PageEditor#FRAGMENT_SIDEBAR_BACK");
 
 		AssertTextEquals(
 			locator1 = "PageEditor#FRAGMENT_SIDEBAR_COMMENT_LIST_TITLE",
@@ -3685,10 +3711,10 @@ return	Array.from(getWebElement("(//div[@aria-label='${fragmentName}'])[${index}
 		}
 
 		if ("${contributed}" == "false") {
-			DoubleClick(locator1 = "Fragment#EDITABLE_FIELD_ANY");
+			Click(locator1 = "Fragment#EDITABLE_FIELD_ANY");
 		}
 		else {
-			DoubleClick(locator1 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT");
+			Click(locator1 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT");
 		}
 	}
 
@@ -3709,6 +3735,33 @@ return	Array.from(getWebElement("(//div[@aria-label='${fragmentName}'])[${index}
 		LexiconEntry.gotoFragmentPageContentEllipsisMenuItem(
 			menuItem = "${menuItem}",
 			rowEntry = "${itemName}");
+	}
+
+	macro gotoEllipsisMenuItemInPageElementsPanel {
+		if (!(isSet(position))) {
+			var position = "1";
+		}
+
+		PageEditor.gotoTab(tabName = "Browser");
+
+		Navigator.gotoNavTab(navTab = "Page Elements");
+
+		if (IsElementNotPresent(key_nodeName = "${fragmentName}", locator1 = "Treeview#PAGE_STRUCTURE_TREE_NODE_ACTIVE")) {
+			Click(
+				key_nodeName = "${fragmentName}",
+				locator1 = "Treeview#PAGE_STRUCTURE_TREE_NODE");
+		}
+
+		Click.clickAtNotVisible(
+			key_index = "${position}",
+			key_nodeName = "${fragmentName}",
+			locator1 = "Treeview#PAGE_STRUCTURE_TREE_VERTICAL_ELLIPSIS");
+
+		MenuItem.click(menuItem = "${menuItem}");
+
+		if ("${menuItem}" != "Rename") {
+			PageEditor.waitForAutoSave();
+		}
 	}
 
 	macro gotoSaveAsFragment {
@@ -3817,6 +3870,12 @@ return	Array.from(getWebElement("(//div[@aria-label='${fragmentName}'])[${index}
 
 		Navigator.gotoNavTab(navTab = "Page Elements");
 
+		if (IsElementNotPresent(key_index = "${index}", key_nodeName = "${fragmentName}", locator1 = "Treeview#PAGE_STRUCTURE_TREE_NODE_INDEX")) {
+			Click(
+				key_nodeName = "",
+				locator1 = "Treeview#PAGE_STRUCTURE_TREE_NODE_COLLAPSED");
+		}
+
 		if (IsElementNotPresent(key_index = "${index}", key_nodeName = "${fragmentName}", locator1 = "Treeview#PAGE_STRUCTURE_TREE_NODE_ACTIVE_INDEX")) {
 			Click(
 				key_index = "${index}",
@@ -3896,28 +3955,6 @@ return	Array.from(getWebElement("(//div[@aria-label='${fragmentName}'])[${index}
 		Click.waitForMenuToggleJSClick(locator1 = "Fragment#FRAGMENT_HEADER_ELLIPSIS");
 
 		MenuItem.click(menuItem = "Delete");
-
-		if (!(isSet(duplicateFragment))) {
-			PageEditor.viewFragmentNotPresent(fragmentName = "${fragmentName}");
-		}
-
-		PageEditor.waitForAutoSave();
-	}
-
-	macro removeFragmentViaPageStructure {
-		PageEditor.gotoTab(tabName = "Browser");
-
-		Navigator.gotoNavTab(navTab = "Page Elements");
-
-		if (IsElementNotPresent(key_nodeName = "${fragmentName}", locator1 = "Treeview#PAGE_STRUCTURE_TREE_NODE_ACTIVE")) {
-			Click(
-				key_nodeName = "${fragmentName}",
-				locator1 = "Treeview#PAGE_STRUCTURE_TREE_NODE");
-		}
-
-		Click.clickNoWaitForVisible(
-			key_nodeName = "${fragmentName}",
-			locator1 = "Treeview#PAGE_STRUCTURE_TREE_NODE_DELETE");
 
 		if (!(isSet(duplicateFragment))) {
 			PageEditor.viewFragmentNotPresent(fragmentName = "${fragmentName}");
@@ -5049,6 +5086,8 @@ return	Array.from(getWebElement("(//div[@aria-label='${fragmentName}'])[${index}
 	}
 
 	macro viewItemSelectorText {
+		SelectFrameTop();
+
 		AssertTextEquals(
 			key_fieldLabel = "${fieldLabel}",
 			locator1 = "PageEditor#ITEM_SELECTOR_CONTENT_INPUT",
@@ -5100,6 +5139,8 @@ return	Array.from(getWebElement("(//div[@aria-label='${fragmentName}'])[${index}
 	}
 
 	macro waitForAutoSave {
+		SelectFrameTop();
+
 		WaitForElementNotPresent(locator1 = "PageEditor#DRAFT_SAVING_MESSAGE");
 
 		WaitForVisible(locator1 = "PageEditor#AUTOSAVE_MESSAGE");

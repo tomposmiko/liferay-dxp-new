@@ -13,6 +13,7 @@
  */
 
 import {
+	API,
 	FormCustomSelect,
 	FormError,
 	Input,
@@ -21,9 +22,6 @@ import {
 	useForm,
 } from '@liferay/object-js-components-web';
 import React, {useEffect, useMemo, useState} from 'react';
-
-import {getObjectDefinitions} from '../../utils/api';
-import {defaultLanguageId} from '../../utils/locale';
 
 export enum ObjectRelationshipType {
 	MANY_TO_MANY = 'manyToMany',
@@ -63,7 +61,8 @@ export function useObjectRelationshipForm({
 	const validate = (relationship: Partial<ObjectRelationship>) => {
 		const errors: FormError<ObjectRelationship> = {};
 
-		const label = relationship.label?.[defaultLanguageId];
+		const label =
+			relationship.label?.[Liferay.ThemeDisplay.getDefaultLanguageId()];
 
 		if (invalidateRequired(label)) {
 			errors.label = REQUIRED_MSG;
@@ -124,7 +123,7 @@ export function ObjectRelationshipFormBase({
 
 	useEffect(() => {
 		const fetchObjectDefinitions = async () => {
-			const items = await getObjectDefinitions();
+			const items = await API.getObjectDefinitions();
 
 			const currentObjectDefinition = items.find(
 				({id}) => values.objectDefinitionId1 === id

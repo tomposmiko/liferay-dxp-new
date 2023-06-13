@@ -12,24 +12,20 @@
  * details.
  */
 
-import {useQuery} from '@apollo/client';
 import {useForm} from 'react-hook-form';
 
 import Form from '../../../components/Form';
 import Modal from '../../../components/Modal';
-import {
-	CreateFactorOption,
-	UpdateFactorOption,
-} from '../../../graphql/mutations';
-import {
-	CTypePagination,
-	TestrayFactorCategory,
-	getFactorCategories,
-} from '../../../graphql/queries';
 import {withVisibleContent} from '../../../hoc/withVisibleContent';
+import {useFetch} from '../../../hooks/useFetch';
 import {FormModalOptions} from '../../../hooks/useFormModal';
 import i18n from '../../../i18n';
 import yupSchema, {yupResolver} from '../../../schema/yup';
+import {
+	createFactorOption,
+	getFactorOptionsTransformData,
+	updateFactorOption,
+} from '../../../services/rest';
 
 type FactorOptionsForm = {
 	factorCategoryId: string;
@@ -42,7 +38,7 @@ type FactorOptionsProps = {
 };
 
 const FactorOptionsFormModal: React.FC<FactorOptionsProps> = ({
-	modal: {modalState, observer, onClose, onSubmit},
+	modal: {modalState, observer, onClose, onError, onSave, onSubmit},
 }) => {
 	const {
 		formState: {errors},
@@ -53,20 +49,20 @@ const FactorOptionsFormModal: React.FC<FactorOptionsProps> = ({
 		resolver: yupResolver(yupSchema.factorOption),
 	});
 
-	const {data} = useQuery<
-		CTypePagination<'factorCategories', TestrayFactorCategory>
-	>(getFactorCategories);
+	const {data} = useFetch('/factoroptions', getFactorOptionsTransformData);
 
-	const factorCategories = data?.c.factorCategories.items || [];
+	const factorCategories = data?.items || [];
 
 	const _onSubmit = (form: FactorOptionsForm) => {
 		onSubmit(
 			{id: form.id, name: form.name},
 			{
-				createMutation: CreateFactorOption,
-				updateMutation: UpdateFactorOption,
+				create: createFactorOption,
+				update: updateFactorOption,
 			}
-		);
+		)
+			.then(onSave)
+			.catch(onError);
 	};
 
 	const inputProps = {

@@ -25,6 +25,7 @@ import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.deployer.ObjectDefinitionDeployer;
 import com.liferay.object.exception.NoSuchObjectFieldException;
+import com.liferay.object.exception.ObjectDefinitionAccountEntryRestrictedException;
 import com.liferay.object.exception.ObjectDefinitionAccountEntryRestrictedObjectFieldIdException;
 import com.liferay.object.exception.ObjectDefinitionActiveException;
 import com.liferay.object.exception.ObjectDefinitionLabelException;
@@ -73,7 +74,7 @@ import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dependency.manager.DependencyManagerSyncUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ResourceAction;
@@ -95,11 +96,13 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalRunMode;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.util.Validator;
@@ -776,7 +779,7 @@ public class ObjectDefinitionLocalServiceImpl
 			ObjectEntryTable.INSTANCE.userName.getName(), dbTableName,
 			ObjectFieldConstants.DB_TYPE_STRING, null, false, false, null,
 			LocalizedMapUtil.getLocalizedMap(
-				LanguageUtil.get(LocaleUtil.getDefault(), "author")),
+				_language.get(LocaleUtil.getDefault(), "author")),
 			"creator", false, false);
 
 		_objectFieldLocalService.addSystemObjectField(
@@ -785,7 +788,7 @@ public class ObjectDefinitionLocalServiceImpl
 			ObjectEntryTable.INSTANCE.createDate.getName(), dbTableName,
 			ObjectFieldConstants.DB_TYPE_DATE, null, false, false, null,
 			LocalizedMapUtil.getLocalizedMap(
-				LanguageUtil.get(LocaleUtil.getDefault(), "create-date")),
+				_language.get(LocaleUtil.getDefault(), "create-date")),
 			"createDate", false, false);
 
 		String dbColumnName = ObjectEntryTable.INSTANCE.objectEntryId.getName();
@@ -794,13 +797,28 @@ public class ObjectDefinitionLocalServiceImpl
 			dbColumnName = pkObjectFieldName;
 		}
 
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-158821")) &&
+			!objectDefinition.isSystem()) {
+
+			_objectFieldLocalService.addSystemObjectField(
+				userId, objectDefinition.getObjectDefinitionId(),
+				ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+				ObjectEntryTable.INSTANCE.externalReferenceCode.getName(),
+				ObjectEntryTable.INSTANCE.getTableName(),
+				ObjectFieldConstants.DB_TYPE_STRING, null, false, false, null,
+				LocalizedMapUtil.getLocalizedMap(
+					_language.get(
+						LocaleUtil.getDefault(), "external-reference-code")),
+				"externalReferenceCode", false, false);
+		}
+
 		_objectFieldLocalService.addSystemObjectField(
 			userId, objectDefinition.getObjectDefinitionId(),
 			ObjectFieldConstants.BUSINESS_TYPE_LONG_INTEGER, dbColumnName,
 			dbTableName, ObjectFieldConstants.DB_TYPE_LONG, null, false, false,
 			null,
 			LocalizedMapUtil.getLocalizedMap(
-				LanguageUtil.get(LocaleUtil.getDefault(), "id")),
+				_language.get(LocaleUtil.getDefault(), "id")),
 			"id", false, false);
 
 		_objectFieldLocalService.addSystemObjectField(
@@ -809,7 +827,7 @@ public class ObjectDefinitionLocalServiceImpl
 			ObjectEntryTable.INSTANCE.modifiedDate.getName(), dbTableName,
 			ObjectFieldConstants.DB_TYPE_DATE, null, false, false, null,
 			LocalizedMapUtil.getLocalizedMap(
-				LanguageUtil.get(LocaleUtil.getDefault(), "modified-date")),
+				_language.get(LocaleUtil.getDefault(), "modified-date")),
 			"modifiedDate", false, false);
 
 		_objectFieldLocalService.addSystemObjectField(
@@ -818,7 +836,7 @@ public class ObjectDefinitionLocalServiceImpl
 			ObjectEntryTable.INSTANCE.status.getName(), dbTableName,
 			ObjectFieldConstants.DB_TYPE_INTEGER, null, false, false, null,
 			LocalizedMapUtil.getLocalizedMap(
-				LanguageUtil.get(LocaleUtil.getDefault(), "status")),
+				_language.get(LocaleUtil.getDefault(), "status")),
 			"status", false, false);
 
 		if (objectFields != null) {
@@ -980,7 +998,7 @@ public class ObjectDefinitionLocalServiceImpl
 		for (LayoutClassedModelUsage layoutClassedModelUsage :
 				layoutClassedModelUsages) {
 
-			Set<Locale> availableLocales = LanguageUtil.getAvailableLocales(
+			Set<Locale> availableLocales = _language.getAvailableLocales(
 				layoutClassedModelUsage.getGroupId());
 
 			for (Locale locale : availableLocales) {
@@ -1026,7 +1044,8 @@ public class ObjectDefinitionLocalServiceImpl
 		boolean originalActive = objectDefinition.isActive();
 
 		_validateAccountEntryRestrictedObjectFieldId(
-			accountEntryRestrictedObjectFieldId, accountEntryRestricted);
+			accountEntryRestrictedObjectFieldId, accountEntryRestricted,
+			objectDefinition);
 		_validateObjectFieldId(objectDefinition, descriptionObjectFieldId);
 		_validateObjectFieldId(objectDefinition, titleObjectFieldId);
 		_validateActive(objectDefinition, active);
@@ -1149,13 +1168,25 @@ public class ObjectDefinitionLocalServiceImpl
 
 	private void _validateAccountEntryRestrictedObjectFieldId(
 			long accountEntryRestrictedObjectFieldId,
-			boolean accountEntryRestricted)
-		throws ObjectDefinitionAccountEntryRestrictedObjectFieldIdException {
+			boolean accountEntryRestricted, ObjectDefinition objectDefinition)
+		throws ObjectDefinitionAccountEntryRestrictedException,
+			   ObjectDefinitionAccountEntryRestrictedObjectFieldIdException {
 
 		if (accountEntryRestricted &&
 			(accountEntryRestrictedObjectFieldId == 0)) {
 
 			throw new ObjectDefinitionAccountEntryRestrictedObjectFieldIdException();
+		}
+
+		if (objectDefinition.isApproved() &&
+			((accountEntryRestricted !=
+				objectDefinition.isAccountEntryRestricted()) ||
+			 (accountEntryRestrictedObjectFieldId !=
+				 objectDefinition.getAccountEntryRestrictedObjectFieldId()))) {
+
+			throw new ObjectDefinitionAccountEntryRestrictedException(
+				"Account entry restrictions on approved object definitions " +
+					"cannot be changed");
 		}
 	}
 
@@ -1348,6 +1379,9 @@ public class ObjectDefinitionLocalServiceImpl
 
 	@Reference
 	private GroupLocalService _groupLocalService;
+
+	@Reference
+	private Language _language;
 
 	@Reference
 	private LayoutClassedModelUsageLocalService

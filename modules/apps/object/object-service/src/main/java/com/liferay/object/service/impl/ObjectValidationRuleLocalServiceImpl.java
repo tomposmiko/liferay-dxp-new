@@ -22,12 +22,13 @@ import com.liferay.object.exception.ObjectValidationRuleNameException;
 import com.liferay.object.exception.ObjectValidationRuleScriptException;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectValidationRule;
+import com.liferay.object.scripting.exception.ObjectScriptingException;
+import com.liferay.object.scripting.validator.ObjectScriptingValidator;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.base.ObjectValidationRuleLocalServiceBaseImpl;
 import com.liferay.object.validation.rule.ObjectValidationRuleEngine;
 import com.liferay.object.validation.rule.ObjectValidationRuleEngineTracker;
 import com.liferay.portal.aop.AopService;
-import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -38,12 +39,11 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
+import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Validator;
-
-import groovy.lang.GroovyShell;
 
 import java.io.Serializable;
 
@@ -182,8 +182,8 @@ public class ObjectValidationRuleLocalServiceImpl
 		return objectValidationRulePersistence.update(objectValidationRule);
 	}
 
-	@CTAware(onProduction = true)
 	@Override
+	@Transactional(readOnly = true)
 	public void validate(BaseModel<?> baseModel, long objectDefinitionId)
 		throws PortalException {
 
@@ -278,14 +278,20 @@ public class ObjectValidationRuleLocalServiceImpl
 						engine,
 						ObjectValidationRuleConstants.ENGINE_TYPE_GROOVY)) {
 
-				GroovyShell groovyShell = new GroovyShell();
-
-				groovyShell.parse(script);
+				_objectScriptingValidator.validate("groovy", script);
 			}
 		}
-		catch (Exception exception) {
+		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(exception);
+				_log.debug(portalException);
+			}
+
+			if (portalException instanceof ObjectScriptingException) {
+				ObjectScriptingException objectScriptingException =
+					(ObjectScriptingException)portalException;
+
+				throw new ObjectValidationRuleScriptException(
+					objectScriptingException.getMessageKey());
 			}
 
 			throw new ObjectValidationRuleScriptException("syntax-error");
@@ -300,6 +306,9 @@ public class ObjectValidationRuleLocalServiceImpl
 
 	@Reference
 	private ObjectEntryLocalService _objectEntryLocalService;
+
+	@Reference
+	private ObjectScriptingValidator _objectScriptingValidator;
 
 	@Reference
 	private ObjectValidationRuleEngineTracker

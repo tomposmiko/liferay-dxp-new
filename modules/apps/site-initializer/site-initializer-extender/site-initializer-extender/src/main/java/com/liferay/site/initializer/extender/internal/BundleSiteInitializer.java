@@ -30,6 +30,7 @@ import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
 import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.dynamic.data.mapping.constants.DDMTemplateConstants;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService;
 import com.liferay.dynamic.data.mapping.util.DefaultDDMStructureHelper;
@@ -104,11 +105,13 @@ import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.LayoutTypePortlet;
 import com.liferay.portal.kernel.model.ResourceAction;
 import com.liferay.portal.kernel.model.ResourceConstants;
+import com.liferay.portal.kernel.model.ResourcePermission;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.Theme;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.model.UserGroup;
 import com.liferay.portal.kernel.model.role.RoleConstants;
+import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
@@ -132,6 +135,7 @@ import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
@@ -201,6 +205,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 		AssetCategoryLocalService assetCategoryLocalService,
 		AssetListEntryLocalService assetListEntryLocalService, Bundle bundle,
 		ClientExtensionEntryLocalService clientExtensionEntryLocalService,
+		ConfigurationProvider configurationProvider,
 		DDMStructureLocalService ddmStructureLocalService,
 		DDMTemplateLocalService ddmTemplateLocalService,
 		DefaultDDMStructureHelper defaultDDMStructureHelper,
@@ -259,6 +264,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 		_assetListEntryLocalService = assetListEntryLocalService;
 		_bundle = bundle;
 		_clientExtensionEntryLocalService = clientExtensionEntryLocalService;
+		_configurationProvider = configurationProvider;
 		_ddmStructureLocalService = ddmStructureLocalService;
 		_ddmTemplateLocalService = ddmTemplateLocalService;
 		_defaultDDMStructureHelper = defaultDDMStructureHelper;
@@ -391,7 +397,10 @@ public class BundleSiteInitializer implements SiteInitializer {
 					new SiteNavigationMenuItemSettingsBuilder();
 
 			_invoke(() -> _addAccounts(serviceContext));
-			_invoke(() -> _addDDMStructures(serviceContext));
+
+			Map<String, String> ddmStructureEntryIdsStringUtilReplaceValues =
+				_invoke(() -> _addDDMStructures(serviceContext));
+
 			_invoke(() -> _addExpandoColumns(serviceContext));
 
 			Map<String, String> assetListEntryIdsStringUtilReplaceValues =
@@ -411,6 +420,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 			_invoke(() -> _addOrganizations(serviceContext));
 			_invoke(() -> _addSAPEntries(serviceContext));
 			_invoke(() -> _addSiteConfiguration(serviceContext));
+			_invoke(() -> _addSiteSettings(serviceContext));
 			_invoke(() -> _addStyleBookEntries(serviceContext));
 			_invoke(() -> _addUserGroups(serviceContext));
 
@@ -482,6 +492,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 				() -> _addLayoutsContent(
 					assetListEntryIdsStringUtilReplaceValues,
 					clientExtensionEntryIdsStringUtilReplaceValues,
+					ddmStructureEntryIdsStringUtilReplaceValues,
 					documentsStringUtilReplaceValues, layouts,
 					objectDefinitionIdsAndObjectEntryIdsStringUtilReplaceValues,
 					serviceContext,
@@ -690,14 +701,17 @@ public class BundleSiteInitializer implements SiteInitializer {
 			serviceContext, _servletContext);
 	}
 
-	private void _addDDMStructures(ServiceContext serviceContext)
+	private Map<String, String> _addDDMStructures(ServiceContext serviceContext)
 		throws Exception {
+
+		Map<String, String> ddmStructuresIdsStringUtilReplaceValues =
+			new HashMap<>();
 
 		Set<String> resourcePaths = _servletContext.getResourcePaths(
 			"/site-initializer/ddm-structures");
 
 		if (SetUtil.isEmpty(resourcePaths)) {
-			return;
+			return ddmStructuresIdsStringUtilReplaceValues;
 		}
 
 		for (String resourcePath : resourcePaths) {
@@ -706,6 +720,18 @@ public class BundleSiteInitializer implements SiteInitializer {
 				_portal.getClassNameId(JournalArticle.class), _classLoader,
 				resourcePath, serviceContext);
 		}
+
+		List<DDMStructure> ddmStructures =
+			_ddmStructureLocalService.getStructures(
+				serviceContext.getScopeGroupId());
+
+		for (DDMStructure ddmStructure : ddmStructures) {
+			ddmStructuresIdsStringUtilReplaceValues.put(
+				"DDM_STRUCTURE_ID:" + ddmStructure.getStructureKey(),
+				String.valueOf(ddmStructure.getStructureId()));
+		}
+
+		return ddmStructuresIdsStringUtilReplaceValues;
 	}
 
 	private void _addDDMTemplates(
@@ -743,20 +769,44 @@ public class BundleSiteInitializer implements SiteInitializer {
 				ddmStructureId = ddmStructure.getStructureId();
 			}
 
-			_ddmTemplateLocalService.addTemplate(
-				serviceContext.getUserId(), serviceContext.getScopeGroupId(),
+			DDMTemplate ddmTemplate = _ddmTemplateLocalService.fetchTemplate(
+				serviceContext.getScopeGroupId(),
 				_portal.getClassNameId(
 					jsonObject.getString(
 						"className", DDMStructure.class.getName())),
-				ddmStructureId, resourceClassNameId,
-				jsonObject.getString("ddmTemplateKey"),
-				HashMapBuilder.put(
-					LocaleUtil.getSiteDefault(), jsonObject.getString("name")
-				).build(),
-				null, DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY, null,
-				TemplateConstants.LANG_TYPE_FTL,
-				SiteInitializerUtil.read(_bundle, "ddm-template.ftl", url),
-				false, false, null, null, serviceContext);
+				jsonObject.getString("ddmTemplateKey"));
+
+			if (ddmTemplate == null) {
+				_ddmTemplateLocalService.addTemplate(
+					serviceContext.getUserId(),
+					serviceContext.getScopeGroupId(),
+					_portal.getClassNameId(
+						jsonObject.getString(
+							"className", DDMStructure.class.getName())),
+					ddmStructureId, resourceClassNameId,
+					jsonObject.getString("ddmTemplateKey"),
+					HashMapBuilder.put(
+						LocaleUtil.getSiteDefault(),
+						jsonObject.getString("name")
+					).build(),
+					null, DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY, null,
+					TemplateConstants.LANG_TYPE_FTL,
+					SiteInitializerUtil.read(_bundle, "ddm-template.ftl", url),
+					false, false, null, null, serviceContext);
+			}
+			else {
+				_ddmTemplateLocalService.updateTemplate(
+					serviceContext.getUserId(), ddmTemplate.getTemplateId(),
+					ddmStructureId,
+					HashMapBuilder.put(
+						LocaleUtil.getSiteDefault(),
+						jsonObject.getString("name")
+					).build(),
+					null, DDMTemplateConstants.TEMPLATE_TYPE_DISPLAY, null,
+					TemplateConstants.LANG_TYPE_FTL,
+					SiteInitializerUtil.read(_bundle, "ddm-template.ftl", url),
+					false, false, null, null, serviceContext);
+			}
 		}
 	}
 
@@ -1529,6 +1579,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 	private void _addLayoutContent(
 			Map<String, String> assetListEntryIdsStringUtilReplaceValues,
 			Map<String, String> clientExtensionEntryIdsStringUtilReplaceValues,
+			Map<String, String> ddmStructureEntryIdsStringUtilReplaceValues,
 			Map<String, String> documentsStringUtilReplaceValues,
 			Map<String, String>
 				objectDefinitionIdsAndObjectEntryIdsStringUtilReplaceValues,
@@ -1550,6 +1601,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 		json = _replace(
 			json, "[$", "$]", assetListEntryIdsStringUtilReplaceValues,
 			clientExtensionEntryIdsStringUtilReplaceValues,
+			ddmStructureEntryIdsStringUtilReplaceValues,
 			documentsStringUtilReplaceValues,
 			objectDefinitionIdsAndObjectEntryIdsStringUtilReplaceValues,
 			taxonomyCategoryIdsStringUtilReplaceValues);
@@ -1730,7 +1782,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 
 		_layoutPageTemplatesImporter.importFile(
 			serviceContext.getUserId(), serviceContext.getScopeGroupId(),
-			zipWriter.getFile(), false);
+			zipWriter.getFile(), true);
 	}
 
 	private Map<String, Layout> _addLayouts(ServiceContext serviceContext)
@@ -1767,6 +1819,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 	private void _addLayoutsContent(
 			Map<String, String> assetListEntryIdsStringUtilReplaceValues,
 			Map<String, String> clientExtensionEntryIdsStringUtilReplaceValues,
+			Map<String, String> ddmStructureEntryIdsStringUtilReplaceValues,
 			Map<String, String> documentsStringUtilReplaceValues,
 			Map<String, Layout> layouts,
 			Map<String, String>
@@ -1781,6 +1834,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 			_addLayoutContent(
 				assetListEntryIdsStringUtilReplaceValues,
 				clientExtensionEntryIdsStringUtilReplaceValues,
+				ddmStructureEntryIdsStringUtilReplaceValues,
 				documentsStringUtilReplaceValues,
 				objectDefinitionIdsAndObjectEntryIdsStringUtilReplaceValues,
 				entry.getValue(), entry.getKey(), serviceContext,
@@ -1794,11 +1848,11 @@ public class BundleSiteInitializer implements SiteInitializer {
 			ServiceContext serviceContext)
 		throws Exception {
 
-		Set<String> resourcePaths = _servletContext.getResourcePaths(
-			"/site-initializer/list-type-definitions");
-
 		Map<String, String> listTypeDefinitionIdsStringUtilReplaceValues =
 			new HashMap<>();
+
+		Set<String> resourcePaths = _servletContext.getResourcePaths(
+			"/site-initializer/list-type-definitions");
 
 		if (SetUtil.isEmpty(resourcePaths)) {
 			return listTypeDefinitionIdsStringUtilReplaceValues;
@@ -2512,11 +2566,26 @@ public class BundleSiteInitializer implements SiteInitializer {
 					String.valueOf(serviceContext.getScopeGroupId()));
 			}
 
-			_resourcePermissionLocalService.addResourcePermission(
-				serviceContext.getCompanyId(),
-				jsonObject.getString("resourceName"), scope,
-				jsonObject.getString("primKey"), role.getRoleId(),
-				jsonObject.getString("actionId"));
+			ResourcePermission resourcePermission =
+				_resourcePermissionLocalService.fetchResourcePermission(
+					serviceContext.getCompanyId(),
+					jsonObject.getString("resourceName"), scope,
+					jsonObject.getString("primKey"), role.getRoleId());
+
+			if (resourcePermission == null) {
+				_resourcePermissionLocalService.addResourcePermission(
+					serviceContext.getCompanyId(),
+					jsonObject.getString("resourceName"), scope,
+					jsonObject.getString("primKey"), role.getRoleId(),
+					jsonObject.getString("actionId"));
+			}
+			else {
+				_resourcePermissionLocalService.updateResourcePermissions(
+					serviceContext.getCompanyId(),
+					jsonObject.getString("resourceName"), scope,
+					jsonObject.getString("primKey"),
+					jsonObject.getString("primKey"));
+			}
 		}
 	}
 
@@ -2828,6 +2897,32 @@ public class BundleSiteInitializer implements SiteInitializer {
 			_addSiteNavigationMenu(
 				jsonArray.getJSONObject(i), serviceContext,
 				siteNavigationMenuItemSettings);
+		}
+	}
+
+	private void _addSiteSettings(ServiceContext serviceContext)
+		throws Exception {
+
+		String json = SiteInitializerUtil.read(
+			"site-initializer/site-settings.json", _servletContext);
+
+		if (json == null) {
+			return;
+		}
+
+		JSONArray jsonArray = _jsonFactory.createJSONArray(json);
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+			JSONObject propertiesJSONObject = jsonObject.getJSONObject(
+				"properties");
+
+			_configurationProvider.saveGroupConfiguration(
+				serviceContext.getScopeGroupId(), jsonObject.getString("pid"),
+				HashMapDictionaryBuilder.<String, Object>create(
+					propertiesJSONObject.toMap()
+				).build());
 		}
 	}
 
@@ -3755,6 +3850,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 	private final ClientExtensionEntryLocalService
 		_clientExtensionEntryLocalService;
 	private CommerceSiteInitializer _commerceSiteInitializer;
+	private final ConfigurationProvider _configurationProvider;
 	private final DDMStructureLocalService _ddmStructureLocalService;
 	private final DDMTemplateLocalService _ddmTemplateLocalService;
 	private final DefaultDDMStructureHelper _defaultDDMStructureHelper;

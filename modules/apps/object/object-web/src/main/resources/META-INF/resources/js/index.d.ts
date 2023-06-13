@@ -15,6 +15,21 @@
 type Locale = Liferay.Language.Locale;
 type LocalizedValue<T> = Liferay.Language.LocalizedValue<T>;
 
+type NotificationTemplate = {
+	attachmentObjectFieldIds: string[] | number[];
+	bcc: string;
+	body: LocalizedValue<string>;
+	cc: string;
+	description: string;
+	from: string;
+	fromName: LocalizedValue<string>;
+	id: number;
+	name: string;
+	objectDefinitionId: number | null;
+	subject: LocalizedValue<string>;
+	to: LocalizedValue<string>;
+};
+
 interface ObjectAction {
 	active: boolean;
 	conditionExpression?: string;
@@ -29,6 +44,7 @@ interface ObjectAction {
 }
 
 interface ObjectActionParameters {
+	lineCount?: number;
 	notificationTemplateId?: number;
 	objectDefinitionId?: number;
 	predefinedValues?: PredefinedValue[];
@@ -39,18 +55,18 @@ interface ObjectActionParameters {
 }
 
 type ObjectFieldBusinessType =
+	| 'Aggregation'
 	| 'Attachment'
+	| 'Date'
+	| 'Decimal'
+	| 'Integer'
+	| 'LongInteger'
 	| 'LongText'
 	| 'Picklist'
+	| 'PrecisionDecimal'
 	| 'Relationship'
 	| 'Text'
-	| 'Aggregation'
-	| 'LongInteger'
-	| 'Integer'
-	| 'Decimal'
-	| 'PrecisionDecimal'
-	| 'Workflow Status'
-	| 'Date';
+	| 'Workflow Status';
 interface ObjectFieldType {
 	businessType: ObjectFieldBusinessType;
 	dbType: string;
@@ -145,16 +161,16 @@ interface IItem extends LabelValueObject {
 type ObjectFieldSettingName =
 	| 'acceptedFileExtensions'
 	| 'fileSource'
-	| 'maximumFileSize'
+	| 'filters'
+	| 'function'
 	| 'maxLength'
+	| 'maximumFileSize'
+	| 'objectFieldName'
+	| 'objectRelationshipName'
 	| 'showCounter'
 	| 'showFilesInDocumentsAndMedia'
-	| 'storageDLFolderPath'
-	| 'relationship'
-	| 'function'
-	| 'summarizeField'
-	| 'filters'
-	| 'stateFlow';
+	| 'stateFlow'
+	| 'storageDLFolderPath';
 
 interface ObjectValidation {
 	active: boolean;
@@ -163,6 +179,7 @@ interface ObjectValidation {
 	engineLabel: string;
 	errorLabel: LocalizedValue<string>;
 	id: number;
+	lineCount?: number;
 	name: LocalizedValue<string>;
 	script: string;
 }

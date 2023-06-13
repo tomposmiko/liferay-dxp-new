@@ -25,17 +25,51 @@ html#{$cadmin-selector} #{$selector} {
 			will-change: padding-left, padding-right;
 			z-index: 1;
 
+			&#{$selector}-old {
+				#{$selector}__label-width {
+					right: $sidebarButtonWidth;
+				}
+
+				&#{$selector}--with-sidebar {
+					padding-left: 0;
+					padding-right: $sidebarButtonWidth;
+				}
+
+				&#{$selector}--with-sidebar-open {
+					#{$selector}__label-width {
+						left: unset;
+						right: $sidebarButtonWidth + $sidebarContentWidth;
+					}
+
+					@include media-breakpoint-up(sm) {
+						padding-right: $sidebarButtonWidth +
+							$sidebarContentWidth;
+						padding-left: 0;
+					}
+				}
+			}
+
 			&#{$selector}--with-sidebar {
-				padding-right: $sidebarButtonWidth;
+				padding-left: $sidebarButtonWidth;
 			}
 
 			&#{$selector}--with-sidebar-open {
 				#{$selector}__label-width {
-					right: $sidebarButtonWidth + $sidebarContentWidth;
+					right: $sidebarContentWidth;
 				}
 
 				@include media-breakpoint-up(sm) {
-					padding-right: $sidebarButtonWidth + $sidebarContentWidth;
+					padding-left: $sidebarButtonWidth + $sidebarContentWidth;
+				}
+			}
+
+			&#{$selector}--with-item-configuration-open {
+				#{$selector}__label-width {
+					right: $sidebarContentWidth;
+				}
+
+				@include media-breakpoint-up(sm) {
+					padding-right: $sidebarContentWidth;
 				}
 			}
 		}
@@ -66,7 +100,7 @@ html#{$cadmin-selector} #{$selector} {
 	#{$selector}__label-width {
 		margin-top: 12px;
 		position: absolute;
-		right: $sidebarButtonWidth;
+		right: 0;
 		z-index: 1;
 
 		span {

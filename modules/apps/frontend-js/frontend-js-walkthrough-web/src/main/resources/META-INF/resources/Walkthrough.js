@@ -119,6 +119,61 @@ function isVisibleInViewport(element, maybeRect) {
 	);
 }
 
+/**
+ * Removes search params on a given url
+ * @param {String} url
+ * @returns {String} url without the search params
+ */
+function stripSearchParams(url) {
+	return url.split('?')[0];
+}
+
+/**
+ * Given a `layoutRelativeURL,` this function will match the paths
+ * of the pages contained in it and return the longest path.
+ * @param {String} currentLayoutRelativeURL
+ * @param {Array<String>} pagesArray
+ * @returns {String} longest path
+ */
+function findLongestMatch(currentLayoutRelativeURL, pagesArray) {
+	return pagesArray
+		.filter((pagePath) =>
+			stripSearchParams(currentLayoutRelativeURL).endsWith(pagePath)
+		)
+		.sort((a, b) => (a.length > b.length ? -1 : 1))[0];
+}
+
+function removeStartingSlash(path) {
+	return path.replace('/', '');
+}
+
+/**
+ * When receiving layoutRelativeURL, it contains parts we should use later, like the following example:
+ * > themeDisplay.getLayoutRelativeURL()
+ * > '/web/fiona/home'
+ * We should take `'/web/fiona/'` from this URL because it can be used to be added as
+ * a prefix for navigation stuff like `next` and `previous` and when matching the page.
+ * So, people can provide paths in JSON without needing to specify the site name(/web/fiona in this case).
+ * @param {String} currentPage
+ * @returns {String} a string containg the path without the page URL
+ */
+function getSitePrefix(currentPage) {
+	const currentDXPLayoutRelativeURL = removeStartingSlash(
+		themeDisplay.getLayoutRelativeURL()
+	).split('/');
+
+	const firstPagePath = removeStartingSlash(currentPage.split('/')[0]);
+
+	return currentDXPLayoutRelativeURL
+		.slice(
+			0,
+			currentDXPLayoutRelativeURL.findIndex(
+				(path) => path === firstPagePath
+			)
+		)
+		.join('/');
+}
+
 const Step = ({
 	closeOnClickOutside,
 	closeable,
@@ -146,12 +201,6 @@ const Step = ({
 		previous,
 		title,
 	} = steps[currentStep];
-
-	const path =
-		themeDisplay.getPathContext() +
-		location.pathname +
-		location.search +
-		location.hash;
 
 	const [currentAlignment, setCurrentAlignment] = useState(
 		defaultPositioning
@@ -292,7 +341,16 @@ const Step = ({
 
 	useObserveRect(align, popoverRef?.current);
 
-	if (!pages[path]?.includes(id)) {
+	const currentLayoutRelativeURL = themeDisplay.getLayoutRelativeURL();
+
+	const currentPage = useMemo(
+		() => findLongestMatch(currentLayoutRelativeURL, Object.keys(pages)),
+		[pages, currentLayoutRelativeURL]
+	);
+
+	const SITE_PREFIX_PATH = `/${getSitePrefix(currentPage)}`;
+
+	if (!pages[currentPage]?.includes(id)) {
 		return null;
 	}
 
@@ -379,7 +437,11 @@ const Step = ({
 												onPrevious(previous);
 
 												if (previous) {
-													navigate(previous);
+													navigate(
+														SITE_PREFIX_PATH.concat(
+															previous
+														)
+													);
 												}
 											}}
 											small
@@ -394,7 +456,11 @@ const Step = ({
 												onNext(next);
 
 												if (next) {
-													navigate(next);
+													navigate(
+														SITE_PREFIX_PATH.concat(
+															next
+														)
+													);
 												}
 											}}
 											small

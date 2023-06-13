@@ -439,6 +439,12 @@ public interface PropsKeys {
 	public static final String COMPANY_DEFAULT_TIME_ZONE =
 		"company.default.time.zone";
 
+	public static final String COMPANY_DEFAULT_VIRTUAL_HOST_MAIL_DOMAIN =
+		"company.default.virtual.host.mail.domain";
+
+	public static final String COMPANY_DEFAULT_VIRTUAL_HOST_NAME =
+		"company.default.virtual.host.name";
+
 	public static final String COMPANY_DEFAULT_WEB_ID =
 		"company.default.web.id";
 
@@ -2776,6 +2782,9 @@ public interface PropsKeys {
 		"trash.entry.check.interval";
 
 	public static final String TRASH_SEARCH_LIMIT = "trash.search.limit";
+
+	public static final String TUNNEL_SERVLET_HIDE_EXCEPTION_DATA =
+		"tunnel.servlet.hide.exception.data";
 
 	public static final String TUNNELING_SERVLET_ENCRYPTION_ALGORITHM =
 		"tunneling.servlet.encryption.algorithm";

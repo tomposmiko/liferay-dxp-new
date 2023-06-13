@@ -18,12 +18,11 @@ import ClayTable from '@clayui/table';
 import classNames from 'classnames';
 import {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
+import {KeyedMutator} from 'swr';
 
 import {Sort} from '../../context/ListViewContext';
-import {SortDirection, SortOption} from '../../types';
+import {ActionList, SortDirection, SortOption} from '../../types';
 import DropDown from '../DropDown/DropDown';
-
-const {Body, Cell, Head, Row} = ClayTable;
 
 type Column<T = any> = {
 	clickable?: boolean;
@@ -35,9 +34,10 @@ type Column<T = any> = {
 };
 
 export type TableProps<T = any> = {
-	actions?: any[];
+	actions?: ActionList;
 	columns: Column[];
 	items: T[];
+	mutate: KeyedMutator<T>;
 	navigateTo?: (item: T) => string;
 	onClickRow?: (item: T) => void;
 	onSelectAllRows: () => void;
@@ -52,10 +52,11 @@ const Table: React.FC<TableProps> = ({
 	actions,
 	columns,
 	items,
+	mutate,
 	navigateTo,
 	onClickRow,
-	onSelectRow,
 	onSelectAllRows,
+	onSelectRow,
 	onSort,
 	rowSelectable = false,
 	selectedRows = [],
@@ -104,10 +105,10 @@ const Table: React.FC<TableProps> = ({
 
 	return (
 		<ClayTable borderless className="testray-table" hover>
-			<Head className="testray-table">
-				<Row>
+			<ClayTable.Head>
+				<ClayTable.Row>
 					{rowSelectable && (
-						<Cell>
+						<ClayTable.Cell>
 							<ClayCheckbox
 								checked={checked}
 								onChange={() => {
@@ -115,11 +116,11 @@ const Table: React.FC<TableProps> = ({
 									setChecked(!checked);
 								}}
 							/>
-						</Cell>
+						</ClayTable.Cell>
 					)}
 
 					{columns.map((column, index) => (
-						<Cell
+						<ClayTable.Cell
 							className="align-items-center text-nowrap"
 							headingTitle
 							key={index}
@@ -135,32 +136,32 @@ const Table: React.FC<TableProps> = ({
 									/>
 								)}
 							</>
-						</Cell>
+						</ClayTable.Cell>
 					))}
 
-					{displayActionColumn && <Cell headingCell />}
-				</Row>
-			</Head>
+					{displayActionColumn && <ClayTable.Cell headingCell />}
+				</ClayTable.Row>
+			</ClayTable.Head>
 
-			<Body>
+			<ClayTable.Body>
 				{items.map((item, rowIndex) => (
-					<Row
+					<ClayTable.Row
 						className="table-row text-nowrap"
 						key={rowIndex}
 						onMouseLeave={onMouseLeaveRow}
 						onMouseOver={() => onMouseOverRow(rowIndex)}
 					>
 						{rowSelectable && onSelectRow && (
-							<Cell>
+							<ClayTable.Cell>
 								<ClayCheckbox
 									checked={selectedRows.includes(item.id)}
 									onChange={() => onSelectRow(item)}
 								/>
-							</Cell>
+							</ClayTable.Cell>
 						)}
 
 						{columns.map((column, columnIndex) => (
-							<Cell
+							<ClayTable.Cell
 								className={classNames('text-dark', {
 									'cursor-pointer': column.clickable,
 									'table-cell-expand': column.size === 'sm',
@@ -190,24 +191,32 @@ const Table: React.FC<TableProps> = ({
 											rowIndex,
 									  })
 									: item[column.key]}
-							</Cell>
+							</ClayTable.Cell>
 						))}
 
 						{displayActionColumn && (
-							<Cell
+							<ClayTable.Cell
 								align="right"
 								className="py-0 table-action-column table-cell-expand"
 							>
 								{activeRow === rowIndex ? (
-									<DropDown actions={actions} item={item} />
+									<DropDown
+										actions={
+											typeof actions === 'function'
+												? actions(item)
+												: actions
+										}
+										item={item}
+										mutate={mutate}
+									/>
 								) : (
 									<div></div>
 								)}
-							</Cell>
+							</ClayTable.Cell>
 						)}
-					</Row>
+					</ClayTable.Row>
 				))}
-			</Body>
+			</ClayTable.Body>
 		</ClayTable>
 	);
 };

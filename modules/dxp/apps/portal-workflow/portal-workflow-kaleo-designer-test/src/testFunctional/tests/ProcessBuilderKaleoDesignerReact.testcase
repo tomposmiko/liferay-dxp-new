@@ -896,12 +896,43 @@ definition {
 	}
 
 	@description = "Verify that the user can delete a specific notification configuration"
-	@ignore = "Test Stub"
 	@priority = "5"
 	test CanDeleteSpecificNotification {
+		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#CanDeleteSpecificNotification";
 
-		// TODO CanDeleteSpecificNotification pending implementation
+		Workflow.openWorkflowListView();
 
+		Workflow.addNewDefinition(workflowDefinitionTitle = "New Workflow Definition");
+
+		ProcessBuilderKaleoDesignerReact.selectNode(nodeType = "start");
+
+		ProcessBuilderKaleoDesignerReact.viewAndFillNotification(
+			name = "Liferay Notification",
+			newNotification = "true",
+			newSection = "New Notification",
+			notificationTemplateValue = "Liferay Template",
+			notificationTypeOption = "email",
+			sectionOptionList = "1,2,");
+
+		ProcessBuilderKaleoDesignerReact.viewMultipleNotificationPresent(
+			name = "Liferay Notification",
+			notificationTemplateValue = "Liferay Template",
+			notificationTypeOption = "email",
+			sectionOptionList = "1,2");
+
+		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
+
+		ProcessBuilderKaleoDesignerReact.viewPropertyValue(
+			propertyName = "Notification",
+			propertyValue = "Liferay Notification 1,Liferay Notification 2");
+
+		ProcessBuilderKaleoDesignerReact.gotoNotification(notificationName = "Liferay Notification 1,Liferay Notification 2");
+
+		ProcessBuilderKaleoDesignerReact.deleteByIconTrashSidebar(propertyValue = "Liferay Notification 1");
+
+		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
+
+		ProcessBuilderKaleoDesignerReact.viewNotificationNotPresent(notificationName = "Liferay Notification 1");
 	}
 
 	@description = "Verify that the user can delete Nodes of Start"
@@ -2014,7 +2045,7 @@ definition {
 
 		ProcessBuilderKaleoDesignerReact.dragSidebarNodeAndMove(
 			nodeLabel = "State",
-			nodePosition = "-20,90");
+			nodePosition = "-200,-250");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
 
@@ -2050,7 +2081,7 @@ definition {
 
 		ProcessBuilderKaleoDesignerReact.dragSidebarNodeAndMove(
 			nodeLabel = "Task",
-			nodePosition = "0,0");
+			nodePosition = "-200,-250");
 
 		ProcessBuilderKaleoDesignerReact.addConnector(
 			connectorIn = "task",
@@ -2106,7 +2137,9 @@ definition {
 
 		Workflow.addNewDefinition(workflowDefinitionTitle = "New Workflow Definition");
 
-		ProcessBuilderKaleoDesignerReact.dragSidebarNodeAndMove(nodeLabel = "Task");
+		ProcessBuilderKaleoDesignerReact.dragSidebarNodeAndMove(
+			nodeLabel = "Task",
+			nodePosition = "-200,-250");
 
 		ProcessBuilderKaleoDesignerReact.viewAndFillTimers(
 			actionName = "Liferay Timer",
@@ -2748,7 +2781,7 @@ definition {
 
 		ProcessBuilderKaleoDesignerReact.dragSidebarNodeAndMove(
 			nodeLabel = "Task",
-			nodePosition = "0,0");
+			nodePosition = "-200,-250");
 
 		ProcessBuilderKaleoDesignerReact.addConnector(
 			connectorIn = "task",
@@ -3612,7 +3645,9 @@ definition {
 
 		Workflow.addNewDefinition(workflowDefinitionTitle = "New Workflow Definition");
 
-		ProcessBuilderKaleoDesignerReact.dragSidebarNodeAndMove(nodeLabel = "Task");
+		ProcessBuilderKaleoDesignerReact.dragSidebarNodeAndMove(
+			nodeLabel = "Task",
+			nodePosition = "-200,-250");
 
 		ProcessBuilderKaleoDesignerReact.addConnector(
 			connectorIn = "task",
@@ -3744,7 +3779,7 @@ definition {
 
 		ProcessBuilderKaleoDesignerReact.dragSidebarNodeAndMove(
 			nodeLabel = "Task",
-			nodePosition = "0,0");
+			nodePosition = "-200,-250");
 
 		ProcessBuilderKaleoDesignerReact.addConnector(
 			connectorIn = "task",
@@ -3774,7 +3809,7 @@ definition {
 
 		ProcessBuilderKaleoDesignerReact.dragSidebarNodeAndMove(
 			nodeLabel = "Task",
-			nodePosition = "0,0");
+			nodePosition = "-200,-250");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
 

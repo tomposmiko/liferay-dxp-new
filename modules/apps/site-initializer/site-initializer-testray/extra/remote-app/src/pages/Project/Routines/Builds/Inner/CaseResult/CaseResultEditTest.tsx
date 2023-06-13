@@ -12,38 +12,45 @@
  * details.
  */
 
-import {useMutation} from '@apollo/client';
 import ClayAlert from '@clayui/alert';
 import {yupResolver} from '@hookform/resolvers/yup';
 import {useForm} from 'react-hook-form';
 import {useOutletContext, useParams} from 'react-router-dom';
+import {KeyedMutator} from 'swr';
 
 import Form from '../../../../../../components/Form';
 import Footer from '../../../../../../components/Form/Footer';
 import Container from '../../../../../../components/Layout/Container';
-import {UpdateCaseResult} from '../../../../../../graphql/mutations';
 import useFormActions from '../../../../../../hooks/useFormActions';
 import i18n from '../../../../../../i18n';
 import yupSchema from '../../../../../../schema/yup';
 import {Liferay} from '../../../../../../services/liferay';
+import {
+	TestrayCaseResult,
+	createCaseResult,
+	updateCaseResult,
+} from '../../../../../../services/rest';
 import {TEST_STATUS} from '../../../../../../util/constants';
 
 type CaseResultForm = {
-	comment: string;
+	commentMBMessage: string;
 	dueStatus: string;
 	issue: string;
 };
 
 const CaseResultEditTest = () => {
 	const {
-		form: {onClose, onSave},
+		form: {onClose, onError, onSave, onSubmit},
 	} = useFormActions();
+	const {caseResultId} = useParams();
 
-	const {refetch}: {refetch: () => void} = useOutletContext();
-
-	const [onUpdateCaseResult] = useMutation(UpdateCaseResult);
-
-	const {caseResultId, status} = useParams();
+	const {
+		caseResult,
+		mutateCaseResult,
+	}: {
+		caseResult: TestrayCaseResult;
+		mutateCaseResult: KeyedMutator<any>;
+	} = useOutletContext();
 
 	const {
 		formState: {errors},
@@ -51,7 +58,13 @@ const CaseResultEditTest = () => {
 		register,
 		watch,
 	} = useForm<CaseResultForm>({
-		defaultValues: status ? {dueStatus: status} : {},
+		defaultValues: caseResult?.dueStatus
+			? ({
+					commentMBMessage: caseResult?.commentMBMessage,
+					dueStatus: caseResult?.dueStatus,
+					issue: caseResult?.issue,
+			  } as any)
+			: {},
 		resolver: yupResolver(yupSchema.caseResult),
 	});
 
@@ -60,24 +73,32 @@ const CaseResultEditTest = () => {
 		register,
 	};
 
-	const _onSubmit = async (form: CaseResultForm) => {
-		await onUpdateCaseResult({
-			variables: {
-				CaseResult: {
-					...form,
-					closedDate: new Date(),
-					r_userToCaseResults_userId: Liferay.ThemeDisplay.getUserId(),
-				},
-				caseResultId,
+	const _onSubmit = async ({
+		commentMBMessage,
+		dueStatus,
+		issue,
+	}: CaseResultForm) => {
+		onSubmit(
+			{
+				commentMBMessage,
+				dueStatus,
+				id: caseResultId,
+				issue,
+				userId: Liferay.ThemeDisplay.getUserId(),
 			},
-		});
-
-		await refetch();
-
-		onSave();
+			{
+				create: createCaseResult,
+				update: updateCaseResult,
+			}
+		)
+			.then(mutateCaseResult)
+			.then(onSave)
+			.catch(onError);
 	};
 
 	const dueStatus = watch('dueStatus');
+	const commentMBMessage = watch('commentMBMessage');
+	const issue = watch('issue');
 
 	return (
 		<Container>
@@ -107,14 +128,16 @@ const CaseResultEditTest = () => {
 				label={i18n.translate('issues')}
 				name="issue"
 				{...inputProps}
+				value={issue}
 			/>
 
 			<Form.Input
 				className="container-fluid-max-md"
 				label={i18n.translate('comment')}
-				name="comment"
+				name="commentMBMessage"
 				type="textarea"
 				{...inputProps}
+				value={commentMBMessage}
 			/>
 
 			<Footer

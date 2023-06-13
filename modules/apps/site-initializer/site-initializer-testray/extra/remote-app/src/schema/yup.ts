@@ -21,10 +21,12 @@ const yupSchema = {
 	build: yup.object({
 		description: yup.string(),
 		gitHash: yup.string(),
+		id: yup.string(),
 		name: yup.string().required(),
 		productVersionId: yup.string().required(),
+		promoted: yup.boolean(),
 		routineId: yup.string().required(),
-		template: yup.string(),
+		template: yup.boolean(),
 	}),
 	case: yup.object({
 		addAnother: yup.boolean(),
@@ -39,14 +41,22 @@ const yupSchema = {
 		stepsType: yup.string(),
 	}),
 	caseResult: yup.object({
-		comment: yup.string(),
+		commentMBMessage: yup.string(),
 		dueStatus: yup.string().required(),
 		issues: yup.string(),
+		userId: yup.number(),
 	}),
 	caseType: yup.object({
 		name: yup.string().required(),
 	}),
+	component: yup.object({
+		id: yup.string(),
+		name: yup.string().required(),
+		projectId: yup.string(),
+		teamId: yup.string(),
+	}),
 	factorCategory: yup.object({
+		id: yup.string(),
 		name: yup.string().required(),
 	}),
 	factorOption: yup.object({
@@ -72,14 +82,22 @@ const yupSchema = {
 				i18n.translate('password-can-only-contain-latin-letters')
 			),
 	}),
+	productVersion: yup.object({
+		id: yup.string(),
+		name: yup.string().required(),
+		projectId: yup.string(),
+	}),
 	project: yup.object({
-		description: yup.string(),
+		description: yup.string().notRequired(),
+		id: yup.string().notRequired(),
 		name: yup.string().required(),
 	}),
 	requirement: yup.object({
 		componentId: yup.string().required(),
 		description: yup.string().required(),
 		descriptionType: yup.string().required(),
+		id: yup.string(),
+		key: yup.string(),
 		linkTitle: yup.string().required(),
 		linkURL: yup.string().required(),
 		summary: yup.string().required(),
@@ -90,9 +108,16 @@ const yupSchema = {
 	}),
 	suite: yup.object({
 		autoanalyze: yup.boolean(),
+		caseParameters: yup.string(),
 		description: yup.string(),
+		id: yup.string(),
 		name: yup.string().required(),
 		smartSuite: yup.string(),
+	}),
+	team: yup.object({
+		id: yup.string(),
+		name: yup.string().required(),
+		projectId: yup.string(),
 	}),
 	user: yup.object({
 		alternateName: yup.string().required(),
