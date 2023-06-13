@@ -42,6 +42,7 @@ export function DefaultSortScreen() {
 	return (
 		<>
 			<ClayAlert
+				className="lfr-objects__side-panel-content-container"
 				displayType="info"
 				title={`${Liferay.Language.get('info')}:`}
 			>
@@ -51,6 +52,7 @@ export function DefaultSortScreen() {
 			</ClayAlert>
 
 			<BuilderScreen
+				defaultSort
 				emptyState={{
 					buttonText: Liferay.Language.get('new-default-sort'),
 					description: Liferay.Language.get(
@@ -62,7 +64,6 @@ export function DefaultSortScreen() {
 				}}
 				firstColumnHeader={Liferay.Language.get('name')}
 				hasDragAndDrop
-				isDefaultSort
 				objectColumns={objectViewSortColumns ?? []}
 				onEditing={setIsEditingSort}
 				onEditingObjectFieldName={setEditingObjectFieldName}

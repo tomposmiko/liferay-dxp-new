@@ -308,6 +308,16 @@ components:
                 - className
                 - classPK
             type: object
+        ClassTypeReference:
+            properties:
+                className:
+                    type: string
+                subtypeId:
+                    format: int64
+                    type: integer
+            required:
+                - className
+            type: object
         CollectionViewport:
             # @review
             description:
@@ -1988,6 +1998,46 @@ components:
                     description:
                         The fragment's viewport style.
                     properties:
+                        backgroundColor:
+                            # @review
+                            description:
+                                The fragment viewport's background color.
+                            type: string
+                        borderColor:
+                            # @review
+                            description:
+                                The fragment viewport's border color.
+                            type: string
+                        borderRadius:
+                            # @review
+                            description:
+                                The fragment viewport's background radius.
+                            type: string
+                        borderWidth:
+                            # @review
+                            description:
+                                The fragment viewport's border width.
+                            type: string
+                        fontFamily:
+                            # @review
+                            description:
+                                The fragment viewport's font family.
+                            type: string
+                        fontSize:
+                            # @review
+                            description:
+                                The fragment viewport's font size.
+                            type: string
+                        fontWeight:
+                            # @review
+                            description:
+                                The fragment viewport's font weight.
+                            type: string
+                        height:
+                            # @review
+                            description:
+                                The fragment viewport's height.
+                            type: string
                         hidden:
                             # @review
                             description:
@@ -2013,6 +2063,36 @@ components:
                             description:
                                 The fragment viewport's margin top.
                             type: string
+                        maxHeight:
+                            # @review
+                            description:
+                                The fragment viewport's max height.
+                            type: string
+                        maxWidth:
+                            # @review
+                            description:
+                                The fragment viewport's max width.
+                            type: string
+                        minHeight:
+                            # @review
+                            description:
+                                The fragment viewport's min height.
+                            type: string
+                        minWidth:
+                            # @review
+                            description:
+                                The fragment viewport's min width.
+                            type: string
+                        opacity:
+                            # @review
+                            description:
+                                The fragment viewport's opacity.
+                            type: string
+                        overflow:
+                            # @review
+                            description:
+                                The fragment viewport's overflow behavior.
+                            type: string
                         paddingBottom:
                             # @review
                             description:
@@ -2033,9 +2113,25 @@ components:
                             description:
                                 The fragment viewport's padding top.
                             type: string
+                        shadow:
+                            # @review
+                            description:
+                                The fragment viewport's shadow effect.
+                            type: string
                         textAlign:
+                            # @review
                             description:
                                 The fragment viewport's text align.
+                            type: string
+                        textColor:
+                            # @review
+                            description:
+                                The fragment viewport's text color.
+                            type: string
+                        width:
+                            # @review
+                            description:
+                                The fragment viewport's width.
                             type: string
                     type: object
                 id:
@@ -3311,6 +3407,7 @@ components:
                         - $ref: "#/components/schemas/PageCollectionItemDefinition"
                         - $ref: "#/components/schemas/PageColumnDefinition"
                         - $ref: "#/components/schemas/PageDropZoneDefinition"
+                        - $ref: "#/components/schemas/PageFormDefinition"
                         - $ref: "#/components/schemas/PageFragmentInstanceDefinition"
                         - $ref: "#/components/schemas/PageRootDefinition"
                         - $ref: "#/components/schemas/PageRowDefinition"
@@ -3326,11 +3423,48 @@ components:
                 type:
                     # @review
                     description:
-                        The page element's type (collection, collection item,, column, drop zone, fragment, fragment
-                        drop zone, root, row, section or widget).
-                    enum: [Collection, CollectionItem, Column, DropZone, Fragment, FragmentDropZone, Root, Row, Section,
+                        The page element's type (collection, collection item, column, drop zone, form, fragment,
+                        fragment drop zone, root, row, section or widget).
+                    enum: [Collection, CollectionItem, Column, DropZone, Form, Fragment, FragmentDropZone, Root, Row, Section,
                         Widget]
                     type: string
+        PageFormDefinition:
+            # @review
+            description:
+                Represent a definition of a Page form.
+            properties:
+                formConfig:
+                    # @review
+                    description:
+                        The page form's configuration.
+                    properties:
+                        formReference:
+                            # @review
+                            description:
+                                The form reference.
+                            oneOf:
+                                - $ref: "#/components/schemas/ClassTypeReference"
+                                - $ref: "#/components/schemas/ContextReference"
+                    type: object
+                fragmentStyle:
+                    allOf:
+                        - $ref: "#/components/schemas/FragmentStyle"
+                    # @review
+                    description:
+                        The fragment style of a Page form.
+                fragmentViewports:
+                    # @review
+                    description:
+                        A list of fragment viewports of a Page form.
+                    items:
+                        $ref: "#/components/schemas/FragmentViewport"
+                    type: array
+                indexed:
+                    # @review
+                    description:
+                        A flag that indicates whether the page fragment instance is indexed or not.
+                    type: boolean
+            type: object
         PageFragmentInstanceDefinition:
             # @review
             description:

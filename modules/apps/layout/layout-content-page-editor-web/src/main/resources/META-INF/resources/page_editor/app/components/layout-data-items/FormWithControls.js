@@ -12,14 +12,17 @@
  * details.
  */
 
+import classNames from 'classnames';
 import React from 'react';
 
 import {useSelectorCallback} from '../../contexts/StoreContext';
+import {formIsMapped} from '../../utils/formIsMapped';
 import isItemEmpty from '../../utils/isItemEmpty';
 import ContainerWithControls from './ContainerWithControls';
-import Root from './Root';
 
 const FormWithControls = React.forwardRef(({children, item, ...rest}, ref) => {
+	const isMapped = formIsMapped(item);
+
 	const isEmpty = useSelectorCallback(
 		(state) =>
 			isItemEmpty(item, state.layoutData, state.selectedViewportSize),
@@ -28,11 +31,37 @@ const FormWithControls = React.forwardRef(({children, item, ...rest}, ref) => {
 
 	return (
 		<form onSubmit={(event) => event.preventDefault()} ref={ref}>
-			<ContainerWithControls {...rest} item={item}>
-				{isEmpty ? <Root item={item} /> : children}
+			<ContainerWithControls
+				{...rest}
+				isDropTarget={isMapped}
+				item={item}
+			>
+				{isEmpty || !isMapped ? (
+					<FormEmptyState isMapped={isMapped} />
+				) : (
+					children
+				)}
 			</ContainerWithControls>
 		</form>
 	);
 });
 
 export default FormWithControls;
+
+function FormEmptyState({isMapped}) {
+	return (
+		<div
+			className={classNames('page-editor__no-fragments-message', {
+				'bg-lighter': !isMapped,
+			})}
+		>
+			<div className="page-editor__no-fragments-message__title">
+				{isMapped
+					? Liferay.Language.get('place-fragments-here')
+					: Liferay.Language.get(
+							'select-a-content-type-to-start-creating-the-form'
+					  )}
+			</div>
+		</div>
+	);
+}

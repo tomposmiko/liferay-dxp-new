@@ -32,10 +32,8 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.zip.ZipWriter;
-import com.liferay.portal.kernel.zip.ZipWriterFactoryUtil;
+import com.liferay.portal.kernel.zip.ZipWriterFactory;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.segments.constants.SegmentsExperienceConstants;
-import com.liferay.segments.model.SegmentsExperience;
 import com.liferay.segments.service.SegmentsExperienceLocalService;
 import com.liferay.translation.exporter.TranslationInfoItemFieldValuesExporter;
 import com.liferay.translation.exporter.TranslationInfoItemFieldValuesExporterTracker;
@@ -47,7 +45,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -97,7 +94,7 @@ public class ExportTranslationServlet extends HttpServlet {
 			String[] targetLanguageIds = ParamUtil.getStringValues(
 				httpServletRequest, "targetLanguageIds");
 
-			ZipWriter zipWriter = ZipWriterFactoryUtil.getZipWriter();
+			ZipWriter zipWriter = _zipWriterFactory.getZipWriter();
 
 			Set<Long> classPKs = SetUtil.fromArray(
 				_getClassPKs(
@@ -105,26 +102,6 @@ public class ExportTranslationServlet extends HttpServlet {
 					translationRequestHelper));
 
 			for (long classPK : classPKs) {
-				if (className.equals(SegmentsExperience.class.getName())) {
-					SegmentsExperience segmentsExperience =
-						_segmentsExperienceLocalService.fetchSegmentsExperience(
-							classPK);
-
-					if (Objects.equals(
-							segmentsExperience.getSegmentsExperienceKey(),
-							SegmentsExperienceConstants.KEY_DEFAULT)) {
-
-						_addZipEntry(
-							zipWriter,
-							translationRequestHelper.getModelClassName(),
-							translationRequestHelper.getModelClassPK(),
-							exportMimeType, sourceLanguageId, targetLanguageIds,
-							_portal.getLocale(httpServletRequest));
-
-						continue;
-					}
-				}
-
 				_addZipEntry(
 					zipWriter, className, classPK, exportMimeType,
 					sourceLanguageId, targetLanguageIds,
@@ -311,5 +288,8 @@ public class ExportTranslationServlet extends HttpServlet {
 	@Reference
 	private TranslationInfoItemFieldValuesExporterTracker
 		_translationInfoItemFieldValuesExporterTracker;
+
+	@Reference
+	private ZipWriterFactory _zipWriterFactory;
 
 }

@@ -14,12 +14,15 @@
 
 import ClayLoadingIndicator from '@clayui/loading-indicator';
 import {openToast} from 'frontend-js-web';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 
+import {ALLOWED_INPUT_TYPES} from '../../../../../../app/config/constants/allowedInputTypes';
 import {COMMON_STYLES_ROLES} from '../../../../../../app/config/constants/commonStylesRoles';
 import {EDITABLE_TYPES} from '../../../../../../app/config/constants/editableTypes';
+import {FORM_MAPPING_SOURCES} from '../../../../../../app/config/constants/formMappingSources';
 import {FREEMARKER_FRAGMENT_ENTRY_PROCESSOR} from '../../../../../../app/config/constants/freemarkerFragmentEntryProcessor';
 import {LAYOUT_DATA_ITEM_TYPES} from '../../../../../../app/config/constants/layoutDataItemTypes';
+import {LAYOUT_TYPES} from '../../../../../../app/config/constants/layoutTypes';
 import {config} from '../../../../../../app/config/index';
 import {
 	useDispatch,
@@ -37,6 +40,27 @@ import {CommonStyles} from './CommonStyles';
 const FIELD_ID_CONFIGURATION_KEY = 'inputFieldId';
 
 export function FormInputGeneralPanel({item}) {
+	return (
+		<>
+			<div className="mb-3">
+				<Collapse
+					label={Liferay.Language.get('form-input-options')}
+					open
+				>
+					<FormInputOptions item={item} />
+				</Collapse>
+			</div>
+
+			<CommonStyles
+				commonStylesValues={item.config.styles || {}}
+				item={item}
+				role={COMMON_STYLES_ROLES.general}
+			/>
+		</>
+	);
+}
+
+function FormInputOptions({item}) {
 	const dispatch = useDispatch();
 	const [fields, setFields] = useState(null);
 	const segmentsExperienceId = useSelector(selectSegmentsExperienceId);
@@ -65,9 +89,22 @@ export function FormInputGeneralPanel({item}) {
 
 				if (parentItem.type === LAYOUT_DATA_ITEM_TYPES.form) {
 					const classNameId = parentItem.config?.classNameId;
+					const mappingSource = parentItem.config?.formConfig;
 
 					if (classNameId && classNameId !== '0') {
 						return parentItem.config;
+					}
+					else if (
+						config.layoutType === LAYOUT_TYPES.display &&
+						(!mappingSource ||
+							mappingSource === FORM_MAPPING_SOURCES.displayPage)
+					) {
+						const {selectedMappingTypes} = config;
+
+						return {
+							classNameId: selectedMappingTypes?.type.id,
+							classTypeId: selectedMappingTypes?.subtype.id,
+						};
 					}
 					else {
 						return {};
@@ -81,6 +118,20 @@ export function FormInputGeneralPanel({item}) {
 		},
 		[item.itemId]
 	);
+
+	const inputType = useMemo(() => {
+		const element = document.createElement('div');
+		element.innerHTML = fragmentEntryLink.content;
+
+		if (element.querySelector('select')) {
+			return 'select';
+		}
+		else if (element.querySelector('textarea')) {
+			return 'textarea';
+		}
+
+		return element.querySelector('input')?.type || 'text';
+	}, [fragmentEntryLink.content]);
 
 	const handleValueSelect = (event) =>
 		dispatch(
@@ -111,7 +162,20 @@ export function FormInputGeneralPanel({item}) {
 			classTypeId,
 			onNetworkStatus: () => {},
 		})
-			.then(setFields)
+			.then((nextFields) =>
+				setFields(
+					nextFields
+						.map((fieldset) => ({
+							...fieldset,
+							fields: fieldset.fields.filter((field) =>
+								ALLOWED_INPUT_TYPES[field.type]?.includes(
+									inputType
+								)
+							),
+						}))
+						.filter((fieldset) => fieldset.fields.length)
+				)
+			)
 			.catch((error) => {
 				if (process.env.NODE_ENV === 'development') {
 					console.error(error);
@@ -126,7 +190,7 @@ export function FormInputGeneralPanel({item}) {
 
 				setFields([]);
 			});
-	}, [formConfiguration]);
+	}, [formConfiguration, inputType]);
 
 	if (!formConfiguration) {
 		return (
@@ -144,32 +208,18 @@ export function FormInputGeneralPanel({item}) {
 		);
 	}
 
-	return (
-		<>
-			<div className="mb-3">
-				<Collapse label="form-input-options" open>
-					{fields ? (
-						<MappingFieldSelector
-							fieldType={EDITABLE_TYPES.text}
-							fields={fields}
-							onValueSelect={handleValueSelect}
-							value={
-								fragmentEntryLink.editableValues[
-									FREEMARKER_FRAGMENT_ENTRY_PROCESSOR
-								][FIELD_ID_CONFIGURATION_KEY] || ''
-							}
-						/>
-					) : (
-						<ClayLoadingIndicator />
-					)}
-				</Collapse>
-			</div>
-
-			<CommonStyles
-				commonStylesValues={item.config.styles || {}}
-				item={item}
-				role={COMMON_STYLES_ROLES.general}
-			/>
-		</>
+	return fields ? (
+		<MappingFieldSelector
+			fieldType={EDITABLE_TYPES.text}
+			fields={fields}
+			onValueSelect={handleValueSelect}
+			value={
+				fragmentEntryLink.editableValues[
+					FREEMARKER_FRAGMENT_ENTRY_PROCESSOR
+				][FIELD_ID_CONFIGURATION_KEY] || ''
+			}
+		/>
+	) : (
+		<ClayLoadingIndicator />
 	);
 }

@@ -12,12 +12,11 @@
  * details.
  */
 
-import React, {ChangeEventHandler, ReactNode} from 'react';
+import React from 'react';
 import {FormError} from '../hooks/useForm';
 export default function ObjectValidationFormBase({
-	children,
 	disabled,
-	objectValidationTypes,
+	objectValidationTypeLabel,
 	setValues,
 	values,
 }: IProps): JSX.Element;
@@ -36,11 +35,9 @@ interface IUseObjectValidationForm {
 	onSubmit: (validation: ObjectValidation) => void;
 }
 interface IProps {
-	children?: ReactNode;
 	disabled: boolean;
 	errors: ObjectValidationErrors;
-	handleChange: ChangeEventHandler<HTMLInputElement>;
-	objectValidationTypes: ObjectValidationType[];
+	objectValidationTypeLabel: string;
 	setValues: (values: Partial<ObjectValidation>) => void;
 	values: Partial<ObjectValidation>;
 }

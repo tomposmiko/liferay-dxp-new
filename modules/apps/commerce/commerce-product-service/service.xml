@@ -754,7 +754,7 @@
 			<finder-column name="CPInstanceId" />
 		</finder>
 	</entity>
-	<entity local-service="true" name="CPMeasurementUnit" remote-service="true" uuid="true">
+	<entity external-reference-code="true" local-service="true" name="CPMeasurementUnit" remote-service="true" uuid="true">
 
 		<!-- PK fields -->
 
@@ -1080,6 +1080,7 @@
 		<exception>DuplicateCommerceChannelRel</exception>
 		<exception>DuplicateCPAttachmentFileEntry</exception>
 		<exception>DuplicateCPDefinitionOptionRelKey</exception>
+		<exception>DuplicateCPMeasurementUnit</exception>
 		<exception>DuplicateCProduct</exception>
 		<exception>DuplicateCPSpecificationOptionKey</exception>
 		<exception>InvalidCommerceChannelType</exception>

@@ -9,6 +9,7 @@
  * distribution rights of the Software.
  */
 
+import ClayAlert from '@clayui/alert';
 import ClayIcon from '@clayui/icon';
 import {ClayTooltipProvider} from '@clayui/tooltip';
 import {FieldArray, Formik} from 'formik';
@@ -64,9 +65,10 @@ const RequiredInformation = ({
 	useEffect(() => {
 		const verificationDisabledType = infoSelectedKey.hasNotPermanentLicence
 			? !values.name || !values.maxClusterNodes
-			: !values.name || hasError;
+			: !hasFilledAtLeastOneField || hasError;
 
 		setBaseButtonDisabled(verificationDisabledType);
+
 		setAddButtonDisabled(
 			hasReachedMaximumKeys || !hasFilledAtLeastOneField
 		);
@@ -114,6 +116,9 @@ const RequiredInformation = ({
 		}
 		else {
 			const productName = `${infoSelectedKey?.productType} ${infoSelectedKey?.licenseEntryType}`;
+			const sizing = `Sizing ${
+				infoSelectedKey?.selectedSubscription?.instanceSize || 1
+			}`;
 
 			const licenseKey = {
 				accountKey,
@@ -128,7 +133,7 @@ const RequiredInformation = ({
 				productPurchaseKey:
 					infoSelectedKey?.selectedSubscription.productPurchaseKey,
 				productVersion: infoSelectedKey?.productVersion,
-				sizing: `Sizing ${infoSelectedKey?.selectedSubscription.instanceSize}`,
+				sizing,
 				startDate: infoSelectedKey?.selectedSubscription.startDate,
 			};
 
@@ -267,6 +272,18 @@ const RequiredInformation = ({
 									</h4>
 
 									<div className="dropdown-divider mb-4 mt-2"></div>
+
+									<ClayAlert
+										className="px-3 py-1"
+										displayType="info"
+									>
+										<span>
+											One or more
+											<b> Host Name, IP Address, </b>
+											or
+											<b> MAC Address</b> is required.
+										</span>
+									</ClayAlert>
 
 									{values?.keys?.map((_, index) => (
 										<KeyInputs id={index} key={index} />

@@ -13,6 +13,7 @@
  */
 
 import ClayTabs from '@clayui/tabs';
+import {useFeatureFlag} from 'data-engine-js-components-web';
 import {fetch} from 'frontend-js-web';
 import React, {useContext, useEffect, useState} from 'react';
 
@@ -20,10 +21,11 @@ import {invalidateRequired} from '../../hooks/useForm';
 import {defaultLanguageId} from '../../utils/locale';
 import SidePanelContent, {closeSidePanel, openToast} from '../SidePanelContent';
 import BasicInfoScreen from './BasicInfoScreen/BasicInfoScreen';
+import {DefaultFilterScreen} from './DefaultFilterScreen/DefaultFilterScreen';
 import {DefaultSortScreen} from './DefaultSortScreen/DefaultSortScreen';
 import ViewBuilderScreen from './ViewBuilderScreen/ViewBuilderScreen';
 import ViewContext, {TYPES, ViewContextProvider} from './context';
-import {TObjectField, TObjectView} from './types';
+import {TObjectField, TObjectView, TWorkflowStatus} from './types';
 
 const TABS = [
 	{
@@ -52,6 +54,15 @@ const CustomView: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 
 	const [activeIndex, setActiveIndex] = useState<number>(0);
 	const [loading, setLoading] = useState<boolean>(true);
+
+	const flags = useFeatureFlag();
+
+	if (TABS.length < 4 && flags['LPS-144957']) {
+		TABS.push({
+			Component: DefaultFilterScreen,
+			label: Liferay.Language.get('default-filters'),
+		});
+	}
 
 	useEffect(() => {
 		const makeFetch = async () => {
@@ -223,32 +234,33 @@ const CustomView: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 				))}
 			</ClayTabs>
 
-			<SidePanelContent.Container>
-				<ClayTabs.Content activeIndex={activeIndex} fade>
-					{TABS.map(({Component}, index) => (
-						<ClayTabs.TabPane key={index}>
-							{!loading && <Component />}
-						</ClayTabs.TabPane>
-					))}
-				</ClayTabs.Content>
-			</SidePanelContent.Container>
+			<ClayTabs.Content activeIndex={activeIndex} fade>
+				{TABS.map(({Component}, index) => (
+					<ClayTabs.TabPane key={index}>
+						{!loading && <Component />}
+					</ClayTabs.TabPane>
+				))}
+			</ClayTabs.Content>
 		</SidePanelContent>
 	);
 };
 interface ICustomViewWrapperProps extends React.HTMLAttributes<HTMLElement> {
 	isViewOnly: boolean;
 	objectViewId: string;
+	workflowStatusJSONArray: TWorkflowStatus[];
 }
 
 const CustomViewWrapper: React.FC<ICustomViewWrapperProps> = ({
 	isViewOnly,
 	objectViewId,
+	workflowStatusJSONArray,
 }) => {
 	return (
 		<ViewContextProvider
 			value={{
 				isViewOnly,
 				objectViewId,
+				workflowStatusJSONArray,
 			}}
 		>
 			<CustomView />

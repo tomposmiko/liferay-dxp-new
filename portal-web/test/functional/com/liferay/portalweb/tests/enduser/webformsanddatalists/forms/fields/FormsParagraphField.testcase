@@ -95,7 +95,7 @@ definition {
 
 		Form.closeSidebar();
 
-		Form.save();
+		Form.publishForm();
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
@@ -423,8 +423,6 @@ definition {
 		SelectFrame.selectSecondFrame();
 
 		Form.save();
-
-		Alert.viewSuccessMessageText(successMessage = "Your request completed successfully.");
 
 		AssertElementPresent(
 			key_formattingStyle = "h2",

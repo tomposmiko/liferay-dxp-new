@@ -440,6 +440,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>SALE_PRICE_FIELD</td>
+	<td>//div/input[contains(@id,'promoPrice')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>ACCORDION</td>
 	<td>//fieldset//div/a[contains(@aria-expanded,'true')]</td>
 	<td></td>
@@ -990,6 +995,12 @@
 <tr>
 	<td>SPECIFIC_MENU_ITEM</td>
 	<td>//a[contains(text(),'${key_itemName}')]//..//..//*[name()='svg'][contains(@class,'lexicon-icon lexicon-icon-ellipsis-v')]</td>
+	<td></td>
+</tr>
+<!--VISIBILITY-->
+<tr>
+	<td>CHECK_SPECIFIC_TOGGLE_SWITCH</td>
+	<td>//h4[contains(.,"${key_name}")]//span[contains(@id,'toggle-switch')]//..//..//..//div[contains(@class,'collapse show')]</td>
 	<td></td>
 </tr>
 </tbody>

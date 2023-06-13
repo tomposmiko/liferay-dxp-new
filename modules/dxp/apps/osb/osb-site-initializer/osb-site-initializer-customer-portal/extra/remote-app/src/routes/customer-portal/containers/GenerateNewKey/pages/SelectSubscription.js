@@ -360,7 +360,9 @@ const SelectSubscription = ({
 										setInfoSelectedKey(infoSelectedKey);
 									}}
 									selected={selected}
-									subtitle={`Instance size: ${subscriptionTerm.instanceSize}`}
+									subtitle={`Instance size: ${
+										subscriptionTerm?.instanceSize || 1
+									}`}
 									value={subscriptionTerm}
 								/>
 							);

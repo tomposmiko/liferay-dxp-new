@@ -575,6 +575,38 @@ public abstract class BaseBuild implements Build {
 
 			buildResultsJSONObject.put("buildResults", buildResultsJSONArray);
 		}
+		else if (dataTypesList.contains("buildResults") &&
+				 (this instanceof DownstreamBuild)) {
+
+			DownstreamBuild downstreamBuild = (DownstreamBuild)this;
+
+			buildResultsJSONObject.put(
+				"axisName", downstreamBuild.getAxisName());
+
+			if (dataTypesList.contains("buildURL")) {
+				buildResultsJSONObject.put("buildURL", getBuildURL());
+			}
+
+			if (dataTypesList.contains("duration")) {
+				buildResultsJSONObject.put("duration", getDuration());
+			}
+
+			buildResultsJSONObject.put("result", getResult());
+
+			if (dataTypesList.contains("stopWatchRecords")) {
+				StopWatchRecordsGroup stopWatchRecordsGroup =
+					downstreamBuild.getStopWatchRecordsGroup();
+
+				if (stopWatchRecordsGroup != null) {
+					JSONArray jsonArray = stopWatchRecordsGroup.getJSONArray();
+
+					if (jsonArray.length() > 0) {
+						buildResultsJSONObject.put(
+							"stopWatchRecords", jsonArray);
+					}
+				}
+			}
+		}
 
 		if (dataTypesList.contains("testResults")) {
 			JSONArray testResultsJSONArray = new JSONArray();
@@ -628,7 +660,6 @@ public abstract class BaseBuild implements Build {
 
 		buildResultsJSONObject.put("jobVariant", getJobVariant());
 		buildResultsJSONObject.put("result", getResult());
-		buildResultsJSONObject.put("testSuiteName", getTestSuiteName());
 
 		return buildResultsJSONObject;
 	}
@@ -2059,6 +2090,15 @@ public abstract class BaseBuild implements Build {
 		public int compare(Build build1, Build build2) {
 			String axisName1 = _getAxisName(build1);
 			String axisName2 = _getAxisName(build2);
+
+			if (JenkinsResultsParserUtil.isNullOrEmpty(axisName1) ||
+				JenkinsResultsParserUtil.isNullOrEmpty(axisName2)) {
+
+				String displayName1 = build1.getDisplayName();
+				String displayName2 = build2.getDisplayName();
+
+				return displayName1.compareTo(displayName2);
+			}
 
 			Matcher matcher1 = _pattern.matcher(axisName1);
 			Matcher matcher2 = _pattern.matcher(axisName2);

@@ -3357,6 +3357,14 @@ definition {
 		Click(locator1 = "PageEditor#EXPERIENCE_DEFAULT_BUTTON_NAME");
 	}
 
+	macro openNewExperienceEditor {
+		PageEditor.openExperienceMenu();
+
+		Click(
+			key_text = "New Experience",
+			locator1 = "Button#ANY");
+	}
+
 	macro openPreviewMode {
 		Click(locator1 = "PageEditor#PREVIEW");
 	}
@@ -4168,6 +4176,17 @@ definition {
 		}
 
 		AssertElementNotPresent(
+			index = "${position}",
+			key_fragmentName = "${fragmentName}",
+			locator1 = "Fragment#FRAGMENT_LABEL");
+	}
+
+	macro viewFragmentNotVisible {
+		if (!(isSet(position))) {
+			var position = "1";
+		}
+
+		AssertNotVisible(
 			index = "${position}",
 			key_fragmentName = "${fragmentName}",
 			locator1 = "Fragment#FRAGMENT_LABEL");

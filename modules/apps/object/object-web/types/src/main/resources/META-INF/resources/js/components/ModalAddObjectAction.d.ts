@@ -13,22 +13,13 @@
  */
 
 import React from 'react';
+import {CustomItem} from './Form/CustomSelect/CustomSelect';
 interface IProps extends React.HTMLAttributes<HTMLElement> {
 	apiURL: string;
-	objectActionExecutors: TObjectActionExecutor[];
-	objectActionTriggers: TObjectActionTrigger[];
+	objectActionExecutors: CustomItem[];
+	objectActionTriggers: CustomItem[];
 	observer: any;
 	onClose: () => void;
 }
-declare type TObjectActionTrigger = {
-	description: string;
-	key: string;
-	label: string;
-};
-declare type TObjectActionExecutor = {
-	description: string;
-	key: string;
-	label: string;
-};
 declare const ModalWithProvider: React.FC<IProps>;
 export default ModalWithProvider;

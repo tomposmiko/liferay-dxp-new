@@ -14,12 +14,12 @@
 
 import {ChangeEventHandler} from 'react';
 import {ObjectValidationErrors} from '../ObjectValidationFormBase';
+import '../Editor/Editor.scss';
 declare function BasicInfo({
 	componentLabel,
 	defaultLocale,
 	disabled,
 	errors,
-	handleChange,
 	locales,
 	setValues,
 	values,
@@ -29,11 +29,11 @@ declare function Conditions({
 	disabled,
 	errors,
 	locales,
+	objectValidationRuleElements,
 	setValues,
 	values,
 }: IConditions): JSX.Element;
-interface IBasicInfo {
-	componentLabel: string;
+interface ITabs {
 	defaultLocale: {
 		label: string;
 		symbol: string;
@@ -45,16 +45,10 @@ interface IBasicInfo {
 	setValues: (values: Partial<ObjectValidation>) => void;
 	values: Partial<ObjectValidation>;
 }
-interface IConditions {
-	defaultLocale: {
-		label: string;
-		symbol: string;
-	};
-	disabled: boolean;
-	errors: ObjectValidationErrors;
-	handleChange: ChangeEventHandler<HTMLInputElement>;
-	locales: Array<any>;
-	setValues: (values: Partial<ObjectValidation>) => void;
-	values: Partial<ObjectValidation>;
+interface IBasicInfo extends ITabs {
+	componentLabel: string;
+}
+interface IConditions extends ITabs {
+	objectValidationRuleElements: ObjectValidationRuleElement[];
 }
 export {BasicInfo, Conditions};
