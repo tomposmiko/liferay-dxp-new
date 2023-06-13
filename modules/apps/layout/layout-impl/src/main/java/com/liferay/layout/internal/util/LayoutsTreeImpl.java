@@ -25,7 +25,6 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.json.JSONSerializable;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -62,7 +61,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
@@ -83,74 +81,7 @@ import org.osgi.service.component.annotations.Reference;
 public class LayoutsTreeImpl implements LayoutsTree {
 
 	@Override
-	public String getLayoutsJSON(
-			HttpServletRequest httpServletRequest, long groupId,
-			boolean includeActions, boolean privateLayout, long layoutId,
-			int max, LayoutSetBranch layoutSetBranch)
-		throws Exception {
-
-		Layout layout = _layoutLocalService.getLayout(
-			groupId, privateLayout, layoutId);
-
-		long parentLayoutId = layout.getParentLayoutId();
-
-		long includedLayoutIndex = _layoutService.getLayoutsCount(
-			groupId, privateLayout, parentLayoutId, layout.getPriority());
-
-		int total = _layoutService.getLayoutsCount(
-			groupId, privateLayout, parentLayoutId);
-
-		int start = (int)includedLayoutIndex - 1;
-		int end = (int)includedLayoutIndex + max;
-
-		if (end > total) {
-			start = total - max;
-			end = total;
-
-			if (start < 0) {
-				start = 0;
-			}
-		}
-
-		List<Layout> layouts = _layoutService.getLayouts(
-			groupId, privateLayout, parentLayoutId, true, start, end);
-
-		JSONSerializable jsonSerializable = _toJSONSerializable(
-			httpServletRequest, groupId, includeActions, layouts, total,
-			layoutSetBranch);
-
-		List<Layout> ancestorLayouts = _layoutService.getAncestorLayouts(
-			layout.getPlid());
-
-		long[] ancestorLayoutIds = new long[ancestorLayouts.size()];
-		String[] ancestorLayoutNames = new String[ancestorLayouts.size()];
-
-		Locale locale = _portal.getLocale(httpServletRequest);
-
-		for (int i = 0; i < ancestorLayouts.size(); i++) {
-			Layout ancestorLayout = ancestorLayouts.get(i);
-
-			ancestorLayoutIds[i] = ancestorLayout.getLayoutId();
-			ancestorLayoutNames[i] = ancestorLayout.getName(locale);
-		}
-
-		if (jsonSerializable instanceof JSONObject) {
-			JSONObject jsonObject = (JSONObject)jsonSerializable;
-
-			jsonObject.put(
-				"ancestorLayoutIds", ancestorLayoutIds
-			).put(
-				"ancestorLayoutNames", ancestorLayoutNames
-			).put(
-				"start", start
-			);
-		}
-
-		return jsonSerializable.toString();
-	}
-
-	@Override
-	public String getLayoutsJSON(
+	public JSONArray getLayoutsJSONArray(
 			HttpServletRequest httpServletRequest, long groupId,
 			boolean includeActions, boolean privateLayout, long parentLayoutId,
 			long[] expandedLayoutIds, boolean incomplete, String treeId,
@@ -160,7 +91,7 @@ public class LayoutsTreeImpl implements LayoutsTree {
 		if (_log.isDebugEnabled()) {
 			_log.debug(
 				StringBundler.concat(
-					"getLayoutsJSON(groupId=", groupId, ", privateLayout=",
+					"getLayoutsJSONArray(groupId=", groupId, ", privateLayout=",
 					privateLayout, ", parentLayoutId=", parentLayoutId,
 					", expandedLayoutIds=", expandedLayoutIds, ", incomplete=",
 					incomplete, ", treeId=", treeId,
@@ -171,41 +102,18 @@ public class LayoutsTreeImpl implements LayoutsTree {
 			httpServletRequest, groupId, privateLayout, parentLayoutId,
 			incomplete, expandedLayoutIds, treeId, false);
 
-		return _toJSON(
-			httpServletRequest, groupId, includeActions, layoutTreeNodes,
-			layoutSetBranch);
-	}
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
-	@Override
-	public String getLayoutsJSON(
-			HttpServletRequest httpServletRequest, long groupId,
-			boolean includeActions, String treeId,
-			LayoutSetBranch layoutSetBranch)
-		throws Exception {
+		boolean hasManageLayoutsPermission = _groupPermission.contains(
+			themeDisplay.getPermissionChecker(), groupId,
+			ActionKeys.MANAGE_LAYOUTS);
 
-		if (_log.isDebugEnabled()) {
-			_log.debug(
-				StringBundler.concat(
-					"getLayoutsJSON(groupId=", groupId, ", treeId=", treeId,
-					StringPool.CLOSE_PARENTHESIS));
-		}
-
-		LayoutTreeNodes layoutTreeNodes = new LayoutTreeNodes();
-
-		layoutTreeNodes.addAll(
-			_getLayoutTreeNodes(
-				httpServletRequest, groupId, true,
-				LayoutConstants.DEFAULT_PARENT_LAYOUT_ID, false, null, treeId,
-				false));
-		layoutTreeNodes.addAll(
-			_getLayoutTreeNodes(
-				httpServletRequest, groupId, false,
-				LayoutConstants.DEFAULT_PARENT_LAYOUT_ID, false, null, treeId,
-				false));
-
-		return _toJSON(
-			httpServletRequest, groupId, includeActions, layoutTreeNodes,
-			layoutSetBranch);
+		return _toJSONArray(
+			hasManageLayoutsPermission, httpServletRequest, groupId,
+			includeActions, layoutTreeNodes, layoutSetBranch,
+			_browserSniffer.isMobile(httpServletRequest), themeDisplay);
 	}
 
 	private Layout _fetchCurrentLayout(HttpServletRequest httpServletRequest) {
@@ -311,8 +219,7 @@ public class LayoutsTreeImpl implements LayoutsTree {
 			LayoutTreeNodes childLayoutTreeNodes = null;
 
 			if (_isExpandableLayout(
-					httpServletRequest, ancestorLayouts, expandedLayoutIds,
-					layout)) {
+					ancestorLayouts, expandedLayoutIds, layout)) {
 
 				if (layout instanceof VirtualLayout) {
 					VirtualLayout virtualLayout = (VirtualLayout)layout;
@@ -497,13 +404,9 @@ public class LayoutsTreeImpl implements LayoutsTree {
 	}
 
 	private boolean _isExpandableLayout(
-		HttpServletRequest httpServletRequest, List<Layout> ancestorLayouts,
-		long[] expandedLayoutIds, Layout layout) {
+		List<Layout> ancestorLayouts, long[] expandedLayoutIds, Layout layout) {
 
-		boolean expandParentLayouts = ParamUtil.getBoolean(
-			httpServletRequest, "expandParentLayouts");
-
-		if (expandParentLayouts || ancestorLayouts.contains(layout) ||
+		if (ancestorLayouts.contains(layout) ||
 			ArrayUtil.contains(expandedLayoutIds, layout.getLayoutId())) {
 
 			return true;
@@ -527,23 +430,12 @@ public class LayoutsTreeImpl implements LayoutsTree {
 		return false;
 	}
 
-	private String _toJSON(
-			HttpServletRequest httpServletRequest, long groupId,
-			boolean includeActions, LayoutTreeNodes layoutTreeNodes,
-			LayoutSetBranch layoutSetBranch)
-		throws Exception {
-
-		JSONSerializable jsonSerializable = _toJSONSerializable(
-			httpServletRequest, groupId, includeActions, layoutTreeNodes,
-			layoutSetBranch);
-
-		return jsonSerializable.toString();
-	}
-
 	private JSONArray _toJSONArray(
+			boolean hasManageLayoutsPermission,
 			HttpServletRequest httpServletRequest, long groupId,
 			boolean includeActions, LayoutTreeNodes layoutTreeNodes,
-			LayoutSetBranch layoutSetBranch)
+			LayoutSetBranch layoutSetBranch, boolean mobile,
+			ThemeDisplay themeDisplay)
 		throws Exception {
 
 		if (_log.isDebugEnabled()) {
@@ -553,16 +445,7 @@ public class LayoutsTreeImpl implements LayoutsTree {
 					layoutTreeNodes));
 		}
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
 		JSONArray jsonArray = _jsonFactory.createJSONArray();
-
-		boolean hasManageLayoutsPermission = _groupPermission.contains(
-			themeDisplay.getPermissionChecker(), groupId,
-			ActionKeys.MANAGE_LAYOUTS);
-		boolean mobile = _browserSniffer.isMobile(httpServletRequest);
 
 		Layout afterDeleteSelectedLayout = null;
 		Layout secondLayout = null;
@@ -583,9 +466,10 @@ public class LayoutsTreeImpl implements LayoutsTree {
 			LayoutTreeNodes childLayoutTreeNodes =
 				layoutTreeNode.getChildLayoutTreeNodes();
 
-			JSONSerializable childrenJSONSerializable = _toJSONSerializable(
-				httpServletRequest, groupId, includeActions,
-				childLayoutTreeNodes, layoutSetBranch);
+			JSONArray childrenJSONArray = _toJSONArray(
+				hasManageLayoutsPermission, httpServletRequest, groupId,
+				includeActions, childLayoutTreeNodes, layoutSetBranch, mobile,
+				themeDisplay);
 
 			Layout layout = layoutTreeNode.getLayout();
 
@@ -617,16 +501,8 @@ public class LayoutsTreeImpl implements LayoutsTree {
 				afterDeleteSelectedLayout = layout;
 			}
 
-			if (childrenJSONSerializable instanceof JSONArray) {
-				JSONArray childrenJSONArray =
-					(JSONArray)childrenJSONSerializable;
-
-				if (childrenJSONArray.length() > 0) {
-					jsonObject.put("children", childrenJSONSerializable);
-				}
-			}
-			else {
-				jsonObject.put("children", childrenJSONSerializable);
+			if (childrenJSONArray.length() > 0) {
+				jsonObject.put("children", childrenJSONArray);
 			}
 
 			jsonObject.put(
@@ -786,46 +662,6 @@ public class LayoutsTreeImpl implements LayoutsTree {
 		}
 
 		return jsonArray;
-	}
-
-	private JSONSerializable _toJSONSerializable(
-			HttpServletRequest httpServletRequest, long groupId,
-			boolean includeActions, LayoutTreeNodes layoutTreeNodes,
-			LayoutSetBranch layoutSetBranch)
-		throws Exception {
-
-		if (_log.isDebugEnabled()) {
-			_log.debug(
-				StringBundler.concat(
-					"Group ", groupId, " and layout tree nodes ",
-					layoutTreeNodes));
-		}
-
-		return _toJSONArray(
-			httpServletRequest, groupId, includeActions, layoutTreeNodes,
-			layoutSetBranch);
-	}
-
-	private JSONSerializable _toJSONSerializable(
-			HttpServletRequest httpServletRequest, long groupId,
-			boolean includeActions, List<Layout> layouts, int total,
-			LayoutSetBranch layoutSetBranch)
-		throws Exception {
-
-		List<LayoutTreeNode> layoutTreeNodesList = new ArrayList<>();
-
-		for (Layout layout : layouts) {
-			LayoutTreeNode layoutTreeNode = new LayoutTreeNode(layout);
-
-			layoutTreeNodesList.add(layoutTreeNode);
-		}
-
-		LayoutTreeNodes layoutTreeNodes = new LayoutTreeNodes(
-			layoutTreeNodesList, total);
-
-		return _toJSONSerializable(
-			httpServletRequest, groupId, includeActions, layoutTreeNodes,
-			layoutSetBranch);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

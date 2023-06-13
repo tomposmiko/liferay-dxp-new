@@ -85,12 +85,15 @@ public class PoshiElementAttribute
 			return sb.toString();
 		}
 
-		sb.append(" = \"");
+		sb.append(" = ");
+
 		value = value.replace("\"", "\\\"");
 
-		sb.append(value);
+		if (parentPoshiElement.isQuotedContent(value)) {
+			value = "\"" + value + "\"";
+		}
 
-		sb.append("\"");
+		sb.append(value);
 
 		return sb.toString();
 	}

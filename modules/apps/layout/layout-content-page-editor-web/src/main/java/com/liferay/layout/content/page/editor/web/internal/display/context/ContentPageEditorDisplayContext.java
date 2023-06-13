@@ -103,6 +103,7 @@ import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -127,18 +128,15 @@ import com.liferay.style.book.util.DefaultStyleBookEntryUtil;
 import com.liferay.style.book.util.comparator.StyleBookEntryNameComparator;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.portlet.PortletConfig;
 import javax.portlet.PortletRequest;
@@ -866,14 +864,17 @@ public class ContentPageEditorDisplayContext {
 			unicodeProperties.getProperty("segmentsExperienceId"), -1);
 
 		if (_segmentsExperienceId != -1) {
-			_segmentsExperienceId = Optional.ofNullable(
+			SegmentsExperience segmentsExperience =
 				SegmentsExperienceLocalServiceUtil.fetchSegmentsExperience(
-					_segmentsExperienceId)
-			).map(
-				SegmentsExperience::getSegmentsExperienceId
-			).orElse(
-				-1L
-			);
+					_segmentsExperienceId);
+
+			if (segmentsExperience != null) {
+				_segmentsExperienceId =
+					segmentsExperience.getSegmentsExperienceId();
+			}
+			else {
+				_segmentsExperienceId = -1L;
+			}
 		}
 
 		if (_segmentsExperienceId == -1) {
@@ -979,17 +980,11 @@ public class ContentPageEditorDisplayContext {
 		Map<String, Map<String, Object>> availableViewportSizesMap =
 			new LinkedHashMap<>();
 
-		EnumSet<ViewportSize> viewportSizes = EnumSet.allOf(ViewportSize.class);
+		for (ViewportSize viewportSize :
+				ListUtil.sort(
+					Arrays.asList(ViewportSize.values()),
+					Comparator.comparingInt(ViewportSize::getOrder))) {
 
-		Stream<ViewportSize> stream = viewportSizes.stream();
-
-		List<ViewportSize> viewportSizesList = stream.sorted(
-			Comparator.comparingInt(ViewportSize::getOrder)
-		).collect(
-			Collectors.toList()
-		);
-
-		for (ViewportSize viewportSize : viewportSizesList) {
 			availableViewportSizesMap.put(
 				viewportSize.getViewportSizeId(),
 				HashMapBuilder.<String, Object>put(
@@ -1498,13 +1493,15 @@ public class ContentPageEditorDisplayContext {
 	private JSONObject _getMasterLayoutJSONObject() {
 		return JSONUtil.put(
 			"masterLayoutData",
-			Optional.ofNullable(
-				_getMasterLayoutStructure()
-			).map(
-				LayoutStructure::toJSONObject
-			).orElse(
-				null
-			)
+			() -> {
+				LayoutStructure layoutStructure = _getMasterLayoutStructure();
+
+				if (layoutStructure != null) {
+					return layoutStructure.toJSONObject();
+				}
+
+				return null;
+			}
 		).put(
 			"masterLayoutPlid",
 			() -> {

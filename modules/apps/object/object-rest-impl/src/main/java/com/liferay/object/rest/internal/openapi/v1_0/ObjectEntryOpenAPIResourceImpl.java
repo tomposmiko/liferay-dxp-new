@@ -32,6 +32,7 @@ import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.TreeMapBuilder;
 import com.liferay.portal.vulcan.batch.engine.Field;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
@@ -51,7 +52,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -98,16 +98,10 @@ public class ObjectEntryOpenAPIResourceImpl
 			String propertyName = schemaEntry.getKey();
 			Schema propertySchema = schemaEntry.getValue();
 
-			if (Optional.ofNullable(
-					propertySchema.getReadOnly()
-				).orElse(
-					false
-				) ||
-				Optional.ofNullable(
-					propertySchema.getWriteOnly()
-				).orElse(
-					false
-				) || propertyName.startsWith("x-")) {
+			if ((propertySchema == null) ||
+				GetterUtil.getBoolean(propertySchema.getReadOnly()) ||
+				GetterUtil.getBoolean(propertySchema.getWriteOnly()) ||
+				propertyName.startsWith("x-")) {
 
 				continue;
 			}
@@ -116,18 +110,10 @@ public class ObjectEntryOpenAPIResourceImpl
 				propertyName,
 				Field.of(
 					propertySchema.getDescription(), propertyName,
-					Optional.ofNullable(
-						propertySchema.getReadOnly()
-					).orElse(
-						false
-					),
+					GetterUtil.getBoolean(propertySchema.getReadOnly()),
 					requiredPropertySchemaNames.contains(propertyName),
 					propertySchema.getType(),
-					Optional.ofNullable(
-						propertySchema.getWriteOnly()
-					).orElse(
-						false
-					)));
+					GetterUtil.getBoolean(propertySchema.getWriteOnly())));
 		}
 
 		return fields;
