@@ -20,7 +20,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -29,7 +29,7 @@ definition {
 	}
 
 	@description = "This is for LPS-114527. Can move multiple pages via dragging in Pages admin of Staging site but cannot in Live site."
-	@priority = "3"
+	@priority = 3
 	test CanMoveMultiplePagesInStagingSiteButCannotInLiveSite {
 		task ("Add 2 widget page and 1 content page in the same level") {
 			for (var n : list "1,2") {
@@ -64,7 +64,7 @@ definition {
 			WaitForPageLoad();
 
 			Page.viewPagesOrder(
-				depth = "2",
+				depth = 2,
 				pageName1 = "Test Page Name 1",
 				pageName2 = "Test Page Name 2",
 				pageName3 = "Test Page Name 3");
@@ -82,7 +82,7 @@ definition {
 
 		task ("Assert Test Page Name 2 and 3 are moved to top of Test Page Name 1 in Staging site") {
 			Page.viewPagesOrder(
-				depth = "2",
+				depth = 2,
 				pageName1 = "Test Page Name 2",
 				pageName2 = "Test Page Name 3",
 				pageName3 = "Test Page Name 1");
@@ -94,7 +94,7 @@ definition {
 			WaitForPageLoad();
 
 			Page.viewPagesOrder(
-				depth = "2",
+				depth = 2,
 				pageName1 = "Test Page Name 1",
 				pageName2 = "Test Page Name 2",
 				pageName3 = "Test Page Name 3");
@@ -114,7 +114,7 @@ definition {
 			Alert.closeMessage(messageType = "ERROR");
 
 			Page.viewPagesOrder(
-				depth = "2",
+				depth = 2,
 				pageName1 = "Test Page Name 1",
 				pageName2 = "Test Page Name 2",
 				pageName3 = "Test Page Name 3");
@@ -122,7 +122,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-110183. Can view information about collection items of collection page when enable Live."
-	@priority = "3"
+	@priority = 3
 	test ViewCollectionItemInformationInStaging {
 		property osgi.modules.includes = "bookmarks,document-library-google-docs";
 
@@ -172,13 +172,13 @@ definition {
 			item = "View Collection Items",
 			pageName = "Content Collection Page Name");
 
-		Pause(locator1 = "5000");
+		Pause(locator1 = 5000);
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
 		for (var tableHeader : list "Title,Type,Author,Modified Date,Create Date") {
 			AssertElementPresent(
-				key_tableHeader = "${tableHeader}",
+				key_tableHeader = ${tableHeader},
 				locator1 = "LexiconTable#TABLE_HEADER");
 		}
 
@@ -186,11 +186,11 @@ definition {
 
 		Page.viewCollectionItem(
 			itemName = "Blogs Entry Title",
-			key_rowNumber = "2");
+			key_rowNumber = 2);
 
 		Page.viewCollectionItem(
 			itemName = "Webcontent Title",
-			key_rowNumber = "3");
+			key_rowNumber = 3);
 
 		IFrame.closeFrame();
 
@@ -204,13 +204,13 @@ definition {
 			menuItem = "View Collection Items",
 			pageName = "Content Collection Page Name");
 
-		Pause(locator1 = "5000");
+		Pause(locator1 = 5000);
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
 		for (var tableHeader : list "Title,Type,Author,Modified Date,Create Date") {
 			AssertElementPresent(
-				key_tableHeader = "${tableHeader}",
+				key_tableHeader = ${tableHeader},
 				locator1 = "LexiconTable#TABLE_HEADER");
 		}
 
@@ -218,11 +218,11 @@ definition {
 
 		Page.viewCollectionItem(
 			itemName = "Blogs Entry Title",
-			key_rowNumber = "2");
+			key_rowNumber = 2);
 
 		Page.viewCollectionItem(
 			itemName = "Webcontent Title",
-			key_rowNumber = "3");
+			key_rowNumber = 3);
 	}
 
 }

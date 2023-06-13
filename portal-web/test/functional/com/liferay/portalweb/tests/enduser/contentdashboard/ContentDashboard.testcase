@@ -18,13 +18,13 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 	}
 
 	@description = "When there are not contents with Audience's categories, the X axis will show just one bar per each one of Stage's categories representing the total number of contents labeled with those categories"
-	@priority = "5"
+	@priority = 5
 	test AuditGraphNoContentsForAudience {
 		property portal.acceptance = "true";
 
@@ -34,7 +34,7 @@ definition {
 			vocabularyName = "Stage");
 
 		JSONWebcontent.addWebContent(
-			assetCategoryIds = "${categoryId}",
+			assetCategoryIds = ${categoryId},
 			content = "WC content",
 			groupName = "Test Site Name",
 			title = "WC Title");
@@ -63,7 +63,7 @@ definition {
 	}
 
 	@description = "When there are not contents with Stage's categories, the X axis will show just one bar per each one of Audience's categories representing the total number of contents labeled with those categories"
-	@priority = "5"
+	@priority = 5
 	test AuditGraphNoContentsForStage {
 		property portal.acceptance = "true";
 
@@ -73,7 +73,7 @@ definition {
 			vocabularyName = "Audience");
 
 		JSONWebcontent.addWebContent(
-			assetCategoryIds = "${categoryId}",
+			assetCategoryIds = ${categoryId},
 			content = "WC content",
 			groupName = "Test Site Name",
 			title = "WC Title");
@@ -102,7 +102,7 @@ definition {
 	}
 
 	@description = "When the user unchecks all of the checkboxes of the content audit graph, all bars in the graph disappear and a message is shown: No Stage Categories selected. Select any stage category from the checkboxes in the legend above."
-	@priority = "5"
+	@priority = 5
 	test AuditGraphUncheckCheckbox {
 		property portal.acceptance = "true";
 
@@ -132,7 +132,7 @@ definition {
 
 		WebContent.selectCategory(
 			categoryName = "Stage 1",
-			userSegmentDetailTitle = "${userSegmentDetailTitle}",
+			userSegmentDetailTitle = ${userSegmentDetailTitle},
 			vocabularyName = "Stage");
 
 		PortletEntry.publish();
@@ -142,7 +142,7 @@ definition {
 			panel = "Applications",
 			portlet = "Content Dashboard");
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		ContentDashboard.uncheckCheckbox(checkboxName = "Stage 1");
 
@@ -168,7 +168,7 @@ definition {
 	}
 
 	@description = "Validate if the user can edit a web content through the Edit option"
-	@priority = "5"
+	@priority = 5
 	test ContentDashboardEditWebContent {
 		property portal.acceptance = "true";
 
@@ -182,7 +182,7 @@ definition {
 			panel = "Applications",
 			portlet = "Content Dashboard");
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		ContentDashboard.editWebContent(webContentTitle = "WC Title Edited");
 
@@ -200,7 +200,7 @@ definition {
 	}
 
 	@description = "Validate if the user can filter by Author, using different display types"
-	@priority = "5"
+	@priority = 5
 	test ContentDashboardFilterByAuthor {
 		property portal.acceptance = "true";
 
@@ -214,11 +214,11 @@ definition {
 			panel = "Applications",
 			portlet = "Content Dashboard");
 
-		Pause(locator1 = "5000");
+		Pause(locator1 = 5000);
 
 		ContentDashboard.filterByAuthorTable(filterOption = "Author");
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		AssertTextPresent(
 			locator1 = "ContentDashboard#FIRST_ELEMENT_LISTED",
@@ -228,7 +228,7 @@ definition {
 
 		ContentDashboard.filterByAuthorList(filterOption = "Author");
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		AssertTextPresent(
 			locator1 = "ContentDashboard#FIRST_ELEMENT_LISTED",
@@ -238,7 +238,7 @@ definition {
 
 		ContentDashboard.filterByAuthorCard(filterOption = "Author");
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		AssertTextPresent(
 			locator1 = "ContentDashboard#FIRST_ELEMENT_LISTED",
@@ -254,7 +254,7 @@ definition {
 	}
 
 	@description = "Validate if the user can filter by category"
-	@priority = "5"
+	@priority = 5
 	test ContentDashboardFilterByCategory {
 		property portal.acceptance = "true";
 
@@ -268,7 +268,7 @@ definition {
 			vocabularyName = "Vocabulary Name");
 
 		JSONWebcontent.addWebContent(
-			assetCategoryIds = "${categoryId}",
+			assetCategoryIds = ${categoryId},
 			content = "WC WebContent Content",
 			groupName = "Test Site Name",
 			title = "WC WebContent Title");
@@ -278,11 +278,11 @@ definition {
 			panel = "Applications",
 			portlet = "Content Dashboard");
 
-		Pause(locator1 = "5000");
+		Pause(locator1 = 5000);
 
 		ContentDashboard.filterByCategory(filterOption = "Categories");
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		AssertTextPresent(
 			locator1 = "ContentDashboard#FIRST_ELEMENT_LISTED",
@@ -300,7 +300,7 @@ definition {
 	}
 
 	@description = "Validate if the user can filter by Site"
-	@priority = "5"
+	@priority = 5
 	test ContentDashboardFilterBySite {
 		property portal.acceptance = "true";
 
@@ -314,7 +314,7 @@ definition {
 			panel = "Applications",
 			portlet = "Content Dashboard");
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		ContentDashboard.filterBySiteGlobal(filterOption = "Site or Asset Library");
 
@@ -328,7 +328,7 @@ definition {
 	}
 
 	@description = "Validate if the user can filter by Status: Any"
-	@priority = "5"
+	@priority = 5
 	test ContentDashboardFilterByStatusAny {
 		property portal.acceptance = "true";
 
@@ -348,7 +348,7 @@ definition {
 			panel = "Applications",
 			portlet = "Content Dashboard");
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		ContentDashboard.filterByStatusAny(filterOption = "Any");
 
@@ -378,7 +378,7 @@ definition {
 	}
 
 	@description = "Validate if the user can filter by Status: Approved"
-	@priority = "5"
+	@priority = 5
 	test ContentDashboardFilterByStatusApproved {
 		property portal.acceptance = "true";
 
@@ -392,7 +392,7 @@ definition {
 			panel = "Applications",
 			portlet = "Content Dashboard");
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		ContentDashboard.filterByStatusApproved(filterOption = "Approved");
 
@@ -406,7 +406,7 @@ definition {
 	}
 
 	@description = "Validate if the user can filter by Status: Draft"
-	@priority = "5"
+	@priority = 5
 	test ContentDashboardFilterByStatusDraft {
 		property portal.acceptance = "true";
 
@@ -421,7 +421,7 @@ definition {
 			panel = "Applications",
 			portlet = "Content Dashboard");
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		ContentDashboard.filterByStatusDraft(filterOption = "Draft");
 
@@ -439,7 +439,7 @@ definition {
 	}
 
 	@description = "Validate if the user can filter by Status: Scheduled. And for LPS-86164 - Assert whether selecting time ends in JS error."
-	@priority = "5"
+	@priority = 5
 	test ContentDashboardFilterByStatusScheduled {
 		property portal.acceptance = "true";
 		property test.assert.javascript.errors = "true";
@@ -478,7 +478,7 @@ definition {
 			panel = "Applications",
 			portlet = "Content Dashboard");
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		ContentDashboard.filterByStatusScheduled(filterOption = "Scheduled");
 
@@ -496,7 +496,7 @@ definition {
 	}
 
 	@description = "Validate if the user can filter by tag"
-	@priority = "5"
+	@priority = 5
 	test ContentDashboardFilterByTag {
 		property portal.acceptance = "true";
 
@@ -514,13 +514,13 @@ definition {
 			panel = "Applications",
 			portlet = "Content Dashboard");
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		ContentDashboard.filterByTag(filterOption = "Tags");
 
 		ContentDashboard.searchValue(webContentTitle = "Web Content Title");
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		AssertTextPresent(
 			locator1 = "ContentDashboard#FIRST_ELEMENT_LISTED_TAGS",
@@ -556,7 +556,7 @@ definition {
 	}
 
 	@description = "Validate if the user can order by Modification Date"
-	@priority = "5"
+	@priority = 5
 	test ContentDashboardOrderByModificationDate {
 		for (var count : list "1,2,3,4,5") {
 			JSONWebcontent.addWebContent(
@@ -570,7 +570,7 @@ definition {
 			panel = "Applications",
 			portlet = "Content Dashboard");
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		ContentDashboard.orderByModificationDate(filterOption = "Modified Date");
 
@@ -580,7 +580,7 @@ definition {
 
 		Click(locator1 = "ContentDashboard#REVERSE_SORT_DIRECTION_BUTTON");
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		AssertTextPresent(
 			locator1 = "ContentDashboard#FIRST_ELEMENT_LISTED",
@@ -600,7 +600,7 @@ definition {
 	}
 
 	@description = "Validate if the user can order by title"
-	@priority = "5"
+	@priority = 5
 	test ContentDashboardOrderByTitle {
 		for (var count : list "1,2,3,4,5") {
 			JSONWebcontent.addWebContent(
@@ -614,7 +614,7 @@ definition {
 			panel = "Applications",
 			portlet = "Content Dashboard");
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		ContentDashboard.orderByTitle(filterOption = "Title");
 
@@ -624,7 +624,7 @@ definition {
 
 		Click(locator1 = "ContentDashboard#REVERSE_SORT_DIRECTION_BUTTON");
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		AssertTextPresent(
 			locator1 = "ContentDashboard#FIRST_ELEMENT_LISTED",
@@ -644,7 +644,7 @@ definition {
 	}
 
 	@description = "Validate if the user can open de Info side panel of a web content"
-	@priority = "5"
+	@priority = 5
 	test ContentDashboardViewInfoPanel {
 		property portal.acceptance = "true";
 
@@ -658,7 +658,7 @@ definition {
 			panel = "Applications",
 			portlet = "Content Dashboard");
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		ContentDashboard.openInfoPanelByDropdownMenu();
 

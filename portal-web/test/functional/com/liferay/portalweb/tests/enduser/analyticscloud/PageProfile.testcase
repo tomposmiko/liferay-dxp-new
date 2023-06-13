@@ -25,7 +25,7 @@ definition {
 
 		ACUtils.tearDownDXP();
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -37,7 +37,7 @@ definition {
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8112 | Test Summary: Assert clicking on a page in the pages lists navigates to the page profile"
 	@ignore = "true"
-	@priority = "5"
+	@priority = 5
 	test ClickOnPageInPagesListsNavigatesToPageProfile {
 		property portal.upstream = "quarantine";
 
@@ -65,7 +65,7 @@ definition {
 		}
 
 		task ("Navigate to Pages tab in Sites") {
-			ACProperties.switchProperty(propertyName = "${propertyName}");
+			ACProperties.switchProperty(propertyName = ${propertyName});
 
 			ACNavigation.goToSites();
 
@@ -89,7 +89,7 @@ definition {
 			ACUtils.assertPageTitle(pageTitle = "AC Page - Site Name - Liferay DXP");
 
 			for (var cardTitle : list "Visitors Behavior,Audience,Views by Location,Views by Technology,Displayed Assets") {
-				ACCards.viewCards(cardTitle = "${cardTitle}");
+				ACCards.viewCards(cardTitle = ${cardTitle});
 			}
 		}
 	}

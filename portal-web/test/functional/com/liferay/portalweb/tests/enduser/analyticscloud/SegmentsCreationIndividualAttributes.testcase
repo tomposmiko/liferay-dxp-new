@@ -49,7 +49,7 @@ definition {
 
 		ACUtils.tearDownDXP();
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -64,7 +64,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8565 | Test Summary: Add segment using an individual property 'role'"
-	@priority = "4"
+	@priority = 4
 	test CanAddSegmentUsingIndividualPropertyRole {
 		property portal.upstream = "quarantine";
 
@@ -99,7 +99,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = "${assignedPropertyName}");
+			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
 		}
 
 		task ("Add a new dynamic segment using Individual Property Role") {
@@ -117,7 +117,7 @@ definition {
 
 			ACSegments.selectDocument(
 				documentTitle = "AC Seg Reg Role",
-				indexField = "1");
+				indexField = 1);
 		}
 
 		task ("View the user showns on the Preview mode") {
@@ -128,7 +128,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8564 | Test Summary: Add segment using an individual property 'site'"
-	@priority = "4"
+	@priority = 4
 	test CanAddSegmentUsingIndividualPropertySite {
 		property portal.upstream = "quarantine";
 
@@ -161,7 +161,7 @@ definition {
 			ACUtils.navigateToSitePageWithUser(
 				actionType = "View Blog",
 				documentTitleList = "Blogs AC Title,Blogs AC Title",
-				emailList = "${emailList}",
+				emailList = ${emailList},
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -173,7 +173,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = "${assignedPropertyName}");
+			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
 		}
 
 		task ("Add a new dynamic segment using Individual Property Site") {
@@ -191,7 +191,7 @@ definition {
 
 			ACSegments.selectDocument(
 				documentTitle = "Site Name",
-				indexField = "1");
+				indexField = 1);
 		}
 
 		task ("View the user showns on the Preview mode and save segment") {
@@ -217,7 +217,7 @@ definition {
 
 			ACSegments.selectDocument(
 				documentTitle = "Site Name",
-				indexField = "1");
+				indexField = 1);
 
 			ACSegments.previewSegmentMembership();
 
@@ -251,11 +251,11 @@ definition {
 
 			ACSegments.selectDocument(
 				documentTitle = "Site Name",
-				indexField = "1");
+				indexField = 1);
 
 			ACSegments.selectDocument(
 				documentTitle = "Site Name",
-				indexField = "2");
+				indexField = 2);
 
 			ACSegments.editConjunction();
 		}
@@ -278,7 +278,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8566 | Test Summary: Add segment using an individual property 'team'"
-	@priority = "4"
+	@priority = 4
 	test CanAddSegmentUsingIndividualPropertyTeam {
 		task ("Assign the site to user") {
 			JSONGroup.assignUserToGroup(
@@ -319,7 +319,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = "${assignedPropertyName}");
+			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
 		}
 
 		task ("Add a new dynamic segment using Individual Property Team") {
@@ -337,7 +337,7 @@ definition {
 
 			ACSegments.selectDocument(
 				documentTitle = "Site Team Name",
-				indexField = "1");
+				indexField = 1);
 		}
 
 		task ("View the user showns on the Preview mode") {
@@ -349,7 +349,7 @@ definition {
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8568 | Test Summary: Add segment using an individual property 'user'"
 	@ignore = "true"
-	@priority = "4"
+	@priority = 4
 	test CanAddSegmentUsingIndividualPropertyUser {
 		property portal.upstream = "quarantine";
 
@@ -377,7 +377,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = "${assignedPropertyName}");
+			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
 		}
 
 		task ("Add a new dynamic segment using Individual Property User criteria") {
@@ -395,7 +395,7 @@ definition {
 
 			ACSegments.selectDocument(
 				documentTitle = "ac ac",
-				indexField = "1");
+				indexField = 1);
 		}
 
 		task ("View and assert that the user is in the list") {
@@ -414,7 +414,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8567 | Test Summary: Add segment using an individual property 'user group'"
-	@priority = "4"
+	@priority = 4
 	test CanAddSegmentUsingIndividualPropertyUserGroup {
 		property portal.upstream = "quarantine";
 
@@ -449,7 +449,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = "${assignedPropertyName}");
+			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
 		}
 
 		task ("Add a new dynamic segment using Individual Property User Group") {
@@ -467,7 +467,7 @@ definition {
 
 			ACSegments.selectDocument(
 				documentTitle = "UG UserGroup Name",
-				indexField = "1");
+				indexField = 1);
 		}
 
 		task ("View the user showns on the Preview mode") {
@@ -479,7 +479,7 @@ definition {
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8569 | Test Summary: Add segment with custom field for individuals"
 	@ignore = "true"
-	@priority = "4"
+	@priority = 4
 	test CanAddSegmentWithCustomFieldsForIndividuals {
 		property portal.upstream = "quarantine";
 
@@ -534,7 +534,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = "${assignedPropertyName}");
+			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
 		}
 
 		task ("Add a new dynamic segment using Individual Property Custom Fields") {
@@ -561,7 +561,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8570 | Test Summary: Add segment with custom fields for organizations"
-	@priority = "4"
+	@priority = 4
 	test CanAddSegmentWithCustomFieldsForOrganizations {
 		property portal.upstream = "quarantine";
 
@@ -606,7 +606,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = "${assignedPropertyName}");
+			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
 		}
 
 		task ("Add a new dynamic segment using Organization Custom Fields") {

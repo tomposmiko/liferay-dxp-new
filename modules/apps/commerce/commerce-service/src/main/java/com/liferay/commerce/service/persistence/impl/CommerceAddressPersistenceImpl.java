@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.service.persistence.impl;
 
+import com.liferay.commerce.exception.DuplicateCommerceAddressExternalReferenceCodeException;
 import com.liferay.commerce.exception.NoSuchAddressException;
 import com.liferay.commerce.model.CommerceAddress;
 import com.liferay.commerce.model.CommerceAddressTable;
@@ -5230,6 +5231,33 @@ public class CommerceAddressPersistenceImpl
 		if (Validator.isNull(commerceAddress.getExternalReferenceCode())) {
 			commerceAddress.setExternalReferenceCode(
 				String.valueOf(commerceAddress.getPrimaryKey()));
+		}
+		else {
+			CommerceAddress ercCommerceAddress = fetchByC_ERC(
+				commerceAddress.getCompanyId(),
+				commerceAddress.getExternalReferenceCode());
+
+			if (isNew) {
+				if (ercCommerceAddress != null) {
+					throw new DuplicateCommerceAddressExternalReferenceCodeException(
+						"Duplicate commerce address with external reference code " +
+							commerceAddress.getExternalReferenceCode() +
+								" and company " +
+									commerceAddress.getCompanyId());
+				}
+			}
+			else {
+				if ((ercCommerceAddress != null) &&
+					(commerceAddress.getCommerceAddressId() !=
+						ercCommerceAddress.getCommerceAddressId())) {
+
+					throw new DuplicateCommerceAddressExternalReferenceCodeException(
+						"Duplicate commerce address with external reference code " +
+							commerceAddress.getExternalReferenceCode() +
+								" and company " +
+									commerceAddress.getCompanyId());
+				}
+			}
 		}
 
 		ServiceContext serviceContext =

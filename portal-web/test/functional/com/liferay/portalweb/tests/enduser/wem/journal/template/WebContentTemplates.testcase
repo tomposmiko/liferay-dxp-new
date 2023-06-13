@@ -16,7 +16,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -24,7 +24,7 @@ definition {
 		}
 	}
 
-	@priority = "5"
+	@priority = 5
 	test AddTemplateWithStructure {
 		property portal.acceptance = "true";
 		property testray.component.names = "Web Content Administration";
@@ -66,7 +66,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-116515. The Add FreeMarker button should be hidden when disable template creation in Dynamic Data Mapping."
-	@priority = "5"
+	@priority = 5
 	test CannotAddTemplateWhenDisableTemplateCreation {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "WebContentTemplates#CannotAddTemplateWhenDisableTemplateCreation";
@@ -114,7 +114,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-116515. The user is able to save changes in existing template when disable template creation in Dynamic Data Mapping."
-	@priority = "5"
+	@priority = 5
 	test SaveChangesInExistingTemplateWhenDisableTemplateCreation {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "WebContentTemplates#SaveChangesInExistingTemplateWhenDisableTemplateCreation";
@@ -179,7 +179,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-116515. The creation of template is not allowed when disable template creation in Dynamic Data Mapping."
-	@priority = "4"
+	@priority = 4
 	test ViewTemplateCreationFailureWhenDisableTemplateCreation {
 		property test.name.skip.portal.instance = "WebContentTemplates#ViewTemplateCreationFailureWhenDisableTemplateCreation";
 
@@ -190,13 +190,13 @@ definition {
 
 			LexiconEntry.gotoAdd();
 
-			Pause(locator1 = "3000");
+			Pause(locator1 = 3000);
 		}
 
 		task ("Disable Template Creation") {
 			Open.openInTheNewTab(locator1 = "http://localhost:8080");
 
-			var siteName = TestCase.getSiteName(siteName = "${siteName}");
+			var siteName = TestCase.getSiteName(siteName = ${siteName});
 
 			SelectWindow(locator1 = "title=Home - ${siteName}");
 

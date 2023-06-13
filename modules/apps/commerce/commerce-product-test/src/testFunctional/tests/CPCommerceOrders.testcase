@@ -21,7 +21,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -63,15 +63,15 @@ definition {
 
 		FrontStore.addInitializerProductToCart(
 			productName = "ABS Sensor",
-			productQuantity = "2");
+			productQuantity = 2);
 
-		Pause(locator1 = "5000");
+		Pause(locator1 = 5000);
 
 		CommerceNavigator.gotoMiniCart();
 
 		Button.click(button = "Submit");
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		CommerceCheckout.initializersCheckout(
 			newAddressAddress = "Test Address",
@@ -81,8 +81,8 @@ definition {
 			newAddressZipCode = "Test Zip Code",
 			paymentMethod = "Money Order",
 			productName = "ABS Sensor",
-			productQuantity = "2",
-			productUnitPrice = "50",
+			productQuantity = 2,
+			productUnitPrice = 50,
 			shippingMethod = "Standard");
 
 		CommerceNavigator.gotoPortlet(
@@ -92,7 +92,7 @@ definition {
 		CommerceNavigator.gotoOrderEntryViaAdmin(status = "Pending");
 
 		CommerceOrders.editOrderItemDetails(
-			orderItemQuantity = "4",
+			orderItemQuantity = 4,
 			orderItemSKU = "MIN93015");
 
 		CommerceNavigator.gotoPortlet(
@@ -108,7 +108,7 @@ definition {
 			paymentMethod = "Money Order",
 			productListPrice = "50.00",
 			productName = "ABS Sensor",
-			productQuantity = "4",
+			productQuantity = 4,
 			productSKU = "SPEED93015",
 			productTotalPrice = "100.00");
 	}

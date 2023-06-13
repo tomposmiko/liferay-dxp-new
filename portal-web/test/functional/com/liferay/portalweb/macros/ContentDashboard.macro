@@ -9,12 +9,12 @@ definition {
 
 		Click(locator1 = "ContentDashboard#EDIT_OPTION");
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		if (isSet(webContentTitle)) {
 			Click(locator1 = "TextInput#TITLE");
 
-			PortletEntry.inputTitle(title = "${webContentTitle}");
+			PortletEntry.inputTitle(title = ${webContentTitle});
 		}
 
 		Button.clickPublish();
@@ -27,7 +27,7 @@ definition {
 				value1 = "Filter and Order");
 		}
 
-		var key_filterOption = "${filterOption}";
+		var key_filterOption = ${filterOption};
 
 		Click(locator1 = "ContentDashboard#FILTER_BY_OPTION");
 
@@ -65,7 +65,7 @@ definition {
 				value1 = "Filter and Order");
 		}
 
-		var key_filterOption = "${filterOption}";
+		var key_filterOption = ${filterOption};
 
 		Click(locator1 = "ContentDashboard#FILTER_BY_OPTION");
 
@@ -103,7 +103,7 @@ definition {
 				value1 = "Filter and Order");
 		}
 
-		var key_filterOption = "${filterOption}";
+		var key_filterOption = ${filterOption};
 
 		Click(locator1 = "ContentDashboard#FILTER_BY_OPTION");
 
@@ -141,7 +141,7 @@ definition {
 				value1 = "Filter and Order");
 		}
 
-		var key_filterOption = "${filterOption}";
+		var key_filterOption = ${filterOption};
 
 		Click(locator1 = "ContentDashboard#FILTER_BY_OPTION");
 
@@ -173,7 +173,7 @@ definition {
 				value1 = "Filter and Order");
 		}
 
-		var key_filterOption = "${filterOption}";
+		var key_filterOption = ${filterOption};
 
 		Click(locator1 = "ContentDashboard#FILTER_BY_OPTION");
 
@@ -193,7 +193,7 @@ definition {
 				value1 = "Filter and Order");
 		}
 
-		var key_filterOption = "${filterOption}";
+		var key_filterOption = ${filterOption};
 
 		Click(locator1 = "ContentDashboard#FILTER_BY_OPTION");
 	}
@@ -205,7 +205,7 @@ definition {
 				value1 = "Filter and Order");
 		}
 
-		var key_filterOption = "${filterOption}";
+		var key_filterOption = ${filterOption};
 
 		Click(locator1 = "ContentDashboard#FILTER_BY_OPTION");
 	}
@@ -217,7 +217,7 @@ definition {
 				value1 = "Filter and Order");
 		}
 
-		var key_filterOption = "${filterOption}";
+		var key_filterOption = ${filterOption};
 
 		Click(locator1 = "ContentDashboard#FILTER_BY_OPTION");
 	}
@@ -229,7 +229,7 @@ definition {
 				value1 = "Filter and Order");
 		}
 
-		var key_filterOption = "${filterOption}";
+		var key_filterOption = ${filterOption};
 
 		Click(locator1 = "ContentDashboard#FILTER_BY_OPTION");
 	}
@@ -241,7 +241,7 @@ definition {
 				value1 = "Filter and Order");
 		}
 
-		var key_filterOption = "${filterOption}";
+		var key_filterOption = ${filterOption};
 
 		Click(locator1 = "ContentDashboard#FILTER_BY_OPTION");
 
@@ -255,7 +255,7 @@ definition {
 
 		Click(locator1 = "ContentDashboard#SELECT_TAGS_BUTTON");
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		SelectFrame(value1 = "relative=top");
 	}
@@ -273,7 +273,7 @@ definition {
 				value1 = "Filter and Order");
 		}
 
-		var key_filterOption = "${filterOption}";
+		var key_filterOption = ${filterOption};
 
 		Click(locator1 = "ContentDashboard#FILTER_BY_OPTION");
 	}
@@ -285,7 +285,7 @@ definition {
 				value1 = "Filter and Order");
 		}
 
-		var key_filterOption = "${filterOption}";
+		var key_filterOption = ${filterOption};
 
 		Click(locator1 = "ContentDashboard#FILTER_BY_OPTION");
 	}
@@ -295,7 +295,7 @@ definition {
 
 		Type(
 			locator1 = "ContentDashboard#SEARCH_FIELD",
-			value1 = "${webContentTitle}");
+			value1 = ${webContentTitle});
 
 		KeyPress(
 			locator1 = "ContentDashboard#SEARCH_FIELD",

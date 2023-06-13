@@ -22,7 +22,7 @@ definition {
 
 	macro accountSignIn {
 		if (isSet(specificURL)) {
-			Navigator.openSpecificURL(url = "${specificURL}");
+			Navigator.openSpecificURL(url = ${specificURL});
 		}
 		else {
 			Navigator.openURL();
@@ -38,13 +38,13 @@ definition {
 
 		Type(
 			locator1 = "GoogleLogin#LOGIN_EMAIL_FIELD",
-			value1 = "${userEmailAddress}");
+			value1 = ${userEmailAddress});
 
 		Click(locator1 = "GoogleLogin#LOGIN_NEXT_BUTTON");
 
 		Type(
 			locator1 = "GoogleLogin#LOGIN_PASSWORD_FIELD",
-			value1 = "${userPassword}");
+			value1 = ${userPassword});
 
 		if (IsElementPresent(locator1 = "GoogleLogin#LOGIN_SIGN_IN_BUTTON")) {
 			Click(locator1 = "GoogleLogin#LOGIN_SIGN_IN_BUTTON");
@@ -59,15 +59,15 @@ definition {
 
 		FormFields.editTextMultiline(
 			fieldName = "providerName",
-			fieldValue = "${providerName}");
+			fieldValue = ${providerName});
 
 		FormFields.editTextMultiline(
 			fieldName = "openIdConnectClientId",
-			fieldValue = "${openIDConnectClientID}");
+			fieldValue = ${openIDConnectClientID});
 
 		FormFields.editTextMultiline(
 			fieldName = "openIdConnectClientSecret",
-			fieldValue = "${openIDConnectClientSecret}");
+			fieldValue = ${openIDConnectClientSecret});
 
 		FormFields.editTextMultiline(
 			fieldName = "discoveryEndPoint",

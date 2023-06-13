@@ -234,7 +234,10 @@ public abstract class BaseProductResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantProduct),
 				(List<Product>)page.getItems());
-			assertValid(page);
+			assertValid(
+				page,
+				testGetChannelProductsPage_getExpectedActions(
+					irrelevantChannelId));
 		}
 
 		Product product1 = testGetChannelProductsPage_addProduct(
@@ -250,7 +253,17 @@ public abstract class BaseProductResourceTestCase {
 
 		assertEqualsIgnoringOrder(
 			Arrays.asList(product1, product2), (List<Product>)page.getItems());
-		assertValid(page);
+		assertValid(
+			page, testGetChannelProductsPage_getExpectedActions(channelId));
+	}
+
+	protected Map<String, Map> testGetChannelProductsPage_getExpectedActions(
+			Long channelId)
+		throws Exception {
+
+		Map<String, Map> expectedActions = new HashMap<>();
+
+		return expectedActions;
 	}
 
 	@Test
@@ -564,6 +577,7 @@ public abstract class BaseProductResourceTestCase {
 										put(
 											"channelId",
 											testGraphQLGetChannelProduct_getChannelId());
+
 										put("productId", product.getId());
 									}
 								},
@@ -875,6 +889,12 @@ public abstract class BaseProductResourceTestCase {
 	}
 
 	protected void assertValid(Page<Product> page) {
+		assertValid(page, Collections.emptyMap());
+	}
+
+	protected void assertValid(
+		Page<Product> page, Map<String, Map> expectedActions) {
+
 		boolean valid = false;
 
 		java.util.Collection<Product> products = page.getItems();
@@ -889,6 +909,20 @@ public abstract class BaseProductResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
+
+		Map<String, Map> actions = page.getActions();
+
+		for (String key : expectedActions.keySet()) {
+			Map action = actions.get(key);
+
+			Assert.assertNotNull(key + " does not contain an action", action);
+
+			Map expectedAction = expectedActions.get(key);
+
+			Assert.assertEquals(
+				expectedAction.get("method"), action.get("method"));
+			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
+		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -1257,6 +1291,10 @@ public abstract class BaseProductResourceTestCase {
 
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
+
+		if (entityModel == null) {
+			return Collections.emptyList();
+		}
 
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();

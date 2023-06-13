@@ -18,7 +18,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -31,7 +31,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-110309 and LPS-112805"
-	@priority = "4"
+	@priority = 4
 	test AssertDescriptionsForConfigurationEntries {
 		property test.name.skip.portal.instance = "MultiFactorAuthentication#AssertDescriptionsForConfigurationEntries";
 
@@ -58,7 +58,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-109786"
-	@priority = "4"
+	@priority = 4
 	test AssertNotificationsAfterMFADisabledOrEnabled {
 		property test.name.skip.portal.instance = "MultiFactorAuthentication#AssertNotificationsAfterMFADisabledOrEnabled";
 
@@ -92,7 +92,7 @@ definition {
 
 		Navigator.openSpecificURL(url = "http://www.able.com:8080");
 
-		Notifications.viewBadgeCount(notificationCount = "1");
+		Notifications.viewBadgeCount(notificationCount = 1);
 
 		Notifications.gotoNotifications();
 
@@ -107,7 +107,7 @@ definition {
 
 		Navigator.openSpecificURL(url = "http://www.able.com:8080");
 
-		Notifications.viewBadgeCount(notificationCount = "2");
+		Notifications.viewBadgeCount(notificationCount = 2);
 
 		Notifications.gotoNotifications();
 
@@ -129,7 +129,7 @@ definition {
 
 		Navigator.openSpecificURL(url = "http://www.able.com:8080");
 
-		Notifications.viewBadgeCount(notificationCount = "2");
+		Notifications.viewBadgeCount(notificationCount = 2);
 
 		Navigator.openURL();
 
@@ -137,11 +137,11 @@ definition {
 
 		Navigator.openSpecificURL(url = "http://www.able.com:8080");
 
-		Notifications.viewBadgeCount(notificationCount = "2");
+		Notifications.viewBadgeCount(notificationCount = 2);
 	}
 
 	@description = "This is a use case for LPS-92659"
-	@priority = "5"
+	@priority = 5
 	test BlockedAfterReachAllowedFailedAttempts {
 		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
 		property test.name.skip.portal.instance = "MultiFactorAuthentication#BlockedAfterReachAllowedFailedAttempts";
@@ -164,8 +164,8 @@ definition {
 		MultiFactorAuthentication.configureOTP(enableOTP = "true");
 
 		MultiFactorAuthentication.emailOTPConfiguration(
-			failedAttemptsAllowed = "1",
-			retryTimeout = "5");
+			failedAttemptsAllowed = 1,
+			retryTimeout = 5);
 
 		SignOut.signOut();
 
@@ -174,7 +174,7 @@ definition {
 		MultiFactorAuthentication.sendOTPEmailPG();
 
 		MultiFactorAuthentication.verifyOTP(
-			portalURL = "${portalURL}",
+			portalURL = ${portalURL},
 			recipient = "test test",
 			userEmailAddress = "test@liferay.com",
 			userPassword = "test",
@@ -184,17 +184,17 @@ definition {
 			key_fieldName = "emailOTPSentSubject",
 			locator1 = "Message#ERROR");
 
-		Pause(locator1 = "5000");
+		Pause(locator1 = 5000);
 
 		MultiFactorAuthentication.verifyOTP(
-			portalURL = "${portalURL}",
+			portalURL = ${portalURL},
 			recipient = "Test Test",
 			userEmailAddress = "test@liferay.com",
 			userPassword = "test");
 	}
 
 	@description = "This is a use case for LPS-86515"
-	@priority = "5"
+	@priority = 5
 	test CheckOrderOfMFAVerifier {
 		property test.name.skip.portal.instance = "MultiFactorAuthentication#CheckOrderOfMFAVerifier";
 
@@ -225,7 +225,7 @@ definition {
 		Type(
 			key_fieldName = "service.ranking",
 			locator1 = "MultiFactorAuthentication#EMAIL_OTP_CONFIG_FIELD",
-			value1 = "100");
+			value1 = 100);
 
 		PortletEntry.update();
 
@@ -239,7 +239,7 @@ definition {
 		Type(
 			key_fieldName = "service.ranking",
 			locator1 = "MultiFactorAuthentication#EMAIL_OTP_CONFIG_FIELD",
-			value1 = "10");
+			value1 = 10);
 
 		PortletEntry.update();
 
@@ -263,7 +263,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-112805"
-	@priority = "5"
+	@priority = 5
 	test DisabledBasicAuthenticationOnInstanceLevel {
 		property custom.properties = "access.control.sanitize.security.exception=false${line.separator}json.service.serialize.throwable=true";
 		property test.name.skip.portal.instance = "MultiFactorAuthentication#DisabledBasicAuthenticationOnInstanceLevel";
@@ -314,9 +314,9 @@ definition {
 			http://www.able.com:8080/api/jsonws/user/get-current-user
 		''';
 
-		var reponse = JSONCurlUtil.get("${curl}");
+		var reponse = JSONCurlUtil.get(${curl});
 
-		if (contains("${reponse}", "Access denied to com.liferay.portal.kernel.service.UserService#getCurrentUser")) {
+		if (contains(${reponse}, "Access denied to com.liferay.portal.kernel.service.UserService#getCurrentUser")) {
 			echo("Instance admin is able to disable Basic Authentication.");
 		}
 		else {
@@ -325,7 +325,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-102468"
-	@priority = "5"
+	@priority = 5
 	test DisableOTPForInstanceOnSystemLevel {
 		property test.name.skip.portal.instance = "MultiFactorAuthentication#DisableOTPForInstanceOnSystemLevel";
 
@@ -393,7 +393,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-102467 and LPS-110444"
-	@priority = "5"
+	@priority = 5
 	test EditEmailTemplate {
 		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
 		property test.name.skip.portal.instance = "MultiFactorAuthentication#EditEmailTemplate";
@@ -441,7 +441,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-101720"
-	@priority = "5"
+	@priority = 5
 	test EnableOTPForInstanceAsInstanceAdminUser {
 		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
 		property test.name.skip.portal.instance = "MultiFactorAuthentication#EnableOTPForInstanceAsInstanceAdminUser";
@@ -511,7 +511,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-101746"
-	@priority = "5"
+	@priority = 5
 	test EndUserPermissionCheck {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -567,7 +567,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-102469"
-	@priority = "5"
+	@priority = 5
 	test LoginSuccessfulAfterResetPasswordAsEndUser {
 		property test.name.skip.portal.instance = "MultiFactorAuthentication#LoginSuccessfulAfterResetPasswordAsEndUser";
 
@@ -614,14 +614,14 @@ definition {
 		MultiFactorAuthentication.sendOTPEmailPG();
 
 		MultiFactorAuthentication.verifyOTP(
-			portalURL = "${portalURL}",
+			portalURL = ${portalURL},
 			recipient = "userfn userln",
 			userEmailAddress = "userea@liferay.com",
 			userPassword = "test");
 	}
 
 	@description = "This is a use case for LPS-92659"
-	@priority = "5"
+	@priority = 5
 	test LoginSuccessfulAfterRetryTimeout {
 		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
 		property test.name.skip.portal.instance = "MultiFactorAuthentication#LoginSuccessfulAfterRetryTimeout";
@@ -644,8 +644,8 @@ definition {
 		MultiFactorAuthentication.configureOTP(enableOTP = "true");
 
 		MultiFactorAuthentication.emailOTPConfiguration(
-			failedAttemptsAllowed = "1",
-			retryTimeout = "10");
+			failedAttemptsAllowed = 1,
+			retryTimeout = 10);
 
 		SignOut.signOut();
 
@@ -654,23 +654,23 @@ definition {
 		MultiFactorAuthentication.sendOTPEmailPG();
 
 		MultiFactorAuthentication.verifyOTP(
-			portalURL = "${portalURL}",
+			portalURL = ${portalURL},
 			recipient = "test test",
 			userEmailAddress = "test@liferay.com",
 			userPassword = "test",
 			validOTP = "false");
 
-		Pause(locator1 = "11000");
+		Pause(locator1 = 11000);
 
 		MultiFactorAuthentication.verifyOTP(
-			portalURL = "${portalURL}",
+			portalURL = ${portalURL},
 			recipient = "Test Test",
 			userEmailAddress = "test@liferay.com",
 			userPassword = "test");
 	}
 
 	@description = "This is a use case for LPS-101746"
-	@priority = "5"
+	@priority = 5
 	test LoginWithIPBasedVerifierEnabled {
 		property test.name.skip.portal.instance = "MultiFactorAuthentication#LoginWithIPBasedVerifierEnabled";
 
@@ -739,7 +739,7 @@ definition {
 		MultiFactorAuthentication.sendOTPEmailPG();
 
 		MultiFactorAuthentication.verifyOTP(
-			portalURL = "${portalURL}",
+			portalURL = ${portalURL},
 			recipient = "Test Test",
 			userEmailAddress = "test@liferay.com",
 			userPassword = "test");
@@ -763,7 +763,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-101717"
-	@priority = "5"
+	@priority = 5
 	test LoginWithIPBasedVerifierFailedOnInstanceLevel {
 		property test.name.skip.portal.instance = "MultiFactorAuthentication#LoginWithIPBasedVerifierFailedOnInstanceLevel";
 
@@ -843,7 +843,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-101720"
-	@priority = "5"
+	@priority = 5
 	test LoginWithOTPEnabled {
 		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
 		property test.name.skip.portal.instance = "MultiFactorAuthentication#LoginWithOTPEnabled";
@@ -884,14 +884,14 @@ definition {
 		MultiFactorAuthentication.sendOTPEmailPG();
 
 		MultiFactorAuthentication.verifyOTP(
-			portalURL = "${portalURL}",
+			portalURL = ${portalURL},
 			recipient = "userfn userln",
 			userEmailAddress = "userea@liferay.com",
 			userPassword = "test");
 	}
 
 	@description = "This is a use case for LPS-98267"
-	@priority = "5"
+	@priority = 5
 	test LoginWithTOTPEnabledForEndUser {
 		property test.name.skip.portal.instance = "MultiFactorAuthentication#LoginWithTOTPEnabledForEndUser";
 
@@ -930,7 +930,7 @@ definition {
 		MultiFactorAuthentication.sendOTPEmailPG();
 
 		MultiFactorAuthentication.verifyOTP(
-			portalURL = "${portalURL}",
+			portalURL = ${portalURL},
 			recipient = "userfn userln",
 			userEmailAddress = "userea@liferay.com",
 			userPassword = "test");
@@ -949,7 +949,7 @@ definition {
 
 		AssertElementPresent(locator1 = "MultiFactorAuthentication#TOTP_FIELD");
 
-		MultiFactorAuthentication.getTOTP(secretKeyUnchanged = "${secretKey}");
+		MultiFactorAuthentication.getTOTP(secretKeyUnchanged = ${secretKey});
 
 		UserBar.gotoDropdownItem(dropdownItem = "Account Settings");
 
@@ -972,7 +972,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-115566"
-	@priority = "5"
+	@priority = 5
 	test RemoveAndAutoGenerateTOTP {
 		property test.name.skip.portal.instance = "MultiFactorAuthentication#RemoveAndAutoGenerateTOTP";
 
@@ -1024,7 +1024,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-115566"
-	@priority = "4"
+	@priority = 4
 	test RemoveCurrentTOTPWontAffectOthers {
 		property test.name.skip.portal.instance = "MultiFactorAuthentication#RemoveCurrentTOTPWontAffectOthers";
 
@@ -1076,7 +1076,7 @@ definition {
 		MultiFactorAuthentication.sendOTPEmailPG();
 
 		MultiFactorAuthentication.verifyOTP(
-			portalURL = "${portalURL}",
+			portalURL = ${portalURL},
 			recipient = "userfn userln",
 			userEmailAddress = "userea@liferay.com",
 			userPassword = "test");
@@ -1100,7 +1100,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-101750"
-	@priority = "5"
+	@priority = 5
 	test UseCustomMFAVerifier {
 		property osgi.modules.includes = "multi-factor-authentication-sample";
 		property test.name.skip.portal.instance = "MultiFactorAuthentication#UseCustomMFAVerifier";
@@ -1121,11 +1121,11 @@ definition {
 
 		AssertTextEquals(
 			locator1 = "MultiFactorAuthentication#ORDER_FIELD",
-			value1 = "400");
+			value1 = 400);
 
 		MultiFactorAuthentication.configureOTP(
 			enableOTP = "true",
-			order = "50");
+			order = 50);
 
 		SignOut.signOut();
 
@@ -1133,7 +1133,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-118204"
-	@priority = "4"
+	@priority = 4
 	test VerifyUIchangesInMFA {
 		PortalSettings.gotoConfiguration(
 			configurationCategory = "Multi-Factor Authentication",
@@ -1175,7 +1175,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-89360"
-	@priority = "4"
+	@priority = 4
 	test ViewOrderOfOTPVerifier {
 		property test.name.skip.portal.instance = "MultiFactorAuthentication#ViewOrderOfOTPVerifier";
 
@@ -1207,7 +1207,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-92658"
-	@priority = "4"
+	@priority = 4
 	test ViewResourceActionsOfOTPVerificationFailure {
 		property test.name.skip.portal.instance = "MultiFactorAuthentication#ViewResourceActionsOfOTPVerificationFailure";
 
@@ -1235,14 +1235,14 @@ definition {
 		MultiFactorAuthentication.sendOTPEmailPG();
 
 		MultiFactorAuthentication.verifyOTP(
-			portalURL = "${portalURL}",
+			portalURL = ${portalURL},
 			recipient = "test test",
 			userEmailAddress = "test@liferay.com",
 			userPassword = "test",
 			validOTP = "false");
 
 		MultiFactorAuthentication.verifyOTP(
-			portalURL = "${portalURL}",
+			portalURL = ${portalURL},
 			recipient = "Test Test",
 			userEmailAddress = "test@liferay.com",
 			userPassword = "test");
@@ -1265,7 +1265,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-86515"
-	@priority = "5"
+	@priority = 5
 	test ViewResourceActionsOfTOTPVerificationAttempts {
 		property test.name.skip.portal.instance = "MultiFactorAuthentication#ViewResourceActionsOfTOTPVerificationAttempts";
 
@@ -1331,13 +1331,13 @@ definition {
 
 		Type(
 			locator1 = "MultiFactorAuthentication#TOTP_VERIFY_FIELD",
-			value1 = "111111");
+			value1 = 111111);
 
 		Button.click(button = "Submit");
 
 		AssertElementPresent(locator1 = "MultiFactorAuthentication#EMAIL_OTP_VERIFY_FAILED_MESSAGE");
 
-		MultiFactorAuthentication.getTOTP(secretKeyUnchanged = "${secretKey}");
+		MultiFactorAuthentication.getTOTP(secretKeyUnchanged = ${secretKey});
 
 		ApplicationsMenu.gotoPortlet(
 			category = "Security",

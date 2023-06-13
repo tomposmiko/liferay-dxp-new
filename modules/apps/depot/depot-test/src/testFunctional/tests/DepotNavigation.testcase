@@ -14,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -27,7 +27,7 @@ definition {
 	}
 
 	@description = "This ensures that a depot can be accessed from a connected site to create shortcut."
-	@priority = "5"
+	@priority = 5
 	test AccessViaShortcut {
 		JSONGroup.addGroup(groupName = "Site Name");
 
@@ -62,7 +62,7 @@ definition {
 	}
 
 	@description = "This test covers LPS-120834. It ensures that a user can not redirect to the depot via Space icon."
-	@priority = "5"
+	@priority = 5
 	test CannotAccessDepotViaSite {
 		property portal.acceptance = "true";
 
@@ -74,7 +74,7 @@ definition {
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		AssertElementNotPresent(
 			locator1 = "NavBar#NAV_ITEM_LINK",
@@ -83,7 +83,7 @@ definition {
 	}
 
 	@description = "This test covers LPS-104832. It ensures that the repositories can not connect to repositories."
-	@priority = "5"
+	@priority = 5
 	test ViewRestrictionWhenConnectingSites {
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",

@@ -14,6 +14,7 @@
 
 package com.liferay.search.experiences.service.impl;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.ResourceConstants;
@@ -27,6 +28,7 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
 import com.liferay.search.experiences.exception.DuplicateSXPBlueprintExternalReferenceCodeException;
@@ -229,11 +231,18 @@ public class SXPBlueprintLocalServiceImpl
 			long companyId, String externalReferenceCode)
 		throws PortalException {
 
+		if (Validator.isNull(externalReferenceCode)) {
+			return;
+		}
+
 		SXPBlueprint sxpBlueprint = fetchSXPBlueprintByExternalReferenceCode(
 			companyId, externalReferenceCode);
 
 		if (sxpBlueprint != null) {
-			throw new DuplicateSXPBlueprintExternalReferenceCodeException();
+			throw new DuplicateSXPBlueprintExternalReferenceCodeException(
+				StringBundler.concat(
+					"Duplicate blueprint external reference code ",
+					externalReferenceCode, " in company ", companyId));
 		}
 	}
 

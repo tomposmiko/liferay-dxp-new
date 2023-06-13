@@ -24,7 +24,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -33,7 +33,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-109555. Can bulk restore multiple items from recycle bin."
-	@priority = "5"
+	@priority = 5
 	test BulkRestoreMultipleAssetsFromRecycleBin {
 		property portal.acceptance = "true";
 
@@ -107,7 +107,7 @@ definition {
 		}
 	}
 
-	@priority = "3"
+	@priority = 3
 	test DisableRecycleBin {
 		Site.openSiteSettingsAdmin(siteURLKey = "site-name");
 
@@ -123,7 +123,7 @@ definition {
 		WebContent.deleteWithDisabledRB(entryTitle = "Web Content Title");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test RecycleBinBlogs {
 		JSONLayout.addWidgetToPublicLayout(
 			groupName = "Site Name",
@@ -169,7 +169,7 @@ definition {
 			entryTitle = "Blogs Entry Title");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test RecycleBinBookmarks {
 		property portal.release = "false";
 
@@ -266,7 +266,7 @@ definition {
 			bookmarkURL = "https://www.liferay.com");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test RecycleBinMBAttachment {
 		MessageBoardsAdmin.openMessageBoardsAdmin(siteURLKey = "site-name");
 
@@ -283,7 +283,7 @@ definition {
 		MessageBoardsAdmin.openMessageBoardsAdmin(siteURLKey = "site-name");
 
 		MessageboardsThread.viewCP(
-			replyCount = "0",
+			replyCount = 0,
 			threadBody = "MB Body Edit",
 			threadSubject = "MB Subject",
 			userName = "Test Test");
@@ -298,13 +298,13 @@ definition {
 
 		MessageboardsThread.viewCP(
 			mbAttachmentFile = "Document_1.doc",
-			replyCount = "0",
+			replyCount = 0,
 			threadBody = "MB Body Edit",
 			threadSubject = "MB Subject",
 			userName = "Test Test");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test RecycleBinScheduledCleanup {
 		property custom.properties = "trash.entry.check.interval=1${line.separator}trash.entries.max.age=1";
 
@@ -335,14 +335,14 @@ definition {
 			customMaxAge = "1 minute",
 			deleteUser = "Test Test");
 
-		Pause(locator1 = "120000");
+		Pause(locator1 = 120000);
 
 		Refresh();
 
 		RecycleBin.viewDefaultCP(assetName = "Blogs Entry Title");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test RecycleBinSearchBlogsEntries {
 		JSONLayout.addWidgetToPublicLayout(
 			groupName = "Site Name",
@@ -377,7 +377,7 @@ definition {
 
 		RecycleBin.openRecycleBinAdmin(siteURLKey = "site-name");
 
-		Search.searchCP(searchTerm = "1");
+		Search.searchCP(searchTerm = 1);
 
 		RecycleBin.viewCP(
 			assetName = "Blogs Entry Title 1",
@@ -386,7 +386,7 @@ definition {
 
 		RecycleBin.openRecycleBinAdmin(siteURLKey = "site-name");
 
-		Search.searchCP(searchTerm = "2");
+		Search.searchCP(searchTerm = 2);
 
 		RecycleBin.viewCP(
 			assetName = "Blogs Entry Title 2",
@@ -395,7 +395,7 @@ definition {
 
 		RecycleBin.openRecycleBinAdmin(siteURLKey = "site-name");
 
-		Search.searchCP(searchTerm = "3");
+		Search.searchCP(searchTerm = 3);
 
 		RecycleBin.viewCP(
 			assetName = "Blogs Entry Title 3",
@@ -403,7 +403,7 @@ definition {
 			deleteUser = "Test Test");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test RecycleBinSearchDMEntriesInFolder {
 		property custom.properties = "default.layout.template.id=1_column";
 
@@ -460,7 +460,7 @@ definition {
 
 		RecycleBin.openRecycleBinAdmin(siteURLKey = "site-name");
 
-		Search.searchCP(searchTerm = "1");
+		Search.searchCP(searchTerm = 1);
 
 		RecycleBin.viewCP(
 			assetName = "DM Document Title 1",
@@ -469,7 +469,7 @@ definition {
 
 		RecycleBin.openRecycleBinAdmin(siteURLKey = "site-name");
 
-		Search.searchCP(searchTerm = "2");
+		Search.searchCP(searchTerm = 2);
 
 		RecycleBin.viewCP(
 			assetName = "DM Document Title 2",
@@ -477,7 +477,7 @@ definition {
 			deleteUser = "test test");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test RecycleBinStaging {
 		JSONLayout.addWidgetToPublicLayout(
 			groupName = "Site Name",
@@ -542,7 +542,7 @@ definition {
 			deleteUser = "Test Test");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test RecycleBinWiki {
 		WikiNavigator.openWikiAdmin(siteURLKey = "site-name");
 
@@ -609,7 +609,7 @@ definition {
 		WikiNavigator.openWikiAdmin(siteURLKey = "site-name");
 
 		WikiNode.viewCP(
-			numberOfWikiPages = "2",
+			numberOfWikiPages = 2,
 			wikiNodeName = "Wiki Node Name");
 
 		LexiconEntry.changeDisplayStyle(displayStyle = "list");
@@ -622,7 +622,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-109555. Automatically rename documents when bulk restore them from recycle bin if document names already exist in the destination."
-	@priority = "5"
+	@priority = 5
 	test RenameBulkRestoreDocumentsAutomaticallyWhenDocumentNamesAlreadyExistInTheDestination {
 		property portal.acceptance = "true";
 		property portal.upstream = "true";
@@ -666,7 +666,7 @@ definition {
 
 			for (var entryName : list "Document_1.png,Document_1.txt") {
 				RecycleBin.viewCP(
-					assetName = "${entryName}",
+					assetName = ${entryName},
 					assetType = "Document",
 					deleteUser = "Test Test");
 			}
@@ -678,12 +678,12 @@ definition {
 			DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
 
 			for (var assetName : list "Document_1.png,Document_1.txt,Document_1 (1).png,Document_1 (1).txt") {
-				DMDocument.viewCardTitle(dmDocumentTitle = "${assetName}");
+				DMDocument.viewCardTitle(dmDocumentTitle = ${assetName});
 			}
 		}
 	}
 
-	@priority = "5"
+	@priority = 5
 	test RestoreDMDocumentFromFolderCP {
 		property portal.acceptance = "true";
 		property portal.upstream = "true";
@@ -723,7 +723,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-44099. The blogs entry moved to the recycle bin shouldn't be searchable by its comments."
-	@priority = "4"
+	@priority = 4
 	test SearchBlogsEntryByComments {
 		task ("Add a Blogs widget to page") {
 			JSONLayout.addWidgetToPublicLayout(
@@ -767,7 +767,7 @@ definition {
 				value1 = "2 Results for Comment");
 
 			for (var title : list "Blogs Entry Title 1,Blogs Entry Title 2") {
-				Blogs.viewEntryTitle(entryTitle = "${title}");
+				Blogs.viewEntryTitle(entryTitle = ${title});
 			}
 		}
 
@@ -791,7 +791,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-109555 and LPS-33785. The error message should be shown when restore a document from recycle bin when it has the same name as existing document. Keep both document entries and rename the document entry from the Recycle Bin."
-	@priority = "4"
+	@priority = 4
 	test ViewErrorMessageWhenRestoreDocumentHasTheSameNameWithExistingOne {
 		task ("Add a document entry named DM Document Title") {
 			JSONDocument.addFileWithUploadedFile(
@@ -832,13 +832,13 @@ definition {
 			DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
 
 			for (var assetName : list "DM Document Title,Previous Document Title") {
-				DMDocument.viewCardTitle(dmDocumentTitle = "${assetName}");
+				DMDocument.viewCardTitle(dmDocumentTitle = ${assetName});
 			}
 		}
 	}
 
 	@description = "This is a test for LPS-44554. View restored document in subfolder after restore parent folder from the recycle bin."
-	@priority = "4"
+	@priority = 4
 	test ViewRestoredDocumentInSubFolderAfterRestoreParentFolder {
 		task ("Add a dm folder") {
 			JSONDocument.addFolder(
@@ -854,7 +854,7 @@ definition {
 			JSONDocument.addFolder(
 				dmFolderName = "DM Subfolder Name",
 				groupName = "Site Name",
-				parentFolderId = "${folderId}");
+				parentFolderId = ${folderId});
 		}
 
 		task ("Add a basic document in subfolder") {
@@ -887,7 +887,7 @@ definition {
 			DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name");
 
 			for (var folderName : list "DM Folder Name,DM Subfolder Name") {
-				DMFolder.gotoEntry(dmFolderName = "${folderName}");
+				DMFolder.gotoEntry(dmFolderName = ${folderName});
 			}
 
 			DMDocument.viewCardTitle(dmDocumentTitle = "DM Document Title");

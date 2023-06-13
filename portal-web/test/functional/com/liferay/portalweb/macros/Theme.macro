@@ -4,16 +4,16 @@ definition {
 		Type(
 			key_text = "regularCss",
 			locator1 = "TextArea#ANY",
-			value1 = "${cssText}");
+			value1 = ${cssText});
 	}
 
 	macro configureLookAndFeelShowFooter {
-		if ("${showFooter}" == "true") {
+		if (${showFooter} == "true") {
 			Check.checkToggleSwitch(
 				key_toggleSwitchLabel = "Show Footer",
 				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
 		}
-		else if ("${showFooter}" == "false") {
+		else if (${showFooter} == "false") {
 			Uncheck.uncheckToggleSwitch(
 				key_toggleSwitchLabel = "Show Footer",
 				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
@@ -21,12 +21,12 @@ definition {
 	}
 
 	macro configureLookAndFeelShowHeader {
-		if ("${showHeader}" == "true") {
+		if (${showHeader} == "true") {
 			Check.checkToggleSwitch(
 				key_toggleSwitchLabel = "Show Header",
 				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
 		}
-		else if ("${showHeader}" == "false") {
+		else if (${showHeader} == "false") {
 			Uncheck.uncheckToggleSwitch(
 				key_toggleSwitchLabel = "Show Header",
 				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
@@ -34,12 +34,12 @@ definition {
 	}
 
 	macro configureLookAndFeelShowHeaderSearch {
-		if ("${showHeaderSearch}" == "true") {
+		if (${showHeaderSearch} == "true") {
 			Check.checkToggleSwitch(
 				key_toggleSwitchLabel = "Show Header Search",
 				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
 		}
-		else if ("${showHeaderSearch}" == "false") {
+		else if (${showHeaderSearch} == "false") {
 			Uncheck.uncheckToggleSwitch(
 				key_toggleSwitchLabel = "Show Header Search",
 				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
@@ -47,12 +47,12 @@ definition {
 	}
 
 	macro configureLookAndFeelShowMaxMinAppLinks {
-		if ("${showMaxMinAppLinks}" == "true") {
+		if (${showMaxMinAppLinks} == "true") {
 			Check.checkToggleSwitch(
 				key_toggleSwitchLabel = "Show Maximize/Minimize Application Links",
 				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
 		}
-		else if ("${showMaxMinAppLinks}" == "false") {
+		else if (${showMaxMinAppLinks} == "false") {
 			Uncheck.uncheckToggleSwitch(
 				key_toggleSwitchLabel = "Show Maximize/Minimize Application Links",
 				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
@@ -64,12 +64,12 @@ definition {
 	}
 
 	macro configureLookAndFeelWrapWidgetPageContent {
-		if ("${wrapWidgetPageContent}" == "true") {
+		if (${wrapWidgetPageContent} == "true") {
 			Check.checkToggleSwitch(
 				key_toggleSwitchLabel = "Wrap Widget Page Content",
 				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
 		}
-		else if ("${wrapWidgetPageContent}" == "false") {
+		else if (${wrapWidgetPageContent} == "false") {
 			Uncheck.uncheckToggleSwitch(
 				key_toggleSwitchLabel = "Wrap Widget Page Content",
 				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
@@ -89,8 +89,8 @@ definition {
 
 		var logContent = FileUtil.read("${projectDir}/log");
 
-		while (!(contains("${logContent}", "STARTED ${themeName}"))) {
-			Pause(locator1 = "3000");
+		while (!(contains(${logContent}, "STARTED ${themeName}"))) {
+			Pause(locator1 = 3000);
 
 			AntCommand(
 				locator1 = "build-test.xml",

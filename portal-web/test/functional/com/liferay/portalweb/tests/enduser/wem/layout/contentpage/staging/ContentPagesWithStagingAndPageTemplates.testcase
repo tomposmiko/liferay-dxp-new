@@ -74,7 +74,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -83,7 +83,7 @@ definition {
 	}
 
 	@description = "Content pages created from page templates can be published to live and will not appear in live until published."
-	@priority = "5"
+	@priority = 5
 	test PublishContentPage {
 		property portal.acceptance = "true";
 
@@ -158,7 +158,7 @@ definition {
 	}
 
 	@description = "This is a use case for for LPS-111548. Undo can make the content page template editor come back to previous state in Staging site."
-	@priority = "4"
+	@priority = 4
 	test UndoPageTemplateChangeTwice {
 		SitePages.openPagesAdmin(siteURLKey = "test-site-name-staging");
 

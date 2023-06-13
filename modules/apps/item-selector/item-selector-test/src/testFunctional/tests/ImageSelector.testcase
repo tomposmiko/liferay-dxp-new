@@ -14,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -27,7 +27,7 @@ definition {
 	}
 
 	@description = "This makes sure that multiple blog images can be previewed by using the keyboard."
-	@priority = "5"
+	@priority = 5
 	test PreviewMultipleImagesInBlogsImages {
 		for (var i : list "1,2,3") {
 			BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
@@ -41,7 +41,7 @@ definition {
 
 			Button.clickPublish();
 
-			Pause(locator1 = "10000");
+			Pause(locator1 = 10000);
 		}
 
 		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
@@ -84,13 +84,13 @@ definition {
 
 		for (var coverImageName : list "Document_1,Document_2,Document_3") {
 			AssertElementNotPresent(
-				key_coverImageName = "${coverImageName}",
+				key_coverImageName = ${coverImageName},
 				locator1 = "BlogsEntry#ENTRY_COVER_IMAGE_UNPUBLISHED");
 		}
 	}
 
 	@description = "This makes sure that multiple DM images can be previewed by using the keyboard."
-	@priority = "5"
+	@priority = 5
 	test PreviewMultipleImagesInDM {
 		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
@@ -100,7 +100,7 @@ definition {
 
 		BlogsNavigator.gotoAddEntry();
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		BlogsNavigator.gotoSelectFile();
 
@@ -142,13 +142,13 @@ definition {
 
 		for (var coverImageName : list "Document_1,Document_2,Document_3") {
 			AssertElementNotPresent(
-				key_coverImageName = "${coverImageName}",
+				key_coverImageName = ${coverImageName},
 				locator1 = "BlogsEntry#ENTRY_COVER_IMAGE_UNPUBLISHED");
 		}
 	}
 
 	@description = "This ensures that navigation arrows do not appear in image preview when there is only one image in the library."
-	@priority = "5"
+	@priority = 5
 	test PreviewSingleImage {
 		property portal.acceptance = "true";
 
@@ -163,7 +163,7 @@ definition {
 
 		Button.clickPublish();
 
-		Pause(locator1 = "10000");
+		Pause(locator1 = 10000);
 
 		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
 
@@ -182,7 +182,7 @@ definition {
 		AssertElementNotPresent(locator1 = "ItemSelector#VIEWER_RIGHT");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test RotateImageViaDMSiteAdmin {
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
@@ -201,7 +201,7 @@ definition {
 
 		ImageEditor.rotateImage(rotateDirection = "left");
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		ImageEditor.applyChangesAndSaveFile();
 
@@ -212,7 +212,7 @@ definition {
 		DMDocument.viewDocumentVersionNumberCmdPG(dmDocumentVersionNumber = "1.1");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewImageEditorControls {
 		property environment.acceptance = "true";
 		property operating.system.types = "alpine,amazonlinux,centos,debian,fedora,orcllinux,osx,redhat,solaris,suse,ubuntu,windows";

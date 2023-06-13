@@ -168,6 +168,11 @@ public class AxisExtender {
 			properties.put(
 				HttpWhiteboardConstants.HTTP_WHITEBOARD_FILTER_PATTERN,
 				"/api/axis/*");
+			properties.put(
+				HttpWhiteboardConstants.
+					HTTP_WHITEBOARD_FILTER_INIT_PARAM_PREFIX +
+						"portal_property_prefix",
+				"axis.servlet.");
 
 			ServiceRegistration<Filter> authVerifierFilterServiceRegistration =
 				bundleContext.registerService(

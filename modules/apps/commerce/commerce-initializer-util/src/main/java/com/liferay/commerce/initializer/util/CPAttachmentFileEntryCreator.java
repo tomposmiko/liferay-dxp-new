@@ -19,6 +19,7 @@ import com.liferay.commerce.product.service.CPAttachmentFileEntryLocalService;
 import com.liferay.document.library.kernel.exception.NoSuchFileEntryException;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppService;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ClassedModel;
@@ -28,7 +29,6 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.FriendlyURLNormalizer;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.MimeTypes;
@@ -174,8 +174,7 @@ public class CPAttachmentFileEntryCreator {
 			displayDateYear, displayDateHour, displayDateMinute,
 			expirationDateMonth, expirationDateDay, expirationDateYear,
 			expirationDateHour, expirationDateMinute, true, titleMap, null,
-			priority, type, _friendlyURLNormalizer.normalize(fileName),
-			serviceContext);
+			priority, type, StringPool.BLANK, serviceContext);
 	}
 
 	private static final String _TEMP_FOLDER_NAME =
@@ -190,9 +189,6 @@ public class CPAttachmentFileEntryCreator {
 
 	@Reference
 	private DLAppService _dlAppService;
-
-	@Reference
-	private FriendlyURLNormalizer _friendlyURLNormalizer;
 
 	@Reference
 	private MimeTypes _mimeTypes;

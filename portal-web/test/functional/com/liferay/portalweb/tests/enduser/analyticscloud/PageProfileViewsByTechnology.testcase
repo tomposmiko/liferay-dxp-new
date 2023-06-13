@@ -52,7 +52,7 @@ definition {
 
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = "${propertyName}");
+			ACProperties.switchProperty(propertyName = ${propertyName});
 		}
 
 		task ("Navigate to the Views by Technology card") {
@@ -77,7 +77,7 @@ definition {
 
 		ACUtils.tearDownDXP();
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -91,7 +91,7 @@ definition {
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8362 | Test Summary: Page profile views by technology shows which browsers are being used"
 	@ignore = "true"
-	@priority = "5"
+	@priority = 5
 	test ShowsWhichBrowsersBeingUsed {
 		property portal.upstream = "quarantine";
 
@@ -109,7 +109,7 @@ definition {
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8363 | Test Summary: Page profile views by technology shows which devices are being used"
 	@ignore = "true"
-	@priority = "5"
+	@priority = 5
 	test ShowsWhichDevicesBeingUsed {
 		property portal.upstream = "quarantine";
 

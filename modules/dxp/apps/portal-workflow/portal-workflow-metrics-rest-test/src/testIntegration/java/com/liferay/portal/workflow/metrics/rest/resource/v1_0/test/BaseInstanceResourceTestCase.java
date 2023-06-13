@@ -55,6 +55,7 @@ import java.text.DateFormat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -224,7 +225,10 @@ public abstract class BaseInstanceResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantInstance),
 				(List<Instance>)page.getItems());
-			assertValid(page);
+			assertValid(
+				page,
+				testGetProcessInstancesPage_getExpectedActions(
+					irrelevantProcessId));
 		}
 
 		Instance instance1 = testGetProcessInstancesPage_addInstance(
@@ -242,7 +246,26 @@ public abstract class BaseInstanceResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(instance1, instance2),
 			(List<Instance>)page.getItems());
-		assertValid(page);
+		assertValid(
+			page, testGetProcessInstancesPage_getExpectedActions(processId));
+	}
+
+	protected Map<String, Map> testGetProcessInstancesPage_getExpectedActions(
+			Long processId)
+		throws Exception {
+
+		Map<String, Map> expectedActions = new HashMap<>();
+
+		Map createBatchAction = new HashMap<>();
+		createBatchAction.put("method", "POST");
+		createBatchAction.put(
+			"href",
+			"http://localhost:8080/o/portal-workflow-metrics/v1.0/processes/{processId}/instances/batch".
+				replace("{processId}", String.valueOf(processId)));
+
+		expectedActions.put("createBatch", createBatchAction);
+
+		return expectedActions;
 	}
 
 	@Test
@@ -329,17 +352,25 @@ public abstract class BaseInstanceResourceTestCase {
 		assertHttpResponseStatusCode(
 			204,
 			instanceResource.deleteProcessInstanceHttpResponse(
-				instance.getProcessId(), instance.getId()));
+				testDeleteProcessInstance_getProcessId(instance),
+				instance.getId()));
 
 		assertHttpResponseStatusCode(
 			404,
 			instanceResource.getProcessInstanceHttpResponse(
-				instance.getProcessId(), instance.getId()));
+				testDeleteProcessInstance_getProcessId(instance),
+				instance.getId()));
 
 		assertHttpResponseStatusCode(
 			404,
 			instanceResource.getProcessInstanceHttpResponse(
-				instance.getProcessId(), 0L));
+				testDeleteProcessInstance_getProcessId(instance), 0L));
+	}
+
+	protected Long testDeleteProcessInstance_getProcessId(Instance instance)
+		throws Exception {
+
+		return instance.getProcessId();
 	}
 
 	protected Instance testDeleteProcessInstance_addInstance()
@@ -354,10 +385,17 @@ public abstract class BaseInstanceResourceTestCase {
 		Instance postInstance = testGetProcessInstance_addInstance();
 
 		Instance getInstance = instanceResource.getProcessInstance(
-			postInstance.getProcessId(), postInstance.getId());
+			testGetProcessInstance_getProcessId(postInstance),
+			postInstance.getId());
 
 		assertEquals(postInstance, getInstance);
 		assertValid(getInstance);
+	}
+
+	protected Long testGetProcessInstance_getProcessId(Instance instance)
+		throws Exception {
+
+		return instance.getProcessId();
 	}
 
 	protected Instance testGetProcessInstance_addInstance() throws Exception {
@@ -381,12 +419,20 @@ public abstract class BaseInstanceResourceTestCase {
 									{
 										put(
 											"processId",
-											instance.getProcessId());
+											testGraphQLGetProcessInstance_getProcessId(
+												instance));
+
 										put("instanceId", instance.getId());
 									}
 								},
 								getGraphQLFields())),
 						"JSONObject/data", "Object/processInstance"))));
+	}
+
+	protected Long testGraphQLGetProcessInstance_getProcessId(Instance instance)
+		throws Exception {
+
+		return instance.getProcessId();
 	}
 
 	@Test
@@ -692,6 +738,12 @@ public abstract class BaseInstanceResourceTestCase {
 	}
 
 	protected void assertValid(Page<Instance> page) {
+		assertValid(page, Collections.emptyMap());
+	}
+
+	protected void assertValid(
+		Page<Instance> page, Map<String, Map> expectedActions) {
+
 		boolean valid = false;
 
 		java.util.Collection<Instance> instances = page.getItems();
@@ -706,6 +758,20 @@ public abstract class BaseInstanceResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
+
+		Map<String, Map> actions = page.getActions();
+
+		for (String key : expectedActions.keySet()) {
+			Map action = actions.get(key);
+
+			Assert.assertNotNull(key + " does not contain an action", action);
+
+			Map expectedAction = expectedActions.get(key);
+
+			Assert.assertEquals(
+				expectedAction.get("method"), action.get("method"));
+			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
+		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -1039,6 +1105,10 @@ public abstract class BaseInstanceResourceTestCase {
 
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
+
+		if (entityModel == null) {
+			return Collections.emptyList();
+		}
 
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();

@@ -14,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -27,7 +27,7 @@ definition {
 	}
 
 	@description = "COMMERCE-5907. As a buyer, I want to be unable to add multiple SKU product to the cart directly, I want to be unable to select the quantity of the product directly and I want to be unable to check the availability of the product directly"
-	@priority = "3"
+	@priority = 3
 	test AssertMultipleSKUProductCannotBeDirectlyAddedToCart {
 		CommerceAccelerators.initializeNewSiteViaAccelerator(siteName = "Minium");
 

@@ -49,6 +49,8 @@ import com.liferay.headless.delivery.resource.v1_0.DocumentResource;
 import com.liferay.journal.service.JournalArticleService;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.events.ServicePreAction;
+import com.liferay.portal.events.ThemeServicePreAction;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
@@ -63,10 +65,13 @@ import com.liferay.portal.kernel.search.filter.TermFilter;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.search.aggregation.Aggregations;
 import com.liferay.portal.search.legacy.searcher.SearchRequestBuilderFactory;
@@ -90,6 +95,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.MultivaluedMap;
@@ -267,7 +275,8 @@ public class DocumentResourceImpl
 				),
 				null, DLVersionNumberIncrease.AUTOMATIC,
 				binaryFile.getInputStream(), binaryFile.getSize(),
-				_getServiceContext(
+				_createServiceContext(
+					Constants.UPDATE,
 					() -> ArrayUtil.toArray(
 						_assetCategoryLocalService.getCategoryIds(
 							DLFileEntry.class.getName(), documentId)),
@@ -359,8 +368,8 @@ public class DocumentResourceImpl
 				),
 				null, DLVersionNumberIncrease.AUTOMATIC,
 				binaryFile.getInputStream(), binaryFile.getSize(),
-				_getServiceContext(
-					() -> new Long[0], () -> new String[0],
+				_createServiceContext(
+					Constants.UPDATE, () -> new Long[0], () -> new String[0],
 					existingFileEntry.getFolderId(), documentOptional,
 					existingFileEntry.getGroupId())));
 	}
@@ -405,9 +414,9 @@ public class DocumentResourceImpl
 					null
 				),
 				null, binaryFile.getInputStream(), binaryFile.getSize(),
-				_getServiceContext(
-					() -> new Long[0], () -> new String[0], documentFolderId,
-					documentOptional, groupId)));
+				_createServiceContext(
+					Constants.ADD, () -> new Long[0], () -> new String[0],
+					documentFolderId, documentOptional, groupId)));
 	}
 
 	private UnsafeConsumer<BooleanQuery, Exception>
@@ -432,6 +441,88 @@ public class DocumentResourceImpl
 					BooleanClauseOccur.MUST);
 			}
 		};
+	}
+
+	private ServiceContext _createServiceContext(
+			String command, Supplier<Long[]> defaultCategoriesSupplier,
+			Supplier<String[]> defaultKeywordsSupplier, Long documentFolderId,
+			Optional<Document> documentOptional, Long groupId)
+		throws Exception {
+
+		ServiceContext serviceContext =
+			ServiceContextRequestUtil.createServiceContext(
+				documentOptional.map(
+					Document::getTaxonomyCategoryIds
+				).orElseGet(
+					defaultCategoriesSupplier
+				),
+				documentOptional.map(
+					Document::getKeywords
+				).orElseGet(
+					defaultKeywordsSupplier
+				),
+				_getExpandoBridgeAttributes1(documentOptional), groupId,
+				contextHttpServletRequest,
+				documentOptional.map(
+					Document::getViewableByAsString
+				).orElse(
+					Document.ViewableBy.OWNER.getValue()
+				));
+
+		serviceContext.setCommand(command);
+		serviceContext.setCompanyId(contextCompany.getCompanyId());
+		serviceContext.setPlid(
+			_portal.getControlPanelPlid(contextCompany.getCompanyId()));
+		serviceContext.setRequest(contextHttpServletRequest);
+		serviceContext.setUserId(contextUser.getUserId());
+
+		if (contextHttpServletRequest != null) {
+			_initThemeDisplay(
+				groupId, contextHttpServletRequest, contextHttpServletResponse);
+		}
+
+		Optional<DLFileEntryType> dlFileEntryTypeOptional =
+			_getDLFileEntryTypeOptional(
+				documentFolderId, documentOptional, groupId);
+
+		if (dlFileEntryTypeOptional.isPresent()) {
+			DLFileEntryType dlFileEntryType = dlFileEntryTypeOptional.get();
+
+			serviceContext.setAttribute(
+				"fileEntryTypeId", dlFileEntryType.getFileEntryTypeId());
+
+			Document document = documentOptional.get();
+
+			List<DDMStructure> ddmStructures =
+				dlFileEntryType.getDDMStructures();
+
+			DocumentType documentType = document.getDocumentType();
+
+			ContentField[] contentFields = documentType.getContentFields();
+
+			for (DDMStructure ddmStructure : ddmStructures) {
+				com.liferay.dynamic.data.mapping.model.DDMStructure
+					modelDDMStructure = _ddmStructureService.getStructure(
+						ddmStructure.getStructureId());
+
+				com.liferay.dynamic.data.mapping.storage.DDMFormValues
+					ddmFormValues = DDMFormValuesUtil.toDDMFormValues(
+						contentFields, modelDDMStructure.getDDMForm(),
+						_dlAppService, groupId, _journalArticleService,
+						_layoutLocalService,
+						contextAcceptLanguage.getPreferredLocale(),
+						transform(
+							ddmStructure.getRootFieldNames(),
+							modelDDMStructure::getDDMFormField));
+
+				serviceContext.setAttribute(
+					DDMFormValues.class.getName() + StringPool.POUND +
+						ddmStructure.getStructureId(),
+					_ddmBeanTranslator.translate(ddmFormValues));
+			}
+		}
+
+		return serviceContext;
 	}
 
 	private Optional<DLFileEntryType> _getDLFileEntryTypeOptional(
@@ -524,78 +615,6 @@ public class DocumentResourceImpl
 			contextAcceptLanguage.getPreferredLocale());
 	}
 
-	private ServiceContext _getServiceContext(
-			Supplier<Long[]> defaultCategoriesSupplier,
-			Supplier<String[]> defaultKeywordsSupplier, Long documentFolderId,
-			Optional<Document> documentOptional, Long groupId)
-		throws Exception {
-
-		ServiceContext serviceContext =
-			ServiceContextRequestUtil.createServiceContext(
-				documentOptional.map(
-					Document::getTaxonomyCategoryIds
-				).orElseGet(
-					defaultCategoriesSupplier
-				),
-				documentOptional.map(
-					Document::getKeywords
-				).orElseGet(
-					defaultKeywordsSupplier
-				),
-				_getExpandoBridgeAttributes1(documentOptional), groupId,
-				contextHttpServletRequest,
-				documentOptional.map(
-					Document::getViewableByAsString
-				).orElse(
-					Document.ViewableBy.OWNER.getValue()
-				));
-
-		serviceContext.setUserId(contextUser.getUserId());
-
-		Optional<DLFileEntryType> dlFileEntryTypeOptional =
-			_getDLFileEntryTypeOptional(
-				documentFolderId, documentOptional, groupId);
-
-		if (dlFileEntryTypeOptional.isPresent()) {
-			DLFileEntryType dlFileEntryType = dlFileEntryTypeOptional.get();
-
-			serviceContext.setAttribute(
-				"fileEntryTypeId", dlFileEntryType.getFileEntryTypeId());
-
-			Document document = documentOptional.get();
-
-			List<DDMStructure> ddmStructures =
-				dlFileEntryType.getDDMStructures();
-
-			DocumentType documentType = document.getDocumentType();
-
-			ContentField[] contentFields = documentType.getContentFields();
-
-			for (DDMStructure ddmStructure : ddmStructures) {
-				com.liferay.dynamic.data.mapping.model.DDMStructure
-					modelDDMStructure = _ddmStructureService.getStructure(
-						ddmStructure.getStructureId());
-
-				com.liferay.dynamic.data.mapping.storage.DDMFormValues
-					ddmFormValues = DDMFormValuesUtil.toDDMFormValues(
-						contentFields, modelDDMStructure.getDDMForm(),
-						_dlAppService, groupId, _journalArticleService,
-						_layoutLocalService,
-						contextAcceptLanguage.getPreferredLocale(),
-						transform(
-							ddmStructure.getRootFieldNames(),
-							modelDDMStructure::getDDMFormField));
-
-				serviceContext.setAttribute(
-					DDMFormValues.class.getName() + StringPool.POUND +
-						ddmStructure.getStructureId(),
-					_ddmBeanTranslator.translate(ddmFormValues));
-			}
-		}
-
-		return serviceContext;
-	}
-
 	private SPIRatingResource<Rating> _getSPIRatingResource() {
 		return new SPIRatingResource<>(
 			DLFileEntry.class.getName(), _ratingsEntryLocalService,
@@ -632,6 +651,29 @@ public class DocumentResourceImpl
 					_portal, ratingsEntry, _userLocalService);
 			},
 			contextUser);
+	}
+
+	private void _initThemeDisplay(
+			long groupId, HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse)
+		throws Exception {
+
+		ServicePreAction servicePreAction = new ServicePreAction();
+
+		servicePreAction.servicePre(
+			httpServletRequest, httpServletResponse, false);
+
+		ThemeServicePreAction themeServicePreAction =
+			new ThemeServicePreAction();
+
+		themeServicePreAction.run(httpServletRequest, httpServletResponse);
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		themeDisplay.setScopeGroupId(groupId);
+		themeDisplay.setSiteGroupId(groupId);
 	}
 
 	private FileEntry _moveDocument(

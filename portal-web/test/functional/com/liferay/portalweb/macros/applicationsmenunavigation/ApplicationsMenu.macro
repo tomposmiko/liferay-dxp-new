@@ -5,12 +5,12 @@ definition {
 		ApplicationsMenuHelper.openApplicationsMenu();
 
 		Click(
-			key_site = "${site}",
+			key_site = ${site},
 			locator1 = "ApplicationsMenu#SITE_LINK");
 	}
 
 	macro gotoPanel {
-		var key_panel = "${panel}";
+		var key_panel = ${panel};
 
 		Click(locator1 = "ApplicationsMenu#PANEL");
 
@@ -23,11 +23,11 @@ definition {
 	macro gotoPortlet {
 		ApplicationsMenuHelper.openApplicationsMenu();
 
-		ApplicationsMenu.gotoPanel(panel = "${panel}");
+		ApplicationsMenu.gotoPanel(panel = ${panel});
 
 		ApplicationsMenuHelper.gotoPortlet(
-			category = "${category}",
-			portlet = "${portlet}");
+			category = ${category},
+			portlet = ${portlet});
 	}
 
 	@summary = "Navigate to Applications Menu > ${site}"
@@ -35,7 +35,7 @@ definition {
 		ApplicationsMenuHelper.openApplicationsMenu();
 
 		Click(
-			key_site = "${site}",
+			key_site = ${site},
 			locator1 = "ApplicationsMenu#SITE_LINK");
 	}
 
@@ -47,23 +47,23 @@ definition {
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		if (isSet(depotName)) {
 			Navigator.gotoNavItem(navItem = "Asset Libraries");
 
-			LexiconCard.clickCard(card = "${depotName}");
+			LexiconCard.clickCard(card = ${depotName});
 		}
 		else {
 			Navigator.gotoNavItem(navItem = "My Sites");
 
-			SiteSelector.selectSite(site = "${site}");
+			SiteSelector.selectSite(site = ${site});
 
 			ProductMenuHelper.openProductMenu();
 
 			AssertTextEquals.assertPartialText(
 				locator1 = "ProductMenu#PRODUCT_MENU_PANEL_SITE_ADMINISTRATION_SITE_NAME",
-				value1 = "${site}");
+				value1 = ${site});
 		}
 	}
 

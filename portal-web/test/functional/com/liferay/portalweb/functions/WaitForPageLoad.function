@@ -7,9 +7,9 @@ definition {
 		''';
 		var message = '''Page is still loading.''';
 
-		selenium.waitForJavaScriptNoError("${javascript}", "${message}", "");
+		selenium.waitForJavaScriptNoError(${javascript}, ${message}, "");
 
-		selenium.verifyJavaScript("${javascript}", "${message}", "");
+		selenium.verifyJavaScript(${javascript}, ${message}, "");
 	}
 
 }

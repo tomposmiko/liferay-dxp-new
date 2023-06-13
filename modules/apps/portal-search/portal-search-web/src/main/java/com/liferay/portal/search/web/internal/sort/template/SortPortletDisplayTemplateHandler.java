@@ -31,7 +31,6 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -39,8 +38,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.portal.search.web.internal.sort.configuration.SortWebTemplateConfiguration",
-	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
-	property = "javax.portlet.name=" + SortPortletKeys.SORT,
+	immediate = true, property = "javax.portlet.name=" + SortPortletKeys.SORT,
 	service = TemplateHandler.class
 )
 public class SortPortletDisplayTemplateHandler

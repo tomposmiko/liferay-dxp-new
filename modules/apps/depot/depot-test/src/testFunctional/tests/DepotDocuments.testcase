@@ -14,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -31,7 +31,7 @@ definition {
 	}
 
 	@description = "This ensures that a shortcut can be added to a depot."
-	@priority = "3"
+	@priority = 3
 	test AccessShortcut {
 		JSONGroup.addGroup(groupName = "Site Name");
 
@@ -57,7 +57,7 @@ definition {
 	}
 
 	@description = "This ensures that a document with document type and metadata set can be added in a depot."
-	@priority = "5"
+	@priority = 5
 	test AddDocumentTypeAndMetadata {
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
@@ -88,7 +88,7 @@ definition {
 			dmDocumentFile = "Document_1.doc",
 			dmDocumentTitle = "DM Document Title",
 			dmDocumentTypeName = "DM Document Type Name",
-			numberField = "1234",
+			numberField = 1234,
 			textField = "Text");
 
 		LexiconEntry.changeDisplayStyle(displayStyle = "list");
@@ -96,12 +96,12 @@ definition {
 		DMNavigator.gotoDocumentCP(dmDocumentTitle = "DM Document Title");
 
 		DMDocument.viewDocumentTypePG(
-			numberValue = "1234",
+			numberValue = 1234,
 			textContent = "Text");
 	}
 
 	@description = "This ensures that a folder can be deleted in a depot."
-	@priority = "5"
+	@priority = 5
 	test DeleteFolder {
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
@@ -117,7 +117,7 @@ definition {
 	}
 
 	@description = "This test makes sure that all files are deleted when user selects all in a depot."
-	@priority = "4"
+	@priority = 4
 	test DeleteMultipleImages {
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
@@ -137,7 +137,7 @@ definition {
 	}
 
 	@description = "This test edits the title and description of a document in a depot."
-	@priority = "5"
+	@priority = 5
 	test EditDocument {
 		property portal.acceptance = "true";
 
@@ -168,7 +168,7 @@ definition {
 	}
 
 	@description = "This ensures that a folder can be edited in a depot."
-	@priority = "5"
+	@priority = 5
 	test EditFolder {
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
@@ -192,7 +192,7 @@ definition {
 	}
 
 	@description = "This ensures that a LAR file consisting of a DL document and image can be imported in a depot."
-	@priority = "4"
+	@priority = 4
 	test ImportFile {
 		JSONDocument.addFile(
 			dmDocumentDescription = "DM Document Description",
@@ -234,7 +234,7 @@ definition {
 	}
 
 	@description = "This ensures that a document can be moved to a folder in a depot."
-	@priority = "5"
+	@priority = 5
 	test MoveDocumentToFolder {
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
@@ -270,7 +270,7 @@ definition {
 	}
 
 	@description = "This ensures that document can be restored to a depot."
-	@priority = "5"
+	@priority = 5
 	test RestoreDocument {
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
@@ -302,7 +302,7 @@ definition {
 	}
 
 	@description = "This ensures that a document can be shared with another user in a depot."
-	@priority = "4"
+	@priority = 4
 	test ShareDocument {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 
@@ -340,7 +340,7 @@ definition {
 			password = "test",
 			userEmailAddress = "userea@liferay.com");
 
-		Notifications.viewBadgeCount(notificationCount = "1");
+		Notifications.viewBadgeCount(notificationCount = 1);
 
 		Notifications.gotoNotifications();
 

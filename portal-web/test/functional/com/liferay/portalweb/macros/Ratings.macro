@@ -2,7 +2,7 @@ definition {
 
 	macro configureRatingType {
 		if (isSet(siteName)) {
-			Site.openSiteSettingsAdmin(siteURLKey = "${siteName}");
+			Site.openSiteSettingsAdmin(siteURLKey = ${siteName});
 		}
 		else {
 			Site.openSiteSettingsAdmin(siteURLKey = "guest");
@@ -11,9 +11,9 @@ definition {
 		Navigator.gotoNavTab(navTab = "Social");
 
 		Select(
-			key_applications = "${applications}",
+			key_applications = ${applications},
 			locator1 = "Select#APPLICATIONS_RATING",
-			value1 = "${ratingType}");
+			value1 = ${ratingType});
 
 		AssertClickNoError(
 			locator1 = "Button#SAVE",
@@ -22,9 +22,9 @@ definition {
 		AssertConfirm(value1 = "Existing ratings data values will be adapted to match the new ratings type even though it may not be accurate. Do you want to continue?");
 
 		AssertSelectedLabel(
-			key_applications = "${applications}",
+			key_applications = ${applications},
 			locator1 = "Select#APPLICATIONS_RATING",
-			value1 = "${ratingType}");
+			value1 = ${ratingType});
 	}
 
 	macro rateLike {
@@ -35,16 +35,16 @@ definition {
 
 	macro rateStackedStars {
 		Click(
-			key_ratingStarCount = "${ratingStarCount}",
+			key_ratingStarCount = ${ratingStarCount},
 			locator1 = "Ratings#YOUR_RATING_STACKED_STAR_COUNT");
 
-		var count = "0";
+		var count = 0;
 
-		while ("${count}" != "${ratingStarCount}") {
+		while (${count} != ${ratingStarCount}) {
 			var index = ${count} + 1;
 
 			AssertElementPresent(
-				key_ratingStarCount = "${index}",
+				key_ratingStarCount = ${index},
 				locator1 = "Ratings#YOUR_RATING_STACKED_STAR_RESULT");
 
 			var count = ${count} + 1;
@@ -59,18 +59,18 @@ definition {
 		}
 
 		Click.clickNoMouseOver(
-			key_ratingStarCount = "${ratingStarCount}",
+			key_ratingStarCount = ${ratingStarCount},
 			locator1 = "Ratings#YOUR_RATING_STAR_COUNT");
 
 		AssertElementPresent(
-			key_ratingStarCount = "${ratingStarCount}",
+			key_ratingStarCount = ${ratingStarCount},
 			locator1 = "Ratings#YOUR_RATING_STAR_RESULT");
 	}
 
 	macro rateStarCollectionItem {
 		Click(
-			key_colPosition = "${colPosition}",
-			key_rowPosition = "${rowPosition}",
+			key_colPosition = ${colPosition},
+			key_rowPosition = ${rowPosition},
 			locator1 = "PageEditor#COLLECTION_ITEM_YOUR_RATING_STAR");
 
 		if (isSet(checkDeleteButton)) {
@@ -78,43 +78,43 @@ definition {
 		}
 
 		Click.clickNoMouseOver(
-			key_ratingStarCount = "${ratingStarCount}",
+			key_ratingStarCount = ${ratingStarCount},
 			locator1 = "PageEditor#COLLECTION_ITEM_YOUR_RATING_STAR_COUNT");
 
 		AssertElementPresent(
-			key_colPosition = "${colPosition}",
-			key_ratingStarCount = "${ratingStarCount}",
-			key_rowPosition = "${rowPosition}",
+			key_colPosition = ${colPosition},
+			key_ratingStarCount = ${ratingStarCount},
+			key_rowPosition = ${rowPosition},
 			locator1 = "PageEditor#COLLECTION_ITEM_YOUR_RATING_STAR_RESULT");
 	}
 
 	macro rateThumb {
 		if (isSet(blogCommentRating)) {
 			Click.javaScriptClick(
-				key_ratingResult = "${ratingResult}",
+				key_ratingResult = ${ratingResult},
 				locator1 = "Ratings#COMMENT_RATING_THUMB");
 		}
 		else if (isSet(blogRating)) {
-			Pause(locator1 = "2000");
+			Pause(locator1 = 2000);
 
 			Click.javaScriptClick(
-				key_ratingResult = "${ratingResult}",
+				key_ratingResult = ${ratingResult},
 				locator1 = "Ratings#THUMB");
 		}
 		else if (isSet(commentRating)) {
 			Click.clickNoMouseOver(
-				key_ratingResult = "${ratingResult}",
+				key_ratingResult = ${ratingResult},
 				locator1 = "Ratings#COMMENT_RATING_THUMB");
 		}
 		else if (isSet(replyRating)) {
 			Click.mouseOverClick(
-				key_ratingResult = "${ratingResult}",
-				key_threadSubject = "${threadSubject}",
+				key_ratingResult = ${ratingResult},
+				key_threadSubject = ${threadSubject},
 				locator1 = "Ratings#REPLY_RATING_THUMB");
 		}
 		else {
 			Click(
-				key_ratingResult = "${ratingResult}",
+				key_ratingResult = ${ratingResult},
 				locator1 = "Ratings#THUMB");
 		}
 	}
@@ -136,12 +136,12 @@ definition {
 	macro viewNoRateStackedStar {
 		for (var ratingStarCount : list "1,2,3,4,5") {
 			AssertElementNotPresent(
-				key_ratingStarCount = "${ratingStarCount}",
+				key_ratingStarCount = ${ratingStarCount},
 				locator1 = "Ratings#YOUR_RATING_STACKED_STAR_RESULT");
 		}
 
 		AssertElementPresent(
-			key_averageStarCount = "${averageStarCount}",
+			key_averageStarCount = ${averageStarCount},
 			locator1 = "Ratings#AVERAGE_STACKED_STAR_RESULT");
 	}
 
@@ -150,40 +150,40 @@ definition {
 
 		AssertTextEquals(
 			locator1 = "Ratings#YOUR_RATING_LIKE_COUNT",
-			value1 = "${ratingLikeCount}");
+			value1 = ${ratingLikeCount});
 	}
 
 	macro viewRateStackedStar {
-		var count = "0";
+		var count = 0;
 
-		while ("${count}" != "${ratingStarCount}") {
+		while (${count} != ${ratingStarCount}) {
 			var index = ${count} + 1;
 
 			AssertElementPresent(
-				key_ratingStarCount = "${index}",
+				key_ratingStarCount = ${index},
 				locator1 = "Ratings#YOUR_RATING_STACKED_STAR_RESULT");
 
 			var count = ${count} + 1;
 		}
 
 		AssertElementPresent(
-			key_averageStarCount = "${averageStarCount}",
+			key_averageStarCount = ${averageStarCount},
 			locator1 = "Ratings#AVERAGE_STACKED_STAR_RESULT");
 	}
 
 	macro viewRateStar {
 		AssertElementPresent(
-			key_ratingStarCount = "${ratingStarCount}",
+			key_ratingStarCount = ${ratingStarCount},
 			locator1 = "Ratings#YOUR_RATING_STAR_RESULT");
 
 		AssertTextEquals(
-			key_ratingStarCount = "${ratingStarCount}",
+			key_ratingStarCount = ${ratingStarCount},
 			locator1 = "Ratings#YOUR_RATING_STAR_RESULT_COUNT",
-			value1 = "${ratingStarCount}");
+			value1 = ${ratingStarCount});
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "Ratings#AVERAGE_STAR_RESULT",
-			value1 = "${averageRatingStarCount}");
+			value1 = ${averageRatingStarCount});
 	}
 
 	macro viewRateStarReadOnly {
@@ -198,15 +198,15 @@ definition {
 		if (isSet(ratingResult)) {
 			if (isSet(commentRating)) {
 				AssertTextEquals(
-					key_ratingResult = "${ratingResult}",
+					key_ratingResult = ${ratingResult},
 					locator1 = "Ratings#COMMENT_RATING_THUMB",
-					value1 = "${voteCount}");
+					value1 = ${voteCount});
 			}
 			else {
 				AssertTextEquals(
-					key_ratingResult = "${ratingResult}",
+					key_ratingResult = ${ratingResult},
 					locator1 = "Ratings#THUMB",
-					value1 = "${voteCount}");
+					value1 = ${voteCount});
 			}
 		}
 	}

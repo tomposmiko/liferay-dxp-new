@@ -17,7 +17,7 @@ definition {
 		User.firstLoginPG();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test AddUserInheritedRolesAsSAMLAttributeStatements {
 		property test.name.skip.portal.instance = "SAML#AddUserInheritedRolesAsSAMLAttributeStatements";
 
@@ -128,7 +128,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-105165"
-	@priority = "5"
+	@priority = 5
 	test AssertInstanceAdminCannotConfigureIdPWhenDisableIdPRole {
 		property test.name.skip.portal.instance = "SAML#AssertInstanceAdminCannotConfigureIdPWhenDisableIdPRole";
 
@@ -175,12 +175,12 @@ definition {
 			value1 = "The identity provider role has been disabled. It can be re-enabled in System Settings.");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AssertKeepAliveToKeepMySAMLSessionAlive {
 		property test.name.skip.portal.instance = "SAML#AssertKeepAliveToKeepMySAMLSessionAlive";
 
 		User.logoutAndLoginPG(
-			nodePort = "9080",
+			nodePort = 9080,
 			userLoginEmailAddress = "test@liferay.com",
 			userLoginFullName = "Test Test");
 
@@ -281,13 +281,13 @@ definition {
 
 		var count = Page.getTextCountFromHtmlSource(text = "document.write");
 
-		if ("${count}" != "2") {
+		if (${count} != 2) {
 			fail("That response should contain two document.write commands");
 		}
 	}
 
 	@description = "This is a use case for LPS-39013."
-	@priority = "4"
+	@priority = 4
 	test AssertSAMLSPUserInformationUpdatesAfterChangingOnIdP {
 		property test.name.skip.portal.instance = "AssertSAMLSPUserInformationUpdatesAfterChangingOnIdP";
 
@@ -343,7 +343,7 @@ definition {
 			userScreenName = "test");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AssertSignedSAMLMetadata {
 		property test.name.skip.portal.instance = "SAML#AssertSignedSAMLMetadata";
 
@@ -370,7 +370,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-96104"
-	@priority = "4"
+	@priority = 4
 	test AssertSSOFailsWhenAlgorithmsMismatch {
 		property blacklist.saml.algorithms = "true";
 		property test.name.skip.portal.instance = "SAML#AssertSSOFailsWhenAlgorithmsMismatch";
@@ -408,14 +408,14 @@ definition {
 		AssertConsoleTextPresent(value1 = "Validation of protocol message signature failed");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AssertSSOIdleSessionTakesPrecedenceOverIdPSessionTimeout {
 		property test.name.skip.portal.instance = "SAML#AssertSSOIdleSessionTakesPrecedenceOverIdPSessionTimeout";
 		property web.xml.timeout = "2";
 
 		SAML.configureLiferaySAMLAsIdP(
-			idpSessionIdleTimeout = "480",
-			idpSessionMaximumAge = "0",
+			idpSessionIdleTimeout = 480,
+			idpSessionMaximumAge = 0,
 			samlEntityID = "samlidp");
 
 		SAML.configureLiferaySAMLAsSP(
@@ -437,7 +437,7 @@ definition {
 
 		Navigator.openURL();
 
-		Pause(locator1 = "120000");
+		Pause(locator1 = 120000);
 
 		AssertTextEquals(
 			locator1 = "Home#ERROR_MESSAGE_EXPIRED_SESSION",
@@ -455,8 +455,8 @@ definition {
 		SAMLNavigation.gotoIdentityProvider();
 
 		SAMLRole.configureIdentityProvider(
-			idpSessionIdleTimeout = "60",
-			idpSessionMaximumAge = "0");
+			idpSessionIdleTimeout = 60,
+			idpSessionMaximumAge = 0);
 
 		User.logoutPG();
 
@@ -471,7 +471,7 @@ definition {
 
 		Navigator.openURL();
 
-		Pause(locator1 = "60000");
+		Pause(locator1 = 60000);
 
 		SAML.executeIdPInitiatedSSO(
 			autoLogin = "true",
@@ -483,7 +483,7 @@ definition {
 
 		Navigator.openURL();
 
-		Pause(locator1 = "120000");
+		Pause(locator1 = 120000);
 
 		AssertTextEquals(
 			locator1 = "Home#ERROR_MESSAGE_EXPIRED_SESSION",
@@ -494,7 +494,7 @@ definition {
 		User.viewLoggedOutPG();
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AssertSSOSessionExistsAfterSPSessionTimeout {
 		property test.name.skip.portal.instance = "SAML#AssertSSOSessionExistsAfterSPSessionTimeout";
 		property web.xml.timeout = "2";
@@ -519,7 +519,7 @@ definition {
 
 		User.viewLoggedInPG();
 
-		Pause(locator1 = "120000");
+		Pause(locator1 = 120000);
 
 		AssertTextEquals(
 			locator1 = "Home#ERROR_MESSAGE_EXPIRED_SESSION",
@@ -534,14 +534,14 @@ definition {
 		User.viewLoggedInPG();
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AssertSSOSessionExpiresAfterMaximumSessionAge {
 		property test.name.skip.portal.instance = "SAML#AssertSSOSessionExpiresAfterMaximumSessionAge";
 		property web.xml.timeout = "2";
 
 		SAML.configureLiferaySAMLAsIdP(
-			idpSessionIdleTimeout = "0",
-			idpSessionMaximumAge = "180",
+			idpSessionIdleTimeout = 0,
+			idpSessionMaximumAge = 180,
 			samlEntityID = "samlidp");
 
 		SAML.configureLiferaySAMLAsSP(
@@ -563,7 +563,7 @@ definition {
 
 		Navigator.openURL();
 
-		Pause(locator1 = "120000");
+		Pause(locator1 = 120000);
 
 		AssertTextEquals(
 			locator1 = "Home#ERROR_MESSAGE_EXPIRED_SESSION",
@@ -573,7 +573,7 @@ definition {
 
 		User.viewLoggedInPG();
 
-		Pause(locator1 = "120000");
+		Pause(locator1 = 120000);
 
 		AssertTextEquals(
 			locator1 = "Home#ERROR_MESSAGE_EXPIRED_SESSION",
@@ -585,7 +585,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-88924"
-	@priority = "4"
+	@priority = 4
 	test AssertSSOWithEncryptionAndDecryption {
 		property test.name.skip.portal.instance = "SAML#AssertSSOWithEncryptionAndDecryption";
 
@@ -647,11 +647,11 @@ definition {
 
 		Clustering.viewTextPresentOnSpecificNode(
 			expectedText = "Data encryption key was null",
-			nodePort = "9080");
+			nodePort = 9080);
 	}
 
 	@description = "This is a use case for LPS-128578 and LPS-69388"
-	@priority = "4"
+	@priority = 4
 	test AssertSSOWithSignAuthnRequests {
 		property test.name.skip.portal.instance = "SAML#AssertSSOWithSignAuthnRequests";
 
@@ -771,7 +771,7 @@ definition {
 
 		SystemSettings.editTextSetting(
 			settingName = "Runtime Metadata Refresh Interval",
-			settingValue = "9999");
+			settingValue = 9999);
 
 		SystemSettings.saveConfiguration();
 
@@ -797,7 +797,7 @@ definition {
 		AssertConsoleTextPresent(value1 = "org.opensaml.messaging.handler.MessageHandlerException: Message context was not authenticated");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test ConfigureSAMLToImportUsersFromLDAP {
 		property apacheds.enabled = "true";
 		property test.name.skip.portal.instance = "SAML#ConfigureSAMLToImportUsersFromLDAP";
@@ -838,9 +838,9 @@ definition {
 
 		var enableSettingList = "enabled,ldapImportEnabled,importOnStartup";
 
-		PortalSettings.configureLDAPSetting(enableSettingList = "${enableSettingList}");
+		PortalSettings.configureLDAPSetting(enableSettingList = ${enableSettingList});
 
-		PortalSettings.viewEnabledLDAPSetting(enableSettingList = "${enableSettingList}");
+		PortalSettings.viewEnabledLDAPSetting(enableSettingList = ${enableSettingList});
 
 		User.logoutPG(specificURL = "http://www.able.com:9080");
 
@@ -918,7 +918,7 @@ definition {
 			userScreenName = "ldapusercn");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test HotDeploySAMLApp {
 		property hot.deploy.osgi.app.includes = "saml";
 		property osgi.app.includes = "";
@@ -947,7 +947,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-108077."
-	@priority = "5"
+	@priority = 5
 	test ImportEncryptionCertificateFromPKCS12KeystoreFile {
 		property test.name.skip.portal.instance = "SAML#ImportEncryptionCertificateFromPKCS12KeystoreFile";
 
@@ -1001,7 +1001,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-108077."
-	@priority = "5"
+	@priority = 5
 	test ImportSigningCertificateFromPKCS12KeystoreFile {
 		property test.name.skip.portal.instance = "SAML#ImportSigningCertificateFromPKCS12KeystoreFile";
 
@@ -1052,7 +1052,7 @@ definition {
 			userEmailAddress = "test@liferay.com");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test SPInitiatedSSOWithScreenNameIdentifier {
 		property test.name.skip.portal.instance = "SAML#SPInitiatedSSOWithScreenNameIdentifier";
 
@@ -1089,7 +1089,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-50747."
-	@priority = "5"
+	@priority = 5
 	test ValidateVulnerabilitiesXMLAttacks {
 		property test.name.skip.portal.instance = "SAML#ValidateVulnerabilitiesXMLAttacks";
 
@@ -1123,7 +1123,7 @@ definition {
 				${adminEditURL}/&_15_content=%3C!DOCTYPE%20lolz%20%5B%0A%3C!ENTITY%20lol%20%22lol%22%3E%0A%3C!ENTITY%20lol2%20%22%26lol%3B%26lol%3B%26lol%3B%26lol%3B%26lol%3B%26lol%3B%26lol%3B%26lol%3B%26lol%3B%26lol%3B%22%3E%0A%3C!ENTITY%20lol3%20%22%26lol2%3B%26lol2%3B%26lol2%3B%26lol2%3B%26lol2%3B%26lol2%3B%26lol2%3B%26lol2%3B%26lol2%3B%26lol2%3B%22%3E%0A%3C!ENTITY%20lol4%20%22%26lol3%3B%26lol3%3B%26lol3%3B%26lol3%3B%26lol3%3B%26lol3%3B%26lol3%3B%26lol3%3B%26lol3%3B%26lol3%3B%22%3E%0A%3C!ENTITY%20lol5%20%22%26lol4%3B%26lol4%3B%26lol4%3B%26lol4%3B%26lol4%3B%26lol4%3B%26lol4%3B%26lol4%3B%26lol4%3B%26lol4%3B%22%3E%0A%3C!ENTITY%20lol6%20%22%26lol5%3B%26lol5%3B%26lol5%3B%26lol5%3B%26lol5%3B%26lol5%3B%26lol5%3B%26lol5%3B%26lol5%3B%26lol5%3B%22%3E%0A%3C!ENTITY%20lol7%20%22%26lol6%3B%26lol6%3B%26lol6%3B%26lol6%3B%26lol6%3B%26lol6%3B%26lol6%3B%26lol6%3B%26lol6%3B%26lol6%3B%22%3E%0A%3C!ENTITY%20lol8%20%22%26lol7%3B%26lol7%3B%26lol7%3B%26lol7%3B%26lol7%3B%26lol7%3B%26lol7%3B%26lol7%3B%26lol7%3B%26lol7%3B%22%3E%0A%3C!ENTITY%20lol9%20%22%26lol8%3B%26lol8%3B%26lol8%3B%26lol8%3B%26lol8%3B%26lol8%3B%26lol8%3B%26lol8%3B%26lol8%3B%26lol8%3B%22%3E%0A%5D%3E%0A%3Clolz%3E%26lol9%3B%3C%2Flolz%3E
 			''';
 
-		Navigator.openSpecificURL(url = "${maliciousURL}");
+		Navigator.openSpecificURL(url = ${maliciousURL});
 
 		WebContent.addCP(
 			webContentContent = "Web Content Content",
@@ -1143,7 +1143,7 @@ definition {
 
 		var adminEditURL = Navigator.getCurrentURL();
 
-		Navigator.openSpecificURL(url = "${maliciousURL}");
+		Navigator.openSpecificURL(url = ${maliciousURL});
 
 		WebContent.addCP(
 			webContentContent = "Web Content Content 2",
@@ -1153,7 +1153,7 @@ definition {
 	}
 
 	@description = "Sign into portal by executing a IdP initiated SSO login. After a successful login, the IdP will redirect to the SP. If the same users with the same email address are present on both instances, it will authenticate and show the SP. SAML can authenticate across major portal versions, that is, the IdP can be Portal 6.1 EE GA3 and the SP can be Portal 6.2. EE GA1. For testing purposes, it is obvious if the authentication succeeds or fails if the IdP and SP are different portal versions."
-	@priority = "4"
+	@priority = 4
 	test ViewIdPInitiatedSSO {
 		property test.name.skip.portal.instance = "SAML#ViewIdPInitiatedSSO";
 
@@ -1199,7 +1199,7 @@ definition {
 	}
 
 	@description = "LPS-50220 - IdP initiated SSO login should work regardless if 'Remember Me' is checked or not."
-	@priority = "4"
+	@priority = 4
 	test ViewIdPInitiatedSSOWithRememberMeChecked {
 		property test.name.skip.portal.instance = "SAML#ViewIdPInitiatedSSOWithRememberMeChecked";
 
@@ -1246,12 +1246,12 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-129934"
-	@priority = "4"
+	@priority = 4
 	test ViewIdPSingleLogoutWithMultipleSPs {
 		property test.name.skip.portal.instance = "SAML#ViewIdPSingleLogoutWithMultipleSPs";
 
 		User.logoutAndLoginPG(
-			nodePort = "9080",
+			nodePort = 9080,
 			userLoginEmailAddress = "test@liferay.com",
 			userLoginFullName = "Test Test");
 
@@ -1359,13 +1359,13 @@ definition {
 		User.viewLoggedOutPG();
 	}
 
-	@priority = "4"
+	@priority = 4
 	test ViewSingleLogoutAndForceAuthWithMultipleSPs {
 		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "SAML#ViewSingleLogoutAndForceAuthWithMultipleSPs";
 
 		User.logoutAndLoginPG(
-			nodePort = "9080",
+			nodePort = 9080,
 			userLoginEmailAddress = "test@liferay.com",
 			userLoginFullName = "Test Test");
 
@@ -1522,7 +1522,7 @@ definition {
 	}
 
 	@description = "LPS-49666 - SAML Single Logout should support HTTP-POST binding."
-	@priority = "4"
+	@priority = 4
 	test ViewSingleLogoutHTTPPostBindingInConsole {
 		property test.name.skip.portal.instance = "SAML#ViewSingleLogoutHTTPPostBindingInConsole";
 
@@ -1562,7 +1562,7 @@ definition {
 	}
 
 	@description = "Sign into portal by executing a SP initiated SSO login. This is done by clicking on the 'Sign In' link in the dockbar on the SP. After the SP is logged in, and if both instances has the same user and email address, the IdP will also be logged in."
-	@priority = "4"
+	@priority = 4
 	test ViewSPInitiatedSSO {
 		property test.name.skip.portal.instance = "SAML#ViewSPInitiatedSSO";
 
@@ -1605,7 +1605,7 @@ definition {
 		User.viewLoggedOutPG();
 	}
 
-	@priority = "4"
+	@priority = 4
 	test ViewSPInitiatedSSOWithMultipleIdPsAndAssertRenderLoginPortletWithoutIdpsMatched {
 		property test.name.skip.portal.instance = "SAML#ViewSPInitiatedSSOWithMultipleIdPsAndAssertRenderLoginPortletWithoutIdpsMatched";
 
@@ -1777,7 +1777,7 @@ definition {
 	}
 
 	@description = "LPS-125272 User profile matchup when NameID is transient, and screenName is in SAML Attributes list"
-	@priority = "4"
+	@priority = 4
 	test ViewSPInitiatedSSOWithTransientNameId {
 		property test.name.skip.portal.instance = "SAML#ViewSPInitiatedSSOWithTransientNameId";
 

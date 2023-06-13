@@ -32,7 +32,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -41,7 +41,7 @@ definition {
 	}
 
 	@description = "Fragments are published automatically on any publishing process."
-	@priority = "5"
+	@priority = 5
 	test AssertFragmentsAlwaysPublished {
 		property portal.acceptance = "true";
 
@@ -88,7 +88,7 @@ definition {
 	}
 
 	@description = "Page Fragments administration is only be accessible in staging view."
-	@priority = "5"
+	@priority = 5
 	test AssertFragmentsAreOnlyEditableInStagingView {
 		property portal.acceptance = "true";
 
@@ -118,7 +118,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-114145. The changes are saved automatically in fragment editor before publish in Staging site."
-	@priority = "3"
+	@priority = 3
 	test ViewAutoSavedBeforePublishingComponentInStaging {
 		JSONFragment.addFragmentCollection(
 			groupKey = "Test Site Name-staging",
@@ -154,7 +154,7 @@ definition {
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "FragmentEditor#HTML_EDITOR_CONTENT",
-			value1 = "${htmlContent}");
+			value1 = ${htmlContent});
 	}
 
 }

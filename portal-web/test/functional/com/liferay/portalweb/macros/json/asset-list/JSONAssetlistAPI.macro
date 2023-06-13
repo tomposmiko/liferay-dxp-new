@@ -14,7 +14,7 @@ definition {
 				-d type=${type}
 		''';
 
-		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+		com.liferay.poshi.runner.util.JSONCurlUtil.post(${curl});
 	}
 
 	@summary = "Directly creates an Dynamic Asset List Entry using the JSON API"
@@ -43,41 +43,41 @@ com.liferay.wiki.model.WikiPage
 		var newLine = '''
 ''';
 
-		var values = StringUtil.regexReplaceAll("${values}", "${newLine}", "");
+		var values = StringUtil.regexReplaceAll(${values}, ${newLine}, "");
 		var classNameIds = "";
 
-		for (var value : list "${values}") {
-			var classNameId = JSONClassname._getClassNameId(value = "${value}");
+		for (var value : list ${values}) {
+			var classNameId = JSONClassname._getClassNameId(value = ${value});
 
-			var classNameIds = StringUtil.add("${classNameIds}", "${classNameId}");
+			var classNameIds = StringUtil.add(${classNameIds}, ${classNameId});
 		}
 
-		var length = StringUtil.length("${classNameIds}");
+		var length = StringUtil.length(${classNameIds});
 
 		var endIndex = ${length} - 1;
 
-		var classNameIds = StringUtil.substring("${classNameIds}", "0", "${endIndex}");
+		var classNameIds = StringUtil.substring(${classNameIds}, 0, ${endIndex});
 		var googleDriveShortcutClassTypeId = JSONDLfileentrytype._getFileEntryTypeId(
 			fileEntryTypeName = "Google Drive Shortcut",
-			groupId = "${globalGroupId}");
-		var basicDocumentClassTypeId = "0";
+			groupId = ${globalGroupId});
+		var basicDocumentClassTypeId = 0;
 		var classNameId = JSONClassname._getClassNameId(value = "com.liferay.journal.model.JournalArticle");
 
 		var basicWebContentClassTypeId = JSONDDMstructure._getStructureId(
-			classNameId = "${classNameId}",
-			groupId = "${globalGroupId}",
+			classNameId = ${classNameId},
+			groupId = ${globalGroupId},
 			structureName = "Basic Web Content");
 
-		if ("${itemType}" == "All Types") {
+		if (${itemType} == "All Types") {
 			var itemType = "true";
 		}
-		else if ("${itemType}" == "Web Content Article") {
+		else if (${itemType} == "Web Content Article") {
 			var itemType = JSONClassname._getClassNameId(value = "com.liferay.journal.model.JournalArticle");
 		}
-		else if ("${itemType}" == "Blogs Entry") {
+		else if (${itemType} == "Blogs Entry") {
 			var itemType = JSONClassname._getClassNameId(value = "com.liferay.blogs.model.BlogsEntry");
 		}
-		else if ("${itemType}" == "Document") {
+		else if (${itemType} == "Document") {
 			var itemType = JSONClassname._getClassNameId(value = "com.liferay.document.library.kernel.model.DLFileEntry");
 		}
 		else {
@@ -101,7 +101,7 @@ subtypeFieldsFilterEnabledDLFileEntryAssetRendererFactory=false
 subtypeFieldsFilterEnabledJournalArticleAssetRendererFactory=false
 ''';
 
-		var typeSettings = StringUtil.regexReplaceAll("${typeSettings}", "${newLine}", "%0A");
+		var typeSettings = StringUtil.regexReplaceAll(${typeSettings}, ${newLine}, "%0A");
 
 		var curl = '''
 			${portalURL}/api/jsonws/assetlist.assetlistentry/add-dynamic-asset-list-entry \
@@ -112,7 +112,7 @@ subtypeFieldsFilterEnabledJournalArticleAssetRendererFactory=false
 				-d typeSettings=${typeSettings}
 		''';
 
-		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+		com.liferay.poshi.runner.util.JSONCurlUtil.post(${curl});
 	}
 
 }

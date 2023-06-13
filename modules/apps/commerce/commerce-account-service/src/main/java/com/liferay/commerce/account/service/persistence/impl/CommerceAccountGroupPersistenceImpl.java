@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.account.service.persistence.impl;
 
+import com.liferay.commerce.account.exception.DuplicateCommerceAccountGroupExternalReferenceCodeException;
 import com.liferay.commerce.account.exception.NoSuchAccountGroupException;
 import com.liferay.commerce.account.model.CommerceAccountGroup;
 import com.liferay.commerce.account.model.CommerceAccountGroupTable;
@@ -3521,6 +3522,33 @@ public class CommerceAccountGroupPersistenceImpl
 		if (Validator.isNull(commerceAccountGroup.getExternalReferenceCode())) {
 			commerceAccountGroup.setExternalReferenceCode(
 				String.valueOf(commerceAccountGroup.getPrimaryKey()));
+		}
+		else {
+			CommerceAccountGroup ercCommerceAccountGroup = fetchByC_ERC(
+				commerceAccountGroup.getCompanyId(),
+				commerceAccountGroup.getExternalReferenceCode());
+
+			if (isNew) {
+				if (ercCommerceAccountGroup != null) {
+					throw new DuplicateCommerceAccountGroupExternalReferenceCodeException(
+						"Duplicate commerce account group with external reference code " +
+							commerceAccountGroup.getExternalReferenceCode() +
+								" and company " +
+									commerceAccountGroup.getCompanyId());
+				}
+			}
+			else {
+				if ((ercCommerceAccountGroup != null) &&
+					(commerceAccountGroup.getCommerceAccountGroupId() !=
+						ercCommerceAccountGroup.getCommerceAccountGroupId())) {
+
+					throw new DuplicateCommerceAccountGroupExternalReferenceCodeException(
+						"Duplicate commerce account group with external reference code " +
+							commerceAccountGroup.getExternalReferenceCode() +
+								" and company " +
+									commerceAccountGroup.getCompanyId());
+				}
+			}
 		}
 
 		ServiceContext serviceContext =

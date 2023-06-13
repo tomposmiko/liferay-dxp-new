@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.price.list.service.persistence.impl;
 
+import com.liferay.commerce.price.list.exception.DuplicateCommerceTierPriceEntryExternalReferenceCodeException;
 import com.liferay.commerce.price.list.exception.NoSuchTierPriceEntryException;
 import com.liferay.commerce.price.list.model.CommerceTierPriceEntry;
 import com.liferay.commerce.price.list.model.CommerceTierPriceEntryTable;
@@ -5323,6 +5324,34 @@ public class CommerceTierPriceEntryPersistenceImpl
 
 			commerceTierPriceEntry.setExternalReferenceCode(
 				commerceTierPriceEntry.getUuid());
+		}
+		else {
+			CommerceTierPriceEntry ercCommerceTierPriceEntry = fetchByC_ERC(
+				commerceTierPriceEntry.getCompanyId(),
+				commerceTierPriceEntry.getExternalReferenceCode());
+
+			if (isNew) {
+				if (ercCommerceTierPriceEntry != null) {
+					throw new DuplicateCommerceTierPriceEntryExternalReferenceCodeException(
+						"Duplicate commerce tier price entry with external reference code " +
+							commerceTierPriceEntry.getExternalReferenceCode() +
+								" and company " +
+									commerceTierPriceEntry.getCompanyId());
+				}
+			}
+			else {
+				if ((ercCommerceTierPriceEntry != null) &&
+					(commerceTierPriceEntry.getCommerceTierPriceEntryId() !=
+						ercCommerceTierPriceEntry.
+							getCommerceTierPriceEntryId())) {
+
+					throw new DuplicateCommerceTierPriceEntryExternalReferenceCodeException(
+						"Duplicate commerce tier price entry with external reference code " +
+							commerceTierPriceEntry.getExternalReferenceCode() +
+								" and company " +
+									commerceTierPriceEntry.getCompanyId());
+				}
+			}
 		}
 
 		ServiceContext serviceContext =

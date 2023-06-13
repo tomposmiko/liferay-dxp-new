@@ -29,7 +29,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -38,7 +38,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-108463. Assert no Section fragment is outside when add a Row fragment to content page template."
-	@priority = "4"
+	@priority = 4
 	test AddRowWithoutSection {
 		PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = "test-site-name");
 
@@ -54,12 +54,12 @@ definition {
 
 		AssertElementNotPresent(
 			key_elementType = "Container",
-			key_position = "1",
+			key_position = 1,
 			locator1 = "PageEditor#LAYOUT_ELEMENTS_HEADER");
 	}
 
 	@description = "This case ensures that a user can select content via content display in content page template editor."
-	@priority = "4"
+	@priority = 4
 	test SelectWebContentViaContentDisplay {
 		JSONWebcontent.addWebContent(
 			content = "WC WebContent Content",

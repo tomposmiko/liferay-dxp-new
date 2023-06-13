@@ -14,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -27,7 +27,7 @@ definition {
 	}
 
 	@description = "It ensures that the user statistics are counted when social tracking is enabled."
-	@priority = "5"
+	@priority = 5
 	test CountUserStatisticsAfterEnablingSocialTracking {
 		property test.name.skip.portal.instance = "SocialActivity#CountUserStatisticsAfterEnablingSocialTracking";
 
@@ -74,7 +74,7 @@ definition {
 	}
 
 	@description = "It ensures that the user statistics are not counted when social tracking is disabled."
-	@priority = "5"
+	@priority = 5
 	test DisableSocialTracking {
 		property test.name.skip.portal.instance = "SocialActivity#DisableSocialTracking";
 
@@ -129,7 +129,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-50602"
-	@priority = "5"
+	@priority = 5
 	test ViewDraftWikiPageViaActivities {
 		JSONLayout.addPublicLayout(
 			groupName = "Guest",

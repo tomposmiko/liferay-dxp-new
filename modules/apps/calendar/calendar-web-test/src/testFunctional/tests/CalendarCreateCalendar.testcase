@@ -38,7 +38,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -56,24 +56,24 @@ definition {
 		}
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AddCalendarToCurrentSiteCalendars {
-		var siteName = TestCase.getSiteName(siteName = "${siteName}");
+		var siteName = TestCase.getSiteName(siteName = ${siteName});
 
 		Calendar.add(
 			calendarName = "Site Calendar Name",
 			calendarType = "Current Site Calendars",
-			site = "${siteName}");
+			site = ${siteName});
 
 		Navigator.gotoPage(pageName = "Calendar Page");
 
 		Calendar.view(
 			calendarName = "Site Calendar Name",
 			calendarType = "Current Site Calendars",
-			site = "${siteName}");
+			site = ${siteName});
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AddCalendarToMyCalendars {
 		Calendar.add(
 			calendarName = "My Calendar Name",
@@ -88,7 +88,7 @@ definition {
 			user = "Test Test");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AddUserCalendarToOtherCalendars {
 		ApplicationsMenu.gotoPortlet(
 			category = "Users",
@@ -120,7 +120,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-45062."
-	@priority = "5"
+	@priority = 5
 	test ResizeAddedEventsViaEventBlock {
 		property portal.release = "false";
 
@@ -168,7 +168,7 @@ definition {
 	}
 
 	@description = "LPS-60800, Verify that can save individual calendar permissions."
-	@priority = "3"
+	@priority = 3
 	test ViewEntryPermissionsNotDefinedByRolePermissions {
 		CalendarNavigator.gotoAddEvent();
 
@@ -227,7 +227,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-56229."
-	@priority = "3"
+	@priority = 3
 	test ViewUserCanAddSiteCalendarsWithCalendarPermissions {
 		ApplicationsMenu.gotoPortlet(
 			category = "Users",
@@ -286,7 +286,7 @@ definition {
 				panel = "Control Panel",
 				portlet = "Sites");
 
-			Site.addBlankCP(siteName = "${siteName}");
+			Site.addBlankCP(siteName = ${siteName});
 
 			ApplicationsMenu.gotoPortlet(
 				category = "Users",
@@ -294,7 +294,7 @@ definition {
 				portlet = "Users and Organizations");
 
 			User.editUserSiteCP(
-				siteName = "${siteName}",
+				siteName = ${siteName},
 				userScreenName = "usersn");
 		}
 
@@ -339,7 +339,7 @@ definition {
 		Calendar.searchOtherCalendars(searchValue = "site");
 
 		for (var calendarName : list "Site A,Site B,Site C") {
-			Calendar.viewOtherCalendarsSearchResult(calendarName = "${calendarName}");
+			Calendar.viewOtherCalendarsSearchResult(calendarName = ${calendarName});
 		}
 
 		CalendarNavigator.gotoAddEvent();

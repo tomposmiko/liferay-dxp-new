@@ -15,12 +15,12 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 	}
 
-	@priority = "4"
+	@priority = 4
 	test ToastMessageAutoClose {
 		property test.name.skip.portal.instance = "ClayAlert#ToastMessageAutoClose";
 
@@ -39,14 +39,14 @@ definition {
 
 		takeScreenshot();
 
-		Pause(locator1 = "5000");
+		Pause(locator1 = 5000);
 
 		takeScreenshot();
 
 		AssertElementNotPresent(locator1 = "Message#SUCCESS_DISMISSIBLE");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test ToastMessageManualClose {
 		property test.name.skip.portal.instance = "ClayAlert#ToastMessageManualClose";
 

@@ -14,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -31,7 +31,7 @@ definition {
 	}
 
 	@description = "This ensures that a depot can be edited via settings."
-	@priority = "4"
+	@priority = 4
 	test EditName {
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
@@ -55,7 +55,7 @@ definition {
 	}
 
 	@description = "This ensures that a user can set the depot site connection via settings."
-	@priority = "4"
+	@priority = 4
 	test SearchForDocument {
 		JSONGroup.addGroup(groupName = "Site Name");
 
@@ -110,7 +110,7 @@ definition {
 	}
 
 	@description = "This ensures that the depot language can be set via settings."
-	@priority = "4"
+	@priority = 4
 	test ViewCustomLanguage {
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",

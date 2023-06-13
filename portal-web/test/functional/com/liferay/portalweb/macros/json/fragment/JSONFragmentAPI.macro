@@ -7,7 +7,7 @@ definition {
 		var portalURL = JSONCompany.getPortalURL();
 
 		if (isSet(description)) {
-			var description = "${description}";
+			var description = ${description};
 		}
 		else {
 			var description = "";
@@ -21,7 +21,7 @@ definition {
 				-d description=${description}
 		''';
 
-		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+		com.liferay.poshi.runner.util.JSONCurlUtil.post(${curl});
 	}
 
 	@summary = "Directly calls the JSON WS API to add a fragment (default type is section)"
@@ -46,7 +46,7 @@ definition {
 				-d status=${status}
 		''';
 
-		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+		com.liferay.poshi.runner.util.JSONCurlUtil.post(${curl});
 	}
 
 	@summary = "Get the collectionId from a collection by using collectionName and groupId"
@@ -65,17 +65,17 @@ definition {
 				-d -orderByComparator=
 		''';
 
-		var collectionId = JSONCurlUtil.post("${curl}", "$.[?(@['name'] == '${collectionName}')]['fragmentCollectionId']");
+		var collectionId = JSONCurlUtil.post(${curl}, "$.[?(@['name'] == '${collectionName}')]['fragmentCollectionId']");
 
-		var collectionId = StringUtil.replace("${collectionId}", "[\"", "");
+		var collectionId = StringUtil.replace(${collectionId}, "[\"", "");
 
-		var collectionId = StringUtil.replace("${collectionId}", "\"]", "");
+		var collectionId = StringUtil.replace(${collectionId}, "\"]", "");
 
-		if ("${collectionId}" == "") {
+		if (${collectionId} == "") {
 			fail("FAIL. Cannot find collection.");
 		}
 
-		return "${collectionId}";
+		return ${collectionId};
 	}
 
 	@summary = "Get the collectionName by using collectionName"
@@ -92,9 +92,9 @@ definition {
 				-d -orderByComparator=
 		''';
 
-		var collectionNameResult = JSONCurlUtil.post("${curl}", "$..[?(@['name'] == '${collectionName}')]");
+		var collectionNameResult = JSONCurlUtil.post(${curl}, "$..[?(@['name'] == '${collectionName}')]");
 
-		return "${collectionNameResult}";
+		return ${collectionNameResult};
 	}
 
 	@summary = "Get the fragmentName from a fragmentCollection by using fragmentName "
@@ -110,9 +110,9 @@ definition {
 				-d <CURL_DATA[end=-1]CURL_DATA>
 		''';
 
-		var fragmentNameResult = JSONCurlUtil.post("${curl}", "$..[?(@['name'] == '${fragmentName}')]");
+		var fragmentNameResult = JSONCurlUtil.post(${curl}, "$..[?(@['name'] == '${fragmentName}')]");
 
-		return "${fragmentNameResult}";
+		return ${fragmentNameResult};
 	}
 
 }

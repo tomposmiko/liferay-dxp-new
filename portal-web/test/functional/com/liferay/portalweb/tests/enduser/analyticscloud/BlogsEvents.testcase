@@ -31,7 +31,7 @@ definition {
 
 		ACUtils.tearDownDXP();
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -42,7 +42,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8668 | Test Summary: Check blogClicked is triggered when a blog is clicked within a widget"
-	@priority = "3"
+	@priority = 3
 	test CheckBlogClickedTriggeredWhenBlogClicked {
 		property portal.upstream = "quarantine";
 		property proxy.server.enabled = "true";
@@ -54,17 +54,17 @@ definition {
 
 			ACNavigation.goToSettings();
 
-			Pause(locator1 = "10000");
+			Pause(locator1 = 10000);
 
-			var expectedChannelId = ACSettings.getPropertyId(propertyName = "${assignedPropertyName}");
+			var expectedChannelId = ACSettings.getPropertyId(propertyName = ${assignedPropertyName});
 		}
 
 		task ("Get the DXP Instance ID in AC") {
-			var dataSourceName = StringUtil.extractFirst("${assignedPropertyName}", "Combined");
+			var dataSourceName = StringUtil.extractFirst(${assignedPropertyName}, "Combined");
 
-			var dataSourceName = StringUtil.trim("${dataSourceName}");
+			var dataSourceName = StringUtil.trim(${dataSourceName});
 
-			var expectedDataSourceId = ACSettings.getDXPInstanceId(dataSourceName = "${dataSourceName}");
+			var expectedDataSourceId = ACSettings.getDXPInstanceId(dataSourceName = ${dataSourceName});
 		}
 
 		task ("Go to the site page and click the blog content") {
@@ -88,7 +88,7 @@ definition {
 		task ("Start Har recording") {
 			ProxyUtil.startHarRecording("blogClicked");
 
-			Pause(locator1 = "5000");
+			Pause(locator1 = 5000);
 		}
 
 		task ("View the properties of blogClicked event") {
@@ -96,7 +96,7 @@ definition {
 				applicationId = "Blog",
 				eventId = "blogClicked",
 				property = "entryId",
-				value = "${entryId}");
+				value = ${entryId});
 
 			ACUtils.assertEventPropertyValue(
 				applicationId = "Blog",
@@ -113,13 +113,13 @@ definition {
 
 		task ("View the request common properties value") {
 			ACUtils.assertRequestCommonPropertiesValue(
-				expectedChannelId = "${expectedChannelId}",
-				expectedDataSourceId = "${expectedDataSourceId}");
+				expectedChannelId = ${expectedChannelId},
+				expectedDataSourceId = ${expectedDataSourceId});
 		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8661 | Test Summary: Check blogClicked is triggered when a blog entry title is clicked and check its properties (see reference document in comments)"
-	@priority = "5"
+	@priority = 5
 	test CheckBlogClickedWhenBlogEntryTitleIsClickedAndCheckProperties {
 		property proxy.server.enabled = "true";
 
@@ -128,17 +128,17 @@ definition {
 
 			ACNavigation.goToSettings();
 
-			Pause(locator1 = "10000");
+			Pause(locator1 = 10000);
 
-			var expectedChannelId = ACSettings.getPropertyId(propertyName = "${assignedPropertyName}");
+			var expectedChannelId = ACSettings.getPropertyId(propertyName = ${assignedPropertyName});
 		}
 
 		task ("Get the DXP Instance ID in AC") {
-			var dataSourceName = StringUtil.extractFirst("${assignedPropertyName}", "Combined");
+			var dataSourceName = StringUtil.extractFirst(${assignedPropertyName}, "Combined");
 
-			var dataSourceName = StringUtil.trim("${dataSourceName}");
+			var dataSourceName = StringUtil.trim(${dataSourceName});
 
-			var expectedDataSourceId = ACSettings.getDXPInstanceId(dataSourceName = "${dataSourceName}");
+			var expectedDataSourceId = ACSettings.getDXPInstanceId(dataSourceName = ${dataSourceName});
 		}
 
 		task ("Go to the site page and click the blog content") {
@@ -162,7 +162,7 @@ definition {
 		task ("Start Har recording") {
 			ProxyUtil.startHarRecording("blogClicked");
 
-			Pause(locator1 = "5000");
+			Pause(locator1 = 5000);
 		}
 
 		task ("View the properties of blogClicked event") {
@@ -170,7 +170,7 @@ definition {
 				applicationId = "Blog",
 				eventId = "blogClicked",
 				property = "entryId",
-				value = "${entryId}");
+				value = ${entryId});
 
 			ACUtils.assertEventPropertyValue(
 				applicationId = "Blog",
@@ -187,13 +187,13 @@ definition {
 
 		task ("View the request common properties value") {
 			ACUtils.assertRequestCommonPropertiesValue(
-				expectedChannelId = "${expectedChannelId}",
-				expectedDataSourceId = "${expectedDataSourceId}");
+				expectedChannelId = ${expectedChannelId},
+				expectedDataSourceId = ${expectedDataSourceId});
 		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8663 | Test Summary: Check blogDepthReached triggers (Level 1)"
-	@priority = "5"
+	@priority = 5
 	test CheckBlogDepthReachedTo25AndCheckProperties {
 		property proxy.server.enabled = "true";
 
@@ -202,17 +202,17 @@ definition {
 
 			ACNavigation.goToSettings();
 
-			Pause(locator1 = "10000");
+			Pause(locator1 = 10000);
 
-			var expectedChannelId = ACSettings.getPropertyId(propertyName = "${assignedPropertyName}");
+			var expectedChannelId = ACSettings.getPropertyId(propertyName = ${assignedPropertyName});
 		}
 
 		task ("Get the DXP Instance ID in AC") {
-			var dataSourceName = StringUtil.extractFirst("${assignedPropertyName}", "Combined");
+			var dataSourceName = StringUtil.extractFirst(${assignedPropertyName}, "Combined");
 
-			var dataSourceName = StringUtil.trim("${dataSourceName}");
+			var dataSourceName = StringUtil.trim(${dataSourceName});
 
-			var expectedDataSourceId = ACSettings.getDXPInstanceId(dataSourceName = "${dataSourceName}");
+			var expectedDataSourceId = ACSettings.getDXPInstanceId(dataSourceName = ${dataSourceName});
 		}
 
 		task ("Add a blog entry") {
@@ -233,7 +233,7 @@ definition {
 
 			ProxyUtil.startHarRecording("blogDepthReached");
 
-			Pause(locator1 = "40000");
+			Pause(locator1 = 40000);
 		}
 
 		task ("Get entryId of blog entry") {
@@ -247,7 +247,7 @@ definition {
 				applicationId = "Blog",
 				eventId = "blogDepthReached",
 				property = "entryId",
-				value = "${entryId}");
+				value = ${entryId});
 
 			ACUtils.assertEventPropertyValue(
 				applicationId = "Blog",
@@ -259,18 +259,18 @@ definition {
 				applicationId = "Blog",
 				eventId = "blogDepthReached",
 				property = "depth",
-				value = "25");
+				value = 25);
 		}
 
 		task ("View the request common properties value") {
 			ACUtils.assertRequestCommonPropertiesValue(
-				expectedChannelId = "${expectedChannelId}",
-				expectedDataSourceId = "${expectedDataSourceId}");
+				expectedChannelId = ${expectedChannelId},
+				expectedDataSourceId = ${expectedDataSourceId});
 		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8664 | Test Summary: Check blogDepthReached triggers (Level 2)"
-	@priority = "5"
+	@priority = 5
 	test CheckBlogDepthReachedTo50AndCheckProperties {
 		property proxy.server.enabled = "true";
 
@@ -279,17 +279,17 @@ definition {
 
 			ACNavigation.goToSettings();
 
-			Pause(locator1 = "10000");
+			Pause(locator1 = 10000);
 
-			var expectedChannelId = ACSettings.getPropertyId(propertyName = "${assignedPropertyName}");
+			var expectedChannelId = ACSettings.getPropertyId(propertyName = ${assignedPropertyName});
 		}
 
 		task ("Get the DXP Instance ID in AC") {
-			var dataSourceName = StringUtil.extractFirst("${assignedPropertyName}", "Combined");
+			var dataSourceName = StringUtil.extractFirst(${assignedPropertyName}, "Combined");
 
-			var dataSourceName = StringUtil.trim("${dataSourceName}");
+			var dataSourceName = StringUtil.trim(${dataSourceName});
 
-			var expectedDataSourceId = ACSettings.getDXPInstanceId(dataSourceName = "${dataSourceName}");
+			var expectedDataSourceId = ACSettings.getDXPInstanceId(dataSourceName = ${dataSourceName});
 		}
 
 		task ("Add a blog entry") {
@@ -310,7 +310,7 @@ definition {
 
 			ProxyUtil.startHarRecording("blogDepthReached");
 
-			Pause(locator1 = "40000");
+			Pause(locator1 = 40000);
 		}
 
 		task ("Get entryId of blog entry") {
@@ -324,7 +324,7 @@ definition {
 				applicationId = "Blog",
 				eventId = "blogDepthReached",
 				property = "entryId",
-				value = "${entryId}");
+				value = ${entryId});
 
 			ACUtils.assertEventPropertyValue(
 				applicationId = "Blog",
@@ -336,18 +336,18 @@ definition {
 				applicationId = "Blog",
 				eventId = "blogDepthReached",
 				property = "depth",
-				value = "50");
+				value = 50);
 		}
 
 		task ("View the request common properties value") {
 			ACUtils.assertRequestCommonPropertiesValue(
-				expectedChannelId = "${expectedChannelId}",
-				expectedDataSourceId = "${expectedDataSourceId}");
+				expectedChannelId = ${expectedChannelId},
+				expectedDataSourceId = ${expectedDataSourceId});
 		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8665 | Test Summary: Check blogDepthReached triggers (Level 3)"
-	@priority = "5"
+	@priority = 5
 	test CheckBlogDepthReachedTo75AndCheckProperties {
 		property proxy.server.enabled = "true";
 
@@ -356,17 +356,17 @@ definition {
 
 			ACNavigation.goToSettings();
 
-			Pause(locator1 = "10000");
+			Pause(locator1 = 10000);
 
-			var expectedChannelId = ACSettings.getPropertyId(propertyName = "${assignedPropertyName}");
+			var expectedChannelId = ACSettings.getPropertyId(propertyName = ${assignedPropertyName});
 		}
 
 		task ("Get the DXP Instance ID in AC") {
-			var dataSourceName = StringUtil.extractFirst("${assignedPropertyName}", "Combined");
+			var dataSourceName = StringUtil.extractFirst(${assignedPropertyName}, "Combined");
 
-			var dataSourceName = StringUtil.trim("${dataSourceName}");
+			var dataSourceName = StringUtil.trim(${dataSourceName});
 
-			var expectedDataSourceId = ACSettings.getDXPInstanceId(dataSourceName = "${dataSourceName}");
+			var expectedDataSourceId = ACSettings.getDXPInstanceId(dataSourceName = ${dataSourceName});
 		}
 
 		task ("Add a blog entry") {
@@ -387,7 +387,7 @@ definition {
 
 			ProxyUtil.startHarRecording("blogDepthReached");
 
-			Pause(locator1 = "5000");
+			Pause(locator1 = 5000);
 		}
 
 		task ("Get entryId of blog entry") {
@@ -401,7 +401,7 @@ definition {
 				applicationId = "Blog",
 				eventId = "blogDepthReached",
 				property = "entryId",
-				value = "${entryId}");
+				value = ${entryId});
 
 			ACUtils.assertEventPropertyValue(
 				applicationId = "Blog",
@@ -413,18 +413,18 @@ definition {
 				applicationId = "Blog",
 				eventId = "blogDepthReached",
 				property = "depth",
-				value = "75");
+				value = 75);
 		}
 
 		task ("View the request common properties value") {
 			ACUtils.assertRequestCommonPropertiesValue(
-				expectedChannelId = "${expectedChannelId}",
-				expectedDataSourceId = "${expectedDataSourceId}");
+				expectedChannelId = ${expectedChannelId},
+				expectedDataSourceId = ${expectedDataSourceId});
 		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8666 | Test Summary: Check blogDepthReached triggers (Level 4)"
-	@priority = "5"
+	@priority = 5
 	test CheckBlogDepthReachedTo100AndCheckProperties {
 		property proxy.server.enabled = "true";
 
@@ -433,17 +433,17 @@ definition {
 
 			ACNavigation.goToSettings();
 
-			Pause(locator1 = "10000");
+			Pause(locator1 = 10000);
 
-			var expectedChannelId = ACSettings.getPropertyId(propertyName = "${assignedPropertyName}");
+			var expectedChannelId = ACSettings.getPropertyId(propertyName = ${assignedPropertyName});
 		}
 
 		task ("Get the DXP Instance ID in AC") {
-			var dataSourceName = StringUtil.extractFirst("${assignedPropertyName}", "Combined");
+			var dataSourceName = StringUtil.extractFirst(${assignedPropertyName}, "Combined");
 
-			var dataSourceName = StringUtil.trim("${dataSourceName}");
+			var dataSourceName = StringUtil.trim(${dataSourceName});
 
-			var expectedDataSourceId = ACSettings.getDXPInstanceId(dataSourceName = "${dataSourceName}");
+			var expectedDataSourceId = ACSettings.getDXPInstanceId(dataSourceName = ${dataSourceName});
 		}
 
 		task ("Add a blog entry") {
@@ -464,7 +464,7 @@ definition {
 
 			ProxyUtil.startHarRecording("blogDepthReached");
 
-			Pause(locator1 = "40000");
+			Pause(locator1 = 40000);
 		}
 
 		task ("Get entryId of blog entry") {
@@ -478,7 +478,7 @@ definition {
 				applicationId = "Blog",
 				eventId = "blogDepthReached",
 				property = "entryId",
-				value = "${entryId}");
+				value = ${entryId});
 
 			ACUtils.assertEventPropertyValue(
 				applicationId = "Blog",
@@ -490,18 +490,18 @@ definition {
 				applicationId = "Blog",
 				eventId = "blogDepthReached",
 				property = "depth",
-				value = "100");
+				value = 100);
 		}
 
 		task ("View the request common properties value") {
 			ACUtils.assertRequestCommonPropertiesValue(
-				expectedChannelId = "${expectedChannelId}",
-				expectedDataSourceId = "${expectedDataSourceId}");
+				expectedChannelId = ${expectedChannelId},
+				expectedDataSourceId = ${expectedDataSourceId});
 		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8669 | Test Summary: Check blogViewed does not trigger when the blog is visible as a widget in the front page"
-	@priority = "2"
+	@priority = 2
 	test CheckBlogViewedDoesNotTriggerWhenBlogIsVisible {
 		property proxy.server.enabled = "true";
 
@@ -510,17 +510,17 @@ definition {
 
 			ACNavigation.goToSettings();
 
-			Pause(locator1 = "10000");
+			Pause(locator1 = 10000);
 
-			var expectedChannelId = ACSettings.getPropertyId(propertyName = "${assignedPropertyName}");
+			var expectedChannelId = ACSettings.getPropertyId(propertyName = ${assignedPropertyName});
 		}
 
 		task ("Get the DXP Instance ID in AC") {
-			var dataSourceName = StringUtil.extractFirst("${assignedPropertyName}", "Combined");
+			var dataSourceName = StringUtil.extractFirst(${assignedPropertyName}, "Combined");
 
-			var dataSourceName = StringUtil.trim("${dataSourceName}");
+			var dataSourceName = StringUtil.trim(${dataSourceName});
 
-			var expectedDataSourceId = ACSettings.getDXPInstanceId(dataSourceName = "${dataSourceName}");
+			var expectedDataSourceId = ACSettings.getDXPInstanceId(dataSourceName = ${dataSourceName});
 		}
 
 		task ("Go to the site page to assert the blog entry is displayed but don't visit it") {
@@ -536,7 +536,7 @@ definition {
 		task ("Start Har recording") {
 			ProxyUtil.startHarRecording("BlogViewed");
 
-			Pause(locator1 = "5000");
+			Pause(locator1 = 5000);
 		}
 
 		task ("View the BlogViewed event not triggered") {
@@ -547,13 +547,13 @@ definition {
 
 		task ("View the request common properties value") {
 			ACUtils.assertRequestCommonPropertiesValue(
-				expectedChannelId = "${expectedChannelId}",
-				expectedDataSourceId = "${expectedDataSourceId}");
+				expectedChannelId = ${expectedChannelId},
+				expectedDataSourceId = ${expectedDataSourceId});
 		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8662 | Test Summary: Check blogViewed triggers when visiting a DXP blog and check its properties (see reference document in comments)"
-	@priority = "5"
+	@priority = 5
 	test CheckBlogViewedWhenVisitingDXPBlogAndCheckProperties {
 		property proxy.server.enabled = "true";
 
@@ -562,17 +562,17 @@ definition {
 
 			ACNavigation.goToSettings();
 
-			Pause(locator1 = "10000");
+			Pause(locator1 = 10000);
 
-			var expectedChannelId = ACSettings.getPropertyId(propertyName = "${assignedPropertyName}");
+			var expectedChannelId = ACSettings.getPropertyId(propertyName = ${assignedPropertyName});
 		}
 
 		task ("Get the DXP Instance ID in AC") {
-			var dataSourceName = StringUtil.extractFirst("${assignedPropertyName}", "Combined");
+			var dataSourceName = StringUtil.extractFirst(${assignedPropertyName}, "Combined");
 
-			var dataSourceName = StringUtil.trim("${dataSourceName}");
+			var dataSourceName = StringUtil.trim(${dataSourceName});
 
-			var expectedDataSourceId = ACSettings.getDXPInstanceId(dataSourceName = "${dataSourceName}");
+			var expectedDataSourceId = ACSettings.getDXPInstanceId(dataSourceName = ${dataSourceName});
 		}
 
 		task ("Go to the site page to visit the blog") {
@@ -592,7 +592,7 @@ definition {
 		task ("Start Har recording") {
 			ProxyUtil.startHarRecording("blogViewed");
 
-			Pause(locator1 = "5000");
+			Pause(locator1 = 5000);
 		}
 
 		task ("View the properties of blogClicked event") {
@@ -600,7 +600,7 @@ definition {
 				applicationId = "Blog",
 				eventId = "blogViewed",
 				property = "entryId",
-				value = "${entryId}");
+				value = ${entryId});
 
 			ACUtils.assertEventPropertyValue(
 				applicationId = "Blog",
@@ -612,13 +612,13 @@ definition {
 				applicationId = "Blog",
 				eventId = "blogViewed",
 				property = "numberOfWords",
-				value = "22");
+				value = 22);
 		}
 
 		task ("View the request common properties value") {
 			ACUtils.assertRequestCommonPropertiesValue(
-				expectedChannelId = "${expectedChannelId}",
-				expectedDataSourceId = "${expectedDataSourceId}");
+				expectedChannelId = ${expectedChannelId},
+				expectedDataSourceId = ${expectedDataSourceId});
 		}
 	}
 

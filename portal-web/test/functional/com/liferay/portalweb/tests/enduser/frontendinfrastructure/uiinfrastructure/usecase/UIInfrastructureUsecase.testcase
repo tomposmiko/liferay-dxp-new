@@ -15,7 +15,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -25,7 +25,7 @@ definition {
 		}
 	}
 
-	@priority = "5"
+	@priority = 5
 	test CheckAUIPreloadConfiguration {
 		property test.name.skip.portal.instance = "UIInfrastructureUsecase#CheckAUIPreloadConfiguration";
 
@@ -63,7 +63,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-95157. It checks the nav-bar menu icons on guest page level after page refresh."
-	@priority = "5"
+	@priority = 5
 	test RefreshHomePage {
 		property app.server.types = "jboss,tcserver,tomcat,weblogic,websphere,wildfly";
 		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
@@ -107,7 +107,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-95157. It checks the nav-bar menu icons on admin page level after page refresh."
-	@priority = "5"
+	@priority = 5
 	test RefreshWebContent {
 		property app.server.types = "jboss,tcserver,tomcat,weblogic,websphere,wildfly";
 		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
@@ -134,7 +134,7 @@ definition {
 		takeScreenshot();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test RightToLeftSmoke {
 		property app.server.types = "jboss,tcserver,tomcat,weblogic,websphere,wildfly";
 		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
@@ -186,7 +186,7 @@ definition {
 	}
 
 	@description = "Ensure that a user can access portlet options and drag and drop portlets."
-	@priority = "5"
+	@priority = 5
 	test Smoke {
 		property app.server.types = "jboss,tcserver,tomcat,weblogic,websphere,wildfly";
 		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
@@ -238,13 +238,13 @@ definition {
 		}
 
 		Portlet.dragAndDropPortletToColumnPG(
-			columnNumberFrom = "1",
-			columnNumberTo = "2",
+			columnNumberFrom = 1,
+			columnNumberTo = 2,
 			portletName = "Hello World");
 
 		Portlet.dragAndDropPortletToColumnPG(
-			columnNumberFrom = "2",
-			columnNumberTo = "1",
+			columnNumberFrom = 2,
+			columnNumberTo = 1,
 			portletName = "Hello World");
 
 		task ("Removes Hello World Portlet on Test Page") {
@@ -257,7 +257,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-70390."
-	@priority = "4"
+	@priority = 4
 	test ViewNonASCIICharactersWithSPADisabled {
 		property custom.properties = "javascript.single.page.application.enabled=false";
 
@@ -285,7 +285,7 @@ definition {
 	}
 
 	@description = "Checks for each portlet having defined boundaries."
-	@priority = "5"
+	@priority = 5
 	test ViewPortletBoundaries {
 		property app.server.types = "jboss,tcserver,tomcat,weblogic,websphere,wildfly";
 		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
@@ -320,15 +320,15 @@ definition {
 		Portlet.addPG(portletName = "Documents and Media");
 
 		Portlet.dragAndDropPortletToColumnPG(
-			columnNumberFrom = "1",
-			columnNumberTo = "2",
+			columnNumberFrom = 1,
+			columnNumberTo = 2,
 			portletName = "Hello World");
 
 		Navigator.gotoPage(pageName = "Test Page");
 
 		Portlet.dragAndDropPortletToColumnPG(
-			columnNumberFrom = "1",
-			columnNumberTo = "3",
+			columnNumberFrom = 1,
+			columnNumberTo = 3,
 			portletName = "Documents and Media");
 
 		MouseOver(
@@ -358,7 +358,7 @@ definition {
 
 	@description = "This test validates sign in and sign out UI"
 	@ignore = "true"
-	@priority = "5"
+	@priority = 5
 	test ViewSignInSignOutUI {
 		property portal.acceptance = "false";
 

@@ -24,7 +24,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -33,13 +33,13 @@ definition {
 	}
 
 	@description = "This is a test for LPS-97184. Invalid fragment configuration cannot be published and offers useful advice."
-	@priority = "4"
+	@priority = 4
 	test AddInvalidConfiguration {
 		FragmentsAdmin.addFragment(fragmentName = "Fragment Name");
 
 		FragmentsEditor.gotoConfigurationTab();
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		FragmentsEditor.typeFileContent(fileName = "fragment_configuration_invalid.json");
 
@@ -53,19 +53,19 @@ definition {
 	}
 
 	@description = "This is a test for LPS-97184. Valid fragment configuration can be published."
-	@priority = "4"
+	@priority = 4
 	test AddValidConfiguration {
 		FragmentsAdmin.addFragment(fragmentName = "Fragment Name");
 
 		FragmentsEditor.gotoConfigurationTab();
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		FragmentsEditor.typeFileContent(fileName = "fragment_configuration.json");
 
 		FragmentsEditor.gotoCodeTab();
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		FragmentsEditor.typeFileContent(fileName = "fragment_configuration.html");
 

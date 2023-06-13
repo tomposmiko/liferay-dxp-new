@@ -13,13 +13,13 @@ definition {
 
 		Type.typePause(
 			locator1 = "TextInput#EMAIL_ADDRESS",
-			value1 = "${userEmailAddress}");
+			value1 = ${userEmailAddress});
 
 		Type.typePause(
 			locator1 = "TextInput#PASSWORD",
-			value1 = "${userPassword}");
+			value1 = ${userPassword});
 
-		if ("${rememberMe}" == "true") {
+		if (${rememberMe} == "true") {
 			Check(locator1 = "Checkbox#REMEMBER_ME");
 		}
 
@@ -45,7 +45,7 @@ definition {
 	macro setPasswordReminder {
 		Type(
 			locator1 = "TextInput#ANSWER",
-			value1 = "${userPasswordReminderAnswer}");
+			value1 = ${userPasswordReminderAnswer});
 
 		Button.clickSave();
 	}
@@ -55,15 +55,15 @@ definition {
 		Navigator.openURL();
 
 		SignIn._signIn(
-			rememberMe = "${rememberMe}",
-			userEmailAddress = "${userEmailAddress}",
-			userPassword = "${userPassword}");
+			rememberMe = ${rememberMe},
+			userEmailAddress = ${userEmailAddress},
+			userPassword = ${userPassword});
 	}
 
 	macro signInPortalInstanceSetUp {
 		var defaultPortalURL = PropsUtil.get("default.portal.url");
 
-		SignIn.signInSpecificURL(url = "${defaultPortalURL}");
+		SignIn.signInSpecificURL(url = ${defaultPortalURL});
 
 		if (IsElementPresent(locator1 = "Button#I_AGREE")) {
 			SignIn.agreeToTermsOfUse();
@@ -75,25 +75,25 @@ definition {
 
 		var portalURL = PropsUtil.get("portal.url");
 
-		var portalURL = StringUtil.replace("${portalURL}", "http://", "");
+		var portalURL = StringUtil.replace(${portalURL}, "http://", "");
 
-		var portalURL = StringUtil.replace("${portalURL}", ":8080", "");
+		var portalURL = StringUtil.replace(${portalURL}, ":8080", "");
 
 		HeadlessPortalInstanceAPI.cleanAllPortalInstances();
 
 		HeadlessPortalInstanceAPI.addPortalInstance(
 			domain = "liferay.com",
-			portalInstanceId = "${portalURL}",
-			virtualHost = "${portalURL}");
+			portalInstanceId = ${portalURL},
+			virtualHost = ${portalURL});
 	}
 
 	macro signInSpecificURL {
-		Navigator.openSpecificURL(url = "${url}");
+		Navigator.openSpecificURL(url = ${url});
 
 		SignIn._signIn(
-			rememberMe = "${rememberMe}",
-			userEmailAddress = "${userEmailAddress}",
-			userPassword = "${userPassword}");
+			rememberMe = ${rememberMe},
+			userEmailAddress = ${userEmailAddress},
+			userPassword = ${userPassword});
 	}
 
 	@summary = "Sign in to Liferay Portal as '${userEmailAddress}' using the password '${userPassword}'"

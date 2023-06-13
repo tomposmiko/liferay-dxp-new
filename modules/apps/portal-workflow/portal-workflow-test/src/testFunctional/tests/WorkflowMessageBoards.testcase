@@ -48,7 +48,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -66,7 +66,7 @@ definition {
 		}
 	}
 
-	@priority = "4"
+	@priority = 4
 	test ApproveMessageBoardsThreadPG {
 		Navigator.gotoPage(pageName = "Message Boards Page");
 
@@ -107,7 +107,7 @@ definition {
 
 		MessageboardsThread.gotoPG(
 			lastPostUserName = "Test Test",
-			replyCount = "0",
+			replyCount = 0,
 			threadBody = "MB Thread Body",
 			threadSubject = "MB Thread Subject");
 
@@ -132,7 +132,7 @@ definition {
 			threadSubject = "MB Thread Subject");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test RejectMessageBoardsThreadPG {
 		property test.name.skip.portal.instance = "WorkflowadminPGMessageboards#RejectMessageBoardsThreadPG";
 

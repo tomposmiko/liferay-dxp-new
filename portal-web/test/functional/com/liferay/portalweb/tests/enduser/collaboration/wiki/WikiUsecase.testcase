@@ -18,7 +18,7 @@ definition {
 			layoutName = "Wiki Test Page");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = "1",
+			column = 1,
 			groupName = "Guest",
 			layoutName = "Wiki Test Page",
 			widgetName = "Wiki");
@@ -29,7 +29,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -42,7 +42,7 @@ definition {
 	}
 
 	@description = "This test covers LPS-95501. It asserts added wiki attachment file via item selector."
-	@priority = "4"
+	@priority = 4
 	test ActivateInitialStagingWithAttachment {
 		ApplicationsMenu.gotoPortlet(
 			category = "Sites",
@@ -58,7 +58,7 @@ definition {
 			layoutName = "Staging Test Page");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = "1",
+			column = 1,
 			groupName = "Site Name",
 			layoutName = "Staging Test Page",
 			widgetName = "Wiki");
@@ -114,7 +114,7 @@ definition {
 	}
 
 	@description = "This test covers LPS-106280. It ensures that the wiki Email content can be edited."
-	@priority = "3"
+	@priority = 3
 	test ConfigureEmailContent {
 		WikiNavigator.openWikiAdmin(siteURLKey = "guest");
 
@@ -141,7 +141,7 @@ definition {
 			value1 = "[$TO_NAME$], [$PAGE_CONTENT$] This is an edited wiki email. [$FROM_NAME$]");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test ConfigurePortletDisplaySettings {
 		Navigator.gotoPage(pageName = "Wiki Test Page");
 
@@ -172,7 +172,7 @@ definition {
 		WikiPortlet.viewDisplaySettings(uncheckedSetting = "ENABLE_COMMENTS,ENABLE_COMMENT_RATINGS,ENABLE_PAGE_RATINGS,SHOW_RELATED_ASSETS");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ImportLARLinkNode {
 		property testray.component.names = "Training";
 
@@ -218,7 +218,7 @@ definition {
 			value1 = "Sweet Potatoes");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test NavigationPortletSmoke {
 		JSONLayout.addPublicLayout(
 			groupName = "Guest",
@@ -233,7 +233,7 @@ definition {
 			value1 = "remove-plugin -Dplugin.name=wiki-navigation-portlet");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test RestoreDeletedFrontPage {
 		WikiNavigator.openWikiAdmin(siteURLKey = "guest");
 
@@ -278,7 +278,7 @@ definition {
 			wikiNodeName = "Main");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test SearchChildPageComment {
 		WikiPage.addFrontPagePG(
 			wikiNodeName = "Main",
@@ -307,7 +307,7 @@ definition {
 			wikiPageTitle = "Wiki FrontPage Child Page Title");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test SearchFrontPageAttachments {
 		WikiPage.addFrontPagePG(
 			wikiNodeName = "Main",
@@ -329,7 +329,7 @@ definition {
 			wikiPageTitle = "FrontPage");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test ViewDraftPagesViaBreadcrumb {
 		Navigator.gotoPage(pageName = "Wiki Test Page");
 
@@ -372,7 +372,7 @@ definition {
 			pathLocator = "CURRENT_LOCATION");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test ViewNoXSSViaAddPage {
 		Navigator.gotoPage(pageName = "Wiki Test Page");
 
@@ -383,9 +383,9 @@ definition {
 		var actualScript = '''<script>alert(123);</script>''';
 		var escapedScript = '''&lt;script&gt;alert(123);&lt;/script&gt;''';
 
-		AssertHTMLSourceTextNotPresent(value1 = "${actualScript}");
+		AssertHTMLSourceTextNotPresent(value1 = ${actualScript});
 
-		AssertHTMLSourceTextPresent(value1 = "${escapedScript}");
+		AssertHTMLSourceTextPresent(value1 = ${escapedScript});
 	}
 
 }

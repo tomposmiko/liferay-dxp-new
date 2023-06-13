@@ -163,7 +163,6 @@ import org.opensaml.xmlsec.signature.support.SignatureTrustEngine;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
@@ -173,8 +172,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  */
 @Component(
 	configurationPid = "com.liferay.saml.runtime.configuration.SamlConfiguration",
-	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
-	service = WebSsoProfile.class
+	immediate = true, service = WebSsoProfile.class
 )
 public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 

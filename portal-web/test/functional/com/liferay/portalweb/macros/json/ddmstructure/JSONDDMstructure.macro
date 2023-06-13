@@ -18,17 +18,17 @@ definition {
 				-d -orderByComparator=
 		''';
 
-		var structureId = JSONCurlUtil.post("${curl}", "$.[?(@['nameCurrentValue'] == '${structureName}')]['structureId']");
+		var structureId = JSONCurlUtil.post(${curl}, "$.[?(@['nameCurrentValue'] == '${structureName}')]['structureId']");
 
-		var structureId = StringUtil.replace("${structureId}", "[\"", "");
+		var structureId = StringUtil.replace(${structureId}, "[\"", "");
 
-		var structureId = StringUtil.replace("${structureId}", "\"]", "");
+		var structureId = StringUtil.replace(${structureId}, "\"]", "");
 
-		if ("${structureId}" == "") {
+		if (${structureId} == "") {
 			fail("FAIL. Cannot find structureId.");
 		}
 
-		return "${structureId}";
+		return ${structureId};
 	}
 
 }

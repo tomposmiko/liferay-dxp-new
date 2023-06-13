@@ -33,7 +33,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -44,7 +44,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-103454. Content author having permission to update blog entry could see edit icon in the content page displaying the blog and could edit blog in editmode. "
-	@priority = "4"
+	@priority = 4
 	test EditBlogsEntryWithBlogEntryUpdatePermission {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 
@@ -121,7 +121,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-96795. Content author having permissions to create and update web content could see edit icon in the content page displaying the web contents and could edit web content in edit mode."
-	@priority = "5"
+	@priority = 5
 	test EditContentWithCreateAndUpdateWebContentPermissions {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 		property portal.acceptance = "true";
@@ -153,7 +153,7 @@ definition {
 
 		for (var resourceActionIndex : list "VIEW,UPDATE_LAYOUT_CONTENT") {
 			Permissions.definePermissionViaJSONAPI(
-				resourceAction = "${resourceActionIndex}",
+				resourceAction = ${resourceActionIndex},
 				resourceName = "com.liferay.portal.kernel.model.Layout",
 				roleTitle = "Roles Siterole Name",
 				roleType = "site");
@@ -161,7 +161,7 @@ definition {
 
 		for (var resourceActionIndex : list "ACCESS_IN_CONTROL_PANEL,VIEW") {
 			Permissions.definePermissionViaJSONAPI(
-				resourceAction = "${resourceActionIndex}",
+				resourceAction = ${resourceActionIndex},
 				resourceName = "com_liferay_journal_web_portlet_JournalPortlet",
 				roleTitle = "Roles Siterole Name",
 				roleType = "site");
@@ -175,7 +175,7 @@ definition {
 
 		for (var resourceActionIndex : list "ADD_ARTICLE,VIEW") {
 			Permissions.definePermissionViaJSONAPI(
-				resourceAction = "${resourceActionIndex}",
+				resourceAction = ${resourceActionIndex},
 				resourceName = "com.liferay.journal",
 				roleTitle = "Roles Siterole Name",
 				roleType = "site");
@@ -203,7 +203,7 @@ definition {
 
 			WebContent.addCP(
 				webContentContent = "WC WebContent Content",
-				webContentTitle = "${webContentTitle}");
+				webContentTitle = ${webContentTitle});
 
 			PortletEntry.publish();
 		}
@@ -279,7 +279,7 @@ definition {
 
 			LexiconEntry.gotoFragmentPageContentEllipsisMenuItem(
 				menuItem = "Edit",
-				rowEntry = "${webContentTitle}");
+				rowEntry = ${webContentTitle});
 
 			AssertVisible(locator1 = "WCEditWebContent#SIDEBAR");
 
@@ -288,7 +288,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-96795. Content author having permissions to update web content and Update Page Content could see edit icon in the content page displaying the web contents and could edit web content in editmode."
-	@priority = "5"
+	@priority = 5
 	test EditContentWithUpdateWebContentAndUpdatePageContentPermissions {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 		property portal.acceptance = "true";
@@ -320,7 +320,7 @@ definition {
 
 		for (var resourceActionIndex : list "UPDATE_LAYOUT_CONTENT,VIEW") {
 			Permissions.definePermissionViaJSONAPI(
-				resourceAction = "${resourceActionIndex}",
+				resourceAction = ${resourceActionIndex},
 				resourceName = "com.liferay.portal.kernel.model.Layout",
 				roleTitle = "Roles Siterole Name",
 				roleType = "site");
@@ -347,7 +347,7 @@ definition {
 			JSONWebcontent.addWebContent(
 				content = "WC WebContent Content",
 				groupName = "Test Site Name",
-				title = "${webContentTitle}");
+				title = ${webContentTitle});
 		}
 
 		ContentPagesNavigator.openEditContentPage(
@@ -417,7 +417,7 @@ definition {
 
 			LexiconEntry.gotoFragmentPageContentEllipsisMenuItem(
 				menuItem = "Edit",
-				rowEntry = "${webContentTitle}");
+				rowEntry = ${webContentTitle});
 
 			AssertVisible(locator1 = "WCEditWebContent#SIDEBAR");
 
@@ -426,7 +426,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-103454. Content author having permission to update web content could see edit icon in the content page displaying the web contents and could edit web content in editmode, but could not edit editable field "
-	@priority = "5"
+	@priority = 5
 	test EditContentWithWebContentArticleUpdatePermission {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 		property portal.acceptance = "true";
@@ -465,7 +465,7 @@ definition {
 			JSONWebcontent.addWebContent(
 				content = "WC WebContent Content",
 				groupName = "Test Site Name",
-				title = "${webContentTitle}");
+				title = ${webContentTitle});
 		}
 
 		ContentPagesNavigator.openEditContentPage(
@@ -528,7 +528,7 @@ definition {
 
 			LexiconEntry.gotoFragmentPageContentEllipsisMenuItem(
 				menuItem = "Edit",
-				rowEntry = "${webContentTitle}");
+				rowEntry = ${webContentTitle});
 
 			AssertVisible(locator1 = "WCEditWebContent#SIDEBAR");
 
@@ -541,7 +541,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-105109. Content author having permissions to update page content can introduce new inline content after clicking edit icon in content page."
-	@priority = "5"
+	@priority = 5
 	test EditInlineContentWithUpdatePageContentPermission {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 		property portal.acceptance = "true";
@@ -583,7 +583,7 @@ definition {
 
 		for (var resourceActionIndex : list "UPDATE_LAYOUT_CONTENT,VIEW") {
 			Permissions.definePermissionViaJSONAPI(
-				resourceAction = "${resourceActionIndex}",
+				resourceAction = ${resourceActionIndex},
 				resourceName = "com.liferay.portal.kernel.model.Layout",
 				roleTitle = "Roles Siterole Name",
 				roleType = "site");
@@ -627,7 +627,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-105109. Content author having permissions to update page content can introduce new inline content after clicking edit icon in content page."
-	@priority = "5"
+	@priority = 5
 	test MapInlineContentWithUpdatePageContentPermission {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 		property portal.acceptance = "true";
@@ -691,7 +691,7 @@ definition {
 
 		for (var resourceActionIndex : list "UPDATE_LAYOUT_CONTENT,VIEW") {
 			Permissions.definePermissionViaJSONAPI(
-				resourceAction = "${resourceActionIndex}",
+				resourceAction = ${resourceActionIndex},
 				resourceName = "com.liferay.portal.kernel.model.Layout",
 				roleTitle = "Roles Siterole Name",
 				roleType = "site");
@@ -743,7 +743,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-103454. When one WC displayed in multiple fields in a content page, there should be one WC entry in Contents Panel list."
-	@priority = "4"
+	@priority = 4
 	test ViewContentViaContentPanelWithWebContentArticleUpdatePermission {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 
@@ -847,7 +847,7 @@ definition {
 		PageEditor.gotoTab(tabName = "Contents");
 
 		AssertElementNotPresent(
-			key_rowNumber = "2",
+			key_rowNumber = 2,
 			locator1 = "PageEditor#FRAGMENT_SIDEBAR_ENTRY_N");
 	}
 

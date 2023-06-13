@@ -5,7 +5,7 @@ definition {
 
 		echo("## translationZipFileName: ${translationZipFileName}");
 
-		if (contains("${translationZipFileName}", "en_US")) {
+		if (contains(${translationZipFileName}, "en_US")) {
 			echo("This is a exported translation file.");
 		}
 		else {
@@ -17,15 +17,15 @@ definition {
 		Portlet.waitForForm();
 
 		Click.clickNoMouseOver(
-			key_currentLocale = StringUtil.lowerCase("${currentBaseLocale}"),
+			key_currentLocale = StringUtil.lowerCase(${currentBaseLocale}),
 			locator1 = "Button#TRANSLATIONS_LOCALIZATION");
 
 		Click(
-			key_locale = "${newBaseLocale}",
+			key_locale = ${newBaseLocale},
 			locator1 = "Translation#DROPDOWN_MENU_ITEM");
 
 		AssertElementPresent(
-			key_locale = "${newBaseLocale}",
+			key_locale = ${newBaseLocale},
 			locator1 = "Translation#CONTENT_TITLE");
 	}
 
@@ -33,15 +33,15 @@ definition {
 		Portlet.waitForForm();
 
 		Click.clickNoMouseOver(
-			key_currentLocale = StringUtil.lowerCase("${currentTargetLocale}"),
+			key_currentLocale = StringUtil.lowerCase(${currentTargetLocale}),
 			locator1 = "Button#TRANSLATIONS_LOCALIZATION");
 
 		Click(
-			key_locale = "${newTargetLocale}",
+			key_locale = ${newTargetLocale},
 			locator1 = "Translation#DROPDOWN_MENU_ITEM");
 
 		AssertElementPresent(
-			key_locale = "${newTargetLocale}",
+			key_locale = ${newTargetLocale},
 			locator1 = "Translation#CONTENT_TITLE");
 	}
 
@@ -49,7 +49,7 @@ definition {
 		AssertElementPresent(locator1 = "Language#EXPORT_TRANSLATION_ORIGIN_LANGUAGE");
 
 		AssertElementPresent(
-			key_checkboxName = "${defaultLanguage}",
+			key_checkboxName = ${defaultLanguage},
 			locator1 = "Checkbox#DISABLED_EXPORT_TRANSLATION");
 
 		AssertElementPresent(locator1 = "Button#EXPORT_MODAL_DISABLED");
@@ -57,12 +57,12 @@ definition {
 		if (isSet(exportFileFormat)) {
 			Select(
 				locator1 = "Select#EXPORT_FILE_FORMAT",
-				value1 = "${exportFileFormat}");
+				value1 = ${exportFileFormat});
 		}
 
-		for (var languageList : list "${languageList}") {
+		for (var languageList : list ${languageList}) {
 			Check.checkNotVisible(
-				checkboxName = "${languageList}",
+				checkboxName = ${languageList},
 				locator1 = "Checkbox#ANY_CHECKBOX");
 		}
 
@@ -75,7 +75,7 @@ definition {
 		LexiconEntry.changeDisplayStyle(displayStyle = "list");
 
 		Click.waitForMenuToggleJSClick(
-			key_webContentTitle = "${webContentTitle}",
+			key_webContentTitle = ${webContentTitle},
 			locator1 = "WC#ENTRY_LIST_MENULIST_ICON");
 
 		MenuItem.click(menuItem = "Export for Translation");
@@ -83,7 +83,7 @@ definition {
 
 	macro gotoImportTranslation {
 		Click.waitForMenuToggleJSClick(
-			key_webContentTitle = "${webContentTitle}",
+			key_webContentTitle = ${webContentTitle},
 			locator1 = "WC#ENTRY_LIST_MENULIST_ICON");
 
 		MenuItem.click(menuItem = "Import Translation");
@@ -91,14 +91,14 @@ definition {
 
 	macro gotoTranslate {
 		Click.waitForMenuToggleJSClick(
-			key_webContentTitle = "${webContentTitle}",
+			key_webContentTitle = ${webContentTitle},
 			locator1 = "WC#ENTRY_LIST_MENULIST_ICON");
 
 		MenuItem.click(menuItem = "Translate");
 	}
 
 	macro importTranslation {
-		Translations.gotoImportTranslation(webContentTitle = "${webContentTitle}");
+		Translations.gotoImportTranslation(webContentTitle = ${webContentTitle});
 
 		AssertClick(
 			locator1 = "Button#SELECT_FILE",
@@ -106,12 +106,12 @@ definition {
 
 		UploadTempFile.uploadTempFileHiddenNoMouseOver(
 			locator1 = "TextInput#FILE",
-			value1 = "${fileName}");
+			value1 = ${fileName});
 
-		if ("${workflow}" == "true") {
+		if (${workflow} == "true") {
 			PortletEntry.submitForPublication();
 		}
-		else if ("${workflowResubmit}" == "true") {
+		else if (${workflowResubmit} == "true") {
 			PortletEntry.save();
 		}
 		else {
@@ -123,7 +123,7 @@ definition {
 		if (isSet(webContentTitle)) {
 			Type(
 				locator1 = "TextInput#TITLE_NOT_READONLY",
-				value1 = "${webContentTitle}");
+				value1 = ${webContentTitle});
 		}
 
 		if (isSet(webContentContent)) {
@@ -131,7 +131,7 @@ definition {
 
 			Type(
 				locator1 = "CKEditor#BODY",
-				value1 = "${webContentContent}");
+				value1 = ${webContentContent});
 
 			SelectFrame(value1 = "relative=top");
 		}
@@ -141,7 +141,7 @@ definition {
 
 			Type(
 				locator1 = "CKEditor#BODY",
-				value1 = "${webContentDescription}");
+				value1 = ${webContentDescription});
 
 			SelectFrame(value1 = "relative=top");
 		}
@@ -151,42 +151,42 @@ definition {
 
 			Type.typeCodeMirrorEditorNoError(
 				locator1 = "CKEditor#BODY_FIELD_SOURCE_ON",
-				value1 = "${webContentSourceHTML}");
+				value1 = ${webContentSourceHTML});
 		}
 
 		if (isSet(webContentText)) {
 			Type(
 				key_fieldName = "Text",
 				locator1 = "TextInput#TRANSLATIONS_TARGET_FIELD",
-				value1 = "${webContentText}");
+				value1 = ${webContentText});
 		}
 
 		if (isSet(webContentTextBox)) {
 			Type(
 				key_fieldName = "TextBox",
 				locator1 = "TextArea#TRANSLATIONS_TARGET_TEXT_BOX_FIELD",
-				value1 = "${webContentTextBox}");
+				value1 = ${webContentTextBox});
 		}
 
 		if (isSet(webContentInteger)) {
 			Type(
 				key_fieldName = "Integer",
 				locator1 = "TextInput#TRANSLATIONS_TARGET_FIELD",
-				value1 = "${webContentInteger}");
+				value1 = ${webContentInteger});
 		}
 
 		if (isSet(webContentNumber)) {
 			Type(
 				key_fieldName = "Number",
 				locator1 = "TextInput#TRANSLATIONS_TARGET_FIELD",
-				value1 = "${webContentNumber}");
+				value1 = ${webContentNumber});
 		}
 
 		if (isSet(webContentDecimal)) {
 			Type(
 				key_fieldName = "Decimal",
 				locator1 = "TextInput#TRANSLATIONS_TARGET_FIELD",
-				value1 = "${webContentDecimal}");
+				value1 = ${webContentDecimal});
 		}
 	}
 
@@ -200,66 +200,66 @@ definition {
 		if (isSet(webContentTitle)) {
 			AssertElementPresent(
 				key_fieldName = "Title",
-				key_fieldValue = "${webContentTitle}",
+				key_fieldValue = ${webContentTitle},
 				locator1 = "Translation#BASE_LANGUAGE_FIELD");
 		}
 
 		if (isSet(webContentContent)) {
 			AssertTextEquals(
-				key_content = "${webContentContent}",
+				key_content = ${webContentContent},
 				key_fieldName = "Content",
 				locator1 = "Translation#BASE_LANGUAGE_CONTENT_FIELD",
-				value1 = "${webContentContent}");
+				value1 = ${webContentContent});
 		}
 
 		if (isSet(webContentDescription)) {
 			AssertTextEquals(
-				key_content = "${webContentDescription}",
+				key_content = ${webContentDescription},
 				key_fieldName = "Description",
 				locator1 = "Translation#BASE_LANGUAGE_CONTENT_FIELD",
-				value1 = "${webContentDescription}");
+				value1 = ${webContentDescription});
 		}
 
 		if (isSet(webContentHTML)) {
 			AssertTextEquals.assertPartialText(
-				key_content = "${webContentHTML}",
+				key_content = ${webContentHTML},
 				key_fieldName = "HTML",
 				locator1 = "Translation#BASE_LANGUAGE_CONTENT_FIELD",
-				value1 = "${webContentHTML}");
+				value1 = ${webContentHTML});
 		}
 
 		if (isSet(webContentText)) {
 			AssertElementPresent(
 				key_fieldName = "Text",
-				key_fieldValue = "${webContentText}",
+				key_fieldValue = ${webContentText},
 				locator1 = "Translation#BASE_LANGUAGE_FIELD");
 		}
 
 		if (isSet(webContentTextBox)) {
 			AssertElementPresent(
 				key_fieldName = "Text Box",
-				key_fieldValue = "${webContentTextBox}",
+				key_fieldValue = ${webContentTextBox},
 				locator1 = "Translation#BASE_LANGUAGE_TEXT_BOX_FIELD");
 		}
 
 		if (isSet(webContentInteger)) {
 			AssertElementPresent(
 				key_fieldName = "Integer",
-				key_fieldValue = "${webContentInteger}",
+				key_fieldValue = ${webContentInteger},
 				locator1 = "Translation#BASE_LANGUAGE_FIELD");
 		}
 
 		if (isSet(webContentNumber)) {
 			AssertElementPresent(
 				key_fieldName = "Number",
-				key_fieldValue = "${webContentNumber}",
+				key_fieldValue = ${webContentNumber},
 				locator1 = "Translation#BASE_LANGUAGE_FIELD");
 		}
 
 		if (isSet(webContentDecimal)) {
 			AssertElementPresent(
 				key_fieldName = "Decimal",
-				key_fieldValue = "${webContentDecimal}",
+				key_fieldValue = ${webContentDecimal},
 				locator1 = "Translation#BASE_LANGUAGE_FIELD");
 		}
 	}
@@ -268,16 +268,16 @@ definition {
 		if (isSet(webContentTitle)) {
 			AssertElementPresent(
 				key_fieldName = "Title",
-				key_fieldValue = "${webContentTitle}",
+				key_fieldValue = ${webContentTitle},
 				locator1 = "Translation#TARGET_LANGUAGE_FIELD");
 		}
 
 		if (isSet(webContentContent)) {
-			Pause(locator1 = "3000");
+			Pause(locator1 = 3000);
 
 			SelectFrame.selectFrameNoLoading(locator1 = "CKEditor#BODY_FIELD_IFRAME_2");
 
-			if (IsTextNotEqual(locator1 = "CKEditor#BODY", value1 = "${webContentContent}")) {
+			if (IsTextNotEqual(locator1 = "CKEditor#BODY", value1 = ${webContentContent})) {
 				Refresh();
 
 				SelectFrame.selectFrameNoLoading(locator1 = "CKEditor#BODY_FIELD_IFRAME_2");
@@ -285,17 +285,17 @@ definition {
 
 			AssertTextEquals(
 				locator1 = "CKEditor#BODY",
-				value1 = "${webContentContent}");
+				value1 = ${webContentContent});
 
 			SelectFrame(value1 = "relative=top");
 		}
 
 		if (isSet(webContentDescription)) {
-			Pause(locator1 = "3000");
+			Pause(locator1 = 3000);
 
 			SelectFrame.selectFrameNoLoading(locator1 = "CKEditor#BODY_FIELD_IFRAME");
 
-			if (IsTextNotEqual(locator1 = "CKEditor#BODY", value1 = "${webContentDescription}")) {
+			if (IsTextNotEqual(locator1 = "CKEditor#BODY", value1 = ${webContentDescription})) {
 				Refresh();
 
 				SelectFrame.selectFrameNoLoading(locator1 = "CKEditor#BODY_FIELD_IFRAME");
@@ -303,7 +303,7 @@ definition {
 
 			AssertTextEquals(
 				locator1 = "CKEditor#BODY",
-				value1 = "${webContentDescription}");
+				value1 = ${webContentDescription});
 
 			SelectFrame(value1 = "relative=top");
 		}
@@ -313,7 +313,7 @@ definition {
 
 			Type.typeCodeMirrorEditorNoError(
 				locator1 = "CKEditor#BODY_FIELD_SOURCE_ON",
-				value1 = "${webContentHTML}");
+				value1 = ${webContentHTML});
 
 			Click(locator1 = "CKEditor#TOOLBAR_SOURCE_BUTTON_2");
 		}
@@ -321,35 +321,35 @@ definition {
 		if (isSet(webContentText)) {
 			AssertElementPresent(
 				key_fieldName = "Text",
-				key_fieldValue = "${webContentText}",
+				key_fieldValue = ${webContentText},
 				locator1 = "Translation#TARGET_LANGUAGE_FIELD");
 		}
 
 		if (isSet(webContentTextBox)) {
 			AssertElementPresent(
 				key_fieldName = "Text Box",
-				key_fieldValue = "${webContentTextBox}",
+				key_fieldValue = ${webContentTextBox},
 				locator1 = "Translation#TARGET_LANGUAGE_TEXT_BOX_FIELD");
 		}
 
 		if (isSet(webContentInteger)) {
 			AssertElementPresent(
 				key_fieldName = "Integer",
-				key_fieldValue = "${webContentInteger}",
+				key_fieldValue = ${webContentInteger},
 				locator1 = "Translation#TARGET_LANGUAGE_FIELD");
 		}
 
 		if (isSet(webContentNumber)) {
 			AssertElementPresent(
 				key_fieldName = "Number",
-				key_fieldValue = "${webContentNumber}",
+				key_fieldValue = ${webContentNumber},
 				locator1 = "Translation#TARGET_LANGUAGE_FIELD");
 		}
 
 		if (isSet(webContentDecimal)) {
 			AssertElementPresent(
 				key_fieldName = "Decimal",
-				key_fieldValue = "${webContentDecimal}",
+				key_fieldValue = ${webContentDecimal},
 				locator1 = "Translation#TARGET_LANGUAGE_FIELD");
 		}
 	}
@@ -358,19 +358,19 @@ definition {
 		Portlet.waitForForm();
 
 		Click.clickNoMouseOver(
-			key_currentLocale = StringUtil.lowerCase("${currentTargetLocale}"),
+			key_currentLocale = StringUtil.lowerCase(${currentTargetLocale}),
 			locator1 = "Button#TRANSLATIONS_LOCALIZATION");
 
-		for (var targetLocale : list "${targetLocale}") {
+		for (var targetLocale : list ${targetLocale}) {
 			AssertElementPresent(
-				key_locale = "${targetLocale}",
+				key_locale = ${targetLocale},
 				locator1 = "Translation#DROPDOWN_MENU_ITEM");
 		}
 
 		if (isSet(noTargetLocale)) {
-			for (var noTargetLocale : list "${noTargetLocale}") {
+			for (var noTargetLocale : list ${noTargetLocale}) {
 				AssertElementNotPresent(
-					key_locale = "${noTargetLocale}",
+					key_locale = ${noTargetLocale},
 					locator1 = "Translation#DROPDOWN_MENU_ITEM");
 			}
 		}
@@ -380,7 +380,7 @@ definition {
 		LexiconEntry.changeDisplayStyle(displayStyle = "list");
 
 		Click.waitForMenuToggleJSClick(
-			key_webContentTitle = "${webContentTitle}",
+			key_webContentTitle = ${webContentTitle},
 			locator1 = "WC#ENTRY_LIST_MENULIST_ICON");
 
 		if (isSet(noOptions)) {
@@ -392,22 +392,22 @@ definition {
 		}
 		else {
 			AssertTextEquals(
-				index = "6",
+				index = 6,
 				locator1 = "MenuItem#DROPDOWN_MENU_ITEM_SPECIFIC",
 				value1 = "Translate");
 
 			AssertTextEquals(
-				index = "7",
+				index = 7,
 				locator1 = "MenuItem#DROPDOWN_MENU_ITEM_SPECIFIC",
 				value1 = "Export for Translation");
 
 			AssertTextEquals(
-				index = "8",
+				index = 8,
 				locator1 = "MenuItem#DROPDOWN_MENU_ITEM_SPECIFIC",
 				value1 = "Import Translation");
 
 			AssertTextEquals(
-				index = "9",
+				index = 9,
 				locator1 = "MenuItem#DROPDOWN_MENU_ITEM_SPECIFIC",
 				value1 = "View History");
 		}

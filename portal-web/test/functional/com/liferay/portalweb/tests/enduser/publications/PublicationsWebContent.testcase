@@ -17,7 +17,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -31,7 +31,7 @@ definition {
 	}
 
 	@description = "This is the use case for LPS-165437."
-	@priority = "3"
+	@priority = 3
 	test CanPublishPublicationWithDeletedWCFolder {
 		JSONWebcontent.addFolder(
 			folderName = "WC Folder Name",
@@ -61,7 +61,7 @@ definition {
 	}
 
 	@description = "Manage Conflicting Web Content Folder changes and discard the changes."
-	@priority = "4"
+	@priority = 4
 	test ManageConflictingWebContentFolderchanges {
 
 		// Wrokaround LPS-127348
@@ -168,7 +168,7 @@ definition {
 			value1 = "Web Content Folder");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test PublishExpiredWebContentViaWCD {
 
 		// Wrokaround LPS-127348
@@ -238,7 +238,7 @@ definition {
 			webContentTitle = "WC WebContent Title");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test PublishWebContentWithCategory {
 
 		// Wrokaround LPS-127348
@@ -300,7 +300,7 @@ definition {
 			searchAssetType = "Web Content");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test PublishWebContentWithDMAndImageFields {
 
 		// Workaround LPS-121020
@@ -334,9 +334,9 @@ definition {
 
 		for (var structureFieldName : list "Documents and Media,Image,Text") {
 			DynamicDataMapping.addField(
-				field = "${structureFieldName}",
-				fieldFieldLabel = "${structureFieldName}",
-				fieldName = StringUtil.replace("${structureFieldName}", " ", ""));
+				field = ${structureFieldName},
+				fieldFieldLabel = ${structureFieldName},
+				fieldName = StringUtil.replace(${structureFieldName}, " ", ""));
 		}
 
 		WebContentStructures.saveCP(structureName = "WC Structure Name");
@@ -403,7 +403,7 @@ definition {
 
 		PublicationsChanges.viewChangesViaChangesStyle(
 			changeCategory = "Document",
-			changeOrder = "2",
+			changeOrder = 2,
 			changeSite = "Guest",
 			changeTitle = "Document_1.jpg",
 			changeType = "Added",
@@ -424,7 +424,7 @@ definition {
 			locator1 = "WC#ENTRY_LIST_TITLE");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test PublishWebContentWithFriendlyURL {
 
 		// Wrokaround LPS-129638
@@ -500,7 +500,7 @@ definition {
 			value1 = "WC WebContent Title");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test ReviewChangesCanProcessWebContentsWithThemeDisplayInTemplate {
 		JSONPublications.addPublication(publicationName = "Publication Name");
 
@@ -560,7 +560,7 @@ definition {
 		Publications.gotoReviewChanges();
 
 		Click(
-			changeOrder = "2",
+			changeOrder = 2,
 			key_changeCategory = "Web Content Article",
 			key_changeTitle = "WC Web Content Title Edited",
 			locator1 = "PublicationsChanges#PUBLICATIONS_CHANGE_TITLE");
@@ -569,7 +569,7 @@ definition {
 	}
 
 	@description = "This is the use case for LPS-161841. The order of the versions is not reversed When resolving web content article version conflicts during publication."
-	@priority = "4"
+	@priority = 4
 	test WebContentArticleVersionCannotBeReversedWhenResolvingTheConflicts {
 		task ("Add new web content on new added site") {
 			JSONGroup.addGroup(groupName = "Site Name");

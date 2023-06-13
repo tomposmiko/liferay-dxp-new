@@ -26,7 +26,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -35,7 +35,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-99377. User can add a checkbox configuration fragment to a display page template."
-	@priority = "5"
+	@priority = 5
 	test AddCheckboxConfigurationFragmentToDisplayPageTemplate {
 		property portal.acceptance = "true";
 		property portal.upstream = "true";
@@ -46,10 +46,10 @@ definition {
 
 			JSONFragment.addSection(
 				collectionName = "Collection Name",
-				configuration = "${jsonSnippet}",
+				configuration = ${jsonSnippet},
 				fragmentStatus = "Approved",
 				groupName = "Test Site Name",
-				html = "${htmlSnippet}",
+				html = ${htmlSnippet},
 				name = "Checkbox Fragment Example");
 		}
 
@@ -87,7 +87,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-100545. An itemSelector fragment configuration can select an asset in a display page template"
-	@priority = "4"
+	@priority = 4
 	test AddItemSelectorConfigurationFragmentToDisplayPageTemplate {
 		task ("Add a section fragment to the fragment collection via JSON") {
 			var htmlSnippet = FragmentsAPI.getFragmentFileContent(fileName = "itemSelector_configuration.html");
@@ -95,10 +95,10 @@ definition {
 
 			JSONFragment.addSection(
 				collectionName = "Collection Name",
-				configuration = "${jsonSnippet}",
+				configuration = ${jsonSnippet},
 				fragmentStatus = "Approved",
 				groupName = "Test Site Name",
-				html = "${htmlSnippet}",
+				html = ${htmlSnippet},
 				name = "itemSelector Fragment Example");
 		}
 
@@ -147,10 +147,10 @@ definition {
 
 			JSONFragment.addSection(
 				collectionName = "Collection Name",
-				configuration = "${jsonSnippet}",
+				configuration = ${jsonSnippet},
 				fragmentStatus = "Approved",
 				groupName = "Test Site Name",
-				html = "${htmlSnippet}",
+				html = ${htmlSnippet},
 				name = "Text Fragment Example");
 		}
 
@@ -180,7 +180,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-99543. User can change text fragment configuration in a display page template."
-	@priority = "5"
+	@priority = 5
 	test AddTextConfigurationFragmentToDisplayPageTemplate {
 		property portal.acceptance = "true";
 
@@ -190,10 +190,10 @@ definition {
 
 			JSONFragment.addSection(
 				collectionName = "Collection Name",
-				configuration = "${jsonSnippet}",
+				configuration = ${jsonSnippet},
 				fragmentStatus = "Approved",
 				groupName = "Test Site Name",
-				html = "${htmlSnippet}",
+				html = ${htmlSnippet},
 				name = "Text Fragment Example");
 		}
 

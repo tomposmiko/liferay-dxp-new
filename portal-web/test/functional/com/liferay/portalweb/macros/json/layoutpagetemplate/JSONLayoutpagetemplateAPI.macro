@@ -19,7 +19,7 @@ definition {
 				-d serviceContext=${serviceContext}
 		''';
 
-		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+		com.liferay.poshi.runner.util.JSONCurlUtil.post(${curl});
 	}
 
 	@summary = "Directly calls the JSON WS API to add a globalPageTemplateEntry"
@@ -37,7 +37,7 @@ definition {
 				-d serviceContext=${serviceContext}
 		''';
 
-		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+		com.liferay.poshi.runner.util.JSONCurlUtil.post(${curl});
 	}
 
 	@summary = "Directly calls the JSON WS API to add a layoutPageTemplateCollection"
@@ -55,7 +55,7 @@ definition {
 				-d serviceContext=${serviceContext}
 		''';
 
-		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+		com.liferay.poshi.runner.util.JSONCurlUtil.post(${curl});
 	}
 
 	@summary = "Directly calls the JSON WS API to add a layoutPageTemplateEntry"
@@ -76,7 +76,7 @@ definition {
 				-d serviceContext=${serviceContext}
 		''';
 
-		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+		com.liferay.poshi.runner.util.JSONCurlUtil.post(${curl});
 	}
 
 	@summary = "Directly calls the JSON WS API to add a masterPageTemplateEntry"
@@ -96,12 +96,12 @@ definition {
 				-d serviceContext=${serviceContext}
 		''';
 
-		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+		com.liferay.poshi.runner.util.JSONCurlUtil.post(${curl});
 	}
 
 	@summary = "Directly calls the JSON WS API to delete a layoutPageTemplateEntry"
 	macro _deleteLayoutPageTemplateEntry {
-		Variables.assertDefined(parameterList = "${layoutPageTemplateEntryId}");
+		Variables.assertDefined(parameterList = ${layoutPageTemplateEntryId});
 
 		var portalURL = JSONCompany.getPortalURL();
 
@@ -111,7 +111,7 @@ definition {
 				-d layoutPageTemplateEntryId=${layoutPageTemplateEntryId}
 		''';
 
-		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+		com.liferay.poshi.runner.util.JSONCurlUtil.post(${curl});
 	}
 
 	@summary = "Get the layoutPageTemplateCollectionId from a layoutPageTemplateCollection by using groupId and layoutPageTemplateCollectionName"
@@ -126,17 +126,17 @@ definition {
 				-d groupId=${groupId}
 		''';
 
-		var layoutPageTemplateCollectionId = JSONCurlUtil.post("${curl}", "$.[?(@['name'] == '${layoutPageTemplateCollectionName}')]['layoutPageTemplateCollectionId']");
+		var layoutPageTemplateCollectionId = JSONCurlUtil.post(${curl}, "$.[?(@['name'] == '${layoutPageTemplateCollectionName}')]['layoutPageTemplateCollectionId']");
 
-		var layoutPageTemplateCollectionId = StringUtil.replace("${layoutPageTemplateCollectionId}", "[\"", "");
+		var layoutPageTemplateCollectionId = StringUtil.replace(${layoutPageTemplateCollectionId}, "[\"", "");
 
-		var layoutPageTemplateCollectionId = StringUtil.replace("${layoutPageTemplateCollectionId}", "\"]", "");
+		var layoutPageTemplateCollectionId = StringUtil.replace(${layoutPageTemplateCollectionId}, "\"]", "");
 
-		if ("${layoutPageTemplateCollectionId}" == "") {
+		if (${layoutPageTemplateCollectionId} == "") {
 			fail("FAIL. Cannot find layoutPageTemplateCollection.");
 		}
 
-		return "${layoutPageTemplateCollectionId}";
+		return ${layoutPageTemplateCollectionId};
 	}
 
 	@summary = "Get the layoutPageTemplateEntryId from a layoutPageTemplateEntry by using groupId and layoutPageTemplateEntryName"
@@ -155,17 +155,17 @@ definition {
 				-d -orderByComparator=
 		''';
 
-		var layoutPageTemplateEntryId = JSONCurlUtil.post("${curl}", "$.[?(@['name'] == '${layoutPageTemplateEntryName}')]['layoutPageTemplateEntryId']");
+		var layoutPageTemplateEntryId = JSONCurlUtil.post(${curl}, "$.[?(@['name'] == '${layoutPageTemplateEntryName}')]['layoutPageTemplateEntryId']");
 
-		var layoutPageTemplateEntryId = StringUtil.replace("${layoutPageTemplateEntryId}", "[\"", "");
+		var layoutPageTemplateEntryId = StringUtil.replace(${layoutPageTemplateEntryId}, "[\"", "");
 
-		var layoutPageTemplateEntryId = StringUtil.replace("${layoutPageTemplateEntryId}", "\"]", "");
+		var layoutPageTemplateEntryId = StringUtil.replace(${layoutPageTemplateEntryId}, "\"]", "");
 
-		if ("${layoutPageTemplateEntryId}" == "") {
+		if (${layoutPageTemplateEntryId} == "") {
 			fail("FAIL. Cannot find layoutPageTemplateEntry.");
 		}
 
-		return "${layoutPageTemplateEntryId}";
+		return ${layoutPageTemplateEntryId};
 	}
 
 	@summary = "Get the masterLayoutPlid from a masterLayoutEntry by using groupId and masterLayoutEntryName"
@@ -184,17 +184,17 @@ definition {
 				-d -orderByComparator=
 		''';
 
-		var masterLayoutPlid = JSONCurlUtil.post("${curl}", "$.[?(@['name'] == '${masterLayoutEntryName}')]['plid']");
+		var masterLayoutPlid = JSONCurlUtil.post(${curl}, "$.[?(@['name'] == '${masterLayoutEntryName}')]['plid']");
 
-		var masterLayoutPlid = StringUtil.replace("${masterLayoutPlid}", "[\"", "");
+		var masterLayoutPlid = StringUtil.replace(${masterLayoutPlid}, "[\"", "");
 
-		var masterLayoutPlid = StringUtil.replace("${masterLayoutPlid}", "\"]", "");
+		var masterLayoutPlid = StringUtil.replace(${masterLayoutPlid}, "\"]", "");
 
-		if ("${masterLayoutPlid}" == "") {
+		if (${masterLayoutPlid} == "") {
 			fail("FAIL. Cannot find masterLayoutEntry.");
 		}
 
-		return "${masterLayoutPlid}";
+		return ${masterLayoutPlid};
 	}
 
 }

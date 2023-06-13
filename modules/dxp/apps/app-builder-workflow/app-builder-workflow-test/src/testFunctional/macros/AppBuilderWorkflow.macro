@@ -11,32 +11,32 @@ definition {
 	macro addWorkflowAppName {
 		Type(
 			locator1 = "AppBuilderWorkflow#WORKFLOW_APP_NAME_FIELD",
-			value1 = "${workflowAppName}");
+			value1 = ${workflowAppName});
 	}
 
 	macro assertAssigneeInfoPresentOnStep {
 		AssertElementPresent(
-			key_assignee = "${assignee}",
-			key_step = "${step}",
+			key_assignee = ${assignee},
+			key_step = ${step},
 			locator1 = "AppBuilderWorkflow#STEP_CARD_ASSIGNEE_INFO");
 	}
 
 	macro assertButtonDisabled {
 		AssertVisible(
-			key_text = "${buttonName}",
+			key_text = ${buttonName},
 			locator1 = "Button#ANY_DISABLED");
 	}
 
 	macro assertButtonNotPresent {
-		Button.viewNotPresent(button = "${buttonName}");
+		Button.viewNotPresent(button = ${buttonName});
 	}
 
 	macro assertButtonPresent {
-		Button.viewPresent(button = "${buttonName}");
+		Button.viewPresent(button = ${buttonName});
 	}
 
 	macro assertEntryAppVersion {
-		var key_versionNumber = "${versionNumber}";
+		var key_versionNumber = ${versionNumber};
 
 		if (IsElementNotPresent(locator1 = "AppBuilderWorkflow#ENTRY_APP_VERSION")) {
 			DetailsView.nextEntry();
@@ -53,42 +53,42 @@ definition {
 	}
 
 	macro assertEntryInfoOnTableView {
-		var key_entryName = "${entryName}";
-		var key_info = "${info}";
+		var key_entryName = ${entryName};
+		var key_info = ${info};
 
 		AssertElementPresent(locator1 = "AppBuilderWorkflow#ENTRY_INFO_ON_TABLE_VIEW");
 	}
 
 	macro assertFieldDisabled {
 		AssertVisible(
-			key_fieldName = "${fieldName}",
+			key_fieldName = ${fieldName},
 			locator1 = "AppBuilderWorkflow#TEXT_FIELD_DISABLED");
 	}
 
 	macro assertStepNotPresent {
 		AssertElementNotPresent(
-			key_step = "${step}",
+			key_step = ${step},
 			locator1 = "AppBuilderWorkflow#STEP_CARD");
 	}
 
 	macro assertStepPresent {
 		AssertElementPresent(
-			key_step = "${step}",
+			key_step = ${step},
 			locator1 = "AppBuilderWorkflow#STEP_CARD");
 	}
 
 	macro assignEntry {
 		Click(
-			key_itemName = "${itemName}",
+			key_itemName = ${itemName},
 			locator1 = "AppBuilder#VERTICAL_ELLIPSIS_BUTTON");
 
 		while (IsElementNotPresent(key_menuItem = "Assign to", locator1 = "MenuItem#ANY_MENU_ITEM")) {
 			Refresh();
 
-			Pause(locator1 = "3000");
+			Pause(locator1 = 3000);
 
 			Click(
-				key_itemName = "${itemName}",
+				key_itemName = ${itemName},
 				locator1 = "AppBuilder#VERTICAL_ELLIPSIS_BUTTON");
 		}
 
@@ -98,10 +98,10 @@ definition {
 
 		Type(
 			locator1 = "AppBuilderWorkflow#SELECT_NEW_ASSIGNEE_SEARCH_FIELD",
-			value1 = "${assignee}");
+			value1 = ${assignee});
 
 		Click(
-			key_assignee = "${assignee}",
+			key_assignee = ${assignee},
 			locator1 = "AppBuilderWorkflow#SELECT_NEW_ASSIGNEE");
 
 		Button.click(button = "Done");
@@ -111,16 +111,16 @@ definition {
 
 	macro assignEntryThroughTableView {
 		Click(
-			key_itemName = "${itemName}",
+			key_itemName = ${itemName},
 			locator1 = "AppBuilder#VERTICAL_ELLIPSIS_BUTTON");
 
 		while (IsElementNotPresent(key_menuItem = "Assign to", locator1 = "MenuItem#ANY_MENU_ITEM")) {
 			Refresh();
 
-			Pause(locator1 = "3000");
+			Pause(locator1 = 3000);
 
 			Click(
-				key_itemName = "${itemName}",
+				key_itemName = ${itemName},
 				locator1 = "AppBuilder#VERTICAL_ELLIPSIS_BUTTON");
 		}
 
@@ -130,15 +130,15 @@ definition {
 
 		Type(
 			locator1 = "AppBuilderWorkflow#SELECT_NEW_ASSIGNEE_SEARCH_FIELD",
-			value1 = "${assignee}");
+			value1 = ${assignee});
 
 		Click(
-			key_assignee = "${assignee}",
+			key_assignee = ${assignee},
 			locator1 = "AppBuilderWorkflow#SELECT_NEW_ASSIGNEE");
 
 		Button.click(button = "Done");
 
-		AppBuilderAppAdmin.waitForItemPresentOnTable(itemName = "${assignee}");
+		AppBuilderAppAdmin.waitForItemPresentOnTable(itemName = ${assignee});
 	}
 
 	macro clickBackButton {
@@ -151,7 +151,7 @@ definition {
 
 	macro clickOnSelectFormView {
 		Click(
-			key_positionNumber = "${positionNumber}",
+			key_positionNumber = ${positionNumber},
 			locator1 = "AppBuilderWorkflow#SELECT_FORM_VIEW_BUTTON");
 	}
 
@@ -179,14 +179,14 @@ definition {
 
 	macro defineActionName {
 		Type(
-			key_action = "${action}",
+			key_action = ${action},
 			locator1 = "AppBuilderWorkflow#ACTION_ITEM_NAME_INPUT",
-			value1 = "${actionName}");
+			value1 = ${actionName});
 	}
 
 	macro deleteStep {
 		Click(
-			key_step = "${step}",
+			key_step = ${step},
 			locator1 = "AppBuilderWorkflow#STEP_CARD_KEBAB_MENU");
 
 		MenuItem.clickNoError(menuItem = "Delete Step");
@@ -225,13 +225,13 @@ definition {
 
 	macro selectFormView {
 		Click(
-			key_itemName = "${formViewName}",
+			key_itemName = ${formViewName},
 			locator1 = "AppBuilderWorkflow#FORM_OR_TABLE_VIEW_ITEM");
 	}
 
 	macro selectObject {
 		Click(
-			key_objectName = "${objectName}",
+			key_objectName = ${objectName},
 			locator1 = "AppBuilderWorkflow#OBJECT_ITEM");
 	}
 
@@ -242,58 +242,58 @@ definition {
 
 		AppBuilderWorkflow.clickOnSelectObject();
 
-		AppBuilderWorkflow.selectObject(objectName = "${objectName}");
+		AppBuilderWorkflow.selectObject(objectName = ${objectName});
 
-		AppBuilderWorkflow.clickOnSelectFormView(positionNumber = "1");
+		AppBuilderWorkflow.clickOnSelectFormView(positionNumber = 1);
 
-		AppBuilderWorkflow.selectFormView(formViewName = "${formViewName}");
+		AppBuilderWorkflow.selectFormView(formViewName = ${formViewName});
 
 		AppBuilderWorkflow.clickOnSelectTableView();
 
-		AppBuilderWorkflow.selectTableView(tableViewName = "${tableViewName}");
+		AppBuilderWorkflow.selectTableView(tableViewName = ${tableViewName});
 	}
 
 	macro selectStep {
 		Click(
-			key_step = "${step}",
+			key_step = ${step},
 			locator1 = "AppBuilderWorkflow#STEP_CARD");
 	}
 
 	macro selectStepAssignee {
-		AppBuilderWorkflow.selectStep(step = "${step}");
+		AppBuilderWorkflow.selectStep(step = ${step});
 
 		Click(locator1 = "AppBuilderWorkflow#SELECT_ASSIGNEE_FIELD");
 
 		Click(
-			key_assignee = "${assignee}",
+			key_assignee = ${assignee},
 			locator1 = "AppBuilderWorkflow#ASSIGNEE_ITEM");
 	}
 
 	macro selectStepSingleFormView {
-		AppBuilderWorkflow.selectStep(step = "${step}");
+		AppBuilderWorkflow.selectStep(step = ${step});
 
 		AppBuilderWorkflow.selectDataAndViewsCard();
 
-		if (!(IsTextEqual.isPartialText(locator1 = "AppBuilderWorkflow#SELECT_FORM_VIEW_BUTTON_TEXT", value1 = "${formViewName}"))) {
-			AppBuilderWorkflow.clickOnSelectFormView(positionNumber = "1");
+		if (!(IsTextEqual.isPartialText(locator1 = "AppBuilderWorkflow#SELECT_FORM_VIEW_BUTTON_TEXT", value1 = ${formViewName}))) {
+			AppBuilderWorkflow.clickOnSelectFormView(positionNumber = 1);
 
-			AppBuilderWorkflow.selectFormView(formViewName = "${formViewName}");
+			AppBuilderWorkflow.selectFormView(formViewName = ${formViewName});
 		}
 
 		Click.clickNoMouseOverNoWaitForVisible(
-			key_formViewMode = "${formViewMode}",
+			key_formViewMode = ${formViewMode},
 			locator1 = "AppBuilderWorkflow#FORM_VIEW_MODE");
 	}
 
 	macro selectTableView {
 		Click(
-			key_itemName = "${tableViewName}",
+			key_itemName = ${tableViewName},
 			locator1 = "AppBuilderWorkflow#FORM_OR_TABLE_VIEW_ITEM");
 	}
 
 	macro submit {
 		while (IsElementNotPresent(key_text = "Submit", locator1 = "Button#ANY")) {
-			Pause(locator1 = "3000");
+			Pause(locator1 = 3000);
 		}
 
 		Button.click(button = "Submit");
@@ -303,54 +303,54 @@ definition {
 
 	macro validateActionNotPresent {
 		AssertElementNotPresent(
-			key_action = "${action}",
+			key_action = ${action},
 			locator1 = "AppBuilderWorkflow#ACTION_ITEM");
 	}
 
 	macro validateActionPresent {
 		AssertElementPresent(
-			key_action = "${action}",
+			key_action = ${action},
 			locator1 = "AppBuilderWorkflow#ACTION_ITEM");
 	}
 
 	macro validateActionsNamesInsideActionsCards {
 		AssertElementPresent(
 			key_action = "Primary Action",
-			key_actionName = "${primaryActionName}",
+			key_actionName = ${primaryActionName},
 			locator1 = "AppBuilderWorkflow#ACTION_NAME_INSIDE_ACTIONS_CARD");
 
 		if (isSet(secondaryActionName)) {
 			AssertElementPresent(
 				key_action = "Secondary Action",
-				key_actionName = "${secondaryActionName}",
+				key_actionName = ${secondaryActionName},
 				locator1 = "AppBuilderWorkflow#ACTION_NAME_INSIDE_ACTIONS_CARD");
 		}
 	}
 
 	macro validateFormOrTableViewResultNotPresent {
 		AssertElementNotPresent(
-			key_itemName = "${itemName}",
+			key_itemName = ${itemName},
 			locator1 = "AppBuilderWorkflow#FORM_OR_TABLE_VIEW_ITEM");
 	}
 
 	macro validateFormOrTableViewResultPresent {
 		AssertElementPresent(
-			key_itemName = "${itemName}",
+			key_itemName = ${itemName},
 			locator1 = "AppBuilderWorkflow#FORM_OR_TABLE_VIEW_ITEM");
 	}
 
 	macro verifyAssignToOption {
 		Click(
-			key_itemName = "${itemName}",
+			key_itemName = ${itemName},
 			locator1 = "AppBuilder#VERTICAL_ELLIPSIS_BUTTON");
 
 		while (IsElementNotPresent(key_menuItem = "Assign to", locator1 = "MenuItem#ANY_MENU_ITEM")) {
 			Refresh();
 
-			Pause(locator1 = "3000");
+			Pause(locator1 = 3000);
 
 			Click(
-				key_itemName = "${itemName}",
+				key_itemName = ${itemName},
 				locator1 = "AppBuilder#VERTICAL_ELLIPSIS_BUTTON");
 		}
 
@@ -361,14 +361,14 @@ definition {
 	}
 
 	macro waitForButtonNotPresent {
-		while (IsElementPresent(key_text = "${buttonName}", locator1 = "Button#ANY")) {
-			Pause(locator1 = "1000");
+		while (IsElementPresent(key_text = ${buttonName}, locator1 = "Button#ANY")) {
+			Pause(locator1 = 1000);
 		}
 	}
 
 	macro waitForButtonPresent {
-		while (IsElementNotPresent(key_text = "${buttonName}", locator1 = "Button#ANY")) {
-			Pause(locator1 = "1000");
+		while (IsElementNotPresent(key_text = ${buttonName}, locator1 = "Button#ANY")) {
+			Pause(locator1 = 1000);
 		}
 	}
 

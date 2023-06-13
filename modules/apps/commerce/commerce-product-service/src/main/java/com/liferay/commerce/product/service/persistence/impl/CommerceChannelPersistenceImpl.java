@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.product.service.persistence.impl;
 
+import com.liferay.commerce.product.exception.DuplicateCommerceChannelExternalReferenceCodeException;
 import com.liferay.commerce.product.exception.NoSuchChannelException;
 import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.model.CommerceChannelTable;
@@ -1735,6 +1736,33 @@ public class CommerceChannelPersistenceImpl
 		if (Validator.isNull(commerceChannel.getExternalReferenceCode())) {
 			commerceChannel.setExternalReferenceCode(
 				String.valueOf(commerceChannel.getPrimaryKey()));
+		}
+		else {
+			CommerceChannel ercCommerceChannel = fetchByC_ERC(
+				commerceChannel.getCompanyId(),
+				commerceChannel.getExternalReferenceCode());
+
+			if (isNew) {
+				if (ercCommerceChannel != null) {
+					throw new DuplicateCommerceChannelExternalReferenceCodeException(
+						"Duplicate commerce channel with external reference code " +
+							commerceChannel.getExternalReferenceCode() +
+								" and company " +
+									commerceChannel.getCompanyId());
+				}
+			}
+			else {
+				if ((ercCommerceChannel != null) &&
+					(commerceChannel.getCommerceChannelId() !=
+						ercCommerceChannel.getCommerceChannelId())) {
+
+					throw new DuplicateCommerceChannelExternalReferenceCodeException(
+						"Duplicate commerce channel with external reference code " +
+							commerceChannel.getExternalReferenceCode() +
+								" and company " +
+									commerceChannel.getCompanyId());
+				}
+			}
 		}
 
 		ServiceContext serviceContext =

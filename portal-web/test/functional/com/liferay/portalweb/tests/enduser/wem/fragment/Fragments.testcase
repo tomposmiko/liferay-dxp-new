@@ -37,7 +37,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -46,7 +46,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-90063. Images can be uploaded and deleted in the resources folder in a fragment collection."
-	@priority = "4"
+	@priority = 4
 	test AddAndDeleteResource {
 		task ("Navigate to the fragment collection") {
 			FragmentsAdminNavigator.gotoCollection(collectionName = "Collection Name");
@@ -74,7 +74,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-111657. Can add the Container to a column of Row or another Container."
-	@priority = "4"
+	@priority = 4
 	test AddContainerToLayoutElements {
 		task ("Add a content page") {
 			JSONLayout.addPublicLayout(
@@ -108,14 +108,14 @@ definition {
 
 			PageEditor.addElementToColumn(
 				collectionName = "Layout Elements",
-				columnNumber = "1",
+				columnNumber = 1,
 				fragmentName = "Container",
 				navTab = "Fragments");
 		}
 	}
 
 	@description = "This is a test for LPS-101258. Can create a fragment with multiple Drop Zone areas."
-	@priority = "4"
+	@priority = 4
 	test AddFragmentWithTwoDropZones {
 		FragmentsAdminNavigator.openFragmentsAdmin(siteURLKey = "test-site-name");
 
@@ -146,18 +146,18 @@ definition {
 		AssertVisible(
 			key_content = "Place fragments here.",
 			key_fragmentClass = "content",
-			key_position = "1",
+			key_position = 1,
 			locator1 = "Fragment#PAGE_EDITOR_NO_FRAGMENTS_MESSAGE");
 
 		AssertVisible(
 			key_content = "Place fragments here.",
 			key_fragmentClass = "content",
-			key_position = "2",
+			key_position = 2,
 			locator1 = "Fragment#PAGE_EDITOR_NO_FRAGMENTS_MESSAGE");
 	}
 
 	@description = "This is a test for LPS-108339. Can add a Row fragment to Container. Can add several Row fragments to Container."
-	@priority = "5"
+	@priority = 5
 	test AddRowToSection {
 		property portal.acceptance = "true";
 
@@ -194,13 +194,13 @@ definition {
 
 			AssertElementPresent(
 				key_elementHeader = "/div[contains(@class,'page-editor__topper')][2]/div[contains(.,'Grid')]//li[contains(@class,'title')]",
-				key_position = "1",
+				key_position = 1,
 				locator1 = "PageEditor#CONTAINER_CONTAINER_NESTED_ELEMENT");
 		}
 	}
 
 	@description = "This is a test for LPS-76817. Can namespace the CSS of a Web Fragment to avoid affecting the rest of the page."
-	@priority = "3"
+	@priority = 3
 	test CanCheckTheNamespaceOfCSSInFragments {
 		task ("Edit this fragment with the following codes") {
 			FragmentsAdminNavigator.gotoCollection(collectionName = "Collection Name");
@@ -222,9 +222,9 @@ NO CSS
 { font-size: 40px; }
 		''';
 
-			FragmentsEditor.typeHtmlEditor(content = "${htmlSnippet}");
+			FragmentsEditor.typeHtmlEditor(content = ${htmlSnippet});
 
-			FragmentsEditor.typeCssEditor(content = "${cssSnippet}");
+			FragmentsEditor.typeCssEditor(content = ${cssSnippet});
 		}
 
 		task ("Assert CSS only applies to CSS and not NO CSS in Fragment preview") {
@@ -241,7 +241,7 @@ NO CSS
 	}
 
 	@description = "This is a test for LPS-98241. Basic Component Button can be configured."
-	@priority = "4"
+	@priority = 4
 	test ConfigureBasicComponentButton {
 		task ("Add a content page") {
 			JSONLayout.addPublicLayout(
@@ -302,7 +302,7 @@ NO CSS
 	}
 
 	@description = "This is a test for LPS-98241. Basic Component Card can be configured."
-	@priority = "3"
+	@priority = 3
 	test ConfigureBasicComponentCard {
 		task ("Add a content page") {
 			JSONLayout.addPublicLayout(
@@ -329,7 +329,7 @@ NO CSS
 				borderRadius = "Border Radius Small",
 				boxShadow = "Box Shadow Large",
 				imageSize = "Fit",
-				marginBottom = "5");
+				marginBottom = 5);
 		}
 
 		task ("View the fragment style") {
@@ -338,8 +338,8 @@ NO CSS
 				borderRadius = "border-radius-sm",
 				boxShadow = "box-shadow-lg",
 				fragmentName = "card",
-				imageSize = "100",
-				marginBottom = "5");
+				imageSize = 100,
+				marginBottom = 5);
 		}
 
 		task ("Remove the fragment") {
@@ -364,7 +364,7 @@ NO CSS
 	}
 
 	@description = "This is a test for LPS-98241 and LPS-115224. Contributed fragment components Heading can be configured. The common fragment styles settings of fragment should be shown in view mode."
-	@priority = "4"
+	@priority = 4
 	test ConfigureBasicComponentHeading {
 		task ("Add a content page") {
 			JSONLayout.addPublicLayout(
@@ -442,7 +442,7 @@ NO CSS
 	}
 
 	@description = "This is a test for LPS-98241. Basic Component Image can be configured."
-	@priority = "3"
+	@priority = 3
 	test ConfigureBasicComponentImage {
 		task ("Add a content page") {
 			JSONLayout.addPublicLayout(
@@ -467,15 +467,15 @@ NO CSS
 			PageEditor.configureFragment(
 				alignment = "Center",
 				imageSize = "Original Size",
-				marginBottom = "2");
+				marginBottom = 2);
 		}
 
 		task ("View the fragment style") {
 			PageEditor.viewFragmentStyle(
 				alignment = "center",
 				fragmentName = "image",
-				imageSize = "0",
-				marginBottom = "2");
+				imageSize = 0,
+				marginBottom = 2);
 		}
 
 		task ("Remove the fragment") {
@@ -500,7 +500,7 @@ NO CSS
 	}
 
 	@description = "This is a test for LPS-98241. Contributed fragment components Paragraph can be configured."
-	@priority = "4"
+	@priority = 4
 	test ConfigureBasicComponentParagraph {
 		task ("Add a content page") {
 			JSONLayout.addPublicLayout(
@@ -556,7 +556,7 @@ NO CSS
 	}
 
 	@description = "This is a test for LPS-98241. Contributed fragment components Separator can be configured."
-	@priority = "4"
+	@priority = 4
 	test ConfigureBasicComponentSeparator {
 		task ("Add a content page") {
 			JSONLayout.addPublicLayout(
@@ -580,14 +580,14 @@ NO CSS
 
 			PageEditor.configureFragment(
 				borderColor = "Gray 100",
-				bottomSpacing = "1",
+				bottomSpacing = 1,
 				separatorColor = "danger");
 		}
 
 		task ("View the fragment style") {
 			PageEditor.viewFragmentStyle(
 				borderColor = "gray-100",
-				bottomSpacing = "1",
+				bottomSpacing = 1,
 				fragmentName = "separator",
 				separatorColor = "danger");
 		}
@@ -614,7 +614,7 @@ NO CSS
 	}
 
 	@description = "This is a test for LPS-98241. Contributed fragment components Spacer can be configured."
-	@priority = "4"
+	@priority = 4
 	test ConfigureBasicComponentSpacer {
 		task ("Add a content page") {
 			JSONLayout.addPublicLayout(
@@ -636,11 +636,11 @@ NO CSS
 		task ("Configure the fragment") {
 			PageEditor.gotoStyle(fragmentName = "Spacer");
 
-			PageEditor.configureFragment(height = "4");
+			PageEditor.configureFragment(height = 4);
 		}
 
 		task ("View the fragment style") {
-			PageEditor.viewFragmentStyle(height = "4");
+			PageEditor.viewFragmentStyle(height = 4);
 		}
 
 		task ("Remove the fragment") {
@@ -665,7 +665,7 @@ NO CSS
 	}
 
 	@description = "This is a test for LPS-101330. A user should be able to add a video fragment and the video should play."
-	@priority = "5"
+	@priority = 5
 	test ConfigureBasicComponentVideo {
 		property portal.acceptance = "true";
 
@@ -707,7 +707,7 @@ NO CSS
 
 	@description = "This is a test for LPS-106776, LPS-102959 and LPS-111657. Configure the Container and Grid elements."
 	@ignore = "true"
-	@priority = "5"
+	@priority = 5
 	test ConfigureLayoutElements {
 		property portal.acceptance = "true";
 
@@ -745,7 +745,7 @@ NO CSS
 
 			AssertElementPresent(
 				key_elementHeader = "//li[contains(@class,'topper__title') and contains(.,'Heading')]",
-				key_position = "1",
+				key_position = 1,
 				locator1 = "PageEditor#CONTAINER_CONTAINER_NESTED_ELEMENT");
 
 			PageEditor.waitForAutoSave();
@@ -754,25 +754,25 @@ NO CSS
 		task ("Configure the Container styles") {
 			PageEditor.viewContainerStyle(
 				contentDisplay = "block",
-				position = "1");
+				position = 1);
 
 			PageEditor.editLayoutContainer(
 				backgroundColor = "Warning",
 				borderColor = "Danger",
 				borderRadius = "Border Radius Large",
-				borderWidth = "5",
+				borderWidth = 5,
 				boxShadow = "Box Shadow Large",
 				contentDisplay = "Flex",
 				horizontalAlign = "Center",
-				marginBottom = "2",
-				marginLeft = "2",
-				marginRight = "2",
-				marginTop = "2",
-				opacity = "50",
-				paddingBottom = "2",
-				paddingLeft = "2",
-				paddingRight = "2",
-				paddingTop = "2",
+				marginBottom = 2,
+				marginLeft = 2,
+				marginRight = 2,
+				marginTop = 2,
+				opacity = 50,
+				paddingBottom = 2,
+				paddingLeft = 2,
+				paddingRight = 2,
+				paddingTop = 2,
 				panel = "Styles",
 				verticalAlign = "Center");
 		}
@@ -782,21 +782,21 @@ NO CSS
 				backgroundColor = "warning",
 				borderColor = "danger",
 				borderRadius = "border-radius-lg",
-				borderWidth = "5",
+				borderWidth = 5,
 				boxShadow = "box-shadow-lg",
 				contentDisplay = "flex",
 				dropShadow = "lg",
 				horizontalAlign = "center",
-				marginBottom = "2",
-				marginLeft = "2",
-				marginRight = "2",
-				marginTop = "2",
+				marginBottom = 2,
+				marginLeft = 2,
+				marginRight = 2,
+				marginTop = 2,
 				opacity = "0.5",
-				paddingBottom = "2",
-				paddingLeft = "2",
-				paddingRight = "2",
-				paddingTop = "2",
-				position = "1",
+				paddingBottom = 2,
+				paddingLeft = 2,
+				paddingRight = 2,
+				paddingTop = 2,
+				position = 1,
 				verticalAlign = "center");
 		}
 
@@ -817,7 +817,7 @@ NO CSS
 
 		task ("Configure the Grid") {
 			PageEditor.editLayoutGrid(
-				columnCount = "2",
+				columnCount = 2,
 				panel = "General");
 
 			PageEditor.editLayoutGrid(
@@ -829,10 +829,10 @@ NO CSS
 
 		task ("View the Grid style") {
 			PageEditor.viewGridStyle(
-				columnCount = "2",
+				columnCount = 2,
 				inverseOrder = "true",
-				layout = "12",
-				position = "1",
+				layout = 12,
+				position = 1,
 				verticalAlignment = "Bottom");
 		}
 
@@ -846,7 +846,7 @@ NO CSS
 	}
 
 	@description = "This is a test for LPS-90064 and is a supplementary frontend test to the integration tests in LPS-90307. Fragments can be copied."
-	@priority = "5"
+	@priority = 5
 	test CopyFragment {
 		property portal.acceptance = "true";
 
@@ -870,7 +870,7 @@ NO CSS
 	}
 
 	@description = "This is a test for LPS-102173. Inherited contributed fragments can be copied."
-	@priority = "5"
+	@priority = 5
 	test CopyInheritedContributedFragment {
 		property portal.acceptance = "true";
 
@@ -892,7 +892,7 @@ NO CSS
 	}
 
 	@description = "Fragments can be deleted."
-	@priority = "5"
+	@priority = 5
 	test DeleteFragment {
 		property portal.acceptance = "true";
 
@@ -918,7 +918,7 @@ NO CSS
 	}
 
 	@description = "Fragment collections can be deleted."
-	@priority = "5"
+	@priority = 5
 	test DeleteFragmentCollection {
 		property portal.acceptance = "true";
 
@@ -936,7 +936,7 @@ NO CSS
 	}
 
 	@description = "This is a test for LPS-108376. Can check Cacheable for fragments when create them in portal and they are non-Cachable by default."
-	@priority = "5"
+	@priority = 5
 	test MarkFragmentCreatedInPortalAsCacheable {
 		property portal.acceptance = "true";
 
@@ -966,7 +966,7 @@ NO CSS
 	}
 
 	@description = "This is a test for LPS-108376. Can check Cacheable for fragments without Read-Only label imported to portal and they are non-Cachable by default."
-	@priority = "4"
+	@priority = 4
 	test MarkFragmentWithoutReadOnlyImportedToPortalAsCacheable {
 		FragmentsAdmin.importCollectionFromDependenciesFolder(collectionZipFile = "fragment-collection.zip");
 
@@ -1000,7 +1000,7 @@ NO CSS
 	}
 
 	@description = "LPS-79349 - User can propagate the changes of fragment to page templates."
-	@priority = "3"
+	@priority = 3
 	test PropagateChangesOfFragmentToPageTemplates {
 		task ("Navigate to the fragment collection") {
 			FragmentsAdminNavigator.gotoCollection(collectionName = "Collection Name");
@@ -1013,7 +1013,7 @@ NO CSS
 				collectionName = "Collection Name",
 				fragmentStatus = "Approved",
 				groupName = "Test Site Name",
-				html = "${htmlSnippet}",
+				html = ${htmlSnippet},
 				name = "Test Fragment Name");
 		}
 
@@ -1048,7 +1048,7 @@ NO CSS
 
 		task ("View the inline text of new fragment at edit mode") {
 			AssertTextEquals(
-				index = "1",
+				index = 1,
 				key_fragmentName = "Test Fragment Name",
 				locator1 = "Fragment#FRAGMENT_BODY",
 				value1 = "TEST");
@@ -1067,7 +1067,7 @@ NO CSS
 
 			var htmlSnippet = '''<div>EDITED</div>''';
 
-			FragmentsEditor.typeHtmlEditor(content = "${htmlSnippet}");
+			FragmentsEditor.typeHtmlEditor(content = ${htmlSnippet});
 
 			FragmentsEditor.publish();
 		}
@@ -1094,7 +1094,7 @@ NO CSS
 			PageEditor.assertFragmentSidebarLoaded();
 
 			AssertTextEquals(
-				index = "1",
+				index = 1,
 				key_fragmentName = "Test Fragment Name",
 				locator1 = "Fragment#FRAGMENT_BODY",
 				value1 = "EDITED");
@@ -1102,7 +1102,7 @@ NO CSS
 	}
 
 	@description = "This is a test for LPS-100540. Global fragments can be propagated to all pages of a site or sites that use the fragments"
-	@priority = "5"
+	@priority = 5
 	test PropagateGlobalFragmentChanges {
 		property osgi.module.configuration.file.names = "com.liferay.fragment.web.internal.configuration.FragmentGlobalPanelAppConfiguration.config";
 		property osgi.module.configurations = "enabled=B\"true\"";
@@ -1177,18 +1177,18 @@ NO CSS
 		Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/content-page-name");
 
 		for (var button : list "Submit,Cancel") {
-			Button.viewPresent(button = "${button}");
+			Button.viewPresent(button = ${button});
 		}
 
 		Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/content-page-name");
 
 		for (var button : list "Submit,Cancel") {
-			Button.viewPresent(button = "${button}");
+			Button.viewPresent(button = ${button});
 		}
 	}
 
 	@description = "Fragments can be renamed."
-	@priority = "4"
+	@priority = 4
 	test RenameFragment {
 		task ("Navigate to the fragment collection") {
 			FragmentsAdminNavigator.gotoCollection(collectionName = "Collection Name");
@@ -1218,7 +1218,7 @@ NO CSS
 	}
 
 	@description = "This is a test for LPS-111657. Can save Container and nested elements as a new composition when the Container is inside a column of Row."
-	@priority = "5"
+	@priority = 5
 	test SaveContainerAsCompositionInModuleOfGrid {
 		property portal.acceptance = "true";
 
@@ -1242,7 +1242,7 @@ NO CSS
 		task ("Add a Container to the first module of grid") {
 			PageEditor.addElementToColumn(
 				collectionName = "Layout Elements",
-				columnNumber = "1",
+				columnNumber = 1,
 				fragmentName = "Container",
 				navTab = "Fragments");
 		}
@@ -1263,16 +1263,16 @@ NO CSS
 
 			DragAndDrop.javaScriptDragAndDropObjectBelowTallNestedObject(
 				key_portletName = "Asset Publisher",
-				key_position = "1",
+				key_position = 1,
 				locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_TAB_WIDGET",
 				locator2 = "//div[contains(@class,'page-editor__topper__bar') and contains(.,'Image')]//following-sibling::div[contains(@class,'page-editor__topper__content')]",
 				value1 = "Asset Publisher");
 
-			Pause(locator1 = "5000");
+			Pause(locator1 = 5000);
 
 			AssertElementPresent(
 				key_elementHeader = "//div[contains(@class,'page-editor')]//li[contains(.,'Asset Publisher')]",
-				key_position = "1",
+				key_position = 1,
 				locator1 = "PageEditor#CONTAINER_CONTAINER_NESTED_ELEMENT");
 
 			PageEditor.waitForAutoSave();
@@ -1298,14 +1298,14 @@ NO CSS
 			for (var elementName : list "Image,Asset Publisher") {
 				AssertElementPresent(
 					key_elementHeader = "//li[contains(@class,'topper__title') and contains(.,'${elementName}')]",
-					key_position = "2",
+					key_position = 2,
 					locator1 = "PageEditor#CONTAINER_CONTAINER_NESTED_ELEMENT");
 			}
 		}
 	}
 
 	@description = "This is a test for LPS-101258. Can save a composition containing a fragment that has a Drop Zone area as fragment."
-	@priority = "4"
+	@priority = 4
 	test SaveFragmentCompositionWithDropZoneInFragment {
 		FragmentsAdminNavigator.openFragmentsAdmin(siteURLKey = "test-site-name");
 
@@ -1357,12 +1357,12 @@ NO CSS
 
 		AssertElementPresent(
 			key_elementHeader = "//div[contains(@class,'page-editor__topper')][1]/div[contains(.,'Fragment Name 2')]//li[contains(@class,'title')]",
-			key_position = "1",
+			key_position = 1,
 			locator1 = "PageEditor#CONTAINER_CONTAINER_NESTED_ELEMENT");
 	}
 
 	@description = "This is a test for LPS-114145. The latest changes are saved automatically in fragment editor when the fragment has a published version."
-	@priority = "4"
+	@priority = 4
 	test ViewAutoSavedAfterPublishingComponent {
 		FragmentsAdminNavigator.openFragmentsAdmin(siteURLKey = "test-site-name");
 
@@ -1400,11 +1400,11 @@ NO CSS
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "FragmentEditor#HTML_EDITOR_CONTENT",
-			value1 = "${htmlContent}");
+			value1 = ${htmlContent});
 	}
 
 	@description = "This is a test for LPS-114145. The changes are saved automatically in fragment editor before publishing."
-	@priority = "5"
+	@priority = 5
 	test ViewAutoSavedBeforePublishingComponent {
 		property portal.acceptance = "true";
 
@@ -1430,11 +1430,11 @@ NO CSS
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "FragmentEditor#HTML_EDITOR_CONTENT",
-			value1 = "${htmlContent}");
+			value1 = ${htmlContent});
 	}
 
 	@description = "Fragments that are being used cannot be deleted."
-	@priority = "5"
+	@priority = 5
 	test ViewCannotDeleteFragmentInUse {
 		property portal.acceptance = "true";
 
@@ -1447,7 +1447,7 @@ NO CSS
 				entry = "Fragment Name",
 				item = "Edit");
 
-			Pause(locator1 = "3000");
+			Pause(locator1 = 3000);
 
 			PortletEntry.publish();
 		}
@@ -1490,7 +1490,7 @@ NO CSS
 	}
 
 	@description = "Can see contributed fragment collections in fragment administration"
-	@priority = "5"
+	@priority = 5
 	test ViewContributedFragmentCollections {
 		property portal.acceptance = "true";
 
@@ -1508,7 +1508,7 @@ NO CSS
 	}
 
 	@description = "This is a test for LPS-101230 and LPS-100540. Global fragments are visible in fragment admin and added ones are visible in Test Site Name site. Global fragments "View Site Usages" option is not available if fragment is not used in any page"
-	@priority = "5"
+	@priority = 5
 	test ViewGlobalFragments {
 		property osgi.module.configuration.file.names = "com.liferay.fragment.web.internal.configuration.FragmentGlobalPanelAppConfiguration.config";
 		property osgi.module.configurations = "enabled=B\"true\"";
@@ -1574,7 +1574,7 @@ NO CSS
 	}
 
 	@description = "This is a test for LPS-100540. Global fragments "View Site Usages" option shows all the Sites that use the fragment and how many usages there are per site"
-	@priority = "5"
+	@priority = 5
 	test ViewGlobalFragmentsSiteUsages {
 		property osgi.module.configuration.file.names = "com.liferay.fragment.web.internal.configuration.FragmentGlobalPanelAppConfiguration.config";
 		property osgi.module.configurations = "enabled=B\"true\"";
@@ -1671,7 +1671,7 @@ NO CSS
 
 		AssertTextEquals(
 			locator1 = "//tr[1]/td[3]",
-			value1 = "4");
+			value1 = 4);
 
 		AssertTextEquals(
 			locator1 = "//tr[2]/td[2]",
@@ -1679,7 +1679,7 @@ NO CSS
 
 		AssertTextEquals(
 			locator1 = "//tr[2]/td[3]",
-			value1 = "2");
+			value1 = 2);
 
 		FragmentsAdminNavigator.openFragmentsAdmin(siteURLKey = "global");
 
@@ -1693,7 +1693,7 @@ NO CSS
 
 		AssertTextEquals(
 			locator1 = "//tr[1]/td[3]",
-			value1 = "4");
+			value1 = 4);
 
 		AssertElementNotPresent(locator1 = "//*[contains(.,'Test Site Name 2')]");
 	}

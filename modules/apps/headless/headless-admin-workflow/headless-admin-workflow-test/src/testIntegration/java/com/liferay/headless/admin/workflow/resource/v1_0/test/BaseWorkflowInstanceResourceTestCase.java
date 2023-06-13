@@ -57,6 +57,7 @@ import java.text.DateFormat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -224,13 +225,21 @@ public abstract class BaseWorkflowInstanceResourceTestCase {
 			workflowInstance1, (List<WorkflowInstance>)page.getItems());
 		assertContains(
 			workflowInstance2, (List<WorkflowInstance>)page.getItems());
-		assertValid(page);
+		assertValid(page, testGetWorkflowInstancesPage_getExpectedActions());
 
 		workflowInstanceResource.deleteWorkflowInstance(
 			workflowInstance1.getId());
 
 		workflowInstanceResource.deleteWorkflowInstance(
 			workflowInstance2.getId());
+	}
+
+	protected Map<String, Map> testGetWorkflowInstancesPage_getExpectedActions()
+		throws Exception {
+
+		Map<String, Map> expectedActions = new HashMap<>();
+
+		return expectedActions;
 	}
 
 	@Test
@@ -679,6 +688,12 @@ public abstract class BaseWorkflowInstanceResourceTestCase {
 	}
 
 	protected void assertValid(Page<WorkflowInstance> page) {
+		assertValid(page, Collections.emptyMap());
+	}
+
+	protected void assertValid(
+		Page<WorkflowInstance> page, Map<String, Map> expectedActions) {
+
 		boolean valid = false;
 
 		java.util.Collection<WorkflowInstance> workflowInstances =
@@ -694,6 +709,20 @@ public abstract class BaseWorkflowInstanceResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
+
+		Map<String, Map> actions = page.getActions();
+
+		for (String key : expectedActions.keySet()) {
+			Map action = actions.get(key);
+
+			Assert.assertNotNull(key + " does not contain an action", action);
+
+			Map expectedAction = expectedActions.get(key);
+
+			Assert.assertEquals(
+				expectedAction.get("method"), action.get("method"));
+			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
+		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -905,6 +934,10 @@ public abstract class BaseWorkflowInstanceResourceTestCase {
 
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
+
+		if (entityModel == null) {
+			return Collections.emptyList();
+		}
 
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();

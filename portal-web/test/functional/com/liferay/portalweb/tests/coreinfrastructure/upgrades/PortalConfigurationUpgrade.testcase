@@ -23,7 +23,7 @@ definition {
 		SearchAdministration.executeSearchActions(actionsDescription = "Reindex all search indexes.");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewPortalConfigurationAfterUpgrade625 {
 		property data.archive.type = "data-archive-portal-settings";
 		property database.types = "mysql";
@@ -32,7 +32,7 @@ definition {
 		Upgrade.viewInstanceSettings();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewPortalConfigurationAfterUpgrade704 {
 		property data.archive.type = "data-archive-portal-settings";
 		property database.types = "mariadb,mysql,postgresql";
@@ -43,7 +43,7 @@ definition {
 		Upgrade.viewSystemSettings();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewPortalConfigurationAfterUpgrade713 {
 		property data.archive.type = "data-archive-portal-settings";
 		property database.types = "mariadb,mysql,postgresql";
@@ -54,7 +54,7 @@ definition {
 		Upgrade.viewSystemSettings();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewPortalConfigurationAfterUpgrade720 {
 		property data.archive.type = "data-archive-portal-settings";
 		property database.types = "mariadb,mysql,postgresql";
@@ -65,7 +65,7 @@ definition {
 		Upgrade.viewSystemSettings();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewPortalConfigurationAfterUpgrade721 {
 		property data.archive.type = "data-archive-portal-settings";
 		property database.types = "mariadb,mysql,postgresql";
@@ -76,7 +76,7 @@ definition {
 		Upgrade.viewSystemSettings();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewPortalConfigurationAfterUpgrade730 {
 		property data.archive.type = "data-archive-portal-settings";
 		property database.types = "mariadb,mysql,postgresql";
@@ -87,7 +87,7 @@ definition {
 		Upgrade.viewSystemSettings();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewPortalConfigurationAfterUpgrade7110 {
 		property data.archive.type = "data-archive-portal-settings";
 		property portal.version = "7.1.10";
@@ -97,7 +97,7 @@ definition {
 		Upgrade.viewSystemSettings();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewPortalConfigurationAfterUpgrade7210 {
 		property data.archive.type = "data-archive-portal-settings";
 		property portal.version = "7.2.10";
@@ -107,7 +107,7 @@ definition {
 		Upgrade.viewSystemSettings();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewPortalConfigurationAfterUpgrade70106 {
 		property data.archive.type = "data-archive-portal-settings";
 		property portal.version = "7.0.10.6";
@@ -117,7 +117,7 @@ definition {
 		Upgrade.viewSystemSettings();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewPortalConfigurationAfterUpgrade72101 {
 		property data.archive.type = "data-archive-portal-settings";
 		property portal.version = "7.2.10.1";
@@ -127,7 +127,7 @@ definition {
 		Upgrade.viewSystemSettings();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewPortalConfigurationAfterUpgrade621015 {
 		property data.archive.type = "data-archive-portal-settings";
 		property database.types = "db2,mysql,oracle,sybase";
@@ -136,7 +136,7 @@ definition {
 		Upgrade.viewInstanceSettings();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewPortalConfigurationAfterUpgrade621021 {
 		property data.archive.type = "data-archive-portal-settings";
 		property database.types = "db2,mysql,oracle,postgresql,sybase";

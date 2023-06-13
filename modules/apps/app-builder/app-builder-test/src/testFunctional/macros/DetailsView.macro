@@ -2,19 +2,19 @@ definition {
 
 	macro assertFormView {
 		AssertElementPresent(
-			formViewName = "${formViewName}",
+			formViewName = ${formViewName},
 			locator1 = "DetailsView#FORM_VIEW_NAME");
 	}
 
 	macro assertStatus {
 		AssertElementPresent(
-			key_status = "${status}",
+			key_status = ${status},
 			locator1 = "DetailsView#STATUS_INFO");
 	}
 
 	macro assertStep {
 		AssertElementPresent(
-			key_step = "${step}",
+			key_step = ${step},
 			locator1 = "DetailsView#STEP_INFO");
 	}
 
@@ -37,7 +37,7 @@ definition {
 
 		AssertElementNotPresent(
 			locator1 = "AppBuilder#ITEM_ON_THE_TABLE",
-			value1 = "${itemName}");
+			value1 = ${itemName});
 	}
 
 	macro editEntry {
@@ -57,7 +57,7 @@ definition {
 	macro validateEntry {
 		AssertTextEquals(
 			locator1 = "DetailsView#VIEW_ENTRY",
-			value1 = "${entry}");
+			value1 = ${entry});
 	}
 
 }

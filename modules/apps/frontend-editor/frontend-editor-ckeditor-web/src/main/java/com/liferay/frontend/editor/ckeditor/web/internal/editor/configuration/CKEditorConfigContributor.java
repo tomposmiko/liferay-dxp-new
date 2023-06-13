@@ -76,8 +76,6 @@ public class CKEditorConfigContributor extends BaseCKEditorConfigContributor {
 		).put(
 			"closeNoticeTimeout", 8000
 		).put(
-			"enterMode", 2
-		).put(
 			"entities", Boolean.FALSE
 		);
 

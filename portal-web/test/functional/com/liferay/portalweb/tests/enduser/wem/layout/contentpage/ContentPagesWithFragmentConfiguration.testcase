@@ -25,7 +25,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -34,7 +34,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-102526. User can activate fragment configuration by clicking on topper."
-	@priority = "5"
+	@priority = 5
 	test ActivateFragmentConfigurationViaTopper {
 		property portal.acceptance = "true";
 
@@ -50,7 +50,7 @@ definition {
 			key_fragmentName = "Button",
 			locator1 = "Fragment#FRAGMENT_HEADER");
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		var key_navItem = "General";
 
@@ -60,7 +60,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-99377. User can change checkbox fragment configuration."
-	@priority = "5"
+	@priority = 5
 	test AddCheckboxConfigurationFragmentToContentPage {
 		property portal.acceptance = "true";
 
@@ -70,10 +70,10 @@ definition {
 
 			JSONFragment.addSection(
 				collectionName = "Collection Name",
-				configuration = "${jsonSnippet}",
+				configuration = ${jsonSnippet},
 				fragmentStatus = "Approved",
 				groupName = "Test Site Name",
-				html = "${htmlSnippet}",
+				html = ${htmlSnippet},
 				name = "Checkbox Fragment Example");
 		}
 
@@ -109,7 +109,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-97179. User can change colorPalette fragment configuration."
-	@priority = "5"
+	@priority = 5
 	test AddColorPaletteConfigurationFragmentToContentPage {
 		property portal.acceptance = "true";
 
@@ -119,10 +119,10 @@ definition {
 
 			JSONFragment.addSection(
 				collectionName = "Collection Name",
-				configuration = "${jsonSnippet}",
+				configuration = ${jsonSnippet},
 				fragmentStatus = "Approved",
 				groupName = "Test Site Name",
-				html = "${htmlSnippet}",
+				html = ${htmlSnippet},
 				name = "ColorPalette Fragment Example");
 		}
 
@@ -172,7 +172,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-101326. Add placeholder in fragment configuration and assert there the placeholder text is present."
-	@priority = "5"
+	@priority = 5
 	test AddPlaceholderConfigurationFragmentToContentPage {
 		property portal.acceptance = "true";
 
@@ -182,10 +182,10 @@ definition {
 
 			JSONFragment.addSection(
 				collectionName = "Collection Name",
-				configuration = "${jsonSnippet}",
+				configuration = ${jsonSnippet},
 				fragmentStatus = "Approved",
 				groupName = "Test Site Name",
-				html = "${htmlSnippet}",
+				html = ${htmlSnippet},
 				name = "Text Fragment Example");
 		}
 
@@ -202,7 +202,7 @@ definition {
 				key_fragmentName = "Text Fragment Example",
 				locator1 = "Fragment#FRAGMENT_HEADER");
 
-			Pause(locator1 = "3000");
+			Pause(locator1 = 3000);
 
 			AssertClick(
 				key_navItem = "General",
@@ -214,7 +214,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-96685. User can change select fragment configuration."
-	@priority = "5"
+	@priority = 5
 	test AddSelectConfigurationFragmentToContentPage {
 		property portal.acceptance = "true";
 
@@ -224,10 +224,10 @@ definition {
 
 			JSONFragment.addSection(
 				collectionName = "Collection Name",
-				configuration = "${jsonSnippet}",
+				configuration = ${jsonSnippet},
 				fragmentStatus = "Approved",
 				groupName = "Test Site Name",
-				html = "${htmlSnippet}",
+				html = ${htmlSnippet},
 				name = "Text Fragment Example");
 		}
 
@@ -255,7 +255,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-99543. User can change text fragment configuration."
-	@priority = "5"
+	@priority = 5
 	test AddTextConfigurationFragmentToContentPage {
 		property portal.acceptance = "true";
 
@@ -265,10 +265,10 @@ definition {
 
 			JSONFragment.addSection(
 				collectionName = "Collection Name",
-				configuration = "${jsonSnippet}",
+				configuration = ${jsonSnippet},
 				fragmentStatus = "Approved",
 				groupName = "Test Site Name",
-				html = "${htmlSnippet}",
+				html = ${htmlSnippet},
 				name = "Text Fragment Example");
 		}
 
@@ -300,7 +300,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-100545. Ensure that the correct content is selected when using itemSelector."
-	@priority = "4"
+	@priority = 4
 	test CanSelectSpecificWebContentUsingItemSelector {
 		for (var count : list "1,2,3") {
 			JSONWebcontent.addWebContent(
@@ -315,10 +315,10 @@ definition {
 
 			JSONFragment.addSection(
 				collectionName = "Collection Name",
-				configuration = "${jsonSnippet}",
+				configuration = ${jsonSnippet},
 				fragmentStatus = "Approved",
 				groupName = "Test Site Name",
-				html = "${htmlSnippet}",
+				html = ${htmlSnippet},
 				name = "itemSelector Fragment Example");
 		}
 
@@ -351,7 +351,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-96685. User can change fragment configuration value."
-	@priority = "5"
+	@priority = 5
 	test ChangeConfigurationFragmentToContentPage {
 		property portal.acceptance = "true";
 
@@ -361,10 +361,10 @@ definition {
 
 			JSONFragment.addSection(
 				collectionName = "Collection Name",
-				configuration = "${jsonSnippet}",
+				configuration = ${jsonSnippet},
 				fragmentStatus = "Approved",
 				groupName = "Test Site Name",
-				html = "${htmlSnippet}",
+				html = ${htmlSnippet},
 				name = "Text Fragment Example");
 		}
 

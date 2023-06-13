@@ -18,7 +18,7 @@ definition {
 			layoutName = "Wiki Test Page");
 
 		JSONLayout.addWidgetToPublicLayout(
-			column = "1",
+			column = 1,
 			groupName = "Guest",
 			layoutName = "Wiki Test Page",
 			widgetName = "Wiki");
@@ -29,7 +29,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -41,7 +41,7 @@ definition {
 		}
 	}
 
-	@priority = "5"
+	@priority = 5
 	test AddChildSiteWikiFrontPageFormatHTML {
 		property testray.component.names = "Training";
 
@@ -72,7 +72,7 @@ definition {
 
 		WikiPage.addFrontPagePG(
 			htmlSource = "true",
-			wikiPageContent = "${wikiPageContent}");
+			wikiPageContent = ${wikiPageContent});
 
 		SitePages.openPagesAdmin(siteURLKey = "Child SiteName");
 
@@ -104,7 +104,7 @@ definition {
 
 		var wikiPageContent = '''<!DOCTYPE html> <html lang="en"> <body> <h1>Edited My First Heading</h1> <p>Edited My first paragraph.</p> </body> </html>''';
 
-		CKEditor.addSourceContent(content = "${wikiPageContent}");
+		CKEditor.addSourceContent(content = ${wikiPageContent});
 
 		SelectFrame(value1 = "relative=top");
 
@@ -119,7 +119,7 @@ definition {
 			wikiPageContent = "Edited My first paragraph.");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AddFrontPageChildPageFormatHTML {
 		var welcomeToLiferay = '''
 				<p><a href="http://www.liferay.com">Welcome to LIFERAY</a></p>
@@ -145,7 +145,7 @@ definition {
 
 		AssertConfirm(value1 = "You may lose some formatting when switching from Creole to HTML. Do you want to continue?");
 
-		CKEditor.addSourceContent(content = "${welcomeToLiferay}");
+		CKEditor.addSourceContent(content = ${welcomeToLiferay});
 
 		SelectFrame(value1 = "relative=top");
 
@@ -160,7 +160,7 @@ definition {
 			wikiChildPageTitle = "Wiki FrontPage Child Page Title");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AddFrontPageChildPageWithInvalidTitle {
 		WikiPage.addFrontPagePG(
 			wikiNodeName = "Main",
@@ -261,7 +261,7 @@ definition {
 			wikiPageTitle = "FrontPage");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AddFrontPageContentWithNoJavascript {
 		var wikiPageContent = '''<p id='demo'>PASS</p> <script type='text/javascript'>document.getElementById('demo').innerHTML = 'this code should not be read by the client';</script>''';
 
@@ -269,7 +269,7 @@ definition {
 
 		WikiPage.addFrontPagePG(
 			htmlSource = "true",
-			wikiPageContent = "${wikiPageContent}");
+			wikiPageContent = ${wikiPageContent});
 
 		Navigator.gotoPage(pageName = "Wiki Test Page");
 
@@ -280,7 +280,7 @@ definition {
 			wikiPageTitle = "FrontPage");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AddFrontPageWithAttachments {
 		Navigator.gotoPage(pageName = "Wiki Test Page");
 
@@ -292,7 +292,7 @@ definition {
 
 		for (var attachmentFileName : list "Document_1.jpg,Document_2.mp3,Document_3.doc") {
 			WikiPage.addAttachmentViaPageEdit(
-				attachmentFileName = "${attachmentFileName}",
+				attachmentFileName = ${attachmentFileName},
 				wikiPageTitle = "FrontPage");
 
 			Navigator.gotoPage(pageName = "Wiki Test Page");
@@ -303,7 +303,7 @@ definition {
 		WikiPage.viewAttachmentPGViaEdit(
 			attachmentFileName = "Document_1.jpg",
 			attachmentFileSize = "13 KB",
-			numberOfAttachments = "3",
+			numberOfAttachments = 3,
 			wikiPageTitle = "FrontPage");
 
 		Navigator.gotoPage(pageName = "Wiki Test Page");
@@ -313,7 +313,7 @@ definition {
 		WikiPage.viewAttachmentPGViaEdit(
 			attachmentFileName = "Document_2.mp3",
 			attachmentFileSize = "864 B",
-			numberOfAttachments = "3",
+			numberOfAttachments = 3,
 			wikiPageTitle = "FrontPage");
 
 		Navigator.gotoPage(pageName = "Wiki Test Page");
@@ -323,11 +323,11 @@ definition {
 		WikiPage.viewAttachmentPGViaEdit(
 			attachmentFileName = "Document_3.doc",
 			attachmentFileSize = "24 KB",
-			numberOfAttachments = "3",
+			numberOfAttachments = 3,
 			wikiPageTitle = "FrontPage");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test AddFrontPageWithChildPages {
 		Navigator.gotoPage(pageName = "Wiki Test Page");
 
@@ -355,7 +355,7 @@ definition {
 		}
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AddFrontPageWithCreoleFormat {
 		Navigator.gotoPage(pageName = "Wiki Test Page");
 
@@ -377,7 +377,7 @@ definition {
 			wikiPageTitle = "FrontPage");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test AddFrontPageWithHTMLFormat {
 		property portal.acceptance = "true";
 		property testray.component.names = "Training";
@@ -404,7 +404,7 @@ definition {
 			wikiPageUsername = "Test Test");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test AddPageWithChildPage {
 		property portal.acceptance = "true";
 
@@ -436,7 +436,7 @@ definition {
 			wikiChildPageTitle = "Wiki Child Page Title");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test AddPageWithHTMLFormat {
 		property portal.acceptance = "true";
 
@@ -464,7 +464,7 @@ definition {
 
 		Type.typeCodeMirrorEditorNoError(
 			locator1 = "CKEditor#BODY_FIELD_SOURCE_ON",
-			value1 = "${welcomeToLiferay}");
+			value1 = ${welcomeToLiferay});
 
 		SelectFrame(value1 = "relative=top");
 
@@ -478,7 +478,7 @@ definition {
 			wikiPageTitle = "Wiki Page Title",
 			wikiPageUsername = "Test Test");
 
-		Pause(locator1 = "1000");
+		Pause(locator1 = 1000);
 
 		WikiPage.viewPG(
 			wikiPageContent = "Welcome to LIFERAY",
@@ -486,7 +486,7 @@ definition {
 	}
 
 	@description = "This test covers LPS-95711. It ensures that an image can be added to the front page via URL."
-	@priority = "4"
+	@priority = 4
 	test AddPageWithImageViaURL {
 		property test.name.skip.portal.instance = "PGWiki#AddPageWithImageViaURL";
 
@@ -520,7 +520,7 @@ definition {
 			locator1 = "Wiki#CONTENT_IMAGE_NAME");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AddPageWithInlineImage {
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
@@ -577,7 +577,7 @@ definition {
 			wikiPageTitle = "Wiki Page Title");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test AddWikiPages {
 		property testray.component.names = "Training";
 
@@ -606,7 +606,7 @@ definition {
 		}
 	}
 
-	@priority = "5"
+	@priority = 5
 	test CancelAddPage {
 		Navigator.gotoPage(pageName = "Wiki Test Page");
 
@@ -625,7 +625,7 @@ definition {
 		WikiTable.viewNoEntry(wikiPageTitle = "Wiki Page Title");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test CancelEditPage {
 		Navigator.gotoPage(pageName = "Wiki Test Page");
 
@@ -658,7 +658,7 @@ definition {
 		WikiEntry.viewPageContentBody(wikiPageContent = "Wiki Page Content");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test CompareVersionEditFrontPage {
 		Navigator.gotoPage(pageName = "Wiki Test Page");
 
@@ -694,7 +694,7 @@ definition {
 			wikiPageVersionOld = "1.0");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test CopyPage {
 		Navigator.gotoPage(pageName = "Wiki Test Page");
 
@@ -737,7 +737,7 @@ definition {
 		WikiEntry.viewPageContentBody(wikiPageContent = "Copied Wiki Page Content");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test DeleteFrontPage {
 		property portal.acceptance = "true";
 
@@ -754,7 +754,7 @@ definition {
 		WikiPage.deletePG(wikiPageTitle = "FrontPage");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test DeletePage {
 		property portal.acceptance = "true";
 
@@ -779,7 +779,7 @@ definition {
 		WikiPage.viewNoPagePG(wikiPageTitle = "Wiki Page Title");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test EditDraftPage {
 		Navigator.gotoPage(pageName = "Wiki Test Page");
 
@@ -820,7 +820,7 @@ definition {
 		WikiEntry.viewPageContentBody(wikiPageContent = "Edited Wiki Page Content");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test EditFrontPage {
 		property portal.acceptance = "true";
 
@@ -847,7 +847,7 @@ definition {
 			wikiPageTitle = "FrontPage");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test LinkWikiPage1toWikiPage2 {
 		Navigator.gotoPage(pageName = "Wiki Test Page");
 
@@ -887,7 +887,7 @@ definition {
 			wikiPageTitle = "Wiki Page2 Title");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test RemoveRedirectLinkFromPage {
 		property test.name.skip.portal.instance = "PGWiki#RemoveRedirectLinkFromWikiPage";
 
@@ -933,7 +933,7 @@ definition {
 			wikiPageTitle = "Wiki Page Rename");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test RenamePageTitle {
 		Navigator.gotoPage(pageName = "Wiki Test Page");
 
@@ -968,7 +968,7 @@ definition {
 			wikiPageTitle = "Wiki Page Rename");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test RevertChangesMadeToParentPages {
 		Navigator.gotoPage(pageName = "Wiki Test Page");
 
@@ -1032,7 +1032,7 @@ definition {
 			wikiPageTitle = "Wiki Page2 Title");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test RevertEditFrontPage {
 		Navigator.gotoPage(pageName = "Wiki Test Page");
 
@@ -1081,7 +1081,7 @@ definition {
 			wikiPageTitle = "FrontPage");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test SaveEditedPageAsDraft {
 		Navigator.gotoPage(pageName = "Wiki Test Page");
 

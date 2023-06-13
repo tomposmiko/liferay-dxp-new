@@ -17,7 +17,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -25,7 +25,7 @@ definition {
 		}
 	}
 
-	@priority = "4"
+	@priority = 4
 	test DeleteWebcontent {
 		JSONWebcontent.addWebContent(
 			content = "WC WebContent Content",
@@ -56,7 +56,7 @@ definition {
 		WebContent.viewDefaultCP(webContentTitle = "WC WebContent Title");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test MoveFolderWithWebContentToRecycleBin {
 		JSONWebcontent.addFolder(
 			folderName = "WC Folder Name",
@@ -85,7 +85,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-123274. Can move web content to recycle bin via drag and drop."
-	@priority = "3"
+	@priority = 3
 	test MoveWebContentToRecycleBinViaDragAndDrop {
 		task ("Add a web content") {
 			JSONWebcontent.addWebContent(
@@ -133,7 +133,7 @@ definition {
 		}
 	}
 
-	@priority = "3"
+	@priority = 3
 	test RecycleBinWebContent {
 		WebContentStructures.openWebContentStructuresAdmin(siteURLKey = "test-site-name");
 
@@ -209,7 +209,7 @@ definition {
 			templateName = "WC Template Name");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test RecycleWebContentViaDeleteIcon {
 		JSONWebcontent.addWebContent(
 			content = "WC WebContent Content",
@@ -232,7 +232,7 @@ definition {
 			deleteUser = "Test Test");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test RestoreWebcontent {
 		property portal.acceptance = "true";
 
@@ -268,7 +268,7 @@ definition {
 			webContentTitle = "WC WebContent Title");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test RestoreWebContentFromFolderCP {
 		JSONWebcontent.addFolder(
 			folderName = "WC Folder Name",
@@ -304,7 +304,7 @@ definition {
 			webContentTitle = "Web Content Title");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test RestoreWebContentWithArticleVersions {
 		JSONWebcontent.addFolder(
 			folderName = "WC Folder Name",
@@ -405,7 +405,7 @@ definition {
 			webContentTitle = "Web Content Title Edit Draft");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test UndoMoveToRecycleBin {
 		JSONWebcontent.addWebContent(
 			content = "WC WebContent Content",
@@ -429,7 +429,7 @@ definition {
 		RecycleBin.viewDefaultCP(assetName = "WC WebContent Title");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test ViewDuplicateAssetNamesInRecycleBin {
 		JSONWebcontent.addWebContent(
 			content = "WC WebContent Content",
@@ -461,7 +461,7 @@ definition {
 		RecycleBin.viewDuplicateNames(assetName = "WC WebContent Title");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test ViewDuplicateFolderNamesInRecycleBin {
 		JSONWebcontent.addFolder(
 			folderName = "WC Folder Name",
@@ -495,7 +495,7 @@ definition {
 		RecycleBin.viewDuplicateNames(assetName = "WC Folder Name");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test ViewRecycleBinEntryViaSuccessMessageLink {
 		JSONWebcontent.addWebContent(
 			content = "WC WebContent Content",

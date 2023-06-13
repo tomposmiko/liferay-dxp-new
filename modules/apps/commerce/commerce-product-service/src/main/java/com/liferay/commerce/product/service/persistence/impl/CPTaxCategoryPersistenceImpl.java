@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.product.service.persistence.impl;
 
+import com.liferay.commerce.product.exception.DuplicateCPTaxCategoryExternalReferenceCodeException;
 import com.liferay.commerce.product.exception.NoSuchCPTaxCategoryException;
 import com.liferay.commerce.product.model.CPTaxCategory;
 import com.liferay.commerce.product.model.CPTaxCategoryTable;
@@ -1112,6 +1113,31 @@ public class CPTaxCategoryPersistenceImpl
 		if (Validator.isNull(cpTaxCategory.getExternalReferenceCode())) {
 			cpTaxCategory.setExternalReferenceCode(
 				String.valueOf(cpTaxCategory.getPrimaryKey()));
+		}
+		else {
+			CPTaxCategory ercCPTaxCategory = fetchByC_ERC(
+				cpTaxCategory.getCompanyId(),
+				cpTaxCategory.getExternalReferenceCode());
+
+			if (isNew) {
+				if (ercCPTaxCategory != null) {
+					throw new DuplicateCPTaxCategoryExternalReferenceCodeException(
+						"Duplicate cp tax category with external reference code " +
+							cpTaxCategory.getExternalReferenceCode() +
+								" and company " + cpTaxCategory.getCompanyId());
+				}
+			}
+			else {
+				if ((ercCPTaxCategory != null) &&
+					(cpTaxCategory.getCPTaxCategoryId() !=
+						ercCPTaxCategory.getCPTaxCategoryId())) {
+
+					throw new DuplicateCPTaxCategoryExternalReferenceCodeException(
+						"Duplicate cp tax category with external reference code " +
+							cpTaxCategory.getExternalReferenceCode() +
+								" and company " + cpTaxCategory.getCompanyId());
+				}
+			}
 		}
 
 		ServiceContext serviceContext =

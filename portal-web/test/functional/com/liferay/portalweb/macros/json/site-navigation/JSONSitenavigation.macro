@@ -4,23 +4,23 @@ definition {
 		Variables.assertDefined(parameterList = "${groupName},${siteNavigationMenuName}");
 
 		var groupId = JSONSitenavigationSetter.setGroupId(
-			groupName = "${groupName}",
-			site = "${site}");
+			groupName = ${groupName},
+			site = ${site});
 
 		JSONSitenavigationAPI._addSiteNavigationMenu(
-			groupId = "${groupId}",
-			siteNavigationMenuName = "${siteNavigationMenuName}");
+			groupId = ${groupId},
+			siteNavigationMenuName = ${siteNavigationMenuName});
 	}
 
 	macro deleteSiteNavigationMenu {
 		Variables.assertDefined(parameterList = "${groupName},${siteNavigationMenuName}");
 
 		var siteNavigationMenuId = JSONSitenavigationSetter.setSiteNavigationMenuId(
-			groupName = "${groupName}",
-			site = "${site}",
-			siteNavigationMenuName = "${siteNavigationMenuName}");
+			groupName = ${groupName},
+			site = ${site},
+			siteNavigationMenuName = ${siteNavigationMenuName});
 
-		JSONSitenavigationAPI._deleteSiteNavigationMenu(siteNavigationMenuId = "${siteNavigationMenuId}");
+		JSONSitenavigationAPI._deleteSiteNavigationMenu(siteNavigationMenuId = ${siteNavigationMenuId});
 	}
 
 }

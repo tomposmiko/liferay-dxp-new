@@ -16,7 +16,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -28,7 +28,7 @@ definition {
 		}
 	}
 
-	@priority = "5"
+	@priority = 5
 	test AddPageFromExistingPage {
 		property portal.acceptance = "true";
 		property testray.component.names = "Training";
@@ -48,11 +48,11 @@ definition {
 			siteName = "Test Site Name");
 
 		for (var portletName : list "Tags Navigation,Categories Navigation,Wiki") {
-			Portlet.viewSpecificPG(portletName = "${portletName}");
+			Portlet.viewSpecificPG(portletName = ${portletName});
 		}
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AddPagesFullPageApplication {
 		property osgi.app.includes = "hello-soy";
 		property portal.release = "false";
@@ -67,7 +67,7 @@ definition {
 
 			SitePages.configurePage(
 				pageName = "${portlet} Full Page Application",
-				portlet = "${portlet}",
+				portlet = ${portlet},
 				privacy = "Public Pages",
 				sitePageType = "Full Page Application");
 
@@ -76,15 +76,15 @@ definition {
 				siteName = "Test Site Name");
 
 			AssertTextEquals(
-				key_portletTitleName = "${portlet}",
+				key_portletTitleName = ${portlet},
 				locator1 = "Home#PAGE_COLUMN_PORTLET_COLUMN_1_PORTLET_TITLE",
-				value1 = "${portlet}");
+				value1 = ${portlet});
 
 			AssertElementNotPresent(locator1 = "ControlMenu#ADD");
 		}
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AddPagesFullPageApplicationForRelease {
 		property portal.upstream = "false";
 		property testray.component.names = "Site Pages Administration";
@@ -98,7 +98,7 @@ definition {
 
 			SitePages.configurePage(
 				pageName = "${portlet} Full Page Application",
-				portlet = "${portlet}",
+				portlet = ${portlet},
 				privacy = "Public Pages",
 				sitePageType = "Full Page Application");
 
@@ -107,15 +107,15 @@ definition {
 				siteName = "Test Site Name");
 
 			AssertTextEquals.assertText(
-				key_portletTitleName = "${portlet}",
+				key_portletTitleName = ${portlet},
 				locator1 = "Home#PAGE_COLUMN_PORTLET_COLUMN_1_PORTLET_TITLE",
-				value1 = "${portlet}");
+				value1 = ${portlet});
 
 			AssertElementNotPresent(locator1 = "ControlMenu#ADD");
 		}
 	}
 
-	@priority = "3"
+	@priority = 3
 	test AddPageWithEscapeCharacter {
 		property testray.component.names = "Site Pages Administration";
 
@@ -124,7 +124,7 @@ definition {
 		SitePages.addPublicPage(pageName = "Tester's Page");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test AddPageWithMultipleChildPagesToSite {
 		property testray.component.names = "Site Pages Administration";
 
@@ -135,7 +135,7 @@ definition {
 		for (var childPageName : list "Site Child Page 1,Site Child Page 2,Site Child Page 3") {
 			JSONLayout.addPublicLayout(
 				groupName = "Test Site Name",
-				layoutName = "${childPageName}",
+				layoutName = ${childPageName},
 				parentLayoutName = "Site Page");
 		}
 
@@ -143,13 +143,13 @@ definition {
 
 		for (var childPageName : list "Site Child Page 1,Site Child Page 2,Site Child Page 3") {
 			Page.view(
-				depth = "2",
-				pageName = "${childPageName}",
+				depth = 2,
+				pageName = ${childPageName},
 				privacy = "Public Pages");
 		}
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AddSitePrivateChildPage {
 		property testray.component.names = "Site Pages Administration";
 
@@ -169,12 +169,12 @@ definition {
 			url = "${portalURL}/group/test-site-name/site-child-page");
 
 		Page.view(
-			depth = "2",
+			depth = 2,
 			pageName = "Site Child Page",
 			privacy = "Private Pages");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AddSitePrivatePagePortlet {
 		property testray.component.names = "Site Pages Administration";
 
@@ -196,7 +196,7 @@ definition {
 			siteURL = "true");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AddSitePublicPage {
 		property testray.component.names = "Site Pages Administration";
 
@@ -215,7 +215,7 @@ definition {
 			privacy = "Public Pages");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AddSitePublicPagePortlet {
 		property testray.component.names = "Site Pages Administration";
 
@@ -230,7 +230,7 @@ definition {
 		Portlet.addPG(portletName = "Blogs");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ChangePageLayout {
 		property portal.acceptance = "true";
 		property testray.component.names = "Site Pages Administration,Training";
@@ -249,21 +249,21 @@ definition {
 			JSONLayout.updateLayoutTemplateOfPublicLayout(
 				groupName = "Test Site Name",
 				layoutName = "Site Page Name",
-				layoutTemplate = "${layoutTemplate}");
+				layoutTemplate = ${layoutTemplate});
 
 			Navigator.gotoSitePage(
 				pageName = "Site Page Name",
 				siteName = "Test Site Name");
 
-			Pause(locator1 = "3000");
+			Pause(locator1 = 3000);
 
 			Navigator.gotoEditPageViaControlMenu(pageName = "Site Page Name");
 
-			Page.viewSelectedLayoutColumn(columnName = "${layoutTemplate}");
+			Page.viewSelectedLayoutColumn(columnName = ${layoutTemplate});
 		}
 	}
 
-	@priority = "5"
+	@priority = 5
 	test DeleteSitePages {
 		property portal.acceptance = "true";
 		property testray.component.names = "Site Pages Administration";
@@ -271,7 +271,7 @@ definition {
 		for (var pageName : list "Site Page 1,Site Page 2,Site Page 3") {
 			JSONLayout.addPublicLayout(
 				groupName = "Test Site Name",
-				layoutName = "${pageName}");
+				layoutName = ${pageName});
 		}
 
 		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
@@ -279,7 +279,7 @@ definition {
 		SitePages.deletePage(pageName = "Site Page 2");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test EditSitePage {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "WidgetPages#EditSitePage";
@@ -327,7 +327,7 @@ definition {
 			privacy = "Public Pages");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test SaveEmbeddedPageType {
 		property testray.component.names = "Site Pages Administration";
 
@@ -359,7 +359,7 @@ definition {
 		Page.viewEmbeddedPagePG();
 	}
 
-	@priority = "4"
+	@priority = 4
 	test SavePortletPageType {
 		property testray.component.names = "Site Pages Administration";
 
@@ -377,7 +377,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-123143."
-	@priority = "3"
+	@priority = 3
 	test ViewLanguageNameOfLanguageButtonInWidgetConfigurationPage {
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",
@@ -398,7 +398,7 @@ definition {
 		PortletEntry.viewLocale(locale = "en-US");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test ViewNoInfoMessageWhenChangingSiteTemplateAsUser {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 		property testray.component.names = "Site and Page Templates,Site Pages Administration";

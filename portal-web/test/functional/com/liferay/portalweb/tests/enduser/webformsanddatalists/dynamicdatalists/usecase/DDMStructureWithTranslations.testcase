@@ -20,7 +20,7 @@ definition {
 
 		var sourceJSON = TestCase.getFileContent(fileName = "complexDDMStructure.json");
 
-		DynamicDataMapping.addFieldViaJSON(sourceJSON = "${sourceJSON}");
+		DynamicDataMapping.addFieldViaJSON(sourceJSON = ${sourceJSON});
 
 		DDLDataDefinition.setInputFieldLocalization(languageValue = "pt_BR");
 
@@ -50,7 +50,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -63,7 +63,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-69325."
-	@priority = "4"
+	@priority = 4
 	test ViewFieldInputWhenSwitchingTranslations {
 		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "DDMStructureWithTranslations#ViewFieldInputWhenSwitchingTranslations";
@@ -71,7 +71,7 @@ definition {
 		DDLRecord.addCP();
 
 		for (var language : list "es-ES,en-US,pt-BR") {
-			PortletEntry.changeLocale(locale = "${language}");
+			PortletEntry.changeLocale(locale = ${language});
 
 			DDLRecord.populateFieldText(
 				ddlRecordFieldData = "${language} Categoria",
@@ -83,7 +83,7 @@ definition {
 		}
 
 		for (var language : list "pt-BR,en-US,es-ES") {
-			PortletEntry.changeLocale(locale = "${language}");
+			PortletEntry.changeLocale(locale = ${language});
 
 			FormFields.viewTextValue(
 				fieldName = "Categoria",

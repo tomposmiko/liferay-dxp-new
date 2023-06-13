@@ -50,6 +50,7 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
+import com.liferay.search.experiences.exception.DuplicateSXPBlueprintExternalReferenceCodeException;
 import com.liferay.search.experiences.exception.NoSuchSXPBlueprintException;
 import com.liferay.search.experiences.model.SXPBlueprint;
 import com.liferay.search.experiences.model.SXPBlueprintTable;
@@ -3495,6 +3496,31 @@ public class SXPBlueprintPersistenceImpl
 
 		if (Validator.isNull(sxpBlueprint.getExternalReferenceCode())) {
 			sxpBlueprint.setExternalReferenceCode(sxpBlueprint.getUuid());
+		}
+		else {
+			SXPBlueprint ercSXPBlueprint = fetchByC_ERC(
+				sxpBlueprint.getCompanyId(),
+				sxpBlueprint.getExternalReferenceCode());
+
+			if (isNew) {
+				if (ercSXPBlueprint != null) {
+					throw new DuplicateSXPBlueprintExternalReferenceCodeException(
+						"Duplicate sxp blueprint with external reference code " +
+							sxpBlueprint.getExternalReferenceCode() +
+								" and company " + sxpBlueprint.getCompanyId());
+				}
+			}
+			else {
+				if ((ercSXPBlueprint != null) &&
+					(sxpBlueprint.getSXPBlueprintId() !=
+						ercSXPBlueprint.getSXPBlueprintId())) {
+
+					throw new DuplicateSXPBlueprintExternalReferenceCodeException(
+						"Duplicate sxp blueprint with external reference code " +
+							sxpBlueprint.getExternalReferenceCode() +
+								" and company " + sxpBlueprint.getCompanyId());
+				}
+			}
 		}
 
 		ServiceContext serviceContext =

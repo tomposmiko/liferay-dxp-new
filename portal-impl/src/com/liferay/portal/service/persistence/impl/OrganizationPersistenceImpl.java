@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.SQLQuery;
 import com.liferay.portal.kernel.dao.orm.Session;
+import com.liferay.portal.kernel.exception.DuplicateOrganizationExternalReferenceCodeException;
 import com.liferay.portal.kernel.exception.NoSuchOrganizationException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -9501,6 +9502,31 @@ public class OrganizationPersistenceImpl
 
 		if (Validator.isNull(organization.getExternalReferenceCode())) {
 			organization.setExternalReferenceCode(organization.getUuid());
+		}
+		else {
+			Organization ercOrganization = fetchByC_ERC(
+				organization.getCompanyId(),
+				organization.getExternalReferenceCode());
+
+			if (isNew) {
+				if (ercOrganization != null) {
+					throw new DuplicateOrganizationExternalReferenceCodeException(
+						"Duplicate organization with external reference code " +
+							organization.getExternalReferenceCode() +
+								" and company " + organization.getCompanyId());
+				}
+			}
+			else {
+				if ((ercOrganization != null) &&
+					(organization.getOrganizationId() !=
+						ercOrganization.getOrganizationId())) {
+
+					throw new DuplicateOrganizationExternalReferenceCodeException(
+						"Duplicate organization with external reference code " +
+							organization.getExternalReferenceCode() +
+								" and company " + organization.getCompanyId());
+				}
+			}
 		}
 
 		ServiceContext serviceContext =

@@ -33,7 +33,7 @@ definition {
 
 			for (var resourceAction : list "UPDATE,UPDATE_LAYOUT_CONTENT,VIEW") {
 				Permissions.definePermissionViaJSONAPI(
-					resourceAction = "${resourceAction}",
+					resourceAction = ${resourceAction},
 					resourceName = "com.liferay.portal.kernel.model.Layout",
 					roleTitle = "Page Author",
 					roleType = "site");
@@ -41,7 +41,7 @@ definition {
 
 			for (var resourceAction : list "ACCESS_IN_CONTROL_PANEL,VIEW") {
 				Permissions.definePermissionViaJSONAPI(
-					resourceAction = "${resourceAction}",
+					resourceAction = ${resourceAction},
 					resourceName = "com_liferay_layout_admin_web_portlet_GroupPagesPortlet",
 					roleTitle = "Page Author",
 					roleType = "site");
@@ -126,7 +126,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -143,7 +143,7 @@ definition {
 	}
 
 	@description = "This is for LPS-98384. Assert the modification won't be shown in content page for guests until approve."
-	@priority = "3"
+	@priority = 3
 	test GuestCannotViewModificationUntilApprove {
 		task ("Assert guests can not view modification before approve") {
 			User.logoutPG();
@@ -201,7 +201,7 @@ definition {
 	}
 
 	@description = "This is for LPS-98384. The page author can edit content page after reject or approve."
-	@priority = "3"
+	@priority = 3
 	test PageAuthorCanEditAfterRejectOrApprove {
 		task ("Reviewer rejects the request of modification") {
 			User.logoutAndLoginPG(
@@ -391,7 +391,7 @@ definition {
 	}
 
 	@description = "This is for LPS-98384. The page author can not edit again after submit but can preview the modification."
-	@priority = "5"
+	@priority = 5
 	test PageAuthorCanPreviewModificationButCannotEditAfterSubmit {
 		property portal.acceptance = "true";
 
@@ -443,7 +443,7 @@ definition {
 	}
 
 	@description = "This is for LPS-98384. The reviewer can edit the content page and preview the modification after submit."
-	@priority = "5"
+	@priority = 5
 	test ReviewerCanPreviewModificationAndEditAfterSubmit {
 		property portal.acceptance = "true";
 

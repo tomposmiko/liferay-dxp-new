@@ -63,7 +63,7 @@ definition {
 
 		ACUtils.tearDownDXP();
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -77,7 +77,7 @@ definition {
 
 	@description = "Feature ID: LRAC-7346 | Automation ID: LRAC-10147 | Test Summary: Block single custom event and block custom events in bulk"
 	@ignore = "true"
-	@priority = "5"
+	@priority = 5
 	test CanBlockCustomEvent {
 
 		// AC Story ticket: LRAC-9248
@@ -86,20 +86,20 @@ definition {
 			var customEventName1 = ACCustomEvents.generateCustomEventName();
 
 			ACCustomEvents.createCustomEvent(
-				customEventName = "${customEventName1}",
-				timeToSendCustomEvent = "1");
+				customEventName = ${customEventName1},
+				timeToSendCustomEvent = 1);
 
 			var customEventName2 = ACCustomEvents.generateCustomEventName();
 
 			ACCustomEvents.createCustomEvent(
-				customEventName = "${customEventName2}",
-				timeToSendCustomEvent = "1");
+				customEventName = ${customEventName2},
+				timeToSendCustomEvent = 1);
 
 			var customEventName3 = ACCustomEvents.generateCustomEventName();
 
 			ACCustomEvents.createCustomEvent(
-				customEventName = "${customEventName3}",
-				timeToSendCustomEvent = "1");
+				customEventName = ${customEventName3},
+				timeToSendCustomEvent = 1);
 		}
 
 		task ("Close sessions") {
@@ -109,7 +109,7 @@ definition {
 		task ("Switch the property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = "${assignedPropertyName}");
+			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
 		}
 
 		task ("Navigation to custom events tab") {
@@ -123,11 +123,11 @@ definition {
 		}
 
 		task ("Block custom event") {
-			ACCustomEvents.blockCustomEvent(customEventName = "${customEventName1}");
+			ACCustomEvents.blockCustomEvent(customEventName = ${customEventName1});
 		}
 
 		task ("Search for the name of the custom event that was blocked in custom event list") {
-			ACUtils.searchBar(searchItem = "${customEventName1}");
+			ACUtils.searchBar(searchItem = ${customEventName1});
 
 			// This test is being ignored due to a history that makes changes to empty state messages.
 
@@ -139,9 +139,9 @@ definition {
 		}
 
 		task ("Search for the name of the custom event that was blocked in block list") {
-			ACUtils.searchBar(searchItem = "${customEventName1}");
+			ACUtils.searchBar(searchItem = ${customEventName1});
 
-			ACUtils.viewNameList(nameList = "${customEventName1}");
+			ACUtils.viewNameList(nameList = ${customEventName1});
 		}
 
 		task ("Navigation to custom events tab") {
@@ -162,22 +162,22 @@ definition {
 
 		task ("Search for the name of the custom event that was blocked in block list") {
 			for (var customEventName : list "${customEventName2},${customEventName3}") {
-				ACUtils.searchBar(searchItem = "${customEventName}");
+				ACUtils.searchBar(searchItem = ${customEventName});
 
-				ACUtils.viewNameList(nameList = "${customEventName}");
+				ACUtils.viewNameList(nameList = ${customEventName});
 			}
 		}
 	}
 
 	@description = "Feature ID: LRAC-7346 | Automation ID: LRAC-10152 | Test Summary: Blocked events are not shown on Segments"
-	@priority = "5"
+	@priority = 5
 	test CheckBlockedEventsNotShownOnSegments {
 		task ("Fill fields and create custom event") {
 			var customEventName = ACCustomEvents.generateCustomEventName();
 
 			ACCustomEvents.createCustomEvent(
-				customEventName = "${customEventName}",
-				timeToSendCustomEvent = "1");
+				customEventName = ${customEventName},
+				timeToSendCustomEvent = 1);
 		}
 
 		task ("Close sessions") {
@@ -187,7 +187,7 @@ definition {
 		task ("Switch the property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = "${assignedPropertyName}");
+			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
 		}
 
 		task ("Navigation to custom events tab") {
@@ -201,7 +201,7 @@ definition {
 		}
 
 		task ("Block custom event") {
-			ACCustomEvents.blockCustomEvent(customEventName = "${customEventName}");
+			ACCustomEvents.blockCustomEvent(customEventName = ${customEventName});
 		}
 
 		task ("Navigation to segments") {
@@ -213,7 +213,7 @@ definition {
 		task ("Create a new dynamic segment and check that the custom event that has been blocked does not appear") {
 			ACSegments.createDynamicSegment();
 
-			ACUtils.searchBar(searchItem = "${customEventName}");
+			ACUtils.searchBar(searchItem = ${customEventName});
 
 			AssertElementPresent(
 				key_segmentField = "No results were found.",
@@ -222,7 +222,7 @@ definition {
 	}
 
 	@description = "Feature ID: LRAC-7346 | Automation ID: LRAC-10150 | Test Summary: Block/Unblock custom events as non-admin"
-	@priority = "3"
+	@priority = 3
 	test CheckCannotBlockOrUnblockCustomEventsAsNonAdmin {
 		property portal.upstream = "quarantine";
 
@@ -230,8 +230,8 @@ definition {
 			var customEventName = ACCustomEvents.generateCustomEventName();
 
 			ACCustomEvents.createCustomEvent(
-				customEventName = "${customEventName}",
-				timeToSendCustomEvent = "1");
+				customEventName = ${customEventName},
+				timeToSendCustomEvent = 1);
 		}
 
 		task ("Close sessions") {
@@ -241,7 +241,7 @@ definition {
 		task ("Login as a non-admin user and switch the property in AC") {
 			ACUtils.launchAC(emailAddress = "corbin.murakami@faro.io");
 
-			ACProperties.switchProperty(propertyName = "${assignedPropertyName}");
+			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
 		}
 
 		task ("Navigation to custom events tab") {
@@ -255,10 +255,10 @@ definition {
 		}
 
 		task ("Assert block event icon is not present") {
-			var key_nameList = "${customEventName}";
+			var key_nameList = ${customEventName};
 
 			if (IsElementNotPresent(locator1 = "ACUtils#NAME_LIST")) {
-				ACUtils.searchBar(searchItem = "${customEventName}");
+				ACUtils.searchBar(searchItem = ${customEventName});
 			}
 
 			MouseOver(locator1 = "ACUtils#NAME_LIST");
@@ -293,7 +293,7 @@ definition {
 		}
 
 		task ("Block custom event") {
-			ACCustomEvents.blockCustomEvent(customEventName = "${customEventName}");
+			ACCustomEvents.blockCustomEvent(customEventName = ${customEventName});
 		}
 
 		task ("Logout AC and Login as a non-admin user") {
@@ -323,10 +323,10 @@ definition {
 		}
 
 		task ("Assert block event icon is not present") {
-			var key_nameList = "${customEventName}";
+			var key_nameList = ${customEventName};
 
 			if (IsElementNotPresent(locator1 = "ACUtils#NAME_LIST")) {
-				ACUtils.searchBar(searchItem = "${customEventName}");
+				ACUtils.searchBar(searchItem = ${customEventName});
 			}
 
 			MouseOver(locator1 = "ACUtils#NAME_LIST");
@@ -340,14 +340,14 @@ definition {
 	}
 
 	@description = "Feature ID: LRAC-7346 | Automation ID: LRAC-10151 | Test Summary: Blocked events are not processed"
-	@priority = "5"
+	@priority = 5
 	test CheckEventAnalysisNotUpdatedWhenEventIsBlocked {
 		task ("Fill fields and create custom event") {
 			var customEventName = ACCustomEvents.generateCustomEventName();
 
 			ACCustomEvents.createCustomEvent(
-				customEventName = "${customEventName}",
-				timeToSendCustomEvent = "1");
+				customEventName = ${customEventName},
+				timeToSendCustomEvent = 1);
 		}
 
 		task ("Close sessions") {
@@ -357,13 +357,13 @@ definition {
 		task ("Switch the property in AC and go to event analysis") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = "${assignedPropertyName}");
+			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
 
 			ACNavigation.goToEventAnalysis();
 		}
 
 		task ("Add the custom event to analysis") {
-			ACEventAnalysis.addEvent(customEventName = "${customEventName}");
+			ACEventAnalysis.addEvent(customEventName = ${customEventName});
 		}
 
 		task ("Check the interactions are reflected on the event analysis") {
@@ -371,7 +371,7 @@ definition {
 
 			ACTimeFilter.setLast24Hours();
 
-			ACEventAnalysis.viewAnalysisInformation(informationValueList = "1");
+			ACEventAnalysis.viewAnalysisInformation(informationValueList = 1);
 		}
 
 		task ("Navigation to settings and discard analysis change if needed") {
@@ -391,7 +391,7 @@ definition {
 		}
 
 		task ("Block custom event") {
-			ACCustomEvents.blockCustomEvent(customEventName = "${customEventName}");
+			ACCustomEvents.blockCustomEvent(customEventName = ${customEventName});
 		}
 
 		task ("Go to DXP and interact with the custom event again") {
@@ -402,8 +402,8 @@ definition {
 				siteName = "Site Name");
 
 			ACCustomEvents.createCustomEvent(
-				customEventName = "${customEventName}",
-				timeToSendCustomEvent = "1");
+				customEventName = ${customEventName},
+				timeToSendCustomEvent = 1);
 		}
 
 		task ("Close sessions") {
@@ -413,7 +413,7 @@ definition {
 		task ("Switch the property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = "${assignedPropertyName}");
+			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
 		}
 
 		task ("Navigation to custom events tab") {
@@ -431,7 +431,7 @@ definition {
 		}
 
 		task ("Unblock custom event") {
-			ACCustomEvents.unblockCustomEvent(customEventName = "${customEventName}");
+			ACCustomEvents.unblockCustomEvent(customEventName = ${customEventName});
 		}
 
 		task ("Navigation to event analysis") {
@@ -441,7 +441,7 @@ definition {
 		}
 
 		task ("Add the custom event to analysis") {
-			ACEventAnalysis.addEvent(customEventName = "${customEventName}");
+			ACEventAnalysis.addEvent(customEventName = ${customEventName});
 		}
 
 		task ("Check the interactions were not reflected on the event analysis while the custom event was blocked") {
@@ -449,7 +449,7 @@ definition {
 
 			ACTimeFilter.setLast24Hours();
 
-			ACEventAnalysis.viewAnalysisInformation(informationValueList = "1");
+			ACEventAnalysis.viewAnalysisInformation(informationValueList = 1);
 		}
 
 		task ("Go to DXP and interact with the custom event again") {
@@ -460,8 +460,8 @@ definition {
 				siteName = "Site Name");
 
 			ACCustomEvents.createCustomEvent(
-				customEventName = "${customEventName}",
-				timeToSendCustomEvent = "1");
+				customEventName = ${customEventName},
+				timeToSendCustomEvent = 1);
 		}
 
 		task ("Close sessions") {
@@ -471,13 +471,13 @@ definition {
 		task ("Switch the property in AC and go to event analysis") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = "${assignedPropertyName}");
+			ACProperties.switchProperty(propertyName = ${assignedPropertyName});
 
 			ACNavigation.goToEventAnalysis();
 		}
 
 		task ("Add the custom event to analysis") {
-			ACEventAnalysis.addEvent(customEventName = "${customEventName}");
+			ACEventAnalysis.addEvent(customEventName = ${customEventName});
 		}
 
 		task ("Check the interactions were reflected in the event analysis while the custom event was unlocked") {
@@ -485,7 +485,7 @@ definition {
 
 			ACTimeFilter.setLast24Hours();
 
-			ACEventAnalysis.viewAnalysisInformation(informationValueList = "2");
+			ACEventAnalysis.viewAnalysisInformation(informationValueList = 2);
 		}
 	}
 

@@ -14,6 +14,7 @@
 
 package com.liferay.account.service.persistence.impl;
 
+import com.liferay.account.exception.DuplicateAccountGroupExternalReferenceCodeException;
 import com.liferay.account.exception.NoSuchGroupException;
 import com.liferay.account.model.AccountGroup;
 import com.liferay.account.model.AccountGroupTable;
@@ -1117,6 +1118,31 @@ public class AccountGroupPersistenceImpl
 		if (Validator.isNull(accountGroup.getExternalReferenceCode())) {
 			accountGroup.setExternalReferenceCode(
 				String.valueOf(accountGroup.getPrimaryKey()));
+		}
+		else {
+			AccountGroup ercAccountGroup = fetchByC_ERC(
+				accountGroup.getCompanyId(),
+				accountGroup.getExternalReferenceCode());
+
+			if (isNew) {
+				if (ercAccountGroup != null) {
+					throw new DuplicateAccountGroupExternalReferenceCodeException(
+						"Duplicate account group with external reference code " +
+							accountGroup.getExternalReferenceCode() +
+								" and company " + accountGroup.getCompanyId());
+				}
+			}
+			else {
+				if ((ercAccountGroup != null) &&
+					(accountGroup.getAccountGroupId() !=
+						ercAccountGroup.getAccountGroupId())) {
+
+					throw new DuplicateAccountGroupExternalReferenceCodeException(
+						"Duplicate account group with external reference code " +
+							accountGroup.getExternalReferenceCode() +
+								" and company " + accountGroup.getCompanyId());
+				}
+			}
 		}
 
 		ServiceContext serviceContext =

@@ -293,6 +293,7 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 		}
 	}
 
+	@CTAware
 	@Override
 	public void deletePortlets(long companyId, String[] portletIds, long plid)
 		throws PortalException {

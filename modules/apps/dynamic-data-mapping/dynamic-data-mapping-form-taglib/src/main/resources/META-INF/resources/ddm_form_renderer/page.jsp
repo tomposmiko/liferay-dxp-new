@@ -95,14 +95,14 @@ if (ddmFormInstance != null) {
 					<c:if test="<%= showFormBasicInfo %>">
 						<div class="ddm-form-basic-info">
 							<clay:container-fluid>
-								<h1 class="ddm-form-name"><%= HtmlUtil.escape(ddmFormInstance.getName(displayLocale)) %></h1>
+								<h1 class="ddm-form-name" tabindex={0}><%= HtmlUtil.escape(ddmFormInstance.getName(displayLocale)) %></h1>
 
 								<%
 								String description = HtmlUtil.escape(ddmFormInstance.getDescription(displayLocale));
 								%>
 
 								<c:if test="<%= Validator.isNotNull(description) %>">
-									<h5 class="ddm-form-description"><%= description %></h5>
+									<h5 class="ddm-form-description" tabindex={0}><%= description %></h5>
 								</c:if>
 							</clay:container-fluid>
 						</div>

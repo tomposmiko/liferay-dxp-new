@@ -15,21 +15,21 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 	}
 
-	@priority = "5"
+	@priority = 5
 	test CannotEnablePublicationsWhenStagingIsTurnedOn {
-		var siteName = TestCase.getSiteName(siteName = "${siteName}");
+		var siteName = TestCase.getSiteName(siteName = ${siteName});
 
 		ProductMenu.gotoPortlet(
 			category = "Publishing",
 			portlet = "Staging",
 			site = "Guest");
 
-		Staging.activateStagingCP(siteName = "${siteName}");
+		Staging.activateStagingCP(siteName = ${siteName});
 
 		ApplicationsMenu.gotoPortlet(
 			category = "Publications",
@@ -43,7 +43,7 @@ definition {
 		Alert.viewErrorMessage(errorMessage = "Staging is enabled for at least one site in the current virtual instance. Publications and staging cannot be used together.");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test EnableDisablePublications {
 		property portal.acceptance = "true";
 
@@ -64,7 +64,7 @@ definition {
 		AssertElementPresent(locator1 = "PublicationsSettings#DISABLED_SAVE_AND_GO_TO_OVERVIEW_BUTTON");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test EnablePublicationsAndGoToOverview {
 		ApplicationsMenu.gotoPortlet(
 			category = "Publications",
@@ -85,11 +85,11 @@ definition {
 		Click(locator1 = "Publications#PUBLICATIONS_INDICATOR_BUTTON");
 
 		for (var menuItem : list "Select a Publication,Create New Publication") {
-			MenuItem.viewPresent(menuItem = "${menuItem}");
+			MenuItem.viewPresent(menuItem = ${menuItem});
 		}
 
 		for (var menuItem : list "Review Changes,Schedule,Publish") {
-			MenuItem.viewNotPresent(menuItem = "${menuItem}");
+			MenuItem.viewNotPresent(menuItem = ${menuItem});
 		}
 
 		Navigator.openURL();

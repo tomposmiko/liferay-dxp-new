@@ -5,20 +5,20 @@ definition {
 
 		Type(
 			locator1 = "CKEditor#BODY",
-			value1 = "${wikiPageContent}");
+			value1 = ${wikiPageContent});
 	}
 
 	macro addPageTitle {
 		if (isSet(wikiPageTitle)) {
-			var title = "${wikiPageTitle}";
+			var title = ${wikiPageTitle};
 		}
 		else if (isSet(wikiChildPageTitle)) {
-			var title = "${wikiChildPageTitle}";
+			var title = ${wikiChildPageTitle};
 		}
 
 		Type(
 			locator1 = "Wiki#ENTRY_TITLE",
-			value1 = "${title}");
+			value1 = ${title});
 	}
 
 	macro cancel {
@@ -45,19 +45,19 @@ definition {
 
 			SelectNoError(
 				locator1 = "Wiki#ADD_PAGE_FORMAT_DROPDOWN",
-				value1 = "${pageFormat}");
+				value1 = ${pageFormat});
 		}
 		else if (IsVisible(locator1 = "Wiki#ADD_PAGE_FORMAT_DROPDOWN")) {
 			SelectNoError(
 				locator1 = "Wiki#ADD_PAGE_FORMAT_DROPDOWN",
-				value1 = "${pageFormat}");
+				value1 = ${pageFormat});
 		}
 	}
 
 	macro viewPageContentBody {
 		AssertTextEquals(
 			locator1 = "WikiEntry#BODY",
-			value1 = "${wikiPageContent}");
+			value1 = ${wikiPageContent});
 	}
 
 }

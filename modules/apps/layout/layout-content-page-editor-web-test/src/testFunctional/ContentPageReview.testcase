@@ -26,7 +26,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -35,7 +35,7 @@ definition {
 	}
 
 	@description = "This case ensures that the user can add a comment to a fragment of a content page."
-	@priority = "5"
+	@priority = 5
 	test AddComment {
 		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
@@ -50,13 +50,13 @@ definition {
 			fragmentClass = "header",
 			fragmentComment = "This is a fragment comment!",
 			fragmentName = "Title",
-			position = "1");
+			position = 1);
 
 		PageEditor.viewComment(fragmentComment = "This is a fragment comment!");
 	}
 
 	@description = "This case ensures that the user can add a comment with escape characters to a fragment of a content page."
-	@priority = "4"
+	@priority = 4
 	test AddCommentWithEscapeCharacters {
 		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
@@ -71,13 +71,13 @@ definition {
 			fragmentClass = "body",
 			fragmentComment = '''& < > " Escape Characters Comment''',
 			fragmentName = "Content",
-			position = "1");
+			position = 1);
 
 		PageEditor.viewComment(fragmentComment = '''& < > " Escape Characters Comment''');
 	}
 
 	@description = "This case ensures a user can delete a fragment comment after publishing a content page."
-	@priority = "5"
+	@priority = 5
 	test DeleteComment {
 		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
@@ -92,7 +92,7 @@ definition {
 			fragmentClass = "header",
 			fragmentComment = "This is a fragment comment.",
 			fragmentName = "Title",
-			position = "1");
+			position = 1);
 
 		PageEditor.clickPublish();
 
@@ -105,7 +105,7 @@ definition {
 		Click(
 			key_content = "Lorem ipsum dolor sit amet",
 			key_fragmentClass = "header",
-			key_position = "1",
+			key_position = 1,
 			locator1 = "Fragment#FRAGMENT");
 
 		PageEditor.viewComment(fragmentComment = "This is a fragment comment.");
@@ -120,7 +120,7 @@ definition {
 	}
 
 	@description = "This case ensures a user can reopen a resolved comment after publishing a content page."
-	@priority = "4"
+	@priority = 4
 	test ReopenResolvedComment {
 		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
@@ -135,7 +135,7 @@ definition {
 			fragmentClass = "static-text",
 			fragmentComment = "This is a fragment comment",
 			fragmentName = "Static Text",
-			position = "1");
+			position = 1);
 
 		PageEditor.replyToComment(commentReply = "Fragment Comment 1");
 
@@ -152,7 +152,7 @@ definition {
 		Click(
 			key_content = "This is static text.",
 			key_fragmentClass = "static-text",
-			key_position = "1",
+			key_position = 1,
 			locator1 = "Fragment#FRAGMENT");
 
 		PageEditor.reopenResolvedComment(
@@ -163,7 +163,7 @@ definition {
 	}
 
 	@description = "This case ensures a user can mark a fragment comment as resolved after publishing a content page."
-	@priority = "4"
+	@priority = 4
 	test ResolveComment {
 		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
@@ -178,7 +178,7 @@ definition {
 			fragmentClass = "static-text",
 			fragmentComment = "This is a fragment comment.",
 			fragmentName = "Static Text",
-			position = "1");
+			position = 1);
 
 		PageEditor.clickPublish();
 
@@ -191,14 +191,14 @@ definition {
 		Click(
 			key_content = "This is static text.",
 			key_fragmentClass = "static-text",
-			key_position = "1",
+			key_position = 1,
 			locator1 = "Fragment#FRAGMENT");
 
 		PageEditor.resolveComment(fragmentComment = "This is a fragment comment.");
 	}
 
 	@description = "This test ensures that Content Page Comments is being used once the proper configuration is enabled."
-	@priority = "5"
+	@priority = 5
 	test Smoke {
 		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
@@ -212,7 +212,7 @@ definition {
 	}
 
 	@description = "This case ensures that the user can see a fragment comment after publishing a content page."
-	@priority = "5"
+	@priority = 5
 	test ViewComment {
 		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
@@ -227,7 +227,7 @@ definition {
 			fragmentClass = "rich-text",
 			fragmentComment = "This is a fragment comment!",
 			fragmentName = "Rich Text",
-			position = "1");
+			position = 1);
 
 		PageEditor.clickPublish();
 
@@ -240,7 +240,7 @@ definition {
 		Click(
 			key_content = "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
 			key_fragmentClass = "rich-text",
-			key_position = "1",
+			key_position = 1,
 			locator1 = "Fragment#FRAGMENT");
 
 		PageEditor.viewComment(
@@ -249,7 +249,7 @@ definition {
 	}
 
 	@description = "This test covers LPS-101027. It ensures that a published comment should remain if staging is deactivated."
-	@priority = "3"
+	@priority = 3
 	test ViewCommentAfterDeactivatingStaging {
 		Staging.openStagingAdmin(siteURLKey = "test-site-name");
 
@@ -268,7 +268,7 @@ definition {
 			fragmentClass = "rich-text",
 			fragmentComment = "This is a fragment comment!",
 			fragmentName = "Rich Text",
-			position = "1");
+			position = 1);
 
 		PageEditor.clickPublish();
 
@@ -301,7 +301,7 @@ definition {
 			fragmentClass = "rich-text",
 			fragmentComment = "This is a fragment comment!",
 			fragmentName = "Rich Text",
-			position = "1");
+			position = 1);
 
 		PageEditor.viewComment(
 			fragmentComment = "This is a fragment comment!",
@@ -309,7 +309,7 @@ definition {
 	}
 
 	@description = "This test covers LPS-99643. It ensures that the comment on the content page is not removed after the draft is discarded."
-	@priority = "4"
+	@priority = 4
 	test ViewCommentAfterDiscardedDraft {
 		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
@@ -324,7 +324,7 @@ definition {
 			fragmentClass = "rich-text",
 			fragmentComment = "This is a fragment comment",
 			fragmentName = "Rich Text",
-			position = "1");
+			position = 1);
 
 		PageEditor.clickPublish();
 
@@ -350,7 +350,7 @@ definition {
 		Click(
 			key_content = "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
 			key_fragmentClass = "rich-text",
-			key_position = "1",
+			key_position = 1,
 			locator1 = "Fragment#FRAGMENT");
 
 		PageEditor.viewComment(
@@ -359,7 +359,7 @@ definition {
 	}
 
 	@description = "This test covers LPS-99063. It ensures that Edit and Delete actions should not appear for comment if a user did not create it."
-	@priority = "4"
+	@priority = 4
 	test ViewCommentAsNonCreator {
 		JSONUser.addUser(
 			userEmailAddress = "user1@liferay.com",
@@ -399,7 +399,7 @@ definition {
 			fragmentClass = "rich-text",
 			fragmentComment = "This is a fragment comment!",
 			fragmentName = "Rich Text",
-			position = "1");
+			position = 1);
 
 		PageEditor.clickPublish();
 
@@ -418,7 +418,7 @@ definition {
 		Click(
 			key_content = "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
 			key_fragmentClass = "rich-text",
-			key_position = "1",
+			key_position = 1,
 			locator1 = "Fragment#FRAGMENT");
 
 		PageEditor.viewComment(
@@ -429,7 +429,7 @@ definition {
 	}
 
 	@description = "This case ensures that users can view created comments when no fragment is selected and navigate to them."
-	@priority = "5"
+	@priority = 5
 	test ViewCommentList {
 		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
@@ -444,7 +444,7 @@ definition {
 			fragmentClass = "header",
 			fragmentComment = "Title fragment comment",
 			fragmentName = "Title",
-			position = "1");
+			position = 1);
 
 		PageEditor.gotoCommentList();
 
@@ -471,7 +471,7 @@ definition {
 			fragmentClass = "body",
 			fragmentComment = "Content fragment comment",
 			fragmentName = "Content",
-			position = "2");
+			position = 2);
 
 		PageEditor.gotoCommentList();
 
@@ -488,7 +488,7 @@ definition {
 	}
 
 	@description = "This case ensures that comment list can be viewed and accessed via site navigation."
-	@priority = "5"
+	@priority = 5
 	test ViewCommentListNavigation {
 		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
@@ -503,7 +503,7 @@ definition {
 			fragmentClass = "header",
 			fragmentComment = "Title fragment comment",
 			fragmentName = "Title",
-			position = "1");
+			position = 1);
 
 		PageEditor.clickPublish();
 
@@ -524,7 +524,7 @@ definition {
 	}
 
 	@description = "This test covers LPS-100024. It ensures that comments from different experiences are independent from one another."
-	@priority = "4"
+	@priority = 4
 	test ViewCommentOnDifferentExperience {
 		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
@@ -564,7 +564,7 @@ definition {
 			fragmentClass = "header",
 			fragmentComment = "This is a fragment comment.",
 			fragmentName = "Title",
-			position = "1");
+			position = 1);
 
 		PageEditor.changeExperience(newExperience = "Default");
 
@@ -584,7 +584,7 @@ definition {
 			content = "Lorem ipsum dolor sit amet",
 			fragmentClass = "header",
 			fragmentName = "Title",
-			position = "1");
+			position = 1);
 
 		PageEditor.gotoCommentList();
 
@@ -595,7 +595,7 @@ definition {
 	}
 
 	@description = "This case ensures that a comment can be added and viewed using the icon in the fragment topper."
-	@priority = "5"
+	@priority = 5
 	test ViewCommentViaFragment {
 		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
@@ -610,7 +610,7 @@ definition {
 			fragmentClass = "rich-text",
 			fragmentComment = "This is a fragment comment!",
 			fragmentName = "Rich Text",
-			position = "1");
+			position = 1);
 
 		PageEditor.clickPublish();
 
@@ -623,7 +623,7 @@ definition {
 			fragmentClass = "rich-text",
 			fragmentComment = "This is a fragment comment!",
 			fragmentName = "Rich Text",
-			position = "1");
+			position = 1);
 
 		PageEditor.viewComment(
 			fragmentComment = "This is a fragment comment!",
@@ -631,7 +631,7 @@ definition {
 	}
 
 	@description = "This case ensures that the user can see an edited fragment comment after publishing a content page."
-	@priority = "4"
+	@priority = 4
 	test ViewEditedComment {
 		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
@@ -646,7 +646,7 @@ definition {
 			fragmentClass = "static-text",
 			fragmentComment = "This is a fragment comment.",
 			fragmentName = "Static Text",
-			position = "1");
+			position = 1);
 
 		PageEditor.editComment(fragmentCommentEdit = "This is a fragment comment edited.");
 
@@ -661,14 +661,14 @@ definition {
 		Click(
 			key_content = "This is static text.",
 			key_fragmentClass = "static-text",
-			key_position = "1",
+			key_position = 1,
 			locator1 = "Fragment#FRAGMENT");
 
 		PageEditor.viewComment(fragmentComment = "This is a fragment comment edited.");
 	}
 
 	@description = "This case ensures that multiple comments can be added, viewed and accessed in the fragment list."
-	@priority = "4"
+	@priority = 4
 	test ViewMultipleCommentsList {
 		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
@@ -684,7 +684,7 @@ definition {
 				fragmentClass = "static-text",
 				fragmentComment = "Static Text fragment comment ${commentNumber}",
 				fragmentName = "Static Text",
-				position = "1");
+				position = 1);
 
 			PageEditor.gotoTab(tabName = "Comments");
 		}
@@ -702,7 +702,7 @@ definition {
 	}
 
 	@description = "This case ensures that multiple replies can be added and viewed in a comment."
-	@priority = "4"
+	@priority = 4
 	test ViewMultipleReplies {
 		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
 
@@ -717,7 +717,7 @@ definition {
 			fragmentClass = "static-text",
 			fragmentComment = "This is a fragment comment.",
 			fragmentName = "Static Text",
-			position = "1");
+			position = 1);
 
 		for (var commentReplyNumber : list "1,2,3,4,5") {
 			PageEditor.replyToComment(commentReply = "Fragment Comment ${commentReplyNumber}");

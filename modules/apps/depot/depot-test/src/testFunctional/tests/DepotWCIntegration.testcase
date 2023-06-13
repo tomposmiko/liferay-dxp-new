@@ -20,7 +20,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -33,7 +33,7 @@ definition {
 	}
 
 	@description = "This ensures that a user can select depot web content from different repositories through WCD on a connected site."
-	@priority = "4"
+	@priority = 4
 	test ChangeWCDSelection {
 		JSONLayout.addPublicLayout(
 			groupName = "Site Name",
@@ -63,9 +63,9 @@ definition {
 		for (var depotName : list "Test Depot Name,Test Depot Name 2") {
 			DepotNavigator.openDepotAdmin();
 
-			DepotNavigator.gotoEdit(depotName = "${depotName}");
+			DepotNavigator.gotoEdit(depotName = ${depotName});
 
-			DepotNavigator.gotoSites(depotName = "${depotName}");
+			DepotNavigator.gotoSites(depotName = ${depotName});
 
 			Depot.connectSite(siteList = "Site Name");
 		}
@@ -94,7 +94,7 @@ definition {
 	}
 
 	@description = "This ensures that web content using a structure stored in AL can be removed on a connected site."
-	@priority = "4"
+	@priority = 4
 	test RemoveCustomizedWC {
 		DepotNavigator.openDepotWebContentAdmin(depotName = "Test Depot Name");
 
@@ -163,7 +163,7 @@ definition {
 	}
 
 	@description = "This test covers LPS-117063 and LPS-117068. It ensures that web content using a structure stored in AL can be selected without NPE throwing and removed from the disconnected site."
-	@priority = "4"
+	@priority = 4
 	test RemoveCustomizedWCFromDisconnectedSite {
 		JSONLayout.addPublicLayout(
 			groupName = "Site Name",
@@ -258,7 +258,7 @@ definition {
 	}
 
 	@description = "This test covers LPS-118395. It ensures that a web content in a depot can be selected through the page template."
-	@priority = "4"
+	@priority = 4
 	test SelectDepotContentViaPageTemplate {
 		JSONWebcontent.addWebContent(
 			content = "WC WebContent Content",
@@ -312,7 +312,7 @@ definition {
 	}
 
 	@description = "This test covers LPS-105119. It ensures that a web content in a depot can be selected through the field."
-	@priority = "4"
+	@priority = 4
 	test SelectDepotContentViaWebContentField {
 		JSONLayout.addPublicLayout(
 			groupName = "Site Name",
@@ -363,7 +363,7 @@ definition {
 
 		var templateScript = '''${templateWebConetntScript} <a>${webContentData.title}</a>''';
 
-		WebContentTemplates.inputScript(templateScript = "${templateScript}");
+		WebContentTemplates.inputScript(templateScript = ${templateScript});
 
 		DDLDataDefinition.save();
 
@@ -397,7 +397,7 @@ definition {
 	}
 
 	@description = "This ensures that a depot web content can be selected through the fragment in a content page on a connected site."
-	@priority = "5"
+	@priority = 5
 	test SelectFromFragmentInContentPage {
 		JSONWebcontent.addWebContent(
 			content = "WC WebContent Depot",
@@ -438,7 +438,7 @@ definition {
 	}
 
 	@description = "This ensures that a depot web content can be selected through the fragment in a display page template on a connected site."
-	@priority = "5"
+	@priority = 5
 	test SelectFromFragmentInDisplayPageTemplate {
 		JSONWebcontent.addWebContent(
 			content = "WC WebContent Depot",
@@ -496,7 +496,7 @@ definition {
 	}
 
 	@description = "This ensures that a depot web content can be selected through WCD on a connected site."
-	@priority = "5"
+	@priority = 5
 	test SelectFromWCD {
 		JSONWebcontent.addWebContent(
 			content = "WC WebContent Depot",
@@ -534,7 +534,7 @@ definition {
 	}
 
 	@description = "This ensures that a depot web content can be selected through WCD in a content page on a connected site."
-	@priority = "4"
+	@priority = 4
 	test SelectFromWidgetInContentPage {
 		JSONWebcontent.addWebContent(
 			content = "WC WebContent Depot",
@@ -569,7 +569,7 @@ definition {
 	}
 
 	@description = "This ensures that a depot web content can be selected through WCD in a display page template on a connected site."
-	@priority = "4"
+	@priority = 4
 	test SelectFromWidgetInDisplayPageTemplate {
 		JSONWebcontent.addWebContent(
 			content = "WC WebContent Depot",
@@ -605,7 +605,7 @@ definition {
 	}
 
 	@description = "This ensures that a user can use a structure stored in AL to create a template on a connected site."
-	@priority = "5"
+	@priority = 5
 	test SelectStructureInDepotViaTemplateOnSite {
 		DepotNavigator.openDepotAdmin();
 
@@ -648,7 +648,7 @@ definition {
 	}
 
 	@description = "This ensures that a user can use structures stored in AL to create articles and display them in AP on a connected site."
-	@priority = "5"
+	@priority = 5
 	test ViewCustomizedWCInAP {
 		JSONLayout.addPublicLayout(
 			groupName = "Site Name",
@@ -738,7 +738,7 @@ definition {
 	}
 
 	@description = "This ensures that a user can use a structure stored in AL to create an article and display it in WCD on a connected site."
-	@priority = "5"
+	@priority = 5
 	test ViewCustomizedWCInWCD {
 		JSONLayout.addPublicLayout(
 			groupName = "Site Name",
@@ -823,7 +823,7 @@ definition {
 	}
 
 	@description = "This ensures that a user can see information of WC structure from more iframe about which AL owns it."
-	@priority = "4"
+	@priority = 4
 	test ViewStructuresScopeList {
 		for (var i : list "1,2,3") {
 			JSONDepot.addDepot(

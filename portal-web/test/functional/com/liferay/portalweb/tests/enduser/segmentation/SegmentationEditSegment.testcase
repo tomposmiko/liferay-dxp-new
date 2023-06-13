@@ -34,7 +34,7 @@ definition {
 
 		Navigator.openURL();
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -50,7 +50,7 @@ definition {
 	}
 
 	@description = "Validate if the user can edit a segment with Properties Country and Region"
-	@priority = "5"
+	@priority = 5
 	test EditSegmentUserByOrganizationCountryAndRegion {
 		while (IsElementPresent(locator1 = "Segmentation#SEGMENT_LIST")) {
 			Segmentation.editSegment();
@@ -70,7 +70,7 @@ definition {
 	}
 
 	@description = "Validate if the user can edit a segment with Organization Tag"
-	@priority = "5"
+	@priority = 5
 	test EditSegmentUserByOrganizationTag {
 		ApplicationsMenu.gotoPortlet(
 			category = "Users",
@@ -118,7 +118,7 @@ definition {
 	}
 
 	@description = "Validate if the user can edit a segment with Properties Session Hostname"
-	@priority = "5"
+	@priority = 5
 	test EditSegmentUserBySessionHostname {
 		while (IsElementPresent(locator1 = "Segmentation#SEGMENT_LIST")) {
 			Segmentation.editSegment();
@@ -138,7 +138,7 @@ definition {
 	}
 
 	@description = "Validate if the user can edit a segment with Properties Session URL"
-	@priority = "5"
+	@priority = 5
 	test EditSegmentUserBySessionURL {
 		property portal.acceptance = "true";
 
@@ -160,7 +160,7 @@ definition {
 	}
 
 	@description = "Validate if the user can edit a segment with User Tag"
-	@priority = "5"
+	@priority = 5
 	test EditSegmentUserByUserTag {
 		ApplicationsMenu.gotoPortlet(
 			category = "Users",
@@ -206,7 +206,7 @@ definition {
 	}
 
 	@description = "Validate if the user can edit a segment with Properties User and Email Segment with Contains to Equals Option"
-	@priority = "5"
+	@priority = 5
 	test EditSegmentUserEmailAddressContainsToEquals {
 		while (IsElementPresent(locator1 = "Segmentation#SEGMENT_LIST")) {
 			Segmentation.editSegment();

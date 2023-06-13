@@ -19,7 +19,7 @@ definition {
 
 		Depot.remoteStagingSetUp(
 			depotName = "Test Depot Name",
-			remotePort = "9080",
+			remotePort = 9080,
 			remoteStaging = "true");
 
 		JSONGroup.addGroup(groupName = "Site Name");
@@ -29,7 +29,7 @@ definition {
 			layoutName = "Test Page");
 
 		Staging.remoteStagingSetUp(
-			remotePort = "9080",
+			remotePort = 9080,
 			remoteStaging = "true",
 			siteName = "Site Name");
 
@@ -47,7 +47,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -64,7 +64,7 @@ definition {
 	}
 
 	@description = "This ensures that image in depot can be removed and republished in AP through widget config manual selection when enabling remote staging."
-	@priority = "5"
+	@priority = 5
 	test DeleteImageInDepot {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "DepotRemoteStagingDM#DeleteImageInDepot";
@@ -104,7 +104,7 @@ definition {
 		Staging.publishToLive(remoteStaging = "true");
 
 		User.loginPG(
-			nodePort = "9080",
+			nodePort = 9080,
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
@@ -118,7 +118,7 @@ definition {
 			locator1 = "AP#ASSET_ABSTRACT_TITLE");
 
 		User.loginPG(
-			nodePort = "8080",
+			nodePort = 8080,
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
@@ -151,7 +151,7 @@ definition {
 		Staging.publishToLive(remoteStaging = "true");
 
 		User.loginPG(
-			nodePort = "9080",
+			nodePort = 9080,
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
@@ -166,7 +166,7 @@ definition {
 	}
 
 	@description = "This ensures that the blog small image from a depot can be edited and republished when enabling remote staging."
-	@priority = "5"
+	@priority = 5
 	test EditBlogSmallImage {
 		property test.name.skip.portal.instance = "DepotRemoteStagingDM#EditBlogSmallImage";
 
@@ -209,7 +209,7 @@ definition {
 		Staging.publishToLive(remoteStaging = "true");
 
 		User.loginPG(
-			nodePort = "9080",
+			nodePort = 9080,
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
@@ -223,7 +223,7 @@ definition {
 			locator1 = "BlogsEntry#CONTENT_SMALL_IMAGE");
 
 		User.loginPG(
-			nodePort = "8080",
+			nodePort = 8080,
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
@@ -248,7 +248,7 @@ definition {
 		Staging.publishToLive(remoteStaging = "true");
 
 		User.loginPG(
-			nodePort = "9080",
+			nodePort = 9080,
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
@@ -263,7 +263,7 @@ definition {
 	}
 
 	@description = "This ensures that document in depot can be replaced and republished in AP through widget config manual selection when enabling remote staging."
-	@priority = "5"
+	@priority = 5
 	test EditDocumentInDepot {
 		property test.name.skip.portal.instance = "DepotRemoteStagingDM#EditDocumentInDepot";
 
@@ -302,7 +302,7 @@ definition {
 		Staging.publishToLive(remoteStaging = "true");
 
 		User.loginPG(
-			nodePort = "9080",
+			nodePort = 9080,
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
@@ -316,7 +316,7 @@ definition {
 			locator1 = "AP#ASSET_ABSTRACT_TITLE");
 
 		User.loginPG(
-			nodePort = "8080",
+			nodePort = 8080,
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
@@ -346,7 +346,7 @@ definition {
 		Staging.publishToLive(remoteStaging = "true");
 
 		User.loginPG(
-			nodePort = "9080",
+			nodePort = 9080,
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
@@ -361,7 +361,7 @@ definition {
 	}
 
 	@description = "This ensures that a document using a custom document type from a depot can be published in the staging site when enabling remote staging."
-	@priority = "5"
+	@priority = 5
 	test PublishDMWithDocumentType {
 		property test.name.skip.portal.instance = "DepotRemoteStagingDM#PublishDMWithDocumentType";
 
@@ -409,7 +409,7 @@ definition {
 		Staging.publishToLive(remoteStaging = "true");
 
 		User.loginPG(
-			nodePort = "9080",
+			nodePort = 9080,
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
@@ -423,7 +423,7 @@ definition {
 	}
 
 	@description = "This ensures that a folder with a document in depot can be published in AP through widget config manual selection when enabling remote staging."
-	@priority = "5"
+	@priority = 5
 	test PublishDocumentFolder {
 		property test.name.skip.portal.instance = "DepotRemoteStagingDM#PublishDocumentFolder";
 
@@ -470,7 +470,7 @@ definition {
 		Staging.publishToLive(remoteStaging = "true");
 
 		User.loginPG(
-			nodePort = "9080",
+			nodePort = 9080,
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
@@ -485,7 +485,7 @@ definition {
 	}
 
 	@description = "This ensures that the shortcut to an image in the depot can be added and published in the staging site when enabling remote staging."
-	@priority = "5"
+	@priority = 5
 	test PublishImageShortcut {
 		property test.name.skip.portal.instance = "DepotRemoteStagingDM#PublishImageShortcut";
 
@@ -522,7 +522,7 @@ definition {
 		Staging.publishToLive(remoteStaging = "true");
 
 		User.loginPG(
-			nodePort = "9080",
+			nodePort = 9080,
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
@@ -538,7 +538,7 @@ definition {
 	}
 
 	@description = "This ensures that an image with custom field in depot can be published in remote staging site."
-	@priority = "5"
+	@priority = 5
 	test PublishImageWithCustomField {
 		property test.name.skip.portal.instance = "DepotRemoteStagingDM#PublishImageWithCustomField";
 
@@ -561,7 +561,7 @@ definition {
 		LAR.exportPortlet(larFileName = "Custom_Fields.lar");
 
 		User.loginPG(
-			nodePort = "9080",
+			nodePort = 9080,
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
@@ -610,7 +610,7 @@ definition {
 		Staging.publishToLive(remoteStaging = "true");
 
 		User.loginPG(
-			nodePort = "9080",
+			nodePort = 9080,
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
@@ -625,7 +625,7 @@ definition {
 	}
 
 	@description = "This ensures that the latest version of an image in a depot can be published in remote staging site."
-	@priority = "5"
+	@priority = 5
 	test PublishImageWithLatestVersion {
 		property test.name.skip.portal.instance = "DepotRemoteStagingDM#PublishImageWithLatestVersion";
 
@@ -688,7 +688,7 @@ definition {
 		Staging.publishToLive(remoteStaging = "true");
 
 		User.loginPG(
-			nodePort = "9080",
+			nodePort = 9080,
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
@@ -708,7 +708,7 @@ definition {
 	}
 
 	@description = "This ensures that the blog small image from a depot can be removed and republished when enabling remote staging."
-	@priority = "5"
+	@priority = 5
 	test RemoveBlogSmallImage {
 		property test.name.skip.portal.instance = "DepotRemoteStagingDM#RemoveBlogSmallImage";
 
@@ -749,7 +749,7 @@ definition {
 		Staging.publishToLive(remoteStaging = "true");
 
 		User.loginPG(
-			nodePort = "9080",
+			nodePort = 9080,
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
@@ -763,7 +763,7 @@ definition {
 			locator1 = "BlogsEntry#CONTENT_SMALL_IMAGE");
 
 		User.loginPG(
-			nodePort = "8080",
+			nodePort = 8080,
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
@@ -784,7 +784,7 @@ definition {
 		Staging.publishToLive(remoteStaging = "true");
 
 		User.loginPG(
-			nodePort = "9080",
+			nodePort = 9080,
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
@@ -799,7 +799,7 @@ definition {
 	}
 
 	@description = "This ensures that an unavailable structure from a depot can not be viewed in the staged site when enabling remote staging."
-	@priority = "5"
+	@priority = 5
 	test SelectUnavailableStructure {
 		property test.name.skip.portal.instance = "DepotRemoteStagingDM#SelectUnavailableStructure";
 
@@ -826,7 +826,7 @@ definition {
 	}
 
 	@description = "This ensures that a depot image cannot be found from the disconnected remote staging site."
-	@priority = "4"
+	@priority = 4
 	test ViewImageFromDisconnectedSite {
 		property test.name.skip.portal.instance = "DepotRemoteStagingDM#ViewImageFromDisconnectedSite";
 
@@ -889,7 +889,7 @@ definition {
 	}
 
 	@description = "This ensures that a pending image in depot cannot be found in remote staging site."
-	@priority = "5"
+	@priority = 5
 	test ViewPendingImage {
 		property test.name.skip.portal.instance = "DepotRemoteStagingDM#ViewPendingImage";
 

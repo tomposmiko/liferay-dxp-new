@@ -14,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -24,7 +24,7 @@ definition {
 		}
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AssertNoWikiJavascript {
 		property portal.upstream = "quarantine";
 
@@ -48,7 +48,7 @@ definition {
 
 		WikiPage.addFrontPagePG(
 			htmlSource = "true",
-			wikiPageContent = "${wikiPageContent}");
+			wikiPageContent = ${wikiPageContent});
 
 		WikiPage.viewPG(
 			wikiPageContent = "PASS",
@@ -56,12 +56,12 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-112581 and LPS-115803"
-	@priority = "5"
+	@priority = 5
 	test AssertSpecificRulesWorksForModel {
 		property antisamy.enabled = "true";
 		property test.name.skip.portal.instance = "AntiSamy#AssertSpecificRulesWorksForModel";
 
-		Pause(locator1 = "5000");
+		Pause(locator1 = 5000);
 
 		AssertConsoleTextPresent(value1 = "STARTED com.liferay.portal.security.antisamy");
 
@@ -126,7 +126,7 @@ definition {
 		AssertElementNotPresent(locator1 = "Message#SUCCESS");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AssertWebContentJavascript {
 		property portal.upstream = "quarantine";
 
@@ -149,7 +149,7 @@ definition {
 			''';
 
 		WebContent.addPGViaWCD(
-			webContentContent = "${webContentContent}",
+			webContentContent = ${webContentContent},
 			webContentTitle = "WC WebContent Title");
 
 		WebContent.viewPGViaWCD(

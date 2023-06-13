@@ -14,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -25,7 +25,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-105001 and LPS-104999."
-	@priority = "3"
+	@priority = 3
 	test AssertRoleTitleNotRequired {
 		ApplicationsMenu.gotoPortlet(
 			category = "Users",
@@ -51,7 +51,7 @@ definition {
 		Role.viewCP(roleKey = "Role Key Value");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AssignExistingSegmentToRegularRole {
 		ProductMenu.gotoSite(site = "Global");
 
@@ -99,7 +99,7 @@ definition {
 			roleTitle = "Roles Regrole Name");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AssignNewSegmentToRegularRole {
 		JSONRole.addRegularRole(
 			roleKey = "Roles Regrole Name",
@@ -153,7 +153,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-109572."
-	@priority = "5"
+	@priority = 5
 	test AssignUserToRegularRole {
 		property portal.acceptance = "true";
 
@@ -187,7 +187,7 @@ definition {
 			roleTitle = "Regular Role");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test DeleteOrganizationRole {
 		property portal.acceptance = "true";
 		property testray.component.names = "Training";
@@ -229,7 +229,7 @@ definition {
 		Role.viewDefaultCP(roleTitle = "Roles Orgrole Name");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test DeleteRegularRole {
 		property app.server.types = "jboss,tcserver,tomcat,weblogic,websphere,wildfly";
 		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
@@ -268,7 +268,7 @@ definition {
 		Role.viewDefaultCP(roleTitle = "Roles Regrole Name");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test DeleteSiteRole {
 		property portal.acceptance = "true";
 
@@ -309,7 +309,7 @@ definition {
 		Role.viewDefaultCP(roleTitle = "Roles Siterole Name");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test RemoveSegmentFromRegularRole {
 		ProductMenu.gotoSite(site = "Global");
 

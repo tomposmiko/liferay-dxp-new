@@ -38,7 +38,6 @@ import java.util.Map;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -46,8 +45,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.commerce.product.configuration.AttachmentsConfiguration",
-	configurationPolicy = ConfigurationPolicy.OPTIONAL, enabled = false,
-	service = TempAttachmentsUploadFileEntryHandler.class
+	enabled = false, service = TempAttachmentsUploadFileEntryHandler.class
 )
 public class TempAttachmentsUploadFileEntryHandler
 	implements UploadFileEntryHandler {

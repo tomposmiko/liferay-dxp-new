@@ -2,7 +2,7 @@ definition {
 
 	@summary = "Get a classNameId by value"
 	macro _getClassNameId {
-		Variables.assertDefined(parameterList = "${value}");
+		Variables.assertDefined(parameterList = ${value});
 
 		var portalURL = JSONCompany.getPortalURL();
 
@@ -12,17 +12,17 @@ definition {
 				-d value=${value}
 		''';
 
-		var classNameId = JSONCurlUtil.post("${curl}", "$.[?(@['value'] == '${value}')]['classNameId']");
+		var classNameId = JSONCurlUtil.post(${curl}, "$.[?(@['value'] == '${value}')]['classNameId']");
 
-		var classNameId = StringUtil.replace("${classNameId}", "[\"", "");
+		var classNameId = StringUtil.replace(${classNameId}, "[\"", "");
 
-		var classNameId = StringUtil.replace("${classNameId}", "\"]", "");
+		var classNameId = StringUtil.replace(${classNameId}, "\"]", "");
 
-		if ("${classNameId}" == "") {
+		if (${classNameId} == "") {
 			fail("FAIL. Cannot find classNameId.");
 		}
 
-		return "${classNameId}";
+		return ${classNameId};
 	}
 
 }

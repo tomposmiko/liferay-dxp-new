@@ -22,7 +22,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -36,7 +36,7 @@ definition {
 	}
 
 	@description = "Assert user can add/delete/publish publication with all permissions of Publications, can't add/publish a new publicaiton without add/publish publication permission."
-	@priority = "5"
+	@priority = 5
 	test AllowPublicationsPermissionUserToAddAndPublishPublications {
 
 		// Wrokaround LPS-127348
@@ -50,26 +50,26 @@ definition {
 
 		for (var resourceActionIndex : list "ACCESS_IN_CONTROL_PANEL,ADD_TO_PAGE,CONFIGURATION,PERMISSIONS,PREFERENCES,VIEW") {
 			Permissions.definePermissionViaJSONAPI(
-				resourceAction = "${resourceActionIndex}",
+				resourceAction = ${resourceActionIndex},
 				resourceName = "com_liferay_change_tracking_web_portlet_PublicationsPortlet",
 				roleTitle = "Publications Role");
 		}
 
 		Permissions.definePermissionViaJSONAPI(
 			resourceAction = "VIEW_CONTROL_PANEL",
-			resourceName = "90",
+			resourceName = 90,
 			roleTitle = "Publications Role");
 
 		for (var resourceActionIndex : list "ADD_PUBLICATION,PERMISSIONS") {
 			Permissions.definePermissionViaJSONAPI(
-				resourceAction = "${resourceActionIndex}",
+				resourceAction = ${resourceActionIndex},
 				resourceName = "com.liferay.change.tracking",
 				roleTitle = "Publications Role");
 		}
 
 		for (var resourceActionIndex : list "DELETE,PERMISSIONS,PUBLISH,UPDATE,VIEW") {
 			Permissions.definePermissionViaJSONAPI(
-				resourceAction = "${resourceActionIndex}",
+				resourceAction = ${resourceActionIndex},
 				resourceName = "com.liferay.change.tracking.model.CTCollection",
 				roleTitle = "Publications Role");
 		}
@@ -199,7 +199,7 @@ definition {
 	}
 
 	@description = "Assert Non-privileged user cannot see Publications bar."
-	@priority = "5"
+	@priority = 5
 	test AssertNonPrivilegedUserCannotSeePublicationsBar {
 		JSONUser.addUser(
 			userEmailAddress = "userea@liferay.com",
@@ -227,7 +227,7 @@ definition {
 		AssertElementNotPresent(locator1 = "Publications#PUBLICATIONS_INDICATOR_BUTTON");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ConflictingPublicationsAutomaticallyResolved {
 
 		// Wrokaround LPS-127348
@@ -317,7 +317,7 @@ definition {
 		Publications.publishPublication(publicationName = "Publication Name");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ConflictingPublicationsNeedManualResolution {
 
 		// Wrokaround LPS-129546
@@ -367,7 +367,9 @@ definition {
 			webContentTitle = "WC WebContent Title",
 			webContentTitleEdit = "WC WebContent Title 2 Edit");
 
-		Publications.selectPublication(publicationName = "Publication Name");
+		Publications.selectPublication(
+			gotoManagePublications = "true",
+			publicationName = "Publication Name");
 
 		Publications.gotoReviewChanges();
 
@@ -387,7 +389,9 @@ definition {
 
 		Publications.publishPublication(publicationName = "Publication Name");
 
-		Publications.selectPublication(publicationName = "Publication 2 Name");
+		Publications.selectPublication(
+			gotoManagePublications = "true",
+			publicationName = "Publication 2 Name");
 
 		Navigator.gotoNavTab(navTab = "History");
 
@@ -429,13 +433,13 @@ definition {
 
 		Publications.viewPublicationsDiff(
 			columnName = "ct-collection-id",
-			columnValueInPublication = "2",
+			columnValueInPublication = 2,
 			entryTitle = "WC WebContent Title 2 Edit",
 			publicationName = "Publication 2 Name");
 
 		IFrame.closeFrame();
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		Publications.discardChanges(
 			changeCategory = "Asset",
@@ -468,7 +472,7 @@ definition {
 			value1 = "No web content was found.");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test DiscardSubsetsofChangesInPublication {
 		Publications.createNewPublication(publicationName = "Publication Name");
 
@@ -584,7 +588,7 @@ definition {
 			locator1 = "DDMSelectTemplate#TEMPLATE_TABLE_NAME");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test PublishParallelPublications {
 
 		// Wrokaround LPS-127348
@@ -648,7 +652,9 @@ definition {
 
 		Publications.publishPublication(publicationName = "Publication 2 Name");
 
-		Publications.selectPublication(publicationName = "Publication Name");
+		Publications.selectPublication(
+			gotoManagePublications = "true",
+			publicationName = "Publication Name");
 
 		Publications.gotoPublish(publicationName = "Publication Name");
 
@@ -673,7 +679,7 @@ definition {
 			locator1 = "WC#ENTRY_LIST_TITLE");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test RescheduleAndCancelScheduledPublication {
 
 		// Wrokaround LPS-127348
@@ -710,7 +716,7 @@ definition {
 			value1 = "No publication has been scheduled yet.");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test RevertPublicationAndPublishNow {
 
 		// Wrokaround LPS-127348
@@ -777,7 +783,7 @@ definition {
 			value1 = "No web content was found.");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test SchedulePublication {
 
 		// Wrokaround LPS-127348
@@ -802,7 +808,7 @@ definition {
 
 		Publications.schedulePublication(publicationName = "Publication Name 1");
 
-		Pause(locator1 = "240000");
+		Pause(locator1 = 240000);
 
 		Publications.assertScheduledPublicationPublished(publicationName = "Publication Name 1");
 
@@ -826,7 +832,7 @@ definition {
 			gotoManagePublications = "true",
 			publicationName = "Publication Name 2");
 
-		Pause(locator1 = "240000");
+		Pause(locator1 = 240000);
 
 		Publications.assertScheduledPublicationPublished(publicationName = "Publication Name 2");
 
@@ -850,12 +856,12 @@ definition {
 			gotoReviewChanges = "true",
 			publicationName = "Publication Name 3");
 
-		Pause(locator1 = "240000");
+		Pause(locator1 = 240000);
 
 		Publications.assertScheduledPublicationPublished(publicationName = "Publication Name 3");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test SearchPublishedPublications {
 
 		// Wrokaround LPS-127348
@@ -876,7 +882,7 @@ definition {
 		Navigator.gotoNavTab(navTab = "Ongoing");
 
 		for (var publicationName : list "Apple,Banana,Cherry") {
-			Publications.search(publicationName = "${publicationName}");
+			Publications.search(publicationName = ${publicationName});
 		}
 
 		Navigator.openURL();
@@ -922,12 +928,12 @@ definition {
 		Navigator.gotoNavTab(navTab = "History");
 
 		for (var publicationName : list "Apple,Banana,Cherry") {
-			Publications.search(publicationName = "${publicationName}");
+			Publications.search(publicationName = ${publicationName});
 		}
 	}
 
 	@description = "This is a test for LPS-148488. Can view Published Publications items pagination and order on History Tab."
-	@priority = "4"
+	@priority = 4
 	test ViewPublicationsHistoryItemsPaginationAndOrder {
 		for (var count : list "1,2,3,4,5,6,7") {
 			JSONPublications.addPublication(publicationName = "Publication Name ${count}");
@@ -956,7 +962,7 @@ definition {
 
 		Pagination.viewResults(results = "Showing 1 to 7 of 7 entries.");
 
-		Pagination.changePagination(itemsPerPage = "4");
+		Pagination.changePagination(itemsPerPage = 4);
 
 		Pagination.viewResults(results = "Showing 1 to 4 of 7 entries.");
 

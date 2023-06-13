@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.product.service.persistence.impl;
 
+import com.liferay.commerce.product.exception.DuplicateCPAttachmentFileEntryExternalReferenceCodeException;
 import com.liferay.commerce.product.exception.NoSuchCPAttachmentFileEntryException;
 import com.liferay.commerce.product.model.CPAttachmentFileEntry;
 import com.liferay.commerce.product.model.CPAttachmentFileEntryTable;
@@ -5326,6 +5327,34 @@ public class CPAttachmentFileEntryPersistenceImpl
 
 			cpAttachmentFileEntry.setExternalReferenceCode(
 				cpAttachmentFileEntry.getUuid());
+		}
+		else {
+			CPAttachmentFileEntry ercCPAttachmentFileEntry = fetchByC_ERC(
+				cpAttachmentFileEntry.getCompanyId(),
+				cpAttachmentFileEntry.getExternalReferenceCode());
+
+			if (isNew) {
+				if (ercCPAttachmentFileEntry != null) {
+					throw new DuplicateCPAttachmentFileEntryExternalReferenceCodeException(
+						"Duplicate cp attachment file entry with external reference code " +
+							cpAttachmentFileEntry.getExternalReferenceCode() +
+								" and company " +
+									cpAttachmentFileEntry.getCompanyId());
+				}
+			}
+			else {
+				if ((ercCPAttachmentFileEntry != null) &&
+					(cpAttachmentFileEntry.getCPAttachmentFileEntryId() !=
+						ercCPAttachmentFileEntry.
+							getCPAttachmentFileEntryId())) {
+
+					throw new DuplicateCPAttachmentFileEntryExternalReferenceCodeException(
+						"Duplicate cp attachment file entry with external reference code " +
+							cpAttachmentFileEntry.getExternalReferenceCode() +
+								" and company " +
+									cpAttachmentFileEntry.getCompanyId());
+				}
+			}
 		}
 
 		ServiceContext serviceContext =

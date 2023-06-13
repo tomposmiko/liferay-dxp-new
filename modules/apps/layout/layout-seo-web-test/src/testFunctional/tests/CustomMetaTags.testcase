@@ -24,7 +24,7 @@ definition {
 	}
 
 	@description = "This ensures that the custom meta tag can be added with escape characters."
-	@priority = "3"
+	@priority = 3
 	test AddTagWithEscapeCharacters {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -48,7 +48,7 @@ definition {
 	}
 
 	@description = "This ensures that the custom meta tag can be cleared."
-	@priority = "5"
+	@priority = 5
 	test ClearCustomTag {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -80,7 +80,7 @@ definition {
 	}
 
 	@description = "This ensures that the custom meta tag can be edited."
-	@priority = "5"
+	@priority = 5
 	test EditTag {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -110,7 +110,7 @@ definition {
 	}
 
 	@description = "This ensures that users can add multiple translated custom meta tags."
-	@priority = "5"
+	@priority = 5
 	test ViewMultipleTranslatedTags {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -134,7 +134,7 @@ definition {
 			customContentsList = "custom Tag 1 content,custom Tag 2 content,custom Tag 3 content",
 			newCustomContent = "contenido de metaetiqueta personalizado");
 
-		CustomMetaTags.removeTag(tagNum = "2");
+		CustomMetaTags.removeTag(tagNum = 2);
 
 		User.logoutPG();
 
@@ -146,7 +146,7 @@ definition {
 	}
 
 	@description = "This ensures that the custom meta tag can not be generated without property or content."
-	@priority = "5"
+	@priority = 5
 	test ViewTagWithoutPropertyOrContent {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -204,7 +204,7 @@ definition {
 	}
 
 	@description = "This ensures that the translated tag inherits the default property and content."
-	@priority = "4"
+	@priority = 4
 	test ViewTranslatedTagWithDefaultValue {
 		var portalURL = PropsUtil.get("portal.url");
 

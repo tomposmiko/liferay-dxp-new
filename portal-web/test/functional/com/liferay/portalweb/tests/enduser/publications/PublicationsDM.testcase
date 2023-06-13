@@ -17,7 +17,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -30,7 +30,7 @@ definition {
 		}
 	}
 
-	@priority = "4"
+	@priority = 4
 	test CheckoutAndCheckinDocumentInPublication {
 
 		// Wrokaround LPS-127348
@@ -90,7 +90,7 @@ definition {
 		DMDocument.viewDocumentVersionNumberCmdPG(dmDocumentVersionNumber = "2.0");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test ConflictingPublicationsNeedManualResolution {
 
 		// Wrokaround LPS-127348
@@ -160,7 +160,7 @@ definition {
 
 		IFrame.closeFrame();
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		Publications.discardChanges(
 			changeCategory = "Asset",
@@ -175,7 +175,7 @@ definition {
 			dmDocumentVersionNumber = "1.1");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test DeleteDMFolderWithMultipleFiles {
 		property test.assert.warning.exceptions = "true";
 
@@ -201,7 +201,7 @@ definition {
 
 		PublicationsChanges.viewChangesViaChangesStyle(
 			changeCategory = "Documents Folder",
-			changeOrder = "3",
+			changeOrder = 3,
 			changeSite = "Guest",
 			changeTitle = "DM Folder 1 Name",
 			changeType = "Modified",
@@ -217,7 +217,7 @@ definition {
 
 		PublicationsChanges.viewChangesViaChangesStyle(
 			changeCategory = "Documents Folder",
-			changeOrder = "3",
+			changeOrder = 3,
 			changeSite = "Guest",
 			changeTitle = "DM Folder 1 Name",
 			changeType = "Modified",
@@ -244,7 +244,7 @@ definition {
 			changeUser = "Test Test");*/
 	}
 
-	@priority = "4"
+	@priority = 4
 	test PublishDocumentFolderWithEditedDocument {
 
 		// Wrokaround LPS-129546
@@ -337,7 +337,7 @@ definition {
 		DMDocument.viewCP(dmDocumentTitle = "DM Document Title Edit");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test PublishDocumentWithNewDocumentType {
 
 		// Wrokaround LPS-129546
@@ -423,7 +423,7 @@ definition {
 	}
 
 	@description = "Assert Shortcut can add within Publications and publish to production."
-	@priority = "4"
+	@priority = 4
 	test PublishWithShortcut {
 
 		// Wrokaround LPS-127348

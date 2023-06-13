@@ -19,7 +19,7 @@ definition {
 
 		Depot.remoteStagingSetUp(
 			depotName = "Test Depot Name",
-			remotePort = "9080",
+			remotePort = 9080,
 			remoteStaging = "true");
 
 		JSONGroup.addGroup(groupName = "Site Name");
@@ -29,7 +29,7 @@ definition {
 			layoutName = "Test Page");
 
 		Staging.remoteStagingSetUp(
-			remotePort = "9080",
+			remotePort = 9080,
 			remoteStaging = "true",
 			siteName = "Site Name");
 
@@ -47,7 +47,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -64,7 +64,7 @@ definition {
 	}
 
 	@description = "This ensures that image in basic article in depot can be deleted and republished in staging site when enabling remote staging."
-	@priority = "5"
+	@priority = 5
 	test DeleteImageInDepot {
 		property test.name.skip.portal.instance = "DepotRemoteStagingWC#DeleteImageInDepot";
 
@@ -104,7 +104,7 @@ definition {
 		Staging.publishToLive(remoteStaging = "true");
 
 		User.loginPG(
-			nodePort = "9080",
+			nodePort = 9080,
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
@@ -123,7 +123,7 @@ definition {
 			locator1 = "WCPreview#PREVIEW_IMAGE");
 
 		User.loginPG(
-			nodePort = "8080",
+			nodePort = 8080,
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
@@ -158,7 +158,7 @@ definition {
 			entry = "WC WebContent Title");
 
 		User.loginPG(
-			nodePort = "9080",
+			nodePort = 9080,
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
@@ -178,7 +178,7 @@ definition {
 	}
 
 	@description = "This ensures that friendly URL in basic article in depot can be edited and republished in staging site when enabling remote staging."
-	@priority = "5"
+	@priority = 5
 	test EditFriendlyURLInDepot {
 		property test.name.skip.portal.instance = "DepotRemoteStagingWC#EditFriendlyURLInDepot";
 
@@ -230,7 +230,7 @@ definition {
 		Staging.publishToLive(remoteStaging = "true");
 
 		User.loginPG(
-			nodePort = "9080",
+			nodePort = 9080,
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
@@ -242,7 +242,7 @@ definition {
 		WebContent.viewPGViaWCD(webContentContent = "Web Content Content");
 
 		User.loginPG(
-			nodePort = "8080",
+			nodePort = 8080,
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
@@ -283,7 +283,7 @@ definition {
 		Staging.publishToLive(remoteStaging = "true");
 
 		User.loginPG(
-			nodePort = "9080",
+			nodePort = 9080,
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
@@ -296,7 +296,7 @@ definition {
 	}
 
 	@description = "This ensures that image in basic article in depot can be edited and republished in staging site when enabling remote staging."
-	@priority = "5"
+	@priority = 5
 	test EditImageInDepot {
 		property portal.acceptance = "true";
 		property portal.upstream = "quarantine";
@@ -338,7 +338,7 @@ definition {
 		Staging.publishToLive(remoteStaging = "true");
 
 		User.loginPG(
-			nodePort = "9080",
+			nodePort = 9080,
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
@@ -357,7 +357,7 @@ definition {
 			locator1 = "WCPreview#PREVIEW_IMAGE");
 
 		User.loginPG(
-			nodePort = "8080",
+			nodePort = 8080,
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
@@ -380,7 +380,7 @@ definition {
 			entry = "WC WebContent Title");
 
 		User.loginPG(
-			nodePort = "9080",
+			nodePort = 9080,
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
@@ -400,7 +400,7 @@ definition {
 	}
 
 	@description = "This ensures that an article using a structure stored in depot can be deleted and republished in remote staging site."
-	@priority = "5"
+	@priority = 5
 	test PublishDeletedWCCustomization {
 		property test.name.skip.portal.instance = "DepotRemoteStagingWC#PublishDeletedWCCustomization";
 
@@ -477,7 +477,7 @@ definition {
 		Staging.publishToLive(remoteStaging = "true");
 
 		User.loginPG(
-			nodePort = "9080",
+			nodePort = 9080,
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
@@ -489,7 +489,7 @@ definition {
 	}
 
 	@description = "This ensures that an article using a structure stored in depot can be edited and republished in remote staging site."
-	@priority = "5"
+	@priority = 5
 	test PublishEditedWCCustomization {
 		property test.name.skip.portal.instance = "DepotRemoteStagingWC#PublishEditedWCCustomization";
 
@@ -553,7 +553,7 @@ definition {
 		Staging.publishToLive(remoteStaging = "true");
 
 		User.loginPG(
-			nodePort = "9080",
+			nodePort = 9080,
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
@@ -566,7 +566,7 @@ definition {
 			webContentTitle = "Web Content Title");
 
 		User.loginPG(
-			nodePort = "8080",
+			nodePort = 8080,
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
@@ -585,7 +585,7 @@ definition {
 			entry = "Web Content Title Edit");
 
 		User.loginPG(
-			nodePort = "9080",
+			nodePort = 9080,
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
@@ -599,7 +599,7 @@ definition {
 	}
 
 	@description = "This test covers LPS-122790. It ensures that web content with a category in depot can be published in remote staging site."
-	@priority = "4"
+	@priority = 4
 	test PublishWCWithCategory {
 		property test.name.skip.portal.instance = "DepotRemoteStagingWC#PublishWCWithCategory";
 
@@ -647,7 +647,7 @@ definition {
 		Staging.publishToLive(remoteStaging = "true");
 
 		User.loginPG(
-			nodePort = "9080",
+			nodePort = 9080,
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 
@@ -662,7 +662,7 @@ definition {
 	}
 
 	@description = "This ensures that a web content folder with an article in depot can be published in AP through widget config manual selection when enabling remote staging."
-	@priority = "5"
+	@priority = 5
 	test PublishWebContentFolder {
 		property test.name.skip.portal.instance = "DepotRemoteStagingWC#PublishWebContentFolder";
 
@@ -715,7 +715,7 @@ definition {
 		Staging.publishToLive(remoteStaging = "true");
 
 		User.loginPG(
-			nodePort = "9080",
+			nodePort = 9080,
 			password = "test",
 			userEmailAddress = "test@liferay.com");
 

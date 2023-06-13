@@ -23,7 +23,7 @@ definition {
 
 		ACUtils.tearDownDXP();
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -36,7 +36,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8504 | Test Summary: Segment Overview distribution filtered by boolean"
-	@priority = "3"
+	@priority = 3
 	test SegmentOverviewDistributionFilteredByBoolean {
 		property portal.upstream = "quarantine";
 
@@ -45,12 +45,12 @@ definition {
 		var nameList = "user1 user1,user2 user2";
 
 		task ("Add a new user") {
-			for (var user : list "${users}") {
+			for (var user : list ${users}) {
 				JSONUser.addUser(
 					userEmailAddress = "${user}@liferay.com",
-					userFirstName = "${user}",
-					userLastName = "${user}",
-					userScreenName = "${user}");
+					userFirstName = ${user},
+					userLastName = ${user},
+					userScreenName = ${user});
 			}
 		}
 
@@ -60,7 +60,7 @@ definition {
 
 		task ("View AC Page as new user") {
 			ACUtils.navigateToSitePageWithUser(
-				emailList = "${emailList}",
+				emailList = ${emailList},
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -68,7 +68,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = "${propertyName}");
+			ACProperties.switchProperty(propertyName = ${propertyName});
 		}
 
 		task ("Add a CSV Data Source") {
@@ -92,7 +92,7 @@ definition {
 		}
 
 		task ("Add new user as member") {
-			ACSegments.addStaticMultiMember(tableMember = "${nameList}");
+			ACSegments.addStaticMultiMember(tableMember = ${nameList});
 
 			ACSegments.saveSegment();
 		}
@@ -117,7 +117,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8505 | Test Summary: Segment Overview distribution filtered by date"
-	@priority = "3"
+	@priority = 3
 	test SegmentOverviewDistributionFilteredByDate {
 		property portal.upstream = "quarantine";
 
@@ -127,9 +127,9 @@ definition {
 
 		task ("Create two new users") {
 			JSONUser.addUser(
-				birthdayDay = "15",
-				birthdayMonth = "2",
-				birthdayYear = "1972",
+				birthdayDay = 15,
+				birthdayMonth = 2,
+				birthdayYear = 1972,
 				userEmailAddress = "ac1@liferay.com",
 				userFirstName = "ac1",
 				userLastName = "ac1",
@@ -148,7 +148,7 @@ definition {
 
 		task ("View AC Page as new user") {
 			ACUtils.navigateToSitePageWithUser(
-				emailList = "${emailList}",
+				emailList = ${emailList},
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -156,7 +156,7 @@ definition {
 		task ("Close all sessions, lauch AC, change the property and go to segments") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = "${propertyName}");
+			ACProperties.switchProperty(propertyName = ${propertyName});
 
 			ACNavigation.goToSegments();
 		}
@@ -166,7 +166,7 @@ definition {
 
 			ACUtils.setItemName(itemName = "Static Segment Test");
 
-			ACSegments.addStaticMultiMember(tableMember = "${nameList}");
+			ACSegments.addStaticMultiMember(tableMember = ${nameList});
 
 			ACSegments.saveSegment();
 		}
@@ -186,19 +186,19 @@ definition {
 		task ("View chart entry") {
 			ACIndividualsDashboard.viewBreakdownRecharts(
 				fillColor = "#4B9BFF",
-				index = "1",
+				index = 1,
 				tick = "1972-03-15T00:00:00.000Z");
 
 			ACIndividualsDashboard.viewBreakdownRecharts(
 				fillColor = "#4B9BFF",
-				index = "2",
+				index = 2,
 				tick = "1986-05-31T00:00:00.000Z");
 		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8506 | Test Summary: Segment Overview distribution filtered by number"
 	@ignore = "true"
-	@priority = "3"
+	@priority = 3
 	test SegmentOverviewDistributionFilteredByNumber {
 		property portal.upstream = "quarantine";
 
@@ -214,12 +214,12 @@ definition {
 		}
 
 		task ("Add a new user") {
-			for (var user : list "${users}") {
+			for (var user : list ${users}) {
 				JSONUser.addUser(
 					userEmailAddress = "${user}@liferay.com",
-					userFirstName = "${user}",
-					userLastName = "${user}",
-					userScreenName = "${user}");
+					userFirstName = ${user},
+					userLastName = ${user},
+					userScreenName = ${user});
 			}
 		}
 
@@ -229,7 +229,7 @@ definition {
 
 		task ("View AC Page as new user") {
 			ACUtils.navigateToSitePageWithUser(
-				emailList = "${emailList}",
+				emailList = ${emailList},
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -237,7 +237,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = "${propertyName}");
+			ACProperties.switchProperty(propertyName = ${propertyName});
 		}
 
 		task ("Add a CSV Data Source") {
@@ -265,7 +265,7 @@ definition {
 		}
 
 		task ("Add new user as member") {
-			ACSegments.addStaticMultiMember(tableMember = "${nameList}");
+			ACSegments.addStaticMultiMember(tableMember = ${nameList});
 
 			ACSegments.saveSegment();
 		}
@@ -279,7 +279,7 @@ definition {
 		task ("Filter Attribute") {
 			ACSegments.addBreakdownByAttribute(
 				attribute = "age",
-				binsAmount = "10",
+				binsAmount = 10,
 				breakdownName = "AC Breakdown Test");
 		}
 
@@ -287,7 +287,7 @@ definition {
 
 			// Graphic does not show up on the screen.
 
-			for (var user : list "${users}") {
+			for (var user : list ${users}) {
 				ACIndividualsDashboard.viewBreakdownRecharts(
 					fillColor = "#4B9BFF",
 					tick = "${user} - 50.0%");
@@ -296,7 +296,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8507 | Test Summary: Segment Overview distribution filtered by text"
-	@priority = "3"
+	@priority = 3
 	test SegmentOverviewDistributionFilteredByText {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 
@@ -313,13 +313,13 @@ definition {
 		}
 
 		task ("Add two new users") {
-			for (var name : list "${users}") {
+			for (var name : list ${users}) {
 				JSONUser.addUser(
 					jobTitle = "QA",
 					userEmailAddress = "${name}@liferay.com",
-					userFirstName = "${name}",
-					userLastName = "${name}",
-					userScreenName = "${name}");
+					userFirstName = ${name},
+					userLastName = ${name},
+					userScreenName = ${name});
 
 				JSONUser.setFirstPassword(
 					agreeToTermsAndAnswerReminderQuery = "true",
@@ -332,7 +332,7 @@ definition {
 
 		task ("View AC Page as new user") {
 			ACUtils.navigateToSitePageWithUser(
-				emailList = "${emailList}",
+				emailList = ${emailList},
 				pageName = "AC Page",
 				siteName = "Site Name");
 		}
@@ -340,7 +340,7 @@ definition {
 		task ("Switch to new property in AC") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = "${propertyName}");
+			ACProperties.switchProperty(propertyName = ${propertyName});
 		}
 
 		task ("Add a new static segment") {
@@ -354,7 +354,7 @@ definition {
 		}
 
 		task ("Add new user as member") {
-			ACSegments.addStaticMultiMember(tableMember = "${nameList}");
+			ACSegments.addStaticMultiMember(tableMember = ${nameList});
 
 			ACSegments.saveSegment();
 		}

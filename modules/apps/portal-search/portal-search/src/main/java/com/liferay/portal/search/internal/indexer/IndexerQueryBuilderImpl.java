@@ -174,7 +174,7 @@ public class IndexerQueryBuilderImpl<T extends BaseModel<?>>
 
 	protected void contributeSearchContext(SearchContext searchContext) {
 		SearchContextContributorHelper searchContextContributorHelper =
-			() -> _modelSearchSettings.getSearchClassNames();
+			_modelSearchSettings::getSearchClassNames;
 
 		_searchContextContributors.forEach(
 			searchContextContributor -> searchContextContributor.contribute(

@@ -14,6 +14,7 @@
 
 package com.liferay.search.experiences.service.impl;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.ResourceConstants;
@@ -26,6 +27,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.search.experiences.exception.DuplicateSXPElementExternalReferenceCodeException;
 import com.liferay.search.experiences.exception.SXPElementTitleException;
@@ -194,11 +196,18 @@ public class SXPElementLocalServiceImpl extends SXPElementLocalServiceBaseImpl {
 			long companyId, String externalReferenceCode)
 		throws PortalException {
 
+		if (Validator.isNull(externalReferenceCode)) {
+			return;
+		}
+
 		SXPElement sxpElement = fetchSXPElementByExternalReferenceCode(
 			companyId, externalReferenceCode);
 
 		if (sxpElement != null) {
-			throw new DuplicateSXPElementExternalReferenceCodeException();
+			throw new DuplicateSXPElementExternalReferenceCodeException(
+				StringBundler.concat(
+					"Duplicate element external reference code ",
+					externalReferenceCode, " in company ", companyId));
 		}
 	}
 

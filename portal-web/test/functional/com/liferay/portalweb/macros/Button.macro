@@ -2,7 +2,7 @@ definition {
 
 	macro click {
 		Click.mouseDownMouseUp(
-			key_text = "${button}",
+			key_text = ${button},
 			locator1 = "Button#ANY");
 	}
 
@@ -72,11 +72,13 @@ definition {
 
 	macro clickNoError {
 		ClickNoError.mouseDownMouseUp(
-			key_text = "${button}",
+			key_text = ${button},
 			locator1 = "Button#ANY");
 	}
 
 	macro clickPublish {
+		SelectFrameTop();
+
 		ScrollWebElementIntoView(
 			key_text = "Publish",
 			locator1 = "Button#ANY");
@@ -128,13 +130,13 @@ definition {
 
 	macro viewNotPresent {
 		AssertElementNotPresent(
-			key_text = "${button}",
+			key_text = ${button},
 			locator1 = "Button#ANY");
 	}
 
 	macro viewPresent {
 		AssertElementPresent(
-			key_text = "${button}",
+			key_text = ${button},
 			locator1 = "Button#ANY");
 	}
 

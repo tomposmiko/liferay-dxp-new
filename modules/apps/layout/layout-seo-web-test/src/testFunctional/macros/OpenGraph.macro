@@ -2,11 +2,11 @@ definition {
 
 	macro changeLocale {
 		Click.clickNoMouseOver(
-			key_fieldName = "${fieldName}",
+			key_fieldName = ${fieldName},
 			locator1 = "Button#LOCALIZATION_OPEN_GRAPH");
 
 		Click(
-			key_locale = StringUtil.replace("${locale}", "-", "_"),
+			key_locale = StringUtil.replace(${locale}, "-", "_"),
 			locator1 = "Translation#LOCALIZATION_NAME");
 	}
 
@@ -20,7 +20,7 @@ definition {
 
 			Type(
 				locator1 = "TextInput#OPEN_GRAPH_CUSTOM_TITLE",
-				value1 = "${customTitle}");
+				value1 = ${customTitle});
 		}
 
 		if (isSet(customDescription)) {
@@ -33,11 +33,11 @@ definition {
 			Type(
 				key_text = "openGraphDescription",
 				locator1 = "TextArea#ANY",
-				value1 = "${customDescription}");
+				value1 = ${customDescription});
 		}
 
 		if (isSet(customImage)) {
-			var key_uploadFileName = "${uploadFileName}";
+			var key_uploadFileName = ${uploadFileName};
 
 			AssertElementPresent.pauseAssertVisible(locator1 = "Button#SELECT_OPEN_GRAPH_IMAGE");
 
@@ -45,22 +45,22 @@ definition {
 
 			SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
-			Pause(locator1 = "3000");
+			Pause(locator1 = 3000);
 
 			AssertElementPresent(locator1 = "ItemSelector#SELECT_FILE_UPLOAD_IMAGE");
 
 			if (isSet(depotName)) {
 				ItemSelector.selectRepositoryImage(
-					customImage = "${customImage}",
-					depotName = "${depotName}",
-					imageFileName = "${uploadFileName}");
+					customImage = ${customImage},
+					depotName = ${depotName},
+					imageFileName = ${uploadFileName});
 			}
 			else {
 				UploadCommonFile.uploadCommonFileHiddenNoMouseOver(
 					locator1 = "TextInput#FILE",
-					value1 = "${uploadFileName}");
+					value1 = ${uploadFileName});
 
-				Pause(locator1 = "2000");
+				Pause(locator1 = 2000);
 
 				AssertElementPresent.pauseAssertVisible(
 					locator1 = "ItemSelector#ADD_BUTTON",
@@ -76,18 +76,20 @@ definition {
 			if (isSet(altDescription)) {
 				Type(
 					locator1 = "TextInput#OPEN_GRAPH_IMAGE_ALT_DESCRIPTION",
-					value1 = "${altDescription}");
+					value1 = ${altDescription});
 			}
 		}
 
 		if (!(isSet(dontSave))) {
+			SelectFrameTop();
+
 			Button.click(button = "Save");
 
 			if (isSet(customImage)) {
 				AssertTextEquals(
-					key_dmDocumentURL = "${uploadFileName}",
+					key_dmDocumentURL = ${uploadFileName},
 					locator1 = "TextInput#OPEN_GRAPH_CUSTOM_IMAGE_INPUT",
-					value1 = "${uploadFileName}");
+					value1 = ${uploadFileName});
 			}
 		}
 	}
@@ -112,16 +114,16 @@ definition {
 
 	macro mapEditableTextToField {
 		Click(
-			key_mappedField = "${mappedField}",
+			key_mappedField = ${mappedField},
 			locator1 = "PageEditor#EDITABLE_FIELD_TOOLBAR_MAP_BUTTON_SPECIFIC");
 
 		Select(
 			key_fieldLabel = "Field",
 			locator1 = "Select#GENERIC_SELECT_FIELD",
-			value1 = "${field}");
+			value1 = ${field});
 
 		Click(
-			key_mappedField = "${mappedField}",
+			key_mappedField = ${mappedField},
 			locator1 = "PageEditor#EDITABLE_FIELD_TOOLBAR_MAP_BUTTON_SPECIFIC");
 	}
 
@@ -170,31 +172,31 @@ definition {
 
 	macro viewMappedField {
 		AssertTextEquals(
-			key_mappedField = "${mappedField}",
+			key_mappedField = ${mappedField},
 			locator1 = "TextInput#SEO_MAPPED_FIELD",
-			value1 = "${mappedFieldValue}");
+			value1 = ${mappedFieldValue});
 
-		if ("${mappedFieldValue}" == "-- Unmapped --") {
+		if (${mappedFieldValue} == "-- Unmapped --") {
 			AssertElementPresent(
-				key_mappedField = "${mappedField}",
+				key_mappedField = ${mappedField},
 				locator1 = "PageEditor#EDITABLE_FIELD_TOOLBAR_UNMAPPED_BUTTON");
 		}
 		else {
 			AssertElementPresent(
-				key_mappedField = "${mappedField}",
+				key_mappedField = ${mappedField},
 				locator1 = "PageEditor#EDITABLE_FIELD_TOOLBAR_MAPPED_BUTTON");
 		}
 	}
 
 	macro viewNoOpenGraphProperties {
-		for (var ogProperty : list "${ogPropertyList}") {
-			AssertHTMLSourceTextNotPresent(value1 = "${ogProperty}");
+		for (var ogProperty : list ${ogPropertyList}) {
+			AssertHTMLSourceTextNotPresent(value1 = ${ogProperty});
 		}
 	}
 
 	macro viewOpenGraphProperties {
-		for (var ogProperty : list "${ogPropertyList}") {
-			AssertHTMLSourceTextPresent(value1 = "${ogProperty}");
+		for (var ogProperty : list ${ogPropertyList}) {
+			AssertHTMLSourceTextPresent(value1 = ${ogProperty});
 		}
 	}
 

@@ -21,7 +21,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -30,7 +30,7 @@ definition {
 	}
 
 	@description = "This makes sure that the user can edit OG image tag."
-	@priority = "5"
+	@priority = 5
 	test ChangeImageTag {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -62,7 +62,7 @@ definition {
 	}
 
 	@description = "This makes sure that the user can change the default image for OpenGraph at the site level."
-	@priority = "5"
+	@priority = 5
 	test ChangeSiteImage {
 		property portal.acceptance = "true";
 
@@ -108,7 +108,7 @@ definition {
 	}
 
 	@description = "This makes sure that the previously added image can be cleared at the page level."
-	@priority = "5"
+	@priority = 5
 	test ClearImageAtPageLevel {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -166,7 +166,7 @@ definition {
 	}
 
 	@description = "This makes sure that it will apply the OG image of the page when images are set at both the site level and the page level."
-	@priority = "5"
+	@priority = 5
 	test ClearImageAtSiteLevel {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -182,7 +182,7 @@ definition {
 			customImage = "true",
 			uploadFileName = "Document_1.jpg");
 
-		Pause(locator1 = "1000");
+		Pause(locator1 = 1000);
 
 		AssertVisible(
 			key_imageName = "Document_1.jpg",
@@ -236,7 +236,7 @@ definition {
 	}
 
 	@description = "This ensures that the OG image alt description configuration at page level overrides its configuration at the site level."
-	@priority = "4"
+	@priority = 4
 	test ConfigurePageSpecificAltDescription {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -282,7 +282,7 @@ definition {
 	}
 
 	@description = "This makes sure that it will apply the OG image of the page when images are set at both the site level and the page level."
-	@priority = "5"
+	@priority = 5
 	test ConfigurePageSpecificImage {
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -342,7 +342,7 @@ definition {
 	}
 
 	@description = "This ensures that the OG image tags will not appear when the HTTPS user disables Open Graph."
-	@priority = "5"
+	@priority = 5
 	test DisableAfterAddingImage {
 		property test.name.skip.portal.instance = "OpenGraphImages#DisableAfterAddingImage";
 
@@ -386,7 +386,7 @@ definition {
 	}
 
 	@description = "This ensures that users can introduce an alternative text for the image."
-	@priority = "5"
+	@priority = 5
 	test EditAltDescription {
 		property portal.acceptance = "true";
 
@@ -423,7 +423,7 @@ definition {
 	}
 
 	@description = "This ensures that the HTTPS users can customize OG image tags and generate special tags."
-	@priority = "5"
+	@priority = 5
 	test ViewImageWithMetaTags {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "OpenGraphImages#ViewImageWithMetaTags";
@@ -454,7 +454,7 @@ definition {
 	}
 
 	@description = "This ensures that the users can introduce an alternative text with translated language for the image."
-	@priority = "4"
+	@priority = 4
 	test ViewTranslatedAltDescription {
 		var portalURL = PropsUtil.get("portal.url");
 

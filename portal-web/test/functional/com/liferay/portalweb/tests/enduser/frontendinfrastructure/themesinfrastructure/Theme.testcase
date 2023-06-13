@@ -13,7 +13,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 
@@ -28,7 +28,7 @@ definition {
 	}
 
 	@description = "This test validates that a theme can be applied to a single page."
-	@priority = "5"
+	@priority = 5
 	test ApplyThemeToSinglePage {
 		property test.name.skip.portal.instance = "Theme#ApplyThemeToSinglePage";
 
@@ -56,7 +56,7 @@ definition {
 		Theme.viewTestThemeBackgroundColor();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test DeactivateAndReactivateTheme {
 		property test.name.skip.portal.instance = "Theme#DeactivateAndReactivateTheme";
 
@@ -91,9 +91,9 @@ definition {
 			panel = "Control Panel",
 			portlet = "App Manager");
 
-		Search.searchCP(searchTerm = "${appName}");
+		Search.searchCP(searchTerm = ${appName});
 
-		AppManager.deactivateAppCP(appName = "${appName}");
+		AppManager.deactivateAppCP(appName = ${appName});
 
 		AssertConsoleTextPresent(value1 = "STOPPED test-theme_1.0.0");
 
@@ -115,9 +115,9 @@ definition {
 			panel = "Control Panel",
 			portlet = "App Manager");
 
-		Search.searchCP(searchTerm = "${appName}");
+		Search.searchCP(searchTerm = ${appName});
 
-		AppManager.activateAppCP(appName = "${appName}");
+		AppManager.activateAppCP(appName = ${appName});
 
 		Navigator.openSitePage(
 			pageName = "Theme Test Page",
@@ -131,7 +131,7 @@ definition {
 			themeName = "test-theme-7-3");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test StartPortalWithoutClassicTheme {
 		property skip.start-app-server = "true";
 		property test.name.skip.portal.instance = "Theme#StartPortalWithoutClassicTheme";
@@ -159,7 +159,7 @@ definition {
 		takeScreenshot();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test UninstallAndRedeployTheme {
 		property test.name.skip.portal.instance = "Theme#UninstallAndRedeployTheme";
 
@@ -194,9 +194,9 @@ definition {
 			panel = "Control Panel",
 			portlet = "App Manager");
 
-		Search.searchCP(searchTerm = "${appName}");
+		Search.searchCP(searchTerm = ${appName});
 
-		AppManager.uninstallAppCP(appName = "${appName}");
+		AppManager.uninstallAppCP(appName = ${appName});
 
 		AssertConsoleTextPresent(value1 = "Stopping blacklisted bundle test-theme_1.0.0");
 
@@ -223,7 +223,7 @@ definition {
 
 		FileInstall.deployFileOnServer(liferayDependencyJars = "${appName}.war");
 
-		Pause(locator1 = "30000");
+		Pause(locator1 = 30000);
 
 		Navigator.openSitePage(
 			pageName = "Theme Test Page",

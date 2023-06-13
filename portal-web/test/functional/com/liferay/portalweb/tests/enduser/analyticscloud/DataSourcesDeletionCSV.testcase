@@ -19,7 +19,7 @@ definition {
 
 		ACUtils.tearDownDXP();
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 
@@ -27,7 +27,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8155 | Test Summary: Delete a CSV data source and assert that the details from that data source are removed"
-	@priority = "5"
+	@priority = 5
 	test DeleteCSVDataSourceAndAssertDetailsFromDataSourceRemoved {
 		task ("Add a CSV Data Source") {
 			ACSettings.addCSVDataSource(

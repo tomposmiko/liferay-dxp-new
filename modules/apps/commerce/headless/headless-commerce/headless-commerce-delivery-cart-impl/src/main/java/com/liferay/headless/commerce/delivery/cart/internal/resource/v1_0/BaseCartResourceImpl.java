@@ -988,7 +988,9 @@ public abstract class BaseCartResourceImpl
 						permission = _toPermission(
 							resourceActions, resourcePermission, role);
 
-						permissions.put(role.getName(), permission);
+						if (permission != null) {
+							permissions.put(role.getName(), permission);
+						}
 					}
 					else {
 						Set<String> actionsIdsSet = new HashSet<>();
@@ -1027,6 +1029,10 @@ public abstract class BaseCartResourceImpl
 			if ((actionIds & bitwiseValue) == bitwiseValue) {
 				actionsIdsSet.add(resourceAction.getActionId());
 			}
+		}
+
+		if (actionsIdsSet.isEmpty()) {
+			return null;
 		}
 
 		return new Permission() {

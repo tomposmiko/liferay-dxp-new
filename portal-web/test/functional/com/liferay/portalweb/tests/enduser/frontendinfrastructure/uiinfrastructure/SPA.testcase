@@ -14,12 +14,12 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 	}
 
-	@priority = "5"
+	@priority = 5
 	test AssertLoadingBar {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "SPA#AssertLoadingBar";
@@ -34,7 +34,7 @@ definition {
 	}
 
 	@description = "This test validates disable SPA in IE11"
-	@priority = "5"
+	@priority = 5
 	test CheckIE11DisableSPA {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "SPA#CheckIE11DisableSPA";
@@ -50,7 +50,7 @@ definition {
 			configurationScope = "System Scope");
 
 		for (var fieldName : list "Disable SPA in Internet Explorer,Disable SPA in Internet Explorer 11") {
-			FormFields.disableCheckbox(fieldName = "${fieldName}");
+			FormFields.disableCheckbox(fieldName = ${fieldName});
 		}
 
 		SystemSettings.saveConfiguration();
@@ -66,7 +66,7 @@ definition {
 
 		var browserType = PropsUtil.get("browser.type");
 
-		if ("${browserType}" == "internetexplorer") {
+		if (${browserType} == "internetexplorer") {
 			Navigator.openURL();
 
 			ProductMenu.gotoPortlet(

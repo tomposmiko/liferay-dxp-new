@@ -9,14 +9,14 @@ definition {
 		if (isSet(siteTemplateName)) {
 			Site.addCP(
 				membershipType = "Private",
-				siteName = "${siteName}",
-				siteTemplateName = "${siteTemplateName}");
+				siteName = ${siteName},
+				siteTemplateName = ${siteTemplateName});
 		}
 		else {
 			Site.addCP(
 				membershipType = "Private",
-				siteName = "${siteName}",
-				siteTemplateName = "${siteName}");
+				siteName = ${siteName},
+				siteTemplateName = ${siteName});
 		}
 	}
 

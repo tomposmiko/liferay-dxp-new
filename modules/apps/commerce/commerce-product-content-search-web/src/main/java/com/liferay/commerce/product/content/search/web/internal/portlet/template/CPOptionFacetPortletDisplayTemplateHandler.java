@@ -31,7 +31,6 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -39,8 +38,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.commerce.product.content.search.web.internal.configuration.CPOptionFacetsPortletInstanceConfiguration",
-	configurationPolicy = ConfigurationPolicy.OPTIONAL, enabled = false,
-	immediate = true,
+	enabled = false, immediate = true,
 	property = "javax.portlet.name=" + CPPortletKeys.CP_OPTION_FACETS,
 	service = TemplateHandler.class
 )

@@ -25,7 +25,7 @@ definition {
 
 		ACUtils.tearDownDXP();
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -37,7 +37,7 @@ definition {
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8370 | Test Summary: 180 Days time period filter in Interests List"
 	@ignore = "true"
-	@priority = "3"
+	@priority = 3
 	test CanTimeFilterUse180DaysInInterestsList {
 		property portal.upstream = "quarantine";
 
@@ -65,7 +65,7 @@ definition {
 		}
 
 		task ("Navigate to Interests tab in Sites") {
-			ACProperties.switchProperty(propertyName = "${propertyName}");
+			ACProperties.switchProperty(propertyName = ${propertyName});
 
 			ACNavigation.goToSites();
 
@@ -96,7 +96,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8372 | Test Summary: Custom Range time period filter in Interests List"
-	@priority = "5"
+	@priority = 5
 	test CanTimeFilterUseCustomRangeInInterestsList {
 		property portal.upstream = "quarantine";
 
@@ -124,7 +124,7 @@ definition {
 		}
 
 		task ("Navigate to Interests tab in Sites") {
-			ACProperties.switchProperty(propertyName = "${propertyName}");
+			ACProperties.switchProperty(propertyName = ${propertyName});
 
 			ACNavigation.goToSites();
 
@@ -142,12 +142,12 @@ definition {
 
 		task ("Set time filter use Custom Range") {
 			ACTimeFilter.setCustomRange(
-				endDay = "13",
+				endDay = 13,
 				endMonth = "July",
-				endYear = "2020",
-				startDay = "1",
+				endYear = 2020,
+				startDay = 1,
 				startMonth = "July",
-				startYear = "2020");
+				startYear = 2020);
 		}
 
 		task ("Assert result returns") {
@@ -160,7 +160,7 @@ definition {
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8371 | Test Summary: Last Year time period filter in Interests List"
 	@ignore = "true"
-	@priority = "3"
+	@priority = 3
 	test CanTimeFilterUseLastYearInInterestsList {
 		property portal.upstream = "quarantine";
 
@@ -188,7 +188,7 @@ definition {
 		}
 
 		task ("Navigate to Interests tab in Sites") {
-			ACProperties.switchProperty(propertyName = "${propertyName}");
+			ACProperties.switchProperty(propertyName = ${propertyName});
 
 			ACNavigation.goToSites();
 

@@ -1,64 +1,64 @@
 definition {
 
 	macro addOrganization {
-		Variables.assertDefined(parameterList = "${organizationName}");
+		Variables.assertDefined(parameterList = ${organizationName});
 
 		if (isSet(parentOrganizationName)) {
-			var parentOrganizationId = JSONOrganization.getOrganizationIdByName(organizationName = "${parentOrganizationName}");
+			var parentOrganizationId = JSONOrganization.getOrganizationIdByName(organizationName = ${parentOrganizationName});
 		}
 
 		JSONOrganizationAPI._addOrganization(
-			organizationName = "${organizationName}",
-			organizationSite = "${organizationSite}",
-			organizationType = "${organizationType}",
-			parentOrganizationId = "${parentOrganizationId}");
+			organizationName = ${organizationName},
+			organizationSite = ${organizationSite},
+			organizationType = ${organizationType},
+			parentOrganizationId = ${parentOrganizationId});
 	}
 
 	macro addOrganizationToDepot {
 		Variables.assertDefined(parameterList = "${organizationName},${depotName}");
 
-		var organizationId = JSONOrganization.getOrganizationIdByName(organizationName = "${organizationName}");
+		var organizationId = JSONOrganization.getOrganizationIdByName(organizationName = ${organizationName});
 		var depotId = JSONUserSetter.setGroupId(
-			groupName = "${depotName}",
+			groupName = ${depotName},
 			site = "false");
 
 		JSONOrganizationAPI._addOrganizationToSite(
-			groupId = "${depotId}",
-			organizationId = "${organizationId}");
+			groupId = ${depotId},
+			organizationId = ${organizationId});
 	}
 
 	macro addOrganizationToSite {
 		Variables.assertDefined(parameterList = "${organizationName},${siteName}");
 
-		var organizationId = JSONOrganization.getOrganizationIdByName(organizationName = "${organizationName}");
-		var groupId = JSONUserSetter.setGroupId(groupName = "${siteName}");
+		var organizationId = JSONOrganization.getOrganizationIdByName(organizationName = ${organizationName});
+		var groupId = JSONUserSetter.setGroupId(groupName = ${siteName});
 
 		JSONOrganizationAPI._addOrganizationToSite(
-			groupId = "${groupId}",
-			organizationId = "${organizationId}");
+			groupId = ${groupId},
+			organizationId = ${organizationId});
 	}
 
 	macro assignUserToOrganization {
 		Variables.assertDefined(parameterList = "${organizationName},${userEmailAddress}");
 
-		var organizationId = JSONOrganization.getOrganizationIdByName(organizationName = "${organizationName}");
-		var userId = JSONUserAPI._getUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+		var organizationId = JSONOrganization.getOrganizationIdByName(organizationName = ${organizationName});
+		var userId = JSONUserAPI._getUserIdByEmailAddress(userEmailAddress = ${userEmailAddress});
 
 		JSONOrganizationAPI._assignUserToOrganization(
-			organizationId = "${organizationId}",
-			userId = "${userId}");
+			organizationId = ${organizationId},
+			userId = ${userId});
 	}
 
 	macro deleteOrganizationByName {
-		Variables.assertDefined(parameterList = "${organizationName}");
+		Variables.assertDefined(parameterList = ${organizationName});
 
-		var organizationId = JSONOrganization.getOrganizationIdByName(organizationName = "${organizationName}");
+		var organizationId = JSONOrganization.getOrganizationIdByName(organizationName = ${organizationName});
 
-		JSONOrganizationAPI._deleteOrganization(organizationId = "${organizationId}");
+		JSONOrganizationAPI._deleteOrganization(organizationId = ${organizationId});
 	}
 
 	macro getOrganizationIdByName {
-		Variables.assertDefined(parameterList = "${organizationName}");
+		Variables.assertDefined(parameterList = ${organizationName});
 
 		var companyId = JSONCompany.getCompanyId();
 		var portalURL = JSONCompany.getPortalURL();
@@ -68,17 +68,17 @@ definition {
 				-u test@liferay.com:test
 		''';
 
-		var organizationId = JSONCurlUtil.get("${curl}", "$.[?(@['name'] == '${organizationName}')]['organizationId']");
+		var organizationId = JSONCurlUtil.get(${curl}, "$.[?(@['name'] == '${organizationName}')]['organizationId']");
 
-		var organizationId = StringUtil.replace("${organizationId}", "[\"", "");
+		var organizationId = StringUtil.replace(${organizationId}, "[\"", "");
 
-		var organizationId = StringUtil.replace("${organizationId}", "\"]", "");
+		var organizationId = StringUtil.replace(${organizationId}, "\"]", "");
 
-		return "${organizationId}";
+		return ${organizationId};
 	}
 
 	macro getOrganizationName {
-		Variables.assertDefined(parameterList = "${organizationId}");
+		Variables.assertDefined(parameterList = ${organizationId});
 
 		var portalURL = JSONCompany.getPortalURL();
 
@@ -87,9 +87,9 @@ definition {
 				-u test@liferay.com:test
 		''';
 
-		var organizationName = JSONCurlUtil.get("${curl}", "$['name']");
+		var organizationName = JSONCurlUtil.get(${curl}, "$['name']");
 
-		return "${organizationName}";
+		return ${organizationName};
 	}
 
 }

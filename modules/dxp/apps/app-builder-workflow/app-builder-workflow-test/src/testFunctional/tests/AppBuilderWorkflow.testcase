@@ -36,13 +36,13 @@ definition {
 
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 	}
 
 	@description = "LRQA-60330 - LPS-112434: As an App Admin, I want to deploy an App having different Form Views of the same Data Object for each Step"
-	@priority = "5"
+	@priority = 5
 	test AddDifferentFormViewsForEachStep {
 		property portal.acceptance = "true";
 
@@ -81,12 +81,12 @@ definition {
 
 		AppBuilderWorkflow.selectStepAssignee(
 			assignee = "Administrator",
-			step = "1");
+			step = 1);
 
 		AppBuilderWorkflow.selectStepSingleFormView(
 			formViewMode = "Read Only",
 			formViewName = "My Form View 2",
-			step = "1");
+			step = 1);
 
 		AppBuilderWorkflow.addWorkflowAppName(workflowAppName = "My Workflow App");
 
@@ -130,7 +130,7 @@ definition {
 	}
 
 	@description = "LRQA-60347 - Automate LPS-112665: As an App Admin, I want to define more than one Form View for one same step (concatenation of Forms)"
-	@priority = "5"
+	@priority = 5
 	test AddTwoFormViewsForOneStep {
 		property portal.acceptance = "true";
 
@@ -169,13 +169,13 @@ definition {
 
 		AppBuilderWorkflow.selectStepAssignee(
 			assignee = "Administrator",
-			step = "1");
+			step = 1);
 
 		AppBuilderWorkflow.selectDataAndViewsCard();
 
 		AppBuilderWorkflow.addNewFormView();
 
-		AppBuilderWorkflow.clickOnSelectFormView(positionNumber = "2");
+		AppBuilderWorkflow.clickOnSelectFormView(positionNumber = 2);
 
 		AppBuilderWorkflow.selectFormView(formViewName = "My Form View 2");
 
@@ -217,7 +217,7 @@ definition {
 	}
 
 	@description = "Assign an entry (task) through the App's table view"
-	@priority = "5"
+	@priority = 5
 	test AssignEntryThroughTableView {
 		property portal.acceptance = "true";
 
@@ -271,7 +271,7 @@ definition {
 	}
 
 	@description = "Create a Basic Workflow App"
-	@priority = "5"
+	@priority = 5
 	test CreateBasicWorkflowApp {
 		property environment.acceptance = "true";
 		property operating.system.types = "alpine,amazonlinux,centos,debian,fedora,orcllinux,osx,redhat,solaris,suse,ubuntu,windows";
@@ -332,7 +332,7 @@ definition {
 	}
 
 	@description = "Create a Basic Workflow App with different deployment options"
-	@priority = "4"
+	@priority = 4
 	test CreateBasicWorkflowAppWithDifferentDeployments {
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "my custom object 1",
@@ -397,7 +397,7 @@ definition {
 
 		AppBuilderWorkflow.selectObject(objectName = "my custom object 1");
 
-		AppBuilderWorkflow.clickOnSelectFormView(positionNumber = "1");
+		AppBuilderWorkflow.clickOnSelectFormView(positionNumber = 1);
 
 		AppBuilderAppAdmin.searchItem(itemName = "My Form View 1");
 
@@ -425,7 +425,7 @@ definition {
 
 		AppBuilderWorkflow.selectObject(objectName = "my custom object 2");
 
-		AppBuilderWorkflow.clickOnSelectFormView(positionNumber = "1");
+		AppBuilderWorkflow.clickOnSelectFormView(positionNumber = 1);
 
 		AppBuilderWorkflow.validateFormOrTableViewResultPresent(itemName = "My Form View From Object 2");
 
@@ -469,7 +469,7 @@ definition {
 
 		AppBuilderWorkflow.assertButtonDisabled(buttonName = "Save");
 
-		AppBuilderWorkflow.clickOnSelectFormView(positionNumber = "1");
+		AppBuilderWorkflow.clickOnSelectFormView(positionNumber = 1);
 
 		AppBuilderWorkflow.selectFormView(formViewName = "My Form View 1");
 
@@ -547,7 +547,7 @@ definition {
 	}
 
 	@description = "LRQA-60385 - Automate LPS-110981: As an App Admin, I want to deploy an App with multiple workflow steps and one same Form View"
-	@priority = "5"
+	@priority = 5
 	test CreateNewStepSecondaryActionAndAssignee {
 		property portal.acceptance = "true";
 
@@ -562,7 +562,7 @@ definition {
 
 		AppBuilderWorkflow.addNewStep();
 
-		AppBuilderWorkflow.assertStepPresent(step = "1");
+		AppBuilderWorkflow.assertStepPresent(step = 1);
 
 		AppBuilderWorkflow.addNewStep();
 
@@ -576,15 +576,15 @@ definition {
 
 		AppBuilderWorkflow.selectStepAssignee(
 			assignee = "Administrator",
-			step = "2");
+			step = 2);
 
 		AppBuilderWorkflow.assertAssigneeInfoPresentOnStep(
 			assignee = "Administrator",
-			step = "2");
+			step = 2);
 	}
 
 	@description = "Create an App through the 'Apps' portlet"
-	@priority = "5"
+	@priority = 5
 	test CreateStandardApp {
 		property environment.acceptance = "true";
 		property operating.system.types = "alpine,amazonlinux,centos,debian,fedora,orcllinux,osx,redhat,solaris,suse,ubuntu,windows";
@@ -719,7 +719,7 @@ definition {
 	}
 
 	@description = "Delete a step while creating a Workflow App"
-	@priority = "5"
+	@priority = 5
 	test DeleteStep {
 		property portal.acceptance = "true";
 
@@ -744,15 +744,15 @@ definition {
 
 		AppBuilderWorkflow.addNewStep();
 
-		AppBuilderWorkflow.assertStepPresent(step = "1");
+		AppBuilderWorkflow.assertStepPresent(step = 1);
 
-		AppBuilderWorkflow.deleteStep(step = "1");
+		AppBuilderWorkflow.deleteStep(step = 1);
 
-		AppBuilderWorkflow.assertStepNotPresent(step = "1");
+		AppBuilderWorkflow.assertStepNotPresent(step = 1);
 	}
 
 	@description = "LRQA-60707 - Automate LPS-110982: As an App Admin, I want to delete a step of my App's workflow"
-	@priority = "4"
+	@priority = 4
 	test DeleteStepWhileRunning {
 		AppBuilderAdmin.addCustomObject(
 			customObjectName = "my custom object",
@@ -797,13 +797,13 @@ definition {
 
 		AppBuilderAdmin.openItem(itemName = "My Workflow App");
 
-		AppBuilderWorkflow.deleteStep(step = "1");
+		AppBuilderWorkflow.deleteStep(step = 1);
 
 		AppBuilderWorkflow.saveNewVersionedApp();
 
 		AppBuilderAdmin.openItem(itemName = "My Workflow App");
 
-		AppBuilderWorkflow.assertStepNotPresent(step = "1");
+		AppBuilderWorkflow.assertStepNotPresent(step = 1);
 
 		Button.click(button = "Cancel");
 
@@ -825,7 +825,7 @@ definition {
 	}
 
 	@description = "Filter and order the apps created using App Builder"
-	@priority = "5"
+	@priority = 5
 	test FilterAndOrderStandardApps {
 		property portal.acceptance = "true";
 
@@ -873,73 +873,73 @@ definition {
 		AppBuilderAdmin.chooseAppSearchFilterByOption(filterOption = "Name");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = "1",
+			rowNumber = 1,
 			title = "Third App");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = "2",
+			rowNumber = 2,
 			title = "Second App");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = "3",
+			rowNumber = 3,
 			title = "Fourth App");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = "4",
+			rowNumber = 4,
 			title = "First App");
 
 		AppBuilderAdmin.chooseAppSearchFilterByOption(filterOption = "Create Date");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = "1",
+			rowNumber = 1,
 			title = "Fourth App");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = "2",
+			rowNumber = 2,
 			title = "Third App");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = "3",
+			rowNumber = 3,
 			title = "Second App");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = "4",
+			rowNumber = 4,
 			title = "First App");
 
 		AppBuilderAdmin.chooseAppSearchFilterByOption(filterOption = "Modified Date");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = "1",
+			rowNumber = 1,
 			title = "Fourth App");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = "2",
+			rowNumber = 2,
 			title = "Third App");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = "3",
+			rowNumber = 3,
 			title = "Second App");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = "4",
+			rowNumber = 4,
 			title = "First App");
 
 		AppBuilderAdmin.filterListAscendAndDescend();
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = "1",
+			rowNumber = 1,
 			title = "First App");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = "2",
+			rowNumber = 2,
 			title = "Second App");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = "3",
+			rowNumber = 3,
 			title = "Third App");
 
 		AppBuilderAdmin.validateListTitleAtRow(
-			rowNumber = "4",
+			rowNumber = 4,
 			title = "Fourth App");
 
 		AppBuilderAdmin.chooseMultipleFilter(
@@ -1004,7 +1004,7 @@ definition {
 	}
 
 	@description = "Validete Form View in 'Read-Only' and 'Editable' mode'"
-	@priority = "4"
+	@priority = 4
 	test ValidateFormViewModes {
 		property portal.acceptance = "true";
 
@@ -1018,8 +1018,8 @@ definition {
 
 		AppBuilderAdmin.createFormViewAndTableView(
 			fieldType = "Text",
-			formViewName = "${formViewName}",
-			tableViewName = "${tableViewName}");
+			formViewName = ${formViewName},
+			tableViewName = ${tableViewName});
 
 		ApplicationsMenu.gotoPortlet(
 			category = "App Builder",
@@ -1031,26 +1031,26 @@ definition {
 		AppBuilderAppAdmin.clickOnCreateNewAppButton();
 
 		AppBuilderWorkflow.selectStartStepDataAndViews(
-			formViewName = "${formViewName}",
+			formViewName = ${formViewName},
 			objectName = "my custom object",
-			tableViewName = "${tableViewName}");
+			tableViewName = ${tableViewName});
 
 		AppBuilderWorkflow.addNewStep();
 
 		AppBuilderWorkflow.selectStepAssignee(
 			assignee = "Administrator",
-			step = "1");
+			step = 1);
 
 		AppBuilderWorkflow.selectStepSingleFormView(
 			formViewMode = "Editable",
-			formViewName = "${formViewName}",
-			step = "1");
+			formViewName = ${formViewName},
+			step = 1);
 
 		AppBuilderWorkflow.addNewStep();
 
 		AppBuilderWorkflow.selectStepAssignee(
 			assignee = "Administrator",
-			step = "2");
+			step = 2);
 
 		AppBuilderWorkflow.addWorkflowAppName(workflowAppName = "My Workflow App");
 
@@ -1106,7 +1106,7 @@ definition {
 	}
 
 	@description = "Automate LPS-111262 & LPS-111681"
-	@priority = "5"
+	@priority = 5
 	test ValidateListOfStandardApps {
 		property portal.acceptance = "true";
 
@@ -1170,7 +1170,7 @@ definition {
 		AppBuilderAdmin.searchByItem(itemName = "Ap");
 
 		AppBuilderAppAdmin.validateSearchItemCount(
-			itemCount = "3",
+			itemCount = 3,
 			itemName = "Ap");
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "My App");
@@ -1182,7 +1182,7 @@ definition {
 		AppBuilderAdmin.searchByItem(itemName = "Widget");
 
 		AppBuilderAppAdmin.validateSearchItemCount(
-			itemCount = "1",
+			itemCount = 1,
 			itemName = "Widget");
 
 		AppBuilderAdmin.validateItemNameOnTableNotPresent(itemName = "My App");
@@ -1221,7 +1221,7 @@ definition {
 	}
 
 	@description = "LRQA-60598 - Automate LPS-111001: As an App Admin, I want to Liferay to handle multiple running versions of my App every time I make an update on a existing App"
-	@priority = "5"
+	@priority = 5
 	test ValidateMultipleRunningVersions {
 		property portal.acceptance = "true";
 
@@ -1275,7 +1275,7 @@ definition {
 
 		AppBuilderWorkflow.selectStepAssignee(
 			assignee = "Administrator",
-			step = "1");
+			step = 1);
 
 		AppBuilderWorkflow.saveNewVersionedApp();
 
@@ -1288,7 +1288,7 @@ definition {
 		AppBuilderWorkflow.selectStepSingleFormView(
 			formViewMode = "Editable",
 			formViewName = "My Form View 2",
-			step = "1");
+			step = 1);
 
 		AppBuilderWorkflow.saveNewVersionedApp();
 
@@ -1298,7 +1298,7 @@ definition {
 
 		AppBuilderAdmin.openItem(itemName = "My Workflow App");
 
-		AppBuilderWorkflow.deleteStep(step = "1");
+		AppBuilderWorkflow.deleteStep(step = 1);
 
 		AppBuilderWorkflow.saveNewVersionedApp();
 
@@ -1326,7 +1326,7 @@ definition {
 	}
 
 	@description = "LRQA-61243 - Automate LPS-119370: As an App Admin, I want a shortcut link to create new Objects during the Workflow App creation experience"
-	@priority = "4"
+	@priority = 4
 	test ValidateShortcutLinkToCreateObject {
 		ApplicationsMenu.gotoPortlet(
 			category = "App Builder",
@@ -1431,7 +1431,7 @@ definition {
 	}
 
 	@description = "Validate steps while running an App"
-	@priority = "4"
+	@priority = 4
 	test ValidateStepsWhileRunningApp {
 		var formViewName = "My Form View";
 		var tableViewName = "My Table View";
@@ -1443,8 +1443,8 @@ definition {
 
 		AppBuilderAdmin.createFormViewAndTableView(
 			fieldType = "Text",
-			formViewName = "${formViewName}",
-			tableViewName = "${tableViewName}");
+			formViewName = ${formViewName},
+			tableViewName = ${tableViewName});
 
 		ApplicationsMenu.gotoPortlet(
 			category = "App Builder",
@@ -1463,7 +1463,7 @@ definition {
 
 		AppBuilderWorkflow.assertButtonNotPresent(button = "Add New Action");
 
-		AppBuilderWorkflow.selectStep(step = "1");
+		AppBuilderWorkflow.selectStep(step = 1);
 
 		AppBuilderWorkflow.selectActionsCard();
 
@@ -1473,24 +1473,24 @@ definition {
 
 		AppBuilderWorkflow.assertButtonNotPresent(button = "Actions");
 
-		AppBuilderWorkflow.selectStep(step = "1");
+		AppBuilderWorkflow.selectStep(step = 1);
 
 		AppBuilderWorkflow.addNewStep();
 
 		AppBuilderWorkflow.selectStartStepDataAndViews(
-			formViewName = "${formViewName}",
+			formViewName = ${formViewName},
 			objectName = "my custom object",
-			tableViewName = "${tableViewName}");
+			tableViewName = ${tableViewName});
 
 		AppBuilderWorkflow.addWorkflowAppName(workflowAppName = "My Workflow App");
 
 		AppBuilderWorkflow.selectStepAssignee(
 			assignee = "Administrator",
-			step = "1");
+			step = 1);
 
 		AppBuilderWorkflow.selectStepAssignee(
 			assignee = "Administrator",
-			step = "2");
+			step = 2);
 
 		AppBuilderWorkflow.selectActionsCard();
 
@@ -1562,7 +1562,7 @@ definition {
 	}
 
 	@description = "LRQA-61050 - Automate smoke tests from LPS-111006"
-	@priority = "5"
+	@priority = 5
 	test ViewWorkflowAppThroughNotifications {
 		property portal.acceptance = "true";
 
@@ -1584,7 +1584,7 @@ definition {
 		for (var delpoyOption : list "Widget,Standalone,Product Menu") {
 			AppBuilderAppAdmin.createBasicWorkflowAppWith1ExtraStep(
 				assignee = "Administrator",
-				deployOption = "${delpoyOption}",
+				deployOption = ${delpoyOption},
 				formViewName = "My Form View",
 				isCreatingViaPlusIcon = "true",
 				objectName = "my custom object",

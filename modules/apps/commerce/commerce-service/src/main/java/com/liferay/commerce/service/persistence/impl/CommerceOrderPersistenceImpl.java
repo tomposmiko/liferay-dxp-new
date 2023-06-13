@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.service.persistence.impl;
 
+import com.liferay.commerce.exception.DuplicateCommerceOrderExternalReferenceCodeException;
 import com.liferay.commerce.exception.NoSuchOrderException;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.model.CommerceOrderTable;
@@ -8103,6 +8104,31 @@ public class CommerceOrderPersistenceImpl
 
 		if (Validator.isNull(commerceOrder.getExternalReferenceCode())) {
 			commerceOrder.setExternalReferenceCode(commerceOrder.getUuid());
+		}
+		else {
+			CommerceOrder ercCommerceOrder = fetchByC_ERC(
+				commerceOrder.getCompanyId(),
+				commerceOrder.getExternalReferenceCode());
+
+			if (isNew) {
+				if (ercCommerceOrder != null) {
+					throw new DuplicateCommerceOrderExternalReferenceCodeException(
+						"Duplicate commerce order with external reference code " +
+							commerceOrder.getExternalReferenceCode() +
+								" and company " + commerceOrder.getCompanyId());
+				}
+			}
+			else {
+				if ((ercCommerceOrder != null) &&
+					(commerceOrder.getCommerceOrderId() !=
+						ercCommerceOrder.getCommerceOrderId())) {
+
+					throw new DuplicateCommerceOrderExternalReferenceCodeException(
+						"Duplicate commerce order with external reference code " +
+							commerceOrder.getExternalReferenceCode() +
+								" and company " + commerceOrder.getCompanyId());
+				}
+			}
 		}
 
 		ServiceContext serviceContext =

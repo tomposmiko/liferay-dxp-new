@@ -25,7 +25,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -34,7 +34,7 @@ definition {
 	}
 
 	@description = "Add a content page and edit its fragment immediately. This is a variation of the steps from LPS-85872."
-	@priority = "5"
+	@priority = 5
 	test AddContentPageWithEditedFragmentText {
 		property portal.acceptance = "true";
 		property testray.component.names = "Training";
@@ -68,7 +68,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-101333. Freemarker code should not be executed in an html fragment."
-	@priority = "5"
+	@priority = 5
 	test AddContentPageWithHTMLFragment {
 		property portal.acceptance = "true";
 
@@ -99,7 +99,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-95045. A user should be able to add an image fragment and change the image in the fragment."
-	@priority = "5"
+	@priority = 5
 	test AddContentPageWithImageFragment {
 		property portal.acceptance = "true";
 
@@ -121,7 +121,7 @@ definition {
 			AssertVisible(
 				key_fragmentClass = "image",
 				key_image = "Document_1.png",
-				key_position = "1",
+				key_position = 1,
 				locator1 = "Fragment#PAGE_EDITOR_FRAGMENT_IMAGE");
 		}
 
@@ -135,7 +135,7 @@ definition {
 			AssertVisible(
 				key_fragmentClass = "image",
 				key_image = "Document_1.png",
-				key_position = "1",
+				key_position = 1,
 				locator1 = "Fragment#PAGE_EDITOR_FRAGMENT_IMAGE");
 		}
 
@@ -145,13 +145,13 @@ definition {
 			AssertVisible(
 				key_fragmentClass = "image",
 				key_image = "Document_1.png",
-				key_position = "1",
+				key_position = 1,
 				locator1 = "Fragment#PAGE_EDITOR_FRAGMENT_IMAGE");
 		}
 	}
 
 	@description = "This is a test for LPS-106776. Add a translation to editable text."
-	@priority = "5"
+	@priority = 5
 	test AddTraslationtoRichText {
 		property portal.acceptance = "true";
 
@@ -209,7 +209,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-127732. Edit the inline content style of rich text fragment."
-	@priority = "4"
+	@priority = 4
 	test EditInlineContentStyleOfRichTextFragment {
 		task ("Add a Paragraph fragment to page") {
 			ContentPagesNavigator.openEditContentPage(

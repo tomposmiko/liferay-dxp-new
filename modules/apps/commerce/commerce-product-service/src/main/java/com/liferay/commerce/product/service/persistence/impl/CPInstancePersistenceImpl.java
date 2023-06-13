@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.product.service.persistence.impl;
 
+import com.liferay.commerce.product.exception.DuplicateCPInstanceExternalReferenceCodeException;
 import com.liferay.commerce.product.exception.NoSuchCPInstanceException;
 import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.model.CPInstanceTable;
@@ -6804,6 +6805,31 @@ public class CPInstancePersistenceImpl
 
 		if (Validator.isNull(cpInstance.getExternalReferenceCode())) {
 			cpInstance.setExternalReferenceCode(cpInstance.getUuid());
+		}
+		else {
+			CPInstance ercCPInstance = fetchByC_ERC(
+				cpInstance.getCompanyId(),
+				cpInstance.getExternalReferenceCode());
+
+			if (isNew) {
+				if (ercCPInstance != null) {
+					throw new DuplicateCPInstanceExternalReferenceCodeException(
+						"Duplicate cp instance with external reference code " +
+							cpInstance.getExternalReferenceCode() +
+								" and company " + cpInstance.getCompanyId());
+				}
+			}
+			else {
+				if ((ercCPInstance != null) &&
+					(cpInstance.getCPInstanceId() !=
+						ercCPInstance.getCPInstanceId())) {
+
+					throw new DuplicateCPInstanceExternalReferenceCodeException(
+						"Duplicate cp instance with external reference code " +
+							cpInstance.getExternalReferenceCode() +
+								" and company " + cpInstance.getCompanyId());
+				}
+			}
 		}
 
 		ServiceContext serviceContext =

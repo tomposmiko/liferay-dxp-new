@@ -14,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -34,7 +34,7 @@ definition {
 		}
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AddChildArticleToKBArticleViaKBAdmin {
 		JSONKnowledgeBase.addkBArticle(
 			kbArticleContent = "Knowledge Base Article Content",
@@ -58,7 +58,7 @@ definition {
 			kbChildArticleTitle = "Knowledge Base Child Article Title");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AddKBArticleAsDraft {
 		KBAdmin.openKBAdmin(siteURLKey = "guest");
 
@@ -75,7 +75,7 @@ definition {
 			kbStatus = "Draft");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AddKBArticlesViaKBAdmin {
 		KBAdmin.openKBAdmin(siteURLKey = "guest");
 
@@ -94,7 +94,7 @@ definition {
 		}
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AddKBArticleViaKBAdmin {
 		KBAdmin.openKBAdmin(siteURLKey = "guest");
 
@@ -109,7 +109,7 @@ definition {
 			kbArticleTitle = "Knowledge Base Article Title");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test AddKBArticleViaTemplateCP {
 		property test.name.skip.portal.instance = "CPKnowledgebase#AddKBArticleViaTemplateCP";
 
@@ -132,7 +132,7 @@ definition {
 			kbArticleTitle = "Knowledge Base Article Title");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AddKBArticleWithAttachmentViaKBAdmin {
 		KBAdmin.openKBAdmin(siteURLKey = "guest");
 
@@ -149,7 +149,7 @@ definition {
 			kbArticleTitle = "Knowledge Base Article Title");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test AddKBArticleWithBlogsEntryRelatedAssetViaKBAdmin {
 		property test.name.skip.portal.instance = "CPKnowledgebase#AddKBArticleWithBlogsEntryRelatedAssetViaKBAdmin";
 
@@ -174,16 +174,16 @@ definition {
 
 		var kbArticleRelatedAssetTitle = "Blogs Entry Title";
 
-		var key_kbArticleRelatedAssetTitle = "${kbArticleRelatedAssetTitle}";
+		var key_kbArticleRelatedAssetTitle = ${kbArticleRelatedAssetTitle};
 
 		AssertClick(
 			locator1 = "AssetRelatedAssets#KB_RELATED_ASSETS_LINKS",
-			value1 = "${kbArticleRelatedAssetTitle}");
+			value1 = ${kbArticleRelatedAssetTitle});
 
 		KBArticle.viewBlogsEntryRelatedAsset();
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AddKBArticleWithCategory {
 		Navigator.openURL();
 
@@ -221,7 +221,7 @@ definition {
 			vocabularyName = "Vocabulary Name");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AddKBArticleWithHTMLViaKBAdmin {
 		var kbArticleContentSource = '''<b>Knowledge Base&rsquo;s Article Content</b>''';
 
@@ -229,7 +229,7 @@ definition {
 
 		KBArticle.addCP(
 			kbArticleAddViaSource = "true",
-			kbArticleContentSource = "${kbArticleContentSource}",
+			kbArticleContentSource = ${kbArticleContentSource},
 			kbArticleTitle = "Knowledge Base Article Title");
 
 		KBArticle.viewCPWithHTML(
@@ -237,7 +237,7 @@ definition {
 			kbArticleTitle = "Knowledge Base Article Title");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test AddKBArticleWithInvalidAttachmentSize {
 		property test.name.skip.portal.instance = "CPKnowledgebase#AddKBArticleWithInvalidAttachmentSize";
 
@@ -248,7 +248,7 @@ definition {
 			configurationName = "Upload Servlet Request",
 			configurationScope = "System Scope");
 
-		ServerAdministration.configureFileUploadOverallMaximumFileSize(maxFileSize = "102400");
+		ServerAdministration.configureFileUploadOverallMaximumFileSize(maxFileSize = 102400);
 
 		KBAdmin.openKBAdmin(siteURLKey = "guest");
 
@@ -256,7 +256,7 @@ definition {
 			kbArticleAttachment = "Document_1.ppt",
 			kbArticleContent = "Knowledge Base Article Content",
 			kbArticleTitle = "Knowledge Base Article Title",
-			maxFileSize = "100");
+			maxFileSize = 100);
 
 		KBAdmin.openKBAdmin(siteURLKey = "guest");
 
@@ -266,7 +266,7 @@ definition {
 			noAttachment = "true");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test AddKBArticleWithoutRequiredCategory {
 		property test.name.skip.portal.instance = "CPKnowledgebase#AddKBArticleWithoutRequiredCategory";
 
@@ -300,7 +300,7 @@ definition {
 			vocabularyName = "Vocabulary Name");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test AddKBFolder {
 		property portal.acceptance = "true";
 		property testray.component.names = "Training";
@@ -328,7 +328,7 @@ definition {
 		KBArticle.viewDefaultCP();
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AddTemplateCP {
 		KBAdmin.openKBAdmin(siteURLKey = "guest");
 
@@ -343,7 +343,7 @@ definition {
 			kbTemplateTitle = "Knowledge Base Template Title");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test CancelAddKBArticle {
 		property test.name.skip.portal.instance = "CPKnowledgebase#CancelAddKBArticle";
 
@@ -356,7 +356,7 @@ definition {
 		KBArticle.viewDefaultCP();
 	}
 
-	@priority = "3"
+	@priority = 3
 	test CancelEditKBArticle {
 		property test.name.skip.portal.instance = "CPKnowledgebase#CancelEditKBArticle";
 
@@ -379,7 +379,7 @@ definition {
 			kbArticleTitle = "Knowledge Base Article Title");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test CannotAddDuplicateKBFolder {
 		property test.name.skip.portal.instance = "CPKnowledgebase#CannotAddDuplicateKBFolder";
 
@@ -396,7 +396,7 @@ definition {
 			kbFolderName = "KB Folder 1");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test DeleteKBArticleViaKBAdmin {
 		JSONKnowledgeBase.addkBArticle(
 			kbArticleContent = "Knowledge Base Article Content",
@@ -413,7 +413,7 @@ definition {
 		KBArticle.viewDefaultCP();
 	}
 
-	@priority = "4"
+	@priority = 4
 	test DeleteKBFolder {
 		JSONKnowledgeBase.addkBFolder(
 			groupName = "Guest",
@@ -433,7 +433,7 @@ definition {
 		KBFolder.deleteCP(kbFolderName = "KB Folder 1");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test EditKBArticleAndAddAttachmentViaKBAdmin {
 		JSONKnowledgeBase.addkBArticle(
 			kbArticleContent = "Knowledge Base Article Content",
@@ -455,7 +455,7 @@ definition {
 			kbArticleTitle = "Knowledge Base Article Title Edit");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test EditKBArticleViaKBAdmin {
 		JSONKnowledgeBase.addkBArticle(
 			kbArticleContent = "Knowledge Base Article Content",
@@ -475,7 +475,7 @@ definition {
 			kbArticleTitle = "Knowledge Base Article Title Edit");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test EditKBFolder {
 		JSONKnowledgeBase.addkBFolder(
 			groupName = "Guest",
@@ -500,7 +500,7 @@ definition {
 		KBFolder.viewFolderNameCP(kbFolderName = "KB Folder 1 Edited");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test RemoveParentArticleViaKBAdmin {
 		KBAdmin.openKBAdmin(siteURLKey = "guest");
 
@@ -560,7 +560,7 @@ definition {
 			kbStatus = "Draft");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test SelectParentArticleViaKBAdmin {
 		KBAdmin.openKBAdmin(siteURLKey = "guest");
 
@@ -587,7 +587,7 @@ definition {
 			kbChildArticleTitle = "Knowledge Base Article Title Child");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test ViewChildArticleInKBArticleViaKBAdmin {
 		property test.name.skip.portal.instance = "CPKnowledgebase#ViewChildArticleInKBArticleViaKBAdmin";
 
@@ -613,7 +613,7 @@ definition {
 			kbChildArticleTitle = "Knowledge Base Child Article Title");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test ViewDuplicateFriendlyURLIsNotAllowed {
 		KBAdmin.openKBAdmin(siteURLKey = "guest");
 
@@ -641,7 +641,7 @@ definition {
 			kbArticleTitle = "Knowledge Base Article Title");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test ViewImportedKBArticlesPrioritization {
 		KBAdmin.openKBAdmin(siteURLKey = "guest");
 
@@ -766,7 +766,7 @@ definition {
 			kbPriority = "4.0");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test ViewKBArticlePriority {
 		KBAdmin.openKBAdmin(siteURLKey = "guest");
 
@@ -785,7 +785,7 @@ definition {
 			kbPriority = "2.0");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test ViewKBTemplateViaAddKBArticleCP {
 		property test.name.skip.portal.instance = "CPKnowledgebase#ViewKBTemplateViaAddKBArticleCP";
 
@@ -802,7 +802,7 @@ definition {
 			kbTemplateTitle = "Knowledge Base Template Title");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test ViewNoErrorAfterImportWithoutParentMarkdownFiles {
 		KBAdmin.openKBAdmin(siteURLKey = "guest");
 
@@ -813,7 +813,7 @@ definition {
 		KBArticle.viewUploadFailed(kbImportFail = "false");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test ViewPendingKBArticleContent {
 		property test.name.skip.portal.instance = "CPKnowledgebase#ViewPendingKBArticleContent";
 

@@ -30,7 +30,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -122,7 +122,7 @@ definition {
 	}
 
 	@description = "This is for COMMERCE-2658. Can be Drag and Drop fragments on a Minium site page."
-	@priority = "4"
+	@priority = 4
 	test FragmentsCanBeDragAndDroppedToMiniumSitePage {
 		property test.name.skip.portal.instance = "CommerceAccelerators#FragmentsCanBeDragAndDroppedToMiniumSitePage";
 
@@ -159,19 +159,19 @@ definition {
 			pageName = "Test Content Page Name",
 			siteName = "Minium");
 
-		var position = "1";
+		var position = 1;
 
 		AssertTextEquals(
 			fragmentName = "heading",
 			id = "element-text",
-			index = "${position}",
+			index = ${position},
 			locator1 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT",
 			value1 = "Heading Example 1");
 
 		AssertTextEquals(
 			fragmentName = "html",
 			id = "element-html",
-			index = "${position}",
+			index = ${position},
 			locator1 = "Fragment#CONTRIBUTED_FRAGMENT_TEXT",
 			value1 = "HTML Example A paragraph is a self-contained unit of a discourse in writing dealing with a particular point or idea. Paragraphs are usually an expected part of formal writing, used to organize longer prose.");
 	}
@@ -336,15 +336,15 @@ definition {
 
 		FrontStore.addInitializerProductToCart(
 			productName = "ABS Sensor",
-			productQuantity = "2");
+			productQuantity = 2);
 
-		Pause(locator1 = "5000");
+		Pause(locator1 = 5000);
 
 		CommerceNavigator.gotoMiniCart();
 
 		Button.click(button = "Submit");
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		CommerceCheckout.initializersCheckout(
 			newAddressAddress = "Test Address",
@@ -354,8 +354,8 @@ definition {
 			newAddressZipCode = "Test Zip Code",
 			paymentMethod = "Money Order",
 			productName = "ABS Sensor",
-			productQuantity = "2",
-			productUnitPrice = "50",
+			productQuantity = 2,
+			productUnitPrice = 50,
 			shippingMethod = "Standard");
 
 		CommerceNavigator.gotoMiniumSidebarItem(menuItem = "Catalog");
@@ -368,7 +368,7 @@ definition {
 
 		FrontStore.addInitializerProductToCart(
 			productName = "ABS Sensor",
-			productQuantity = "2");
+			productQuantity = 2);
 
 		CommerceLogin.miniumLogoutPG();
 
@@ -383,7 +383,7 @@ definition {
 			orderAuthor = "buyer@liferay.com",
 			productName = "ABS Sensor",
 			productPrice = "100.00",
-			productQuantity = "2",
+			productQuantity = 2,
 			productSKU = "MIN93015",
 			productUnitPrice = "50.00");
 
@@ -393,7 +393,7 @@ definition {
 			orderAuthor = "buyer@liferay.com",
 			productName = "ABS Sensor",
 			productPrice = "100.00",
-			productQuantity = "2",
+			productQuantity = 2,
 			productSKU = "MIN93015",
 			productUnitPrice = "50.00");
 
@@ -406,7 +406,7 @@ definition {
 		CommerceOrders.viewOrdersEntry(
 			productListPrice = "50.00",
 			productName = "ABS Sensor",
-			productQuantity = "2",
+			productQuantity = 2,
 			productSKU = "MIN93015",
 			productTotalPrice = "100.00");
 
@@ -423,7 +423,7 @@ definition {
 			paymentMethod = "Money Order",
 			productListPrice = "50.00",
 			productName = "ABS Sensor",
-			productQuantity = "2",
+			productQuantity = 2,
 			productSKU = "MIN93015",
 			productTotalPrice = "100.00");
 	}
@@ -494,9 +494,9 @@ definition {
 
 		FrontStore.addInitializerProductToCart(
 			productName = "ABS Sensor",
-			productQuantity = "2");
+			productQuantity = 2);
 
-		Pause(locator1 = "5000");
+		Pause(locator1 = 5000);
 
 		Refresh();
 
@@ -504,7 +504,7 @@ definition {
 
 		Button.click(button = "Submit");
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		CommerceCheckout.initializersCheckout(
 			newAddressAddress = "Test Address",
@@ -514,8 +514,8 @@ definition {
 			newAddressZipCode = "Test Zip Code",
 			paymentMethod = "Money Order",
 			productName = "ABS Sensor",
-			productQuantity = "2",
-			productUnitPrice = "50",
+			productQuantity = 2,
+			productUnitPrice = 50,
 			shippingMethod = "Standard");
 
 		CommerceNavigator.gotoSpeedwellTopbarItem(menuItem = "Catalog");
@@ -524,7 +524,7 @@ definition {
 
 		FrontStore.addInitializerProductToCart(
 			productName = "ABS Sensor",
-			productQuantity = "2");
+			productQuantity = 2);
 
 		CommerceLogin.speedwellLogout();
 
@@ -544,7 +544,7 @@ definition {
 		CommerceOrders.viewOrdersEntry(
 			productListPrice = "50.00",
 			productName = "ABS Sensor",
-			productQuantity = "2",
+			productQuantity = 2,
 			productSKU = "SPEED93015",
 			productTotalPrice = "100.00");
 
@@ -561,7 +561,7 @@ definition {
 			paymentMethod = "Money Order",
 			productListPrice = "50.00",
 			productName = "ABS Sensor",
-			productQuantity = "2",
+			productQuantity = 2,
 			productSKU = "SPEED93015",
 			productTotalPrice = "100.00");
 	}

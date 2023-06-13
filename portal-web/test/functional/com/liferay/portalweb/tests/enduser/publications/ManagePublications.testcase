@@ -22,7 +22,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -35,7 +35,7 @@ definition {
 		}
 	}
 
-	@priority = "3"
+	@priority = 3
 	test CancelPublicationCreation {
 		Publications.cancelPublicationCreation(publicationName = "Publication Name");
 
@@ -44,7 +44,7 @@ definition {
 			value1 = "Publication Name");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test CreateNewPublicationWithLongName {
 		Publications.createNewPublication(
 			gotoManagePublications = "true",
@@ -53,14 +53,14 @@ definition {
 		Alert.viewLengthValidationField();
 	}
 
-	@priority = "3"
+	@priority = 3
 	test CreateNewPublicationWithoutName {
 		Publications.createNewPublication(gotoManagePublications = "true");
 
 		Alert.viewRequiredField();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test DeletePublication {
 		property portal.acceptance = "true";
 
@@ -81,7 +81,7 @@ definition {
 			locator1 = "Publications#PUBLISHED_PUBLICATION_NAME");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test SwitchPublication {
 		Publications.createNewPublication(publicationName = "Publication Name");
 

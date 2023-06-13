@@ -35,7 +35,6 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -43,7 +42,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.change.tracking.web.internal.configuration.CTConfiguration",
-	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
+	immediate = true,
 	property = {
 		"com.liferay.portlet.css-class-wrapper=portlet-publications-configuration",
 		"com.liferay.portlet.display-category=category.hidden",

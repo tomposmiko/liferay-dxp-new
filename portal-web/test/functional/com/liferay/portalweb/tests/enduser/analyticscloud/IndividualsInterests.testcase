@@ -29,7 +29,7 @@ definition {
 
 		ACUtils.tearDownDXP();
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -41,7 +41,7 @@ definition {
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8979 | Test Summary: All interests in the workspace appear in a list"
 	@ignore = "true"
-	@priority = "5"
+	@priority = 5
 	test AllInterestsInWorkspaceAppearInList {
 		property portal.upstream = "quarantine";
 
@@ -56,10 +56,10 @@ definition {
 			Navigator.openSiteURL(siteName = "Site Name");
 
 			for (var layoutName : list "Movies,Music,Science,Sports,Technology") {
-				ACUtils.addPage(layoutName = "${layoutName}");
+				ACUtils.addPage(layoutName = ${layoutName});
 
 				ACUtils.createWCAndAddToPage(
-					layoutName = "${layoutName}",
+					layoutName = ${layoutName},
 					webContentTitle = "Web Content Title ${layoutName}");
 			}
 		}
@@ -68,9 +68,9 @@ definition {
 			for (var name : list "ac,usera") {
 				JSONUser.addUser(
 					userEmailAddress = "${name}@liferay.com",
-					userFirstName = "${name}",
-					userLastName = "${name}",
-					userScreenName = "${name}");
+					userFirstName = ${name},
+					userLastName = ${name},
+					userScreenName = ${name});
 			}
 
 			ACDXPSettings.syncNewContactData();
@@ -83,7 +83,7 @@ definition {
 
 			for (var pageName : list "Movies,Music,Science,Sports,Technology") {
 				ACUtils.navigateToSitePage(
-					pageName = "${pageName}",
+					pageName = ${pageName},
 					siteName = "Site Name");
 			}
 		}
@@ -95,7 +95,7 @@ definition {
 
 			for (var pageName : list "Movies,Music,Science,Sports,Technology") {
 				ACUtils.navigateToSitePage(
-					pageName = "${pageName}",
+					pageName = ${pageName},
 					siteName = "Site Name");
 			}
 		}
@@ -105,7 +105,7 @@ definition {
 
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = "${propertyName}");
+			ACProperties.switchProperty(propertyName = ${propertyName});
 		}
 
 		task ("Navigate to Individule Tab") {
@@ -118,14 +118,14 @@ definition {
 			Click(locator1 = "ACInterests#VIEW_ALL_INTERESTS_BUTTON");
 
 			for (var interestTopic : list "liferay dxp,site,movies,music,science,sports,technology") {
-				ACInterests.viewInterest(interestTopic = "${interestTopic}");
+				ACInterests.viewInterest(interestTopic = ${interestTopic});
 			}
 		}
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8981| Test Summary: Assert individual interest shows contributing pages"
 	@ignore = "true"
-	@priority = "3"
+	@priority = 3
 	test AssertIndividualInterestContributingPages {
 		property portal.upstream = "quarantine";
 
@@ -171,7 +171,7 @@ definition {
 
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = "${propertyName}");
+			ACProperties.switchProperty(propertyName = ${propertyName});
 		}
 
 		task ("Navigate to the Individual Interests") {
@@ -195,7 +195,7 @@ definition {
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8982| Test Summary: Individuals interest details are shown"
 	@ignore = "true"
-	@priority = "3"
+	@priority = 3
 	test AssertIndividualInterestDetails {
 		property portal.upstream = "quarantine";
 
@@ -241,7 +241,7 @@ definition {
 
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = "${propertyName}");
+			ACProperties.switchProperty(propertyName = ${propertyName});
 		}
 
 		task ("Navigate to the Individual Interests") {
@@ -259,7 +259,7 @@ definition {
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8980 | Test Summary: Order the Individual's Interest List"
 	@ignore = "true"
-	@priority = "3"
+	@priority = 3
 	test OrderIndividualsInterests {
 		property portal.upstream = "quarantine";
 
@@ -274,10 +274,10 @@ definition {
 			Navigator.openSiteURL(siteName = "Site Name");
 
 			for (var layoutName : list "Movies,Sports,Technology") {
-				ACUtils.addPage(layoutName = "${layoutName}");
+				ACUtils.addPage(layoutName = ${layoutName});
 
 				ACUtils.createWCAndAddToPage(
-					layoutName = "${layoutName}",
+					layoutName = ${layoutName},
 					webContentTitle = "Web Content Title ${layoutName}");
 			}
 		}
@@ -299,7 +299,7 @@ definition {
 
 			for (var pageName : list "Movies,Sports,Technology") {
 				ACUtils.navigateToSitePage(
-					pageName = "${pageName}",
+					pageName = ${pageName},
 					siteName = "Site Name");
 			}
 		}
@@ -309,7 +309,7 @@ definition {
 
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = "${propertyName}");
+			ACProperties.switchProperty(propertyName = ${propertyName});
 		}
 
 		task ("Navigate to the Individual Interests") {
@@ -337,7 +337,7 @@ definition {
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8983 | Test Summary: Individuals Interest list has pagination"
 	@ignore = "true"
-	@priority = "3"
+	@priority = 3
 	test PaginateIndividualsInterestsList {
 		property portal.upstream = "quarantine";
 
@@ -348,10 +348,10 @@ definition {
 			Navigator.openSiteURL(siteName = "Site Name");
 
 			for (var layoutName : list "Movies,Music,Science,Sports,Technology") {
-				ACUtils.addPage(layoutName = "${layoutName}");
+				ACUtils.addPage(layoutName = ${layoutName});
 
 				ACUtils.createWCAndAddToPage(
-					layoutName = "${layoutName}",
+					layoutName = ${layoutName},
 					webContentTitle = "Web Content Title ${layoutName}");
 			}
 		}
@@ -373,7 +373,7 @@ definition {
 
 			for (var pageName : list "Movies,Music,Science,Sports,Technology") {
 				ACUtils.navigateToSitePage(
-					pageName = "${pageName}",
+					pageName = ${pageName},
 					siteName = "Site Name");
 			}
 		}
@@ -383,7 +383,7 @@ definition {
 
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = "${propertyName}");
+			ACProperties.switchProperty(propertyName = ${propertyName});
 		}
 
 		task ("Navigate to Individule Interests") {
@@ -393,7 +393,7 @@ definition {
 		}
 
 		task ("Change pagination") {
-			ACUtils.changePagination(itemsPerPage = "5");
+			ACUtils.changePagination(itemsPerPage = 5);
 		}
 
 		task ("Click next page") {

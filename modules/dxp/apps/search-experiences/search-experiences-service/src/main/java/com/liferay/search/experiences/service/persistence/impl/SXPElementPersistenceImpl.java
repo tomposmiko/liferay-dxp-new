@@ -50,6 +50,7 @@ import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
+import com.liferay.search.experiences.exception.DuplicateSXPElementExternalReferenceCodeException;
 import com.liferay.search.experiences.exception.NoSuchSXPElementException;
 import com.liferay.search.experiences.model.SXPElement;
 import com.liferay.search.experiences.model.SXPElementTable;
@@ -6314,6 +6315,31 @@ public class SXPElementPersistenceImpl
 
 		if (Validator.isNull(sxpElement.getExternalReferenceCode())) {
 			sxpElement.setExternalReferenceCode(sxpElement.getUuid());
+		}
+		else {
+			SXPElement ercSXPElement = fetchByC_ERC(
+				sxpElement.getCompanyId(),
+				sxpElement.getExternalReferenceCode());
+
+			if (isNew) {
+				if (ercSXPElement != null) {
+					throw new DuplicateSXPElementExternalReferenceCodeException(
+						"Duplicate sxp element with external reference code " +
+							sxpElement.getExternalReferenceCode() +
+								" and company " + sxpElement.getCompanyId());
+				}
+			}
+			else {
+				if ((ercSXPElement != null) &&
+					(sxpElement.getSXPElementId() !=
+						ercSXPElement.getSXPElementId())) {
+
+					throw new DuplicateSXPElementExternalReferenceCodeException(
+						"Duplicate sxp element with external reference code " +
+							sxpElement.getExternalReferenceCode() +
+								" and company " + sxpElement.getCompanyId());
+				}
+			}
 		}
 
 		ServiceContext serviceContext =

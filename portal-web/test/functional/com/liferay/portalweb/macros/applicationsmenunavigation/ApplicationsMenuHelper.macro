@@ -14,12 +14,14 @@ definition {
 
 	macro gotoPortlet {
 		Click(
-			key_category = "${category}",
-			key_portlet = "${portlet}",
+			key_category = ${category},
+			key_portlet = ${portlet},
 			locator1 = "ApplicationsMenu#PORTLET");
 	}
 
 	macro openApplicationsMenu {
+		SelectFrameTop();
+
 		if (IsElementNotPresent(locator1 = "ApplicationsMenu#APPLICATIONS_MENU")) {
 			Click(locator1 = "ApplicationsMenu#TOGGLE");
 		}

@@ -3,19 +3,19 @@ definition {
 	macro addStyleBooks {
 		LexiconEntry.gotoAdd();
 
-		PortletEntry.inputName(name = "${styleBookName}");
+		PortletEntry.inputName(name = ${styleBookName});
 
 		Button.clickSave();
 	}
 
 	macro gotoStyleBook {
-		LexiconCard.clickCardTitle(card = "${styleBookName}");
+		LexiconCard.clickCardTitle(card = ${styleBookName});
 	}
 
 	macro gotoStyleBookEllipsisItem {
 		LexiconCard.clickEllipsisItem(
-			card = "${styleBookName}",
-			item = "${item}");
+			card = ${styleBookName},
+			item = ${item});
 	}
 
 	macro openStyleBooksAdmin {
@@ -23,7 +23,7 @@ definition {
 	}
 
 	macro viewStyleBooksPresent {
-		LexiconCard.viewCardPresent(card = "${styleBookName}");
+		LexiconCard.viewCardPresent(card = ${styleBookName});
 	}
 
 }

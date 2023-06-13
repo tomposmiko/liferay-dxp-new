@@ -24,7 +24,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -37,7 +37,7 @@ definition {
 	}
 
 	@description = "A user should be able to add page, submenu, and URL items to a navigation menu."
-	@priority = "5"
+	@priority = 5
 	test AddNavigationMenuEntriesAllTypes {
 		property portal.acceptance = "true";
 
@@ -92,7 +92,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-87134. We assert that navigation menus are not automatically created, even if a page is created."
-	@priority = "3"
+	@priority = 3
 	test AssertNavigationMenuNotCreatedByDefault {
 		task ("Add a public page to the site") {
 			JSONLayout.addPublicLayout(
@@ -116,7 +116,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-107833. Assert no option to add displayed page in Global Navigation Menu."
-	@priority = "5"
+	@priority = 5
 	test CannotAddPageItemInGlobalNavigationMenu {
 		property portal.acceptance = "true";
 
@@ -152,7 +152,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-107833. Don't support Add page to Global Navigation Menu when creating a new page."
-	@priority = "5"
+	@priority = 5
 	test CannotAddPageToGlobalNavigationMenuWhenCreatingPageInNormalSite {
 		property portal.acceptance = "true";
 
@@ -181,7 +181,7 @@ definition {
 	}
 
 	@description = "Navigation menus can be marked as Primary Navigation. At any given time, only one navigation menu can be Primary Navigation."
-	@priority = "4"
+	@priority = 4
 	test ConfigurePrimaryNavigationMenu {
 		task ("Add a navigation menu") {
 			JSONSitenavigation.addSiteNavigationMenu(
@@ -226,7 +226,7 @@ definition {
 	}
 
 	@description = "Navigation menus can be marked as Secondary Navigation. At any given time, only one navigation menu can be Secondary Navigation."
-	@priority = "4"
+	@priority = 4
 	test ConfigureSecondaryNavigationMenu {
 		task ("Add a navigation menu") {
 			JSONSitenavigation.addSiteNavigationMenu(
@@ -258,7 +258,7 @@ definition {
 	}
 
 	@description = "Navigation menus can be marked as Social Navigation. At any given time, only one navigation menu can be Social Navigation."
-	@priority = "4"
+	@priority = 4
 	test ConfigureSocialNavigationMenu {
 		task ("Add a navigation menu") {
 			JSONSitenavigation.addSiteNavigationMenu(
@@ -290,7 +290,7 @@ definition {
 	}
 
 	@description = "LPS-78049 - Multiple Navigation Menus can be deleted Filter by All."
-	@priority = "3"
+	@priority = 3
 	test DeleteMultipleNavigationMenus {
 		property portal.acceptance = "true";
 
@@ -332,7 +332,7 @@ definition {
 	}
 
 	@description = "Navigation menus can be deleted."
-	@priority = "5"
+	@priority = 5
 	test DeleteNavigationMenu {
 		property portal.acceptance = "true";
 
@@ -356,7 +356,7 @@ definition {
 	}
 
 	@description = "User can rename a navigation menu."
-	@priority = "5"
+	@priority = 5
 	test RenameNavigationMenu {
 		property portal.acceptance = "true";
 
@@ -384,7 +384,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-76658. A user can rename the page items in a navigation menu."
-	@priority = "5"
+	@priority = 5
 	test RenamePageTypeNavigationMenuItem {
 		task ("Add two pages") {
 			for (var n : list "1,2") {
@@ -461,7 +461,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-87134. We assert that the option to automatically add new pages to a navigation menu works as expected."
-	@priority = "5"
+	@priority = 5
 	test ToggleAutomaticallyAddNewPagesToNavigationMenu {
 		property portal.acceptance = "true";
 
@@ -556,7 +556,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-85566. A user can enter translations for navigation menu items."
-	@priority = "5"
+	@priority = 5
 	test TranslateItemName {
 		property portal.acceptance = "true";
 
@@ -672,7 +672,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-67191."
-	@priority = "5"
+	@priority = 5
 	test ViewNavigationMenuPropertiesSidebar {
 		property portal.acceptance = "true";
 
@@ -705,7 +705,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-85566. A navigation menu page item will be prepopulated with existing translations for a page."
-	@priority = "5"
+	@priority = 5
 	test ViewPageItemPrepopulatedWithTranslation {
 		property portal.acceptance = "true";
 
@@ -762,7 +762,7 @@ definition {
 	}
 
 	@description = "This is a test case for LPS-77912. There should be a success message after adding an item to a navigation menu."
-	@priority = "4"
+	@priority = 4
 	test ViewSuccessMessageAfterAddingMenuItem {
 		property portal.acceptance = "true";
 

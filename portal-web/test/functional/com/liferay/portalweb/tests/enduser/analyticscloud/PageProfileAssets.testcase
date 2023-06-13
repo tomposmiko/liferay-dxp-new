@@ -23,7 +23,7 @@ definition {
 
 		ACUtils.tearDownDXP();
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -37,7 +37,7 @@ definition {
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8368 | Test Summary: Page profile assets card shows which assets are on the page"
 	@ignore = "true"
-	@priority = "5"
+	@priority = 5
 	test ShowsWhichAssetsOnPage {
 		property portal.upstream = "quarantine";
 
@@ -79,7 +79,7 @@ definition {
 
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = "${propertyName}");
+			ACProperties.switchProperty(propertyName = ${propertyName});
 		}
 
 		task ("Go to Sites > Pages > Set 24 hours on Time Filter") {
@@ -106,13 +106,13 @@ definition {
 		task ("Assert Blog and WC on the List") {
 			for (var assetName : list "Blogs AC Title,Blogs") {
 				AssertTextEquals(
-					categoryName = "${assetName}",
+					categoryName = ${assetName},
 					locator1 = "ContentDashboard#CATEGORY_NAME_ELEMENT");
 			}
 
 			for (var assetName : list "Web Content AC Title,Web Content") {
 				AssertTextEquals(
-					categoryName = "${assetName}",
+					categoryName = ${assetName},
 					locator1 = "ContentDashboard#CATEGORY_NAME_ELEMENT");
 			}
 		}

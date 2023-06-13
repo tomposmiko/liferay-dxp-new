@@ -14,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -23,14 +23,14 @@ definition {
 	}
 
 	@description = "This test ensures that a SERP preview is shown correctly based on the meta tags."
-	@priority = "5"
+	@priority = 5
 	test Smoke {
 		property environment.acceptance = "true";
 		property operating.system.types = "alpine,amazonlinux,centos,debian,fedora,orcllinux,osx,redhat,solaris,suse,ubuntu,windows";
 		property portal.acceptance = "true";
 
 		var portalURL = PropsUtil.get("portal.url");
-		var siteName = TestCase.getSiteName(siteName = "${siteName}");
+		var siteName = TestCase.getSiteName(siteName = ${siteName});
 
 		JSONLayout.addPublicLayout(
 			groupName = "Guest",
@@ -56,7 +56,7 @@ definition {
 			description = "Description",
 			htmlTitle = "Page HTML Title - ${siteName}",
 			pageName = "Test Page",
-			portalURL = "${portalURL}");
+			portalURL = ${portalURL});
 
 		Button.clickSave();
 
@@ -68,14 +68,14 @@ definition {
 			description = "Description",
 			htmlTitle = "Page HTML Title - ${siteName}",
 			pageName = "Test Page",
-			portalURL = "${portalURL}");
+			portalURL = ${portalURL});
 	}
 
 	@description = "This test ensures that ellipses are shown in the preview when the text limit is reached."
-	@priority = "5"
+	@priority = 5
 	test ValidateLongInputs {
 		var portalURL = PropsUtil.get("portal.url");
-		var siteName = TestCase.getSiteName(siteName = "${siteName}");
+		var siteName = TestCase.getSiteName(siteName = ${siteName});
 
 		JSONLayout.addPublicLayout(
 			groupName = "Guest",
@@ -99,7 +99,7 @@ definition {
 			description = "Liferay Portal provides an excellent platform for building web applications, websites, and portals, but it can additionally be used for a new category of web ap…",
 			htmlTitle = "Liferay Portal provides an excellent platform for building web applications - ${siteName}",
 			pageName = "Long Test Page Name To Check The Display Style Of The URL In The SERP Preview",
-			portalURL = "${portalURL}",
+			portalURL = ${portalURL},
 			truncatedHTMLTitle = "true",
 			truncatedURL = "true");
 
@@ -113,16 +113,16 @@ definition {
 			description = "Liferay Portal provides an excellent platform for building web applications, websites, and portals, but it can additionally be used for a new category of web ap…",
 			htmlTitle = "Liferay Portal provides an excellent platform for building web applications - ${siteName}",
 			pageName = "Long Test Page Name To Check The Display Style Of The URL In The SERP Preview",
-			portalURL = "${portalURL}",
+			portalURL = ${portalURL},
 			truncatedHTMLTitle = "true",
 			truncatedURL = "true");
 	}
 
 	@description = "This test ensures that a SERP preview is refreshed when switching translations."
-	@priority = "4"
+	@priority = 4
 	test ViewPreviewWhenSwitchingTranslations {
 		var portalURL = PropsUtil.get("portal.url");
-		var siteName = TestCase.getSiteName(siteName = "${siteName}");
+		var siteName = TestCase.getSiteName(siteName = ${siteName});
 
 		JSONLayout.addPublicLayout(
 			groupName = "Guest",
@@ -146,7 +146,7 @@ definition {
 			description = "Page Description",
 			htmlTitle = "Page HTML Title - ${siteName}",
 			pageName = "Test Page",
-			portalURL = "${portalURL}");
+			portalURL = ${portalURL});
 
 		PortletEntry.changeLocale(
 			fieldName = "HTML Title",
@@ -165,7 +165,7 @@ definition {
 			htmlTitle = "中文标题 - ${siteName}",
 			locale = "zh-CN",
 			pageName = "Test Page",
-			portalURL = "${portalURL}");
+			portalURL = ${portalURL});
 
 		PortletEntry.changeLocale(
 			fieldName = "HTML Title",
@@ -175,7 +175,7 @@ definition {
 			description = "Page Description",
 			htmlTitle = "Page HTML Title - ${siteName}",
 			pageName = "Test Page",
-			portalURL = "${portalURL}");
+			portalURL = ${portalURL});
 
 		Button.clickSave();
 
@@ -187,7 +187,7 @@ definition {
 			description = "Page Description",
 			htmlTitle = "Page HTML Title - ${siteName}",
 			pageName = "Test Page",
-			portalURL = "${portalURL}");
+			portalURL = ${portalURL});
 
 		PortletEntry.changeLocale(
 			fieldName = "HTML Title",
@@ -198,14 +198,14 @@ definition {
 			htmlTitle = "中文标题 - ${siteName}",
 			locale = "zh-CN",
 			pageName = "Test Page",
-			portalURL = "${portalURL}");
+			portalURL = ${portalURL});
 	}
 
 	@description = "This test ensures that a user can preview SEO tags with different languages."
-	@priority = "5"
+	@priority = 5
 	test ViewTranslatedLanguages {
 		var portalURL = PropsUtil.get("portal.url");
-		var siteName = TestCase.getSiteName(siteName = "${siteName}");
+		var siteName = TestCase.getSiteName(siteName = ${siteName});
 
 		JSONGroup.addGroup(groupName = "Test Site Name");
 
@@ -237,7 +237,7 @@ definition {
 			description = "وصف الاختبار",
 			htmlTitle = "عنوان الاختبار - Test Site Name - ${siteName}",
 			locale = "ar-SA",
-			portalURL = "${portalURL}",
+			portalURL = ${portalURL},
 			siteNameURL = "test-site-name");
 
 		Button.clickSave();
@@ -258,7 +258,7 @@ definition {
 			description = "Descripción de la Prueba",
 			htmlTitle = "Título de la Prueba - Test Site Name - ${siteName}",
 			locale = "ca-ES",
-			portalURL = "${portalURL}",
+			portalURL = ${portalURL},
 			siteNameURL = "test-site-name");
 
 		Button.clickSave();
@@ -271,7 +271,7 @@ definition {
 			description = "وصف الاختبار",
 			htmlTitle = "عنوان الاختبار - Test Site Name - ${siteName}",
 			locale = "ar-SA",
-			portalURL = "${portalURL}",
+			portalURL = ${portalURL},
 			siteNameURL = "test-site-name");
 
 		OpenGraph.changeLocale(
@@ -282,7 +282,7 @@ definition {
 			description = "Descripción de la Prueba",
 			htmlTitle = "Título de la Prueba - Test Site Name - ${siteName}",
 			locale = "ca-ES",
-			portalURL = "${portalURL}",
+			portalURL = ${portalURL},
 			siteNameURL = "test-site-name");
 	}
 

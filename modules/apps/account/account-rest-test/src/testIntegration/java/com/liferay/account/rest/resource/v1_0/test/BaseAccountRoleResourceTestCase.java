@@ -300,7 +300,10 @@ public abstract class BaseAccountRoleResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantAccountRole),
 				(List<AccountRole>)page.getItems());
-			assertValid(page);
+			assertValid(
+				page,
+				testGetAccountRolesByExternalReferenceCodePage_getExpectedActions(
+					irrelevantExternalReferenceCode));
 		}
 
 		AccountRole accountRole1 =
@@ -319,7 +322,20 @@ public abstract class BaseAccountRoleResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(accountRole1, accountRole2),
 			(List<AccountRole>)page.getItems());
-		assertValid(page);
+		assertValid(
+			page,
+			testGetAccountRolesByExternalReferenceCodePage_getExpectedActions(
+				externalReferenceCode));
+	}
+
+	protected Map<String, Map>
+			testGetAccountRolesByExternalReferenceCodePage_getExpectedActions(
+				String externalReferenceCode)
+		throws Exception {
+
+		Map<String, Map> expectedActions = new HashMap<>();
+
+		return expectedActions;
 	}
 
 	@Test
@@ -583,7 +599,10 @@ public abstract class BaseAccountRoleResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantAccountRole),
 				(List<AccountRole>)page.getItems());
-			assertValid(page);
+			assertValid(
+				page,
+				testGetAccountRolesPage_getExpectedActions(
+					irrelevantAccountId));
 		}
 
 		AccountRole accountRole1 = testGetAccountRolesPage_addAccountRole(
@@ -600,7 +619,17 @@ public abstract class BaseAccountRoleResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(accountRole1, accountRole2),
 			(List<AccountRole>)page.getItems());
-		assertValid(page);
+		assertValid(
+			page, testGetAccountRolesPage_getExpectedActions(accountId));
+	}
+
+	protected Map<String, Map> testGetAccountRolesPage_getExpectedActions(
+			Long accountId)
+		throws Exception {
+
+		Map<String, Map> expectedActions = new HashMap<>();
+
+		return expectedActions;
 	}
 
 	@Test
@@ -867,8 +896,16 @@ public abstract class BaseAccountRoleResourceTestCase {
 		assertHttpResponseStatusCode(
 			204,
 			accountRoleResource.deleteAccountRoleUserAssociationHttpResponse(
-				accountRole.getAccountId(), accountRole.getId(),
+				testDeleteAccountRoleUserAssociation_getAccountId(accountRole),
+				accountRole.getId(),
 				testDeleteAccountRoleUserAssociation_getAccountUserId()));
+	}
+
+	protected Long testDeleteAccountRoleUserAssociation_getAccountId(
+			AccountRole accountRole)
+		throws Exception {
+
+		return accountRole.getAccountId();
 	}
 
 	protected Long testDeleteAccountRoleUserAssociation_getAccountUserId()
@@ -1042,6 +1079,12 @@ public abstract class BaseAccountRoleResourceTestCase {
 	}
 
 	protected void assertValid(Page<AccountRole> page) {
+		assertValid(page, Collections.emptyMap());
+	}
+
+	protected void assertValid(
+		Page<AccountRole> page, Map<String, Map> expectedActions) {
+
 		boolean valid = false;
 
 		java.util.Collection<AccountRole> accountRoles = page.getItems();
@@ -1056,6 +1099,20 @@ public abstract class BaseAccountRoleResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
+
+		Map<String, Map> actions = page.getActions();
+
+		for (String key : expectedActions.keySet()) {
+			Map action = actions.get(key);
+
+			Assert.assertNotNull(key + " does not contain an action", action);
+
+			Map expectedAction = expectedActions.get(key);
+
+			Assert.assertEquals(
+				expectedAction.get("method"), action.get("method"));
+			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
+		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -1248,6 +1305,10 @@ public abstract class BaseAccountRoleResourceTestCase {
 
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
+
+		if (entityModel == null) {
+			return Collections.emptyList();
+		}
 
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();

@@ -28,7 +28,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -37,7 +37,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-113740."
-	@priority = "4"
+	@priority = 4
 	test ChangeSitePageVariationInPagesAdmin {
 		Staging.addSitePagesVariationPG(
 			copySitePagesVariationName = "Main Variation",
@@ -78,7 +78,7 @@ definition {
 			value1 = "The page Test Page Name is not enabled in Main Variation, but is available for other pages variations.");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test DeleteChildPageFromVariationWhereNotEnabled {
 		Staging.addSitePagesVariationPG(
 			copySitePagesVariationName = "Main Variation",
@@ -103,7 +103,7 @@ definition {
 			privacy = "Public Pages");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test DeleteHistory {
 		Portlet.addPG(portletName = "Sites Directory");
 
@@ -112,7 +112,7 @@ definition {
 		Portlet.viewNoSpecificPG(portletName = "Sites Directory");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test EnableAndDeleteSitePageVariationPage {
 		Staging.addSitePagesVariationPG(
 			copySitePagesVariationName = "Main Variation",
@@ -151,7 +151,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-78292."
-	@priority = "4"
+	@priority = 4
 	test PublicationWithoutReadyForPublication {
 		SitePages.openPagesAdmin(siteURLKey = "site-name-staging");
 
@@ -210,7 +210,7 @@ definition {
 		Portlet.viewNoSpecificPG(portletName = "Hello World Custom");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test PublishCustomPortletTitle {
 		Staging.addSitePagesVariationPG(sitePagesVariationName = "Site Pages Variation Name");
 
@@ -287,7 +287,7 @@ definition {
 		Portlet.viewSpecificPG(portletName = "Sites Directory Custom");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test StagingDeletePageVariation {
 		Navigator.openSiteURL(siteName = "Site Name");
 
@@ -348,7 +348,7 @@ definition {
 		Portlet.viewSpecificPG(portletName = "Site Map");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test StagingDeleteSitePagesVariation {
 		Navigator.openSiteURL(siteName = "Site Name");
 
@@ -397,7 +397,7 @@ definition {
 		Portlet.viewSpecificPG(portletName = "Site Map");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test StagingMergeSitePagesVariation1 {
 		Navigator.openSiteURL(siteName = "Site Name");
 
@@ -450,7 +450,7 @@ definition {
 			siteName = "Site Name");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test StagingMergeSitePagesVariation2 {
 		Navigator.openSiteURL(siteName = "Site Name");
 
@@ -540,7 +540,7 @@ definition {
 			siteName = "Site Name");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test StagingPageLogo {
 		Page.viewDefaultLogoPG();
 
@@ -591,7 +591,7 @@ definition {
 		Page.viewLayoutLogoPG(assertLayoutLogoPresent = "true");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test StagingPortletPublishContentCount {
 		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name-staging");
 
@@ -608,7 +608,7 @@ definition {
 		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name-staging");
 
 		Staging.viewPublishContentCountViaPortletStagingCP(
-			contentCount = "1",
+			contentCount = 1,
 			contentInformation = "Web Content (1)",
 			stagingDateRange = "From Last Publish Date");
 
@@ -621,7 +621,7 @@ definition {
 		Staging.viewNoPublishContentCountViaPortletStagingCP(stagingDateRange = "From Last Publish Date");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test StagingPublishLast {
 		property app.server.types = "jboss,tcserver,tomcat,weblogic,websphere,wildfly";
 		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
@@ -668,7 +668,7 @@ definition {
 			webContentTitle = "Web Content Title");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test StagingSiteLogo {
 		Page.viewDefaultLogoPG();
 
@@ -717,7 +717,7 @@ definition {
 		Page.viewCustomLogoPG();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test StagingSiteVariationIncompletePage {
 		property portal.acceptance = "true";
 
@@ -744,7 +744,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-87030."
-	@priority = "3"
+	@priority = 3
 	test StagingTurnOffPageTemplatePropagation {
 		PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = "site-name-staging");
 
@@ -777,7 +777,7 @@ definition {
 		Page.viewPageLayoutColumn(columnName = "1 Column");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test StagingVersionHistory {
 		Staging.gotoHistory();
 
@@ -789,7 +789,7 @@ definition {
 			pageName = "Staging Test Page",
 			siteName = "Site Name");
 
-		Staging.viewHistoryVersionPG(historyVersion = "${historyVersion}");
+		Staging.viewHistoryVersionPG(historyVersion = ${historyVersion});
 
 		Navigator.gotoStagedSitePage(
 			pageName = "Staging Test Page",
@@ -804,7 +804,7 @@ definition {
 		Portlet.viewSpecificPG(portletName = "Blogs");
 
 		Staging.viewHistoryVersionPG(
-			historyVersion = "${historyVersion}",
+			historyVersion = ${historyVersion},
 			modifiedVersion = "true");
 
 		Navigator.gotoStagedSitePage(
@@ -819,7 +819,7 @@ definition {
 
 		Portlet.viewNoSpecificPG(portletName = "Blogs");
 
-		Staging.viewHistoryVersionPG(historyVersion = "${historyVersion}");
+		Staging.viewHistoryVersionPG(historyVersion = ${historyVersion});
 
 		Navigator.gotoStagedSitePage(
 			pageName = "Staging Test Page",
@@ -834,7 +834,7 @@ definition {
 		Portlet.viewSpecificPG(portletName = "Blogs");
 
 		Staging.viewHistoryVersionPG(
-			historyVersion = "${historyVersion}",
+			historyVersion = ${historyVersion},
 			modifiedVersion = "true");
 
 		Staging.gotoPublishToLive();
@@ -843,7 +843,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-84809."
-	@priority = "3"
+	@priority = 3
 	test ViewChildPageNameViaLocalizedPage {
 		property test.name.skip.portal.instance = "StagingUsecaseWithVersioning#ViewChildPageNameViaLocalizedPage";
 

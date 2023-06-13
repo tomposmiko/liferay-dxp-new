@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.inventory.service.persistence.impl;
 
+import com.liferay.commerce.inventory.exception.DuplicateCommerceInventoryWarehouseItemExternalReferenceCodeException;
 import com.liferay.commerce.inventory.exception.NoSuchInventoryWarehouseItemException;
 import com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItem;
 import com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItemTable;
@@ -2610,6 +2611,38 @@ public class CommerceInventoryWarehouseItemPersistenceImpl
 
 			commerceInventoryWarehouseItem.setExternalReferenceCode(
 				String.valueOf(commerceInventoryWarehouseItem.getPrimaryKey()));
+		}
+		else {
+			CommerceInventoryWarehouseItem ercCommerceInventoryWarehouseItem =
+				fetchByC_ERC(
+					commerceInventoryWarehouseItem.getCompanyId(),
+					commerceInventoryWarehouseItem.getExternalReferenceCode());
+
+			if (isNew) {
+				if (ercCommerceInventoryWarehouseItem != null) {
+					throw new DuplicateCommerceInventoryWarehouseItemExternalReferenceCodeException(
+						"Duplicate commerce inventory warehouse item with external reference code " +
+							commerceInventoryWarehouseItem.
+								getExternalReferenceCode() + " and company " +
+									commerceInventoryWarehouseItem.
+										getCompanyId());
+				}
+			}
+			else {
+				if ((ercCommerceInventoryWarehouseItem != null) &&
+					(commerceInventoryWarehouseItem.
+						getCommerceInventoryWarehouseItemId() !=
+							ercCommerceInventoryWarehouseItem.
+								getCommerceInventoryWarehouseItemId())) {
+
+					throw new DuplicateCommerceInventoryWarehouseItemExternalReferenceCodeException(
+						"Duplicate commerce inventory warehouse item with external reference code " +
+							commerceInventoryWarehouseItem.
+								getExternalReferenceCode() + " and company " +
+									commerceInventoryWarehouseItem.
+										getCompanyId());
+				}
+			}
 		}
 
 		ServiceContext serviceContext =

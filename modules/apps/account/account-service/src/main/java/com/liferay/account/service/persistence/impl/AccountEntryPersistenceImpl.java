@@ -14,6 +14,7 @@
 
 package com.liferay.account.service.persistence.impl;
 
+import com.liferay.account.exception.DuplicateAccountEntryExternalReferenceCodeException;
 import com.liferay.account.exception.NoSuchEntryException;
 import com.liferay.account.model.AccountEntry;
 import com.liferay.account.model.AccountEntryTable;
@@ -2440,6 +2441,31 @@ public class AccountEntryPersistenceImpl
 		if (Validator.isNull(accountEntry.getExternalReferenceCode())) {
 			accountEntry.setExternalReferenceCode(
 				String.valueOf(accountEntry.getPrimaryKey()));
+		}
+		else {
+			AccountEntry ercAccountEntry = fetchByC_ERC(
+				accountEntry.getCompanyId(),
+				accountEntry.getExternalReferenceCode());
+
+			if (isNew) {
+				if (ercAccountEntry != null) {
+					throw new DuplicateAccountEntryExternalReferenceCodeException(
+						"Duplicate account entry with external reference code " +
+							accountEntry.getExternalReferenceCode() +
+								" and company " + accountEntry.getCompanyId());
+				}
+			}
+			else {
+				if ((ercAccountEntry != null) &&
+					(accountEntry.getAccountEntryId() !=
+						ercAccountEntry.getAccountEntryId())) {
+
+					throw new DuplicateAccountEntryExternalReferenceCodeException(
+						"Duplicate account entry with external reference code " +
+							accountEntry.getExternalReferenceCode() +
+								" and company " + accountEntry.getCompanyId());
+				}
+			}
 		}
 
 		ServiceContext serviceContext =

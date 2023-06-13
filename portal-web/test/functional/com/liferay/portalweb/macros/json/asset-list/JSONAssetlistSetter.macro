@@ -1,31 +1,31 @@
 definition {
 
 	macro setGroupId {
-		Variables.assertDefined(parameterList = "${groupName}");
+		Variables.assertDefined(parameterList = ${groupName});
 
 		if (!(isSet(site))) {
 			var site = "true";
 		}
 
 		var groupId = JSONGroupAPI._getGroupIdByName(
-			groupName = "${groupName}",
-			site = "${site}");
+			groupName = ${groupName},
+			site = ${site});
 
-		return "${groupId}";
+		return ${groupId};
 	}
 
 	macro setType {
-		Variables.assertDefined(parameterList = "${selectionType}");
+		Variables.assertDefined(parameterList = ${selectionType});
 
-		if ("${selectionType}" == "manual") {
-			var type = "1";
+		if (${selectionType} == "manual") {
+			var type = 1;
 		}
 
-		if ("${selectionType}" == "dynamic") {
-			var type = "0";
+		if (${selectionType} == "dynamic") {
+			var type = 0;
 		}
 
-		return "${type}";
+		return ${type};
 	}
 
 }

@@ -25,7 +25,7 @@ definition {
 
 		ACUtils.tearDownDXP();
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 
@@ -34,7 +34,7 @@ definition {
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8356 | Test Summary: 180 Days time period filter in Path Analysis"
 	@ignore = "true"
-	@priority = "3"
+	@priority = 3
 	test CanTimeFilterUse180DaysPathAnalysis {
 		property portal.upstream = "quarantine";
 
@@ -46,7 +46,7 @@ definition {
 
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = "${propertyName}");
+			ACProperties.switchProperty(propertyName = ${propertyName});
 		}
 
 		task ("Go to Pages tab in Sites") {
@@ -68,7 +68,7 @@ definition {
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8358 | Test Summary: Custom Range time period filter in Path Analysis"
 	@ignore = "true"
-	@priority = "5"
+	@priority = 5
 	test CanTimeFilterUseCustomRangeInPathAnalysis {
 		property portal.upstream = "quarantine";
 
@@ -80,7 +80,7 @@ definition {
 
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = "${propertyName}");
+			ACProperties.switchProperty(propertyName = ${propertyName});
 		}
 
 		task ("Go to Pages tab in Sites") {
@@ -93,12 +93,12 @@ definition {
 
 		task ("Assert custom time filter") {
 			ACTimeFilter.setCustomRange(
-				endDay = "13",
+				endDay = 13,
 				endMonth = "July",
-				endYear = "2020",
-				startDay = "1",
+				endYear = 2020,
+				startDay = 1,
 				startMonth = "July",
-				startYear = "2020");
+				startYear = 2020);
 
 			ACTimeFilter.assertCurrentTimeFilterRange(timeFilterRange = "Jul 1, 2020 - Jul 13, 2020");
 		}
@@ -106,7 +106,7 @@ definition {
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8357 | Test Summary: Last Year time period filter in Path Analysis"
 	@ignore = "true"
-	@priority = "3"
+	@priority = 3
 	test CanTimeFilterUseLastYearPathAnalysis {
 		property portal.upstream = "quarantine";
 
@@ -118,7 +118,7 @@ definition {
 
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = "${propertyName}");
+			ACProperties.switchProperty(propertyName = ${propertyName});
 		}
 
 		task ("Go to Pages tab in Sites") {

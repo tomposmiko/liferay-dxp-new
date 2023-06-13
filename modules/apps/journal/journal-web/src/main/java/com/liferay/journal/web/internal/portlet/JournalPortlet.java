@@ -87,7 +87,6 @@ import javax.portlet.ResourceResponse;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
@@ -101,7 +100,7 @@ import org.osgi.service.component.annotations.Reference;
 		"com.liferay.journal.web.internal.configuration.JournalDDMEditorConfiguration",
 		"com.liferay.journal.web.internal.configuration.JournalWebConfiguration"
 	},
-	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
+	immediate = true,
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=portlet-journal",

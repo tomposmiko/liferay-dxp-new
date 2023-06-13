@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.service.persistence.impl;
 
+import com.liferay.commerce.exception.DuplicateCommerceOrderNoteExternalReferenceCodeException;
 import com.liferay.commerce.exception.NoSuchOrderNoteException;
 import com.liferay.commerce.model.CommerceOrderNote;
 import com.liferay.commerce.model.CommerceOrderNoteTable;
@@ -1679,6 +1680,33 @@ public class CommerceOrderNotePersistenceImpl
 		if (Validator.isNull(commerceOrderNote.getExternalReferenceCode())) {
 			commerceOrderNote.setExternalReferenceCode(
 				String.valueOf(commerceOrderNote.getPrimaryKey()));
+		}
+		else {
+			CommerceOrderNote ercCommerceOrderNote = fetchByC_ERC(
+				commerceOrderNote.getCompanyId(),
+				commerceOrderNote.getExternalReferenceCode());
+
+			if (isNew) {
+				if (ercCommerceOrderNote != null) {
+					throw new DuplicateCommerceOrderNoteExternalReferenceCodeException(
+						"Duplicate commerce order note with external reference code " +
+							commerceOrderNote.getExternalReferenceCode() +
+								" and company " +
+									commerceOrderNote.getCompanyId());
+				}
+			}
+			else {
+				if ((ercCommerceOrderNote != null) &&
+					(commerceOrderNote.getCommerceOrderNoteId() !=
+						ercCommerceOrderNote.getCommerceOrderNoteId())) {
+
+					throw new DuplicateCommerceOrderNoteExternalReferenceCodeException(
+						"Duplicate commerce order note with external reference code " +
+							commerceOrderNote.getExternalReferenceCode() +
+								" and company " +
+									commerceOrderNote.getCompanyId());
+				}
+			}
 		}
 
 		ServiceContext serviceContext =

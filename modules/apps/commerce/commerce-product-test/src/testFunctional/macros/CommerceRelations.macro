@@ -17,8 +17,8 @@ definition {
 
 		WaitForSPARefresh();
 
-		for (var entriesNames : list "${entriesList}") {
-			CommerceItemSelector.selectEntry(entryName = "${entriesNames}");
+		for (var entriesNames : list ${entriesList}) {
+			CommerceItemSelector.selectEntry(entryName = ${entriesNames});
 		}
 
 		Click(
@@ -30,15 +30,15 @@ definition {
 		var searchTerm = '''"${entryName}"''';
 
 		Type(
-			key_title = "${title}",
+			key_title = ${title},
 			locator1 = "CommerceEntry#ADD_RELATION_FIELD",
-			value1 = "${searchTerm}");
+			value1 = ${searchTerm});
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		ClickNoError(
-			key_entryName = "${entryName}",
-			key_title = "${title}",
+			key_entryName = ${entryName},
+			key_title = ${title},
 			locator1 = "CommerceEntry#ADD_RELATION_FIELD_SELECT");
 	}
 

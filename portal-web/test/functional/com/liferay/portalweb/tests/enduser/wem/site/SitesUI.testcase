@@ -15,7 +15,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -23,7 +23,7 @@ definition {
 		}
 	}
 
-	@priority = "5"
+	@priority = 5
 	test AddChildSite {
 		property portal.acceptance = "true";
 		property testray.component.names = "Training";
@@ -49,7 +49,7 @@ definition {
 			siteName = "Site Name");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AddSitesMultiple {
 		ApplicationsMenu.gotoPortlet(
 			category = "Sites",
@@ -106,7 +106,7 @@ definition {
 		Site.viewCP(siteName = "Site3 Name");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test DeleteSite {
 		property portal.acceptance = "true";
 

@@ -42,7 +42,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -51,7 +51,7 @@ definition {
 	}
 
 	@description = "Add a fragment in the UI and then assert that it displays properly when added to a content page."
-	@priority = "5"
+	@priority = 5
 	test AddFragmentToContentPage {
 		property app.server.types = "jboss,tcserver,tomcat,weblogic,websphere,wildfly";
 		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
@@ -111,7 +111,7 @@ definition {
 	}
 
 	@description = "Edit a fragment and assert the edits persist."
-	@priority = "5"
+	@priority = 5
 	test EditFragment {
 		property portal.acceptance = "true";
 		property testray.component.names = "Training";
@@ -138,7 +138,7 @@ definition {
 			FragmentsAdminNavigator.gotoEntry(entry = "Fragment Name");
 		}
 
-		Pause(locator1 = "1000");
+		Pause(locator1 = 1000);
 
 		task ("Assert the edits to the section fragment persist by asserting that the preview displays the Title fragment") {
 			FragmentsEditor.assertFragmentPreview(
@@ -148,7 +148,7 @@ definition {
 	}
 
 	@description = "This is a test for LPS-89251. When creating fragments there should be a visible reference to the Liferay Fragments Toolkit."
-	@priority = "4"
+	@priority = 4
 	test ViewReferenceToFragmentsToolkit {
 		task ("Click on the Fragments Toolkit link") {
 			Click(locator1 = "FragmentEditor#FRAGMENTS_TOOLKIT_LINK");

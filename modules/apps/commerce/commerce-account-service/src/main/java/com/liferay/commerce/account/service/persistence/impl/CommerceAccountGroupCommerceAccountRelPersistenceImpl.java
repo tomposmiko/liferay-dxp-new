@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.account.service.persistence.impl;
 
+import com.liferay.commerce.account.exception.DuplicateCommerceAccountGroupCommerceAccountRelExternalReferenceCodeException;
 import com.liferay.commerce.account.exception.NoSuchAccountGroupCommerceAccountRelException;
 import com.liferay.commerce.account.model.CommerceAccountGroupCommerceAccountRel;
 import com.liferay.commerce.account.model.CommerceAccountGroupCommerceAccountRelTable;
@@ -2059,6 +2060,39 @@ public class CommerceAccountGroupCommerceAccountRelPersistenceImpl
 			commerceAccountGroupCommerceAccountRel.setExternalReferenceCode(
 				String.valueOf(
 					commerceAccountGroupCommerceAccountRel.getPrimaryKey()));
+		}
+		else {
+			CommerceAccountGroupCommerceAccountRel
+				ercCommerceAccountGroupCommerceAccountRel = fetchByC_ERC(
+					commerceAccountGroupCommerceAccountRel.getCompanyId(),
+					commerceAccountGroupCommerceAccountRel.
+						getExternalReferenceCode());
+
+			if (isNew) {
+				if (ercCommerceAccountGroupCommerceAccountRel != null) {
+					throw new DuplicateCommerceAccountGroupCommerceAccountRelExternalReferenceCodeException(
+						"Duplicate commerce account group commerce account rel with external reference code " +
+							commerceAccountGroupCommerceAccountRel.
+								getExternalReferenceCode() + " and company " +
+									commerceAccountGroupCommerceAccountRel.
+										getCompanyId());
+				}
+			}
+			else {
+				if ((ercCommerceAccountGroupCommerceAccountRel != null) &&
+					(commerceAccountGroupCommerceAccountRel.
+						getCommerceAccountGroupCommerceAccountRelId() !=
+							ercCommerceAccountGroupCommerceAccountRel.
+								getCommerceAccountGroupCommerceAccountRelId())) {
+
+					throw new DuplicateCommerceAccountGroupCommerceAccountRelExternalReferenceCodeException(
+						"Duplicate commerce account group commerce account rel with external reference code " +
+							commerceAccountGroupCommerceAccountRel.
+								getExternalReferenceCode() + " and company " +
+									commerceAccountGroupCommerceAccountRel.
+										getCompanyId());
+				}
+			}
 		}
 
 		ServiceContext serviceContext =

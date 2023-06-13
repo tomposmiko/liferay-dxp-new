@@ -14,6 +14,7 @@
 
 package com.liferay.portlet.asset.service.persistence.impl;
 
+import com.liferay.asset.kernel.exception.DuplicateAssetCategoryExternalReferenceCodeException;
 import com.liferay.asset.kernel.exception.NoSuchCategoryException;
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetCategoryTable;
@@ -12341,6 +12342,31 @@ public class AssetCategoryPersistenceImpl
 
 		if (Validator.isNull(assetCategory.getExternalReferenceCode())) {
 			assetCategory.setExternalReferenceCode(assetCategory.getUuid());
+		}
+		else {
+			AssetCategory ercAssetCategory = fetchByC_ERC(
+				assetCategory.getCompanyId(),
+				assetCategory.getExternalReferenceCode());
+
+			if (isNew) {
+				if (ercAssetCategory != null) {
+					throw new DuplicateAssetCategoryExternalReferenceCodeException(
+						"Duplicate asset category with external reference code " +
+							assetCategory.getExternalReferenceCode() +
+								" and company " + assetCategory.getCompanyId());
+				}
+			}
+			else {
+				if ((ercAssetCategory != null) &&
+					(assetCategory.getCategoryId() !=
+						ercAssetCategory.getCategoryId())) {
+
+					throw new DuplicateAssetCategoryExternalReferenceCodeException(
+						"Duplicate asset category with external reference code " +
+							assetCategory.getExternalReferenceCode() +
+								" and company " + assetCategory.getCompanyId());
+				}
+			}
 		}
 
 		ServiceContext serviceContext =

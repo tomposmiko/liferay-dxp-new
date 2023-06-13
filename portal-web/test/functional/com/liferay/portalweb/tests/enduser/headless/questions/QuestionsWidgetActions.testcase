@@ -26,7 +26,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -43,7 +43,7 @@ definition {
 	}
 
 	@description = "Validate if the user can create a question with an AL image."
-	@priority = "4"
+	@priority = 4
 	test AddQuestionWithDepotImage {
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
@@ -64,9 +64,9 @@ definition {
 
 		DepotNavigator.gotoSites(depotName = "Test Depot Name");
 
-		var siteName = TestCase.getSiteName(siteName = "${siteName}");
+		var siteName = TestCase.getSiteName(siteName = ${siteName});
 
-		Depot.connectSite(siteList = "${siteName}");
+		Depot.connectSite(siteList = ${siteName});
 
 		JSONMBMessage.addCategory(
 			categoryDescription = "Description",
@@ -93,7 +93,7 @@ definition {
 	}
 
 	@description = "Validate if the user can create a question with an image."
-	@priority = "4"
+	@priority = 4
 	test AddQuestionWithImage {
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
@@ -126,7 +126,7 @@ definition {
 	}
 
 	@description = "Validate if the user can not create a question with the maximum of 6 tags with unexisting tag"
-	@priority = "2"
+	@priority = 2
 	test AddQuestionWithMoreThanTheMaximumTagsIsNotPossible {
 		JSONMBMessage.addCategory(
 			categoryDescription = "Description",
@@ -148,7 +148,7 @@ definition {
 	}
 
 	@description = "Validate if the user can create a question with the maximum of 5 tags with unexisting tag"
-	@priority = "3"
+	@priority = 3
 	test AddQuestionWithTheMaximumTags {
 		JSONMBMessage.addCategory(
 			categoryDescription = "Description",
@@ -180,7 +180,7 @@ definition {
 	}
 
 	@description = "Validate if the user can view the topic selector and category label."
-	@priority = "4"
+	@priority = 4
 	test AddSubcategoryConfigureParentCategoryDisplay {
 		JSONMBMessage.addCategory(
 			categoryDescription = "Description",
@@ -229,12 +229,12 @@ definition {
 
 		var messageBoardsCategoryURL = selenium.getLocation();
 
-		var parentCategoryId = StringUtil.extractLast("${messageBoardsCategoryURL}", "mbCategoryId=");
+		var parentCategoryId = StringUtil.extractLast(${messageBoardsCategoryURL}, "mbCategoryId=");
 
 		JSONMBMessage.addCategory(
 			categoryDescription = "Subcategory Description",
 			categoryName = "Questions Test Subcategory",
-			parentCategoryId = "${parentCategoryId}",
+			parentCategoryId = ${parentCategoryId},
 			userEmailAddress = "test@liferay.com");
 
 		Navigator.gotoPage(pageName = "Questions Page");
@@ -269,7 +269,7 @@ definition {
 	}
 
 	@description = "Validate if the user can add subtopic via the widget."
-	@priority = "4"
+	@priority = 4
 	test AddSubTopicsViaWidget {
 		JSONMBMessage.addCategory(
 			categoryDescription = "Description",
@@ -308,7 +308,7 @@ definition {
 	}
 
 	@description = "Validate if the anonymous user can ask questions and redirected to login."
-	@priority = "4"
+	@priority = 4
 	test AskQuestionsThroughAnonymousUser {
 		ApplicationsMenu.gotoPortlet(
 			category = "Security",
@@ -330,7 +330,7 @@ definition {
 		''';
 
 		ServiceAccessPolicy.editServiceAccessPolicy(
-			allowedServiceSignature = "${allowedServiceSignature}",
+			allowedServiceSignature = ${allowedServiceSignature},
 			policyName = "QUESTIONS");
 
 		MessageBoardsAdmin.openMessageBoardsAdmin(siteURLKey = "guest");
@@ -359,7 +359,7 @@ definition {
 	}
 
 	@description = "Validate if the user can add root topic without permission."
-	@priority = "4"
+	@priority = 4
 	test CannotAddRootTopicWithoutPermission {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 
@@ -412,7 +412,7 @@ definition {
 	}
 
 	@description = "Validate if the user can add subtopic without permission."
-	@priority = "4"
+	@priority = 4
 	test CannotAddSubTopicWithoutPermission {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 
@@ -465,7 +465,7 @@ definition {
 	}
 
 	@description = "Validate if the user can setup the landing page topic navigation for the widget."
-	@priority = "4"
+	@priority = 4
 	test ConfigureLandingPageTopicNavigation {
 		JSONLayout.addPublicLayout(
 			groupName = "Guest",
@@ -517,7 +517,7 @@ definition {
 
 		for (var topicName : list "Questions Test Category1,Questions Test Category2") {
 			AssertElementPresent(
-				key_card = "${topicName}",
+				key_card = ${topicName},
 				locator1 = "Card#CARD_TITLE");
 		}
 
@@ -537,7 +537,7 @@ definition {
 	}
 
 	@description = "Validate if the user can setup the root topic for the widget."
-	@priority = "4"
+	@priority = 4
 	test ConfigureRootTopic {
 		JSONLayout.addPublicLayout(
 			groupName = "Guest",
@@ -583,7 +583,7 @@ definition {
 
 		for (var topicName : list "Questions Test Category,Questions Test SubCategory") {
 			AssertElementNotPresent(
-				key_card = "${topicName}",
+				key_card = ${topicName},
 				locator1 = "Card#CARD_TITLE");
 		}
 
@@ -607,7 +607,7 @@ definition {
 	}
 
 	@description = "Validate if the user can lock and unlock a question through the MB."
-	@priority = "4"
+	@priority = 4
 	test LockAndUnlockThroughMB {
 		JSONMBMessage.addCategory(
 			categoryDescription = "Description",
@@ -684,7 +684,7 @@ definition {
 	}
 
 	@description = "Validate if the user can search for the questions."
-	@priority = "4"
+	@priority = 4
 	test SearchForQuestions {
 		JSONMBMessage.addCategory(
 			categoryDescription = "Description",
@@ -713,7 +713,7 @@ definition {
 
 		Questions.gotoCategory(categoryName = "Questions Test Category");
 
-		Pause(locator = "3000");
+		Pause(locator = 3000);
 
 		Questions.search(
 			resultsInfo = '''1 Results for "questions title 5"''',
@@ -771,7 +771,7 @@ definition {
 	}
 
 	@description = "Validate if the user can subscribe and unsubscribe from the question."
-	@priority = "5"
+	@priority = 5
 	test SubscribeAndUnsubscribeFromQuestion {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 
@@ -864,7 +864,7 @@ definition {
 	}
 
 	@description = "Validate if the user can subscribe and unsubscribe from the topic."
-	@priority = "5"
+	@priority = 5
 	test SubscribeAndUnsubscribeFromTopic {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 
@@ -938,7 +938,7 @@ definition {
 	}
 
 	@description = "Validate if the My Activity tab appears"
-	@priority = "4"
+	@priority = 4
 	test ValidateIfTheMyActivityAppears {
 		JSONMBMessage.addCategory(
 			categoryDescription = "Description",
@@ -955,7 +955,7 @@ definition {
 	}
 
 	@description = "Validate if the user can view the statistics."
-	@priority = "3"
+	@priority = 3
 	test ViewCreatorStatistics {
 		JSONMBMessage.addCategory(
 			categoryDescription = "Description",
@@ -982,7 +982,7 @@ definition {
 	}
 
 	@description = "Validate if the user can view the question after changing the subtopic using the breadcrumb filter."
-	@priority = "3"
+	@priority = 3
 	test ViewQuestionAfterChangingSubTopic {
 		JSONMBMessage.addCategory(
 			categoryDescription = "Description",
@@ -995,12 +995,12 @@ definition {
 
 		var messageBoardsCategoryURL = selenium.getLocation();
 
-		var parentCategoryId = StringUtil.extractLast("${messageBoardsCategoryURL}", "mbCategoryId=");
+		var parentCategoryId = StringUtil.extractLast(${messageBoardsCategoryURL}, "mbCategoryId=");
 
 		JSONMBMessage.addCategory(
 			categoryDescription = "Subcategory Description",
 			categoryName = "Questions Test Category2",
-			parentCategoryId = "${parentCategoryId}",
+			parentCategoryId = ${parentCategoryId},
 			userEmailAddress = "test@liferay.com");
 
 		MessageBoardsAdmin.openMessageBoardsAdmin(siteURLKey = "guest");
@@ -1011,12 +1011,12 @@ definition {
 
 		var messageBoardsCategoryURL = selenium.getLocation();
 
-		var parentCategoryId = StringUtil.extractLast("${messageBoardsCategoryURL}", "mbCategoryId=");
+		var parentCategoryId = StringUtil.extractLast(${messageBoardsCategoryURL}, "mbCategoryId=");
 
 		JSONMBMessage.addCategory(
 			categoryDescription = "Subcategory Description",
 			categoryName = "Questions Test Category3",
-			parentCategoryId = "${parentCategoryId}",
+			parentCategoryId = ${parentCategoryId},
 			userEmailAddress = "test@liferay.com");
 
 		Questions.addQuestionWithoutTagByAPI(
@@ -1049,7 +1049,7 @@ definition {
 	}
 
 	@description = "Validate if the user can filter by votes."
-	@priority = "4"
+	@priority = 4
 	test ViewQuestionsFilteredByVotes {
 		property custom.properties = "jsonws.web.service.paths.excludes=";
 
@@ -1090,7 +1090,7 @@ definition {
 			questionTitle = "Question 1");
 
 		Questions.voteQuestion(
-			currentVotedCount = "0",
+			currentVotedCount = 0,
 			voteUp = "true");
 
 		Click(locator1 = "Questions#QUESTIONS_HOME_ICON");
@@ -1102,7 +1102,7 @@ definition {
 			questionTitle = "Question 2");
 
 		Questions.voteQuestion(
-			currentVotedCount = "0",
+			currentVotedCount = 0,
 			voteUp = "true");
 
 		User.logoutAndLoginPG(
@@ -1118,7 +1118,7 @@ definition {
 			questionTitle = "Question 2");
 
 		Questions.voteQuestion(
-			currentVotedCount = "1",
+			currentVotedCount = 1,
 			voteUp = "true");
 
 		Click(locator1 = "Questions#QUESTIONS_HOME_ICON");
@@ -1130,17 +1130,17 @@ definition {
 		AssertTextEquals(
 			key_questionTitle = "Question 1",
 			locator1 = "Questions#QUESTIONS_VOTED_COUNT",
-			value1 = "1");
+			value1 = 1);
 
 		AssertTextEquals(
 			key_questionTitle = "Question 2",
 			locator1 = "Questions#QUESTIONS_VOTED_COUNT",
-			value1 = "2");
+			value1 = 2);
 
 		AssertTextEquals(
 			key_questionTitle = "Question 3",
 			locator1 = "Questions#QUESTIONS_VOTED_COUNT",
-			value1 = "0");
+			value1 = 0);
 
 		Questions.configureFilter(filterBy = "Most Voted");
 
@@ -1150,7 +1150,7 @@ definition {
 	}
 
 	@description = "Validate if the users can view the questions from different topics via the breadcrumb."
-	@priority = "4"
+	@priority = 4
 	test ViewQuestionsFromDifferentSubTopics {
 		JSONMBMessage.addCategory(
 			categoryDescription = "Description",
@@ -1176,13 +1176,13 @@ definition {
 
 		var messageBoardsCategoryURL = selenium.getLocation();
 
-		var parentCategoryId = StringUtil.extractLast("${messageBoardsCategoryURL}", "mbCategoryId=");
+		var parentCategoryId = StringUtil.extractLast(${messageBoardsCategoryURL}, "mbCategoryId=");
 
 		for (var num : list "1,2") {
 			JSONMBMessage.addCategory(
 				categoryDescription = "Subcategory Description",
 				categoryName = "Questions Subcategory${num}",
-				parentCategoryId = "${parentCategoryId}",
+				parentCategoryId = ${parentCategoryId},
 				userEmailAddress = "test@liferay.com");
 		}
 
@@ -1222,7 +1222,7 @@ definition {
 	}
 
 	@description = "Validate if the pagination will appear and works when we have more than 4 questions."
-	@priority = "3"
+	@priority = 3
 	test ViewQuestionsPagination {
 		JSONMBMessage.addCategory(
 			categoryDescription = "Description",
@@ -1241,7 +1241,7 @@ definition {
 
 		Questions.gotoCategory(categoryName = "Questions Test Category");
 
-		Pause(locator = "3000");
+		Pause(locator = 3000);
 
 		Questions.viewPaginationResults(results = "Showing 1 to 10 of 10");
 
@@ -1259,7 +1259,7 @@ definition {
 	}
 
 	@description = "Validate if the user can select the filter and view the related results."
-	@priority = "4"
+	@priority = 4
 	test ViewQuestionsWithConfiguredFilter {
 		JSONMBMessage.addCategory(
 			categoryDescription = "Description",
@@ -1288,7 +1288,7 @@ definition {
 
 		Questions.gotoCategory(categoryName = "Questions Test Category");
 
-		Pause(locator = "3000");
+		Pause(locator = 3000);
 
 		Questions.configureFilter(filterBy = "Latest Edited");
 

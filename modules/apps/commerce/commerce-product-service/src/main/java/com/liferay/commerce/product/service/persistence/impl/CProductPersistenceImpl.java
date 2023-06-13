@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.product.service.persistence.impl;
 
+import com.liferay.commerce.product.exception.DuplicateCProductExternalReferenceCodeException;
 import com.liferay.commerce.product.exception.NoSuchCProductException;
 import com.liferay.commerce.product.model.CProduct;
 import com.liferay.commerce.product.model.CProductTable;
@@ -2473,6 +2474,29 @@ public class CProductPersistenceImpl
 
 		if (Validator.isNull(cProduct.getExternalReferenceCode())) {
 			cProduct.setExternalReferenceCode(cProduct.getUuid());
+		}
+		else {
+			CProduct ercCProduct = fetchByC_ERC(
+				cProduct.getCompanyId(), cProduct.getExternalReferenceCode());
+
+			if (isNew) {
+				if (ercCProduct != null) {
+					throw new DuplicateCProductExternalReferenceCodeException(
+						"Duplicate c product with external reference code " +
+							cProduct.getExternalReferenceCode() +
+								" and company " + cProduct.getCompanyId());
+				}
+			}
+			else {
+				if ((ercCProduct != null) &&
+					(cProduct.getCProductId() != ercCProduct.getCProductId())) {
+
+					throw new DuplicateCProductExternalReferenceCodeException(
+						"Duplicate c product with external reference code " +
+							cProduct.getExternalReferenceCode() +
+								" and company " + cProduct.getCompanyId());
+				}
+			}
 		}
 
 		ServiceContext serviceContext =

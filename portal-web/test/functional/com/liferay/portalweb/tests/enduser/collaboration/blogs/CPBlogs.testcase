@@ -14,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -23,7 +23,7 @@ definition {
 	}
 
 	@description = "Ensure that a user can add multiple Blogs Entries."
-	@priority = "4"
+	@priority = 4
 	test AddBlogsEntries {
 		property testray.component.names = "Blogs";
 		property testray.main.component.name = "Blogs";
@@ -83,7 +83,7 @@ definition {
 		}
 	}
 
-	@priority = "5"
+	@priority = 5
 	test AddBlogsEntry {
 		property app.server.types = "jboss,tcserver,tomcat,weblogic,websphere,wildfly";
 		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
@@ -106,7 +106,7 @@ definition {
 			entryTitle = "Blogs Entry Title");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AddBlogsEntryContentNull {
 		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
 
@@ -119,7 +119,7 @@ definition {
 		BlogsEntry.viewDefaultCP(entryTitle = "Blogs Entry Title");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AddBlogsEntryTitleEscapeCharacters {
 		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
 
@@ -136,7 +136,7 @@ definition {
 			entryTitle = '''& < > " Escape Characters Entry''');
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AddBlogsEntryTitleNull {
 		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
 
@@ -150,7 +150,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-70143."
-	@priority = "4"
+	@priority = 4
 	test AddBlogsEntryWithDMLink {
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentTitle = "Document_1.jpg",
@@ -188,7 +188,7 @@ definition {
 
 		BlogsEntry.viewEntryExternalURL(
 			entryContent = "Blogs Entry Content",
-			entryExternalURL = "${dmDocument1URL}",
+			entryExternalURL = ${dmDocument1URL},
 			entryTitle = "Blogs Entry Title");
 
 		BlogsEntry.addEntryExternalLinkViaBrowseButton(
@@ -198,11 +198,11 @@ definition {
 
 		BlogsEntry.viewEntryExternalURL(
 			entryContent = "Blogs Entry Content",
-			entryExternalURL = "${dmDocument2URL}",
+			entryExternalURL = ${dmDocument2URL},
 			entryTitle = "Blogs Entry Title");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test AddBlogsEntryWithSubtitle {
 		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
 
@@ -221,7 +221,7 @@ definition {
 			entryTitle = "Blogs Entry Title");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test AddBlogWithFormatting {
 		property testray.component.names = "Training,WYSIWYG";
 
@@ -246,7 +246,7 @@ definition {
 	}
 
 	@description = "This test covers LPS-108029. It ensures that a blog entry can be edited from the search result."
-	@priority = "4"
+	@priority = 4
 	test BlogEntryCanBeEditedFromSearchResult {
 		JSONBlog.addEntry(
 			entryContent = "Blogs Entry Content",
@@ -275,7 +275,7 @@ definition {
 			entryTitle = "Blogs Entry Title Edit");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test DeleteBlogsEntries {
 		property portal.acceptance = "true";
 
@@ -319,7 +319,7 @@ definition {
 	}
 
 	@description = "This test covers LPS-121443. It ensures that a blog entry can be published normally after saving automatically."
-	@priority = "4"
+	@priority = 4
 	test PublishBlogsEntryAutoDraft {
 		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
 
@@ -350,7 +350,7 @@ definition {
 			entryTitle = "Blogs Entry Title");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test PublishBlogsEntryDraft {
 		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
 
@@ -376,7 +376,7 @@ definition {
 			entryTitle = "Blogs Entry Title");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test SaveBlogsEntryDraft {
 		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
 
@@ -397,7 +397,7 @@ definition {
 			entryTitle = "Blogs Entry Title");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test SaveBlogsEntryDraftAuto {
 		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
 
@@ -418,7 +418,7 @@ definition {
 			entryTitle = "Blogs Entry Title");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test SearchBlogsEntryContent {
 		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
 
@@ -456,7 +456,7 @@ definition {
 			entryTitle = "Blogs Entry Title");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test SearchBlogsEntryTitle {
 		JSONBlog.addEntry(
 			entryContent = "Blogs Entry Content",
@@ -492,7 +492,7 @@ definition {
 			entryTitle = "Blogs Entry Title");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test SearchBlogsImagesViaItemSelector {
 		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
 
@@ -506,7 +506,7 @@ definition {
 
 		Button.clickPublish();
 
-		Pause(locator1 = "30000");
+		Pause(locator1 = 30000);
 
 		BlogsNavigator.gotoEntryCP(entryTitle = "Blogs Entry Title");
 
@@ -521,7 +521,7 @@ definition {
 		ItemSelector.searchBlogImages(imageFileName = "Document_1.jpg");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test SearchDMImagesViaItemSelector {
 		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
 
@@ -535,7 +535,7 @@ definition {
 
 		Button.clickPublish();
 
-		Pause(locator1 = "30000");
+		Pause(locator1 = 30000);
 
 		BlogsNavigator.gotoEntryCP(entryTitle = "Blogs Entry Title");
 
@@ -551,7 +551,7 @@ definition {
 	}
 
 	@description = "This test covers LPS-111741. It ensures that a blog entry can be added with the same blog image."
-	@priority = "4"
+	@priority = 4
 	test TheSameBlogImageCanBeUsedForDifferentEntries {
 		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
 
@@ -586,7 +586,7 @@ definition {
 			uploadFileName = "Document_1");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test ViewBlogsEntryDraftWithCoverImage {
 		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
 
@@ -598,7 +598,7 @@ definition {
 			navTab = "Blog Images",
 			uploadFileName = "Document_1.jpg");
 
-		Pause(locator1 = "1000");
+		Pause(locator1 = 1000);
 
 		BlogsEntry.saveAsDraft();
 
@@ -623,7 +623,7 @@ definition {
 			uploadFileName = "Document_1");
 	}
 
-	@priority = "3"
+	@priority = 3
 	test ViewCoverImageDetails {
 		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
 
@@ -637,7 +637,7 @@ definition {
 
 		Button.clickPublish();
 
-		Pause(locator1 = "30000");
+		Pause(locator1 = 30000);
 
 		BlogsNavigator.gotoEntryCP(entryTitle = "Blogs Entry Title");
 
@@ -659,7 +659,7 @@ definition {
 			versionNumber = "1.0");
 	}
 
-	@priority = "4"
+	@priority = 4
 	test ViewErrorMessageForNullCustomAbstract {
 		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
 

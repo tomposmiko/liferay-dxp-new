@@ -20,7 +20,7 @@ definition {
 		SearchAdministration.executeSearchActions(actionsDescription = "Reindex all search indexes.");
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewClassicSearchPortletConfigurationArchive704 {
 		property data.archive.type = "data-archive-classic-search-portlet";
 		property database.types = "mariadb,mysql,postgresql";
@@ -43,7 +43,7 @@ definition {
 		Upgrade.viewClassicSearchPortletConfiguration();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewClassicSearchPortletConfigurationArchive713 {
 		property data.archive.type = "data-archive-classic-search-portlet";
 		property database.types = "mariadb,mysql,postgresql";
@@ -52,7 +52,7 @@ definition {
 		Upgrade.viewClassicSearchPortletConfiguration();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewClassicSearchPortletConfigurationArchive720 {
 		property data.archive.type = "data-archive-classic-search-portlet";
 		property database.types = "mariadb,mysql,postgresql";
@@ -61,7 +61,7 @@ definition {
 		Upgrade.viewClassicSearchPortletConfiguration();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewClassicSearchPortletConfigurationArchive721 {
 		property data.archive.type = "data-archive-classic-search-portlet";
 		property database.types = "mariadb,mysql,postgresql";
@@ -70,7 +70,7 @@ definition {
 		Upgrade.viewClassicSearchPortletConfiguration();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewClassicSearchPortletConfigurationArchive730 {
 		property data.archive.type = "data-archive-classic-search-portlet";
 		property database.types = "mariadb,mysql,postgresql";
@@ -79,7 +79,7 @@ definition {
 		Upgrade.viewClassicSearchPortletConfiguration();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewClassicSearchPortletConfigurationArchive7110 {
 		property data.archive.type = "data-archive-classic-search-portlet";
 		property portal.version = "7.1.10";
@@ -87,7 +87,7 @@ definition {
 		Upgrade.viewClassicSearchPortletConfiguration();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewClassicSearchPortletConfigurationArchive7210 {
 		property data.archive.type = "data-archive-classic-search-portlet";
 		property portal.version = "7.2.10";
@@ -96,7 +96,7 @@ definition {
 		Upgrade.viewClassicSearchPortletConfiguration();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewClassicSearchPortletConfigurationArchive7310 {
 		property data.archive.type = "data-archive-classic-search-portlet";
 		property portal.version = "7.3.10";
@@ -105,7 +105,7 @@ definition {
 		Upgrade.viewClassicSearchPortletConfiguration();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewClassicSearchPortletConfigurationArchive70106 {
 		property data.archive.type = "data-archive-classic-search-portlet";
 		property portal.version = "7.0.10.6";
@@ -127,7 +127,7 @@ definition {
 		Upgrade.viewClassicSearchPortletConfiguration();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewClassicSearchPortletConfigurationArchive72101 {
 		property data.archive.type = "data-archive-classic-search-portlet";
 		property portal.version = "7.2.10.1";
@@ -136,7 +136,7 @@ definition {
 		Upgrade.viewClassicSearchPortletConfiguration();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewClassicSearchPortletConfigurationArchiveAutoUpgrade721 {
 		property custom.properties = "upgrade.database.auto.run=true";
 		property data.archive.type = "data-archive-classic-search-portlet";
@@ -149,7 +149,7 @@ definition {
 		Upgrade.viewClassicSearchPortletConfiguration();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewClassicSearchPortletConfigurationArchiveAutoUpgrade730 {
 		property custom.properties = "upgrade.database.auto.run=true";
 		property data.archive.type = "data-archive-classic-search-portlet";
@@ -162,7 +162,7 @@ definition {
 		Upgrade.viewClassicSearchPortletConfiguration();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewClassicSearchPortletConfigurationArchiveAutoUpgrade7110 {
 		property custom.properties = "upgrade.database.auto.run=true";
 		property data.archive.type = "data-archive-classic-search-portlet";
@@ -174,7 +174,7 @@ definition {
 		Upgrade.viewClassicSearchPortletConfiguration();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewClassicSearchPortletConfigurationArchiveAutoUpgrade7210 {
 		property custom.properties = "upgrade.database.auto.run=true";
 		property data.archive.type = "data-archive-classic-search-portlet";
@@ -187,7 +187,7 @@ definition {
 		Upgrade.viewClassicSearchPortletConfiguration();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewClassicSearchPortletConfigurationArchiveAutoUpgrade70106 {
 		property custom.properties = "upgrade.database.auto.run=true";
 		property data.archive.type = "data-archive-classic-search-portlet";
@@ -213,7 +213,7 @@ definition {
 		Upgrade.viewClassicSearchPortletConfiguration();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewClassicSearchPortletConfigurationArchiveAutoUpgrade72101 {
 		property custom.properties = "upgrade.database.auto.run=true";
 		property data.archive.type = "data-archive-classic-search-portlet";
@@ -226,7 +226,7 @@ definition {
 		Upgrade.viewClassicSearchPortletConfiguration();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewSearchPortletsConfigurationArchive713 {
 		property data.archive.type = "data-archive-search-portlets";
 		property database.types = "mariadb,mysql,postgresql";
@@ -236,7 +236,7 @@ definition {
 		Upgrade.viewSearchPortletsConfiguration();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewSearchPortletsConfigurationArchive720 {
 		property data.archive.type = "data-archive-search-portlets";
 		property database.types = "mariadb,mysql,postgresql";
@@ -245,7 +245,7 @@ definition {
 		Upgrade.viewSearchPortletsConfiguration();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewSearchPortletsConfigurationArchive721 {
 		property data.archive.type = "data-archive-search-portlets";
 		property database.types = "mariadb,mysql,postgresql";
@@ -254,7 +254,7 @@ definition {
 		Upgrade.viewSearchPortletsConfiguration();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewSearchPortletsConfigurationArchive730 {
 		property data.archive.type = "data-archive-search-portlets";
 		property database.types = "mariadb,mysql,postgresql";
@@ -263,7 +263,7 @@ definition {
 		Upgrade.viewSearchPortletsConfiguration();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewSearchPortletsConfigurationArchive7110 {
 		property data.archive.type = "data-archive-search-portlets";
 		property portal.version = "7.1.10";
@@ -271,7 +271,7 @@ definition {
 		Upgrade.viewSearchPortletsConfiguration();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewSearchPortletsConfigurationArchive7210 {
 		property data.archive.type = "data-archive-search-portlets";
 		property portal.version = "7.2.10";
@@ -281,7 +281,7 @@ definition {
 		Upgrade.viewSearchPortletsConfiguration();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewSearchPortletsConfigurationArchive7310 {
 		property data.archive.type = "data-archive-search-portlets";
 		property portal.version = "7.3.10";
@@ -291,7 +291,7 @@ definition {
 		Upgrade.viewSearchPortletsConfiguration();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewSearchPortletsConfigurationArchive72101 {
 		property data.archive.type = "data-archive-search-portlets";
 		property portal.version = "7.2.10.1";
@@ -301,7 +301,7 @@ definition {
 		Upgrade.viewSearchPortletsConfiguration();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewSearchPortletsConfigurationArchiveAutoUpgrade721 {
 		property custom.properties = "upgrade.database.auto.run=true";
 		property data.archive.type = "data-archive-search-portlets";
@@ -314,7 +314,7 @@ definition {
 		Upgrade.viewSearchPortletsConfiguration();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewSearchPortletsConfigurationArchiveAutoUpgrade730 {
 		property custom.properties = "upgrade.database.auto.run=true";
 		property data.archive.type = "data-archive-search-portlets";
@@ -327,7 +327,7 @@ definition {
 		Upgrade.viewSearchPortletsConfiguration();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewSearchPortletsConfigurationArchiveAutoUpgrade7110 {
 		property custom.properties = "upgrade.database.auto.run=true";
 		property data.archive.type = "data-archive-search-portlets";
@@ -339,7 +339,7 @@ definition {
 		Upgrade.viewSearchPortletsConfiguration();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewSearchPortletsConfigurationArchiveAutoUpgrade7210 {
 		property custom.properties = "upgrade.database.auto.run=true";
 		property data.archive.type = "data-archive-search-portlets";
@@ -352,7 +352,7 @@ definition {
 		Upgrade.viewSearchPortletsConfiguration();
 	}
 
-	@priority = "5"
+	@priority = 5
 	test ViewSearchPortletsConfigurationArchiveAutoUpgrade72101 {
 		property custom.properties = "upgrade.database.auto.run=true";
 		property data.archive.type = "data-archive-search-portlets";

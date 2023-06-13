@@ -24,7 +24,7 @@ definition {
 
 		ACUtils.tearDownDXP();
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -37,7 +37,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9220 | Test Summary: Create a segment with behavior of commenting on a blog"
-	@priority = "4"
+	@priority = 4
 	test CanCreateWebBehaviorSegmentCommentingBlog {
 		ACUtils.createBlogsAndAddToPage();
 
@@ -71,7 +71,7 @@ definition {
 
 		ACUtils.launchAC();
 
-		ACProperties.switchProperty(propertyName = "${propertyName}");
+		ACProperties.switchProperty(propertyName = ${propertyName});
 
 		ACNavigation.goToSegments();
 
@@ -82,8 +82,8 @@ definition {
 		ACSegments.addSegmentField(segmentField = "Commented on Blog");
 
 		ACSegments.editWebBehaviorCriterion(
-			indexField = "1",
-			occurenceNumber = "4",
+			indexField = 1,
+			occurenceNumber = 4,
 			searchTerm = "Blogs AC Title");
 
 		ACSegments.saveSegment();
@@ -119,7 +119,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9221 | Test Summary: Create a Web Behavior criteria at least/at most times"
-	@priority = "4"
+	@priority = 4
 	test CanCreateWebBehaviorSegmentCriteriaLeastMostTimes {
 		property portal.upstream = "quarantine";
 
@@ -152,7 +152,7 @@ definition {
 
 		ACUtils.launchAC();
 
-		ACProperties.switchProperty(propertyName = "${propertyName}");
+		ACProperties.switchProperty(propertyName = ${propertyName});
 
 		ACNavigation.goToSegments();
 
@@ -164,8 +164,8 @@ definition {
 
 		ACSegments.editWebBehaviorCriterion(
 			atLeastMost = "at least",
-			indexField = "1",
-			occurenceNumber = "4",
+			indexField = 1,
+			occurenceNumber = 4,
 			searchTerm = "Web Content AC Title");
 
 		ACSegments.saveSegment();
@@ -199,8 +199,8 @@ definition {
 
 		ACSegments.editWebBehaviorCriterion(
 			atLeastMost = "at most",
-			indexField = "1",
-			occurenceNumber = "3",
+			indexField = 1,
+			occurenceNumber = 3,
 			searchTerm = "Web Content AC Title");
 
 		ACSegments.saveSegment();
@@ -211,7 +211,7 @@ definition {
 	}
 
 	@description = "Create a segment with behavior of downloading a document"
-	@priority = "5"
+	@priority = 5
 	test CanCreateWebBehaviorSegmentDownloadingDocument {
 		property portal.upstream = "quarantine";
 
@@ -248,7 +248,7 @@ definition {
 
 		ACUtils.launchAC();
 
-		ACProperties.switchProperty(propertyName = "${propertyName}");
+		ACProperties.switchProperty(propertyName = ${propertyName});
 
 		ACNavigation.goToSegments();
 
@@ -260,9 +260,9 @@ definition {
 
 		ACSegments.selectDocument(
 			documentTitle = "Document_1.jpg",
-			indexField = "1");
+			indexField = 1);
 
-		ACSegments.setOccurence(occurenceNumber = "4");
+		ACSegments.setOccurence(occurenceNumber = 4);
 
 		ACSegments.saveSegment();
 
@@ -292,7 +292,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9222 | Test Summary: Create a Web Behavior since X days"
-	@priority = "4"
+	@priority = 4
 	test CanCreateWebBehaviorSegmentSinceXdays {
 		property test.name.skip.portal.instance = "SegmentsCreationWebBehavior#CanCreateWebBehaviorSegmentSinceXdays";
 
@@ -325,7 +325,7 @@ definition {
 
 		ACUtils.launchAC();
 
-		ACProperties.switchProperty(propertyName = "${propertyName}");
+		ACProperties.switchProperty(propertyName = ${propertyName});
 
 		ACNavigation.goToSegments();
 
@@ -336,8 +336,8 @@ definition {
 		ACSegments.addSegmentField(segmentField = "Viewed Web Content");
 
 		ACSegments.editWebBehaviorCriterion(
-			indexField = "1",
-			occurenceNumber = "4",
+			indexField = 1,
+			occurenceNumber = 4,
 			searchTerm = "Web Content AC Title",
 			timeOption = "since",
 			timePeriod = "Last 7 days");
@@ -369,7 +369,7 @@ definition {
 	}
 
 	@description = "Create a Web Behavior Segment Submitting a Form"
-	@priority = "5"
+	@priority = 5
 	test CanCreateWebBehaviorSegmentSubmittingForm {
 		property portal.upstream = "quarantine";
 
@@ -408,7 +408,7 @@ definition {
 
 		ACUtils.launchAC();
 
-		ACProperties.switchProperty(propertyName = "${propertyName}");
+		ACProperties.switchProperty(propertyName = ${propertyName});
 
 		ACNavigation.goToSegments();
 
@@ -420,9 +420,9 @@ definition {
 
 		ACSegments.selectDocument(
 			documentTitle = "Created Form Name",
-			indexField = "1");
+			indexField = 1);
 
-		ACSegments.setOccurence(occurenceNumber = "4");
+		ACSegments.setOccurence(occurenceNumber = 4);
 
 		ACSegments.saveSegment();
 
@@ -453,7 +453,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9216 | Test Summary: Add segment using a web behavior 'after' some time"
-	@priority = "4"
+	@priority = 4
 	test CanCreateWebBehaviorSegmentUsingAfter {
 		property portal.upstream = "quarantine";
 
@@ -486,7 +486,7 @@ definition {
 
 		ACUtils.launchAC();
 
-		ACProperties.switchProperty(propertyName = "${propertyName}");
+		ACProperties.switchProperty(propertyName = ${propertyName});
 
 		ACNavigation.goToSegments();
 
@@ -499,13 +499,13 @@ definition {
 		ACSegments.generateDayMonthAndYearValues(dateDifferenceFromCurrentDate = "-1");
 
 		ACSegments.editWebBehaviorCriterion(
-			day = "${staticDay}",
-			indexField = "1",
-			month = "${staticMonth}",
-			occurenceNumber = "4",
+			day = ${staticDay},
+			indexField = 1,
+			month = ${staticMonth},
+			occurenceNumber = 4,
 			searchTerm = "Web Content AC Title",
 			timeOption = "after",
-			year = "${staticYear}");
+			year = ${staticYear});
 
 		ACSegments.saveSegment();
 
@@ -534,7 +534,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9217 | Test Summary: Add segment using a web behavior 'before' some time"
-	@priority = "4"
+	@priority = 4
 	test CanCreateWebBehaviorSegmentUsingBefore {
 		property portal.upstream = "quarantine";
 
@@ -568,7 +568,7 @@ definition {
 
 		ACUtils.launchAC();
 
-		ACProperties.switchProperty(propertyName = "${propertyName}");
+		ACProperties.switchProperty(propertyName = ${propertyName});
 
 		ACNavigation.goToSegments();
 
@@ -578,16 +578,16 @@ definition {
 
 		ACSegments.addSegmentField(segmentField = "Viewed Web Content");
 
-		ACSegments.generateDayMonthAndYearValues(dateDifferenceFromCurrentDate = "1");
+		ACSegments.generateDayMonthAndYearValues(dateDifferenceFromCurrentDate = 1);
 
 		ACSegments.editWebBehaviorCriterion(
-			day = "${staticDay}",
-			indexField = "1",
-			month = "${staticMonth}",
-			occurenceNumber = "4",
+			day = ${staticDay},
+			indexField = 1,
+			month = ${staticMonth},
+			occurenceNumber = 4,
 			searchTerm = "Web Content AC Title",
 			timeOption = "before",
-			year = "${staticYear}");
+			year = ${staticYear});
 
 		ACSegments.saveSegment();
 
@@ -615,7 +615,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9218 | Test Summary: Add segment using a web behavior 'between' some time"
-	@priority = "4"
+	@priority = 4
 	test CanCreateWebBehaviorSegmentUsingBetween {
 		property portal.upstream = "quarantine";
 
@@ -648,7 +648,7 @@ definition {
 
 		ACUtils.launchAC();
 
-		ACProperties.switchProperty(propertyName = "${propertyName}");
+		ACProperties.switchProperty(propertyName = ${propertyName});
 
 		ACNavigation.goToSegments();
 
@@ -660,19 +660,19 @@ definition {
 
 		ACSegments.generateDayMonthAndYearValues(dateDifferenceFromCurrentDate = "-1");
 
-		ACSegments.generateSecondDayMonthAndYearValues(dateDifferenceFromCurrentDate = "1");
+		ACSegments.generateSecondDayMonthAndYearValues(dateDifferenceFromCurrentDate = 1);
 
 		ACSegments.editWebBehaviorCriterion(
-			day = "${staticDay}",
-			day2 = "${staticDay2}",
-			indexField = "1",
-			month = "${staticMonth}",
-			month2 = "${staticMonth2}",
-			occurenceNumber = "4",
+			day = ${staticDay},
+			day2 = ${staticDay2},
+			indexField = 1,
+			month = ${staticMonth},
+			month2 = ${staticMonth2},
+			occurenceNumber = 4,
 			searchTerm = "Web Content AC Title",
 			timeOption = "between",
-			year = "${staticYear}",
-			year2 = "${staticYear2}");
+			year = ${staticYear},
+			year2 = ${staticYear2});
 
 		ACSegments.saveSegment();
 
@@ -701,7 +701,7 @@ definition {
 	}
 
 	@description = "Add segment using a web behavior 'ever' done"
-	@priority = "5"
+	@priority = 5
 	test CanCreateWebBehaviorSegmentUsingEver {
 		property portal.upstream = "quarantine";
 
@@ -734,7 +734,7 @@ definition {
 
 		ACUtils.launchAC();
 
-		ACProperties.switchProperty(propertyName = "${propertyName}");
+		ACProperties.switchProperty(propertyName = ${propertyName});
 
 		ACNavigation.goToSegments();
 
@@ -745,8 +745,8 @@ definition {
 		ACSegments.addSegmentField(segmentField = "Viewed Web Content");
 
 		ACSegments.editWebBehaviorCriterion(
-			indexField = "1",
-			occurenceNumber = "4",
+			indexField = 1,
+			occurenceNumber = 4,
 			searchTerm = "Web Content AC Title",
 			timeOption = "ever");
 
@@ -777,7 +777,7 @@ definition {
 	}
 
 	@description = "Create a Web Behavior using 'has not' segment"
-	@priority = "5"
+	@priority = 5
 	test CanCreateWebBehaviorSegmentUsingHasNot {
 		property portal.upstream = "quarantine";
 
@@ -812,7 +812,7 @@ definition {
 
 		ACUtils.launchAC();
 
-		ACProperties.switchProperty(propertyName = "${propertyName}");
+		ACProperties.switchProperty(propertyName = ${propertyName});
 
 		ACNavigation.goToSegments();
 
@@ -824,8 +824,8 @@ definition {
 
 		ACSegments.editWebBehaviorCriterion(
 			activitiesOption = "has not",
-			indexField = "1",
-			occurenceNumber = "4",
+			indexField = 1,
+			occurenceNumber = 4,
 			searchTerm = "Blogs AC Title");
 
 		ACSegments.saveSegment();
@@ -860,7 +860,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9219 | Test Summary: Add segment using a web behavior 'on' some time"
-	@priority = "4"
+	@priority = 4
 	test CanCreateWebBehaviorSegmentUsingOn {
 		property portal.upstream = "quarantine";
 
@@ -894,7 +894,7 @@ definition {
 
 		ACUtils.launchAC();
 
-		ACProperties.switchProperty(propertyName = "${propertyName}");
+		ACProperties.switchProperty(propertyName = ${propertyName});
 
 		ACNavigation.goToSegments();
 
@@ -904,16 +904,16 @@ definition {
 
 		ACSegments.addSegmentField(segmentField = "Viewed Web Content");
 
-		ACSegments.generateDayMonthAndYearValues(dateDifferenceFromCurrentDate = "0");
+		ACSegments.generateDayMonthAndYearValues(dateDifferenceFromCurrentDate = 0);
 
 		ACSegments.editWebBehaviorCriterion(
-			day = "${staticDay}",
-			indexField = "1",
-			month = "${staticMonth}",
-			occurenceNumber = "4",
+			day = ${staticDay},
+			indexField = 1,
+			month = ${staticMonth},
+			occurenceNumber = 4,
 			searchTerm = "Web Content AC Title",
 			timeOption = "on",
-			year = "${staticYear}");
+			year = ${staticYear});
 
 		ACSegments.saveSegment();
 
@@ -941,7 +941,7 @@ definition {
 	}
 
 	@description = "Add segment using a web behavior 'since' some time"
-	@priority = "5"
+	@priority = 5
 	test CanCreateWebBehaviorSegmentUsingSince {
 		property test.name.skip.portal.instance = "SegmentsCreationWebBehavior#CanCreateWebBehaviorSegmentUsingSince";
 
@@ -976,7 +976,7 @@ definition {
 
 		ACUtils.launchAC();
 
-		ACProperties.switchProperty(propertyName = "${propertyName}");
+		ACProperties.switchProperty(propertyName = ${propertyName});
 
 		ACNavigation.goToSegments();
 
@@ -987,8 +987,8 @@ definition {
 		ACSegments.addSegmentField(segmentField = "Viewed Blog");
 
 		ACSegments.editWebBehaviorCriterion(
-			indexField = "1",
-			occurenceNumber = "4",
+			indexField = 1,
+			occurenceNumber = 4,
 			searchTerm = "Blogs AC Title",
 			timeOption = "since",
 			timePeriod = "Yesterday");
@@ -1016,7 +1016,7 @@ definition {
 		ACSegments.accessSegment(segmentName = "Dynamic Segment Test");
 
 		ACSegments.viewSegmentCriteriaWebBehavior(
-			occurenceNumber = "4",
+			occurenceNumber = 4,
 			searchTerm = "'Blogs AC Title'",
 			timeOption = "since",
 			timePeriod = "Yesterday");
@@ -1027,7 +1027,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9223 | Test Summary: Create a Web Behavior Segment of Viewing a Blog"
-	@priority = "4"
+	@priority = 4
 	test CanCreateWebBehaviorSegmentViewingBlog {
 		ACUtils.createBlogsAndAddToPage();
 
@@ -1065,7 +1065,7 @@ definition {
 
 		ACUtils.launchAC();
 
-		ACProperties.switchProperty(propertyName = "${propertyName}");
+		ACProperties.switchProperty(propertyName = ${propertyName});
 
 		ACNavigation.goToSegments();
 
@@ -1076,8 +1076,8 @@ definition {
 		ACSegments.addSegmentField(segmentField = "Viewed Blog");
 
 		ACSegments.editWebBehaviorCriterion(
-			indexField = "1",
-			occurenceNumber = "4",
+			indexField = 1,
+			occurenceNumber = 4,
 			searchTerm = "Blogs AC Title");
 
 		ACSegments.saveSegment();
@@ -1108,7 +1108,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9224 | Test Summary: Create a Web Behavior Segment of Viewing Document & Media in a Topic"
-	@priority = "4"
+	@priority = 4
 	test CanCreateWebBehaviorSegmentViewingDM {
 		property test.name.skip.portal.instance = "SegmentsCreationWebBehavior#CanCreateWebBehaviorSegmentViewingDM";
 
@@ -1120,9 +1120,9 @@ definition {
 
 		JSONUser.addUser(
 			userEmailAddress = "${username}@liferay.com",
-			userFirstName = "${username}",
-			userLastName = "${username}",
-			userScreenName = "${username}");
+			userFirstName = ${username},
+			userLastName = ${username},
+			userScreenName = ${username});
 
 		JSONUser.setFirstPassword(
 			agreeToTermsAndAnswerReminderQuery = "true",
@@ -1145,7 +1145,7 @@ definition {
 
 		ACUtils.launchAC();
 
-		ACProperties.switchProperty(propertyName = "${propertyName}");
+		ACProperties.switchProperty(propertyName = ${propertyName});
 
 		ACNavigation.goToSegments();
 
@@ -1157,9 +1157,9 @@ definition {
 
 		ACSegments.selectDocument(
 			documentTitle = "DM AC Title",
-			indexField = "1");
+			indexField = 1);
 
-		ACSegments.setOccurence(occurenceNumber = "4");
+		ACSegments.setOccurence(occurenceNumber = 4);
 
 		ACSegments.saveSegment();
 
@@ -1189,7 +1189,7 @@ definition {
 	}
 
 	@description = "Create a segment with behavior of viewing a form"
-	@priority = "5"
+	@priority = 5
 	test CanCreateWebBehaviorSegmentViewingForm {
 		property portal.upstream = "quarantine";
 
@@ -1203,9 +1203,9 @@ definition {
 
 		JSONUser.addUser(
 			userEmailAddress = "${username}@liferay.com",
-			userFirstName = "${username}",
-			userLastName = "${username}",
-			userScreenName = "${username}");
+			userFirstName = ${username},
+			userLastName = ${username},
+			userScreenName = ${username});
 
 		JSONUser.setFirstPassword(
 			agreeToTermsAndAnswerReminderQuery = "true",
@@ -1227,7 +1227,7 @@ definition {
 
 		ACUtils.launchAC();
 
-		ACProperties.switchProperty(propertyName = "${propertyName}");
+		ACProperties.switchProperty(propertyName = ${propertyName});
 
 		ACNavigation.goToSegments();
 
@@ -1239,9 +1239,9 @@ definition {
 
 		ACSegments.selectDocument(
 			documentTitle = "Created Form Name",
-			indexField = "1");
+			indexField = 1);
 
-		ACSegments.setOccurence(occurenceNumber = "4");
+		ACSegments.setOccurence(occurenceNumber = 4);
 
 		ACSegments.saveSegment();
 
@@ -1272,20 +1272,20 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9225 | Test Summary: Create a Web Behavior Segment of Viewing a Page"
-	@priority = "4"
+	@priority = 4
 	test CanCreateWebBehaviorSegmentViewingPage {
 		property portal.upstream = "quarantine";
 
 		var username = "ac";
 		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 
-		var dataSource = StringUtil.extractFirst("${propertyName}", " ");
+		var dataSource = StringUtil.extractFirst(${propertyName}, " ");
 
 		JSONUser.addUser(
 			userEmailAddress = "${username}@liferay.com",
-			userFirstName = "${username}",
-			userLastName = "${username}",
-			userScreenName = "${username}");
+			userFirstName = ${username},
+			userLastName = ${username},
+			userScreenName = ${username});
 
 		JSONUser.setFirstPassword(
 			agreeToTermsAndAnswerReminderQuery = "true",
@@ -1306,7 +1306,7 @@ definition {
 
 		ACUtils.launchAC();
 
-		ACProperties.switchProperty(propertyName = "${propertyName}");
+		ACProperties.switchProperty(propertyName = ${propertyName});
 
 		ACNavigation.goToSegments();
 
@@ -1317,8 +1317,8 @@ definition {
 		ACSegments.addSegmentField(segmentField = "Viewed Page");
 
 		ACSegments.editWebBehaviorCriterion(
-			indexField = "1",
-			occurenceNumber = "4",
+			indexField = 1,
+			occurenceNumber = 4,
 			searchTerm = "AC Page - Site Name - ${dataSource}");
 
 		ACSegments.saveSegment();
@@ -1349,7 +1349,7 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9226 | Test Summary: Create a Web Behavior Segment of Viewing a Web Content"
-	@priority = "4"
+	@priority = 4
 	test CanCreateWebBehaviorSegmentViewingWC {
 		ACUtils.createWCAndAddToPage();
 
@@ -1380,7 +1380,7 @@ definition {
 
 		ACUtils.launchAC();
 
-		ACProperties.switchProperty(propertyName = "${propertyName}");
+		ACProperties.switchProperty(propertyName = ${propertyName});
 
 		ACNavigation.goToSegments();
 
@@ -1391,8 +1391,8 @@ definition {
 		ACSegments.addSegmentField(segmentField = "Viewed Web Content");
 
 		ACSegments.editWebBehaviorCriterion(
-			indexField = "1",
-			occurenceNumber = "4",
+			indexField = 1,
+			occurenceNumber = 4,
 			searchTerm = "Web Content AC Title");
 
 		ACSegments.saveSegment();

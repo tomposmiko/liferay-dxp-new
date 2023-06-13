@@ -14,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -31,7 +31,7 @@ definition {
 	}
 
 	@description = "This ensures that the language can be set in a depot."
-	@priority = "5"
+	@priority = 5
 	test Smoke {
 		property portal.acceptance = "true";
 
@@ -57,7 +57,7 @@ definition {
 	}
 
 	@description = "This ensures that the custom type language can be set in a depot."
-	@priority = "4"
+	@priority = 4
 	test ViewCustomLanguagesOrderForCustomType {
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
@@ -74,12 +74,12 @@ definition {
 			defaultDepotLanguage = "English (United States)");
 
 		Depot.changeLanguagesOrder(
-			fromRowNumber = "2",
-			toRowNumber = "3");
+			fromRowNumber = 2,
+			toRowNumber = 3);
 
 		Depot.changeLanguagesOrder(
-			fromRowNumber = "4",
-			toRowNumber = "1");
+			fromRowNumber = 4,
+			toRowNumber = 1);
 
 		Button.click(button = "Save");
 
@@ -89,11 +89,11 @@ definition {
 
 		DepotNavigator.gotoGeneral(depotName = "Test Depot Name");
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		for (var fieldName : list "Name,Description") {
 			Click(
-				key_fieldName = "${fieldName}",
+				key_fieldName = ${fieldName},
 				locator1 = "Button#LOCALIZATION");
 
 			Depot.view4LanguagesOrder(
@@ -151,7 +151,7 @@ definition {
 	}
 
 	@description = "This ensures that the web content language can be set in a depot."
-	@priority = "5"
+	@priority = 5
 	test ViewCustomLanguagesOrderForWebContent {
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
@@ -210,12 +210,12 @@ definition {
 			defaultDepotLanguage = "English (United States)");
 
 		Depot.changeLanguagesOrder(
-			fromRowNumber = "2",
-			toRowNumber = "3");
+			fromRowNumber = 2,
+			toRowNumber = 3);
 
 		Depot.changeLanguagesOrder(
-			fromRowNumber = "4",
-			toRowNumber = "1");
+			fromRowNumber = 4,
+			toRowNumber = 1);
 
 		Button.click(button = "Save");
 
@@ -225,11 +225,11 @@ definition {
 
 		DepotNavigator.gotoGeneral(depotName = "Test Depot Name");
 
-		Pause(locator1 = "3000");
+		Pause(locator1 = 3000);
 
 		for (var fieldName : list "Name,Description") {
 			Click(
-				key_fieldName = "${fieldName}",
+				key_fieldName = ${fieldName},
 				locator1 = "Button#LOCALIZATION");
 
 			Depot.view4LanguagesOrder(

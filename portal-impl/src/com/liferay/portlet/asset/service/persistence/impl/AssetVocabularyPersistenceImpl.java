@@ -14,6 +14,7 @@
 
 package com.liferay.portlet.asset.service.persistence.impl;
 
+import com.liferay.asset.kernel.exception.DuplicateAssetVocabularyExternalReferenceCodeException;
 import com.liferay.asset.kernel.exception.NoSuchVocabularyException;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.model.AssetVocabularyTable;
@@ -6827,6 +6828,33 @@ public class AssetVocabularyPersistenceImpl
 
 		if (Validator.isNull(assetVocabulary.getExternalReferenceCode())) {
 			assetVocabulary.setExternalReferenceCode(assetVocabulary.getUuid());
+		}
+		else {
+			AssetVocabulary ercAssetVocabulary = fetchByC_ERC(
+				assetVocabulary.getCompanyId(),
+				assetVocabulary.getExternalReferenceCode());
+
+			if (isNew) {
+				if (ercAssetVocabulary != null) {
+					throw new DuplicateAssetVocabularyExternalReferenceCodeException(
+						"Duplicate asset vocabulary with external reference code " +
+							assetVocabulary.getExternalReferenceCode() +
+								" and company " +
+									assetVocabulary.getCompanyId());
+				}
+			}
+			else {
+				if ((ercAssetVocabulary != null) &&
+					(assetVocabulary.getVocabularyId() !=
+						ercAssetVocabulary.getVocabularyId())) {
+
+					throw new DuplicateAssetVocabularyExternalReferenceCodeException(
+						"Duplicate asset vocabulary with external reference code " +
+							assetVocabulary.getExternalReferenceCode() +
+								" and company " +
+									assetVocabulary.getCompanyId());
+				}
+			}
 		}
 
 		ServiceContext serviceContext =

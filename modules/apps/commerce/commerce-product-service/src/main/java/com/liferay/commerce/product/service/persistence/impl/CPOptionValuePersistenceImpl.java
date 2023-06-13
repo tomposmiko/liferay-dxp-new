@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.product.service.persistence.impl;
 
+import com.liferay.commerce.product.exception.DuplicateCPOptionValueExternalReferenceCodeException;
 import com.liferay.commerce.product.exception.NoSuchCPOptionValueException;
 import com.liferay.commerce.product.model.CPOptionValue;
 import com.liferay.commerce.product.model.CPOptionValueTable;
@@ -3007,6 +3008,31 @@ public class CPOptionValuePersistenceImpl
 
 		if (Validator.isNull(cpOptionValue.getExternalReferenceCode())) {
 			cpOptionValue.setExternalReferenceCode(cpOptionValue.getUuid());
+		}
+		else {
+			CPOptionValue ercCPOptionValue = fetchByC_ERC(
+				cpOptionValue.getCompanyId(),
+				cpOptionValue.getExternalReferenceCode());
+
+			if (isNew) {
+				if (ercCPOptionValue != null) {
+					throw new DuplicateCPOptionValueExternalReferenceCodeException(
+						"Duplicate cp option value with external reference code " +
+							cpOptionValue.getExternalReferenceCode() +
+								" and company " + cpOptionValue.getCompanyId());
+				}
+			}
+			else {
+				if ((ercCPOptionValue != null) &&
+					(cpOptionValue.getCPOptionValueId() !=
+						ercCPOptionValue.getCPOptionValueId())) {
+
+					throw new DuplicateCPOptionValueExternalReferenceCodeException(
+						"Duplicate cp option value with external reference code " +
+							cpOptionValue.getExternalReferenceCode() +
+								" and company " + cpOptionValue.getCompanyId());
+				}
+			}
 		}
 
 		ServiceContext serviceContext =

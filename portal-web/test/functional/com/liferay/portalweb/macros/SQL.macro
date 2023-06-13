@@ -6,23 +6,23 @@ definition {
 
 		var mysqlStatement = "SHOW DATABASES LIKE '${databaseFilter}';";
 
-		var sqlResults = SQL.executeMySQLStatement(mysqlStatement = "${mysqlStatement}");
+		var sqlResults = SQL.executeMySQLStatement(mysqlStatement = ${mysqlStatement});
 
-		var matches = StringUtil.count("${sqlResults}", "${databaseSubstring}");
+		var matches = StringUtil.count(${sqlResults}, ${databaseSubstring});
 
-		if ("${matches}" != "${expectedCount}") {
+		if (${matches} != ${expectedCount}) {
 			fail("Expected ${expectedCount} matches of ${databaseSubstring}, found ${matches}.");
 		}
 	}
 
 	macro executeMySQLStatement {
-		Variables.assertDefined(parameterList = "${mysqlStatement}");
+		Variables.assertDefined(parameterList = ${mysqlStatement});
 
 		var liferayHome = PropsUtil.get("liferay.home.dir.name");
 		var inputFile = "mysqltemp.sql";
 		var outputFile = "mysqltemp.txt";
 
-		FileUtil.write("${liferayHome}/${inputFile}", "${mysqlStatement}");
+		FileUtil.write("${liferayHome}/${inputFile}", ${mysqlStatement});
 
 		AntCommand(
 			locator1 = "build-test.xml",
@@ -30,7 +30,7 @@ definition {
 
 		var output = FileUtil.read("${liferayHome}/${outputFile}");
 
-		return "${output}";
+		return ${output};
 	}
 
 }

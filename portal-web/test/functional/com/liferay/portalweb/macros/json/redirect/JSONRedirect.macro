@@ -9,10 +9,10 @@ definition {
 		}
 
 		var groupId = JSONGroupAPI._getGroupIdByName(
-			groupName = "${groupName}",
-			site = "${site}");
+			groupName = ${groupName},
+			site = ${site});
 		var portalURL = JSONCompany.getPortalURL();
-		var destinationURL = StringUtil.replace("${destinationURL}", ":", "%3A");
+		var destinationURL = StringUtil.replace(${destinationURL}, ":", "%3A");
 
 		if (!(isSet(expirationDate))) {
 			var expirationDate = "2100-01-01";
@@ -38,7 +38,7 @@ definition {
 
 		echo("## * DestinationURL: ${destinationURL}");
 
-		var messageId = JSONCurlUtil.post("${curl}");
+		var messageId = JSONCurlUtil.post(${curl});
 	}
 
 }

@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.price.list.service.persistence.impl;
 
+import com.liferay.commerce.price.list.exception.DuplicateCommercePriceListExternalReferenceCodeException;
 import com.liferay.commerce.price.list.exception.NoSuchPriceListException;
 import com.liferay.commerce.price.list.model.CommercePriceList;
 import com.liferay.commerce.price.list.model.CommercePriceListTable;
@@ -8965,6 +8966,33 @@ public class CommercePriceListPersistenceImpl
 		if (Validator.isNull(commercePriceList.getExternalReferenceCode())) {
 			commercePriceList.setExternalReferenceCode(
 				commercePriceList.getUuid());
+		}
+		else {
+			CommercePriceList ercCommercePriceList = fetchByC_ERC(
+				commercePriceList.getCompanyId(),
+				commercePriceList.getExternalReferenceCode());
+
+			if (isNew) {
+				if (ercCommercePriceList != null) {
+					throw new DuplicateCommercePriceListExternalReferenceCodeException(
+						"Duplicate commerce price list with external reference code " +
+							commercePriceList.getExternalReferenceCode() +
+								" and company " +
+									commercePriceList.getCompanyId());
+				}
+			}
+			else {
+				if ((ercCommercePriceList != null) &&
+					(commercePriceList.getCommercePriceListId() !=
+						ercCommercePriceList.getCommercePriceListId())) {
+
+					throw new DuplicateCommercePriceListExternalReferenceCodeException(
+						"Duplicate commerce price list with external reference code " +
+							commercePriceList.getExternalReferenceCode() +
+								" and company " +
+									commercePriceList.getCompanyId());
+				}
+			}
 		}
 
 		ServiceContext serviceContext =

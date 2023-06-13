@@ -219,11 +219,19 @@ public abstract class BaseAppResourceTestCase {
 
 		assertContains(app1, (List<App>)page.getItems());
 		assertContains(app2, (List<App>)page.getItems());
-		assertValid(page);
+		assertValid(page, testGetAppsPage_getExpectedActions());
 
 		appResource.deleteApp(app1.getId());
 
 		appResource.deleteApp(app2.getId());
+	}
+
+	protected Map<String, Map> testGetAppsPage_getExpectedActions()
+		throws Exception {
+
+		Map<String, Map> expectedActions = new HashMap<>();
+
+		return expectedActions;
 	}
 
 	@Test
@@ -604,7 +612,10 @@ public abstract class BaseAppResourceTestCase {
 
 			assertEquals(
 				Arrays.asList(irrelevantApp), (List<App>)page.getItems());
-			assertValid(page);
+			assertValid(
+				page,
+				testGetDataDefinitionAppsPage_getExpectedActions(
+					irrelevantDataDefinitionId));
 		}
 
 		App app1 = testGetDataDefinitionAppsPage_addApp(
@@ -620,11 +631,22 @@ public abstract class BaseAppResourceTestCase {
 
 		assertEqualsIgnoringOrder(
 			Arrays.asList(app1, app2), (List<App>)page.getItems());
-		assertValid(page);
+		assertValid(
+			page,
+			testGetDataDefinitionAppsPage_getExpectedActions(dataDefinitionId));
 
 		appResource.deleteApp(app1.getId());
 
 		appResource.deleteApp(app2.getId());
+	}
+
+	protected Map<String, Map> testGetDataDefinitionAppsPage_getExpectedActions(
+			Long dataDefinitionId)
+		throws Exception {
+
+		Map<String, Map> expectedActions = new HashMap<>();
+
+		return expectedActions;
 	}
 
 	@Test
@@ -850,7 +872,8 @@ public abstract class BaseAppResourceTestCase {
 
 			assertEquals(
 				Arrays.asList(irrelevantApp), (List<App>)page.getItems());
-			assertValid(page);
+			assertValid(
+				page, testGetSiteAppsPage_getExpectedActions(irrelevantSiteId));
 		}
 
 		App app1 = testGetSiteAppsPage_addApp(siteId, randomApp());
@@ -864,11 +887,20 @@ public abstract class BaseAppResourceTestCase {
 
 		assertEqualsIgnoringOrder(
 			Arrays.asList(app1, app2), (List<App>)page.getItems());
-		assertValid(page);
+		assertValid(page, testGetSiteAppsPage_getExpectedActions(siteId));
 
 		appResource.deleteApp(app1.getId());
 
 		appResource.deleteApp(app2.getId());
+	}
+
+	protected Map<String, Map> testGetSiteAppsPage_getExpectedActions(
+			Long siteId)
+		throws Exception {
+
+		Map<String, Map> expectedActions = new HashMap<>();
+
+		return expectedActions;
 	}
 
 	@Test
@@ -1226,6 +1258,12 @@ public abstract class BaseAppResourceTestCase {
 	}
 
 	protected void assertValid(Page<App> page) {
+		assertValid(page, Collections.emptyMap());
+	}
+
+	protected void assertValid(
+		Page<App> page, Map<String, Map> expectedActions) {
+
 		boolean valid = false;
 
 		java.util.Collection<App> apps = page.getItems();
@@ -1240,6 +1278,20 @@ public abstract class BaseAppResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
+
+		Map<String, Map> actions = page.getActions();
+
+		for (String key : expectedActions.keySet()) {
+			Map action = actions.get(key);
+
+			Assert.assertNotNull(key + " does not contain an action", action);
+
+			Map expectedAction = expectedActions.get(key);
+
+			Assert.assertEquals(
+				expectedAction.get("method"), action.get("method"));
+			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
+		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -1508,6 +1560,10 @@ public abstract class BaseAppResourceTestCase {
 
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
+
+		if (entityModel == null) {
+			return Collections.emptyList();
+		}
 
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();

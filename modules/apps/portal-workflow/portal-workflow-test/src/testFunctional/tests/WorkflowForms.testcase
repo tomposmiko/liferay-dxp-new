@@ -10,7 +10,7 @@ definition {
 	setUp {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			SignIn.signInPortalInstanceSetUp();
 		}
 
@@ -20,7 +20,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -38,7 +38,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-62371"
-	@priority = "3"
+	@priority = 3
 	test SubmitPublishedFormWithTextField {
 		property portal.acceptance = "true";
 
@@ -55,7 +55,7 @@ definition {
 
 		Form.editDescription();
 
-		Form.addTextField(fieldPositionNumber = "1");
+		Form.addTextField(fieldPositionNumber = 1);
 
 		var fieldTextField = FormFields.getFieldName();
 
@@ -78,10 +78,10 @@ definition {
 
 		Form.publishForm();
 
-		FormsAdminNavigator.openPublishURL(publishFormURL = "${publishedFormPublicURL}");
+		FormsAdminNavigator.openPublishURL(publishFormURL = ${publishedFormPublicURL});
 
 		FormFields.editText(
-			fieldName = "${fieldTextField}",
+			fieldName = ${fieldTextField},
 			fieldValue = "Text Field Value");
 
 		Button.clickSubmitForPublication();
@@ -147,7 +147,7 @@ definition {
 	}
 
 	@description = "This is a use case LPS-61197."
-	@priority = "5"
+	@priority = 5
 	test ViewDateAssetDetails {
 		Navigator.openURL();
 
@@ -163,7 +163,7 @@ definition {
 		Form.editDescription();
 
 		Form.gotoAddField(
-			fieldPositionNumber = "1",
+			fieldPositionNumber = 1,
 			fieldType = "Date");
 
 		var fieldDateField = FormFields.getFieldName();
@@ -212,10 +212,10 @@ definition {
 
 		FormFields.viewDateLabel(
 			fieldLabel = "Date",
-			fieldName = "${fieldDateField}");
+			fieldName = ${fieldDateField});
 
 		FormFields.editDate(
-			fieldName = "${fieldDateField}",
+			fieldName = ${fieldDateField},
 			fieldValue = "02/01/2016");
 
 		Button.clickSubmitForPublication();
@@ -243,7 +243,7 @@ definition {
 
 		FormFields.viewDateField(
 			fieldLabel = "Date",
-			fieldName = "${fieldDateField}");
+			fieldName = ${fieldDateField});
 
 		UserBar.gotoDropdownItem(dropdownItem = "My Workflow Tasks");
 
@@ -259,7 +259,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-65270."
-	@priority = "5"
+	@priority = 5
 	test ViewEntryWithConditionalVisibilityFromSelectAndRadio {
 		Navigator.openURL();
 
@@ -275,7 +275,7 @@ definition {
 		Form.editDescription();
 
 		Form.gotoAddField(
-			fieldPositionNumber = "1",
+			fieldPositionNumber = 1,
 			fieldType = "Select from List");
 
 		var selectFromListField = FormFields.getFieldName();
@@ -288,7 +288,7 @@ definition {
 
 		Form.closeSidebar();
 
-		Form.addTextField(fieldPositionNumber = "2");
+		Form.addTextField(fieldPositionNumber = 2);
 
 		var textField_1 = FormFields.getFieldName();
 
@@ -297,7 +297,7 @@ definition {
 		Form.closeSidebar();
 
 		Form.gotoAddField(
-			fieldPositionNumber = "3",
+			fieldPositionNumber = 3,
 			fieldType = "Single Selection");
 
 		var singleSelectionField = FormFields.getFieldName();
@@ -310,7 +310,7 @@ definition {
 
 		Form.closeSidebar();
 
-		Form.addTextField(fieldPositionNumber = "4");
+		Form.addTextField(fieldPositionNumber = 4);
 
 		var textField_2 = FormFields.getFieldName();
 
@@ -325,13 +325,13 @@ definition {
 		FormRules.configureConditionOptions(
 			conditionField = "Select",
 			conditionOperator = "Is equal to",
-			conditionRowNumber = "1",
+			conditionRowNumber = 1,
 			conditionValueField = "Select 1",
 			conditionValueType = "Value");
 
 		FormRules.configureActionOptions(
 			action = "Show",
-			actionRowNumber = "1",
+			actionRowNumber = 1,
 			actionTarget = "Text One");
 
 		FormRules.save();
@@ -341,13 +341,13 @@ definition {
 		FormRules.configureConditionOptions(
 			conditionField = "Radio",
 			conditionOperator = "Is equal to",
-			conditionRowNumber = "1",
+			conditionRowNumber = 1,
 			conditionValueField = "Option 1",
 			conditionValueType = "Value");
 
 		FormRules.configureActionOptions(
 			action = "Show",
-			actionRowNumber = "1",
+			actionRowNumber = 1,
 			actionTarget = "Text Two");
 
 		FormRules.save();
@@ -383,28 +383,28 @@ definition {
 
 		FormFields.viewTextFieldNotVisible(
 			fieldLabel = "Text One",
-			fieldName = "${textField_1}",
+			fieldName = ${textField_1},
 			fieldValue = "Text One Input");
 
 		FormFields.selectSelectOption(
-			fieldName = "${selectFromListField}",
+			fieldName = ${selectFromListField},
 			selectOption = "Select 1");
 
 		FormFields.editText(
-			fieldName = "${textField_1}",
+			fieldName = ${textField_1},
 			fieldValue = "Text One Input");
 
 		FormFields.viewTextFieldNotVisible(
 			fieldLabel = "Text Two",
-			fieldName = "${textField_2}",
+			fieldName = ${textField_2},
 			fieldValue = "Text Two Input");
 
 		FormFields.selectRadioOption(
-			fieldName = "${singleSelectionField}",
+			fieldName = ${singleSelectionField},
 			radioOption = "Option 1");
 
 		FormFields.editText(
-			fieldName = "${textField_2}",
+			fieldName = ${textField_2},
 			fieldValue = "Text Two Input");
 
 		Button.clickSubmitForPublication();
@@ -432,25 +432,25 @@ definition {
 
 		FormsAdmin.viewSelectEntry(
 			fieldLabel = "Select",
-			fieldName = "${selectFromListField}",
+			fieldName = ${selectFromListField},
 			onSitePage = "true",
 			selectOption = "Select 1");
 
 		FormsAdmin.viewTextEntry(
 			fieldLabel = "Text One",
-			fieldName = "${textField_1}",
+			fieldName = ${textField_1},
 			fieldValue = "Text One Input",
 			onSitePage = "true");
 
 		FormsAdmin.viewRadioEntry(
 			fieldLabel = "Radio",
-			fieldName = "${singleSelectionField}",
+			fieldName = ${singleSelectionField},
 			fieldValue = "Option 1",
 			onSitePage = "true");
 
 		FormsAdmin.viewTextEntry(
 			fieldLabel = "Text Two",
-			fieldName = "${textField_2}",
+			fieldName = ${textField_2},
 			fieldValue = "Text Two Input",
 			onSitePage = "true");
 
@@ -490,22 +490,22 @@ definition {
 
 		FormsAdmin.viewSelectEntry(
 			fieldLabel = "Select",
-			fieldName = "${selectFromListField}",
+			fieldName = ${selectFromListField},
 			selectOption = "Select 1");
 
 		FormsAdmin.viewTextEntry(
 			fieldLabel = "Text One",
-			fieldName = "${textField_1}",
+			fieldName = ${textField_1},
 			fieldValue = "Text One Input");
 
 		FormsAdmin.viewRadioEntry(
 			fieldLabel = "Radio",
-			fieldName = "${singleSelectionField}",
+			fieldName = ${singleSelectionField},
 			fieldValue = "Option 1");
 
 		FormsAdmin.viewTextEntry(
 			fieldLabel = "Text Two",
-			fieldName = "${textField_2}",
+			fieldName = ${textField_2},
 			fieldValue = "Text Two Input");
 	}
 

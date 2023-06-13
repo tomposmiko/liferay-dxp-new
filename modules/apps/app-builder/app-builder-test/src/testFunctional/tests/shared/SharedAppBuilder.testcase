@@ -34,7 +34,7 @@ definition {
 
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if (("${testPortalInstance}" == "true") && !(IsTestName(locator1 = "", value1 = "${testNameSkipPortalInstance}"))) {
+		if ((${testPortalInstance} == "true") && !(IsTestName(locator1 = "", value1 = ${testNameSkipPortalInstance}))) {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -50,25 +50,25 @@ definition {
 
 			Permissions.removePermissionViaAPI(
 				resourceAction = "VIEW_CONTROL_PANEL",
-				resourceName = "90",
+				resourceName = 90,
 				roleTitle = "User");
 
 			for (var roleTitle : list "Portal Content Reviewer,User") {
 				Permissions.removePermissionViaAPI(
 					resourceAction = "ACCESS_IN_CONTROL_PANEL",
 					resourceName = "com_liferay_app_builder_web_internal_portlet_ObjectsPortlet",
-					roleTitle = "${roleTitle}");
+					roleTitle = ${roleTitle});
 
 				Permissions.removePermissionViaAPI(
 					resourceAction = "MANAGE",
 					resourceName = "com.liferay.app.builder",
-					roleTitle = "${roleTitle}");
+					roleTitle = ${roleTitle});
 			}
 		}
 	}
 
 	@description = "Create, Remove, Update and Delete entries of an application deployed as Product Menu"
-	@priority = "5"
+	@priority = 5
 	test CreateRemoveUpdateDeleteEntriesOfProductMenuApp {
 		property portal.acceptance = "true";
 		property portal.upstream = "quarantine";
@@ -111,7 +111,7 @@ definition {
 			FormViewBuilder.editOptionsRow(
 				optionName = "Select${number}",
 				optionValue = "Select ${number}",
-				rowNumber = "${number}");
+				rowNumber = ${number});
 		}
 
 		FormViewBuilder.closeSidebar();
@@ -132,16 +132,16 @@ definition {
 			FormViewBuilder.editOptionsRow(
 				optionName = "Multiple${number}",
 				optionValue = "Multiple ${number}",
-				rowNumber = "${number}");
+				rowNumber = ${number});
 		}
 
 		FormViewBuilder.closeSidebar();
 
-		FormViewBuilder.setName(formViewName = "${myFormViewName}");
+		FormViewBuilder.setName(formViewName = ${myFormViewName});
 
 		FormViewBuilder.save();
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "${myFormViewName}");
+		AppBuilderAdmin.validateItemNameOnTable(itemName = ${myFormViewName});
 
 		AppBuilderAdmin.switchTab(tabName = "Table Views");
 
@@ -159,19 +159,19 @@ definition {
 
 		TableViewBuilder.addColumnByDoubleClick(fieldType = "Hobbies");
 
-		TableViewBuilder.setName(tableViewName = "${myTableViewName}");
+		TableViewBuilder.setName(tableViewName = ${myTableViewName});
 
 		TableViewBuilder.save();
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "${myTableViewName}");
+		AppBuilderAdmin.validateItemNameOnTable(itemName = ${myTableViewName});
 
 		App.add(
-			appTitle = "${myAppName}",
+			appTitle = ${myAppName},
 			deployOption = "Product Menu",
-			formViewName = "${myFormViewName}",
-			tableViewName = "${myTableViewName}");
+			formViewName = ${myFormViewName},
+			tableViewName = ${myTableViewName});
 
-		AppBuilderAdmin.gotoCustomAppApplicationsMenuApplications(portlet = "${myAppName}");
+		AppBuilderAdmin.gotoCustomAppApplicationsMenuApplications(portlet = ${myAppName});
 
 		AppBuilderAdmin.addEntry();
 
@@ -185,7 +185,7 @@ definition {
 
 		FormViewBuilder.editText(
 			fieldName = "Number of children",
-			fieldValue = "4");
+			fieldValue = 4);
 
 		FormViewBuilder.selectSelectOption(
 			fieldName = "Occupation",
@@ -205,7 +205,7 @@ definition {
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Mister");
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "4");
+		AppBuilderAdmin.validateItemNameOnTable(itemName = 4);
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Select 2");
 
@@ -225,7 +225,7 @@ definition {
 
 		FormViewBuilder.editText(
 			fieldName = "Number of children",
-			fieldValue = "7");
+			fieldValue = 7);
 
 		FormViewBuilder.selectSelectOption(
 			fieldName = "Occupation",
@@ -245,7 +245,7 @@ definition {
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Mister Ferguson");
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "7");
+		AppBuilderAdmin.validateItemNameOnTable(itemName = 7);
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Select 3");
 
@@ -259,7 +259,7 @@ definition {
 
 		DetailsView.validateEntry(entry = "Mister Ferguson");
 
-		DetailsView.validateEntry(entry = "7");
+		DetailsView.validateEntry(entry = 7);
 
 		DetailsView.validateEntry(entry = "Select 3");
 
@@ -273,7 +273,7 @@ definition {
 
 		DetailsView.validateEntry(entry = "Mister");
 
-		DetailsView.validateEntry(entry = "4");
+		DetailsView.validateEntry(entry = 4);
 
 		DetailsView.validateEntry(entry = "Select 2");
 
@@ -297,7 +297,7 @@ definition {
 
 		FormViewBuilder.editText(
 			fieldName = "Number of children",
-			fieldValue = "6");
+			fieldValue = 6);
 
 		FormViewBuilder.selectSelectOption(
 			fieldName = "Occupation",
@@ -329,7 +329,7 @@ definition {
 
 		FormViewBuilder.editText(
 			fieldName = "Number of children",
-			fieldValue = "4");
+			fieldValue = 4);
 
 		FormViewBuilder.selectSelectOption(
 			fieldName = "Occupation",
@@ -349,7 +349,7 @@ definition {
 
 		DetailsView.validateEntry(entry = "Mister Guardi");
 
-		DetailsView.validateEntry(entry = "6");
+		DetailsView.validateEntry(entry = 6);
 
 		DetailsView.validateEntry(entry = "Select 1");
 
@@ -363,7 +363,7 @@ definition {
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Mister Guardi");
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "6");
+		AppBuilderAdmin.validateItemNameOnTable(itemName = 6);
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Select 1");
 
@@ -373,7 +373,7 @@ definition {
 	}
 
 	@description = "Create, Remove, Update and Delete entries of an application deployed as a Standalone"
-	@priority = "5"
+	@priority = 5
 	test CreateRemoveUpdateDeleteEntriesOfStandaloneApp {
 		property portal.acceptance = "true";
 		property portal.upstream = "quarantine";
@@ -416,7 +416,7 @@ definition {
 			FormViewBuilder.editOptionsRow(
 				optionName = "Select${number}",
 				optionValue = "Select ${number}",
-				rowNumber = "${number}");
+				rowNumber = ${number});
 		}
 
 		FormViewBuilder.closeSidebar();
@@ -437,16 +437,16 @@ definition {
 			FormViewBuilder.editOptionsRow(
 				optionName = "Multiple${number}",
 				optionValue = "Multiple ${number}",
-				rowNumber = "${number}");
+				rowNumber = ${number});
 		}
 
 		FormViewBuilder.closeSidebar();
 
-		FormViewBuilder.setName(formViewName = "${myFormViewName}");
+		FormViewBuilder.setName(formViewName = ${myFormViewName});
 
 		FormViewBuilder.save();
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "${myFormViewName}");
+		AppBuilderAdmin.validateItemNameOnTable(itemName = ${myFormViewName});
 
 		AppBuilderAdmin.switchTab(tabName = "Table Views");
 
@@ -464,17 +464,17 @@ definition {
 
 		TableViewBuilder.addColumnByDoubleClick(fieldType = "Hobbies");
 
-		TableViewBuilder.setName(tableViewName = "${myTableViewName}");
+		TableViewBuilder.setName(tableViewName = ${myTableViewName});
 
 		TableViewBuilder.save();
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "${myTableViewName}");
+		AppBuilderAdmin.validateItemNameOnTable(itemName = ${myTableViewName});
 
 		App.add(
-			appTitle = "${myAppName}",
+			appTitle = ${myAppName},
 			deployOption = "Standalone",
-			formViewName = "${myFormViewName}",
-			tableViewName = "${myTableViewName}");
+			formViewName = ${myFormViewName},
+			tableViewName = ${myTableViewName});
 
 		AppBuilderAdmin.openStandAloneApp(itemName = "My Registration app");
 
@@ -492,7 +492,7 @@ definition {
 
 		FormViewBuilder.editText(
 			fieldName = "Number of children",
-			fieldValue = "4");
+			fieldValue = 4);
 
 		FormViewBuilder.selectSelectOption(
 			fieldName = "Occupation",
@@ -512,7 +512,7 @@ definition {
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Mister");
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "4");
+		AppBuilderAdmin.validateItemNameOnTable(itemName = 4);
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Select 2");
 
@@ -532,7 +532,7 @@ definition {
 
 		FormViewBuilder.editText(
 			fieldName = "Number of children",
-			fieldValue = "7");
+			fieldValue = 7);
 
 		FormViewBuilder.selectSelectOption(
 			fieldName = "Occupation",
@@ -552,7 +552,7 @@ definition {
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Mister Ferguson");
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "7");
+		AppBuilderAdmin.validateItemNameOnTable(itemName = 7);
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Select 3");
 
@@ -566,7 +566,7 @@ definition {
 
 		DetailsView.validateEntry(entry = "Mister Ferguson");
 
-		DetailsView.validateEntry(entry = "7");
+		DetailsView.validateEntry(entry = 7);
 
 		DetailsView.validateEntry(entry = "Select 3");
 
@@ -580,7 +580,7 @@ definition {
 
 		DetailsView.validateEntry(entry = "Mister");
 
-		DetailsView.validateEntry(entry = "4");
+		DetailsView.validateEntry(entry = 4);
 
 		DetailsView.validateEntry(entry = "Select 2");
 
@@ -604,7 +604,7 @@ definition {
 
 		FormViewBuilder.editText(
 			fieldName = "Number of children",
-			fieldValue = "6");
+			fieldValue = 6);
 
 		FormViewBuilder.selectSelectOption(
 			fieldName = "Occupation",
@@ -636,7 +636,7 @@ definition {
 
 		FormViewBuilder.editText(
 			fieldName = "Number of children",
-			fieldValue = "4");
+			fieldValue = 4);
 
 		FormViewBuilder.selectSelectOption(
 			fieldName = "Occupation",
@@ -656,7 +656,7 @@ definition {
 
 		DetailsView.validateEntry(entry = "Mister Guardi");
 
-		DetailsView.validateEntry(entry = "6");
+		DetailsView.validateEntry(entry = 6);
 
 		DetailsView.validateEntry(entry = "Select 1");
 
@@ -670,7 +670,7 @@ definition {
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Mister Guardi");
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "6");
+		AppBuilderAdmin.validateItemNameOnTable(itemName = 6);
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Select 1");
 
@@ -680,7 +680,7 @@ definition {
 	}
 
 	@description = "Create, Remove, Update and Delete entries of an application deployed as a Widget"
-	@priority = "5"
+	@priority = 5
 	test CreateRemoveUpdateDeleteEntriesOfWidgetApp {
 		property portal.acceptance = "true";
 		property portal.upstream = "quarantine";
@@ -723,7 +723,7 @@ definition {
 			FormViewBuilder.editOptionsRow(
 				optionName = "Select${number}",
 				optionValue = "Select ${number}",
-				rowNumber = "${number}");
+				rowNumber = ${number});
 		}
 
 		FormViewBuilder.closeSidebar();
@@ -744,16 +744,16 @@ definition {
 			FormViewBuilder.editOptionsRow(
 				optionName = "Multiple${number}",
 				optionValue = "Multiple ${number}",
-				rowNumber = "${number}");
+				rowNumber = ${number});
 		}
 
 		FormViewBuilder.closeSidebar();
 
-		FormViewBuilder.setName(formViewName = "${myFormViewName}");
+		FormViewBuilder.setName(formViewName = ${myFormViewName});
 
 		FormViewBuilder.save();
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "${myFormViewName}");
+		AppBuilderAdmin.validateItemNameOnTable(itemName = ${myFormViewName});
 
 		AppBuilderAdmin.switchTab(tabName = "Table Views");
 
@@ -771,17 +771,17 @@ definition {
 
 		TableViewBuilder.addColumnByDoubleClick(fieldType = "Hobbies");
 
-		TableViewBuilder.setName(tableViewName = "${myTableViewName}");
+		TableViewBuilder.setName(tableViewName = ${myTableViewName});
 
 		TableViewBuilder.save();
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "${myTableViewName}");
+		AppBuilderAdmin.validateItemNameOnTable(itemName = ${myTableViewName});
 
 		App.add(
-			appTitle = "${myAppName}",
+			appTitle = ${myAppName},
 			deployOption = "Widget",
-			formViewName = "${myFormViewName}",
-			tableViewName = "${myTableViewName}");
+			formViewName = ${myFormViewName},
+			tableViewName = ${myTableViewName});
 
 		JSONLayout.addPublicLayout(
 			groupName = "App Builder Site Name",
@@ -812,7 +812,7 @@ definition {
 
 		FormViewBuilder.editText(
 			fieldName = "Number of children",
-			fieldValue = "2");
+			fieldValue = 2);
 
 		FormViewBuilder.selectSelectOption(
 			fieldName = "Occupation",
@@ -836,7 +836,7 @@ definition {
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Mister");
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "2");
+		AppBuilderAdmin.validateItemNameOnTable(itemName = 2);
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Select 2");
 
@@ -856,7 +856,7 @@ definition {
 
 		FormViewBuilder.editText(
 			fieldName = "Number of children",
-			fieldValue = "1");
+			fieldValue = 1);
 
 		FormViewBuilder.selectSelectOption(
 			fieldName = "Occupation",
@@ -880,7 +880,7 @@ definition {
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Guardi");
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "1");
+		AppBuilderAdmin.validateItemNameOnTable(itemName = 1);
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Select 1");
 
@@ -892,7 +892,7 @@ definition {
 	}
 
 	@description = "Create table views with a fixed entries filter of list field types (select from list and single selection)"
-	@priority = "5"
+	@priority = 5
 	test CreateTableViewsWithFixedEntriesFilter {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "AppBuilder#CreateTableViewsWithFixedEntriesFilter";
@@ -915,17 +915,17 @@ definition {
 		FormViewBuilder.editOptionsRow(
 			optionName = "Red",
 			optionValue = "Red",
-			rowNumber = "1");
+			rowNumber = 1);
 
 		FormViewBuilder.editOptionsRow(
 			optionName = "Blue",
 			optionValue = "Blue",
-			rowNumber = "2");
+			rowNumber = 2);
 
 		FormViewBuilder.editOptionsRow(
 			optionName = "Green",
 			optionValue = "Green",
-			rowNumber = "3");
+			rowNumber = 3);
 
 		FormViewBuilder.closeSidebar();
 
@@ -936,17 +936,17 @@ definition {
 		FormViewBuilder.editOptionsRow(
 			optionName = "Dog",
 			optionValue = "Dog",
-			rowNumber = "1");
+			rowNumber = 1);
 
 		FormViewBuilder.editOptionsRow(
 			optionName = "Cat",
 			optionValue = "Cat",
-			rowNumber = "2");
+			rowNumber = 2);
 
 		FormViewBuilder.editOptionsRow(
 			optionName = "Fish",
 			optionValue = "Fish",
-			rowNumber = "3");
+			rowNumber = 3);
 
 		FormViewBuilder.closeSidebar();
 
@@ -1036,7 +1036,7 @@ definition {
 
 		FormViewBuilder.editText(
 			fieldName = "ID",
-			fieldValue = "1");
+			fieldValue = 1);
 
 		FormViewBuilder.selectSelectOption(
 			fieldName = "Color",
@@ -1048,13 +1048,13 @@ definition {
 
 		AppBuilderAdmin.save();
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "1");
+		AppBuilderAdmin.validateItemNameOnTable(itemName = 1);
 
 		AppBuilderAdmin.addEntry();
 
 		FormViewBuilder.editText(
 			fieldName = "ID",
-			fieldValue = "2");
+			fieldValue = 2);
 
 		FormViewBuilder.selectSelectOption(
 			fieldName = "Color",
@@ -1070,7 +1070,7 @@ definition {
 
 		FormViewBuilder.editText(
 			fieldName = "ID",
-			fieldValue = "3");
+			fieldValue = 3);
 
 		FormViewBuilder.selectSelectOption(
 			fieldName = "Color",
@@ -1086,7 +1086,7 @@ definition {
 
 		FormViewBuilder.editText(
 			fieldName = "ID",
-			fieldValue = "4");
+			fieldValue = 4);
 
 		FormViewBuilder.selectSelectOption(
 			fieldName = "Color",
@@ -1098,17 +1098,17 @@ definition {
 
 		AppBuilderAdmin.save();
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "1");
+		AppBuilderAdmin.validateItemNameOnTable(itemName = 1);
 
-		AppBuilderAdmin.validateItemNameOnTableNotPresent(itemName = "2");
+		AppBuilderAdmin.validateItemNameOnTableNotPresent(itemName = 2);
 
-		AppBuilderAdmin.validateItemNameOnTableNotPresent(itemName = "3");
+		AppBuilderAdmin.validateItemNameOnTableNotPresent(itemName = 3);
 
-		AppBuilderAdmin.validateItemNameOnTableNotPresent(itemName = "4");
+		AppBuilderAdmin.validateItemNameOnTableNotPresent(itemName = 4);
 
 		AppBuilderAdmin.gotoCustomAppApplicationsMenuApplications(portlet = "App Full");
 
-		AppBuilderAdmin.viewItem(itemName = "1");
+		AppBuilderAdmin.viewItem(itemName = 1);
 
 		DetailsView.editEntry();
 
@@ -1124,7 +1124,7 @@ definition {
 
 		AppBuilderAdmin.gotoBack();
 
-		AppBuilderAdmin.viewItem(itemName = "2");
+		AppBuilderAdmin.viewItem(itemName = 2);
 
 		DetailsView.editEntry();
 
@@ -1140,13 +1140,13 @@ definition {
 
 		AppBuilderAdmin.gotoCustomAppApplicationsMenuApplications(portlet = "App Filtered");
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "2");
+		AppBuilderAdmin.validateItemNameOnTable(itemName = 2);
 
-		AppBuilderAdmin.validateItemNameOnTableNotPresent(itemName = "1");
+		AppBuilderAdmin.validateItemNameOnTableNotPresent(itemName = 1);
 
-		AppBuilderAdmin.validateItemNameOnTableNotPresent(itemName = "3");
+		AppBuilderAdmin.validateItemNameOnTableNotPresent(itemName = 3);
 
-		AppBuilderAdmin.validateItemNameOnTableNotPresent(itemName = "4");
+		AppBuilderAdmin.validateItemNameOnTableNotPresent(itemName = 4);
 
 		ApplicationsMenu.gotoPortlet(
 			category = "App Builder",
@@ -1181,13 +1181,13 @@ definition {
 
 		AppBuilderAdmin.gotoCustomAppApplicationsMenuApplications(portlet = "App Filtered");
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "1");
+		AppBuilderAdmin.validateItemNameOnTable(itemName = 1);
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "2");
+		AppBuilderAdmin.validateItemNameOnTable(itemName = 2);
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "3");
+		AppBuilderAdmin.validateItemNameOnTable(itemName = 3);
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "4");
+		AppBuilderAdmin.validateItemNameOnTable(itemName = 4);
 
 		ApplicationsMenu.gotoPortlet(
 			category = "App Builder",
@@ -1220,7 +1220,7 @@ definition {
 
 		FormViewBuilder.editText(
 			fieldName = "ID",
-			fieldValue = "5");
+			fieldValue = 5);
 
 		FormViewBuilder.selectSelectOption(
 			fieldName = "Color",
@@ -1232,15 +1232,15 @@ definition {
 
 		AppBuilderAdmin.save();
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "1");
+		AppBuilderAdmin.validateItemNameOnTable(itemName = 1);
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "4");
+		AppBuilderAdmin.validateItemNameOnTable(itemName = 4);
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "5");
+		AppBuilderAdmin.validateItemNameOnTable(itemName = 5);
 
-		AppBuilderAdmin.validateItemNameOnTableNotPresent(itemName = "2");
+		AppBuilderAdmin.validateItemNameOnTableNotPresent(itemName = 2);
 
-		AppBuilderAdmin.validateItemNameOnTableNotPresent(itemName = "3");
+		AppBuilderAdmin.validateItemNameOnTableNotPresent(itemName = 3);
 
 		ApplicationsMenu.gotoPortlet(
 			category = "App Builder",
@@ -1275,19 +1275,19 @@ definition {
 
 		AppBuilderAdmin.gotoCustomAppApplicationsMenuApplications(portlet = "App Filtered");
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "1");
+		AppBuilderAdmin.validateItemNameOnTable(itemName = 1);
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "2");
+		AppBuilderAdmin.validateItemNameOnTable(itemName = 2);
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "3");
+		AppBuilderAdmin.validateItemNameOnTable(itemName = 3);
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "4");
+		AppBuilderAdmin.validateItemNameOnTable(itemName = 4);
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "5");
+		AppBuilderAdmin.validateItemNameOnTable(itemName = 5);
 	}
 
 	@description = "Delete fields from the Form View through the Delete options and assert its affect on other Form and Table views"
-	@priority = "5"
+	@priority = 5
 	test DeleteFormViewFieldFromObject {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "AppBuilder#DeleteFormViewFieldFromObject";
@@ -1435,7 +1435,7 @@ definition {
 	}
 
 	@description = "Remove fields from the Form View through the 'Remove' option"
-	@priority = "5"
+	@priority = 5
 	test RemoveFormViewFields {
 		property portal.acceptance = "true";
 
@@ -1447,7 +1447,7 @@ definition {
 		FormViewBuilder.setName(formViewName = "Form View Title 1");
 
 		for (var fieldType : list "Text,Select from List,Single Selection,Multiple Selection,Date,Numeric,Upload") {
-			FormViewBuilder.addFieldByDoubleClick(fieldType = "${fieldType}");
+			FormViewBuilder.addFieldByDoubleClick(fieldType = ${fieldType});
 
 			FormViewBuilder.closeSidebar();
 		}
@@ -1458,7 +1458,7 @@ definition {
 
 		for (var fieldLabel : list "Text,Select from List,Single Selection,Multiple Selection,Date,Numeric,Upload") {
 			FormViewBuilder.fieldEllipsisAction(
-				fieldLabel = "${fieldLabel}",
+				fieldLabel = ${fieldLabel},
 				selectAction = "Remove");
 		}
 
@@ -1469,16 +1469,16 @@ definition {
 		FormViewBuilder.openFormView(formViewName = "Form View Title 1");
 
 		for (var fieldType : list "Select from List,Single Selection,Multiple Selection,Date,Numeric,Upload") {
-			FormViewBuilder.validateNoFieldLabel(fieldLabel = "${fieldType}");
+			FormViewBuilder.validateNoFieldLabel(fieldLabel = ${fieldType});
 
-			FormViewBuilder.validateObjectFieldName(fieldName = "${fieldType}");
+			FormViewBuilder.validateObjectFieldName(fieldName = ${fieldType});
 		}
 
 		FormViewBuilder.validateFieldLabel(fieldLabel = "Text");
 	}
 
 	@description = "Reuse my object's existing fields when creating a new form view"
-	@priority = "5"
+	@priority = 5
 	test ReuseExistingFormViewFields {
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "AppBuilder#ReuseExistingFormViewFields";
@@ -1524,7 +1524,7 @@ definition {
 			FormViewBuilder.editOptionsRow(
 				optionName = "Select ${number}",
 				optionValue = "Occupation ${number}",
-				rowNumber = "${number}");
+				rowNumber = ${number});
 		}
 
 		FormViewBuilder.closeSidebar();
@@ -1541,7 +1541,7 @@ definition {
 			FormViewBuilder.editOptionsRow(
 				optionName = "Option ${number}",
 				optionValue = "Marital Status ${number}",
-				rowNumber = "${number}");
+				rowNumber = ${number});
 		}
 
 		FormViewBuilder.closeSidebar();
@@ -1566,7 +1566,7 @@ definition {
 			FormViewBuilder.editOptionsRow(
 				optionName = "Multiple ${number}",
 				optionValue = "Hobby ${number}",
-				rowNumber = "${number}");
+				rowNumber = ${number});
 		}
 
 		FormViewBuilder.setFieldRequired();
@@ -1607,7 +1607,7 @@ definition {
 
 		FormViewBuilder.validateSelectFromListField(
 			optionValue = "Occupation 2",
-			rowNumber = "2");
+			rowNumber = 2);
 
 		FormViewBuilder.validateFieldLabelRequired(fieldLabel = "Occupation");
 

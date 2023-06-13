@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.discount.service.persistence.impl;
 
+import com.liferay.commerce.discount.exception.DuplicateCommerceDiscountExternalReferenceCodeException;
 import com.liferay.commerce.discount.exception.NoSuchDiscountException;
 import com.liferay.commerce.discount.model.CommerceDiscount;
 import com.liferay.commerce.discount.model.CommerceDiscountTable;
@@ -6873,6 +6874,33 @@ public class CommerceDiscountPersistenceImpl
 		if (Validator.isNull(commerceDiscount.getExternalReferenceCode())) {
 			commerceDiscount.setExternalReferenceCode(
 				commerceDiscount.getUuid());
+		}
+		else {
+			CommerceDiscount ercCommerceDiscount = fetchByC_ERC(
+				commerceDiscount.getCompanyId(),
+				commerceDiscount.getExternalReferenceCode());
+
+			if (isNew) {
+				if (ercCommerceDiscount != null) {
+					throw new DuplicateCommerceDiscountExternalReferenceCodeException(
+						"Duplicate commerce discount with external reference code " +
+							commerceDiscount.getExternalReferenceCode() +
+								" and company " +
+									commerceDiscount.getCompanyId());
+				}
+			}
+			else {
+				if ((ercCommerceDiscount != null) &&
+					(commerceDiscount.getCommerceDiscountId() !=
+						ercCommerceDiscount.getCommerceDiscountId())) {
+
+					throw new DuplicateCommerceDiscountExternalReferenceCodeException(
+						"Duplicate commerce discount with external reference code " +
+							commerceDiscount.getExternalReferenceCode() +
+								" and company " +
+									commerceDiscount.getCompanyId());
+				}
+			}
 		}
 
 		ServiceContext serviceContext =

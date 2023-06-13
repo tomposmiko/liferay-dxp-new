@@ -7,7 +7,7 @@ definition {
 
 		SelectFrame(locator1 = "IFrame#CONFIGURATION");
 
-		Pause(locator1 = "5000");
+		Pause(locator1 = 5000);
 
 		WaitForElementPresent(locator1 = "Checkbox#SHOW_ACTIONS_CHECKBOX");
 
@@ -32,7 +32,7 @@ definition {
 		Click.waitForMenuToggleJSClick(locator1 = "Icon#BODY_VERTICAL_ELLIPSIS");
 
 		for (var menuItem : list "Permissions,Multiple Media,Add Shortcut,Access from Desktop") {
-			MenuItem.viewPresent(menuItem = "${menuItem}");
+			MenuItem.viewPresent(menuItem = ${menuItem});
 		}
 	}
 

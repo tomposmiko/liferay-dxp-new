@@ -22,7 +22,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -33,7 +33,7 @@ definition {
 	}
 
 	@description = "This is the test for LPS-107774. Can create a Collection Page based on Collections or Collection Providers in Pages Tree panel of Staging site."
-	@priority = "4"
+	@priority = 4
 	test AddCollectionPageViaPageFinder {
 		property osgi.modules.includes = "bookmarks,document-library-google-docs";
 
@@ -43,7 +43,7 @@ definition {
 					content = "Web Content Content",
 					groupName = "Test Site Name (Staging)",
 					site = "false",
-					title = "${entryTitle}");
+					title = ${entryTitle});
 			}
 		}
 
@@ -71,17 +71,17 @@ definition {
 
 			AssertVisible(
 				key_elementHeader = "//div[contains(.,'Dynamic Collection') and contains(@id,'fragment-')]",
-				key_position = "1",
+				key_position = 1,
 				locator1 = "PageEditor#CONTAINER_CONTAINER_NESTED_ELEMENT");
 
-			var n = "1";
+			var n = 1;
 
 			for (var title : list "Third Web Content,Second Web Content,First Web Content") {
 				AssertVisible(
-					key_colPosition = "1",
-					key_entryTitle = "${title}",
+					key_colPosition = 1,
+					key_entryTitle = ${title},
 					key_fragmentName = "Collection Display",
-					key_rowPosition = "${n}",
+					key_rowPosition = ${n},
 					locator1 = "PageEditor#COLLECTION_ITEM_TITLE");
 
 				var n = ${n} + 1;
@@ -104,17 +104,17 @@ definition {
 
 			AssertVisible(
 				key_elementHeader = "//div[contains(.,'Most Viewed Assets') and contains(@id,'fragment-')]",
-				key_position = "1",
+				key_position = 1,
 				locator1 = "PageEditor#CONTAINER_CONTAINER_NESTED_ELEMENT");
 
-			var n = "1";
+			var n = 1;
 
 			for (var title : list "Third Web Content,Second Web Content,First Web Content") {
 				AssertVisible(
-					key_colPosition = "1",
-					key_entryTitle = "${title}",
+					key_colPosition = 1,
+					key_entryTitle = ${title},
 					key_fragmentName = "Collection Display",
-					key_rowPosition = "${n}",
+					key_rowPosition = ${n},
 					locator1 = "PageEditor#COLLECTION_ITEM_TITLE");
 
 				var n = ${n} + 1;
@@ -125,7 +125,7 @@ definition {
 	}
 
 	@description = "This is the test for LPS-116428. Can reorganize the pages via Page Tree panel in Staging site but not in Live site."
-	@priority = "3"
+	@priority = 3
 	test CanReorganizePagesViaPageFinderInStagingSiteNotInLiveSite {
 		task ("Add a widget page and a content page in Site Name") {
 			JSONLayout.addPublicLayout(
@@ -149,12 +149,12 @@ definition {
 
 			PagesFinder.goToFindAPage();
 
-			var n = "1";
+			var n = 1;
 
 			for (var pageName : list "Test Widget Page,Test Content Page") {
 				AssertVisible(
-					key_index = "${n}",
-					key_pageName = "${pageName}",
+					key_index = ${n},
+					key_pageName = ${pageName},
 					locator1 = "PagesFinder#TREE_NODE_ITEM");
 
 				var n = ${n} + 1;
@@ -165,12 +165,12 @@ definition {
 				locator2 = "//ul[contains(@class,'tree-container')]/li[contains(@class,'tree-node')][1][contains(.,'Test Widget Page')]",
 				position = "0,-3");
 
-			var n = "1";
+			var n = 1;
 
 			for (var pageName : list "Test Content Page,Test Widget Page") {
 				AssertVisible(
-					key_index = "${n}",
-					key_pageName = "${pageName}",
+					key_index = ${n},
+					key_pageName = ${pageName},
 					locator1 = "PagesFinder#TREE_NODE_ITEM");
 
 				var n = ${n} + 1;

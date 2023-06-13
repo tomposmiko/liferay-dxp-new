@@ -234,7 +234,10 @@ public abstract class BaseLanguageResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantLanguage),
 				(List<Language>)page.getItems());
-			assertValid(page);
+			assertValid(
+				page,
+				testGetAssetLibraryLanguagesPage_getExpectedActions(
+					irrelevantAssetLibraryId));
 		}
 
 		Language language1 = testGetAssetLibraryLanguagesPage_addLanguage(
@@ -250,7 +253,20 @@ public abstract class BaseLanguageResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(language1, language2),
 			(List<Language>)page.getItems());
-		assertValid(page);
+		assertValid(
+			page,
+			testGetAssetLibraryLanguagesPage_getExpectedActions(
+				assetLibraryId));
+	}
+
+	protected Map<String, Map>
+			testGetAssetLibraryLanguagesPage_getExpectedActions(
+				Long assetLibraryId)
+		throws Exception {
+
+		Map<String, Map> expectedActions = new HashMap<>();
+
+		return expectedActions;
 	}
 
 	protected Language testGetAssetLibraryLanguagesPage_addLanguage(
@@ -294,7 +310,9 @@ public abstract class BaseLanguageResourceTestCase {
 			assertEquals(
 				Arrays.asList(irrelevantLanguage),
 				(List<Language>)page.getItems());
-			assertValid(page);
+			assertValid(
+				page,
+				testGetSiteLanguagesPage_getExpectedActions(irrelevantSiteId));
 		}
 
 		Language language1 = testGetSiteLanguagesPage_addLanguage(
@@ -310,7 +328,16 @@ public abstract class BaseLanguageResourceTestCase {
 		assertEqualsIgnoringOrder(
 			Arrays.asList(language1, language2),
 			(List<Language>)page.getItems());
-		assertValid(page);
+		assertValid(page, testGetSiteLanguagesPage_getExpectedActions(siteId));
+	}
+
+	protected Map<String, Map> testGetSiteLanguagesPage_getExpectedActions(
+			Long siteId)
+		throws Exception {
+
+		Map<String, Map> expectedActions = new HashMap<>();
+
+		return expectedActions;
 	}
 
 	protected Language testGetSiteLanguagesPage_addLanguage(
@@ -499,6 +526,12 @@ public abstract class BaseLanguageResourceTestCase {
 	}
 
 	protected void assertValid(Page<Language> page) {
+		assertValid(page, Collections.emptyMap());
+	}
+
+	protected void assertValid(
+		Page<Language> page, Map<String, Map> expectedActions) {
+
 		boolean valid = false;
 
 		java.util.Collection<Language> languages = page.getItems();
@@ -513,6 +546,20 @@ public abstract class BaseLanguageResourceTestCase {
 		}
 
 		Assert.assertTrue(valid);
+
+		Map<String, Map> actions = page.getActions();
+
+		for (String key : expectedActions.keySet()) {
+			Map action = actions.get(key);
+
+			Assert.assertNotNull(key + " does not contain an action", action);
+
+			Map expectedAction = expectedActions.get(key);
+
+			Assert.assertEquals(
+				expectedAction.get("method"), action.get("method"));
+			Assert.assertEquals(expectedAction.get("href"), action.get("href"));
+		}
 	}
 
 	protected String[] getAdditionalAssertFieldNames() {
@@ -702,6 +749,10 @@ public abstract class BaseLanguageResourceTestCase {
 
 		EntityModel entityModel = entityModelResource.getEntityModel(
 			new MultivaluedHashMap());
+
+		if (entityModel == null) {
+			return Collections.emptyList();
+		}
 
 		Map<String, EntityField> entityFieldsMap =
 			entityModel.getEntityFieldsMap();

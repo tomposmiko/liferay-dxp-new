@@ -4,38 +4,38 @@ definition {
 	macro addSegment {
 		Variables.assertDefined(parameterList = "${groupName},${segmentName},${fieldName},${operator}");
 
-		var descriptionMap = JSONSegmentsentrySetter.setDescriptionMap(description = "${description}");
-		var field = JSONSegmentsentrySetter.setField(fieldName = "${fieldName}");
+		var descriptionMap = JSONSegmentsentrySetter.setDescriptionMap(description = ${description});
+		var field = JSONSegmentsentrySetter.setField(fieldName = ${fieldName});
 
 		var criteria = JSONSegmentsentrySetter.setCriteria(
-			date = "${date}",
-			field = "${field}",
-			operator = "${operator}",
-			text = "${text}");
-		var nameMap = JSONSegmentsentrySetter.setNameMap(name = "${segmentName}");
+			date = ${date},
+			field = ${field},
+			operator = ${operator},
+			text = ${text});
+		var nameMap = JSONSegmentsentrySetter.setNameMap(name = ${segmentName});
 		var serviceContext = JSONSegmentsentrySetter.setServiceContext(
-			assetCategoryIds = "${assetCategoryIds}",
-			assetTagNames = "${assetTagNames}",
-			groupName = "${groupName}",
-			site = "${site}",
-			workflowAction = "${workflowAction}");
+			assetCategoryIds = ${assetCategoryIds},
+			assetTagNames = ${assetTagNames},
+			groupName = ${groupName},
+			site = ${site},
+			workflowAction = ${workflowAction});
 
 		JSONSegmentsentryAPI._addSegment(
-			criteria = "${criteria}",
-			descriptionMap = "${descriptionMap}",
-			nameMap = "${nameMap}",
-			serviceContext = "${serviceContext}");
+			criteria = ${criteria},
+			descriptionMap = ${descriptionMap},
+			nameMap = ${nameMap},
+			serviceContext = ${serviceContext});
 	}
 
 	macro getSegmentId {
-		Variables.assertDefined(parameterList = "${segmentName}");
+		Variables.assertDefined(parameterList = ${segmentName});
 
 		if (!(isSet(groupName))) {
 			var groupName = "Guest";
 		}
 
 		var groupId = JSONGroupAPI._getGroupIdByName(
-			groupName = "${groupName}",
+			groupName = ${groupName},
 			site = "true");
 		var portalURL = JSONCompany.getPortalURL();
 
@@ -46,11 +46,11 @@ definition {
 				-d includeAncestorSegmentsEntries=true
 		''';
 
-		var segmentId = JSONCurlUtil.post("${curl}", "$.[?(@['nameCurrentValue'] == '${segmentName}')]['segmentsEntryId']");
+		var segmentId = JSONCurlUtil.post(${curl}, "$.[?(@['nameCurrentValue'] == '${segmentName}')]['segmentsEntryId']");
 
 		echo("## ID for Segment ${segmentName}: ${segmentId}");
 
-		return "${segmentId}";
+		return ${segmentId};
 	}
 
 }

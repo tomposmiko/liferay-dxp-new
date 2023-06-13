@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.dao.orm.Query;
 import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
+import com.liferay.portal.kernel.exception.DuplicateUserExternalReferenceCodeException;
 import com.liferay.portal.kernel.exception.NoSuchUserException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -8597,6 +8598,29 @@ public class UserPersistenceImpl
 
 		if (Validator.isNull(user.getExternalReferenceCode())) {
 			user.setExternalReferenceCode(user.getUuid());
+		}
+		else {
+			User ercUser = fetchByC_ERC(
+				user.getCompanyId(), user.getExternalReferenceCode());
+
+			if (isNew) {
+				if (ercUser != null) {
+					throw new DuplicateUserExternalReferenceCodeException(
+						"Duplicate user with external reference code " +
+							user.getExternalReferenceCode() + " and company " +
+								user.getCompanyId());
+				}
+			}
+			else {
+				if ((ercUser != null) &&
+					(user.getUserId() != ercUser.getUserId())) {
+
+					throw new DuplicateUserExternalReferenceCodeException(
+						"Duplicate user with external reference code " +
+							user.getExternalReferenceCode() + " and company " +
+								user.getCompanyId());
+				}
+			}
 		}
 
 		ServiceContext serviceContext =

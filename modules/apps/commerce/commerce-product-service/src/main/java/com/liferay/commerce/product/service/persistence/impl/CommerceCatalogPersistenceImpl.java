@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.product.service.persistence.impl;
 
+import com.liferay.commerce.product.exception.DuplicateCommerceCatalogExternalReferenceCodeException;
 import com.liferay.commerce.product.exception.NoSuchCatalogException;
 import com.liferay.commerce.product.model.CommerceCatalog;
 import com.liferay.commerce.product.model.CommerceCatalogTable;
@@ -2452,6 +2453,33 @@ public class CommerceCatalogPersistenceImpl
 		if (Validator.isNull(commerceCatalog.getExternalReferenceCode())) {
 			commerceCatalog.setExternalReferenceCode(
 				String.valueOf(commerceCatalog.getPrimaryKey()));
+		}
+		else {
+			CommerceCatalog ercCommerceCatalog = fetchByC_ERC(
+				commerceCatalog.getCompanyId(),
+				commerceCatalog.getExternalReferenceCode());
+
+			if (isNew) {
+				if (ercCommerceCatalog != null) {
+					throw new DuplicateCommerceCatalogExternalReferenceCodeException(
+						"Duplicate commerce catalog with external reference code " +
+							commerceCatalog.getExternalReferenceCode() +
+								" and company " +
+									commerceCatalog.getCompanyId());
+				}
+			}
+			else {
+				if ((ercCommerceCatalog != null) &&
+					(commerceCatalog.getCommerceCatalogId() !=
+						ercCommerceCatalog.getCommerceCatalogId())) {
+
+					throw new DuplicateCommerceCatalogExternalReferenceCodeException(
+						"Duplicate commerce catalog with external reference code " +
+							commerceCatalog.getExternalReferenceCode() +
+								" and company " +
+									commerceCatalog.getCompanyId());
+				}
+			}
 		}
 
 		ServiceContext serviceContext =

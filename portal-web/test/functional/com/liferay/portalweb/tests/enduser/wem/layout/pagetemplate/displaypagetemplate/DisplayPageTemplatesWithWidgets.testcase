@@ -28,7 +28,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -37,7 +37,7 @@ definition {
 	}
 
 	@description = "This is for LPS-106813. Can set permissions for widgets in display page template."
-	@priority = "5"
+	@priority = 5
 	test ConfigurePermissionsOfAP {
 		property portal.acceptance = "true";
 

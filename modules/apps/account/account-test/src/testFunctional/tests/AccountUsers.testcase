@@ -14,7 +14,7 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
+		if (${testPortalInstance} == "true") {
 			PortalInstances.tearDownCP();
 		}
 		else {
@@ -23,7 +23,7 @@ definition {
 	}
 
 	@description = "This test adds an account user via Account Users portlet"
-	@priority = "5"
+	@priority = 5
 	test AddAccountUser {
 		property portal.acceptance = "true";
 
@@ -57,7 +57,7 @@ definition {
 	}
 
 	@description = "This test adds a new user via the Users tab of an Account"
-	@priority = "4"
+	@priority = 4
 	test AddAccountUserViaAssignUser {
 		ApplicationsMenu.gotoPortlet(
 			category = "Accounts",
@@ -93,7 +93,7 @@ definition {
 	}
 
 	@description = "This test assigns an existing user to account through the Users tab"
-	@priority = "5"
+	@priority = 5
 	test AssignExistingUserToAccount {
 		ApplicationsMenu.gotoPortlet(
 			category = "Accounts",
@@ -149,7 +149,7 @@ definition {
 	}
 
 	@description = "This test deactivates an active user"
-	@priority = "4"
+	@priority = 4
 	test DeactivateUser {
 		ApplicationsMenu.gotoPortlet(
 			category = "Accounts",
@@ -189,7 +189,7 @@ definition {
 	}
 
 	@description = "This test edits a user via Account Users portlet"
-	@priority = "4"
+	@priority = 4
 	test EditAccountUser {
 		ApplicationsMenu.gotoPortlet(
 			category = "Accounts",
@@ -245,7 +245,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-107598."
-	@priority = "4"
+	@priority = 4
 	test FilterAccountUserInTheUsersAdminPortlet {
 		ApplicationsMenu.gotoPortlet(
 			category = "Accounts",
@@ -297,7 +297,7 @@ definition {
 	}
 
 	@description = "This filters users by accounts, choosing a specific account to view"
-	@priority = "4"
+	@priority = 4
 	test FilterByAccounts {
 		for (var accountType : list "Business,Person") {
 			ApplicationsMenu.gotoPortlet(
@@ -308,7 +308,7 @@ definition {
 			Accounts.addCP(
 				accountDescription = "This is a ${accountType} Account.",
 				accountName = "${accountType} Account",
-				accountType = "${accountType}");
+				accountType = ${accountType});
 		}
 
 		ApplicationsMenu.gotoPortlet(
@@ -374,7 +374,7 @@ definition {
 	}
 
 	@description = "This filters users that do not have any assigned account"
-	@priority = "4"
+	@priority = 4
 	test FilterByNoAssignedAccount {
 		ApplicationsMenu.gotoPortlet(
 			category = "Accounts",
@@ -427,7 +427,7 @@ definition {
 	}
 
 	@description = "This filters users by status: active and inactive"
-	@priority = "4"
+	@priority = 4
 	test FilterByStatus {
 		ApplicationsMenu.gotoPortlet(
 			category = "Accounts",
@@ -480,9 +480,9 @@ definition {
 	}
 
 	@description = "This test impersonates an account user via Account Users portlet"
-	@priority = "4"
+	@priority = 4
 	test ImpersonateUser {
-		var siteName = TestCase.getSiteName(siteName = "${siteName}");
+		var siteName = TestCase.getSiteName(siteName = ${siteName});
 
 		ApplicationsMenu.gotoPortlet(
 			category = "Accounts",
@@ -513,12 +513,12 @@ definition {
 		LexiconEntry.viewEntryName(rowEntry = "userfn userln");
 
 		User.impersonateCP(
-			siteName = "${siteName}",
+			siteName = ${siteName},
 			userName = "userfn");
 	}
 
 	@description = "This test removes a user from account via Users tab"
-	@priority = "4"
+	@priority = 4
 	test RemoveUserFromAccount {
 		ApplicationsMenu.gotoPortlet(
 			category = "Accounts",

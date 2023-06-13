@@ -61,11 +61,13 @@ DispatchLogDisplayContext dispatchLogDisplayContext = (DispatchLogDisplayContext
 		) {
 			var form = window.document['<portlet:namespace />fm'];
 
-			form.setAttibute('method', 'post');
-
-			form['<%= Constants.CMD %>'].value = '<%= Constants.DELETE %>';
-			form['redirect'].value = '<%= currentURL %>';
-			form['deleteDispatchLogIds'].value = Liferay.Util.listCheckedExcept(
+			form.setAttribute('method', 'post');
+			form['<portlet:namespace /><%= Constants.CMD %>'].value =
+				'<%= Constants.DELETE %>';
+			form['<portlet:namespace />redirect'].value = '<%= currentURL %>';
+			form[
+				'<portlet:namespace />deleteDispatchLogIds'
+			].value = Liferay.Util.listCheckedExcept(
 				form,
 				'<portlet:namespace />allRowIds'
 			);

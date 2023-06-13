@@ -10,9 +10,9 @@ definition {
 				-H Content-Type: application/json
 		''';
 
-		var JSON = JSONCurlUtil.get("${curl}");
+		var JSON = JSONCurlUtil.get(${curl});
 
-		return "${JSON}";
+		return ${JSON};
 	}
 
 	@summary = "Creates a new Portal Instance with domain = mailDomain, virtualHost = virtualHost, and portalInstanceId = webId"
@@ -26,12 +26,12 @@ definition {
 			value = "\"${domain}\"");
 
 		var parameters = JSONUtil2._addJSONObject(
-			JSON = "${parameters}",
+			JSON = ${parameters},
 			key = "virtualHost",
 			value = "\"${virtualHost}\"");
 
 		var parameters = JSONUtil2._addJSONObject(
-			JSON = "${parameters}",
+			JSON = ${parameters},
 			key = "portalInstanceId",
 			value = "\"${portalInstanceId}\"");
 
@@ -42,28 +42,28 @@ definition {
 				-H Content-Type: application/json
 		''';
 
-		JSONCurlUtil.post("${curl}");
+		JSONCurlUtil.post(${curl});
 	}
 
 	@summary = "Clean up all Portal Instances that are not the default using Headless"
 	macro cleanAllPortalInstances {
 		var portalInstanceJSON = HeadlessPortalInstanceAPI._getPortalInstances();
 
-		var portalInstanceIds = JSONUtil.getWithJSONPath("${portalInstanceJSON}", "$.items..portalInstanceId");
+		var portalInstanceIds = JSONUtil.getWithJSONPath(${portalInstanceJSON}, "$.items..portalInstanceId");
 
-		for (var portalInstanceId : list "${portalInstanceIds}") {
-			if ("${portalInstanceId}" != "liferay.com") {
-				HeadlessPortalInstanceAPI.deletePortalInstance(portalInstanceId = "${portalInstanceId}");
+		for (var portalInstanceId : list ${portalInstanceIds}) {
+			if (${portalInstanceId} != "liferay.com") {
+				HeadlessPortalInstanceAPI.deletePortalInstance(portalInstanceId = ${portalInstanceId});
 			}
 		}
 	}
 
 	@summary = "Deletes a Portal Instance with portalInstanceId resembling webId"
 	macro deletePortalInstance {
-		Variables.assertDefined(parameterList = "${portalInstanceId}");
+		Variables.assertDefined(parameterList = ${portalInstanceId});
 
 		var portalURL = JSONCompany.getPortalURL();
-		var portalInstanceId = StringUtil.replace("${portalInstanceId}", " ", "%20");
+		var portalInstanceId = StringUtil.replace(${portalInstanceId}, " ", "%20");
 
 		var curl = '''
 			${portalURL}/o/headless-portal-instances/v1.0/portal-instances/${portalInstanceId} \
@@ -71,7 +71,7 @@ definition {
 				-H Content-Type: application/json
 		''';
 
-		JSONCurlUtil.delete("${curl}");
+		JSONCurlUtil.delete(${curl});
 	}
 
 }
