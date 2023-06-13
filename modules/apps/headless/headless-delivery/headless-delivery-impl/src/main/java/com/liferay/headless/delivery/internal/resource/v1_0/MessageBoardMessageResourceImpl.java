@@ -749,8 +749,6 @@ public class MessageBoardMessageResourceImpl
 		if ((showAsAnswer != null) && (showAsAnswer != mbMessage.isAnswer())) {
 			_mbMessageService.updateAnswer(
 				mbMessage.getMessageId(), showAsAnswer, false);
-
-			mbMessage.setAnswer(showAsAnswer);
 		}
 	}
 

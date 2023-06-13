@@ -39,7 +39,6 @@ import java.io.OutputStream;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Supplier;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -57,8 +56,7 @@ import org.osgi.service.component.annotations.Reference;
 public class UpgradeExecutor {
 
 	public void execute(
-		String bundleSymbolicName, List<UpgradeInfo> upgradeInfos,
-		String outputStreamContainerFactoryName) {
+		String bundleSymbolicName, List<UpgradeInfo> upgradeInfos) {
 
 		Bundle bundle = null;
 
@@ -119,8 +117,7 @@ public class UpgradeExecutor {
 
 		if (size != 0) {
 			release = executeUpgradeInfos(
-				bundleSymbolicName, upgradeInfosList.get(0),
-				outputStreamContainerFactoryName);
+				bundleSymbolicName, upgradeInfosList.get(0));
 		}
 
 		if (release != null) {
@@ -142,8 +139,7 @@ public class UpgradeExecutor {
 	}
 
 	public Release executeUpgradeInfos(
-		String bundleSymbolicName, List<UpgradeInfo> upgradeInfos,
-		String outputStreamContainerFactoryName) {
+		String bundleSymbolicName, List<UpgradeInfo> upgradeInfos) {
 
 		Release release = _releaseLocalService.fetchRelease(bundleSymbolicName);
 
@@ -154,13 +150,7 @@ public class UpgradeExecutor {
 				release);
 		}
 
-		UpgradeInfosRunnable upgradeInfosRunnable = new UpgradeInfosRunnable(
-			bundleSymbolicName, upgradeInfos,
-			_swappedLogExecutor::getOutputStream);
-
-		_swappedLogExecutor.execute(
-			bundleSymbolicName, upgradeInfosRunnable,
-			outputStreamContainerFactoryName);
+		_executeUpgradeInfos(bundleSymbolicName, upgradeInfos);
 
 		release = _releaseLocalService.fetchRelease(bundleSymbolicName);
 
@@ -187,7 +177,7 @@ public class UpgradeExecutor {
 		_bundleContext = bundleContext;
 
 		_upgradeStepRegistratorTracker = new UpgradeStepRegistratorTracker(
-			bundleContext, _releaseLocalService, _swappedLogExecutor, this);
+			bundleContext, _releaseLocalService, this);
 
 		_upgradeStepRegistratorTracker.open();
 	}
@@ -195,6 +185,75 @@ public class UpgradeExecutor {
 	@Deactivate
 	protected void deactivate() {
 		_upgradeStepRegistratorTracker.close();
+	}
+
+	private void _executeUpgradeInfos(
+		String bundleSymbolicName, List<UpgradeInfo> upgradeInfos) {
+
+		int buildNumber = 0;
+		int state = ReleaseConstants.STATE_GOOD;
+
+		try {
+			_updateReleaseState(bundleSymbolicName, _STATE_IN_PROGRESS);
+
+			for (UpgradeInfo upgradeInfo : upgradeInfos) {
+				UpgradeStep upgradeStep = upgradeInfo.getUpgradeStep();
+
+				upgradeStep.upgrade(
+					new DBProcessContext() {
+
+						@Override
+						public DBContext getDBContext() {
+							return new DBContext();
+						}
+
+						@Override
+						public OutputStream getOutputStream() {
+							return null;
+						}
+
+					});
+
+				_releaseLocalService.updateRelease(
+					bundleSymbolicName, upgradeInfo.getToSchemaVersionString(),
+					upgradeInfo.getFromSchemaVersionString());
+
+				buildNumber = upgradeInfo.getBuildNumber();
+			}
+		}
+		catch (Exception exception) {
+			state = ReleaseConstants.STATE_UPGRADE_FAILURE;
+
+			ReflectionUtil.throwException(exception);
+		}
+		finally {
+			Release release = _releaseLocalService.fetchRelease(
+				bundleSymbolicName);
+
+			if (release != null) {
+				if (buildNumber > 0) {
+					release.setBuildNumber(buildNumber);
+				}
+
+				release.setState(state);
+
+				_releaseLocalService.updateRelease(release);
+			}
+		}
+
+		Bundle bundle = IndexUpdaterUtil.getBundle(
+			_bundleContext, bundleSymbolicName);
+
+		if (_requiresUpdateIndexes(bundle, upgradeInfos)) {
+			try {
+				IndexUpdaterUtil.updateIndexes(bundle);
+			}
+			catch (Exception exception) {
+				_log.error(exception);
+			}
+		}
+
+		CacheRegistryUtil.clear();
 	}
 
 	private boolean _isInitialRelease(List<UpgradeInfo> upgradeInfos) {
@@ -213,6 +272,32 @@ public class UpgradeExecutor {
 		return false;
 	}
 
+	private boolean _requiresUpdateIndexes(
+		Bundle bundle, List<UpgradeInfo> upgradeInfos) {
+
+		if (!IndexUpdaterUtil.isLiferayServiceBundle(bundle)) {
+			return false;
+		}
+
+		if (upgradeInfos.size() != 1) {
+			return true;
+		}
+
+		return !_isInitialRelease(upgradeInfos);
+	}
+
+	private void _updateReleaseState(String bundleSymbolicName, int state) {
+		Release release = _releaseLocalService.fetchRelease(bundleSymbolicName);
+
+		if (release != null) {
+			release.setState(state);
+
+			_releaseLocalService.updateRelease(release);
+		}
+	}
+
+	private static final int _STATE_IN_PROGRESS = -1;
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		UpgradeExecutor.class);
 
@@ -224,120 +309,6 @@ public class UpgradeExecutor {
 	@Reference
 	private ReleasePublisher _releasePublisher;
 
-	@Reference
-	private SwappedLogExecutor _swappedLogExecutor;
-
 	private UpgradeStepRegistratorTracker _upgradeStepRegistratorTracker;
-
-	private class UpgradeInfosRunnable implements Runnable {
-
-		@Override
-		public void run() {
-			int buildNumber = 0;
-			int state = ReleaseConstants.STATE_GOOD;
-
-			try {
-				_updateReleaseState(_STATE_IN_PROGRESS);
-
-				for (UpgradeInfo upgradeInfo : _upgradeInfos) {
-					UpgradeStep upgradeStep = upgradeInfo.getUpgradeStep();
-
-					upgradeStep.upgrade(
-						new DBProcessContext() {
-
-							@Override
-							public DBContext getDBContext() {
-								return new DBContext();
-							}
-
-							@Override
-							public OutputStream getOutputStream() {
-								return _outputStreamSupplier.get();
-							}
-
-						});
-
-					_releaseLocalService.updateRelease(
-						_bundleSymbolicName,
-						upgradeInfo.getToSchemaVersionString(),
-						upgradeInfo.getFromSchemaVersionString());
-
-					buildNumber = upgradeInfo.getBuildNumber();
-				}
-			}
-			catch (Exception exception) {
-				state = ReleaseConstants.STATE_UPGRADE_FAILURE;
-
-				ReflectionUtil.throwException(exception);
-			}
-			finally {
-				Release release = _releaseLocalService.fetchRelease(
-					_bundleSymbolicName);
-
-				if (release != null) {
-					if (buildNumber > 0) {
-						release.setBuildNumber(buildNumber);
-					}
-
-					release.setState(state);
-
-					_releaseLocalService.updateRelease(release);
-				}
-			}
-
-			Bundle bundle = IndexUpdaterUtil.getBundle(
-				_bundleContext, _bundleSymbolicName);
-
-			if (_requiresUpdateIndexes(bundle)) {
-				try {
-					IndexUpdaterUtil.updateIndexes(bundle);
-				}
-				catch (Exception exception) {
-					_log.error(exception);
-				}
-			}
-
-			CacheRegistryUtil.clear();
-		}
-
-		private UpgradeInfosRunnable(
-			String bundleSymbolicName, List<UpgradeInfo> upgradeInfos,
-			Supplier<OutputStream> outputStreamSupplier) {
-
-			_bundleSymbolicName = bundleSymbolicName;
-			_upgradeInfos = upgradeInfos;
-			_outputStreamSupplier = outputStreamSupplier;
-		}
-
-		private boolean _requiresUpdateIndexes(Bundle bundle) {
-			if (!IndexUpdaterUtil.isLiferayServiceBundle(bundle)) {
-				return false;
-			}
-
-			if (_upgradeInfos.size() != 1) {
-				return true;
-			}
-
-			return !_isInitialRelease(_upgradeInfos);
-		}
-
-		private void _updateReleaseState(int state) {
-			Release release = _releaseLocalService.fetchRelease(
-				_bundleSymbolicName);
-
-			if (release != null) {
-				release.setState(state);
-
-				_releaseLocalService.updateRelease(release);
-			}
-		}
-
-		private static final int _STATE_IN_PROGRESS = -1;
-
-		private final String _bundleSymbolicName;
-		private final Supplier<OutputStream> _outputStreamSupplier;
-		private final List<UpgradeInfo> _upgradeInfos;
-
-	}
 
 }

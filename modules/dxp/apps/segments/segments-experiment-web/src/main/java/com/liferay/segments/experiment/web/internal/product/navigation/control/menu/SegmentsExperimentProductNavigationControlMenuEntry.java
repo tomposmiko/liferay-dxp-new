@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletURLFactory;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -53,6 +54,7 @@ import com.liferay.segments.service.SegmentsExperienceLocalService;
 import com.liferay.segments.service.SegmentsExperienceService;
 import com.liferay.segments.service.SegmentsExperimentRelService;
 import com.liferay.segments.service.SegmentsExperimentService;
+import com.liferay.staging.StagingGroupHelper;
 import com.liferay.taglib.aui.IconTag;
 import com.liferay.taglib.util.BodyBottomTag;
 
@@ -342,15 +344,17 @@ public class SegmentsExperimentProductNavigationControlMenuEntry
 
 			SegmentsExperimentDisplayContext segmentsExperimentDisplayContext =
 				new SegmentsExperimentDisplayContext(
-					_layoutLocalService, _portal,
+					_groupLocalService,
 					(HttpServletRequest)pageContext.getRequest(),
 					(HttpServletResponse)pageContext.getResponse(),
-					_servletContext.getContextPath(),
-					_segmentsExperienceService,
-					_segmentsExperimentConfiguration,
+					_layoutLocalService, _servletContext.getContextPath(),
+					_portal,
 					new SegmentsExperienceManager(
 						_segmentsExperienceLocalService),
-					_segmentsExperimentRelService, _segmentsExperimentService);
+					_segmentsExperienceService,
+					_segmentsExperimentConfiguration,
+					_segmentsExperimentRelService, _segmentsExperimentService,
+					_stagingGroupHelper);
 
 			_reactRenderer.renderReact(
 				new ComponentDescriptor(
@@ -371,6 +375,9 @@ public class SegmentsExperimentProductNavigationControlMenuEntry
 
 	private static final String _SESSION_CLICKS_KEY =
 		"com.liferay.segments.experiment.web_panelState";
+
+	@Reference
+	private GroupLocalService _groupLocalService;
 
 	@Reference
 	private Html _html;
@@ -414,5 +421,8 @@ public class SegmentsExperimentProductNavigationControlMenuEntry
 		target = "(osgi.web.symbolicname=com.liferay.segments.experiment.web)"
 	)
 	private ServletContext _servletContext;
+
+	@Reference
+	private StagingGroupHelper _stagingGroupHelper;
 
 }

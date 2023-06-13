@@ -25,6 +25,7 @@ import com.liferay.redirect.service.RedirectEntryLocalService;
 
 import java.util.Collections;
 import java.util.Dictionary;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
@@ -59,6 +60,17 @@ public class RedirectProviderImpl
 	}
 
 	@Override
+	public Map<Pattern, String> getPatternStrings(long groupId) {
+		Map<Pattern, String> patternStrings = _patternStrings.get(groupId);
+
+		if (patternStrings != null) {
+			return patternStrings;
+		}
+
+		return new LinkedHashMap<>();
+	}
+
+	@Override
 	public Redirect getRedirect(
 		long groupId, String friendlyURL, String fullURL) {
 
@@ -80,7 +92,7 @@ public class RedirectProviderImpl
 				redirectEntry.getDestinationURL(), redirectEntry.isPermanent());
 		}
 
-		Map<Pattern, String> patternStrings = _groupPatternStrings.getOrDefault(
+		Map<Pattern, String> patternStrings = _patternStrings.getOrDefault(
 			groupId, Collections.emptyMap());
 
 		for (Map.Entry<Pattern, String> entry : patternStrings.entrySet()) {
@@ -116,15 +128,15 @@ public class RedirectProviderImpl
 			ConfigurableUtil.createConfigurable(
 				RedirectPatternConfiguration.class, dictionary);
 
-		_groupPatternStrings.put(
+		_patternStrings.put(
 			groupId,
-			PatternUtil.parse(redirectPatternConfiguration.patterns()));
+			PatternUtil.parse(redirectPatternConfiguration.patternStrings()));
 	}
 
-	protected void setGroupPatternStrings(
-		Map<Long, Map<Pattern, String>> groupPatternStrings) {
+	protected void setPatternStrings(
+		Map<Long, Map<Pattern, String>> patternStrings) {
 
-		_groupPatternStrings = groupPatternStrings;
+		_patternStrings = patternStrings;
 	}
 
 	protected void setRedirectEntryLocalService(
@@ -137,12 +149,12 @@ public class RedirectProviderImpl
 		if (_groupIds.containsKey(pid)) {
 			Long groupId = _groupIds.remove(pid);
 
-			_groupPatternStrings.remove(groupId);
+			_patternStrings.remove(groupId);
 		}
 	}
 
 	private final Map<String, Long> _groupIds = new ConcurrentHashMap<>();
-	private Map<Long, Map<Pattern, String>> _groupPatternStrings =
+	private Map<Long, Map<Pattern, String>> _patternStrings =
 		new ConcurrentHashMap<>();
 
 	@Reference

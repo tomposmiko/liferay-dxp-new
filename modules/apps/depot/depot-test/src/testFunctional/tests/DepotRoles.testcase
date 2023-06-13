@@ -96,9 +96,9 @@ definition {
 		UserNavigator.gotoMemberships();
 
 		AssertElementNotPresent(
-			key_depotName = "Test Depot Name",
-			locator1 = "UsersAndOrganizationsEditUser#DEPOT_TABLE_NAME",
-			value1 = "Test Depot Name");
+			key_assetType = "depotGroups",
+			key_assigneeName = "Test Depot Name",
+			locator1 = "UsersAndOrganizationsEditUser#MEMBERSHIPS_TABLE_ENTRY_NAME");
 
 		UserNavigator.gotoRoles();
 
@@ -164,7 +164,7 @@ definition {
 			panel = "Control Panel",
 			portlet = "Users and Organizations");
 
-		Site.assignUserSitesCP(
+		User.editUserSiteCP(
 			siteName = "Site Name",
 			userScreenName = "usersn");
 
@@ -510,6 +510,7 @@ definition {
 		Role.definePermissionCP(
 			permissionDefinitionKey = "SITE_ADMIN_APPLICATIONS_DOCUMENTS_AND_MEDIA_RESOURCE_PERMISSIONS_DOCUMENT_VIEW_CHECKBOX",
 			permissionDefinitionValue = "View",
+			permissionNavigationValue = "Documents and Media",
 			roleTitle = "AL Role Name",
 			roleType = "Asset Library");
 
@@ -517,7 +518,7 @@ definition {
 
 		RoleNavigator.gotoRoleType(roleType = "Asset Library");
 
-		Role.deleteCP(roleTitle = "AL Role Name");
+		LexiconEntry.delete(rowEntry = "AL Role Name");
 
 		Role.openRolesAdmin();
 
@@ -541,6 +542,7 @@ definition {
 		Role.definePermissionCP(
 			permissionDefinitionKey = "SITE_ADMIN_APPLICATIONS_DOCUMENTS_AND_MEDIA_RESOURCE_PERMISSIONS_DOCUMENT_VIEW_CHECKBOX",
 			permissionDefinitionValue = "View",
+			permissionNavigationValue = "Documents and Media",
 			roleTitle = "AL Role Name",
 			roleType = "Asset Library");
 
@@ -555,6 +557,7 @@ definition {
 		Role.definePermissionCP(
 			permissionDefinitionKey = "SITE_ADMIN_CONTENT_DOCUMENTS_AND_MEDIA_RESOURCE_PERMISSIONS_DOCUMENTS_ADD_DOCUMENT_CHECKBOX",
 			permissionDefinitionValue = "Add Document",
+			permissionNavigationValue = "Documents and Media",
 			roleTitle = "AL Role Name",
 			roleTitleEdit = "AL Role Name Edit",
 			roleType = "Asset Library");
@@ -709,7 +712,7 @@ definition {
 			panel = "Control Panel",
 			portlet = "Users and Organizations");
 
-		Site.assignUserSitesCP(
+		User.editUserSiteCP(
 			siteName = "Site Name",
 			userScreenName = "usersn");
 

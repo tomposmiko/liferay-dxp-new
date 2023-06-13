@@ -65,6 +65,7 @@ import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.filter.Filter;
@@ -720,8 +721,8 @@ public class DocumentResourceImpl extends BaseDocumentResourceImpl {
 
 		return SearchUtil.search(
 			actions, booleanQueryUnsafeConsumer,
-			FilterUtil.processFilter(_ddmIndexer, filter),
-			DLFileEntry.class.getName(), keywords, pagination,
+			FilterUtil.processFilter(_ddmIndexer, filter), _indexer, keywords,
+			pagination,
 			queryConfig -> queryConfig.setSelectedFieldNames(
 				Field.ENTRY_CLASS_PK),
 			searchContext -> {
@@ -980,6 +981,11 @@ public class DocumentResourceImpl extends BaseDocumentResourceImpl {
 
 	@Reference
 	private ExpandoTableLocalService _expandoTableLocalService;
+
+	@Reference(
+		target = "(indexer.class.name=com.liferay.document.library.kernel.model.DLFileEntry)"
+	)
+	private Indexer<?> _indexer;
 
 	@Reference
 	private InfoItemServiceTracker _infoItemServiceTracker;

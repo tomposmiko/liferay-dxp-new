@@ -169,10 +169,6 @@ public class AccountEntryLocalServiceImpl
 			_accountEntryEmailAddressValidatorFactory.create(
 				user.getCompanyId());
 
-		domains = _validateDomains(accountEntryEmailAddressValidator, domains);
-
-		accountEntry.setDomains(StringUtil.merge(domains, StringPool.COMMA));
-
 		_validateEmailAddress(accountEntryEmailAddressValidator, emailAddress);
 
 		accountEntry.setEmailAddress(emailAddress);
@@ -191,6 +187,10 @@ public class AccountEntryLocalServiceImpl
 		accountEntry.setStatus(status);
 
 		accountEntry = accountEntryPersistence.update(accountEntry);
+
+		if (domains != null) {
+			accountEntry = updateDomains(accountEntryId, domains);
+		}
 
 		// Group
 
@@ -591,10 +591,6 @@ public class AccountEntryLocalServiceImpl
 			_accountEntryEmailAddressValidatorFactory.create(
 				accountEntry.getCompanyId());
 
-		domains = _validateDomains(accountEntryEmailAddressValidator, domains);
-
-		accountEntry.setDomains(StringUtil.merge(domains, StringPool.COMMA));
-
 		_validateEmailAddress(accountEntryEmailAddressValidator, emailAddress);
 
 		accountEntry.setEmailAddress(emailAddress);
@@ -619,7 +615,13 @@ public class AccountEntryLocalServiceImpl
 			accountEntry.setExpandoBridgeAttributes(serviceContext);
 		}
 
-		return accountEntryPersistence.update(accountEntry);
+		accountEntry = accountEntryPersistence.update(accountEntry);
+
+		if (domains != null) {
+			accountEntry = updateDomains(accountEntryId, domains);
+		}
+
+		return accountEntry;
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -644,6 +646,24 @@ public class AccountEntryLocalServiceImpl
 		AccountEntry accountEntry = getAccountEntry(accountEntryId);
 
 		accountEntry.setDefaultShippingAddressId(addressId);
+
+		return updateAccountEntry(accountEntry);
+	}
+
+	@Indexable(type = IndexableType.REINDEX)
+	@Override
+	public AccountEntry updateDomains(long accountEntryId, String[] domains)
+		throws PortalException {
+
+		AccountEntry accountEntry = getAccountEntry(accountEntryId);
+
+		AccountEntryEmailAddressValidator accountEntryEmailAddressValidator =
+			_accountEntryEmailAddressValidatorFactory.create(
+				accountEntry.getCompanyId());
+
+		domains = _validateDomains(accountEntryEmailAddressValidator, domains);
+
+		accountEntry.setDomains(StringUtil.merge(domains, StringPool.COMMA));
 
 		return updateAccountEntry(accountEntry);
 	}

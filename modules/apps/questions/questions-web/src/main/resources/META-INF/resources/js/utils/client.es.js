@@ -75,6 +75,7 @@ export const createCommentQuery = `
 			dateCreated
 			dateModified
 			friendlyUrlPath
+			hasCompanyMx
 			id
 		}
 	}
@@ -409,6 +410,7 @@ export const getMessagesQuery = `
 				dateModified
 				encodingFormat
 				friendlyUrlPath
+				hasCompanyMx
 				id
 				messageBoardMessages(flatten: true, sort: "dateCreated:asc") {
 					items {
@@ -422,6 +424,7 @@ export const getMessagesQuery = `
 						dateCreated
 						dateModified
 						encodingFormat
+						hasCompanyMx
 						id
 						friendlyUrlPath
 						showAsAnswer

@@ -28,6 +28,7 @@ import com.liferay.commerce.product.exception.CPInstanceJsonException;
 import com.liferay.commerce.product.exception.CPInstanceMaxPriceValueException;
 import com.liferay.commerce.product.exception.CPInstanceReplacementCPInstanceUuidException;
 import com.liferay.commerce.product.exception.CPInstanceSkuException;
+import com.liferay.commerce.product.exception.DuplicateCPInstanceException;
 import com.liferay.commerce.product.exception.NoSuchSkuContributorCPDefinitionOptionRelException;
 import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.model.CPInstance;
@@ -127,6 +128,7 @@ public class EditCPInstanceMVCActionCommand extends BaseMVCActionCommand {
 				throwable instanceof
 					CPInstanceReplacementCPInstanceUuidException ||
 				throwable instanceof CPInstanceSkuException ||
+				throwable instanceof DuplicateCPInstanceException ||
 				throwable instanceof
 					NoSuchSkuContributorCPDefinitionOptionRelException) {
 
@@ -300,6 +302,8 @@ public class EditCPInstanceMVCActionCommand extends BaseMVCActionCommand {
 	private CPInstance _updateCPInstance(ActionRequest actionRequest)
 		throws Exception {
 
+		String externalReferenceCode = ParamUtil.getString(
+			actionRequest, "externalReferenceCode");
 		long cpInstanceId = ParamUtil.getLong(actionRequest, "cpInstanceId");
 
 		String sku = ParamUtil.getString(actionRequest, "sku");
@@ -409,15 +413,15 @@ public class EditCPInstanceMVCActionCommand extends BaseMVCActionCommand {
 
 		if (cpInstanceId > 0) {
 			cpInstance = _cpInstanceService.updateCPInstance(
-				cpInstanceId, sku, gtin, manufacturerPartNumber, purchasable,
-				width, height, depth, weight, price, promoPrice, cost,
-				published, displayDateMonth, displayDateDay, displayDateYear,
-				displayDateHour, displayDateMinute, expirationDateMonth,
-				expirationDateDay, expirationDateYear, expirationDateHour,
-				expirationDateMinute, neverExpire, unspsc, discontinued,
-				replacementCPInstanceUuid, replacementCProductId,
-				discontinuedDateMonth, discontinuedDateDay,
-				discontinuedDateYear, serviceContext);
+				externalReferenceCode, cpInstanceId, sku, gtin,
+				manufacturerPartNumber, purchasable, width, height, depth,
+				weight, price, promoPrice, cost, published, displayDateMonth,
+				displayDateDay, displayDateYear, displayDateHour,
+				displayDateMinute, expirationDateMonth, expirationDateDay,
+				expirationDateYear, expirationDateHour, expirationDateMinute,
+				neverExpire, unspsc, discontinued, replacementCPInstanceUuid,
+				replacementCProductId, discontinuedDateMonth,
+				discontinuedDateDay, discontinuedDateYear, serviceContext);
 		}
 		else {
 			long cpDefinitionId = ParamUtil.getLong(
@@ -427,8 +431,9 @@ public class EditCPInstanceMVCActionCommand extends BaseMVCActionCommand {
 				_cpDefinitionLocalService.getCPDefinition(cpDefinitionId);
 
 			cpInstance = _cpInstanceService.addCPInstance(
-				StringPool.BLANK, cpDefinitionId, cpDefinition.getGroupId(),
-				sku, gtin, manufacturerPartNumber, purchasable,
+				externalReferenceCode, cpDefinitionId,
+				cpDefinition.getGroupId(), sku, gtin, manufacturerPartNumber,
+				purchasable,
 				_cpDefinitionOptionRelLocalService.
 					getCPDefinitionOptionRelCPDefinitionOptionValueRelIds(
 						cpDefinitionId,

@@ -37,13 +37,14 @@ public class MessageBoardMessageEntityModel implements EntityModel {
 
 	public MessageBoardMessageEntityModel(List<EntityField> entityFields) {
 		_entityFieldsMap = EntityFieldsMapFactory.create(
+			new BooleanEntityField("answered", locale -> "answered"),
 			new BooleanEntityField("showAsQuestion", locale -> "question"),
-			new CollectionEntityField(
-				new IntegerEntityField(
-					"taxonomyCategoryIds", locale -> "assetCategoryIds")),
 			new CollectionEntityField(
 				new StringEntityField(
 					"keywords", locale -> "assetTagNames.raw")),
+			new CollectionEntityField(
+				new IntegerEntityField(
+					"taxonomyCategoryIds", locale -> "assetCategoryIds")),
 			new ComplexEntityField(
 				"creator",
 				Collections.singletonList(
@@ -61,6 +62,8 @@ public class MessageBoardMessageEntityModel implements EntityModel {
 				"showAsAnswer", EntityField.Type.BOOLEAN,
 				locale -> Field.getSortableFieldName("answer_String"),
 				locale -> "answer", String::valueOf),
+			new IntegerEntityField(
+				"childMessagesCount", locale -> "childMessagesCount"),
 			new IntegerEntityField("creatorId", locale -> Field.USER_ID),
 			new IntegerEntityField(
 				"messageBoardSectionId", locale -> Field.CATEGORY_ID),
@@ -69,8 +72,10 @@ public class MessageBoardMessageEntityModel implements EntityModel {
 			new IntegerEntityField(
 				"parentMessageBoardMessageId", locale -> "parentMessageId"),
 			new IntegerEntityField(
-				"ratingValue",
-				locale -> Field.getSortableFieldName("totalScore")),
+				"ratingsStatTotalScore",
+				locale -> Field.getSortableFieldName("ratingsStatTotalScore")),
+			new IntegerEntityField(
+				"viewCount", locale -> Field.getSortableFieldName("viewCount")),
 			new StringEntityField(
 				"friendlyUrlPath",
 				locale -> Field.getSortableFieldName("urlSubject_String")),

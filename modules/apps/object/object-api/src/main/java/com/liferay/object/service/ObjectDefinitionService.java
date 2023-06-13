@@ -76,6 +76,11 @@ public interface ObjectDefinitionService extends BaseService {
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public ObjectDefinition getObjectDefinitionByExternalReferenceCode(
+			String externalReferenceCode, long companyId)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<ObjectDefinition> getObjectDefinitions(int start, int end);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -112,6 +117,11 @@ public interface ObjectDefinitionService extends BaseService {
 
 	public ObjectDefinition updateExternalReferenceCode(
 			long objectDefinitionId, String externalReferenceCode)
+		throws PortalException;
+
+	public ObjectDefinition updateSystemObjectDefinition(
+			String externalReferenceCode, long objectDefinitionId,
+			long titleObjectFieldId)
 		throws PortalException;
 
 	public ObjectDefinition updateTitleObjectFieldId(

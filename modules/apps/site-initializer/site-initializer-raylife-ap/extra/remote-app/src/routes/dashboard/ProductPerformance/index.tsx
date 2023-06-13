@@ -96,7 +96,7 @@ const ProductPerformance = () => {
 
 	const chartContainer = document.getElementById(
 		'dashboard-product-performance-chart-container'
-	); // mudar id
+	);
 
 	let chartWidth = 0;
 	if (chartContainer) {
@@ -355,9 +355,11 @@ const ProductPerformance = () => {
 
 		yearlySalesGoal?.data?.items?.forEach(
 			({goalValue, productExternalReferenceCode}: SalesGoalTypes) => {
-				yearlyProductsTotal[productExternalReferenceCode][
-					'goalValue'
-				] += goalValue;
+				if (yearlyProductsTotal[productExternalReferenceCode]) {
+					yearlyProductsTotal[productExternalReferenceCode][
+						'goalValue'
+					] += goalValue;
+				}
 			}
 		);
 
@@ -614,7 +616,6 @@ const ProductPerformance = () => {
 										format(x: string) {
 											return '$' + x;
 										},
-										stepSize: 10000,
 									},
 								},
 							}}
@@ -640,11 +641,12 @@ const ProductPerformance = () => {
 								show: true,
 							}}
 							padding={{
+								bottom: 20,
 								right: 42.5,
 							}}
 							ref={labelRef}
 							size={{
-								height: 440,
+								height: 480,
 								width: chartWidth,
 							}}
 							tooltip={tooltip}

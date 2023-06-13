@@ -19,8 +19,8 @@ import {
 	FormError,
 	Input,
 	SingleSelect,
+	filterArrayByQuery,
 	invalidateRequired,
-	stringIncludesQuery,
 	useForm,
 } from '@liferay/object-js-components-web';
 import React, {useEffect, useMemo, useState} from 'react';
@@ -161,30 +161,9 @@ export function ObjectRelationshipFormBase({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [readonly, values.objectDefinitionId1]);
 
-	const filteredObjectDefinitions = useMemo(
-		() =>
-			values.type === ObjectRelationshipType.MANY_TO_MANY
-				? objectDefinitions.filter(
-						({id}) => id !== values.objectDefinitionId1
-				  )
-				: objectDefinitions,
-		[objectDefinitions, values.objectDefinitionId1, values.type]
-	);
-
 	const filteredRelationships = useMemo(() => {
-		if (Liferay.FeatureFlags['LPS-158478']) {
-			return objectDefinitions.filter(({label}) =>
-				stringIncludesQuery(label[defaultLanguageId] as string, query)
-			);
-		}
-		else {
-			return filteredObjectDefinitions.filter(({label}) => {
-				return label[defaultLanguageId]
-					?.toLocaleLowerCase()
-					.includes(query.toLowerCase());
-			});
-		}
-	}, [filteredObjectDefinitions, objectDefinitions, query]);
+		return filterArrayByQuery(objectDefinitions, 'label', query);
+	}, [objectDefinitions, query]);
 
 	return (
 		<>

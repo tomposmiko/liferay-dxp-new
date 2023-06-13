@@ -9,19 +9,16 @@
  * distribution rights of the Software.
  */
 
+import {FieldInputProps} from 'formik';
+
 interface MetaState {
 	error?: string;
 	touched: boolean;
 }
 
-interface FieldState<T> {
-	name: string;
-	onBlur: (event: React.FocusEvent) => void;
-	onChange: (event: React.ChangeEvent) => void;
-	value: T;
-}
-
 export default interface PRMFormFieldStateProps<T> {
-	field: FieldState<T>;
+	field: FieldInputProps<T>;
 	meta: MetaState;
+	onChange?: (event: React.ChangeEvent) => void;
+	value?: T;
 }

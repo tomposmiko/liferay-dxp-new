@@ -14,10 +14,15 @@
 
 package com.liferay.redirect.provider;
 
+import java.util.Map;
+import java.util.regex.Pattern;
+
 /**
  * @author Adolfo Pérez
  */
 public interface RedirectProvider {
+
+	public Map<Pattern, String> getPatternStrings(long groupId);
 
 	public Redirect getRedirect(
 		long groupId, String friendlyURL, String fullURL);

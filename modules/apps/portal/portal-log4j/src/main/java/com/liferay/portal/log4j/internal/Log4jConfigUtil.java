@@ -22,6 +22,8 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
+import java.io.File;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -143,6 +145,10 @@ public class Log4jConfigUtil {
 		}
 
 		return Collections.emptyMap();
+	}
+
+	public static File getCompanyLogDirectory(long companyId) {
+		return _centralizedConfiguration.getCompanyLogDirectory(companyId);
 	}
 
 	public static java.util.logging.Level getJDKLevel(String levelString) {

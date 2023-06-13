@@ -17,6 +17,7 @@ package com.liferay.info.item;
 import com.liferay.info.exception.CapabilityVerificationException;
 import com.liferay.info.item.capability.InfoItemCapability;
 import com.liferay.info.item.provider.filter.InfoItemServiceFilter;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
 
 import java.util.List;
 
@@ -62,6 +63,11 @@ public interface InfoItemServiceTracker {
 
 	public List<InfoItemClassDetails> getInfoItemClassDetails(
 			InfoItemCapability itemCapability)
+		throws CapabilityVerificationException;
+
+	public List<InfoItemClassDetails> getInfoItemClassDetails(
+			long groupId, String itemCapabilityKey,
+			PermissionChecker permissionChecker)
 		throws CapabilityVerificationException;
 
 	public List<InfoItemClassDetails> getInfoItemClassDetails(

@@ -29,7 +29,6 @@
 		<column name="from" type="String" />
 		<column name="fromName" type="String" />
 		<column name="priority" type="double" />
-		<column name="sent" type="boolean" />
 		<column name="sentDate" type="Date" />
 		<column name="subject" type="String" />
 		<column name="to" type="String" />
@@ -40,9 +39,6 @@
 
 		<finder name="NotificationTemplateId" return-type="Collection">
 			<finder-column name="notificationTemplateId" />
-		</finder>
-		<finder name="Sent" return-type="Collection">
-			<finder-column name="sent" />
 		</finder>
 		<finder name="LtSentDate" return-type="Collection">
 			<finder-column comparator="&lt;" name="sentDate" />
@@ -96,8 +92,10 @@
 		<column name="from" type="String" />
 		<column localized="true" name="fromName" type="String" />
 		<column localized="true" name="name" type="String" />
+		<column name="recipientType" type="String" />
 		<column localized="true" name="subject" type="String" />
 		<column localized="true" name="to" type="String" />
+		<column name="type" type="String" />
 	</entity>
 	<entity local-service="true" name="NotificationTemplateAttachment" remote-service="false" table="NTemplateAttachment" uuid="false">
 
@@ -129,5 +127,6 @@
 		<exception>NotificationTemplateFrom</exception>
 		<exception>NotificationTemplateName</exception>
 		<exception>NotificationTemplateObjectDefinitionId</exception>
+		<exception>NotificationTemplateType</exception>
 	</exceptions>
 </service-builder>

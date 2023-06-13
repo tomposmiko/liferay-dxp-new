@@ -89,6 +89,17 @@ public class ObjectDefinitionServiceWrapper
 	}
 
 	@Override
+	public com.liferay.object.model.ObjectDefinition
+			getObjectDefinitionByExternalReferenceCode(
+				String externalReferenceCode, long companyId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _objectDefinitionService.
+			getObjectDefinitionByExternalReferenceCode(
+				externalReferenceCode, companyId);
+	}
+
+	@Override
 	public java.util.List<com.liferay.object.model.ObjectDefinition>
 		getObjectDefinitions(int start, int end) {
 
@@ -168,6 +179,17 @@ public class ObjectDefinitionServiceWrapper
 
 		return _objectDefinitionService.updateExternalReferenceCode(
 			objectDefinitionId, externalReferenceCode);
+	}
+
+	@Override
+	public com.liferay.object.model.ObjectDefinition
+			updateSystemObjectDefinition(
+				String externalReferenceCode, long objectDefinitionId,
+				long titleObjectFieldId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _objectDefinitionService.updateSystemObjectDefinition(
+			externalReferenceCode, objectDefinitionId, titleObjectFieldId);
 	}
 
 	@Override

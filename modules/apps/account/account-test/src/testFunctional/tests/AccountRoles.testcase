@@ -65,9 +65,9 @@ definition {
 
 			Accounts.openAccountsAdmin();
 
-			LexiconEntry.gotoEntry(rowEntry = "AM Account");
-
-			Accounts.gotoAssigneeTab(assigneeTab = "Users");
+			LexiconEntry.gotoEntryMenuItemNoError(
+				menuItem = "Manage Users",
+				rowEntry = "AM Account");
 		}
 
 		task ("Then the account manager should be able to see the user listed in that account") {
@@ -498,8 +498,8 @@ definition {
 				LexiconEntry.viewEntryName(rowEntry = "${orgName}");
 
 				AssertElementNotPresent(
-					key_assigneeName = "${orgName}",
-					locator1 = "Icon#REMOVE_ASSIGNEE");
+					key_entryName = "${orgName}",
+					locator1 = "LexiconTable#TABLE_ENTRY_DELETE");
 
 				AssertElementNotPresent(
 					key_rowEntry = "${orgName}",

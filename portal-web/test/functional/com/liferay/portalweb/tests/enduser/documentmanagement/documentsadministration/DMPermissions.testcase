@@ -455,7 +455,7 @@ definition {
 			panel = "Control Panel",
 			portlet = "Users and Organizations");
 
-		Site.assignUserSitesCP(
+		User.editUserSiteCP(
 			siteName = "Site Name",
 			userScreenName = "usersn");
 
@@ -631,7 +631,7 @@ definition {
 
 		DMDocument.enableActionsMenuOnPortlet();
 
-		Permissions.addDMFolderLoginUserPG(
+		DMFolder.addDMFolderLoginUserPG(
 			dmFolderDescription = "DM Folder Description",
 			dmFolderName = "DM Folder Name",
 			pageName = "Documents and Media Page",
@@ -1201,7 +1201,7 @@ definition {
 			panel = "Control Panel",
 			portlet = "Roles");
 
-		Role.definePermissionsCP(
+		Role.definePermissionCmdCP(
 			permissionDefinitionKeys = "SITE_ADMIN_CONTENT_DOCUMENTS_AND_MEDIA_GENERAL_PERMISSIONS_ACCESS_IN_SITE_ADMINISTRATION_CHECKBOX,SITE_ADMIN_CONTENT_DOCUMENTS_AND_MEDIA_GENERAL_PERMISSIONS_VIEW_CHECKBOX,SITE_ADMIN_CONTENT_DOCUMENTS_AND_MEDIA_RESOURCE_PERMISSIONS_DOCUMENTS_ADD_FOLDER_CHECKBOX,SITE_ADMIN_CONTENT_DOCUMENTS_AND_MEDIA_RESOURCE_PERMISSIONS_DOCUMENTS_VIEW_CHECKBOX,SITE_ADMIN_CONTENT_DOCUMENTS_AND_MEDIA_RESOURCE_PERMISSIONS_DOCUMENTS_FOLDER_ADD_SUBFOLDER_CHECKBOX,SITE_ADMIN_CONTENT_DOCUMENTS_AND_MEDIA_RESOURCE_PERMISSIONS_DOCUMENTS_FOLDER_VIEW_CHECKBOX,SITE_ADMIN_CONTENT_DOCUMENTS_AND_MEDIA_RESOURCE_PERMISSIONS_DOCUMENT_UPDATE_CHECKBOX",
 			roleTitle = "Regular Role Name");
 
@@ -2184,7 +2184,7 @@ definition {
 			panel = "Control Panel",
 			portlet = "Users and Organizations");
 
-		Site.assignUserSitesCP(
+		User.editUserSiteCP(
 			siteName = "${siteName}",
 			userScreenName = "usersn");
 
@@ -2213,7 +2213,7 @@ definition {
 			panel = "Control Panel",
 			portlet = "Users and Organizations");
 
-		Site.assignUserSitesCP(
+		User.editUserSiteCP(
 			siteName = "${siteName}",
 			userScreenName = "usersn2");
 

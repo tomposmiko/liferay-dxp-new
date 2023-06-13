@@ -16,12 +16,14 @@ package com.liferay.notification.service.impl;
 
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
+import com.liferay.notification.constants.NotificationConstants;
 import com.liferay.notification.constants.NotificationPortletKeys;
 import com.liferay.notification.constants.NotificationTermContributorConstants;
 import com.liferay.notification.exception.NotificationTemplateAttachmentObjectFieldIdException;
 import com.liferay.notification.exception.NotificationTemplateFromException;
 import com.liferay.notification.exception.NotificationTemplateNameException;
 import com.liferay.notification.exception.NotificationTemplateObjectDefinitionIdException;
+import com.liferay.notification.exception.NotificationTemplateTypeException;
 import com.liferay.notification.model.NotificationQueueEntry;
 import com.liferay.notification.model.NotificationTemplate;
 import com.liferay.notification.model.NotificationTemplateAttachment;
@@ -64,16 +66,18 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.auth.EmailAddressValidatorFactory;
+import com.liferay.portal.util.PropsUtil;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -97,11 +101,13 @@ public class NotificationTemplateLocalServiceImpl
 			long userId, long objectDefinitionId, String bcc,
 			Map<Locale, String> bodyMap, String cc, String description,
 			String from, Map<Locale, String> fromNameMap, String name,
-			Map<Locale, String> subjectMap, Map<Locale, String> toMap,
+			String recipientType, Map<Locale, String> subjectMap,
+			Map<Locale, String> toMap, String type,
 			List<Long> attachmentObjectFieldIds)
 		throws PortalException {
 
-		_validate(objectDefinitionId, from, name, attachmentObjectFieldIds);
+		_validate(
+			objectDefinitionId, from, name, type, attachmentObjectFieldIds);
 
 		NotificationTemplate notificationTemplate =
 			notificationTemplatePersistence.create(
@@ -121,8 +127,10 @@ public class NotificationTemplateLocalServiceImpl
 		notificationTemplate.setFrom(from);
 		notificationTemplate.setFromNameMap(fromNameMap);
 		notificationTemplate.setName(name);
+		notificationTemplate.setRecipientType(recipientType);
 		notificationTemplate.setSubjectMap(subjectMap);
 		notificationTemplate.setToMap(toMap);
+		notificationTemplate.setType(type);
 
 		notificationTemplate = notificationTemplatePersistence.update(
 			notificationTemplate);
@@ -213,20 +221,17 @@ public class NotificationTemplateLocalServiceImpl
 
 		User user = _userLocalService.getUser(userId);
 
-		String bcc = notificationTemplate.getBcc();
+		String bcc = _formatContent(
+			notificationTemplate.getBcc(), user.getLocale(), null,
+			notificationType, object);
 
 		Locale siteDefaultLocale = _portal.getSiteDefaultLocale(
 			user.getGroupId());
 
-		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-159052"))) {
+		if (Validator.isNull(bcc)) {
 			bcc = _formatContent(
-				bcc, user.getLocale(), null, notificationType, object);
-
-			if (Validator.isNull(bcc)) {
-				bcc = _formatContent(
-					notificationTemplate.getBcc(), siteDefaultLocale, null,
-					notificationType, object);
-			}
+				notificationTemplate.getBcc(), siteDefaultLocale, null,
+				notificationType, object);
 		}
 
 		String body = _formatContent(
@@ -239,44 +244,34 @@ public class NotificationTemplateLocalServiceImpl
 				siteDefaultLocale, null, notificationType, object);
 		}
 
-		String cc = notificationTemplate.getCc();
-		String from = notificationTemplate.getFrom();
+		String cc = _formatContent(
+			notificationTemplate.getCc(), user.getLocale(), null,
+			notificationType, object);
 
-		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-159052"))) {
+		if (Validator.isNull(cc)) {
 			cc = _formatContent(
-				cc, user.getLocale(), null, notificationType, object);
+				notificationTemplate.getCc(), siteDefaultLocale, null,
+				notificationType, object);
+		}
 
-			if (Validator.isNull(cc)) {
-				cc = _formatContent(
-					notificationTemplate.getCc(), siteDefaultLocale, null,
-					notificationType, object);
-			}
+		String from = _formatContent(
+			notificationTemplate.getFrom(), user.getLocale(), null,
+			notificationType, object);
 
+		if (Validator.isNull(from)) {
 			from = _formatContent(
-				from, user.getLocale(), null, notificationType, object);
-
-			if (Validator.isNull(from)) {
-				from = _formatContent(
-					notificationTemplate.getFrom(), siteDefaultLocale, null,
-					notificationType, object);
-			}
+				notificationTemplate.getFrom(), siteDefaultLocale, null,
+				notificationType, object);
 		}
 
-		String fromName = notificationTemplate.getFromName(user.getLocale());
+		String fromName = _formatContent(
+			notificationTemplate.getFromName(user.getLocale()),
+			user.getLocale(), null, notificationType, object);
 
-		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-159052"))) {
+		if (Validator.isNull(fromName)) {
 			fromName = _formatContent(
-				fromName, user.getLocale(), null, notificationType, object);
-
-			if (Validator.isNull(fromName)) {
-				fromName = _formatContent(
-					notificationTemplate.getFromName(siteDefaultLocale),
-					siteDefaultLocale, null, notificationType, object);
-			}
-		}
-		else if (Validator.isNull(fromName)) {
-			fromName = notificationTemplate.getFromName(
-				_portal.getSiteDefaultLocale(user.getGroupId()));
+				notificationTemplate.getFromName(siteDefaultLocale),
+				siteDefaultLocale, null, notificationType, object);
 		}
 
 		String subject = _formatContent(
@@ -289,10 +284,9 @@ public class NotificationTemplateLocalServiceImpl
 				siteDefaultLocale, null, notificationType, object);
 		}
 
-		String to = _formatContent(
+		String to = _formatTo(
 			notificationTemplate.getTo(user.getLocale()), user.getLocale(),
-			NotificationTermContributorConstants.RECIPIENT, notificationType,
-			object);
+			notificationType, object);
 
 		if (Validator.isNull(to)) {
 			to = _formatContent(
@@ -356,11 +350,13 @@ public class NotificationTemplateLocalServiceImpl
 			long notificationTemplateId, long objectDefinitionId, String bcc,
 			Map<Locale, String> bodyMap, String cc, String description,
 			String from, Map<Locale, String> fromNameMap, String name,
-			Map<Locale, String> subjectMap, Map<Locale, String> toMap,
+			String recipientType, Map<Locale, String> subjectMap,
+			Map<Locale, String> toMap, String type,
 			List<Long> attachmentObjectFieldIds)
 		throws PortalException {
 
-		_validate(objectDefinitionId, from, name, attachmentObjectFieldIds);
+		_validate(
+			objectDefinitionId, from, name, type, attachmentObjectFieldIds);
 
 		NotificationTemplate notificationTemplate =
 			notificationTemplatePersistence.findByPrimaryKey(
@@ -374,6 +370,7 @@ public class NotificationTemplateLocalServiceImpl
 		notificationTemplate.setFrom(from);
 		notificationTemplate.setFromNameMap(fromNameMap);
 		notificationTemplate.setName(name);
+		notificationTemplate.setRecipientType(recipientType);
 		notificationTemplate.setSubjectMap(subjectMap);
 		notificationTemplate.setToMap(toMap);
 
@@ -472,6 +469,29 @@ public class NotificationTemplateLocalServiceImpl
 			object, termNames);
 	}
 
+	private String _formatTo(
+			String to, Locale locale, NotificationType notificationType,
+			Object object)
+		throws PortalException {
+
+		if (Validator.isNull(to)) {
+			return StringPool.BLANK;
+		}
+
+		Set<String> emailAddresses = new HashSet<>();
+
+		Matcher matcher = _emailAddressPattern.matcher(to);
+
+		while (matcher.find()) {
+			emailAddresses.add(matcher.group());
+		}
+
+		return _formatContent(
+			StringUtil.merge(emailAddresses), locale,
+			NotificationTermContributorConstants.RECIPIENT, notificationType,
+			object);
+	}
+
 	private List<Long> _getFileEntryIds(
 			long companyId, long notificationTemplateId, Object object)
 		throws PortalException {
@@ -545,17 +565,9 @@ public class NotificationTemplateLocalServiceImpl
 	}
 
 	private void _validate(
-			long objectDefinitionId, String from, String name,
+			long objectDefinitionId, String from, String name, String type,
 			List<Long> attachmentObjectFieldIds)
 		throws PortalException {
-
-		if (Validator.isNull(name)) {
-			throw new NotificationTemplateNameException("Name is null");
-		}
-
-		if (Validator.isNull(from)) {
-			throw new NotificationTemplateFromException("From is null");
-		}
 
 		if (objectDefinitionId > 0) {
 			ObjectDefinition objectDefinition =
@@ -565,6 +577,27 @@ public class NotificationTemplateLocalServiceImpl
 			if (objectDefinition == null) {
 				throw new NotificationTemplateObjectDefinitionIdException();
 			}
+		}
+
+		if (!Objects.equals(
+				NotificationConstants.TYPE_USER_NOTIFICATION, type) &&
+			Validator.isNull(from)) {
+
+			throw new NotificationTemplateFromException("From is null");
+		}
+
+		if (Validator.isNull(name)) {
+			throw new NotificationTemplateNameException("Name is null");
+		}
+
+		if (type == null) {
+			if (GetterUtil.getBoolean(
+					PropsUtil.get("feature.flag.LPS-162133"))) {
+
+				throw new NotificationTemplateTypeException();
+			}
+
+			type = NotificationConstants.TYPE_EMAIL;
 		}
 
 		for (long attachmentObjectFieldId : attachmentObjectFieldIds) {
@@ -586,6 +619,9 @@ public class NotificationTemplateLocalServiceImpl
 	private static final Log _log = LogFactoryUtil.getLog(
 		NotificationTemplateLocalServiceImpl.class);
 
+	private static final Pattern _emailAddressPattern = Pattern.compile(
+		"[\\w!#$%&'*+/=?^_`{|}~-]+(?:\\.[\\w!#$%&'*+/=?^_`{|}~-]+)*@" +
+			"(?:\\w(?:[\\w-]*\\w)?\\.)+(\\w(?:[\\w-]*\\w))");
 	private static final Pattern _pattern = Pattern.compile(
 		"\\[%[^\\[%]+%\\]", Pattern.CASE_INSENSITIVE);
 

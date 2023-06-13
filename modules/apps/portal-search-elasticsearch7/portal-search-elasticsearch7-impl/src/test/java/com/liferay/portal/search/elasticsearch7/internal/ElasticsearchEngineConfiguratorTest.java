@@ -15,17 +15,16 @@
 package com.liferay.portal.search.elasticsearch7.internal;
 
 import com.liferay.portal.kernel.messaging.Destination;
+import com.liferay.portal.kernel.messaging.DestinationConfiguration;
+import com.liferay.portal.kernel.messaging.DestinationFactory;
 import com.liferay.portal.kernel.messaging.MessageBus;
+import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.search.SearchEngine;
 import com.liferay.portal.kernel.search.SearchEngineHelper;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.PropsTestUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.search.elasticsearch7.internal.BaseSearchEngineConfigurator.DestinationServiceRegistrarHelper;
-import com.liferay.portal.search.elasticsearch7.internal.BaseSearchEngineConfigurator.SearchDestinationHelper;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
-
-import java.util.Collections;
 
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -33,9 +32,6 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.Mockito;
-
-import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.component.ComponentContext;
 
 /**
  * @author André de Oliveira
@@ -55,98 +51,48 @@ public class ElasticsearchEngineConfiguratorTest {
 
 	@Test
 	public void testDestroyMustNotCreateDestinationsAgain() {
-		SearchDestinationHelper searchDestinationHelper =
-			_createSearchDestinationHelper();
+		DestinationFactory destinationFactory = Mockito.mock(
+			DestinationFactory.class);
+
+		Mockito.when(
+			destinationFactory.createDestination(
+				Mockito.any(DestinationConfiguration.class))
+		).thenReturn(
+			Mockito.mock(Destination.class)
+		);
 
 		ElasticsearchEngineConfigurator elasticsearchEngineConfigurator =
-			_createElasticsearchEngineConfigurator(searchDestinationHelper);
+			_createElasticsearchEngineConfigurator(destinationFactory);
 
 		elasticsearchEngineConfigurator.activate(
-			Mockito.mock(ComponentContext.class));
+			SystemBundleUtil.getBundleContext());
 
-		elasticsearchEngineConfigurator.destroy();
-
-		Mockito.verify(
-			searchDestinationHelper, Mockito.times(1)
-		).createSearchReaderDestination(
-			Mockito.nullable(String.class)
-		);
+		elasticsearchEngineConfigurator.deactivate();
 
 		Mockito.verify(
-			searchDestinationHelper, Mockito.times(1)
-		).createSearchWriterDestination(
-			Mockito.nullable(String.class)
+			destinationFactory, Mockito.times(2)
+		).createDestination(
+			Mockito.any(DestinationConfiguration.class)
 		);
-	}
-
-	private DestinationServiceRegistrarHelper
-		_createDestinationServiceRegistrarHelper() {
-
-		DestinationServiceRegistrarHelper destinationServiceRegistrarHelper =
-			Mockito.mock(DestinationServiceRegistrarHelper.class);
-
-		Mockito.doReturn(
-			Mockito.mock(ServiceRegistration.class)
-		).when(
-			destinationServiceRegistrarHelper
-		).registerDestination(
-			Mockito.any()
-		);
-
-		Mockito.doReturn(
-			Mockito.mock(Destination.class)
-		).when(
-			destinationServiceRegistrarHelper
-		).getDestination(
-			Mockito.any()
-		);
-
-		return destinationServiceRegistrarHelper;
 	}
 
 	private ElasticsearchEngineConfigurator
 		_createElasticsearchEngineConfigurator(
-			SearchDestinationHelper searchDestinationHelper) {
+			DestinationFactory destinationFactory) {
 
 		return new ElasticsearchEngineConfigurator() {
 			{
-				setDestinationServiceRegistrarHelper(
-					_createDestinationServiceRegistrarHelper());
+				ReflectionTestUtil.setFieldValue(
+					this, "_destinationFactory", destinationFactory);
 				ReflectionTestUtil.setFieldValue(
 					this, "_messageBus", Mockito.mock(MessageBus.class));
-				setSearchDestinationHelper(searchDestinationHelper);
-				setSearchEngine(
-					Mockito.mock(SearchEngine.class),
-					Collections.singletonMap(
-						"search.engine.id", "SYSTEM_ENGINE"));
+				ReflectionTestUtil.setFieldValue(
+					this, "_searchEngine", Mockito.mock(SearchEngine.class));
 				ReflectionTestUtil.setFieldValue(
 					this, "_searchEngineHelper",
 					Mockito.mock(SearchEngineHelper.class));
 			}
 		};
-	}
-
-	private SearchDestinationHelper _createSearchDestinationHelper() {
-		SearchDestinationHelper searchDestinationHelper = Mockito.mock(
-			SearchDestinationHelper.class);
-
-		Mockito.doReturn(
-			Mockito.mock(Destination.class)
-		).when(
-			searchDestinationHelper
-		).createSearchReaderDestination(
-			Mockito.nullable(String.class)
-		);
-
-		Mockito.doReturn(
-			Mockito.mock(Destination.class)
-		).when(
-			searchDestinationHelper
-		).createSearchWriterDestination(
-			Mockito.nullable(String.class)
-		);
-
-		return searchDestinationHelper;
 	}
 
 }

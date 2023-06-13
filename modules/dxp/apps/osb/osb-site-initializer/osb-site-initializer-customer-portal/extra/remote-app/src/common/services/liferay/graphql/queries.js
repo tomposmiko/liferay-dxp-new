@@ -482,6 +482,7 @@ export const getAccountUserAccountsByExternalReferenceCode = gql`
 			filter: $filter
 		) {
 			items {
+				dateCreated
 				id
 				emailAddress
 				lastLoginDate
@@ -540,6 +541,7 @@ export const updateAccountSubscriptionGroups = gql`
 				accountSubscriptionGroupId
 				accountKey
 				activationStatus
+				externalReferenceCode
 				name
 			}
 		}

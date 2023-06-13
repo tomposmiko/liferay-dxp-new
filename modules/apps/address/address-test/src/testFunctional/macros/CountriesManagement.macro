@@ -1,7 +1,9 @@
 definition {
 
 	macro _inputCountryDetails {
-		PortletEntry.inputName(name = "${countryName}");
+		if (isSet(countryName)) {
+			PortletEntry.inputName(name = "${countryName}");
+		}
 
 		if (isSet(countryKey)) {
 			PortletEntry.inputText(

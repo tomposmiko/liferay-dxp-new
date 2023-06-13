@@ -15,6 +15,7 @@
 package com.liferay.notification.service.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.notification.constants.NotificationConstants;
 import com.liferay.notification.constants.NotificationQueueEntryConstants;
 import com.liferay.notification.exception.NotificationTemplateFromException;
 import com.liferay.notification.exception.NotificationTemplateNameException;
@@ -34,16 +35,18 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
-import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.portal.util.PropsUtil;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -116,6 +119,31 @@ public class NotificationTemplateLocalServiceTest {
 			HashMapDictionaryBuilder.put(
 				"notification.type.key", _NOTIFICATION_TYPE_KEY
 			).build());
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		List<NotificationQueueEntry> notificationQueueEntries =
+			_notificationQueueEntryLocalService.getNotificationQueueEntries(
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
+		for (NotificationQueueEntry notificationQueueEntry :
+				notificationQueueEntries) {
+
+			_notificationQueueEntryLocalService.deleteNotificationQueueEntry(
+				notificationQueueEntry.getNotificationQueueEntryId());
+		}
+
+		List<NotificationTemplate> notificationTemplates =
+			_notificationTemplateLocalService.getNotificationTemplates(
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
+		for (NotificationTemplate notificationTemplate :
+				notificationTemplates) {
+
+			_notificationTemplateLocalService.deleteNotificationTemplate(
+				notificationTemplate.getNotificationTemplateId());
+		}
 	}
 
 	@Test
@@ -191,11 +219,6 @@ public class NotificationTemplateLocalServiceTest {
 
 	@Test
 	public void testSendNotificationTemplate() throws Exception {
-		PropsUtil.addProperties(
-			UnicodePropertiesBuilder.setProperty(
-				"feature.flag.LPS-159052", "true"
-			).build());
-
 		String emailTerm = "[%emailTerm%]";
 		String term = "[%term%]";
 
@@ -204,9 +227,10 @@ public class NotificationTemplateLocalServiceTest {
 				TestPropsValues.getUserId(), 0, term,
 				Collections.singletonMap(LocaleUtil.US, term), term, "",
 				emailTerm, Collections.singletonMap(LocaleUtil.US, term),
-				"New Template", Collections.singletonMap(LocaleUtil.US, term),
+				"New Template", null,
+				Collections.singletonMap(LocaleUtil.US, term),
 				Collections.singletonMap(LocaleUtil.US, emailTerm),
-				Collections.emptyList());
+				NotificationConstants.TYPE_EMAIL, Collections.emptyList());
 
 		String emailTermValue = "test@liferay.com";
 		String termValue = "termValue";
@@ -238,11 +262,56 @@ public class NotificationTemplateLocalServiceTest {
 			notificationQueueEntry.getStatus());
 		Assert.assertEquals(termValue, notificationQueueEntry.getSubject());
 		Assert.assertEquals(emailTermValue, notificationQueueEntry.getTo());
+	}
 
-		PropsUtil.addProperties(
-			UnicodePropertiesBuilder.setProperty(
-				"feature.flag.LPS-159052", "false"
-			).build());
+	@Test
+	public void testSendNotificationTemplateToMultipleEmailAddresses()
+		throws Exception {
+
+		List<NotificationQueueEntry> notificationQueueEntries =
+			_notificationQueueEntryLocalService.getNotificationQueueEntries(
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
+		Assert.assertEquals(
+			notificationQueueEntries.toString(), 0,
+			notificationQueueEntries.size());
+
+		NotificationTemplate notificationTemplate =
+			_notificationTemplateLocalService.addNotificationTemplate(
+				TestPropsValues.getUserId(), 0, "",
+				Collections.singletonMap(LocaleUtil.US, ""), "", "",
+				"test@liferay.com", Collections.singletonMap(LocaleUtil.US, ""),
+				RandomTestUtil.randomString(), null,
+				Collections.singletonMap(LocaleUtil.US, ""),
+				Collections.singletonMap(
+					LocaleUtil.US,
+					"abc@def.hij.com, br@test.com;caleb@able.test.com\n" +
+						"david@test.com"),
+				NotificationConstants.TYPE_EMAIL, Collections.emptyList());
+
+		_notificationTemplateLocalService.sendNotificationTemplate(
+			TestPropsValues.getUserId(),
+			notificationTemplate.getNotificationTemplateId(),
+			_NOTIFICATION_TYPE_KEY, new Object());
+
+		notificationQueueEntries =
+			_notificationQueueEntryLocalService.getNotificationQueueEntries(
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
+		Stream<NotificationQueueEntry> stream =
+			notificationQueueEntries.stream();
+
+		Set<String> tos = stream.map(
+			NotificationQueueEntry::getTo
+		).collect(
+			Collectors.toSet()
+		);
+
+		Assert.assertEquals(tos.toString(), 4, tos.size());
+		Assert.assertTrue(tos.contains("abc@def.hij.com"));
+		Assert.assertTrue(tos.contains("br@test.com"));
+		Assert.assertTrue(tos.contains("caleb@able.test.com"));
+		Assert.assertTrue(tos.contains("david@test.com"));
 	}
 
 	private NotificationTemplate _addNotificationTemplate(
@@ -256,12 +325,12 @@ public class NotificationTemplateLocalServiceTest {
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(), from,
 			Collections.singletonMap(
 				LocaleUtil.US, RandomTestUtil.randomString()),
-			name,
+			name, null,
 			Collections.singletonMap(
 				LocaleUtil.US, RandomTestUtil.randomString()),
 			Collections.singletonMap(
 				LocaleUtil.US, RandomTestUtil.randomString()),
-			Collections.emptyList());
+			NotificationConstants.TYPE_EMAIL, Collections.emptyList());
 	}
 
 	private static final String _NOTIFICATION_TYPE_KEY = "notificationTypeKey";

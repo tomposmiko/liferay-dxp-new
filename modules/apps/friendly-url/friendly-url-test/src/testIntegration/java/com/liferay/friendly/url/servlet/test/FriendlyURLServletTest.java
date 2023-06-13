@@ -219,11 +219,11 @@ public class FriendlyURLServletTest {
 	public void testGetRedirectWithRedirectEntryLayoutViewAction()
 		throws Throwable {
 
-		Layout redirectionLayout = LayoutTestUtil.addTypePortletLayout(_group);
+		Layout layout = LayoutTestUtil.addTypePortletLayout(_group);
 
 		_redirectEntryLocalService.addRedirectEntry(
-			_group.getGroupId(), redirectionLayout.getName(LocaleUtil.US), null,
-			false, _layout.getName(LocaleUtil.US),
+			_group.getGroupId(), layout.getName(LocaleUtil.US), null, false,
+			_layout.getName(LocaleUtil.US),
 			ServiceContextTestUtil.getServiceContext());
 
 		MockHttpServletRequest mockHttpServletRequest =
@@ -254,6 +254,50 @@ public class FriendlyURLServletTest {
 		testGetRedirect(
 			mockHttpServletRequest, getPath(_group, _layout), Portal.PATH_MAIN,
 			_redirectConstructor1.newInstance(getURL(_layout)));
+	}
+
+	@Test
+	public void testGetRedirectWithUpperCaseAccentedSourceURLRedirectEntry()
+		throws Throwable {
+
+		Layout layout = LayoutTestUtil.addTypePortletLayout(_group);
+
+		_redirectEntryLocalService.addRedirectEntry(
+			_group.getGroupId(), layout.getName(LocaleUtil.US), null, false,
+			"TÉSTREDIRECT", ServiceContextTestUtil.getServiceContext());
+
+		MockHttpServletRequest mockHttpServletRequest =
+			new MockHttpServletRequest();
+
+		mockHttpServletRequest.setPathInfo("/TÉSTREDIRECT");
+
+		testGetRedirect(
+			mockHttpServletRequest, _group.getFriendlyURL() + "/TÉSTREDIRECT",
+			Portal.PATH_MAIN,
+			_redirectConstructor2.newInstance(
+				layout.getName(LocaleUtil.US), true, false));
+	}
+
+	@Test
+	public void testGetRedirectWithUpperCaseSourceURLRedirectEntry()
+		throws Throwable {
+
+		Layout layout = LayoutTestUtil.addTypePortletLayout(_group);
+
+		_redirectEntryLocalService.addRedirectEntry(
+			_group.getGroupId(), layout.getName(LocaleUtil.US), null, false,
+			"TESTREDIRECT", ServiceContextTestUtil.getServiceContext());
+
+		MockHttpServletRequest mockHttpServletRequest =
+			new MockHttpServletRequest();
+
+		mockHttpServletRequest.setPathInfo("/TESTREDIRECT");
+
+		testGetRedirect(
+			mockHttpServletRequest, _group.getFriendlyURL() + "/TESTREDIRECT",
+			Portal.PATH_MAIN,
+			_redirectConstructor2.newInstance(
+				layout.getName(LocaleUtil.US), true, false));
 	}
 
 	@Test

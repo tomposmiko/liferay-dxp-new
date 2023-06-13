@@ -31,7 +31,6 @@ create table NotificationQueueEntry (
 	from_ VARCHAR(75) null,
 	fromName VARCHAR(75) null,
 	priority DOUBLE,
-	sent BOOLEAN,
 	sentDate DATE null,
 	subject VARCHAR(75) null,
 	to_ VARCHAR(75) null,
@@ -56,6 +55,8 @@ create table NotificationTemplate (
 	from_ VARCHAR(75) null,
 	fromName STRING null,
 	name STRING null,
+	recipientType VARCHAR(75) null,
 	subject STRING null,
-	to_ STRING null
+	to_ STRING null,
+	type_ VARCHAR(75) null
 );

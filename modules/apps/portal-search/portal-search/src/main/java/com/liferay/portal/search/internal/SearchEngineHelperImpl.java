@@ -14,27 +14,18 @@
 
 package com.liferay.portal.search.internal;
 
-import com.liferay.petra.string.StringBundler;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.messaging.DestinationNames;
-import com.liferay.portal.kernel.search.Document;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchEngine;
 import com.liferay.portal.kernel.search.SearchEngineHelper;
-import com.liferay.portal.kernel.search.queue.QueuingSearchEngine;
-import com.liferay.portal.kernel.util.ClassUtil;
+import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.search.configuration.SearchEngineHelperConfiguration;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,6 +34,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Michael C. Han
@@ -52,46 +44,6 @@ import org.osgi.service.component.annotations.Modified;
 	immediate = true, service = SearchEngineHelper.class
 )
 public class SearchEngineHelperImpl implements SearchEngineHelper {
-
-	@Override
-	public void flushQueuedSearchEngine() {
-		synchronized (_queuingSearchEngines) {
-			for (QueuingSearchEngine queuingSearchEngine :
-					_queuingSearchEngines.values()) {
-
-				queuingSearchEngine.flush();
-			}
-
-			_queuingSearchEngines.clear();
-		}
-	}
-
-	@Override
-	public void flushQueuedSearchEngine(String searchEngineId) {
-		QueuingSearchEngine queuingSearchEngine = null;
-
-		synchronized (_queuingSearchEngines) {
-			queuingSearchEngine = _queuingSearchEngines.remove(searchEngineId);
-		}
-
-		if (queuingSearchEngine != null) {
-			queuingSearchEngine.flush();
-		}
-	}
-
-	@Override
-	public Collection<Long> getCompanyIds() {
-		return _companyIds.keySet();
-	}
-
-	@Override
-	public String getDefaultSearchEngineId() {
-		if (_defaultSearchEngineId == null) {
-			return SYSTEM_ENGINE_ID;
-		}
-
-		return _defaultSearchEngineId;
-	}
 
 	@Override
 	public String[] getEntryClassNames() {
@@ -109,73 +61,8 @@ public class SearchEngineHelperImpl implements SearchEngineHelper {
 	}
 
 	@Override
-	public Collection<Long> getIndexedCompanyIds() {
-		Collection<Long> companyIds = new ArrayList<>();
-
-		for (SearchEngine searchEngine : _searchEngines.values()) {
-			companyIds.addAll(searchEngine.getIndexedCompanyIds());
-		}
-
-		return companyIds;
-	}
-
-	@Override
 	public SearchEngine getSearchEngine(String searchEngineId) {
-		SearchEngine searchEngine = _searchEngines.get(searchEngineId);
-
-		if (searchEngine != null) {
-			return searchEngine;
-		}
-
-		synchronized (_queuingSearchEngines) {
-			searchEngine = _queuingSearchEngines.get(searchEngineId);
-
-			if (searchEngine == null) {
-				QueuingSearchEngine queuingSearchEngine =
-					new QueuingSearchEngine(_queueCapacity);
-
-				_queuingSearchEngines.put(searchEngineId, queuingSearchEngine);
-
-				searchEngine = queuingSearchEngine;
-			}
-
-			if (_log.isInfoEnabled()) {
-				_log.info("Returning queuing search engine");
-			}
-
-			return searchEngine;
-		}
-	}
-
-	@Override
-	public String getSearchEngineId(Collection<Document> documents) {
-		if (!documents.isEmpty()) {
-			Iterator<Document> iterator = documents.iterator();
-
-			Document document = iterator.next();
-
-			return getSearchEngineId(document);
-		}
-
-		return getDefaultSearchEngineId();
-	}
-
-	@Override
-	public String getSearchEngineId(Document document) {
-		String entryClassName = document.get("entryClassName");
-
-		Indexer<?> indexer = IndexerRegistryUtil.getIndexer(entryClassName);
-
-		String searchEngineId = indexer.getSearchEngineId();
-
-		if (_log.isDebugEnabled()) {
-			_log.debug(
-				StringBundler.concat(
-					"Search engine ID ", searchEngineId, " is associated with ",
-					ClassUtil.getClassName(indexer)));
-		}
-
-		return searchEngineId;
+		return _searchEngines.get(searchEngineId);
 	}
 
 	@Override
@@ -189,51 +76,17 @@ public class SearchEngineHelperImpl implements SearchEngineHelper {
 	}
 
 	@Override
-	public SearchEngine getSearchEngineSilent(String searchEngineId) {
-		return _searchEngines.get(searchEngineId);
-	}
-
-	@Override
-	public String getSearchReaderDestinationName(String searchEngineId) {
-		return StringBundler.concat(
-			DestinationNames.SEARCH_READER, StringPool.SLASH, searchEngineId);
-	}
-
-	@Override
-	public String getSearchWriterDestinationName(String searchEngineId) {
-		return StringBundler.concat(
-			DestinationNames.SEARCH_WRITER, StringPool.SLASH, searchEngineId);
-	}
-
-	@Override
 	public synchronized void initialize(long companyId) {
-		if (_companyIds.containsKey(companyId)) {
-			return;
-		}
-
-		_companyIds.put(companyId, companyId);
-
 		for (SearchEngine searchEngine : _searchEngines.values()) {
 			searchEngine.initialize(companyId);
 		}
 	}
 
 	@Override
-	public void removeCompany(long companyId) {
-		removeCompany(companyId, false);
-	}
-
-	@Override
-	public synchronized void removeCompany(long companyId, boolean force) {
-		if (!force && !_companyIds.containsKey(companyId)) {
-			return;
-		}
-
+	public synchronized void removeCompany(long companyId) {
 		for (SearchEngine searchEngine : _searchEngines.values()) {
 			searchEngine.removeCompany(companyId);
 		}
-
-		_companyIds.remove(companyId);
 	}
 
 	@Override
@@ -242,43 +95,13 @@ public class SearchEngineHelperImpl implements SearchEngineHelper {
 	}
 
 	@Override
-	public void setDefaultSearchEngineId(String defaultSearchEngineId) {
-		_defaultSearchEngineId = defaultSearchEngineId;
-	}
-
-	@Override
-	public void setQueueCapacity(int queueCapacity) {
-		_queueCapacity = queueCapacity;
-	}
-
-	@Override
 	public void setSearchEngine(
 		String searchEngineId, SearchEngine searchEngine) {
 
 		_searchEngines.put(searchEngineId, searchEngine);
 
-		for (Long companyId : _companyIds.keySet()) {
-			searchEngine.initialize(companyId);
-		}
-
-		synchronized (_queuingSearchEngines) {
-			QueuingSearchEngine queuingSearchEngine = _queuingSearchEngines.get(
-				searchEngineId);
-
-			if (queuingSearchEngine != null) {
-				try {
-					queuingSearchEngine.invokeQueued(
-						searchEngine.getIndexWriter());
-				}
-				catch (Exception exception) {
-					if (_log.isWarnEnabled()) {
-						_log.warn(
-							"Unable to execute pending write events for " +
-								"engine: " + searchEngineId,
-							exception);
-					}
-				}
-			}
+		for (Company company : _companyLocalService.getCompanies()) {
+			searchEngine.initialize(company.getCompanyId());
 		}
 	}
 
@@ -298,15 +121,10 @@ public class SearchEngineHelperImpl implements SearchEngineHelper {
 			searchEngineHelperConfiguration.excludedEntryClassNames());
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		SearchEngineHelperImpl.class);
+	@Reference
+	private CompanyLocalService _companyLocalService;
 
-	private final Map<Long, Long> _companyIds = new ConcurrentHashMap<>();
-	private String _defaultSearchEngineId;
 	private final Set<String> _excludedEntryClassNames = new HashSet<>();
-	private int _queueCapacity = 200;
-	private final Map<String, QueuingSearchEngine> _queuingSearchEngines =
-		new HashMap<>();
 	private final Map<String, SearchEngine> _searchEngines =
 		new ConcurrentHashMap<>();
 

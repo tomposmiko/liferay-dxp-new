@@ -18,11 +18,18 @@ declare const VersionActions: ({actions}: IProps) => JSX.Element;
 interface IProps {
 	actions: IAction[];
 }
-interface IAction {
-	action: string;
-	actionLabel: string;
-	actionURL: string;
+export interface IAction {
 	icon?: string;
-	title: string;
+	label: string;
+	name: string;
+	url: string;
+}
+declare global {
+	interface Window {
+		submitForm: (form: HTMLElement, url: string) => void;
+	}
+	interface IDocument extends Document {
+		hrefFm: HTMLElement;
+	}
 }
 export default VersionActions;

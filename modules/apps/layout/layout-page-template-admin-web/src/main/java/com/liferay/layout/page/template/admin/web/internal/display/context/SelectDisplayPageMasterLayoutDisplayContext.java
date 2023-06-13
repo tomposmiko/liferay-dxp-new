@@ -63,7 +63,9 @@ public class SelectDisplayPageMasterLayoutDisplayContext {
 
 		for (InfoItemClassDetails infoItemClassDetails :
 				_infoItemServiceTracker.getInfoItemClassDetails(
-					DisplayPageInfoItemCapability.KEY)) {
+					_themeDisplay.getScopeGroupId(),
+					DisplayPageInfoItemCapability.KEY,
+					_themeDisplay.getPermissionChecker())) {
 
 			mappingTypesJSONArray.put(
 				JSONUtil.put(

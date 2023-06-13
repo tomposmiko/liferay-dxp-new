@@ -13,9 +13,21 @@ import ClayButton, {ClayButtonWithIcon} from '@clayui/button';
 import PropTypes from 'prop-types';
 import React, {useContext, useState} from 'react';
 
+import {DEFAULT_LANGUAGE} from '../../../../../source-builder/constants';
 import {DiagramBuilderContext} from '../../../../DiagramBuilderContext';
 import SidebarPanel from '../../SidebarPanel';
 import BaseActionsInfo from '../shared-components/BaseActionsInfo';
+
+const scriptLanguageOptions = [
+	{
+		label: Liferay.Language.get('groovy'),
+		value: 'groovy',
+	},
+	{
+		label: Liferay.Language.get('java'),
+		value: 'java',
+	},
+];
 
 const ActionsInfo = ({
 	identifier,
@@ -45,6 +57,10 @@ const ActionsInfo = ({
 			value: 'onExit',
 		},
 	]);
+
+	const [scriptLanguage, setScriptLanguage] = useState(
+		actions?.scriptLanguage?.[index] || DEFAULT_LANGUAGE
+	);
 
 	if (
 		selectedItem.type === 'task' &&
@@ -103,6 +119,9 @@ const ActionsInfo = ({
 					name: values.map(({name}) => name),
 					priority: values.map(({priority}) => priority),
 					script: values.map(({script}) => script),
+					scriptLanguage: values.map(
+						({scriptLanguage}) => scriptLanguage
+					),
 					sectionsData: values.map((values) => values),
 				},
 			},
@@ -122,8 +141,8 @@ const ActionsInfo = ({
 				placeholderScript="${userName} sent you a ${entryType} for review in the workflow."
 				priority={priority}
 				script={script}
-				scriptLabel={Liferay.Language.get('script')}
-				scriptLabelSecondary={Liferay.Language.get('groovy')}
+				scriptLanguage={scriptLanguage}
+				scriptLanguageOptions={scriptLanguageOptions}
 				selectedItem={selectedItem}
 				setDescription={setDescription}
 				setExecutionType={setExecutionType}
@@ -131,6 +150,7 @@ const ActionsInfo = ({
 				setName={setName}
 				setPriority={setPriority}
 				setScript={setScript}
+				setScriptLanguage={setScriptLanguage}
 				updateActionInfo={updateActionInfo}
 			/>
 

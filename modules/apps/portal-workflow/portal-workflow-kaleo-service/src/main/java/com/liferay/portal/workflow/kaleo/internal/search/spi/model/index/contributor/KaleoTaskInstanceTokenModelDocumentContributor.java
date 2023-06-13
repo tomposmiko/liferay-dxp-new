@@ -20,7 +20,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
-import com.liferay.portal.kernel.util.LocalizationUtil;
+import com.liferay.portal.kernel.util.Localization;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.search.spi.model.index.contributor.ModelDocumentContributor;
 import com.liferay.portal.workflow.kaleo.internal.search.KaleoTaskInstanceTokenField;
@@ -41,7 +41,6 @@ import org.osgi.service.component.annotations.Reference;
  * @author Rafael Praxedes
  */
 @Component(
-	immediate = true,
 	property = "indexer.class.name=com.liferay.portal.workflow.kaleo.model.KaleoTaskInstanceToken",
 	service = ModelDocumentContributor.class
 )
@@ -152,8 +151,7 @@ public class KaleoTaskInstanceTokenModelDocumentContributor
 	protected String[] getLanguageIds(
 		String defaultLanguageId, String content) {
 
-		String[] languageIds = LocalizationUtil.getAvailableLanguageIds(
-			content);
+		String[] languageIds = _localization.getAvailableLanguageIds(content);
 
 		if (languageIds.length == 0) {
 			languageIds = new String[] {defaultLanguageId};
@@ -174,5 +172,8 @@ public class KaleoTaskInstanceTokenModelDocumentContributor
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		KaleoTaskInstanceTokenModelDocumentContributor.class);
+
+	@Reference
+	private Localization _localization;
 
 }

@@ -34,6 +34,7 @@ interface NotificationTemplate {
 	objectDefinitionId: number | null;
 	subject: LocalizedValue<string>;
 	to: LocalizedValue<string>;
+	type: string;
 }
 
 type ObjectRelationshipType = 'manyToMany' | 'oneToMany' | 'oneToOne';
@@ -55,12 +56,27 @@ interface PickListItem {
 	id: number;
 	key: string;
 	name: string;
+	name_i18n: LocalizedValue<string>;
 }
 
 interface PickList {
+	actions: Actions;
 	id: number;
 	listTypeEntries: PickListItem[];
 	name: string;
+	name_i18n: LocalizedValue<string>;
+}
+
+interface Actions {
+	delete: HTTPMethod;
+	get: HTTPMethod;
+	permissions: HTTPMethod;
+	update: HTTPMethod;
+}
+
+interface HTTPMethod {
+	href: string;
+	method: string;
 }
 
 const headers = new Headers({
@@ -152,6 +168,12 @@ export async function getObjectRelationships(objectDefinitionId: number) {
 	);
 }
 
+export async function getPickList(pickListId: number): Promise<PickList> {
+	return await fetchJSON<PickList>(
+		`/o/headless-admin-list-type/v1.0/list-type-definitions/${pickListId}`
+	);
+}
+
 export async function getPickLists() {
 	return await getList<PickList>(
 		'/o/headless-admin-list-type/v1.0/list-type-definitions?pageSize=-1'
@@ -169,9 +191,11 @@ export async function save(
 	item: unknown,
 	method: 'PUT' | 'POST' = 'PUT'
 ) {
+	const isFormData = item instanceof FormData;
+
 	const response = await fetch(url, {
-		body: JSON.stringify(item),
-		headers,
+		body: isFormData ? item : JSON.stringify(item),
+		...(!isFormData && {headers}),
 		method,
 	});
 
@@ -218,5 +242,48 @@ export async function updateRelationship({
 export async function getRelationship<T>(objectRelationshipId: number) {
 	return fetchJSON<T>(
 		`/o/object-admin/v1.0/object-relationships/${objectRelationshipId}`
+	);
+}
+
+export async function updatePickList({id, name_i18n}: Partial<PickListItem>) {
+	return await save(
+		`/o/headless-admin-list-type/v1.0/list-type-definitions/${id}`,
+		{name_i18n},
+		'PUT'
+	);
+}
+
+export async function deletePickList(pickListId: number) {
+	return await deleteItem(
+		`/o/headless-admin-list-type/v1.0/list-type-definitions/${pickListId}`
+	);
+}
+
+export async function addPickListItem({
+	id,
+	key,
+	name_i18n,
+}: Partial<PickListItem>) {
+	return await save(
+		`/o/headless-admin-list-type/v1.0/list-type-definitions/${id}/list-type-entries`,
+		{key, name_i18n},
+		'POST'
+	);
+}
+
+export async function deletePickListItem(id: number) {
+	return await deleteItem(
+		`/o/headless-admin-list-type/v1.0/list-type-entries/${id}`
+	);
+}
+
+export async function updatePickListItem({
+	id,
+	name_i18n,
+}: Partial<PickListItem>) {
+	return await save(
+		`/o/headless-admin-list-type/v1.0/list-type-entries/${id}`,
+		{name_i18n},
+		'PUT'
 	);
 }

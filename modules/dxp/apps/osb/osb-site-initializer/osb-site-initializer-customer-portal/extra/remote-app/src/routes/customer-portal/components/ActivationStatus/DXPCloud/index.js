@@ -41,7 +41,7 @@ const submittedModalTexts = {
 		'return-to-the-product-activation-page-to-view-the-current-activation-status'
 	),
 	subtitle: i18n.translate(
-		'we-ll-need-a-few-details-to-finish-building-your-dxp-environment'
+		'we-ll-need-a-few-details-to-finish-building-your-lxc-sm-environment'
 	),
 	text: i18n.translate(
 		'another-user-already-submitted-the-lxc-sm-activation-request'
@@ -103,7 +103,6 @@ const ActivationStatusDXPCloud = ({
 	const activationStatusModalProps = useModal({
 		onClose: () => setVisibleStatus(false),
 	});
-
 	const projectID = dxpCloudEnvironment?.projectId;
 
 	const onCloseSetupModal = async (isSuccess) => {
@@ -136,7 +135,6 @@ const ActivationStatusDXPCloud = ({
 			getSubscriptionGroups(project.accountKey);
 		}
 	};
-
 	const currentActivationStatus = {
 		[STATUS_TAG_TYPE_NAMES.active]: {
 			buttonLink: (
@@ -158,7 +156,8 @@ const ActivationStatusDXPCloud = ({
 			title: i18n.translate('activation-status'),
 		},
 		[STATUS_TAG_TYPE_NAMES.inProgress]: {
-			dropdownIcon: userAccount.isStaff && userAccount.isProvisioning && (
+			dropdownIcon: (userAccount.isStaff ||
+				userAccount.isProvisioning) && (
 				<ButtonDropDown
 					align={Align.BottomRight}
 					customDropDownButton={

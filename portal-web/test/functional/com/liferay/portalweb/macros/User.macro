@@ -780,11 +780,7 @@ definition {
 
 		UserNavigator.gotoUser(userScreenName = "${userScreenName}");
 
-		UserNavigator.gotoMemberships();
-
-		AssertClick(
-			locator1 = "UsersAndOrganizationsEditUser#ACCOUNTS_SELECT_LINK",
-			value1 = "SELECT");
+		User.selectMembership(assetType = "Accounts");
 
 		SelectFrame(
 			key_title = "Select Account",
@@ -930,17 +926,13 @@ definition {
 	}
 
 	macro assignUserGroupCP {
-		UserNavigator.gotoMemberships();
-
-		AssertClick(
-			locator1 = "UsersAndOrganizationsEditUser#USER_GROUPS_SELECT_LINK",
-			value1 = "Select");
+		User.selectMembership(assetType = "User Groups");
 
 		SelectFrame(locator1 = "IFrame#SELECT_USER_GROUP");
 
 		AssertTextEquals(
-			key_userGroupName = "${userGroupName}",
-			locator1 = "UsersAndOrganizationsEditUser#USER_GROUPS_TABLE_NAME",
+			key_rowEntry = "${userGroupName}",
+			locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME",
 			value1 = "${userGroupName}");
 
 		AssertClick(
@@ -951,13 +943,15 @@ definition {
 		SelectFrame(value1 = "relative=top");
 
 		AssertTextEquals(
-			key_userGroupName = "${userGroupName}",
-			locator1 = "UsersAndOrganizationsEditUser#USER_GROUPS_TABLE_NAME",
+			key_assetType = "userGroups",
+			key_assigneeName = "${userGroupName}",
+			locator1 = "UsersAndOrganizationsEditUser#MEMBERSHIPS_TABLE_ENTRY_NAME",
 			value1 = "${userGroupName}");
 
 		AssertElementPresent(
-			key_userGroupName = "${userGroupName}",
-			locator1 = "UsersAndOrganizationsEditUser#USER_GROUPS_TABLE_REMOVE");
+			key_assetType = "userGroups",
+			key_assigneeName = "${userGroupName}",
+			locator1 = "UsersAndOrganizationsEditUser#MEMBERSHIPS_TABLE_ENTRY_REMOVE_ASSIGNEE_ICON");
 
 		PortletEntry.save();
 	}
@@ -1358,36 +1352,6 @@ definition {
 		PortletEntry.save();
 	}
 
-	macro editCategorizationCP {
-		UserNavigator.gotoUser(userScreenName = "${userScreenName}");
-
-		AssertElementPresent(locator1 = "UsersAndOrganizationsEditUser#CATEGORIZATION_LABEL");
-
-		AssertElementPresent(
-			key_vocabularyName = "${vocabularyName}",
-			locator1 = "UsersAndOrganizationsEditUser#VOCABULARY_LABEL");
-
-		AssertElementPresent.assertVisible(
-			key_vocabularyName = "${vocabularyName}",
-			locator1 = "UsersAndOrganizationsEditUser#DETAILS_CATEGORY_SELECT",
-			value1 = "Select");
-
-		WaitForLiferayEvent.initializeLiferayEventLog();
-
-		AssertClick(
-			key_vocabularyName = "${vocabularyName}",
-			locator1 = "UsersAndOrganizationsEditUser#DETAILS_CATEGORY_SELECT",
-			value1 = "Select");
-
-		AssertTextEquals(
-			locator1 = "Modal#HEADER",
-			value1 = "Select ${vocabularyName}");
-
-		AssetCategorization.selectCategories(categoryNameList = "${categoryName}");
-
-		PortletEntry.save();
-	}
-
 	macro editDetailsViaProfile {
 		Click.javaScriptClick(locator1 = "Icon#EDIT_PENCIL");
 
@@ -1589,15 +1553,7 @@ definition {
 	macro editUserAssetLibraryCP {
 		UserNavigator.gotoUser(userScreenName = "${userScreenName}");
 
-		UserNavigator.gotoMemberships();
-
-		AssertElementPresent.assertVisible(
-			locator1 = "UsersAndOrganizationsEditUser#DEPOT_SELECT_LINK",
-			value1 = "SELECT");
-
-		AssertClick(
-			locator1 = "UsersAndOrganizationsEditUser#DEPOT_SELECT_LINK",
-			value1 = "SELECT");
+		User.selectMembership(assetType = "Asset Libraries");
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
@@ -1605,9 +1561,10 @@ definition {
 
 		SelectFrame(value1 = "relative=top");
 
-		AssertTextEquals.assertPartialText(
-			key_siteName = "${depotName}",
-			locator1 = "UsersAndOrganizationsEditUser#SITES_TABLE_NAME",
+		AssertTextEquals(
+			key_assetType = "depotGroups",
+			key_assigneeName = "${depotName}",
+			locator1 = "UsersAndOrganizationsEditUser#MEMBERSHIPS_TABLE_ENTRY_NAME",
 			value1 = "${depotName}");
 
 		PortletEntry.save();
@@ -1739,17 +1696,11 @@ definition {
 	macro editUserSiteCP {
 		UserNavigator.gotoUser(userScreenName = "${userScreenName}");
 
-		UserNavigator.gotoMemberships();
-
-		var key_siteName = "${siteName}";
-
-		WaitForLiferayEvent.initializeLiferayEventLog();
-
-		AssertClick(
-			locator1 = "UsersAndOrganizationsEditUser#SITES_SELECT_LINK",
-			value1 = "SELECT");
+		User.selectMembership(assetType = "Sites");
 
 		SelectFrame(locator1 = "IFrame#SELECT_USER_SITES");
+
+		var key_siteName = "${siteName}";
 
 		Type(
 			locator1 = "TextInput#SITE_SEARCH_KEYWORDS",
@@ -1762,8 +1713,9 @@ definition {
 				locator1 = "TextInput#SEARCH",
 				value1 = "\RETURN");
 
-			AssertTextEquals.assertPartialText(
-				locator1 = "UsersAndOrganizationsEditUser#SITES_TABLE_NAME",
+			AssertTextEquals(
+				key_rowEntry = "${siteName}",
+				locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME",
 				value1 = "${siteName}");
 
 			Click(locator1 = "SitesSelectSite#SITES_TABLE_CHOOSE_SITE_LINK");
@@ -1774,8 +1726,10 @@ definition {
 
 		SelectFrame(value1 = "relative=top");
 
-		AssertTextEquals.assertPartialText(
-			locator1 = "UsersAndOrganizationsEditUser#SITES_TABLE_NAME",
+		AssertTextEquals(
+			key_assetType = "groups",
+			key_assigneeName = "${siteName}",
+			locator1 = "UsersAndOrganizationsEditUser#MEMBERSHIPS_TABLE_ENTRY_NAME",
 			value1 = "${siteName}");
 
 		PortletEntry.save();
@@ -2386,6 +2340,27 @@ definition {
 		AssertElementPresent(locator1 = "Search#SEARCH_INFO");
 	}
 
+	macro selectMembership {
+		UserNavigator.gotoMemberships();
+
+		if ("${assetType}" == "Sites") {
+			var key_selectId = "selectSiteLink";
+		}
+		else if ("${assetType}" == "User Groups") {
+			var key_selectId = "UserGroupsLink";
+		}
+		else if ("${assetType}" == "Accounts") {
+			var key_selectId = "selectAccountLink";
+		}
+		else if ("${assetType}" == "Asset Libraries") {
+			var key_selectId = "selectDepotGroupLink";
+		}
+
+		AssertClick(
+			locator1 = "UsersAndOrganizationsEditUser#MEMBERSHIPS_SELECT_ASSET_BUTTON",
+			value1 = "Select");
+	}
+
 	macro selectUserTagCP {
 		AssertElementPresent.assertVisible(
 			locator1 = "AssetCategorization#TAGS_SELECT_BUTTON",
@@ -2892,6 +2867,38 @@ definition {
 		}
 	}
 
+	macro viewMemberships {
+		UserNavigator.gotoMemberships();
+
+		if ("${assetType}" == "Sites") {
+			var key_assetType = "groups";
+		}
+		else if ("${assetType}" == "User Groups") {
+			var key_assetType = "userGroups";
+		}
+		else if ("${assetType}" == "Accounts") {
+			var key_assetType = "accountEntries";
+		}
+		else if ("${assetType}" == "Asset Libraries") {
+			var key_assetType = "depotGroups";
+		}
+
+		var key_assigneeName = "${assigneeName}";
+
+		AssertTextEquals(
+			locator1 = "UsersAndOrganizationsEditUser#MEMBERSHIPS_TABLE_ENTRY_NAME",
+			value1 = "${assigneeName}");
+
+		if (isSet(roleName)) {
+			var key_assigneeName = "${assigneeName}";
+			var key_roleName = "${roleName}";
+
+			AssertElementPresent(
+				locator1 = "UsersAndOrganizationsEditUser#MEMBERSHIPS_TABLE_ENTRY_ROLE",
+				value1 = "${roleName}");
+		}
+	}
+
 	macro viewNotPrimary {
 		if (isSet(primaryValue)) {
 			var key_primaryValue = "${primaryValue}";
@@ -3002,16 +3009,6 @@ definition {
 		}
 	}
 
-	macro viewUserInfomationOrganizationSitesCP {
-		UserNavigator.gotoMemberships();
-
-		var key_siteName = "${siteName}";
-
-		AssertTextEquals(
-			locator1 = "UsersAndOrganizationsEditUser#SITES_TABLE_NAME",
-			value1 = "${orgName}");
-	}
-
 	macro viewUserInfomationRolesCP {
 		UserNavigator.gotoRoles();
 
@@ -3027,26 +3024,6 @@ definition {
 				locator1 = "UsersAndOrganizationsEditUser#ROLES_SELECT_ROLE_NAME",
 				value1 = "${roleTitle}");
 		}
-	}
-
-	macro viewUserInfomationSitesCP {
-		UserNavigator.gotoMemberships();
-
-		var key_siteName = "${siteName}";
-
-		AssertTextEquals(
-			locator1 = "UsersAndOrganizationsEditUser#SITES_TABLE_NAME",
-			value1 = "${siteName}");
-	}
-
-	macro viewUserInfomationUserGroupsCP {
-		UserNavigator.gotoMemberships();
-
-		var key_userGroupName = "${userGroupName}";
-
-		AssertTextEquals(
-			locator1 = "UsersAndOrganizationsEditUser#USER_GROUPS_TABLE_NAME",
-			value1 = "${userGroupName}");
 	}
 
 	macro viewUserTableName {

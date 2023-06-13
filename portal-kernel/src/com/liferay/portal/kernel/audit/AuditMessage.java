@@ -18,6 +18,8 @@ import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 
@@ -31,6 +33,7 @@ import java.util.Date;
  * @author Michael C. Han
  * @author Mika Koivisto
  * @author Bruno Farache
+ * @author Stian Sigvartsen
  */
 public class AuditMessage implements Serializable {
 
@@ -67,7 +70,9 @@ public class AuditMessage implements Serializable {
 
 		_timestamp = GetterUtil.getDate(
 			jsonObject.getString(_TIMESTAMP), _getDateFormat());
+		_userEmailAddress = jsonObject.getString(_USER_EMAIL_ADDRESS);
 		_userId = jsonObject.getLong(_USER_ID);
+		_userLogin = jsonObject.getString(_USER_LOGIN);
 		_userName = jsonObject.getString(_USER_NAME);
 	}
 
@@ -109,6 +114,10 @@ public class AuditMessage implements Serializable {
 		_className = className;
 		_classPK = classPK;
 		_message = message;
+		_timestamp = (timestamp != null) ? timestamp : new Date();
+		_additionalInfoJSONObject =
+			(additionalInfoJSONObject != null) ? additionalInfoJSONObject :
+				JSONFactoryUtil.createJSONObject();
 
 		AuditRequestThreadLocal auditRequestThreadLocal =
 			AuditRequestThreadLocal.getAuditThreadLocal();
@@ -119,16 +128,16 @@ public class AuditMessage implements Serializable {
 		_serverPort = auditRequestThreadLocal.getServerPort();
 		_sessionID = auditRequestThreadLocal.getSessionID();
 
-		_timestamp = timestamp;
+		_userEmailAddress = auditRequestThreadLocal.getRealUserEmailAddress();
 
-		if (_timestamp == null) {
-			_timestamp = new Date();
+		long realUserId = auditRequestThreadLocal.getRealUserId();
+
+		if (userId == realUserId) {
+			_userLogin = auditRequestThreadLocal.getRealUserLogin();
 		}
-
-		_additionalInfoJSONObject = additionalInfoJSONObject;
-
-		if (_additionalInfoJSONObject == null) {
-			JSONFactoryUtil.createJSONObject();
+		else if (realUserId > 0) {
+			_log.error(
+				"Impersonated actions must be audited on the real user's ID");
 		}
 	}
 
@@ -190,8 +199,16 @@ public class AuditMessage implements Serializable {
 		return _timestamp;
 	}
 
+	public String getUserEmailAddress() {
+		return _userEmailAddress;
+	}
+
 	public long getUserId() {
 		return _userId;
+	}
+
+	public String getUserLogin() {
+		return _userLogin;
 	}
 
 	public String getUserName() {
@@ -250,8 +267,16 @@ public class AuditMessage implements Serializable {
 		_timestamp = timestamp;
 	}
 
+	public void setUserEmailAddress(String userEmailAddress) {
+		_userEmailAddress = userEmailAddress;
+	}
+
 	public void setUserId(long userId) {
 		_userId = userId;
+	}
+
+	public void setUserLogin(String userLogin) {
+		_userLogin = userLogin;
 	}
 
 	public void setUserName(String userName) {
@@ -284,7 +309,11 @@ public class AuditMessage implements Serializable {
 		).put(
 			_TIMESTAMP, _getDateFormat().format(new Date())
 		).put(
+			_USER_EMAIL_ADDRESS, _userEmailAddress
+		).put(
 			_USER_ID, _userId
+		).put(
+			_USER_LOGIN, _userLogin
 		).put(
 			_USER_NAME, _userName
 		);
@@ -320,9 +349,15 @@ public class AuditMessage implements Serializable {
 
 	private static final String _TIMESTAMP = "timestamp";
 
+	private static final String _USER_EMAIL_ADDRESS = "userEmailAddress";
+
 	private static final String _USER_ID = "userId";
 
+	private static final String _USER_LOGIN = "userLogin";
+
 	private static final String _USER_NAME = "userName";
+
+	private static final Log _log = LogFactoryUtil.getLog(AuditMessage.class);
 
 	private JSONObject _additionalInfoJSONObject;
 	private String _className;
@@ -336,7 +371,9 @@ public class AuditMessage implements Serializable {
 	private int _serverPort;
 	private String _sessionID;
 	private Date _timestamp;
+	private String _userEmailAddress;
 	private long _userId = -1;
+	private String _userLogin;
 	private String _userName;
 
 }

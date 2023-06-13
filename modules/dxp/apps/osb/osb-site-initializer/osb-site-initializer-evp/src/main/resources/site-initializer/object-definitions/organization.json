@@ -8,10 +8,12 @@
 		},
 		"permissions": {
 		},
+		"publish": {
+		},
 		"update": {
 		}
 	},
-	"active": true,
+	"active": false,
 	"label": {
 		"en_US": "EVP Organization"
 	},
@@ -391,12 +393,12 @@
 	"panelCategoryKey": "",
 	"parameterRequired": false,
 	"pluralLabel": {
-		"en_US": "EVP Organizations"
+		"en_US": "EVP Organization"
 	},
 	"portlet": false,
 	"scope": "company",
 	"status": {
-		"code": 0,
+		"code": 2,
 		"label": "approved",
 		"label_i18n": "Approved"
 	},
