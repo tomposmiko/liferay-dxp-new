@@ -114,6 +114,10 @@ definition {
 			var subtotal = ${productUnitPrice} * ${productQuantity};
 		}
 
+		if (isSet(productDiscountedTotalPrice)) {
+			var subtotal = "${productDiscountedTotalPrice}";
+		}
+
 		if (isSet(singleShippingOption)) {
 			if (isSet(shippingMethod)) {
 				var deliveryCost = CommerceCheckout.getDeliveryCost(
@@ -291,6 +295,8 @@ definition {
 			deliveryValue = "${deliveryValue}",
 			paymentMethod = "${paymentMethod}",
 			paymentTerm = "${paymentTerm}",
+			productDiscountedTotalPrice = "${productDiscountedTotalPrice}",
+			productDiscountValue = "${productDiscountValue}",
 			productName = "${productName}",
 			productPrice = "${productUnitPrice}",
 			productQuantity = "${productQuantity}",
@@ -483,6 +489,22 @@ definition {
 				key_productPrice = "${productPrice}",
 				locator1 = "CommerceAccelerators#CHECKOUT_SUMMARY_PRODUCT_TABLE_PRICE",
 				value1 = "${productPrice}");
+		}
+
+		if (isSet(productDiscountValue)) {
+			AssertTextEquals.assertPartialText(
+				key_column = "discount",
+				key_value = "${productDiscountValue}",
+				locator1 = "CommerceAccelerators#CHECKOUT_SUMMARY_PRODUCT_TABLE_VALUE",
+				value1 = "${productDiscountValue}");
+		}
+
+		if (isSet(productDiscountedTotalPrice)) {
+			AssertTextEquals.assertPartialText(
+				key_column = "total",
+				key_value = "${productDiscountedTotalPrice}",
+				locator1 = "CommerceAccelerators#CHECKOUT_SUMMARY_PRODUCT_TABLE_VALUE",
+				value1 = "${productDiscountedTotalPrice}");
 		}
 
 		if (isSet(subtotalValue)) {

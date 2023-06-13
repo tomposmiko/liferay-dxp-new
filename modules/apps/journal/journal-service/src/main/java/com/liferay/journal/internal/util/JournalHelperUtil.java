@@ -23,7 +23,6 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import javax.portlet.PortletRequest;
 
@@ -33,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Tom Wang
  */
-@Component(immediate = true, service = {})
+@Component(service = {})
 public class JournalHelperUtil {
 
 	public static String createURLPattern(
@@ -64,15 +63,6 @@ public class JournalHelperUtil {
 
 	public static int getRestrictionType(long folderId) {
 		return _journalHelper.getRestrictionType(folderId);
-	}
-
-	public static String getTemplateScript(
-			long groupId, String ddmTemplateKey, Map<String, String> tokens,
-			String languageId)
-		throws PortalException {
-
-		return _journalHelper.getTemplateScript(
-			groupId, ddmTemplateKey, tokens, languageId);
 	}
 
 	@Reference(unbind = "-")

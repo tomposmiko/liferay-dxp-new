@@ -57,6 +57,7 @@ import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizer;
 import com.liferay.portal.kernel.util.Html;
 import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Localization;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -90,7 +91,6 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
-	immediate = true,
 	property = {
 		"javax.portlet.name=" + JournalPortletKeys.JOURNAL,
 		"mvc.command.name=/journal/add_article",
@@ -521,11 +521,18 @@ public class UpdateArticleMVCActionCommand extends BaseMVCActionCommand {
 				String languageId = ParamUtil.getString(
 					actionRequest, "languageId");
 
-				if (Validator.isNotNull(languageId)) {
-					return languageId;
+				if (Validator.isNull(languageId)) {
+					return null;
 				}
 
-				return null;
+				Locale locale = LocaleUtil.fromLanguageId(
+					languageId, true, false);
+
+				if (locale == null) {
+					return null;
+				}
+
+				return languageId;
 			}
 		).setParameter(
 			"referringPortletResource",

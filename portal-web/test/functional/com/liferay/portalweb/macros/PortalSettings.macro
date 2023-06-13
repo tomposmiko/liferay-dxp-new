@@ -372,65 +372,77 @@ definition {
 
 		if (isSet(orgName)) {
 			AssertTextEquals.assertPartialText(
-				locator1 = "PortalSettingsUsers#DEFAULT_USER_ASSOCIATIONS_ORGANIZATION_SITES_HEADER",
+				key_fieldLabel = "Organization Sites",
+				locator1 = "SystemSettings#LABEL",
 				value1 = "Organization Sites");
 
 			Type(
-				locator1 = "PortalSettingsUsers#DEFAULT_USER_ASSOCIATIONS_ORGANIZATION_SITES_FIELD",
+				key_text = "organization.group.names",
+				locator1 = "TextArea#ANY",
 				value1 = "${orgName}");
 
 			PortletEntry.save();
 
 			AssertTextEquals(
-				locator1 = "PortalSettingsUsers#DEFAULT_USER_ASSOCIATIONS_ORGANIZATION_SITES_FIELD",
+				key_text = "organization.group.names",
+				locator1 = "TextArea#ANY",
 				value1 = "${orgName}");
 		}
 
 		if (isSet(roleTitle)) {
 			AssertTextEquals.assertPartialText(
-				locator1 = "PortalSettingsUsers#DEFAULT_USER_ASSOCIATIONS_ROLES_HEADER",
+				key_fieldLabel = "Roles",
+				locator1 = "SystemSettings#LABEL",
 				value1 = "Roles");
 
 			Type(
-				locator1 = "PortalSettingsUsers#DEFAULT_USER_ASSOCIATIONS_ROLES_FIELD",
+				key_text = "role.names",
+				locator1 = "TextArea#ANY",
 				value1 = "${roleTitle}");
 
 			PortletEntry.save();
 
 			AssertTextEquals(
-				locator1 = "PortalSettingsUsers#DEFAULT_USER_ASSOCIATIONS_ROLES_FIELD",
+				key_text = "role.names",
+				locator1 = "TextArea#ANY",
 				value1 = "${roleTitle}");
 		}
 
 		if (isSet(userGroupName)) {
 			AssertTextEquals.assertPartialText(
-				locator1 = "PortalSettingsUsers#DEFAULT_USER_ASSOCIATIONS_USER_GROUPS_HEADER",
+				key_fieldLabel = "User Groups",
+				locator1 = "SystemSettings#LABEL",
 				value1 = "User Groups");
 
 			Type(
-				locator1 = "PortalSettingsUsers#DEFAULT_USER_ASSOCIATIONS_USER_GROUPS_FIELD",
+				key_text = "user.group.names",
+				locator1 = "TextArea#ANY",
 				value1 = "${userGroupName}");
 
 			PortletEntry.save();
 
 			AssertTextEquals(
-				locator1 = "PortalSettingsUsers#DEFAULT_USER_ASSOCIATIONS_USER_GROUPS_FIELD",
+				key_text = "user.group.names",
+				locator1 = "TextArea#ANY",
 				value1 = "${userGroupName}");
 		}
 
 		if (isSet(siteName)) {
 			AssertTextEquals.assertPartialText(
-				locator1 = "PortalSettingsUsers#DEFAULT_USER_ASSOCIATIONS_ORGANIZATION_SITES_HEADER",
+				key_fieldLabel = "Organization Sites",
+				locator1 = "SystemSettings#LABEL",
 				value1 = "Organization Sites");
 
 			Type(
-				locator1 = "PortalSettingsUsers#DEFAULT_USER_ASSOCIATIONS_SITES_FIELD",
+				key_text = "group.names",
+				locator1 = "TextArea#ANY",
 				value1 = "${siteName}");
 
 			PortletEntry.save();
 
 			AssertTextEquals(
-				locator1 = "PortalSettingsUsers#DEFAULT_USER_ASSOCIATIONS_SITES_FIELD",
+				key_text = "group.names",
+				locator1 = "TextArea#ANY",
 				value1 = "${siteName}");
 		}
 	}
@@ -591,11 +603,13 @@ definition {
 			configurationScope = "Virtual Instance Scope");
 
 		AssertTextEquals.assertPartialText(
-			locator1 = "PortalSettingsUsers#RESERVED_CREDENTIALS_EMAIL_ADDRESSES_HEADER",
+			key_fieldLabel = "Email Addresses",
+			locator1 = "SystemSettings#LABEL",
 			value1 = "Email Addresses");
 
 		Type(
-			locator1 = "PortalSettingsUsers#RESERVED_CREDENTIALS_EMAIL_ADDRESSES_FIELD",
+			key_text = "admin.reserved.email.addresses",
+			locator1 = "TextArea#ANY",
 			value1 = "${userEmailAddress}");
 
 		PortletEntry.save();
@@ -606,7 +620,8 @@ definition {
 			configurationScope = "Virtual Instance Scope");
 
 		AssertTextEquals(
-			locator1 = "PortalSettingsUsers#RESERVED_CREDENTIALS_EMAIL_ADDRESSES_FIELD",
+			key_text = "admin.reserved.email.addresses",
+			locator1 = "TextArea#ANY",
 			value1 = "${userEmailAddress}");
 	}
 
@@ -617,11 +632,13 @@ definition {
 			configurationScope = "Virtual Instance Scope");
 
 		AssertTextEquals.assertPartialText(
-			locator1 = "PortalSettingsUsers#RESERVED_CREDENTIALS_SCREEN_NAMES_HEADER",
+			key_fieldLabel = "Screen Names",
+			locator1 = "SystemSettings#LABEL",
 			value1 = "Screen Names");
 
 		Type(
-			locator1 = "PortalSettingsUsers#RESERVED_CREDENTIALS_SCREEN_NAMES_FIELD",
+			key_text = "admin.reserved.screen.names",
+			locator1 = "TextArea#ANY",
 			value1 = "${userScreenName}");
 
 		PortletEntry.save();
@@ -632,7 +649,8 @@ definition {
 			configurationScope = "Virtual Instance Scope");
 
 		AssertTextEquals(
-			locator1 = "PortalSettingsUsers#RESERVED_CREDENTIALS_SCREEN_NAMES_FIELD",
+			key_text = "admin.reserved.screen.names",
+			locator1 = "TextArea#ANY",
 			value1 = "${userScreenName}");
 	}
 
@@ -720,19 +738,23 @@ definition {
 			configurationScope = "Virtual Instance Scope");
 
 		Type(
-			locator1 = "PortalSettingsUsers#DEFAULT_USER_ASSOCIATIONS_ORGANIZATION_SITES_FIELD",
+			key_text = "organization.group.names",
+			locator1 = "TextArea#ANY",
 			value1 = "");
 
 		Type(
-			locator1 = "PortalSettingsUsers#DEFAULT_USER_ASSOCIATIONS_ROLES_FIELD",
+			key_text = "role.names",
+			locator1 = "TextArea#ANY",
 			value1 = "Power User\nUser");
 
 		Type(
-			locator1 = "PortalSettingsUsers#DEFAULT_USER_ASSOCIATIONS_SITES_FIELD",
+			key_text = "group.names",
+			locator1 = "TextArea#ANY",
 			value1 = "");
 
 		Type(
-			locator1 = "PortalSettingsUsers#DEFAULT_USER_ASSOCIATIONS_USER_GROUPS_FIELD",
+			key_text = "user.group.names",
+			locator1 = "TextArea#ANY",
 			value1 = "");
 
 		PortalSettings.gotoConfiguration(
@@ -741,11 +763,13 @@ definition {
 			configurationScope = "Virtual Instance Scope");
 
 		Type(
-			locator1 = "PortalSettingsUsers#RESERVED_CREDENTIALS_EMAIL_ADDRESSES_FIELD",
+			key_text = "admin.reserved.email.addresses",
+			locator1 = "TextArea#ANY",
 			value1 = "");
 
 		Type(
-			locator1 = "PortalSettingsUsers#RESERVED_CREDENTIALS_SCREEN_NAMES_FIELD",
+			key_text = "admin.reserved.screen.names",
+			locator1 = "TextArea#ANY",
 			value1 = "");
 
 		PortletEntry.save();
@@ -1005,38 +1029,48 @@ definition {
 			configurationName = "Default User Associations",
 			configurationScope = "Virtual Instance Scope");
 
-		AssertElementPresent(locator1 = "PortalSettingsUsers#APPLY_TO_EXISTING_USERS_CHECKBOX");
+		AssertElementPresent(
+			checkboxName = "Apply to Existing Users",
+			locator1 = "Checkbox#ANY_CHECKBOX");
 
 		AssertTextEquals.assertPartialText(
-			locator1 = "PortalSettingsUsers#DEFAULT_USER_ASSOCIATIONS_SITES_HEADER",
+			key_fieldLabel = "Sites",
+			locator1 = "SystemSettings#LABEL",
 			value1 = "Sites");
 
 		AssertTextEquals(
-			locator1 = "PortalSettingsUsers#DEFAULT_USER_ASSOCIATIONS_SITES_FIELD",
+			key_text = "group.names",
+			locator1 = "TextArea#ANY",
 			value1 = "");
 
 		AssertTextEquals.assertPartialText(
-			locator1 = "PortalSettingsUsers#DEFAULT_USER_ASSOCIATIONS_ORGANIZATION_SITES_HEADER",
+			key_fieldLabel = "Organization Sites",
+			locator1 = "SystemSettings#LABEL",
 			value1 = "Organization Sites");
 
 		AssertTextEquals(
-			locator1 = "PortalSettingsUsers#DEFAULT_USER_ASSOCIATIONS_ORGANIZATION_SITES_FIELD",
+			key_text = "organization.group.names",
+			locator1 = "TextArea#ANY",
 			value1 = "");
 
 		AssertTextEquals.assertPartialText(
-			locator1 = "PortalSettingsUsers#DEFAULT_USER_ASSOCIATIONS_ROLES_HEADER",
+			key_fieldLabel = "Roles",
+			locator1 = "SystemSettings#LABEL",
 			value1 = "Roles");
 
 		Type.clickAtType(
-			locator1 = "PortalSettingsUsers#DEFAULT_USER_ASSOCIATIONS_ROLES_FIELD",
+			key_text = "role.names",
+			locator1 = "TextArea#ANY",
 			value1 = "Power User\nUser");
 
 		AssertTextEquals.assertPartialText(
-			locator1 = "PortalSettingsUsers#DEFAULT_USER_ASSOCIATIONS_USER_GROUPS_HEADER",
+			key_fieldLabel = "User Groups",
+			locator1 = "SystemSettings#LABEL",
 			value1 = "User Groups");
 
 		AssertTextEquals(
-			locator1 = "PortalSettingsUsers#DEFAULT_USER_ASSOCIATIONS_USER_GROUPS_FIELD",
+			key_text = "user.group.names",
+			locator1 = "TextArea#ANY",
 			value1 = "");
 	}
 
@@ -1152,19 +1186,23 @@ definition {
 			configurationScope = "Virtual Instance Scope");
 
 		AssertTextEquals.assertPartialText(
-			locator1 = "PortalSettingsUsers#RESERVED_CREDENTIALS_SCREEN_NAMES_HEADER",
+			key_fieldLabel = "Screen Names",
+			locator1 = "SystemSettings#LABEL",
 			value1 = "Screen Names");
 
 		AssertTextEquals(
-			locator1 = "PortalSettingsUsers#RESERVED_CREDENTIALS_SCREEN_NAMES_FIELD",
+			key_text = "admin.reserved.screen.names",
+			locator1 = "TextArea#ANY",
 			value1 = "");
 
 		AssertTextEquals.assertPartialText(
-			locator1 = "PortalSettingsUsers#RESERVED_CREDENTIALS_EMAIL_ADDRESSES_HEADER",
+			key_fieldLabel = "Email Addresses",
+			locator1 = "SystemSettings#LABEL",
 			value1 = "Email Addresses");
 
 		AssertTextEquals(
-			locator1 = "PortalSettingsUsers#RESERVED_CREDENTIALS_EMAIL_ADDRESSES_FIELD",
+			key_text = "admin.reserved.email.addresses",
+			locator1 = "TextArea#ANY",
 			value1 = "");
 	}
 

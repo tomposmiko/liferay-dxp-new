@@ -256,9 +256,11 @@ definition {
 			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE",
 			value1 = "${dmDocumentTitle}");
 
-		DMDocument.viewDocumentInfoTitleCmdPG(dmDocumentTitle = "${dmDocumentTitle}");
+		WaitForPageLoad();
 
 		DMDocument.expandInfo();
+
+		DMDocument.viewDocumentInfoTitleCmdPG(dmDocumentTitle = "${dmDocumentTitle}");
 
 		AssertElementPresent(locator1 = "Button#SHARE_SIDEBAR");
 

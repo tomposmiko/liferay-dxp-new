@@ -31,6 +31,7 @@ import com.liferay.asset.kernel.service.AssetVocabularyServiceUtil;
 import com.liferay.asset.kernel.service.persistence.AssetEntryQuery;
 import com.liferay.asset.list.asset.entry.provider.AssetListAssetEntryProvider;
 import com.liferay.asset.list.model.AssetListEntry;
+import com.liferay.asset.list.service.AssetListEntrySegmentsEntryRelLocalService;
 import com.liferay.asset.list.service.AssetListEntryServiceUtil;
 import com.liferay.asset.publisher.action.AssetEntryAction;
 import com.liferay.asset.publisher.constants.AssetPublisherPortletKeys;
@@ -66,8 +67,10 @@ import com.liferay.item.selector.criteria.asset.criterion.AssetEntryItemSelector
 import com.liferay.item.selector.criteria.group.criterion.GroupItemSelectorCriterion;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalServiceUtil;
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -92,6 +95,7 @@ import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
@@ -99,13 +103,14 @@ import com.liferay.portal.kernel.settings.LocalizedValuesMap;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.CollatorUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PrefsParamUtil;
 import com.liferay.portal.kernel.util.StringComparator;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -118,8 +123,11 @@ import com.liferay.segments.context.RequestContextMapper;
 
 import java.io.Serializable;
 
+import java.text.Collator;
+
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -160,13 +168,15 @@ public class AssetPublisherDisplayContext {
 			AssetEntryActionRegistry assetEntryActionRegistry,
 			AssetHelper assetHelper,
 			AssetListAssetEntryProvider assetListAssetEntryProvider,
+			AssetListEntrySegmentsEntryRelLocalService
+				assetListEntrySegmentsEntryRelLocalService,
 			AssetPublisherCustomizer assetPublisherCustomizer,
 			AssetPublisherHelper assetPublisherHelper,
 			AssetPublisherWebConfiguration assetPublisherWebConfiguration,
 			AssetPublisherWebHelper assetPublisherWebHelper,
 			InfoItemServiceRegistry infoItemServiceRegistry,
-			ItemSelector itemSelector, PortletRequest portletRequest,
-			PortletResponse portletResponse,
+			ItemSelector itemSelector, Portal portal,
+			PortletRequest portletRequest, PortletResponse portletResponse,
 			PortletPreferences portletPreferences,
 			RequestContextMapper requestContextMapper,
 			SegmentsEntryRetriever segmentsEntryRetriever)
@@ -175,12 +185,15 @@ public class AssetPublisherDisplayContext {
 		_assetEntryActionRegistry = assetEntryActionRegistry;
 		_assetHelper = assetHelper;
 		_assetListAssetEntryProvider = assetListAssetEntryProvider;
+		_assetListEntrySegmentsEntryRelLocalService =
+			assetListEntrySegmentsEntryRelLocalService;
 		_assetPublisherCustomizer = assetPublisherCustomizer;
 		_assetPublisherHelper = assetPublisherHelper;
 		_assetPublisherWebConfiguration = assetPublisherWebConfiguration;
 		_assetPublisherWebHelper = assetPublisherWebHelper;
 		_infoItemServiceRegistry = infoItemServiceRegistry;
 		_itemSelector = itemSelector;
+		_portal = portal;
 		_portletRequest = portletRequest;
 		_portletResponse = portletResponse;
 		_portletPreferences = portletPreferences;
@@ -196,7 +209,7 @@ public class AssetPublisherDisplayContext {
 			portletDisplay.getPortletInstanceConfiguration(
 				AssetPublisherPortletInstanceConfiguration.class);
 
-		_httpServletRequest = PortalUtil.getHttpServletRequest(portletRequest);
+		_httpServletRequest = _portal.getHttpServletRequest(portletRequest);
 	}
 
 	public AssetListEntry fetchAssetListEntry() throws PortalException {
@@ -204,9 +217,22 @@ public class AssetPublisherDisplayContext {
 			return _assetListEntry;
 		}
 
-		_assetListEntry = AssetListEntryServiceUtil.fetchAssetListEntry(
-			GetterUtil.getLong(
-				_portletPreferences.getValue("assetListEntryId", null)));
+		long assetListEntryId = GetterUtil.getLong(
+			_portletPreferences.getValue("assetListEntryId", null));
+
+		if (assetListEntryId <= 0) {
+			return null;
+		}
+
+		try {
+			_assetListEntry = AssetListEntryServiceUtil.fetchAssetListEntry(
+				assetListEntryId);
+		}
+		catch (PrincipalException principalException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(principalException);
+			}
+		}
 
 		return _assetListEntry;
 	}
@@ -342,7 +368,7 @@ public class AssetPublisherDisplayContext {
 
 			if (assetListEntry != null) {
 				assetEntries = _assetListAssetEntryProvider.getAssetEntries(
-					assetListEntry, _getSegmentsEntryIds(),
+					assetListEntry, _getSegmentsEntryIds(assetListEntry),
 					_getSegmentsAnonymousUserId());
 			}
 			else {
@@ -405,7 +431,7 @@ public class AssetPublisherDisplayContext {
 
 		if (isSelectionStyleAssetList() && (assetListEntry != null)) {
 			_assetEntryQuery = _assetListAssetEntryProvider.getAssetEntryQuery(
-				assetListEntry, _getSegmentsEntryIds(),
+				assetListEntry, _getSegmentsEntryIds(assetListEntry),
 				_getSegmentsAnonymousUserId());
 		}
 		else {
@@ -701,7 +727,7 @@ public class AssetPublisherDisplayContext {
 				_themeDisplay.getCompanyId(), true),
 			availableClassNameId -> {
 				Indexer<?> indexer = IndexerRegistryUtil.getIndexer(
-					PortalUtil.getClassName(availableClassNameId));
+					_portal.getClassName(availableClassNameId));
 
 				return indexer != null;
 			});
@@ -829,7 +855,7 @@ public class AssetPublisherDisplayContext {
 	}
 
 	public Integer getDelta() {
-		return _assetPublisherCustomizer.getDelta(_httpServletRequest);
+		return _assetPublisherCustomizer.getDelta(_portletPreferences);
 	}
 
 	public String getDisplayStyle() {
@@ -917,7 +943,7 @@ public class AssetPublisherDisplayContext {
 
 			List<ClassType> assetAvailableClassTypes =
 				classTypeReader.getAvailableClassTypes(
-					PortalUtil.getCurrentAndAncestorSiteGroupIds(
+					_portal.getCurrentAndAncestorSiteGroupIds(
 						curGroup.getGroupId()),
 					_themeDisplay.getLocale());
 
@@ -939,7 +965,9 @@ public class AssetPublisherDisplayContext {
 			}
 		}
 
-		return dropdownItemList;
+		return ListUtil.sort(
+			dropdownItemList,
+			new SelectorEntriesLabelComparator(_themeDisplay.getLocale()));
 	}
 
 	public LocalizedValuesMap getEmailAssetEntryAddedBody() {
@@ -1117,7 +1145,7 @@ public class AssetPublisherDisplayContext {
 
 	public PortletURL getPortletURL() {
 		LiferayPortletResponse liferayPortletResponse =
-			PortalUtil.getLiferayPortletResponse(_portletResponse);
+			_portal.getLiferayPortletResponse(_portletResponse);
 
 		PortletURL portletURL = liferayPortletResponse.createRenderURL();
 
@@ -1130,7 +1158,7 @@ public class AssetPublisherDisplayContext {
 			String redirect = ParamUtil.getString(_portletRequest, "redirect");
 
 			if (Validator.isNull(redirect)) {
-				redirect = PortalUtil.getCurrentURL(_portletRequest);
+				redirect = _portal.getCurrentURL(_portletRequest);
 			}
 
 			if (Validator.isNotNull(redirect)) {
@@ -1151,8 +1179,8 @@ public class AssetPublisherDisplayContext {
 			return _referencedModelsGroupIds;
 		}
 
-		_referencedModelsGroupIds =
-			PortalUtil.getCurrentAndAncestorSiteGroupIds(getGroupIds(), true);
+		_referencedModelsGroupIds = _portal.getCurrentAndAncestorSiteGroupIds(
+			getGroupIds(), true);
 
 		return _referencedModelsGroupIds;
 	}
@@ -1218,9 +1246,9 @@ public class AssetPublisherDisplayContext {
 			scopeAssetPublisherAddItemHolders = new HashMap<>();
 
 		LiferayPortletRequest liferayPortletRequest =
-			PortalUtil.getLiferayPortletRequest(_portletRequest);
+			_portal.getLiferayPortletRequest(_portletRequest);
 		LiferayPortletResponse liferayPortletResponse =
-			PortalUtil.getLiferayPortletResponse(_portletResponse);
+			_portal.getLiferayPortletResponse(_portletResponse);
 
 		for (long groupId : groupIds) {
 			List<AssetPublisherAddItemHolder> assetPublisherAddItemHolders =
@@ -1353,7 +1381,7 @@ public class AssetPublisherDisplayContext {
 	}
 
 	public String getSelectAssetListEventName() {
-		String portletNamespace = PortalUtil.getPortletNamespace(
+		String portletNamespace = _portal.getPortletNamespace(
 			AssetPublisherPortletKeys.ASSET_PUBLISHER);
 
 		return portletNamespace + "selectAssetList";
@@ -1421,7 +1449,7 @@ public class AssetPublisherDisplayContext {
 	}
 
 	public List<Long> getVocabularyIds() throws PortalException {
-		long[] groupIds = PortalUtil.getCurrentAndAncestorSiteGroupIds(
+		long[] groupIds = _portal.getCurrentAndAncestorSiteGroupIds(
 			getReferencedModelsGroupIds());
 
 		List<AssetVocabulary> vocabularies = ListUtil.filter(
@@ -1434,10 +1462,10 @@ public class AssetPublisherDisplayContext {
 						return true;
 					}
 
-					if (classNameId == PortalUtil.getClassNameId(
+					if (classNameId == _portal.getClassNameId(
 							FileEntry.class.getName())) {
 
-						classNameId = PortalUtil.getClassNameId(
+						classNameId = _portal.getClassNameId(
 							DLFileEntry.class.getName());
 					}
 
@@ -1867,7 +1895,7 @@ public class AssetPublisherDisplayContext {
 		_showContextLink = isShowContextLink();
 
 		if (_showContextLink &&
-			(PortalUtil.getPlidFromPortletId(groupId, portletId) == 0)) {
+			(_portal.getPlidFromPortletId(groupId, portletId) == 0)) {
 
 			_showContextLink = false;
 		}
@@ -2128,7 +2156,7 @@ public class AssetPublisherDisplayContext {
 					getAssetCategoryId());
 
 			if (assetCategory != null) {
-				PortalUtil.setPageKeywords(
+				_portal.setPageKeywords(
 					HtmlUtil.escape(
 						assetCategory.getTitle(_themeDisplay.getLocale())),
 					_httpServletRequest);
@@ -2136,7 +2164,7 @@ public class AssetPublisherDisplayContext {
 		}
 
 		if (Validator.isNotNull(getAssetTagName())) {
-			PortalUtil.setPageKeywords(getAssetTagName(), _httpServletRequest);
+			_portal.setPageKeywords(getAssetTagName(), _httpServletRequest);
 		}
 	}
 
@@ -2243,6 +2271,16 @@ public class AssetPublisherDisplayContext {
 		AssetRendererFactory<?> assetRendererFactory, Group scopeGroup,
 		long subtypeSelectionId) {
 
+		PortletURL portletURL = assetRendererFactory.getItemSelectorURL(
+			_portal.getLiferayPortletRequest(_portletRequest),
+			_portal.getLiferayPortletResponse(_portletResponse),
+			subtypeSelectionId, _portletResponse.getNamespace() + "selectAsset",
+			scopeGroup, true, 0);
+
+		if (portletURL != null) {
+			return portletURL.toString();
+		}
+
 		AssetEntryItemSelectorCriterion assetEntryItemSelectorCriterion =
 			new AssetEntryItemSelectorCriterion();
 
@@ -2271,11 +2309,20 @@ public class AssetPublisherDisplayContext {
 				SegmentsWebKeys.SEGMENTS_ANONYMOUS_USER_ID));
 	}
 
-	private long[] _getSegmentsEntryIds() {
+	private long[] _getSegmentsEntryIds(AssetListEntry assetListEntry) {
 		return _segmentsEntryRetriever.getSegmentsEntryIds(
 			_themeDisplay.getScopeGroupId(), _themeDisplay.getUserId(),
 			_requestContextMapper.map(
-				PortalUtil.getHttpServletRequest(_portletRequest)));
+				_portal.getOriginalServletRequest(
+					_portal.getHttpServletRequest(_portletRequest))),
+			ArrayUtil.toLongArray(
+				TransformUtil.transform(
+					_assetListEntrySegmentsEntryRelLocalService.
+						getAssetListEntrySegmentsEntryRels(
+							assetListEntry.getAssetListEntryId(),
+							QueryUtil.ALL_POS, QueryUtil.ALL_POS),
+					assetListEntrySegmentsEntryRel ->
+						assetListEntrySegmentsEntryRel.getSegmentsEntryId())));
 	}
 
 	private boolean _isShowRelatedAssets() {
@@ -2369,6 +2416,8 @@ public class AssetPublisherDisplayContext {
 	private String _assetLinkBehavior;
 	private final AssetListAssetEntryProvider _assetListAssetEntryProvider;
 	private AssetListEntry _assetListEntry;
+	private final AssetListEntrySegmentsEntryRelLocalService
+		_assetListEntrySegmentsEntryRelLocalService;
 	private final AssetPublisherCustomizer _assetPublisherCustomizer;
 	private final AssetPublisherHelper _assetPublisherHelper;
 	private final AssetPublisherPortletInstanceConfiguration
@@ -2414,6 +2463,7 @@ public class AssetPublisherDisplayContext {
 	private String _orderByType1;
 	private String _orderByType2;
 	private String _paginationType;
+	private final Portal _portal;
 	private final PortletPreferences _portletPreferences;
 	private final PortletRequest _portletRequest;
 	private String _portletResource;
@@ -2448,5 +2498,29 @@ public class AssetPublisherDisplayContext {
 	private String _socialBookmarksTypes;
 	private Boolean _subtypeFieldsFilterEnabled;
 	private final ThemeDisplay _themeDisplay;
+
+	private class SelectorEntriesLabelComparator
+		implements Comparator<Map<String, Object>>, Serializable {
+
+		public SelectorEntriesLabelComparator(Locale locale) {
+			_collator = CollatorUtil.getInstance(locale);
+		}
+
+		@Override
+		public int compare(Map<String, Object> map1, Map<String, Object> map2) {
+			String label1 = StringPool.BLANK;
+			String label2 = StringPool.BLANK;
+
+			if (map1.containsKey("label") && map2.containsKey("label")) {
+				label1 = (String)map1.get("label");
+				label2 = (String)map2.get("label");
+			}
+
+			return _collator.compare(label1, label2);
+		}
+
+		private final Collator _collator;
+
+	}
 
 }

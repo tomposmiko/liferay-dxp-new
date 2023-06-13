@@ -52,7 +52,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -74,14 +73,12 @@ public class FragmentEntryInputTemplateNodeContextHelper {
 
 	public InputTemplateNode toInputTemplateNode(
 		FragmentEntryLink fragmentEntryLink,
-		HttpServletRequest httpServletRequest,
-		Optional<InfoForm> infoFormOptional, Locale locale) {
+		HttpServletRequest httpServletRequest, InfoForm infoForm,
+		Locale locale) {
 
 		String errorMessage = StringPool.BLANK;
 
 		InfoField infoField = null;
-
-		InfoForm infoForm = infoFormOptional.orElse(null);
 
 		if (infoForm != null) {
 			String fieldName = GetterUtil.getString(
@@ -175,12 +172,15 @@ public class FragmentEntryInputTemplateNodeContextHelper {
 		String value = StringPool.BLANK;
 
 		if (infoFieldType instanceof SelectInfoFieldType) {
-			Optional<List<SelectInfoFieldType.Option>> optionsOptional =
-				infoField.getAttributeOptional(SelectInfoFieldType.OPTIONS);
+			List<SelectInfoFieldType.Option> options =
+				(List<SelectInfoFieldType.Option>)infoField.getAttribute(
+					SelectInfoFieldType.OPTIONS);
 
-			for (SelectInfoFieldType.Option option :
-					optionsOptional.orElse(Collections.emptyList())) {
+			if (options == null) {
+				options = Collections.emptyList();
+			}
 
+			for (SelectInfoFieldType.Option option : options) {
 				if (option.isActive()) {
 					label = option.getLabel(locale);
 					value = option.getValue();
@@ -204,12 +204,12 @@ public class FragmentEntryInputTemplateNodeContextHelper {
 			inputShowHelpText, inputShowLabel, infoFieldType.getName(), value);
 
 		if (infoFieldType instanceof FileInfoFieldType) {
-			Optional<String> acceptedFileExtensionsOptional =
-				infoField.getAttributeOptional(
-					FileInfoFieldType.ALLOWED_FILE_EXTENSIONS);
+			String allowedFileExtensions = (String)infoField.getAttribute(
+				FileInfoFieldType.ALLOWED_FILE_EXTENSIONS);
 
-			String allowedFileExtensions =
-				acceptedFileExtensionsOptional.orElse(StringPool.BLANK);
+			if (allowedFileExtensions == null) {
+				allowedFileExtensions = StringPool.BLANK;
+			}
 
 			if (Validator.isNotNull(allowedFileExtensions)) {
 				StringBundler sb = new StringBundler();
@@ -230,17 +230,18 @@ public class FragmentEntryInputTemplateNodeContextHelper {
 			inputTemplateNode.addAttribute(
 				"allowedFileExtensions", allowedFileExtensions);
 
-			Optional<Long> maximumFileSizeOptional =
-				infoField.getAttributeOptional(FileInfoFieldType.MAX_FILE_SIZE);
+			Long maximumFileSize = (Long)infoField.getAttribute(
+				FileInfoFieldType.MAX_FILE_SIZE);
 
-			inputTemplateNode.addAttribute(
-				"maxFileSize", maximumFileSizeOptional.orElse(0L));
+			if (maximumFileSize == null) {
+				maximumFileSize = 0L;
+			}
 
-			Optional<FileInfoFieldType.FileSourceType> fileSourceTypeOptional =
-				infoField.getAttributeOptional(FileInfoFieldType.FILE_SOURCE);
+			inputTemplateNode.addAttribute("maxFileSize", maximumFileSize);
 
 			FileInfoFieldType.FileSourceType fileSourceType =
-				fileSourceTypeOptional.orElse(null);
+				(FileInfoFieldType.FileSourceType)infoField.getAttribute(
+					FileInfoFieldType.FILE_SOURCE);
 
 			if (fileSourceType != null) {
 				String fileName = null;
@@ -302,59 +303,52 @@ public class FragmentEntryInputTemplateNodeContextHelper {
 		else if (infoField.getInfoFieldType() instanceof NumberInfoFieldType) {
 			String dataType = "integer";
 
-			Optional<Boolean> decimalOptional = infoField.getAttributeOptional(
-				NumberInfoFieldType.DECIMAL);
+			if (GetterUtil.getBoolean(
+					infoField.getAttribute(NumberInfoFieldType.DECIMAL))) {
 
-			if (decimalOptional.orElse(false)) {
 				dataType = "decimal";
 
-				Optional<Integer> decimalPartMaxLengthOptional =
-					infoField.getAttributeOptional(
-						NumberInfoFieldType.DECIMAL_PART_MAX_LENGTH);
+				Integer decimalPartMaxLength = (Integer)infoField.getAttribute(
+					NumberInfoFieldType.DECIMAL_PART_MAX_LENGTH);
 
-				decimalPartMaxLengthOptional.ifPresent(
-					decimalPartMaxLength -> inputTemplateNode.addAttribute(
-						"step", _getStep(decimalPartMaxLength)));
+				if (decimalPartMaxLength != null) {
+					inputTemplateNode.addAttribute(
+						"step", _getStep(decimalPartMaxLength));
+				}
 			}
 
 			inputTemplateNode.addAttribute("dataType", dataType);
 
-			Optional<BigDecimal> maxValueOptional =
-				infoField.getAttributeOptional(NumberInfoFieldType.MAX_VALUE);
+			BigDecimal maxValue = (BigDecimal)infoField.getAttribute(
+				NumberInfoFieldType.MAX_VALUE);
 
-			maxValueOptional.ifPresent(
-				maxValue -> inputTemplateNode.addAttribute("max", maxValue));
+			if (maxValue != null) {
+				inputTemplateNode.addAttribute("max", maxValue);
+			}
 
-			Optional<BigDecimal> minValueOptional =
-				infoField.getAttributeOptional(NumberInfoFieldType.MIN_VALUE);
+			BigDecimal minValue = (BigDecimal)infoField.getAttribute(
+				NumberInfoFieldType.MIN_VALUE);
 
-			minValueOptional.ifPresent(
-				minValue -> inputTemplateNode.addAttribute("min", minValue));
+			if (minValue != null) {
+				inputTemplateNode.addAttribute("min", minValue);
+			}
 		}
 		else if (infoField.getInfoFieldType() instanceof
 					RelationshipInfoFieldType) {
 
-			Optional<String> optionsLabelFieldNameOptional =
-				infoField.getAttributeOptional(
-					RelationshipInfoFieldType.LABEL_FIELD_NAME);
-
 			inputTemplateNode.addAttribute(
 				"relationshipLabelFieldName",
-				optionsLabelFieldNameOptional.orElse(null));
-
-			Optional<String> optionsURLOptional =
-				infoField.getAttributeOptional(RelationshipInfoFieldType.URL);
+				infoField.getAttribute(
+					RelationshipInfoFieldType.LABEL_FIELD_NAME));
 
 			inputTemplateNode.addAttribute(
-				"relationshipURL", optionsURLOptional.orElse(null));
-
-			Optional<String> optionsValueFieldNameOptional =
-				infoField.getAttributeOptional(
-					RelationshipInfoFieldType.VALUE_FIELD_NAME);
+				"relationshipURL",
+				infoField.getAttribute(RelationshipInfoFieldType.URL));
 
 			inputTemplateNode.addAttribute(
 				"relationshipValueFieldName",
-				optionsValueFieldNameOptional.orElse(null));
+				infoField.getAttribute(
+					RelationshipInfoFieldType.VALUE_FIELD_NAME));
 
 			if (Validator.isNotNull(label)) {
 				inputTemplateNode.addAttribute("selectedOptionLabel", label);
@@ -363,11 +357,16 @@ public class FragmentEntryInputTemplateNodeContextHelper {
 		else if (infoField.getInfoFieldType() instanceof SelectInfoFieldType) {
 			List<InputTemplateNode.Option> options = new ArrayList<>();
 
-			Optional<List<SelectInfoFieldType.Option>> optionsOptional =
-				infoField.getAttributeOptional(SelectInfoFieldType.OPTIONS);
+			List<SelectInfoFieldType.Option> selectInfoFieldTypeOptions =
+				(List<SelectInfoFieldType.Option>)infoField.getAttribute(
+					SelectInfoFieldType.OPTIONS);
+
+			if (selectInfoFieldTypeOptions == null) {
+				selectInfoFieldTypeOptions = Collections.emptyList();
+			}
 
 			for (SelectInfoFieldType.Option option :
-					optionsOptional.orElse(Collections.emptyList())) {
+					selectInfoFieldTypeOptions) {
 
 				options.add(
 					new InputTemplateNode.Option(

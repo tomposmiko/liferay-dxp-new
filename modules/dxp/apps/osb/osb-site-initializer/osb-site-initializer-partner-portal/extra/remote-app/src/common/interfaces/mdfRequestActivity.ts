@@ -11,37 +11,17 @@
 
 import LiferayObject from './liferayObject';
 import LiferayPicklist from './liferayPicklist';
+import MDFRequestActivityDescription from './mdfRequestActivityDescription';
 import MDFRequestBudget from './mdfRequestBudget';
 
 export default interface MDFRequestActivity extends Partial<LiferayObject> {
-	activityPromotion: string;
-	ad: string;
-	assetsLiferayRequired: string;
+	activityDescription?: MDFRequestActivityDescription;
 	budgets: MDFRequestBudget[];
-	description: string;
-	detailsLeadFollowUp: string;
-	endDate?: Date;
-	gatedLandingPage: string;
-	goalOfContent: string;
-	hiringOutsideWriterOrAgency: string;
-	howLiferayBrandUsed: string;
-	keywordsForPPCCampaigns: string;
-	leadFollowUpStrategies: string[];
-	leadGenerated: string;
-	liferayBranding: string;
-	liferayParticipationRequirements: string;
-	location: string;
-	marketingActivity: string;
+	endDate?: string;
 	mdfRequestAmount: number;
 	name: string;
-	overallMessageContentCTA: string;
-	primaryThemeOrMessage: string;
-	sourceAndSizeOfInviteeList: string;
-	specificSites: string;
-	startDate?: Date;
+	startDate?: string;
 	tactic: LiferayPicklist;
-	targetOfLeads: string;
 	totalCostOfExpense: number;
 	typeActivity: LiferayPicklist;
-	venueName: string;
 }

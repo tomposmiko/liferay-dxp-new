@@ -14,6 +14,9 @@
 
 package com.liferay.portal.workflow.kaleo.runtime.internal.notification.recipient;
 
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.workflow.kaleo.definition.NotificationReceptionType;
@@ -32,7 +35,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -53,7 +59,7 @@ public class ScriptNotificationRecipientBuilder
 			ExecutionContext executionContext)
 		throws Exception {
 
-		Map<String, ?> results = _notificationRecipientEvaluator.evaluate(
+		Map<String, ?> results = _evaluate(
 			kaleoNotificationRecipient, executionContext);
 
 		Map<String, Serializable> resultsWorkflowContext =
@@ -95,10 +101,46 @@ public class ScriptNotificationRecipientBuilder
 		throws Exception {
 	}
 
-	@Reference(target = "(!(scripting.language=*))")
-	private NotificationRecipientEvaluator _notificationRecipientEvaluator;
+	@Activate
+	protected void activate(BundleContext bundleContext) {
+		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
+			bundleContext, NotificationRecipientEvaluator.class,
+			"component.name");
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		_serviceTrackerMap.close();
+	}
+
+	private Map<String, ?> _evaluate(
+			KaleoNotificationRecipient kaleoNotificationRecipient,
+			ExecutionContext executionContext)
+		throws Exception {
+
+		NotificationRecipientEvaluator notificationRecipientEvaluator =
+			_serviceTrackerMap.getService(
+				kaleoNotificationRecipient.getRecipientScript());
+
+		if ((notificationRecipientEvaluator == null) ||
+			!notificationRecipientEvaluator.canEvaluate(
+				kaleoNotificationRecipient.getRecipientScriptLanguage())) {
+
+			throw new IllegalArgumentException(
+				StringBundler.concat(
+					"No notification recipient evaluator found for script ",
+					"language ",
+					kaleoNotificationRecipient.getRecipientScriptLanguage()));
+		}
+
+		return notificationRecipientEvaluator.evaluate(
+			kaleoNotificationRecipient, executionContext);
+	}
 
 	@Reference
 	private RoleNotificationRecipientBuilder _roleNotificationRecipientBuilder;
+
+	private ServiceTrackerMap<String, NotificationRecipientEvaluator>
+		_serviceTrackerMap;
 
 }

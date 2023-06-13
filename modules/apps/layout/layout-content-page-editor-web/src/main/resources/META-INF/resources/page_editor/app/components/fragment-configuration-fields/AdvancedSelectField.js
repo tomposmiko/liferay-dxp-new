@@ -135,6 +135,11 @@ export function AdvancedSelectField({
 		);
 	}, [activeItemId, field.cssProperty, globalContext, value]);
 
+	const resetButtonLabel = useMemo(
+		() => getResetLabelByViewport(selectedViewportSize),
+		[selectedViewportSize]
+	);
+
 	return (
 		<div
 			className={classNames('page-editor__select-field d-flex', {
@@ -174,6 +179,7 @@ export function AdvancedSelectField({
 			{canDetachTokenValues ? (
 				isTokenValueOrInherited ? (
 					<ClayButtonWithIcon
+						aria-label={Liferay.Language.get('detach-style')}
 						className="border-0 flex-shrink-0 mb-0 ml-2 page-editor__select-field__action-button"
 						displayType="secondary"
 						onClick={() => {
@@ -184,7 +190,7 @@ export function AdvancedSelectField({
 									: defaultOptionComputedValue,
 							});
 						}}
-						small
+						size="sm"
 						symbol="chain-broken"
 						title={Liferay.Language.get('detach-style')}
 					/>
@@ -201,10 +207,13 @@ export function AdvancedSelectField({
 						onActiveChange={setActive}
 						trigger={
 							<ClayButtonWithIcon
+								aria-label={Liferay.Language.get(
+									'value-from-stylebook'
+								)}
 								className="border-0"
 								displayType="secondary"
 								id={triggerId}
-								small
+								size="sm"
 								symbol="theme"
 								title={Liferay.Language.get(
 									'value-from-stylebook'
@@ -240,14 +249,15 @@ export function AdvancedSelectField({
 
 			{value && value !== field.defaultValue ? (
 				<ClayButtonWithIcon
+					aria-label={resetButtonLabel}
 					className="border-0 flex-shrink-0 mb-0 ml-2 page-editor__select-field__action-button"
 					displayType="secondary"
 					onClick={() =>
 						onSetValue({isTokenValue: true, value: null})
 					}
-					small
+					size="sm"
 					symbol="restore"
-					title={getResetLabelByViewport(selectedViewportSize)}
+					title={resetButtonLabel}
 				/>
 			) : null}
 

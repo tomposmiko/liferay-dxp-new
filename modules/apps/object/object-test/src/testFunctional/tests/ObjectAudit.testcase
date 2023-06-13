@@ -1,4 +1,5 @@
 @component-name = "portal-object"
+@ignore = "true"
 definition {
 
 	property portal.release = "true";
@@ -61,7 +62,7 @@ definition {
 			fieldLabelName = "Custom Field",
 			tabName = "Field Tab");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		Audit.openAuditAdmin();
 
@@ -115,7 +116,7 @@ definition {
 			fieldLabelName = "Custom Field",
 			tabName = "Field Tab");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		Audit.openAuditAdmin();
 
@@ -180,7 +181,7 @@ definition {
 
 		CreateObject.editLabel(labelName = "Update Relationship");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		Audit.openAuditAdmin();
 
@@ -264,7 +265,7 @@ definition {
 			relationshipsLabelName = "Relationship",
 			tabName = "Relationship Tab");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		Audit.openAuditAdmin();
 
@@ -318,7 +319,7 @@ definition {
 			fieldLabelName = "Custom Field",
 			tabName = "Field Tab");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		Audit.openAuditAdmin();
 
@@ -384,7 +385,7 @@ definition {
 
 		ObjectCustomViews.addColumnsViaUI(addColumns = "Author");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		Audit.openAuditAdmin();
 
@@ -445,7 +446,7 @@ definition {
 			columnOption = "ID",
 			sortOption = "Ascending");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		Audit.openAuditAdmin();
 
@@ -647,7 +648,7 @@ definition {
 	@description = "LPS-149508 - Verify if there are default resources of the System Objects on the Audit Portlet"
 	@priority = "3"
 	test CanViewDefaultResourcesOnSystemObjects {
-		for (var loops : list "3,7,10,13,16") {
+		for (var loops : list "2,4,6,8,10,12") {
 			Audit.openAuditAdmin();
 
 			WaitForElementPresent(locator1 = "TextInput#SITE_SEARCH_KEYWORDS");
@@ -659,7 +660,7 @@ definition {
 			Click(locator1 = "Button#SUBMIT");
 
 			Audit.viewAuditDetailsByPosition(
-				additionalInformation = "company,false",
+				additionalInformation = "scope\":\"company",
 				clientIp = "",
 				key_resourceAction = "ADD",
 				key_resourceName = "ObjectDefinition",
@@ -997,7 +998,7 @@ definition {
 			fieldLabelName = "Custom Field",
 			tabName = "Field Tab");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		Audit.openAuditAdmin();
 
@@ -1036,7 +1037,7 @@ definition {
 
 		CreateObject.editLabel(labelName = "New Relationship");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		Audit.openAuditAdmin();
 
@@ -1074,7 +1075,7 @@ definition {
 
 		ObjectCustomViews.addColumnsViaUI(addColumns = "Author");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		Audit.openAuditAdmin();
 

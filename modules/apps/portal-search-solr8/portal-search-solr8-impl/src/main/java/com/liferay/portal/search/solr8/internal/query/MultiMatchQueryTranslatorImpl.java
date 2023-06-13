@@ -26,13 +26,14 @@ import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
+import org.apache.solr.client.solrj.util.ClientUtils;
 
 import org.osgi.service.component.annotations.Component;
 
 /**
  * @author Michael C. Han
  */
-@Component(immediate = true, service = MultiMatchQueryTranslator.class)
+@Component(service = MultiMatchQueryTranslator.class)
 public class MultiMatchQueryTranslatorImpl
 	implements MultiMatchQueryTranslator {
 
@@ -50,7 +51,8 @@ public class MultiMatchQueryTranslatorImpl
 
 	protected Query translate(String field, MultiMatchQuery multiMatchQuery) {
 		Query query = translate(
-			field, multiMatchQuery.getType(), multiMatchQuery.getValue(),
+			field, multiMatchQuery.getType(),
+			ClientUtils.escapeQueryChars(multiMatchQuery.getValue()),
 			multiMatchQuery.getSlop());
 
 		Map<String, Float> boostMap = multiMatchQuery.getFieldsBoosts();

@@ -15,7 +15,8 @@ import LiferayPicklist from '../../../../../../../common/interfaces/liferayPickl
 
 export default function useTacticsOptions(
 	tactics: OptionHTMLAttributes<HTMLOptionElement>[] | undefined,
-	handleSelected: (option: LiferayPicklist) => void
+	handleSelected: (option: LiferayPicklist) => void,
+	handleClearForm: () => void
 ) {
 	const onTacticSelected = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const optionSelected = tactics?.find(
@@ -24,8 +25,10 @@ export default function useTacticsOptions(
 
 		handleSelected({
 			key: optionSelected?.value as string,
-			name: optionSelected?.label as string,
+			name: optionSelected?.label,
 		});
+
+		handleClearForm();
 	};
 
 	return {

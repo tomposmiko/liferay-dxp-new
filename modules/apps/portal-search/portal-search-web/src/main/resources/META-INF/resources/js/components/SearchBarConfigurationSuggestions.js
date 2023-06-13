@@ -18,17 +18,15 @@ import ClayIcon from '@clayui/icon';
 import ClayLoadingIndicator from '@clayui/loading-indicator';
 import {useModal} from '@clayui/modal';
 import ClayMultiSelect from '@clayui/multi-select';
+import {ClayTooltipProvider} from '@clayui/tooltip';
 import getCN from 'classnames';
 import {fetch, sub} from 'frontend-js-web';
 import React, {useEffect, useState} from 'react';
 
+import cleanSuggestionsContributorConfiguration from '../utils/clean_suggestions_contributor_configuration';
+import {CONTRIBUTOR_TYPES} from '../utils/types/contributorTypes';
 import FieldList from './FieldList';
 import SelectSXPBlueprintModal from './select_sxp_blueprint_modal/SelectSXPBlueprintModal';
-
-const CONTRIBUTORS = {
-	BASIC: 'basic',
-	SXP_BLUEPRINT: 'sxpBlueprint',
-};
 
 const DEFAULT_ATTRIBUTES = {
 	characterThreshold: '',
@@ -47,7 +45,7 @@ const DEFAULT_ATTRIBUTES = {
  */
 const removeEmptyFields = (fields) =>
 	fields.filter(({attributes, contributorName, displayGroupName, size}) => {
-		if (contributorName === CONTRIBUTORS.BASIC) {
+		if (contributorName === CONTRIBUTOR_TYPES.BASIC) {
 			return displayGroupName && size;
 		}
 
@@ -258,7 +256,21 @@ function SXPBlueprintAttributes({onBlur, onChange, touched, value}) {
 				</ClayInput.GroupItem>
 
 				<ClayInput.GroupItem>
-					<label>{Liferay.Language.get('include-asset-url')}</label>
+					<label>
+						{Liferay.Language.get('include-asset-url')}
+
+						<ClayTooltipProvider>
+							<span
+								className="ml-2"
+								data-tooltip-align="top"
+								title={Liferay.Language.get(
+									'include-asset-url-help'
+								)}
+							>
+								<ClayIcon symbol="question-circle-full" />
+							</span>
+						</ClayTooltipProvider>
+					</label>
 
 					<ClaySelect
 						aria-label={Liferay.Language.get('include-asset-url')}
@@ -280,6 +292,18 @@ function SXPBlueprintAttributes({onBlur, onChange, touched, value}) {
 				<ClayInput.GroupItem>
 					<label>
 						{Liferay.Language.get('include-asset-summary')}
+
+						<ClayTooltipProvider>
+							<span
+								className="ml-2"
+								data-tooltip-align="top"
+								title={Liferay.Language.get(
+									'include-asset-summary-help'
+								)}
+							>
+								<ClayIcon symbol="question-circle-full" />
+							</span>
+						</ClayTooltipProvider>
 					</label>
 
 					<ClaySelect
@@ -306,7 +330,21 @@ function SXPBlueprintAttributes({onBlur, onChange, touched, value}) {
 
 			<div className="form-group-autofit">
 				<ClayInput.GroupItem>
-					<label>{Liferay.Language.get('fields')}</label>
+					<label>
+						{Liferay.Language.get('fields')}
+
+						<ClayTooltipProvider>
+							<span
+								className="ml-2"
+								data-tooltip-align="top"
+								title={Liferay.Language.get(
+									'fields-suggestion-help'
+								)}
+							>
+								<ClayIcon symbol="question-circle-full" />
+							</span>
+						</ClayTooltipProvider>
+					</label>
 
 					<ClayMultiSelect
 						items={multiSelectItems}
@@ -337,7 +375,7 @@ function Inputs({onChange, onReplace, contributorOptions, value = {}}) {
 	};
 
 	const _handleChangeContributorName = (event) => {
-		if (event.target.value === CONTRIBUTORS.BASIC) {
+		if (event.target.value === CONTRIBUTOR_TYPES.BASIC) {
 			onReplace({
 				contributorName: event.target.value,
 				displayGroupName: value.displayGroupName,
@@ -364,6 +402,18 @@ function Inputs({onChange, onReplace, contributorOptions, value = {}}) {
 						<span className="reference-mark">
 							<ClayIcon symbol="asterisk" />
 						</span>
+
+						<ClayTooltipProvider>
+							<span
+								className="ml-2"
+								data-tooltip-align="top"
+								title={Liferay.Language.get(
+									'suggestion-contributor-help'
+								)}
+							>
+								<ClayIcon symbol="question-circle-full" />
+							</span>
+						</ClayTooltipProvider>
 					</label>
 
 					<ClaySelect
@@ -390,6 +440,18 @@ function Inputs({onChange, onReplace, contributorOptions, value = {}}) {
 						<span className="reference-mark">
 							<ClayIcon symbol="asterisk" />
 						</span>
+
+						<ClayTooltipProvider>
+							<span
+								className="ml-2"
+								data-tooltip-align="top"
+								title={Liferay.Language.get(
+									'display-group-name-help'
+								)}
+							>
+								<ClayIcon symbol="question-circle-full" />
+							</span>
+						</ClayTooltipProvider>
 					</label>
 
 					<ClayInput
@@ -413,6 +475,18 @@ function Inputs({onChange, onReplace, contributorOptions, value = {}}) {
 						<span className="reference-mark">
 							<ClayIcon symbol="asterisk" />
 						</span>
+
+						<ClayTooltipProvider>
+							<span
+								className="ml-2"
+								data-tooltip-align="top"
+								title={Liferay.Language.get(
+									'size-suggestion-help'
+								)}
+							>
+								<ClayIcon symbol="question-circle-full" />
+							</span>
+						</ClayTooltipProvider>
 					</label>
 
 					<ClayInput
@@ -440,7 +514,7 @@ function Inputs({onChange, onReplace, contributorOptions, value = {}}) {
 				</ClayInput.GroupItem>
 			</div>
 
-			{value.contributorName === CONTRIBUTORS.SXP_BLUEPRINT && (
+			{value.contributorName === CONTRIBUTOR_TYPES.SXP_BLUEPRINT && (
 				<SXPBlueprintAttributes
 					onBlur={_handleBlur}
 					onChange={onChange}
@@ -455,40 +529,50 @@ function Inputs({onChange, onReplace, contributorOptions, value = {}}) {
 function SearchBarConfigurationSuggestions({
 	initialSuggestionsContributorConfiguration = '[]',
 	isDXP = false,
+	isSearchExperiencesSupported = true,
 	namespace = '',
 	suggestionsContributorConfigurationName = '',
 }) {
+	const blueprintsEnabled = isDXP && isSearchExperiencesSupported;
+
 	const [
 		suggestionsContributorConfiguration,
 		setSuggestionsContributorConfiguration,
 	] = useState(
-		JSON.parse(initialSuggestionsContributorConfiguration).map(
-			(item, index) => ({
-				...item,
-				id: index, // For FieldList item `key` when reordering.
-			})
-		)
+		cleanSuggestionsContributorConfiguration(
+			initialSuggestionsContributorConfiguration,
+			isSearchExperiencesSupported
+		).map((item, index) => ({
+			...item,
+			id: index, // For FieldList item `key` when reordering.
+		}))
 	);
 
+	/*
+	 * If blueprints are not enabled, exactly one contributor can be added.
+	 */
+	const _hasAvailableContributors = () =>
+		blueprintsEnabled || !suggestionsContributorConfiguration.length;
+
 	const _getContributorOptions = (index) => {
-		if (!isDXP) {
+		if (!blueprintsEnabled) {
 			return (
 				<ClaySelect.Option
 					label={Liferay.Language.get('basic')}
-					value={CONTRIBUTORS.BASIC}
+					value={CONTRIBUTOR_TYPES.BASIC}
 				/>
 			);
 		}
 
 		const indexOfBasic = suggestionsContributorConfiguration.findIndex(
-			(value) => value.contributorName === CONTRIBUTORS.BASIC
+			(value) => value.contributorName === CONTRIBUTOR_TYPES.BASIC
 		);
 
 		if (indexOfBasic > -1 && index !== indexOfBasic) {
 			return (
 				<ClaySelect.Option
 					label={Liferay.Language.get('blueprint')}
-					value={CONTRIBUTORS.SXP_BLUEPRINT}
+					value={CONTRIBUTOR_TYPES.SXP_BLUEPRINT}
 				/>
 			);
 		}
@@ -497,12 +581,12 @@ function SearchBarConfigurationSuggestions({
 			<>
 				<ClaySelect.Option
 					label={Liferay.Language.get('basic')}
-					value={CONTRIBUTORS.BASIC}
+					value={CONTRIBUTOR_TYPES.BASIC}
 				/>
 
 				<ClaySelect.Option
 					label={Liferay.Language.get('blueprint')}
-					value={CONTRIBUTORS.SXP_BLUEPRINT}
+					value={CONTRIBUTOR_TYPES.SXP_BLUEPRINT}
 				/>
 			</>
 		);
@@ -511,19 +595,19 @@ function SearchBarConfigurationSuggestions({
 	const _getDefaultValue = () => {
 		if (
 			suggestionsContributorConfiguration.some(
-				(config) => config.contributorName === CONTRIBUTORS.BASIC
+				(config) => config.contributorName === CONTRIBUTOR_TYPES.BASIC
 			)
 		) {
 			return {
 				attributes: DEFAULT_ATTRIBUTES,
-				contributorName: CONTRIBUTORS.SXP_BLUEPRINT,
+				contributorName: CONTRIBUTOR_TYPES.SXP_BLUEPRINT,
 				displayGroupName: '',
 				size: '',
 			};
 		}
 
 		return {
-			contributorName: CONTRIBUTORS.BASIC,
+			contributorName: CONTRIBUTOR_TYPES.BASIC,
 			displayGroupName: '',
 			size: '',
 		};
@@ -565,9 +649,9 @@ function SearchBarConfigurationSuggestions({
 						value={value}
 					/>
 				)}
-				showAddButton={isDXP}
-				showDeleteButton={isDXP}
-				showDragButton={isDXP}
+				showAddButton={_hasAvailableContributors()}
+				showDeleteButton={true}
+				showDragButton={blueprintsEnabled}
 				value={suggestionsContributorConfiguration}
 			/>
 		</div>

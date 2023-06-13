@@ -64,6 +64,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
@@ -87,6 +88,8 @@ public class InputAssetLinksDisplayContext {
 				"liferay-asset:input-asset-links:className"));
 		_portletRequest = (PortletRequest)_httpServletRequest.getAttribute(
 			JavaConstants.JAVAX_PORTLET_REQUEST);
+		_portletResponse = (PortletResponse)_httpServletRequest.getAttribute(
+			JavaConstants.JAVAX_PORTLET_RESPONSE);
 		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
@@ -253,7 +256,7 @@ public class InputAssetLinksDisplayContext {
 			return _eventName;
 		}
 
-		_eventName = _randomNamespace + "selectAsset";
+		_eventName = _portletResponse.getNamespace() + "selectAsset";
 
 		return _eventName;
 	}
@@ -264,19 +267,6 @@ public class InputAssetLinksDisplayContext {
 		Group group = GroupLocalServiceUtil.getGroup(assetEntry.getGroupId());
 
 		return group.getDescriptiveName(_themeDisplay.getLocale());
-	}
-
-	public String getRandomNamespace() {
-		if (_randomNamespace != null) {
-			return _randomNamespace;
-		}
-
-		String randomKey = PortalUtil.generateRandomKey(
-			_httpServletRequest, "taglib_asset_input_asset_links_page");
-
-		_randomNamespace = randomKey + StringPool.UNDERLINE;
-
-		return _randomNamespace;
 	}
 
 	private List<AssetLink> _createAssetLinks() throws PortalException {
@@ -358,6 +348,23 @@ public class InputAssetLinksDisplayContext {
 	private PortletURL _getAssetEntryItemSelectorPortletURL(
 		AssetRendererFactory<?> assetRendererFactory, long subtypeSelectionId) {
 
+		PortletRequest portletRequest =
+			(PortletRequest)_httpServletRequest.getAttribute(
+				JavaConstants.JAVAX_PORTLET_REQUEST);
+		PortletResponse portletResponse =
+			(PortletResponse)_httpServletRequest.getAttribute(
+				JavaConstants.JAVAX_PORTLET_RESPONSE);
+
+		PortletURL portletURL = assetRendererFactory.getItemSelectorURL(
+			PortalUtil.getLiferayPortletRequest(portletRequest),
+			PortalUtil.getLiferayPortletResponse(portletResponse),
+			subtypeSelectionId, portletResponse.getNamespace() + "selectAsset",
+			_themeDisplay.getScopeGroup(), true, _assetEntryId);
+
+		if (portletURL != null) {
+			return portletURL;
+		}
+
 		AssetEntryItemSelectorCriterion assetEntryItemSelectorCriterion =
 			new AssetEntryItemSelectorCriterion();
 
@@ -376,7 +383,7 @@ public class InputAssetLinksDisplayContext {
 
 		ItemSelector itemSelector = ItemSelectorUtil.getItemSelector();
 
-		PortletURL portletURL = itemSelector.getItemSelectorURL(
+		portletURL = itemSelector.getItemSelectorURL(
 			RequestBackedPortletURLFactoryUtil.create(_portletRequest),
 			getEventName(), assetEntryItemSelectorCriterion);
 
@@ -440,7 +447,7 @@ public class InputAssetLinksDisplayContext {
 	private final HttpServletRequest _httpServletRequest;
 	private final PageContext _pageContext;
 	private final PortletRequest _portletRequest;
-	private String _randomNamespace;
+	private final PortletResponse _portletResponse;
 	private Boolean _stagedLocally;
 	private Boolean _stagedReferrerPortlet;
 	private final ThemeDisplay _themeDisplay;

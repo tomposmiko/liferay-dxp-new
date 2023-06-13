@@ -11,6 +11,7 @@
 
 import ClayAlert from '@clayui/alert';
 import ClayButton from '@clayui/button';
+import ClayLoadingIndicator from '@clayui/loading-indicator';
 import {useFormikContext} from 'formik';
 import {useCallback} from 'react';
 
@@ -18,10 +19,10 @@ import PRMForm from '../../../../common/components/PRMForm';
 import PRMFormik from '../../../../common/components/PRMFormik';
 import PRMFormikPageProps from '../../../../common/components/PRMFormik/interfaces/prmFormikPageProps';
 import ResumeCard from '../../../../common/components/ResumeCard';
-import {Status} from '../../../../common/enums/status';
 import MDFRequestDTO from '../../../../common/interfaces/dto/mdfRequestDTO';
 import MDFClaim from '../../../../common/interfaces/mdfClaim';
 import MDFClaimProps from '../../../../common/interfaces/mdfClaimProps';
+import {Status} from '../../../../common/utils/constants/status';
 import getIntlNumberFormat from '../../../../common/utils/getIntlNumberFormat';
 import ActivityClaimPanel from './components/ActivityClaimPanel';
 import useActivitiesAmount from './hooks/useActivitiesAmount';
@@ -52,14 +53,22 @@ const MDFClaimPage = ({
 		)
 	);
 
-	const claimsNotDraft = mdfRequest.mdfRequestToMdfClaims?.filter(
+	const claimsFiltered = mdfRequest.mdfReqToMDFClms?.filter(
 		(mdfRequestToMdfClaim) => {
-			return !mdfRequestToMdfClaim.claimStatus.includes(Status.DRAFT);
+			const ignoreStatus = [
+				Status.DRAFT.key,
+				Status.EXPIRED.key,
+				Status.REJECT.key,
+			];
+
+			return !ignoreStatus.includes(
+				mdfRequestToMdfClaim.mdfClaimStatus.key as string
+			);
 		}
 	).length;
 
 	const getClaimPage = () => {
-		if (claimsNotDraft && claimsNotDraft >= 2) {
+		if (claimsFiltered && claimsFiltered >= 2) {
 			return (
 				<PRMForm name="New" title="Reimbursement Claim">
 					<div className="d-flex justify-content-center mt-4">
@@ -69,6 +78,34 @@ const MDFClaimPage = ({
 							title="Info:"
 						>
 							You already submitted 2 claims.
+						</ClayAlert>
+					</div>
+
+					<PRMForm.Footer>
+						<div className="d-flex mr-auto">
+							<ClayButton
+								className="mr-4"
+								displayType="secondary"
+								onClick={() => onCancel()}
+							>
+								Cancel
+							</ClayButton>
+						</div>
+					</PRMForm.Footer>
+				</PRMForm>
+			);
+		}
+
+		if (mdfRequest.mdfRequestStatus?.key !== 'approved') {
+			return (
+				<PRMForm name="New" title="Reimbursement Claim">
+					<div className="d-flex justify-content-center mt-4">
+						<ClayAlert
+							className="m-0 w-100"
+							displayType="info"
+							title="Info:"
+						>
+							Waiting for Manager approval
 						</ClayAlert>
 					</div>
 
@@ -151,12 +188,16 @@ const MDFClaimPage = ({
 				<PRMForm.Footer>
 					<div className="d-flex mr-auto">
 						<ClayButton
-							className="pl-0"
+							className="inline-item inline-item-after pl-0"
 							disabled={isSubmitting}
 							displayType={null}
 							onClick={() => onSaveAsDraft(values, formikHelpers)}
 						>
 							Save as Draft
+							{isSubmitting &&
+								values.mdfClaimStatus === Status.DRAFT && (
+									<ClayLoadingIndicator className="inline-item inline-item-after ml-2" />
+								)}
 						</ClayButton>
 					</div>
 
@@ -170,10 +211,15 @@ const MDFClaimPage = ({
 						</ClayButton>
 
 						<ClayButton
+							className="inline-item inline-item-after"
 							disabled={!isValid || isSubmitting}
 							type="submit"
 						>
 							Submit
+							{isSubmitting &&
+								values.mdfClaimStatus === Status.PENDING && (
+									<ClayLoadingIndicator className="inline-item inline-item-after ml-2" />
+								)}
 						</ClayButton>
 					</div>
 				</PRMForm.Footer>

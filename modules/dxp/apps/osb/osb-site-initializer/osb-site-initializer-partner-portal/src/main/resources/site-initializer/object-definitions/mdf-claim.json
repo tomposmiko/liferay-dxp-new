@@ -24,6 +24,18 @@
 			"indexed": true,
 			"indexedAsKeyword": false,
 			"label": {
+				"en_US": "Company Name"
+			},
+			"name": "companyName",
+			"required": false,
+			"type": "String"
+		},
+		{
+			"DBType": "String",
+			"businessType": "Text",
+			"indexed": true,
+			"indexedAsKeyword": false,
+			"label": {
 				"en_US": "External Reference Code SF"
 			},
 			"name": "externalReferenceCodeSF",
@@ -56,7 +68,6 @@
 		},
 		{
 			"DBType": "Boolean",
-			"businessType": "Text",
 			"indexed": true,
 			"indexedAsKeyword": false,
 			"label": {
@@ -92,20 +103,150 @@
 		},
 		{
 			"DBType": "String",
-			"businessType": "Text",
+			"businessType": "Picklist",
+			"defaultValue": "pendingMarketingReview",
 			"indexed": true,
 			"indexedAsKeyword": false,
+			"indexedLanguageId": "en_US",
 			"label": {
 				"en_US": "MDF Claim Status"
 			},
-			"name": "claimStatus",
-			"required": false,
+			"listTypeDefinitionId": "[$LIST_TYPE_DEFINITION_ID:MDF Claim Status$]",
+			"name": "mdfClaimStatus",
+			"objectFieldSettings": [
+				{
+					"name": "stateFlow",
+					"value": {
+						"objectStates": [
+							{
+								"key": "pendingMarketingReview",
+								"objectStateTransitions": [
+									{
+										"key": "approved"
+									},
+									{
+										"key": "inFinanceReview"
+									},
+									{
+										"key": "moreInfoRequested"
+									},
+									{
+										"key": "rejected"
+									},
+									{
+										"key": "inDirectorReview"
+									}
+								]
+							},
+							{
+								"key": "approved",
+								"objectStateTransitions": [
+									{
+										"key": "inFinanceReview"
+									}
+								]
+							},
+							{
+								"key": "claimPaid",
+								"objectStateTransitions": [
+								]
+							},
+							{
+								"key": "inFinanceReview",
+								"objectStateTransitions": [
+									{
+										"key": "approved"
+									},
+									{
+										"key": "claimPaid"
+									},
+									{
+										"key": "moreInfoRequested"
+									},
+									{
+										"key": "rejected"
+									},
+									{
+										"key": "inDirectorReview"
+									}
+								]
+							},
+							{
+								"key": "moreInfoRequested",
+								"objectStateTransitions": [
+									{
+										"key": "pendingMarketingReview"
+									},
+									{
+										"key": "approved"
+									},
+									{
+										"key": "claimPaid"
+									},
+									{
+										"key": "inFinanceReview"
+									},
+									{
+										"key": "rejected"
+									},
+									{
+										"key": "draft"
+									}
+								]
+							},
+							{
+								"key": "rejected",
+								"objectStateTransitions": [
+									{
+										"key": "pendingMarketingReview"
+									}
+								]
+							},
+							{
+								"key": "draft",
+								"objectStateTransitions": [
+									{
+										"key": "pendingMarketingReview"
+									},
+									{
+										"key": "canceled"
+									}
+								]
+							},
+							{
+								"key": "inDirectorReview",
+								"objectStateTransitions": [
+									{
+										"key": "approved"
+									},
+									{
+										"key": "inFinanceReview"
+									},
+									{
+										"key": "rejected"
+									}
+								]
+							},
+							{
+								"key": "canceled",
+								"objectStateTransitions": [
+									{
+										"key": "approved"
+									}
+								]
+							}
+						]
+					}
+				}
+			],
+			"required": true,
+			"state": true,
+			"system": false,
 			"type": "String"
 		}
 	],
 	"pluralLabel": {
 		"en_US": "MDF Claims"
 	},
-	"scope": "company",
-	"titleObjectFieldName": "ID"
+	"scope": "company"
 }

@@ -472,9 +472,6 @@ public class BundleSiteInitializer implements SiteInitializer {
 					documentsStringUtilReplaceValues, serviceContext,
 					siteNavigationMenuItemSettingsBuilder));
 
-			Map<String, Layout> layouts = _invoke(
-				() -> _addOrUpdateLayouts(serviceContext));
-
 			Map<String, String> listTypeDefinitionIdsStringUtilReplaceValues =
 				_invoke(() -> _addOrUpdateListTypeDefinitions(serviceContext));
 
@@ -487,11 +484,6 @@ public class BundleSiteInitializer implements SiteInitializer {
 							serviceContext,
 							siteNavigationMenuItemSettingsBuilder));
 
-			_invoke(
-				() -> _addCPDefinitions(
-					documentsStringUtilReplaceValues,
-					objectDefinitionIdsAndObjectEntryIdsStringUtilReplaceValues,
-					serviceContext));
 			_invoke(
 				() -> _addLayoutPageTemplates(
 					assetListEntryIdsStringUtilReplaceValues,
@@ -506,6 +498,15 @@ public class BundleSiteInitializer implements SiteInitializer {
 					serviceContext));
 			_invoke(
 				() -> _addPermissions(
+					objectDefinitionIdsAndObjectEntryIdsStringUtilReplaceValues,
+					serviceContext));
+
+			Map<String, Layout> layouts = _invoke(
+				() -> _addOrUpdateLayouts(serviceContext));
+
+			_invoke(
+				() -> _addCPDefinitions(
+					documentsStringUtilReplaceValues,
 					objectDefinitionIdsAndObjectEntryIdsStringUtilReplaceValues,
 					serviceContext));
 
@@ -1051,6 +1052,9 @@ public class BundleSiteInitializer implements SiteInitializer {
 				taxonomyCategoryIdsStringUtilReplaceValues);
 		}
 
+		_siteNavigationMenuLocalService.deleteSiteNavigationMenus(
+			serviceContext.getScopeGroupId());
+
 		_addSiteNavigationMenus(serviceContext, siteNavigationMenuItemSettings);
 	}
 
@@ -1167,7 +1171,8 @@ public class BundleSiteInitializer implements SiteInitializer {
 				JSONObject parametersJSONObject = jsonObject.getJSONObject(
 					"parameters");
 
-				_objectActionLocalService.addObjectAction(
+				_objectActionLocalService.addOrUpdateObjectAction(
+					jsonObject.getString("externalReferenceCode"), 0,
 					serviceContext.getUserId(), objectDefinition.getId(),
 					jsonObject.getBoolean("active"),
 					jsonObject.getString("conditionExpression"),
@@ -2444,7 +2449,8 @@ public class BundleSiteInitializer implements SiteInitializer {
 		for (int i = 0; i < jsonArray.length(); i++) {
 			JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-			_objectActionLocalService.addObjectAction(
+			_objectActionLocalService.addOrUpdateObjectAction(
+				jsonObject.getString("externalReferenceCode"), 0,
 				serviceContext.getUserId(),
 				jsonObject.getLong("objectDefinitionId"),
 				jsonObject.getBoolean("active"),

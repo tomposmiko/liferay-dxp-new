@@ -161,12 +161,12 @@ public class DLFileEntryLocalServiceUtil {
 
 	public static DLFileEntry copyFileEntry(
 			long userId, long groupId, long repositoryId, long fileEntryId,
-			long destFolderId,
+			long destFolderId, String fileName,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().copyFileEntry(
-			userId, groupId, repositoryId, fileEntryId, destFolderId,
+			userId, groupId, repositoryId, fileEntryId, destFolderId, fileName,
 			serviceContext);
 	}
 
@@ -644,6 +644,13 @@ public class DLFileEntryLocalServiceUtil {
 
 	public static List<DLFileEntry> getFileEntries(long folderId, String name) {
 		return getService().getFileEntries(folderId, name);
+	}
+
+	public static List<DLFileEntry> getFileEntriesByClassNameIdAndTreePath(
+		long classNameId, String treePath) {
+
+		return getService().getFileEntriesByClassNameIdAndTreePath(
+			classNameId, treePath);
 	}
 
 	public static int getFileEntriesCount() {

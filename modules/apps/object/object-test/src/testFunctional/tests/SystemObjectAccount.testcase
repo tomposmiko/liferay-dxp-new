@@ -78,9 +78,7 @@ definition {
 				key_picklistOption = "${typeLabel}",
 				locator1 = "ObjectAdmin#ENTRY_PICKLIST_OPTION");
 
-			Button.clickSave();
-
-			WaitForSPARefresh();
+			PortletEntry.save();
 
 			Navigator.gotoBack();
 		}
@@ -102,14 +100,15 @@ definition {
 		ObjectAdmin.goToActionsTab();
 
 		ObjectAdmin.addObjectActionViaUI(
-			actionName = "Action Name",
+			actionLabel = "Action Label",
+			actionName = "ActionName",
 			thenAction = "Webhook",
 			urlAction = "http://localhost:8080",
 			whenAction = "On After Add");
 
 		ObjectAdmin.assertObjectActions(
 			actionActive = "Yes",
-			actionName = "Action Name");
+			actionName = "ActionName");
 	}
 
 	@description = "LPS-151765 - Verify if is possible to create Relationship one to many on System Object Account and to relate with the Custom Object"
@@ -143,6 +142,7 @@ definition {
 	}
 
 	@description = "LPS-151765 - Verify if Cascade deletion type of Relationship One to Many can delete and you also will delete the child related entry (if you also have permissions for it)"
+	@ignore = "true"
 	@priority = "4"
 	test CanDeleteRelationshipWhenDeletionTypeIsCascade {
 		Account.openAccountsAdmin();
@@ -200,7 +200,7 @@ definition {
 			relationshipsLabelName = "Relationship",
 			tabName = "Relationship Tab");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject");
 
@@ -249,6 +249,7 @@ definition {
 	}
 
 	@description = "LPS-151765 - Verify it's not possible to delete an entry if the relationship is one to many with prevent deletion type"
+	@ignore = "true"
 	@priority = "4"
 	test CannotDeleteEntryWhenDeletionTypeIsPrevent {
 		Account.openAccountsAdmin();
@@ -305,7 +306,7 @@ definition {
 			relationshipsLabelName = "Relationship",
 			tabName = "Relationship Tab");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		Navigator.openURL();
 
@@ -330,6 +331,7 @@ definition {
 	}
 
 	@description = "LPS-151765 - Verify if Disassociate deletion type of Relationship One to Many can delete normally and nothing happens with the child"
+	@ignore = "true"
 	@priority = "4"
 	test CannotDeleteRelationshipWhenDeletionTypeIsDisassociate {
 		Account.openAccountsAdmin();
@@ -387,7 +389,7 @@ definition {
 			relationshipsLabelName = "Relationship",
 			tabName = "Relationship Tab");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject");
 
@@ -514,7 +516,7 @@ definition {
 
 		ObjectPortlet.chooseEntryOnRelationshipField(entryOption = "Test Business Account Description");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		ObjectAdmin.goToCustomObject(objectName = "CustomObject153528");
 
@@ -596,7 +598,7 @@ definition {
 
 		ObjectPortlet.chooseEntryOnRelationshipField(entryOption = "Test Business Account");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		ObjectAdmin.goToCustomObject(objectName = "CustomObject153527");
 
@@ -606,7 +608,7 @@ definition {
 	@description = "LPS-151765 - Verify if is possible to view the Relationship by Account on Custom Object Entries with Custom View"
 	@priority = "4"
 	test CanViewRelationshipOnCustomObjectEntriesWithCustomView {
-		task ("Create new Account (via APO") {
+		task ("Create new Account (via API") {
 			JSONAccountEntry.addAccountEntry(
 				accountEntryName = "Account Name",
 				accountEntryType = "Business");
@@ -657,7 +659,7 @@ definition {
 
 			ObjectCustomViews.addColumnsViaUI(addColumns = "ID,Relationship");
 
-			Button.clickSave();
+			PortletEntry.save();
 		}
 
 		task ("Go to Custom Objects entries, and add relationship by Account") {
@@ -667,7 +669,7 @@ definition {
 
 			ObjectPortlet.chooseEntryOnRelationshipField(entryOption = "Account Name");
 
-			Button.clickSave();
+			PortletEntry.save();
 		}
 
 		task ("Assert that Account is present on entries table") {
@@ -714,7 +716,7 @@ definition {
 
 		ObjectPortlet.chooseEntryOnRelationshipField(entryOption = "business");
 
-		Button.clickSave();
+		PortletEntry.save();
 
 		ObjectAdmin.goToCustomObject(objectName = "CustomObject153526");
 

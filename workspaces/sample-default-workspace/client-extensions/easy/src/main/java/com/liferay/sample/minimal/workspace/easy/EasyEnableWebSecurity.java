@@ -73,11 +73,15 @@ public class EasyEnableWebSecurity {
 				"DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"));
 		corsConfiguration.setAllowedOrigins(
 			Stream.of(
-				_lxcDXPDomains.split("\\s*[,\n]\\s*")
+				_dxpDomains.split("\\s*[,\n]\\s*")
 			).map(
 				String::trim
-			).map(
-				"https://"::concat
+			).flatMap(
+				domain -> Stream.of(
+					"http://", "https://"
+				).map(
+					scheme -> scheme.concat(domain)
+				)
 			).collect(
 				Collectors.toList()
 			));
@@ -89,26 +93,20 @@ public class EasyEnableWebSecurity {
 	}
 
 	@Bean
-	public JwtDecoder jwtDecoder(
-			@Value("${liferay.oauth.application.external.reference.code}")
-				String oAuthApplicationExternalReferenceCode,
-			@Value("${liferay.portal.url}") String portalURL)
-		throws Exception {
-
+	public JwtDecoder jwtDecoder() throws Exception {
 		DefaultJWTProcessor<SecurityContext> defaultJWTProcessor =
 			new DefaultJWTProcessor<>();
 
 		defaultJWTProcessor.setJWSKeySelector(
 			JWSAlgorithmFamilyJWSKeySelector.fromJWKSetURL(
-				new URL(portalURL + "/o/oauth2/jwks")));
+				new URL(_liferayPortalURL + "/o/oauth2/jwks")));
 		defaultJWTProcessor.setJWSTypeVerifier(
 			new DefaultJOSEObjectTypeVerifier<>(new JOSEObjectType("at+jwt")));
 
 		NimbusJwtDecoder nimbusJwtDecoder = new NimbusJwtDecoder(
 			defaultJWTProcessor);
 
-		String clientId = _getClientId(
-			oAuthApplicationExternalReferenceCode, portalURL);
+		String clientId = _getClientId();
 
 		if (_log.isInfoEnabled()) {
 			_log.info("Using client ID " + clientId);
@@ -144,19 +142,16 @@ public class EasyEnableWebSecurity {
 		).build();
 	}
 
-	private String _getClientId(
-			String oAuthApplicationExternalReferenceCode, String portalURL)
-		throws Exception {
-
+	private String _getClientId() throws Exception {
 		while (true) {
 			try {
 				return WebClient.create(
-					portalURL + "/o/oauth2/application"
+					_liferayPortalURL + "/o/oauth2/application"
 				).get(
 				).uri(
 					uriBuilder -> uriBuilder.queryParam(
 						"externalReferenceCode",
-						oAuthApplicationExternalReferenceCode
+						_liferayOAuthApplicationExternalReferenceCode
 					).build()
 				).retrieve(
 				).bodyToMono(
@@ -179,7 +174,13 @@ public class EasyEnableWebSecurity {
 		EasyEnableWebSecurity.class);
 
 	@Value("${dxp.domains}")
-	private String _lxcDXPDomains;
+	private String _dxpDomains;
+
+	@Value("${liferay.oauth.application.external.reference.code}")
+	private String _liferayOAuthApplicationExternalReferenceCode;
+
+	@Value("${liferay.portal.url}")
+	private String _liferayPortalURL;
 
 	private static class ApplicationInfo {
 
@@ -200,11 +201,11 @@ public class EasyEnableWebSecurity {
 				return OAuth2TokenValidatorResult.success();
 			}
 
-			return OAuth2TokenValidatorResult.failure(_noClientIdMatch);
+			return OAuth2TokenValidatorResult.failure(_oAuth2Error);
 		}
 
 		private final String _clientId;
-		private final OAuth2Error _noClientIdMatch = new OAuth2Error(
+		private final OAuth2Error _oAuth2Error = new OAuth2Error(
 			"invalid_token", "The client_id does not match", null);
 
 	}

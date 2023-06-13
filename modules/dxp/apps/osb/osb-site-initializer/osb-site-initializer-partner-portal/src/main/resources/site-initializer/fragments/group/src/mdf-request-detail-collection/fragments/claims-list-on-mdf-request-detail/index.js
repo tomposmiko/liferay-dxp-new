@@ -14,6 +14,12 @@
 import ClayAlert from '@clayui/alert';
 import React, {useEffect, useState} from 'react';
 
+const findRequestIdUrl = (paramsUrl) => {
+	const splitParamsUrl = paramsUrl.split('?');
+
+	return splitParamsUrl[0];
+};
+
 function getIntlNumberFormat() {
 	return new Intl.NumberFormat(Liferay.ThemeDisplay.getBCP47LanguageId(), {
 		currency: 'USD',
@@ -23,7 +29,7 @@ function getIntlNumberFormat() {
 
 function getSiteVariables() {
 	const currentPath = Liferay.currentURL.split('/');
-	const mdfRequestId = +currentPath.at(-1);
+	const mdfRequestId = findRequestIdUrl(currentPath.at(-1));
 	const SITE_URL = Liferay.ThemeDisplay.getLayoutRelativeURL()
 		.split('/')
 		.slice(0, 3)
@@ -33,27 +39,23 @@ function getSiteVariables() {
 }
 
 const ClaimStatus = {
-	APPROVED: 'Approved',
-	CANCELED: 'Canceled',
-	CLAIM_PAID: 'Claim Paid',
-	DRAFT: 'Draft',
-	EXPIRED: 'Expired',
-	IN_FINANCE_REVIEW: 'In Finance Review',
-	MARKETING_DIRECTOR_REVIEW: 'Marketing Director Review',
-	PENDING: 'Pending Marketing Review',
-	REJECT: 'Reject',
-	REQUEST_MORE_INFO: 'Request More Info',
+	APPROVED: 'approved',
+	CLAIM_PAID: 'claimPaid',
+	DRAFT: 'draft',
+	EXPIRED: 'expired',
+	IN_FINANCE_REVIEW: 'inFinanceReview',
+	MORE_INFO_REQUEST: 'moreInfoRequested',
+	PENDING: 'pendingMarketingReview',
+	REJECT: 'rejected',
 };
 
 const statusClassName = {
 	[ClaimStatus.DRAFT]: 'label label-tonal-dark ml-2',
 	[ClaimStatus.PENDING]: 'label label-tonal-warning ml-2',
 	[ClaimStatus.APPROVED]: 'label label-tonal-success ml-2',
-	[ClaimStatus.REQUEST_MORE_INFO]: 'label label-tonal-warning ml-2',
+	[ClaimStatus.MORE_INFO_REQUEST]: 'label label-tonal-warning ml-2',
 	[ClaimStatus.REJECT]: 'label label-tonal-danger ml-2',
 	[ClaimStatus.EXPIRED]: 'label label-tonal-danger ml-2',
-	[ClaimStatus.MARKETING_DIRECTOR_REVIEW]: 'label label-tonal-light ml-2',
-	[ClaimStatus.CANCELED]: 'label label-borderless-dark ml-2',
 	[ClaimStatus.CLAIM_PAID]: 'label label-tonal-info ml-2',
 	[ClaimStatus.IN_FINANCE_REVIEW]: 'label label-tonal-light ml-2',
 };
@@ -64,7 +66,7 @@ const Panel = ({mdfClaims}) => {
 	return (
 		<div>
 			<div className="text-neutral-7 text-paragraph-xs">
-				Type: {mdfClaims.partial === 'true' ? 'Partial' : 'Full'}
+				Type: {mdfClaims.partial ? 'Partial' : 'Full'}
 			</div>
 
 			<div className="mb-1 mt-1 text-neutral-9 text-paragraph-sm">
@@ -78,8 +80,12 @@ const Panel = ({mdfClaims}) => {
 						{getIntlNumberFormat().format(mdfClaims.amountClaimed)}
 					</p>
 
-					<div className={statusClassName[mdfClaims.claimStatus]}>
-						{mdfClaims.claimStatus}
+					<div
+						className={
+							statusClassName[mdfClaims.mdfClaimStatus.key]
+						}
+					>
+						{mdfClaims.mdfClaimStatus.name}
 					</div>
 				</div>
 
@@ -106,7 +112,7 @@ export default function () {
 	useEffect(() => {
 		const getClaimFromMDFRequest = async () => {
 			const response = await fetch(
-				`/o/c/mdfclaims?nestedFields=mdfClaimToMdfClaimActivities,mdfClaimActivityToMdfClaimBudgets&nestedFieldsDepth=2&filter=(r_mdfRequestToMdfClaims_c_mdfRequestId eq '${mdfRequestId}')`,
+				`/o/c/mdfclaims?nestedFields=mdfClmToMDFClmActs,mdfClmActToMDFClmBgts&nestedFieldsDepth=2&filter=(r_mdfReqToMDFClms_c_mdfRequestId eq '${mdfRequestId}')`,
 				{
 					headers: {
 						'accept': 'application/json',
@@ -137,7 +143,7 @@ export default function () {
 			});
 		};
 
-		if (mdfRequestId) {
+		if (!isNaN(mdfRequestId)) {
 			getClaimFromMDFRequest();
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -147,13 +153,19 @@ export default function () {
 		return <>Loading...</>;
 	}
 
-	const claimsNotDraft = claims?.items.filter((claim) => {
-		return !claim.claimStatus.includes(ClaimStatus.DRAFT);
+	const filteredClaims = claims?.items.filter((claim) => {
+		const ignoreStatus = [
+			ClaimStatus.DRAFT,
+			ClaimStatus.EXPIRED,
+			ClaimStatus.REJECT,
+		];
+
+		return !ignoreStatus.includes(claim.mdfClaimStatus.key);
 	});
 
 	return (
 		<>
-			{request?.requestStatus === 'Approved' ? (
+			{request?.mdfRequestStatus.key === 'approved' ? (
 				<div>
 					{!!claims?.items.length && (
 						<div>
@@ -173,10 +185,10 @@ export default function () {
 								Get Reimbursed
 							</h6>
 
-							{claimsNotDraft.length < 2 ? (
+							{filteredClaims.length < 2 ? (
 								<h6 className="font-weight-normal text-neutral-8">
 									You can submit up to{' '}
-									{2 - claimsNotDraft.length} claim(s).
+									{2 - filteredClaims.length} claim(s).
 								</h6>
 							) : (
 								<h6 className="font-weight-normal text-neutral-8">
@@ -185,7 +197,7 @@ export default function () {
 							)}
 						</div>
 
-						{claimsNotDraft.length < 2 && (
+						{filteredClaims.length < 2 && (
 							<button
 								className="btn btn-primary"
 								onClick={() =>

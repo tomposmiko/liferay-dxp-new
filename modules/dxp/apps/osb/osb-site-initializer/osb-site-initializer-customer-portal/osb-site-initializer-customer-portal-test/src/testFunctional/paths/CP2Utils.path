@@ -27,7 +27,7 @@
 </tr>
 <tr>
 	<td>ROLE</td>
-	<td>//p[contains(@class, 'text-truncate') and contains(text(), '${key_role}')]</td>
+	<td>//*[contains(@class, 'text-truncate') and contains(text(), '${key_email}')]/following::p[contains(text(), '${key_role}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -83,6 +83,11 @@
 <tr>
 	<td>MODAL_TEXT</td>
 	<td>//*[contains(@class, 'modal-content')]//*[text()='${key_text}']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ANY_TEXT</td>
+	<td>//*[contains(text(), '${key_text}')]</td>
 	<td></td>
 </tr>
 </tbody>

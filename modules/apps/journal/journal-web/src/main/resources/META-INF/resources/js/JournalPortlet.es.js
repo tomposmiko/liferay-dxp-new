@@ -54,7 +54,10 @@ export default function _JournalPortlet({
 	);
 	const saveButton = document.getElementById(`${namespace}saveButton`);
 
-	const availableLocales = [...initialAvailableLocales];
+	const availableLocales = [
+		...initialAvailableLocales,
+		initialDefaultLanguageId,
+	];
 
 	let articleId = initialArticleId;
 	let defaultLanguageId = initialDefaultLanguageId;
@@ -71,6 +74,25 @@ export default function _JournalPortlet({
 	});
 
 	const editingDefaultValues = classNameId && classNameId !== '0';
+
+	if (editingDefaultValues) {
+		const resetInput = (inputName) => {
+			const input = document.getElementById(`${namespace}${inputName}`);
+
+			if (input) {
+				input.value = '';
+			}
+		};
+
+		resetInput('displayDate');
+		resetInput('displayDateAmPm');
+		resetInput('displayDateDay');
+		resetInput('displayDateHour');
+		resetInput('displayDateMinute');
+		resetInput('displayDateMonth');
+		resetInput('displayDateTime');
+		resetInput('displayDateYear');
+	}
 
 	const handleContextualSidebarButton = () => {
 		contextualSidebarContainer?.classList.toggle(

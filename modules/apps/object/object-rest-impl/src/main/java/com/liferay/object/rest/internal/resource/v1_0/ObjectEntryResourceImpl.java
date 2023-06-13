@@ -16,7 +16,6 @@ package com.liferay.object.rest.internal.resource.v1_0;
 
 import com.liferay.object.action.engine.ObjectActionEngine;
 import com.liferay.object.constants.ObjectActionTriggerConstants;
-import com.liferay.object.entry.util.ObjectEntryNameUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
@@ -28,6 +27,7 @@ import com.liferay.object.scope.ObjectScopeProvider;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
+import com.liferay.object.service.ObjectEntryService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipService;
 import com.liferay.object.system.SystemObjectDefinitionMetadata;
@@ -43,8 +43,8 @@ import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.vulcan.aggregation.Aggregation;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
@@ -73,6 +73,7 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		ObjectDefinitionLocalService objectDefinitionLocalService,
 		ObjectEntryLocalService objectEntryLocalService,
 		ObjectEntryManagerRegistry objectEntryManagerRegistry,
+		ObjectEntryService objectEntryService,
 		ObjectFieldLocalService objectFieldLocalService,
 		ObjectRelationshipService objectRelationshipService,
 		ObjectScopeProviderRegistry objectScopeProviderRegistry,
@@ -85,6 +86,7 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		_objectDefinitionLocalService = objectDefinitionLocalService;
 		_objectEntryLocalService = objectEntryLocalService;
 		_objectEntryManagerRegistry = objectEntryManagerRegistry;
+		_objectEntryService = objectEntryService;
 		_objectFieldLocalService = objectFieldLocalService;
 		_objectRelationshipService = objectRelationshipService;
 		_objectScopeProviderRegistry = objectScopeProviderRegistry;
@@ -357,10 +359,6 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 				String objectActionName)
 		throws Exception {
 
-		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-166918"))) {
-			throw new UnsupportedOperationException();
-		}
-
 		_executeObjectAction(
 			objectActionName,
 			getByExternalReferenceCode(objectEntryExternalReferenceCode));
@@ -385,10 +383,6 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 			Long objectEntryId, String objectActionName)
 		throws Exception {
 
-		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-166918"))) {
-			throw new UnsupportedOperationException();
-		}
-
 		_executeObjectAction(objectActionName, getObjectEntry(objectEntryId));
 	}
 
@@ -405,6 +399,19 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		return objectEntryManager.addOrUpdateObjectEntry(
 			contextCompany.getCompanyId(), _getDTOConverterContext(null),
 			externalReferenceCode, _objectDefinition, objectEntry, scopeKey);
+	}
+
+	@Override
+	public void
+			putScopeScopeKeyByExternalReferenceCodeObjectActionObjectActionName(
+				String scopeKey, String externalReferenceCode,
+				String objectActionName)
+		throws Exception {
+
+		_executeObjectAction(
+			objectActionName,
+			getScopeScopeKeyByExternalReferenceCode(
+				scopeKey, externalReferenceCode));
 	}
 
 	@Override
@@ -486,6 +493,10 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 	private void _executeObjectAction(
 			String objectActionName, ObjectEntry objectEntry)
 		throws Exception {
+
+		_objectEntryService.checkModelResourcePermission(
+			_objectDefinition.getObjectDefinitionId(), objectEntry.getId(),
+			objectActionName);
 
 		com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry =
 			_objectEntryLocalService.getObjectEntry(objectEntry.getId());
@@ -591,10 +602,7 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		String taskItemDelegateName = (String)parameters.get(
 			"taskItemDelegateName");
 
-		if (taskItemDelegateName != null) {
-			taskItemDelegateName = ObjectEntryNameUtil.fromTechnicalName(
-				taskItemDelegateName);
-
+		if (Validator.isNotNull(taskItemDelegateName)) {
 			_objectDefinition =
 				_objectDefinitionLocalService.fetchObjectDefinition(
 					contextCompany.getCompanyId(), taskItemDelegateName);
@@ -632,6 +640,7 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 	private final ObjectDefinitionLocalService _objectDefinitionLocalService;
 	private final ObjectEntryLocalService _objectEntryLocalService;
 	private final ObjectEntryManagerRegistry _objectEntryManagerRegistry;
+	private final ObjectEntryService _objectEntryService;
 	private final ObjectFieldLocalService _objectFieldLocalService;
 	private final ObjectRelationshipService _objectRelationshipService;
 	private final ObjectScopeProviderRegistry _objectScopeProviderRegistry;

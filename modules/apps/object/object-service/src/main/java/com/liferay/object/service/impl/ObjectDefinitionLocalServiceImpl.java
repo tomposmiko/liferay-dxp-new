@@ -122,6 +122,7 @@ import com.liferay.portal.kernel.workflow.WorkflowInstanceManager;
 import com.liferay.portal.search.batch.DynamicQueryBatchIndexingActionableFactory;
 import com.liferay.portal.search.spi.model.query.contributor.ModelPreFilterContributor;
 import com.liferay.portal.search.spi.model.registrar.ModelSearchRegistrarHelper;
+import com.liferay.portal.util.PortalInstances;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -189,6 +190,7 @@ public class ObjectDefinitionLocalServiceImpl
 		objectDefinition.setLabel(externalReferenceCode);
 		objectDefinition.setName(externalReferenceCode);
 		objectDefinition.setPluralLabel(externalReferenceCode);
+		objectDefinition.setScope(ObjectDefinitionConstants.SCOPE_COMPANY);
 		objectDefinition.setStorageType(
 			ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT);
 		objectDefinition.setSystem(false);
@@ -342,7 +344,7 @@ public class ObjectDefinitionLocalServiceImpl
 			ObjectDefinition objectDefinition)
 		throws PortalException {
 
-		if (!CompanyThreadLocal.isDeleteInProcess() &&
+		if (!PortalInstances.isCurrentCompanyInDeletionProcess() &&
 			!PortalRunMode.isTestMode() && objectDefinition.isSystem()) {
 
 			throw new RequiredObjectDefinitionException();
@@ -599,13 +601,14 @@ public class ObjectDefinitionLocalServiceImpl
 				_assetCategoryLocalService, _assetTagLocalService,
 				_assetVocabularyLocalService, _bundleContext,
 				_dynamicQueryBatchIndexingActionableFactory, _groupLocalService,
-				_listTypeEntryLocalService, _modelSearchRegistrarHelper, this,
-				_objectEntryLocalService, _objectEntryManagerRegistry,
-				_objectEntryService, _objectFieldLocalService,
-				_objectLayoutLocalService, _objectRelationshipLocalService,
-				_objectScopeProviderRegistry, _objectViewLocalService,
-				_organizationLocalService, _persistedModelLocalServiceRegistry,
-				_portletLocalService, _resourceActions, _userLocalService,
+				_listTypeEntryLocalService, _modelSearchRegistrarHelper,
+				_objectActionLocalService, this, _objectEntryLocalService,
+				_objectEntryManagerRegistry, _objectEntryService,
+				_objectFieldLocalService, _objectLayoutLocalService,
+				_objectRelationshipLocalService, _objectScopeProviderRegistry,
+				_objectViewLocalService, _organizationLocalService,
+				_persistedModelLocalServiceRegistry, _portletLocalService,
+				_resourceActions, _userLocalService,
 				_resourcePermissionLocalService,
 				_workflowStatusModelPreFilterContributor,
 				_userGroupRoleLocalService));

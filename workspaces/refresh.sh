@@ -37,8 +37,8 @@ function check_blade {
 function copy_template {
 	cp -R ../modules/apps/client-extension/client-extension-type-api/src/main/resources/com/liferay/client/extension/type/dependencies/templates/${1} "${2}"
 
-	find "${2}" -not -path '*/*\.ico' -type f -exec sed -i'.bak' "s/\${id}/$(basename ${2})/g" {} +
-	find "${2}" -not -path '*/*\.ico' -type f -exec sed -i'.bak' "s/\${name}/${3}/g" {} +
+	find "${2}" -not -path '*/*\.ico' -type f -exec sed -i "s/\${id}/$(basename ${2})/g" {} +
+	find "${2}" -not -path '*/*\.ico' -type f -exec sed -i "s/\${name}/${3}/g" {} +
 }
 
 function init_workspace {
@@ -65,14 +65,14 @@ function refresh_sample_default_workspace {
 
 	cd sample-default-workspace
 
-	${BLADE_PATH} init --liferay-version dxp-7.4-u53
+	${BLADE_PATH} init --liferay-version dxp-7.4-u58
 
-	echo -e "\n**/dist\n**/node_modules_cache\n.DS_Store" >> .gitignore
+	echo -en "\n**/dist\n**/node_modules_cache\n.DS_Store" >> .gitignore
 
-	echo -e "\n\nfeature.flag.LPS-153457=true" >> configs/local/portal-ext.properties
+	echo -en "\n\nfeature.flag.LPS-166479=true" >> configs/local/portal-ext.properties
 
-	#echo -e "\nliferay.workspace.docker.image.liferay=liferay/dxp:7.4.13-u53-d5.0.3-20221201085420" >> gradle.properties
-	echo -e "\nliferay.workspace.node.package.manager=yarn" >> gradle.properties
+	#echo -en "\nliferay.workspace.docker.image.liferay=liferay/dxp:7.4.13-u54-d5.0.5-20221208173455" >> gradle.properties
+	echo -en "\nliferay.workspace.node.package.manager=yarn" >> gradle.properties
 
 	#
 	# https://stackoverflow.com/questions/1654021/how-can-i-delete-a-newline-if-it-is-the-last-character-in-a-file
@@ -82,6 +82,8 @@ function refresh_sample_default_workspace {
 	{ head -n 5 gradle.properties ; tail -n +6 gradle.properties | sort | perl -e "chomp if eof" -p; } >gradle.properties.tmp
 
 	mv gradle.properties.tmp gradle.properties
+
+	sed -i 's/name: "com.liferay.gradle.plugins.workspace", version: ".*"/name: "com.liferay.gradle.plugins.workspace", version: "4.1.5"/' settings.gradle
 
 	touch modules/.touch
 	touch themes/.touch
@@ -104,6 +106,7 @@ function refresh_sample_minimal_workspace {
 	copy_template iframe sample-minimal-workspace/client-extensions/able-iframe "Able IFrame"
 	copy_template theme-css sample-minimal-workspace/client-extensions/able-theme-css "Able Theme CSS"
 	copy_template theme-favicon sample-minimal-workspace/client-extensions/able-theme-favicon "Able Theme Favicon"
+	copy_template theme-spritemap sample-minimal-workspace/client-extensions/able-theme-spritemap "Able Theme Spritemap"
 
 	#
 	# Fox remote app client extension
@@ -112,6 +115,50 @@ function refresh_sample_minimal_workspace {
 	rm -fr sample-minimal-workspace/client-extensions/fox-remote-app
 
 	../tools/create_remote_app.sh fox-remote-app react
+
+	mkdir -p fox-remote-app/src/common/components
+
+	cat <<EOF > fox-remote-app/src/common/components/DadJoke.js
+import React from 'react';
+
+class DadJoke extends React.Component {
+	constructor(props) {
+		super(props);
+
+		this.oAuth2Client = props.oAuth2Client;
+		this.state = {"joke": ""};
+	}
+
+	componentDidMount() {
+		this._request = this.oAuth2Client.fetch(
+			'/dad-joke'
+		).then(response => response.text()
+		).then(text => {
+			this._request = null;
+			this.setState({"joke": text});
+		});
+	}
+
+	componentWillUnmount() {
+		if (this._request) {
+			this._request.cancel();
+		}
+	}
+
+	render() {
+		if (this.state === null) {
+			return <div>Loading...</div>
+		}
+		else {
+			return <div>{this.state.joke}</div>
+		}
+	}
+}
+
+export default DadJoke;
+EOF
+
+	sed -i "s/react-scripts test/react-scripts test --passWithNoTests --watchAll=false/" fox-remote-app/package.json
 
 	mv fox-remote-app sample-minimal-workspace/client-extensions
 

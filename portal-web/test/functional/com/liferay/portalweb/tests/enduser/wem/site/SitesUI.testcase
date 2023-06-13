@@ -236,6 +236,8 @@ definition {
 		}
 
 		task ("View the new site is created") {
+			WaitForTextNotPresent(value1 = "The creation of the site may take some time. Closing the window will not cancel the process.");
+
 			SelectFrameTop();
 
 			Alert.viewSuccessMessageText(successMessage = "Site was successfully added.");

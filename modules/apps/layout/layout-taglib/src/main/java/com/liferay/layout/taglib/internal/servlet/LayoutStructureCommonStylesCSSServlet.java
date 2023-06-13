@@ -27,6 +27,7 @@ import com.liferay.layout.util.structure.LayoutStructure;
 import com.liferay.layout.util.structure.LayoutStructureItem;
 import com.liferay.layout.util.structure.StyledLayoutStructureItem;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -36,15 +37,22 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutSet;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
+import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.LayoutSetLocalService;
+import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.servlet.PortalSessionThreadLocal;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -61,15 +69,17 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 import javax.servlet.Servlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Víctor Galán
@@ -89,6 +99,43 @@ public class LayoutStructureCommonStylesCSSServlet extends HttpServlet {
 			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse)
 		throws IOException {
+
+		try {
+			User user = _portal.getUser(httpServletRequest);
+
+			if (user == null) {
+				HttpSession httpSession = httpServletRequest.getSession();
+
+				if (PortalSessionThreadLocal.getHttpSession() == null) {
+					PortalSessionThreadLocal.setHttpSession(httpSession);
+				}
+
+				String userIdString = (String)httpSession.getAttribute(
+					"j_username");
+				String password = (String)httpSession.getAttribute(
+					"j_password");
+
+				if ((userIdString != null) && (password != null)) {
+					long userId = GetterUtil.getLong(userIdString);
+
+					user = _userLocalService.getUser(userId);
+				}
+			}
+
+			if (user != null) {
+				PrincipalThreadLocal.setName(user.getUserId());
+				PrincipalThreadLocal.setPassword(
+					_portal.getUserPassword(httpServletRequest));
+
+				PermissionThreadLocal.setPermissionChecker(
+					_permissionCheckerFactory.create(user));
+			}
+		}
+		catch (PortalException portalException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(portalException);
+			}
+		}
 
 		httpServletResponse.setContentType(ContentTypes.TEXT_CSS_UTF8);
 		httpServletResponse.setStatus(HttpServletResponse.SC_OK);
@@ -259,6 +306,16 @@ public class LayoutStructureCommonStylesCSSServlet extends HttpServlet {
 				continue;
 			}
 
+			String value = frontendToken.getDefaultValue();
+
+			JSONObject valueJSONObject =
+				frontendTokenValuesJSONObject.getJSONObject(
+					frontendToken.getName());
+
+			if (valueJSONObject != null) {
+				value = valueJSONObject.getString("value");
+			}
+
 			frontendTokensJSONObject.put(
 				frontendToken.getName(),
 				JSONUtil.put(
@@ -270,15 +327,7 @@ public class LayoutStructureCommonStylesCSSServlet extends HttpServlet {
 						return frontendTokenMapping.getValue();
 					}
 				).put(
-					"value",
-					Optional.ofNullable(
-						frontendTokenValuesJSONObject.getJSONObject(
-							frontendToken.getName())
-					).map(
-						valueJSONObject -> valueJSONObject.getString("value")
-					).orElse(
-						frontendToken.getDefaultValue()
-					)
+					"value", value
 				));
 		}
 
@@ -355,13 +404,18 @@ public class LayoutStructureCommonStylesCSSServlet extends HttpServlet {
 			return itemConfigJSONObject.getJSONObject("styles");
 		}
 
-		return Optional.ofNullable(
-			itemConfigJSONObject.getJSONObject(viewportSize.getViewportSizeId())
-		).map(
-			viewportJSONObject -> viewportJSONObject.getJSONObject("styles")
-		).orElse(
-			_jsonFactory.createJSONObject()
-		);
+		JSONObject viewportJSONObject = itemConfigJSONObject.getJSONObject(
+			viewportSize.getViewportSizeId());
+
+		if (viewportJSONObject != null) {
+			JSONObject jsonObject = viewportJSONObject.getJSONObject("styles");
+
+			if (jsonObject != null) {
+				return jsonObject;
+			}
+		}
+
+		return _jsonFactory.createJSONObject();
 	}
 
 	private String _getStyleValue(
@@ -489,5 +543,17 @@ public class LayoutStructureCommonStylesCSSServlet extends HttpServlet {
 
 	@Reference
 	private LayoutStructureProvider _layoutStructureProvider;
+
+	@Reference(
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY
+	)
+	private volatile PermissionCheckerFactory _permissionCheckerFactory;
+
+	@Reference
+	private Portal _portal;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }

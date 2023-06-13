@@ -36,13 +36,12 @@ import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.JavaDetector;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OSDetector;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.PortalLifecycle;
 import com.liferay.portal.kernel.util.PortalLifecycleUtil;
-import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.kernel.util.TimeZoneUtil;
@@ -52,7 +51,6 @@ import com.liferay.portal.log4j.Log4JUtil;
 import com.liferay.portal.module.framework.ModuleFrameworkUtil;
 import com.liferay.portal.security.xml.SecureXMLFactoryProviderImpl;
 import com.liferay.portal.spring.bean.LiferayBeanFactory;
-import com.liferay.portal.spring.compat.CompatBeanDefinitionRegistryPostProcessor;
 import com.liferay.portal.spring.configurator.ConfigurableApplicationContextConfigurator;
 import com.liferay.portal.spring.context.ArrayApplicationContext;
 import com.liferay.portal.xml.SAXReaderImpl;
@@ -135,7 +133,7 @@ public class InitUtil {
 
 		// Properties
 
-		com.liferay.portal.kernel.util.PropsUtil.setProps(new PropsImpl());
+		PropsUtil.setProps(new PropsImpl());
 
 		// Shared log
 
@@ -201,17 +199,8 @@ public class InitUtil {
 	}
 
 	public static synchronized void initWithSpring(
-		boolean initModuleFramework, boolean registerContext) {
-
-		List<String> configLocations = ListUtil.fromArray(
-			PropsUtil.getArray(PropsKeys.SPRING_CONFIGS));
-
-		initWithSpring(configLocations, initModuleFramework, registerContext);
-	}
-
-	public static synchronized void initWithSpring(
 		List<String> configLocations, boolean initModuleFramework,
-		boolean registerContext) {
+		boolean registerContext, Runnable initFrameworkCallbackRunnable) {
 
 		if (_initialized) {
 			return;
@@ -225,6 +214,10 @@ public class InitUtil {
 					System.getProperty(SystemProperties.TMP_DIR);
 
 				ModuleFrameworkUtil.initFramework();
+
+				if (initFrameworkCallbackRunnable != null) {
+					initFrameworkCallbackRunnable.run();
+				}
 			}
 
 			DBInitUtil.init();
@@ -265,9 +258,6 @@ public class InitUtil {
 				configurableApplicationContextConfigurator.configure(
 					configurableApplicationContext);
 			}
-
-			configurableApplicationContext.addBeanFactoryPostProcessor(
-				new CompatBeanDefinitionRegistryPostProcessor());
 
 			configurableApplicationContext.refresh();
 

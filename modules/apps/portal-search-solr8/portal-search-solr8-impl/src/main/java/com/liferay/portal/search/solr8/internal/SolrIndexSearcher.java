@@ -66,8 +66,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.portal.search.solr8.configuration.SolrConfiguration",
-	immediate = true, property = "search.engine.impl=Solr",
-	service = IndexSearcher.class
+	property = "search.engine.impl=Solr", service = IndexSearcher.class
 )
 public class SolrIndexSearcher extends BaseIndexSearcher {
 
@@ -282,7 +281,11 @@ public class SolrIndexSearcher extends BaseIndexSearcher {
 			GetterUtil.getBoolean(
 				searchContext.getAttribute(
 					SearchContextAttributes.ATTRIBUTE_KEY_LUCENE_SYNTAX)));
-		searchSearchRequest.setPostFilter(query.getPostFilter());
+
+		if (query != null) {
+			searchSearchRequest.setPostFilter(query.getPostFilter());
+		}
+
 		searchSearchRequest.setScoreEnabled(queryConfig.isScoreEnabled());
 		searchSearchRequest.setSelectedFieldNames(
 			queryConfig.getSelectedFieldNames());
@@ -317,7 +320,7 @@ public class SolrIndexSearcher extends BaseIndexSearcher {
 
 		long companyId = searchContext.getCompanyId();
 
-		if (companyId >= 0) {
+		if ((companyId >= 0) && (query != null)) {
 			BooleanFilter preBooleanFilter = query.getPreBooleanFilter();
 
 			if (preBooleanFilter == null) {
@@ -346,6 +349,8 @@ public class SolrIndexSearcher extends BaseIndexSearcher {
 			baseSearchResponse.getSearchRequestString()
 		).responseString(
 			baseSearchResponse.getSearchResponseString()
+		).searchTimeValue(
+			baseSearchResponse.getSearchTimeValue()
 		).statsResponseMap(
 			baseSearchResponse.getStatsResponseMap()
 		);

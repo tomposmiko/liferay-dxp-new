@@ -11,8 +11,8 @@
 
 import ClayButton from '@clayui/button';
 import ClayLoadingIndicator from '@clayui/loading-indicator';
-import ClassNames from 'classnames';
-import React, {useEffect, useState} from 'react';
+import classNames from 'classnames';
+import React, {useEffect, useMemo, useState} from 'react';
 
 import Container from '../../common/components/container';
 
@@ -29,8 +29,6 @@ const siteURL = Liferay.ThemeDisplay.getLayoutRelativeURL()
 
 export default function () {
 	const [data, setData] = useState();
-	const currentDate = new Date();
-	const milisecondsPerDay = 1000 * 3600 * 24;
 
 	useEffect(() => {
 		const getRenewalsData = async () => {
@@ -55,10 +53,45 @@ export default function () {
 		getRenewalsData();
 	}, []);
 
+	const filteredArray = useMemo(() => {
+		const newArray = [];
+		const currentDate = new Date();
+		const milisecondsPerDay = 1000 * 3600 * 24;
+
+		data?.items?.map((item) => {
+			const expirationInTime = new Date(item.closeDate) - currentDate;
+			const expirationInDays =
+				Math.floor(expirationInTime / milisecondsPerDay) + 1;
+
+			if (expirationInDays > 0 && expirationInDays <= 30) {
+				newArray.push({
+					closeDate: item.closeDate,
+					expirationDays: expirationInDays,
+					opportunityName: item.opportunityName,
+				});
+			}
+		});
+
+		return newArray.slice(0, 4);
+	}, [data?.items]);
+
+	const getCurrentStatusColor = (item) => {
+		if (item?.expirationDays <= 5) {
+			return status[5];
+		}
+		else if (item?.expirationDays <= 15) {
+			return status[15];
+		}
+		else if (item?.expirationDays <= 30) {
+			return status[30];
+		}
+	};
+
 	return (
 		<Container
 			footer={
 				<ClayButton
+					className="border-brand-primary-darken-1 mt-2 text-brand-primary-darken-1"
 					displayType="secondary"
 					onClick={() =>
 						Liferay.Util.navigate(
@@ -72,60 +105,42 @@ export default function () {
 			}
 			title="Renewals"
 		>
-			{!data && <ClayLoadingIndicator size="md" />}
+			{!data && <ClayLoadingIndicator className="mb-10 mt-9" size="md" />}
 
 			<div className="align-items-start d-flex flex-column mt-3">
-				{data?.items?.map((item, index) => {
-					const expirationInTime =
-						new Date(item.closeDate) - currentDate;
+				{filteredArray?.map((item, index) => {
+					getCurrentStatusColor(item);
 
-					const expirationInDays =
-						Math.floor(expirationInTime / milisecondsPerDay) + 1;
-
-					const currentStatusColor = () => {
-						if (expirationInDays <= 5) {
-							return status[5];
-						}
-						else if (expirationInDays <= 15) {
-							return status[15];
-						}
-						else if (expirationInDays <= 30) {
-							return status[30];
-						}
-					};
-
-					if (expirationInDays > 0 && expirationInDays <= 30) {
-						return (
+					return (
+						<div
+							className="align-items-center d-flex flex-row justify-content-center mb-4"
+							key={index}
+						>
 							<div
-								className="align-items-center d-flex flex-row justify-content-center mb-4"
-								key={index}
-							>
-								<div
-									className={ClassNames(
-										'mr-3 status-bar-vertical',
-										currentStatusColor()
-									)}
-								></div>
+								className={classNames(
+									'mr-3 status-bar-vertical',
+									getCurrentStatusColor(item)
+								)}
+							></div>
+
+							<div>
+								<div className="font-weight-semi-bold">
+									{item.opportunityName}
+								</div>
 
 								<div>
-									<div className="font-weight-semi-bold">
-										{item.opportunityName}
-									</div>
-
-									<div>
-										Expires in &nbsp;
-										<span className="font-weight-semi-bold">
-											{expirationInDays} days.
-										</span>
-										&nbsp;
-										<span className="ml-2">
-											{item.closeDate}
-										</span>
-									</div>
+									Expires in &nbsp;
+									<span className="font-weight-semi-bold">
+										{item.expirationDays} days.
+									</span>
+									&nbsp;
+									<span className="ml-2">
+										{item.closeDate}
+									</span>
 								</div>
 							</div>
-						);
-					}
+						</div>
+					);
 				})}
 			</div>
 		</Container>

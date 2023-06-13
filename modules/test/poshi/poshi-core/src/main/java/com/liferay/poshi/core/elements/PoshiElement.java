@@ -669,6 +669,10 @@ public abstract class PoshiElement
 				storedIndices.clear();
 			}
 
+			if (trimmedPoshiScriptSnippet.startsWith("return") && (c != ';')) {
+				continue;
+			}
+
 			if (skipBalanceCheck || ((c != '}') && (c != ';'))) {
 				continue;
 			}
@@ -797,6 +801,48 @@ public abstract class PoshiElement
 		}
 
 		return false;
+	}
+
+	protected boolean isQuotedContent(String content) {
+		if (content.matches(NONQUOTED_REGEX)) {
+			if (content.contains("{")) {
+				return !isSingleVariable(content);
+			}
+
+			return false;
+		}
+
+		return true;
+	}
+
+	protected boolean isSingleVariable(String content) {
+		boolean singleVariable = false;
+
+		Stack<Character> stack = new Stack<>();
+
+		for (int i = 0; i < content.length(); i++) {
+			char c = content.charAt(i);
+
+			if (i > 0) {
+				char previousChar = content.charAt(i - 1);
+
+				if ((previousChar == '$') && (c == '{')) {
+					stack.push(c);
+				}
+			}
+
+			if (!stack.isEmpty() && (c == '}')) {
+				stack.pop();
+
+				if (i == (content.length() - 1)) {
+					singleVariable = true;
+				}
+
+				break;
+			}
+		}
+
+		return singleVariable;
 	}
 
 	protected boolean isValidFunctionFileName(String poshiScriptInvocation) {
@@ -988,6 +1034,8 @@ public abstract class PoshiElement
 
 	protected static final String INVOCATION_REGEX;
 
+	protected static final String NONQUOTED_REGEX = "(\\$\\{.*\\}|\\d+)";
+
 	protected static final String PARAMETER_REGEX = "\\(.*\\)";
 
 	protected static final String QUOTED_REGEX = "\".*\"";
@@ -1005,8 +1053,6 @@ public abstract class PoshiElement
 			Pattern.DOTALL);
 	protected static final Pattern poshiScriptBlockPattern = Pattern.compile(
 		"^[^{]*\\{[\\s\\S]*\\}$");
-	protected static final Pattern quotedPattern = Pattern.compile(
-		QUOTED_REGEX);
 
 	private void _addAttributes(Element element) {
 		for (Attribute attribute :

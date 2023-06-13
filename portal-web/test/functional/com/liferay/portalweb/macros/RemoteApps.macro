@@ -81,6 +81,13 @@ definition {
 			locator1 = "FormFields#FIELD_DROPDOWN_ITEM");
 	}
 
+	macro assertContentField {
+		AssertTextEquals(
+			key_text = "${entryField}",
+			locator1 = "RemoteApps#REMOTE_APPS_FIELDS",
+			value1 = "${entryInformation}");
+	}
+
 	macro assertCustomElementFields {
 		AssertTextEquals(
 			custom_entryName = "${entryName}",
@@ -149,6 +156,56 @@ definition {
 			key_index = "2",
 			locator1 = "RemoteAppsEntry#URL_ROW_INDEX",
 			value1 = "https://liferay.github.io/liferay-frontend-projects/index2.css");
+	}
+
+	macro assertFieldDisable {
+		for (var entryField : list "${entryFieldList}") {
+			AssertNotEditable(
+				key_text = "${entryField}",
+				locator1 = "RemoteApps#REMOTE_APPS_FIELDS");
+		}
+	}
+
+	macro assertMultipleFields {
+		RemoteApps.assertContentField(
+			entryField = "Name",
+			entryInformation = "${entryName}");
+
+		RemoteApps.assertContentField(
+			entryField = "Source Code URL",
+			entryInformation = "${entrySourceCodeURL}");
+
+		RemoteApps.assertContentField(
+			entryField = "Type",
+			entryInformation = "${entryType}");
+
+		RemoteApps.assertContentField(
+			entryField = "Friendly URL Mapping",
+			entryInformation = "${entryFriendlyURLMapping}");
+
+		RemoteApps.assertContentField(
+			entryField = "HTML Element Name",
+			entryInformation = "${entryHTMLElementName}");
+
+		RemoteApps.assertContentField(
+			entryField = "Portlet Category Name",
+			entryInformation = "${entryPortletCategoryName}");
+
+		RemoteApps.assertContentField(
+			entryField = "description",
+			entryInformation = "${entrydescription}");
+
+		RemoteApps.assertContentField(
+			entryField = "CSS URLs",
+			entryInformation = "${entryCSSURLs}");
+
+		RemoteApps.assertContentField(
+			entryField = "_URLs",
+			entryInformation = "${entry_URLs}");
+
+		RemoteApps.assertContentField(
+			entryField = "properties",
+			entryInformation = "${entryproperties}");
 	}
 
 	macro assertTableEntryNameNotPresent {
@@ -240,7 +297,7 @@ definition {
 			ApplicationsMenu.gotoPortlet(
 				category = "Custom Apps",
 				panel = "Applications",
-				portlet = "Remote Apps");
+				portlet = "Client Extensions");
 		}
 	}
 

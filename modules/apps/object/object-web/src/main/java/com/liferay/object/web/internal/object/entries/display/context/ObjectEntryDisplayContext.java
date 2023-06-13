@@ -72,7 +72,7 @@ import com.liferay.object.service.ObjectLayoutLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.web.internal.constants.ObjectWebKeys;
 import com.liferay.object.web.internal.display.context.helper.ObjectRequestHelper;
-import com.liferay.object.web.internal.util.ObjectDefinitionPermissionUtil;
+import com.liferay.object.web.internal.security.permission.resource.util.ObjectDefinitionResourcePermissionUtil;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -563,9 +563,10 @@ public class ObjectEntryDisplayContext {
 				return false;
 			}
 
-			return !ObjectDefinitionPermissionUtil.hasModelResourcePermission(
-				getObjectDefinition(), objectEntry, _objectEntryService,
-				ActionKeys.UPDATE);
+			return !ObjectDefinitionResourcePermissionUtil.
+				hasModelResourcePermission(
+					getObjectDefinition(), objectEntry, _objectEntryService,
+					ActionKeys.UPDATE);
 		}
 		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
@@ -715,9 +716,10 @@ public class ObjectEntryDisplayContext {
 
 			if (objectEntry != null) {
 				readOnly =
-					!ObjectDefinitionPermissionUtil.hasModelResourcePermission(
-						objectDefinition, objectEntry, _objectEntryService,
-						ActionKeys.UPDATE);
+					!ObjectDefinitionResourcePermissionUtil.
+						hasModelResourcePermission(
+							objectDefinition, objectEntry, _objectEntryService,
+							ActionKeys.UPDATE);
 			}
 		}
 
@@ -1008,6 +1010,9 @@ public class ObjectEntryDisplayContext {
 		LiferayPortletResponse liferayPortletResponse, ObjectEntry objectEntry,
 		ObjectLayoutTab objectLayoutTab) {
 
+		HttpServletRequest httpServletRequest =
+			_objectRequestHelper.getRequest();
+
 		if (_readOnly) {
 			LiferayPortletURL liferayPortletURL =
 				(LiferayPortletURL)liferayPortletResponse.createResourceURL();
@@ -1016,6 +1021,8 @@ public class ObjectEntryDisplayContext {
 
 			return PortletURLBuilder.create(
 				liferayPortletURL
+			).setBackURL(
+				httpServletRequest.getParameter("backURL")
 			).setParameter(
 				"externalReferenceCode", objectEntry.getExternalReferenceCode()
 			).setParameter(
@@ -1027,6 +1034,8 @@ public class ObjectEntryDisplayContext {
 			liferayPortletResponse.createRenderURL()
 		).setMVCRenderCommandName(
 			"/object_entries/edit_object_entry"
+		).setBackURL(
+			httpServletRequest.getParameter("backURL")
 		).setParameter(
 			"externalReferenceCode", objectEntry.getExternalReferenceCode()
 		).setParameter(

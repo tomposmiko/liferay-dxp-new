@@ -105,8 +105,13 @@ class TestrayCaseResultRest extends Rest<CaseResultForm, TestrayCaseResult> {
 	}
 
 	public assignTo(caseResult: TestrayCaseResult, userId: number) {
+		const dueStatus =
+			userId === Number(Liferay.ThemeDisplay.getUserId())
+				? CaseResultStatuses.IN_PROGRESS
+				: caseResult.dueStatus.key;
+
 		return this.update(caseResult.id, {
-			dueStatus: caseResult.dueStatus.key,
+			dueStatus,
 			startDate: caseResult.startDate,
 			userId,
 		});
@@ -130,7 +135,7 @@ class TestrayCaseResultRest extends Rest<CaseResultForm, TestrayCaseResult> {
 
 	public async assignCaseResultIssue(caseResultId: number, issues: string[]) {
 		const caseResultIssuesResponse = await testrayCaseResultsIssuesImpl.getAll(
-			searchUtil.eq('caseResultId', caseResultId)
+			{filter: searchUtil.eq('caseResultId', caseResultId)}
 		);
 
 		for (const issue of issues) {
@@ -142,8 +147,6 @@ class TestrayCaseResultRest extends Rest<CaseResultForm, TestrayCaseResult> {
 				name: `${issue}-${caseResultId}`,
 			});
 		}
-
-		await super.update(caseResultId, {issues: issues.join(',')});
 
 		if (caseResultIssuesResponse?.items) {
 			const caseResultIssuesTransform = testrayCaseResultsIssuesImpl.transformDataFromList(

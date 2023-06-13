@@ -84,9 +84,12 @@ public class ExecutePoshiElement extends PoshiElement {
 			for (int i = 0; i < methodParameterValues.size(); i++) {
 				String methodParameterValue = methodParameterValues.get(i);
 
-				addAttribute(
-					"argument" + (i + 1),
-					getDoubleQuotedContent(methodParameterValue));
+				if (isQuotedContent(methodParameterValue)) {
+					methodParameterValue = getDoubleQuotedContent(
+						methodParameterValue);
+				}
+
+				addAttribute("argument" + (i + 1), methodParameterValue);
 			}
 
 			return;
@@ -167,7 +170,7 @@ public class ExecutePoshiElement extends PoshiElement {
 				if (name.equals(functionAttributeName)) {
 					String value = getValueFromAssignment(methodParameterValue);
 
-					Matcher matcher = quotedPattern.matcher(value);
+					Matcher matcher = _functionParameterPattern.matcher(value);
 
 					if (!matcher.matches()) {
 						StringBuilder sb = new StringBuilder();
@@ -180,11 +183,13 @@ public class ExecutePoshiElement extends PoshiElement {
 							(PoshiElement)getParent());
 					}
 
-					value = getDoubleQuotedContent(value);
+					if (isQuotedContent(value)) {
+						value = getDoubleQuotedContent(value);
 
-					value = value.replace("\\\"", "\"");
+						value = value.replace("\\\"", "\"");
 
-					value = StringEscapeUtils.unescapeXml(value);
+						value = StringEscapeUtils.unescapeXml(value);
+					}
 
 					add(
 						new PoshiElementAttribute(
@@ -230,12 +235,21 @@ public class ExecutePoshiElement extends PoshiElement {
 				String poshiElementAttributeValue =
 					poshiElementAttribute.getValue();
 
-				assignments.add(doubleQuoteContent(poshiElementAttributeValue));
+				if (isQuotedContent(poshiElementAttributeValue)) {
+					poshiElementAttributeValue = doubleQuoteContent(
+						poshiElementAttributeValue);
+				}
+
+				assignments.add(poshiElementAttributeValue);
 
 				continue;
 			}
 
 			String poshiScript = poshiElementAttribute.toPoshiScript();
+
+			if (poshiScript.matches(_UNQUOTED_PARAMETER_REGEX)) {
+				poshiScript = poshiScript.replace("\"", "");
+			}
 
 			assignments.add(poshiScript.trim());
 		}
@@ -416,15 +430,24 @@ public class ExecutePoshiElement extends PoshiElement {
 
 	private static final String _ELEMENT_NAME = "execute";
 
+	private static final String _FUNCTION_PARAMETER_REGEX =
+		QUOTED_REGEX + "|\\$\\{\\S+\\}|\\d*";
+
+	private static final String _UNQUOTED_PARAMETER_REGEX =
+		"\\w*\\s*=\\s\"(\\$\\{[\\w_-]+\\}|\\d+)\"";
+
 	private static final String _UTILITY_INVOCATION_REGEX =
 		"(echo|fail|takeScreenshot)\\(.*?\\)";
 
 	private static final Pattern _executeParameterPattern = Pattern.compile(
 		"^[\\s]*(\\w*\\s*=\\s*\"[ \\t\\S]*?\"|\\w*\\s*=\\s*'''.*?'''|" +
-			"\\w*\\s=\\s*[\\w\\.]*\\(.*?\\))[\\s]*$",
+			"\\w*\\s=\\s*[\\w\\.]*\\(.*?\\)|\\w*\\s*=\\s*\\d+|" +
+				"\\w*\\s*=\\s*\\$\\{\\S+\\})[\\s]*$",
 		Pattern.DOTALL);
 	private static final List<String> _functionAttributeNames = Arrays.asList(
 		"locator1", "locator2", "value1", "value2", "value3");
+	private static final Pattern _functionParameterPattern = Pattern.compile(
+		_FUNCTION_PARAMETER_REGEX);
 	private static final Pattern _statementPattern = Pattern.compile(
 		"^" + INVOCATION_REGEX + STATEMENT_END_REGEX, Pattern.DOTALL);
 	private static final Pattern _utilityInvocationStatementPattern =

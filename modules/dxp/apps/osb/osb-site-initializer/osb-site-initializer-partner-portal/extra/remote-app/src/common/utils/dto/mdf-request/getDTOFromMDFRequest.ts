@@ -23,19 +23,20 @@ export function getDTOFromMDFRequest(
 		accountExternalReferenceCodeSF:
 			mdfRequest.accountExternalReferenceCodeSF,
 		additionalOption: mdfRequest.additionalOption,
+		companyName: mdfRequest.company?.name,
 		country: mdfRequest.country,
 		emailAddress: Liferay.ThemeDisplay.getUserEmailAddress(),
 		externalReferenceCodeSF,
-		liferayBusinessSalesGoals: mdfRequest.liferayBusinessSalesGoals.join(
+		liferayBusinessSalesGoals: mdfRequest.liferayBusinessSalesGoals?.join(
 			'; '
 		),
 		liferaysUserIdSF: Number(Liferay.ThemeDisplay.getUserId()),
+		mdfRequestStatus: mdfRequest.mdfRequestStatus,
 		overallCampaignDescription: mdfRequest.overallCampaignDescription,
 		overallCampaignName: mdfRequest.overallCampaignName,
-		r_accountToMDFRequests_accountEntryId: mdfRequest.company.id,
-		r_userToMDFRequests_userId: Number(Liferay.ThemeDisplay.getUserId()),
-		requestStatus: mdfRequest.requestStatus,
-		targetAudienceRoles: mdfRequest.targetAudienceRoles.join('; '),
-		targetMarkets: mdfRequest.targetMarkets.join('; '),
+		r_accToMDFReqs_accountEntryId: mdfRequest.company?.id,
+		r_usrToMDFReqs_userId: Number(Liferay.ThemeDisplay.getUserId()),
+		targetAudienceRoles: mdfRequest.targetAudienceRoles?.join('; '),
+		targetMarkets: mdfRequest.targetMarkets?.join('; '),
 	};
 }

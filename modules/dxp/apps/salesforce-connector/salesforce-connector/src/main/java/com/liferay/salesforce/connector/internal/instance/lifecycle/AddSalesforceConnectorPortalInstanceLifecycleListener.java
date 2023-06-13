@@ -14,6 +14,7 @@
 
 package com.liferay.salesforce.connector.internal.instance.lifecycle;
 
+import com.liferay.dispatch.executor.DispatchTaskExecutor;
 import com.liferay.dispatch.model.DispatchTrigger;
 import com.liferay.dispatch.repository.DispatchFileRepository;
 import com.liferay.dispatch.service.DispatchTriggerLocalService;
@@ -82,7 +83,8 @@ public class AddSalesforceConnectorPortalInstanceLifecycleListener
 				company.getCompanyId());
 
 			dispatchTrigger = _dispatchTriggerLocalService.addDispatchTrigger(
-				null, userId, "talend", unicodeProperties, name, true);
+				null, userId, _dispatchTaskExecutor, "talend",
+				unicodeProperties, name, true);
 
 			_dispatchFileRepository.addFileEntry(
 				userId, dispatchTrigger.getDispatchTriggerId(), name, 0,
@@ -95,6 +97,9 @@ public class AddSalesforceConnectorPortalInstanceLifecycleListener
 
 	@Reference
 	private DispatchFileRepository _dispatchFileRepository;
+
+	@Reference(target = "(dispatch.task.executor.type=talend)")
+	private DispatchTaskExecutor _dispatchTaskExecutor;
 
 	@Reference
 	private DispatchTriggerLocalService _dispatchTriggerLocalService;

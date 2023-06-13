@@ -73,6 +73,7 @@ export default function StructureTreeNodeActions({
 			<ClayButton
 				aria-expanded={active}
 				aria-haspopup="true"
+				aria-label={Liferay.Language.get('options')}
 				className={classNames(
 					'page-editor__page-structure__tree-node__actions-button',
 					{
@@ -82,7 +83,7 @@ export default function StructureTreeNodeActions({
 				displayType="unstyled"
 				onClick={() => updateActive(!active)}
 				ref={alignElementRef}
-				small
+				size="sm"
 				title={Liferay.Language.get('options')}
 			>
 				<ClayIcon symbol="ellipsis-v" />
@@ -252,6 +253,9 @@ const ActionList = ({item, setActive, setEditingName, setOpenSaveModal}) => {
 						) : (
 							<React.Fragment key={index}>
 								<ClayDropDown.Item
+									aria-label={Liferay.Language.get(
+										dropdownItem.label
+									)}
 									onClick={() => {
 										setActive(false);
 

@@ -14,13 +14,13 @@
 
 package com.liferay.segments.asah.connector.internal.messaging;
 
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.model.UserModel;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -39,7 +39,6 @@ import com.liferay.segments.asah.connector.internal.client.util.OrderByField;
 import com.liferay.segments.asah.connector.internal.util.AsahUtil;
 import com.liferay.segments.constants.SegmentsEntryConstants;
 import com.liferay.segments.model.SegmentsEntry;
-import com.liferay.segments.model.SegmentsEntryModel;
 import com.liferay.segments.service.SegmentsEntryLocalService;
 import com.liferay.segments.service.SegmentsEntryRelLocalService;
 
@@ -49,9 +48,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -99,20 +96,23 @@ public class IndividualSegmentsChecker {
 
 		ServiceContext serviceContext = _getServiceContext(companyId);
 
-		Stream<String> stream = individualSegmentIds.stream();
+		List<Long> segmentsEntryIds = TransformUtil.transform(
+			individualSegmentIds,
+			individualSegmentId -> {
+				SegmentsEntry segmentsEntry =
+					_segmentsEntryLocalService.fetchSegmentsEntry(
+						serviceContext.getScopeGroupId(), individualSegmentId,
+						true);
+
+				if (segmentsEntry != null) {
+					return segmentsEntry.getSegmentsEntryId();
+				}
+
+				return null;
+			});
 
 		_asahSegmentsEntryCache.putSegmentsEntryIds(
-			individualPK,
-			stream.map(
-				segmentsEntryKey ->
-					_segmentsEntryLocalService.fetchSegmentsEntry(
-						serviceContext.getScopeGroupId(), segmentsEntryKey,
-						true)
-			).filter(
-				Objects::nonNull
-			).mapToLong(
-				SegmentsEntryModel::getSegmentsEntryId
-			).toArray());
+			individualPK, ArrayUtil.toLongArray(segmentsEntryIds));
 	}
 
 	@Activate
@@ -168,7 +168,7 @@ public class IndividualSegmentsChecker {
 		try {
 			_segmentsEntryLocalService.addSegmentsEntryClassPKs(
 				segmentsEntry.getSegmentsEntryId(),
-				ArrayUtil.toArray(userIds.toArray(new Long[0])),
+				ArrayUtil.toLongArray(userIds),
 				_getServiceContext(segmentsEntry.getCompanyId()));
 		}
 		catch (PortalException portalException) {
@@ -215,10 +215,12 @@ public class IndividualSegmentsChecker {
 
 				individuals.forEach(
 					individual -> {
-						Optional<Long> userIdOptional = _getUserIdOptional(
+						Long userId = _getUserId(
 							segmentsEntry.getCompanyId(), individual);
 
-						userIdOptional.ifPresent(userIds::add);
+						if (userId != null) {
+							userIds.add(userId);
+						}
 					});
 
 				curPage++;
@@ -317,51 +319,36 @@ public class IndividualSegmentsChecker {
 		return serviceContext;
 	}
 
-	private Optional<Long> _getUserIdOptional(
-		long companyId, Individual individual) {
+	private Long _getUserId(long companyId, Individual individual) {
+		for (Individual.DataSourceIndividualPK dataSourceIndividualPK :
+				individual.getDataSourceIndividualPKs()) {
 
-		Optional<Long> userIdOptional = Optional.empty();
+			if (Objects.equals(
+					_asahFaroBackendClient.getDataSourceId(companyId),
+					dataSourceIndividualPK.getDataSourceId())) {
 
-		List<Individual.DataSourceIndividualPK> dataSourceIndividualPKs =
-			individual.getDataSourceIndividualPKs();
+				for (String individualUuid :
+						dataSourceIndividualPK.getIndividualPKs()) {
 
-		Stream<Individual.DataSourceIndividualPK>
-			dataSourceIndividualPKsStream = dataSourceIndividualPKs.stream();
+					User user = _userLocalService.fetchUserByUuidAndCompanyId(
+						individualUuid, companyId);
 
-		List<String> individualUuids = dataSourceIndividualPKsStream.filter(
-			dataSourceIndividualPK -> Objects.equals(
-				_asahFaroBackendClient.getDataSourceId(companyId),
-				dataSourceIndividualPK.getDataSourceId())
-		).findFirst(
-		).map(
-			Individual.DataSourceIndividualPK::getIndividualPKs
-		).orElse(
-			Collections.emptyList()
-		);
+					if (user != null) {
+						return user.getUserId();
+					}
+				}
 
-		if (ListUtil.isNotEmpty(individualUuids)) {
-			Stream<String> individualUuidsStream = individualUuids.stream();
-
-			userIdOptional = individualUuidsStream.map(
-				individualUuid -> _userLocalService.fetchUserByUuidAndCompanyId(
-					individualUuid, companyId)
-			).filter(
-				Objects::nonNull
-			).findFirst(
-			).map(
-				UserModel::getUserId
-			);
-		}
-
-		if (!userIdOptional.isPresent()) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(
-					"Unable to find a user corresponding to individual " +
-						individual.getId());
+				break;
 			}
 		}
 
-		return userIdOptional;
+		if (_log.isWarnEnabled()) {
+			_log.warn(
+				"Unable to find a user corresponding to individual " +
+					individual.getId());
+		}
+
+		return null;
 	}
 
 	private static final int _DELTA = 100;

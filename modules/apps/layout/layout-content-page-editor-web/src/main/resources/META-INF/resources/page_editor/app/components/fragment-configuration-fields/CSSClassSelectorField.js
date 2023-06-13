@@ -48,17 +48,9 @@ export default function CSSClassSelectorField({
 	const helpTextId = useId();
 
 	const alignElementRef = useRef();
+	const dropdownRef = useRef();
 	const firstOptionRef = useRef();
 	const multiSelectRef = useRef();
-
-	const onKeyDown = (event) => {
-		if (event.key === 'Escape') {
-			setDropdownActive(false);
-			setValue((previousValue) => previousValue.trim());
-
-			multiSelectRef.current?.focus();
-		}
-	};
 
 	const addItem = (newItem) => {
 		if (!newItem.trim()) {
@@ -85,6 +77,15 @@ export default function CSSClassSelectorField({
 		multiSelectRef.current?.focus();
 	};
 
+	const onKeyDown = (event) => {
+		if (event.key === 'Escape') {
+			setDropdownActive(false);
+			setValue((previousValue) => previousValue.trim());
+
+			multiSelectRef.current?.focus();
+		}
+	};
+
 	return (
 		<>
 			<ClayForm.Group
@@ -101,10 +102,16 @@ export default function CSSClassSelectorField({
 						id={cssClassesInputId}
 						items={items}
 						onBlur={() => {
-							if (!dropDownActive) {
-								addItem(value);
-								setValue('');
-							}
+							requestAnimationFrame(() => {
+								if (
+									!dropdownRef.current.contains(
+										document.activeElement
+									)
+								) {
+									addItem(value);
+									setValue('');
+								}
+							});
 						}}
 						onChange={(value) => {
 							setValue(value);
@@ -160,6 +167,7 @@ export default function CSSClassSelectorField({
 				active={dropDownActive}
 				alignElementRef={alignElementRef}
 				cssClass={value}
+				dropdownRef={dropdownRef}
 				firstOptionRef={firstOptionRef}
 				onItemClick={onItemClick}
 				onKeyDown={onKeyDown}
@@ -173,13 +181,12 @@ function CSSClassSelectorDropDown({
 	active,
 	alignElementRef,
 	cssClass,
+	dropdownRef,
 	firstOptionRef,
 	onItemClick,
 	onKeyDown,
 	onSetActive,
 }) {
-	const dropdownRef = useRef();
-
 	const availableCssClasses = useSelector((state) => {
 		const layoutData = state.layoutData;
 

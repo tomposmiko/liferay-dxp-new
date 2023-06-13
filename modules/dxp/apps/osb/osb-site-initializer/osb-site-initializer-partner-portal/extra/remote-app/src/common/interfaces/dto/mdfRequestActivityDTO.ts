@@ -10,17 +10,20 @@
  */
 
 import MDFRequestActivity from '../mdfRequestActivity';
+import MDFRequestActivityDescription from '../mdfRequestActivityDescription';
 import MDFRequestBudgetDTO from './mdfRequestBudgetDTO';
 
-export default interface MDFRequestActivityDTO
-	extends Omit<
-		MDFRequestActivity,
-		'budgets' | 'leadFollowUpStrategies' | 'mdfRequestId'
-	> {
-	activityToBudgets?: MDFRequestBudgetDTO[];
-	externalReferenceCodeSF?: string;
-	leadFollowUpStrategies?: string;
-	mdfRequestExternalReferenceCodeSF?: string;
-	r_accountToActivities_accountEntryId?: number;
-	r_mdfRequestToActivities_c_mdfRequestId?: number;
-}
+type MDFRequestActivityDTO = Omit<
+	MDFRequestActivity,
+	'activityDescription' | 'budgets'
+> &
+	Omit<MDFRequestActivityDescription, 'leadFollowUpStrategies'> & {
+		actToBgts?: MDFRequestBudgetDTO[];
+		externalReferenceCodeSF?: string;
+		leadFollowUpStrategies?: string;
+		mdfRequestExternalReferenceCodeSF?: string;
+		r_accToActs_accountEntryId?: number;
+		r_mdfReqToActs_c_mdfRequestId?: number;
+	};
+
+export default MDFRequestActivityDTO;

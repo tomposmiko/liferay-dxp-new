@@ -15,6 +15,7 @@
 package com.liferay.analytics.batch.exportimport.internal;
 
 import com.liferay.analytics.batch.exportimport.AnalyticsDXPEntityBatchExporter;
+import com.liferay.analytics.settings.security.constants.AnalyticsSecurityConstants;
 import com.liferay.dispatch.constants.DispatchConstants;
 import com.liferay.dispatch.executor.DispatchTaskClusterMode;
 import com.liferay.dispatch.model.DispatchTrigger;
@@ -139,7 +140,10 @@ public class AnalyticsDXPEntityBatchExporterImpl
 
 		DispatchTrigger dispatchTrigger =
 			_dispatchTriggerLocalService.addDispatchTrigger(
-				null, _userLocalService.getDefaultUserId(companyId),
+				null,
+				_userLocalService.getUserIdByScreenName(
+					companyId,
+					AnalyticsSecurityConstants.SCREEN_NAME_ANALYTICS_ADMIN),
 				dispatchTriggerName, null, dispatchTriggerName, false);
 
 		return _dispatchTriggerLocalService.updateDispatchTrigger(
@@ -153,6 +157,7 @@ public class AnalyticsDXPEntityBatchExporterImpl
 	private static final String _CRON_EXPRESSION = "0 0 * * * ?";
 
 	private static final String[] _DISPATCH_TRIGGER_NAMES = {
+		"analytics-upload-order", "analytics-upload-product",
 		"export-account-entry-analytics-dxp-entities",
 		"export-account-group-analytics-dxp-entities",
 		"export-analytics-association-analytics-dxp-entities",

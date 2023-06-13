@@ -17,12 +17,14 @@ package com.liferay.headless.commerce.admin.account.internal.graphql.query.v1_0;
 import com.liferay.headless.commerce.admin.account.dto.v1_0.Account;
 import com.liferay.headless.commerce.admin.account.dto.v1_0.AccountAddress;
 import com.liferay.headless.commerce.admin.account.dto.v1_0.AccountChannelEntry;
+import com.liferay.headless.commerce.admin.account.dto.v1_0.AccountChannelShippingOption;
 import com.liferay.headless.commerce.admin.account.dto.v1_0.AccountGroup;
 import com.liferay.headless.commerce.admin.account.dto.v1_0.AccountMember;
 import com.liferay.headless.commerce.admin.account.dto.v1_0.AccountOrganization;
 import com.liferay.headless.commerce.admin.account.dto.v1_0.User;
 import com.liferay.headless.commerce.admin.account.resource.v1_0.AccountAddressResource;
 import com.liferay.headless.commerce.admin.account.resource.v1_0.AccountChannelEntryResource;
+import com.liferay.headless.commerce.admin.account.resource.v1_0.AccountChannelShippingOptionResource;
 import com.liferay.headless.commerce.admin.account.resource.v1_0.AccountGroupResource;
 import com.liferay.headless.commerce.admin.account.resource.v1_0.AccountMemberResource;
 import com.liferay.headless.commerce.admin.account.resource.v1_0.AccountOrganizationResource;
@@ -81,6 +83,15 @@ public class Query {
 
 		_accountChannelEntryResourceComponentServiceObjects =
 			accountChannelEntryResourceComponentServiceObjects;
+	}
+
+	public static void
+		setAccountChannelShippingOptionResourceComponentServiceObjects(
+			ComponentServiceObjects<AccountChannelShippingOptionResource>
+				accountChannelShippingOptionResourceComponentServiceObjects) {
+
+		_accountChannelShippingOptionResourceComponentServiceObjects =
+			accountChannelShippingOptionResourceComponentServiceObjects;
 	}
 
 	public static void setAccountGroupResourceComponentServiceObjects(
@@ -240,7 +251,7 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountChannelBillingAddressId(id: ___){accountExternalReferenceCode, accountId, channelExternalReferenceCode, channelId, classExternalReferenceCode, classPK, id, overrideEligibility, priority}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountChannelBillingAddressId(id: ___){accountExternalReferenceCode, accountId, actions, channelExternalReferenceCode, channelId, classExternalReferenceCode, classPK, id, overrideEligibility, priority}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public AccountChannelEntry accountChannelBillingAddressId(
@@ -258,7 +269,7 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountChannelCurrencyId(id: ___){accountExternalReferenceCode, accountId, channelExternalReferenceCode, channelId, classExternalReferenceCode, classPK, id, overrideEligibility, priority}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountChannelCurrencyId(id: ___){accountExternalReferenceCode, accountId, actions, channelExternalReferenceCode, channelId, classExternalReferenceCode, classPK, id, overrideEligibility, priority}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public AccountChannelEntry accountChannelCurrencyId(
@@ -275,7 +286,7 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountChannelDeliveryTermId(id: ___){accountExternalReferenceCode, accountId, channelExternalReferenceCode, channelId, classExternalReferenceCode, classPK, id, overrideEligibility, priority}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountChannelDeliveryTermId(id: ___){accountExternalReferenceCode, accountId, actions, channelExternalReferenceCode, channelId, classExternalReferenceCode, classPK, id, overrideEligibility, priority}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public AccountChannelEntry accountChannelDeliveryTermId(
@@ -293,7 +304,7 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountChannelDiscountId(id: ___){accountExternalReferenceCode, accountId, channelExternalReferenceCode, channelId, classExternalReferenceCode, classPK, id, overrideEligibility, priority}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountChannelDiscountId(id: ___){accountExternalReferenceCode, accountId, actions, channelExternalReferenceCode, channelId, classExternalReferenceCode, classPK, id, overrideEligibility, priority}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public AccountChannelEntry accountChannelDiscountId(
@@ -310,7 +321,25 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountChannelPaymentTermId(id: ___){accountExternalReferenceCode, accountId, channelExternalReferenceCode, channelId, classExternalReferenceCode, classPK, id, overrideEligibility, priority}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountChannelPaymentMethodId(id: ___){accountExternalReferenceCode, accountId, actions, channelExternalReferenceCode, channelId, classExternalReferenceCode, classPK, id, overrideEligibility, priority}}"}' -u 'test@liferay.com:test'
+	 */
+	@GraphQLField
+	public AccountChannelEntry accountChannelPaymentMethodId(
+			@GraphQLName("id") Long id)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_accountChannelEntryResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			accountChannelEntryResource ->
+				accountChannelEntryResource.getAccountChannelPaymentMethodId(
+					id));
+	}
+
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountChannelPaymentTermId(id: ___){accountExternalReferenceCode, accountId, actions, channelExternalReferenceCode, channelId, classExternalReferenceCode, classPK, id, overrideEligibility, priority}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public AccountChannelEntry accountChannelPaymentTermId(
@@ -327,7 +356,7 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountChannelPriceListId(id: ___){accountExternalReferenceCode, accountId, channelExternalReferenceCode, channelId, classExternalReferenceCode, classPK, id, overrideEligibility, priority}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountChannelPriceListId(id: ___){accountExternalReferenceCode, accountId, actions, channelExternalReferenceCode, channelId, classExternalReferenceCode, classPK, id, overrideEligibility, priority}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public AccountChannelEntry accountChannelPriceListId(
@@ -344,7 +373,7 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountChannelShippingAddressId(id: ___){accountExternalReferenceCode, accountId, channelExternalReferenceCode, channelId, classExternalReferenceCode, classPK, id, overrideEligibility, priority}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountChannelShippingAddressId(id: ___){accountExternalReferenceCode, accountId, actions, channelExternalReferenceCode, channelId, classExternalReferenceCode, classPK, id, overrideEligibility, priority}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public AccountChannelEntry accountChannelShippingAddressId(
@@ -362,7 +391,7 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountChannelUserId(id: ___){accountExternalReferenceCode, accountId, channelExternalReferenceCode, channelId, classExternalReferenceCode, classPK, id, overrideEligibility, priority}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountChannelUserId(id: ___){accountExternalReferenceCode, accountId, actions, channelExternalReferenceCode, channelId, classExternalReferenceCode, classPK, id, overrideEligibility, priority}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
 	public AccountChannelEntry accountChannelUserId(@GraphQLName("id") Long id)
@@ -464,6 +493,29 @@ public class Query {
 			accountChannelEntryResource -> new AccountChannelEntryPage(
 				accountChannelEntryResource.
 					getAccountByExternalReferenceCodeAccountChannelDiscountsPage(
+						externalReferenceCode, Pagination.of(page, pageSize))));
+	}
+
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountByExternalReferenceCodeAccountChannelPaymentMethods(externalReferenceCode: ___, page: ___, pageSize: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
+	 */
+	@GraphQLField
+	public AccountChannelEntryPage
+			accountByExternalReferenceCodeAccountChannelPaymentMethods(
+				@GraphQLName("externalReferenceCode") String
+					externalReferenceCode,
+				@GraphQLName("pageSize") int pageSize,
+				@GraphQLName("page") int page)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_accountChannelEntryResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			accountChannelEntryResource -> new AccountChannelEntryPage(
+				accountChannelEntryResource.
+					getAccountByExternalReferenceCodeAccountChannelPaymentMethodsPage(
 						externalReferenceCode, Pagination.of(page, pageSize))));
 	}
 
@@ -642,6 +694,26 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountIdAccountChannelPaymentMethods(id: ___, page: ___, pageSize: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
+	 */
+	@GraphQLField
+	public AccountChannelEntryPage accountIdAccountChannelPaymentMethods(
+			@GraphQLName("id") Long id, @GraphQLName("pageSize") int pageSize,
+			@GraphQLName("page") int page)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_accountChannelEntryResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			accountChannelEntryResource -> new AccountChannelEntryPage(
+				accountChannelEntryResource.
+					getAccountIdAccountChannelPaymentMethodsPage(
+						id, Pagination.of(page, pageSize))));
+	}
+
+	/**
+	 * Invoke this method with the command line:
+	 *
 	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountIdAccountChannelPaymentTerms(id: ___, page: ___, pageSize: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
@@ -716,6 +788,72 @@ public class Query {
 			accountChannelEntryResource -> new AccountChannelEntryPage(
 				accountChannelEntryResource.getAccountIdAccountChannelUsersPage(
 					id, Pagination.of(page, pageSize))));
+	}
+
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountChannelShippingOption(id: ___){accountExternalReferenceCode, accountId, actions, channelExternalReferenceCode, channelId, id, shippingMethodId, shippingMethodKey, shippingOptionId, shippingOptionKey}}"}' -u 'test@liferay.com:test'
+	 */
+	@GraphQLField
+	public AccountChannelShippingOption accountChannelShippingOption(
+			@GraphQLName("id") Long id)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_accountChannelShippingOptionResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			accountChannelShippingOptionResource ->
+				accountChannelShippingOptionResource.
+					getAccountChannelShippingOption(id));
+	}
+
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountByExternalReferenceCodeAccountChannelShippingOption(externalReferenceCode: ___, page: ___, pageSize: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
+	 */
+	@GraphQLField
+	public AccountChannelShippingOptionPage
+			accountByExternalReferenceCodeAccountChannelShippingOption(
+				@GraphQLName("externalReferenceCode") String
+					externalReferenceCode,
+				@GraphQLName("pageSize") int pageSize,
+				@GraphQLName("page") int page)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_accountChannelShippingOptionResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			accountChannelShippingOptionResource ->
+				new AccountChannelShippingOptionPage(
+					accountChannelShippingOptionResource.
+						getAccountByExternalReferenceCodeAccountChannelShippingOptionPage(
+							externalReferenceCode,
+							Pagination.of(page, pageSize))));
+	}
+
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountIdAccountChannelShippingOption(id: ___, page: ___, pageSize: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
+	 */
+	@GraphQLField
+	public AccountChannelShippingOptionPage
+			accountIdAccountChannelShippingOption(
+				@GraphQLName("id") Long id,
+				@GraphQLName("pageSize") int pageSize,
+				@GraphQLName("page") int page)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_accountChannelShippingOptionResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			accountChannelShippingOptionResource ->
+				new AccountChannelShippingOptionPage(
+					accountChannelShippingOptionResource.
+						getAccountIdAccountChannelShippingOptionPage(
+							id, Pagination.of(page, pageSize))));
 	}
 
 	/**
@@ -974,6 +1112,38 @@ public class Query {
 			accountOrganizationResource ->
 				accountOrganizationResource.getAccountIdAccountOrganization(
 					id, organizationId));
+	}
+
+	@GraphQLTypeExtension(Account.class)
+	public class
+		GetAccountByExternalReferenceCodeAccountChannelShippingOptionPageTypeExtension {
+
+		public GetAccountByExternalReferenceCodeAccountChannelShippingOptionPageTypeExtension(
+			Account account) {
+
+			_account = account;
+		}
+
+		@GraphQLField
+		public AccountChannelShippingOptionPage
+				byExternalReferenceCodeAccountChannelShippingOption(
+					@GraphQLName("pageSize") int pageSize,
+					@GraphQLName("page") int page)
+			throws Exception {
+
+			return _applyComponentServiceObjects(
+				_accountChannelShippingOptionResourceComponentServiceObjects,
+				Query.this::_populateResourceContext,
+				accountChannelShippingOptionResource ->
+					new AccountChannelShippingOptionPage(
+						accountChannelShippingOptionResource.
+							getAccountByExternalReferenceCodeAccountChannelShippingOptionPage(
+								_account.getExternalReferenceCode(),
+								Pagination.of(page, pageSize))));
+		}
+
+		private Account _account;
+
 	}
 
 	@GraphQLTypeExtension(Account.class)
@@ -1356,6 +1526,37 @@ public class Query {
 
 	@GraphQLTypeExtension(Account.class)
 	public class
+		GetAccountByExternalReferenceCodeAccountChannelPaymentMethodsPageTypeExtension {
+
+		public GetAccountByExternalReferenceCodeAccountChannelPaymentMethodsPageTypeExtension(
+			Account account) {
+
+			_account = account;
+		}
+
+		@GraphQLField
+		public AccountChannelEntryPage
+				byExternalReferenceCodeAccountChannelPaymentMethods(
+					@GraphQLName("pageSize") int pageSize,
+					@GraphQLName("page") int page)
+			throws Exception {
+
+			return _applyComponentServiceObjects(
+				_accountChannelEntryResourceComponentServiceObjects,
+				Query.this::_populateResourceContext,
+				accountChannelEntryResource -> new AccountChannelEntryPage(
+					accountChannelEntryResource.
+						getAccountByExternalReferenceCodeAccountChannelPaymentMethodsPage(
+							_account.getExternalReferenceCode(),
+							Pagination.of(page, pageSize))));
+		}
+
+		private Account _account;
+
+	}
+
+	@GraphQLTypeExtension(Account.class)
+	public class
 		GetAccountByExternalReferenceCodeAccountOrganizationsPageTypeExtension {
 
 		public GetAccountByExternalReferenceCodeAccountOrganizationsPageTypeExtension(
@@ -1572,6 +1773,41 @@ public class Query {
 
 	}
 
+	@GraphQLName("AccountChannelShippingOptionPage")
+	public class AccountChannelShippingOptionPage {
+
+		public AccountChannelShippingOptionPage(
+			Page accountChannelShippingOptionPage) {
+
+			actions = accountChannelShippingOptionPage.getActions();
+
+			items = accountChannelShippingOptionPage.getItems();
+			lastPage = accountChannelShippingOptionPage.getLastPage();
+			page = accountChannelShippingOptionPage.getPage();
+			pageSize = accountChannelShippingOptionPage.getPageSize();
+			totalCount = accountChannelShippingOptionPage.getTotalCount();
+		}
+
+		@GraphQLField
+		protected Map<String, Map> actions;
+
+		@GraphQLField
+		protected java.util.Collection<AccountChannelShippingOption> items;
+
+		@GraphQLField
+		protected long lastPage;
+
+		@GraphQLField
+		protected long page;
+
+		@GraphQLField
+		protected long pageSize;
+
+		@GraphQLField
+		protected long totalCount;
+
+	}
+
 	@GraphQLName("AccountGroupPage")
 	public class AccountGroupPage {
 
@@ -1736,6 +1972,26 @@ public class Query {
 	}
 
 	private void _populateResourceContext(
+			AccountChannelShippingOptionResource
+				accountChannelShippingOptionResource)
+		throws Exception {
+
+		accountChannelShippingOptionResource.setContextAcceptLanguage(
+			_acceptLanguage);
+		accountChannelShippingOptionResource.setContextCompany(_company);
+		accountChannelShippingOptionResource.setContextHttpServletRequest(
+			_httpServletRequest);
+		accountChannelShippingOptionResource.setContextHttpServletResponse(
+			_httpServletResponse);
+		accountChannelShippingOptionResource.setContextUriInfo(_uriInfo);
+		accountChannelShippingOptionResource.setContextUser(_user);
+		accountChannelShippingOptionResource.setGroupLocalService(
+			_groupLocalService);
+		accountChannelShippingOptionResource.setRoleLocalService(
+			_roleLocalService);
+	}
+
+	private void _populateResourceContext(
 			AccountGroupResource accountGroupResource)
 		throws Exception {
 
@@ -1787,6 +2043,8 @@ public class Query {
 		_accountAddressResourceComponentServiceObjects;
 	private static ComponentServiceObjects<AccountChannelEntryResource>
 		_accountChannelEntryResourceComponentServiceObjects;
+	private static ComponentServiceObjects<AccountChannelShippingOptionResource>
+		_accountChannelShippingOptionResourceComponentServiceObjects;
 	private static ComponentServiceObjects<AccountGroupResource>
 		_accountGroupResourceComponentServiceObjects;
 	private static ComponentServiceObjects<AccountMemberResource>

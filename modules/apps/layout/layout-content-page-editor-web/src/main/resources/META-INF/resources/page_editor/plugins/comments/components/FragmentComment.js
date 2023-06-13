@@ -184,12 +184,13 @@ export default function FragmentComment({
 						onActiveChange={setDropDownActive}
 						trigger={
 							<ClayButton
+								aria-label={Liferay.Language.get('options')}
 								borderless
 								disabled={editing}
 								displayType="secondary"
 								monospaced
 								outline
-								small
+								size="sm"
 							>
 								<ClayIcon symbol="ellipsis-v" />
 							</ClayButton>

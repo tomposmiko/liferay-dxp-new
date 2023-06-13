@@ -16,8 +16,7 @@ $toolbarZIndex: 971;
 		}
 	}
 	.knowledge-base-vertical-bar {
-		position: relative;
-		z-index: 1;
+		position: fixed;
 
 		> div {
 			height: 100%;
@@ -225,5 +224,9 @@ $toolbarZIndex: 971;
 
 	.lfr-search-container-wrapper .list-group .list-group-item h2.h5 {
 		font-weight: 600;
+	}
+
+	.management-bar .navbar-nav {
+		column-gap: 0.25rem;
 	}
 }

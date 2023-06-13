@@ -12,47 +12,90 @@
 import Dropdown from '../../../common/components/Dropdown';
 import StatusBadge from '../../../common/components/StatusBadge';
 import {MDFColumnKey} from '../../../common/enums/mdfColumnKey';
-import {Status} from '../../../common/enums/status';
+import {PRMPageRoute} from '../../../common/enums/prmPageRoute';
 import {MDFRequestListItem} from '../../../common/interfaces/mdfRequestListItem';
 import TableColumn from '../../../common/interfaces/tableColumn';
 import {Liferay} from '../../../common/services/liferay';
+import {Status} from '../../../common/utils/constants/status';
 
 export default function getMDFListColumns(
 	columns?: TableColumn<MDFRequestListItem>[],
 	siteURL?: string
 ): TableColumn<MDFRequestListItem>[] | undefined {
+	const getDropdownOptions = (row: MDFRequestListItem) => {
+		if (
+			row[MDFColumnKey.STATUS] !== Status.DRAFT.name &&
+			row[MDFColumnKey.STATUS] !== Status.REQUEST_MORE_INFO.name
+		) {
+			return (
+				<Dropdown
+					options={[
+						{
+							icon: 'view',
+							key: 'approve',
+							label: ' View',
+							onClick: () =>
+								Liferay.Util.navigate(
+									`${siteURL}/l/${row[MDFColumnKey.ID]}`
+								),
+						},
+					]}
+				></Dropdown>
+			);
+		}
+
+		const options = [
+			{
+				icon: 'view',
+				key: 'approve',
+				label: ' View',
+				onClick: () =>
+					Liferay.Util.navigate(
+						`${siteURL}/l/${row[MDFColumnKey.ID]}`
+					),
+			},
+			{
+				icon: 'pencil',
+				key: 'edit',
+				label: ' Edit',
+				onClick: () =>
+					Liferay.Util.navigate(
+						`${siteURL}/${PRMPageRoute.CREATE_MDF_REQUEST}/#/${
+							row[MDFColumnKey.ID]
+						}`
+					),
+			},
+		];
+
+		return <Dropdown options={options}></Dropdown>;
+	};
+
 	return (
 		columns && [
 			{
 				columnKey: MDFColumnKey.ID,
 				label: 'Request ID',
-				render: (data) => <>{`Request-${data}`}</>,
-			},
-			{
-				columnKey: MDFColumnKey.STATUS,
-				label: 'Status',
-				render: (data) => <StatusBadge status={data as Status} />,
-			},
-			...columns,
-			{
-				columnKey: MDFColumnKey.ACTION,
-				label: '',
-				render: (_, row) => (
-					<Dropdown
+				render: (data, row) => (
+					<a
+						className="link"
 						onClick={() =>
 							Liferay.Util.navigate(
 								`${siteURL}/l/${row[MDFColumnKey.ID]}`
 							)
 						}
-						options={[
-							{
-								icon: 'view',
-								key: 'approve',
-								label: ' View',
-							},
-						]}
-					></Dropdown>
+					>{`Request-${data}`}</a>
 				),
+			},
+			{
+				columnKey: MDFColumnKey.STATUS,
+				label: 'Status',
+				render: (data) => <StatusBadge status={data as string} />,
+			},
+			...columns,
+			{
+				columnKey: MDFColumnKey.ACTION,
+				label: '',
+				render: (_, row) => getDropdownOptions(row),
 			},
 		]
 	);

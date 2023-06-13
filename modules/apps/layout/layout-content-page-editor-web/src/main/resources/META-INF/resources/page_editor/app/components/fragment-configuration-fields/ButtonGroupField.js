@@ -39,6 +39,7 @@ export function ButtonGroupField({field, onValueSelect, value}) {
 
 			{field.typeOptions?.validValues.map((validValue) => (
 				<ClayButtonWithIcon
+					aria-label={validValue.label}
 					aria-pressed={nextValue === validValue.value}
 					className={
 						nextValue === validValue.value
@@ -48,7 +49,7 @@ export function ButtonGroupField({field, onValueSelect, value}) {
 					displayType="unstyled"
 					key={validValue.value}
 					onClick={() => updateNextValue(validValue.value)}
-					small
+					size="sm"
 					symbol={validValue.icon}
 					title={validValue.label}
 					value={validValue.value}

@@ -226,6 +226,13 @@ export default function FragmentsSidebar() {
 		}
 	}, [dispatch, searchValue, widgetFragmentEntryLinksRef, widgets]);
 
+	const viewButtonLabel = sub(
+		Liferay.Language.get('switch-to-x-view'),
+		displayStyle === FRAGMENTS_DISPLAY_STYLES.LIST
+			? Liferay.Language.get('card')
+			: Liferay.Language.get('list')
+	);
+
 	return (
 		<>
 			<SidebarPanelHeader>
@@ -245,17 +252,19 @@ export default function FragmentsSidebar() {
 					/>
 
 					<ClayButtonWithIcon
+						aria-label={Liferay.Language.get('reorder-sets')}
 						borderless
 						className="lfr-portal-tooltip ml-2 mt-0"
 						data-tooltip-align="bottom-right"
 						displayType="secondary"
 						onClick={() => setShowReorderModal(true)}
-						small
+						size="sm"
 						symbol="order-arrow"
 						title={Liferay.Language.get('reorder-sets')}
 					/>
 
 					<ClayButtonWithIcon
+						aria-label={viewButtonLabel}
 						borderless
 						className="lfr-portal-tooltip ml-2 mt-0"
 						data-tooltip-align="bottom-right"
@@ -268,19 +277,14 @@ export default function FragmentsSidebar() {
 									: FRAGMENTS_DISPLAY_STYLES.LIST
 							);
 						}}
-						small
+						size="sm"
 						symbol={
 							displayStyleButtonDisabled ||
 							displayStyle === FRAGMENTS_DISPLAY_STYLES.LIST
 								? 'cards2'
 								: 'list'
 						}
-						title={sub(
-							Liferay.Language.get('switch-to-x-view'),
-							displayStyle === FRAGMENTS_DISPLAY_STYLES.LIST
-								? Liferay.Language.get('card')
-								: Liferay.Language.get('list')
-						)}
+						title={viewButtonLabel}
 					/>
 				</div>
 

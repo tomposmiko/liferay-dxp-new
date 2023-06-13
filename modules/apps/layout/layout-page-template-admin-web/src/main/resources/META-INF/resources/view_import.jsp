@@ -62,9 +62,9 @@ ImportDisplayContext importDisplayContext = new ImportDisplayContext(request, re
 			%>
 
 			<div class="alert alert-<%= dialogType %> <%= dialogType %>-dialog">
-				<span class="<%= dialogType %>-message"><%= importDisplayContext.getDialogMessage() %></span>
+				<span class="font-weight-bold"><%= importDisplayContext.getDialogMessage() %></span>
 
-				<ul class="<%= dialogType %>-list-items">
+				<ul>
 
 					<%
 					Map<Integer, List<LayoutsImporterResultEntry>> importedLayoutsImporterResultEntriesMap = importDisplayContext.getImportedLayoutsImporterResultEntriesMap();
@@ -77,7 +77,7 @@ ImportDisplayContext importDisplayContext = new ImportDisplayContext(request, re
 						%>
 
 							<li>
-								<span class="<%= dialogType %>-info"><%= HtmlUtil.escape(importDisplayContext.getSuccessMessage(entrySet)) %></span>
+								<span class="font-italic"><%= HtmlUtil.escape(importDisplayContext.getSuccessMessage(entrySet)) %></span>
 							</li>
 
 						<%
@@ -93,14 +93,12 @@ ImportDisplayContext importDisplayContext = new ImportDisplayContext(request, re
 					<c:if test="<%= ListUtil.isNotEmpty(layoutsImporterResultEntriesWithWarnings) %>">
 
 						<%
-						for (int i = 0; i < layoutsImporterResultEntriesWithWarnings.size(); i++) {
-							LayoutsImporterResultEntry layoutsImporterResultEntry = layoutsImporterResultEntriesWithWarnings.get(i);
-
+						for (LayoutsImporterResultEntry layoutsImporterResultEntry : layoutsImporterResultEntriesWithWarnings) {
 							String[] warningMessages = layoutsImporterResultEntry.getWarningMessages();
 						%>
 
 							<li>
-								<span class="<%= dialogType %>-info"><%= HtmlUtil.escape(importDisplayContext.getWarningMessage(layoutsImporterResultEntry.getName())) %></span>
+								<span class="font-italic"><%= HtmlUtil.escape(importDisplayContext.getWarningMessage(layoutsImporterResultEntry.getName())) %></span>
 
 								<ul>
 
@@ -108,7 +106,7 @@ ImportDisplayContext importDisplayContext = new ImportDisplayContext(request, re
 									for (String warningMessage : warningMessages) {
 									%>
 
-										<li><span class="<%= dialogType %>-info"><%= HtmlUtil.escape(warningMessage) %></span></li>
+										<li><span class="font-italic"><%= HtmlUtil.escape(warningMessage) %></span></li>
 
 									<%
 									}
@@ -124,8 +122,7 @@ ImportDisplayContext importDisplayContext = new ImportDisplayContext(request, re
 					</c:if>
 
 					<%
-					int total = 0;
-					int viewTotal = 0;
+					int i = 0;
 
 					List<LayoutsImporterResultEntry> notImportedLayoutsImporterResultEntries = importDisplayContext.getNotImportedLayoutsImporterResultEntries();
 					%>
@@ -133,16 +130,12 @@ ImportDisplayContext importDisplayContext = new ImportDisplayContext(request, re
 					<c:if test="<%= ListUtil.isNotEmpty(notImportedLayoutsImporterResultEntries) %>">
 
 						<%
-						total = notImportedLayoutsImporterResultEntries.size();
-
-						viewTotal = (total > 10) ? 10 : total;
-
-						for (int i = 0; i < viewTotal; i++) {
+						for (; (i < notImportedLayoutsImporterResultEntries.size()) && (i < 10); i++) {
 							LayoutsImporterResultEntry layoutsImporterResultEntry = notImportedLayoutsImporterResultEntries.get(i);
 						%>
 
 							<li>
-								<span class="<%= dialogType %>-info"><%= HtmlUtil.escape(layoutsImporterResultEntry.getErrorMessage()) %></span>
+								<span class="font-italic"><%= HtmlUtil.escape(layoutsImporterResultEntry.getErrorMessage()) %></span>
 							</li>
 
 						<%
@@ -152,8 +145,8 @@ ImportDisplayContext importDisplayContext = new ImportDisplayContext(request, re
 					</c:if>
 				</ul>
 
-				<c:if test="<%= total > 10 %>">
-					<span class="<%= dialogType %>-info"><%= LanguageUtil.format(request, "x-more-entries-could-also-not-be-imported", "<strong>" + (total - viewTotal) + "</strong>", false) %></span>
+				<c:if test="<%= notImportedLayoutsImporterResultEntries.size() > 10 %>">
+					<span><%= LanguageUtil.format(request, "x-more-entries-could-also-not-be-imported", "<strong>" + (notImportedLayoutsImporterResultEntries.size() - i) + "</strong>", false) %></span>
 				</c:if>
 			</div>
 		</c:if>

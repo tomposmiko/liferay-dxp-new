@@ -45,6 +45,13 @@ export function ImageSelector({
 
 	const hasImageTitle = !!imageTitle.length;
 
+	const selectButtonLabel = sub(
+		hasImageTitle
+			? Liferay.Language.get('change-x')
+			: Liferay.Language.get('select-x'),
+		Liferay.Language.get('image')
+	);
+
 	return selectedViewportSize === VIEWPORT_SIZES.desktop ? (
 		<>
 			<ClayForm.Group>
@@ -69,20 +76,16 @@ export function ImageSelector({
 
 					<ClayInput.GroupItem shrink>
 						<ClayButtonWithIcon
+							aria-label={selectButtonLabel}
 							displayType="secondary"
 							onClick={() =>
 								openImageSelector((image) => {
 									onImageSelected(image);
 								})
 							}
-							small
+							size="sm"
 							symbol={hasImageTitle ? 'change' : 'plus'}
-							title={sub(
-								hasImageTitle
-									? Liferay.Language.get('change-x')
-									: Liferay.Language.get('select-x'),
-								Liferay.Language.get('image')
-							)}
+							title={selectButtonLabel}
 						/>
 					</ClayInput.GroupItem>
 
@@ -90,9 +93,12 @@ export function ImageSelector({
 						<>
 							<ClayInput.GroupItem shrink>
 								<ClayButtonWithIcon
+									aria-label={Liferay.Language.get(
+										'clear-selection'
+									)}
 									displayType="secondary"
 									onClick={onClearButtonPressed}
-									small
+									size="sm"
 									symbol="times-circle"
 									title={Liferay.Language.get(
 										'clear-selection'

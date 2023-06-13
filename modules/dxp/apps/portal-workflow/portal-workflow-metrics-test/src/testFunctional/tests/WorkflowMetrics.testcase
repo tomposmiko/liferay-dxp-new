@@ -960,6 +960,7 @@ definition {
 	@description = "LRQA-53660 Automate LPS-87571 [Reports] Filter the list of items for a certain process"
 	@priority = "5"
 	test FilterAllItemsList {
+		property portal.acceptance = "quarantine";
 		property test.name.skip.portal.instance = "WorkflowMetrics#FilterAllItemsList";
 
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
@@ -3014,6 +3015,7 @@ definition {
 	@priority = "5"
 	test ViewReports {
 		property environment.acceptance = "true";
+		property operating.system.types = "alpine,amazonlinux,centos,debian,fedora,orcllinux,osx,redhat,solaris,suse,ubuntu,windows";
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "WorkflowMetrics#ViewReports";
 

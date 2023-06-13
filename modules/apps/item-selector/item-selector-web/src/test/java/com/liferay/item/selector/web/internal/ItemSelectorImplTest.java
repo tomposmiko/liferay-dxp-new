@@ -15,6 +15,7 @@
 package com.liferay.item.selector.web.internal;
 
 import com.liferay.item.selector.ItemSelectorCriterion;
+import com.liferay.item.selector.ItemSelectorCriterionHandler;
 import com.liferay.item.selector.ItemSelectorRendering;
 import com.liferay.item.selector.ItemSelectorReturnType;
 import com.liferay.item.selector.ItemSelectorView;
@@ -22,18 +23,17 @@ import com.liferay.item.selector.ItemSelectorViewRenderer;
 import com.liferay.item.selector.constants.ItemSelectorPortletKeys;
 import com.liferay.item.selector.web.internal.util.ItemSelectorCriterionSerializerImpl;
 import com.liferay.item.selector.web.internal.util.ItemSelectorKeyUtil;
-import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.ProxyFactory;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.impl.GroupImpl;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
@@ -44,6 +44,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -51,6 +52,9 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import org.mockito.Mockito;
+
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 
 /**
  * @author Iván Zaera
@@ -70,8 +74,6 @@ public class ItemSelectorImplTest {
 		_flickrItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
 			_testURLItemSelectorReturnType);
 
-		_itemSelectorImpl = new ItemSelectorImpl();
-
 		_stubItemSelectorCriterionSerializerImpl.addItemSelectorReturnType(
 			_testFileEntryItemSelectorReturnType);
 		_stubItemSelectorCriterionSerializerImpl.addItemSelectorReturnType(
@@ -83,14 +85,13 @@ public class ItemSelectorImplTest {
 			_stubItemSelectorCriterionSerializerImpl, "_jsonFactory",
 			new JSONFactoryImpl());
 
-		_itemSelectorImpl.setItemSelectorCriterionSerializer(
-			_stubItemSelectorCriterionSerializerImpl);
+		_itemSelectorImpl = new ItemSelectorImpl();
 
 		ReflectionTestUtil.setFieldValue(
-			_itemSelectorImpl, "_portal", new PortalImpl());
+			_itemSelectorImpl, "_itemSelectionCriterionSerializer",
+			_stubItemSelectorCriterionSerializerImpl);
 		ReflectionTestUtil.setFieldValue(
-			_itemSelectorImpl, "_serviceTrackerMap",
-			ProxyFactory.newDummyInstance(ServiceTrackerMap.class));
+			_itemSelectorImpl, "_portal", new PortalImpl());
 
 		_mediaItemSelectorCriterion = new MediaItemSelectorCriterion();
 
@@ -104,6 +105,27 @@ public class ItemSelectorImplTest {
 		PortalUtil portalUtil = new PortalUtil();
 
 		portalUtil.setPortal(new PortalImpl());
+
+		_flickrItemSelectorCriterionHandlerServiceRegistration =
+			_bundleContext.registerService(
+				(Class<ItemSelectorCriterionHandler<?>>)
+					(Class<?>)ItemSelectorCriterionHandler.class,
+				new FlickrItemSelectorCriterionHandler(), null);
+		_mediaItemSelectorCriterionHandlerServiceRegistration =
+			_bundleContext.registerService(
+				(Class<ItemSelectorCriterionHandler<?>>)
+					(Class<?>)ItemSelectorCriterionHandler.class,
+				new MediaItemSelectorCriterionHandler(), null);
+
+		_itemSelectorImpl.activate(_bundleContext);
+	}
+
+	@AfterClass
+	public static void tearDownClass() {
+		_flickrItemSelectorCriterionHandlerServiceRegistration.unregister();
+		_mediaItemSelectorCriterionHandlerServiceRegistration.unregister();
+
+		_itemSelectorImpl.deactivate();
 	}
 
 	@Test
@@ -311,15 +333,29 @@ public class ItemSelectorImplTest {
 	}
 
 	private void _setUpItemSelectionCriterionHandlers() {
-		_itemSelectorImpl.setItemSelectionCriterionHandler(
-			new FlickrItemSelectorCriterionHandler());
-		_itemSelectorImpl.setItemSelectionCriterionHandler(
-			new MediaItemSelectorCriterionHandler());
+		_flickrItemSelectorCriterionHandlerServiceRegistration =
+			_bundleContext.registerService(
+				(Class<ItemSelectorCriterionHandler<?>>)
+					(Class<?>)ItemSelectorCriterionHandler.class,
+				new FlickrItemSelectorCriterionHandler(), null);
+		_mediaItemSelectorCriterionHandlerServiceRegistration =
+			_bundleContext.registerService(
+				(Class<ItemSelectorCriterionHandler<?>>)
+					(Class<?>)ItemSelectorCriterionHandler.class,
+				new MediaItemSelectorCriterionHandler(), null);
+
+		_itemSelectorImpl.activate(_bundleContext);
 	}
 
+	private static final BundleContext _bundleContext =
+		SystemBundleUtil.getBundleContext();
 	private static FlickrItemSelectorCriterion _flickrItemSelectorCriterion;
+	private static ServiceRegistration<ItemSelectorCriterionHandler<?>>
+		_flickrItemSelectorCriterionHandlerServiceRegistration;
 	private static ItemSelectorImpl _itemSelectorImpl;
 	private static MediaItemSelectorCriterion _mediaItemSelectorCriterion;
+	private static ServiceRegistration<ItemSelectorCriterionHandler<?>>
+		_mediaItemSelectorCriterionHandlerServiceRegistration;
 	private static final StubItemSelectorCriterionSerializerImpl
 		_stubItemSelectorCriterionSerializerImpl =
 			new StubItemSelectorCriterionSerializerImpl();

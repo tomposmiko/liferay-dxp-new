@@ -19,6 +19,18 @@
 		},
 		{
 			"DBType": "String",
+			"businessType": "Text",
+			"indexed": true,
+			"indexedAsKeyword": false,
+			"label": {
+				"en_US": "Company Name"
+			},
+			"name": "companyName",
+			"required": false,
+			"type": "String"
+		},
+		{
+			"DBType": "String",
 			"businessType": "Picklist",
 			"indexed": true,
 			"indexedAsKeyword": false,
@@ -165,14 +177,148 @@
 		},
 		{
 			"DBType": "String",
-			"businessType": "Text",
+			"businessType": "Picklist",
+			"defaultValue": "pendingMarketingReview",
 			"indexed": true,
 			"indexedAsKeyword": false,
 			"label": {
 				"en_US": "MDF Request Status"
 			},
-			"name": "requestStatus",
-			"required": false,
+			"listTypeDefinitionId": "[$LIST_TYPE_DEFINITION_ID:MDF Request Status$]",
+			"name": "mdfRequestStatus",
+			"objectFieldSettings": [
+				{
+					"name": "stateFlow",
+					"value": {
+						"objectStates": [
+							{
+								"key": "pendingMarketingReview",
+								"objectStateTransitions": [
+									{
+										"key": "approved"
+									},
+									{
+										"key": "marketingDirectorReview"
+									},
+									{
+										"key": "moreInfoRequested"
+									},
+									{
+										"key": "rejected"
+									},
+									{
+										"key": "canceled"
+									}
+								]
+							},
+							{
+								"key": "approved",
+								"objectStateTransitions": [
+									{
+										"key": "expired"
+									},
+									{
+										"key": "canceled"
+									}
+								]
+							},
+							{
+								"key": "marketingDirectorReview",
+								"objectStateTransitions": [
+									{
+										"key": "approved"
+									},
+									{
+										"key": "moreInfoRequested"
+									},
+									{
+										"key": "rejected"
+									},
+									{
+										"key": "canceled"
+									},
+									{
+										"key": "pendingMarketingReview"
+									}
+								]
+							},
+							{
+								"key": "moreInfoRequested",
+								"objectStateTransitions": [
+									{
+										"key": "marketingDirectorReview"
+									},
+									{
+										"key": "expired"
+									},
+									{
+										"key": "canceled"
+									},
+									{
+										"key": "draft"
+									}
+								]
+							},
+							{
+								"key": "expired",
+								"objectStateTransitions": [
+									{
+										"key": "marketingDirectorReview"
+									},
+									{
+										"key": "moreInfoRequested"
+									},
+									{
+										"key": "canceled"
+									}
+								]
+							},
+							{
+								"key": "rejected",
+								"objectStateTransitions": [
+									{
+										"key": "pendingMarketingReview"
+									},
+									{
+										"key": "marketingDirectorReview"
+									},
+									{
+										"key": "moreInfoRequested"
+									},
+									{
+										"key": "canceled"
+									}
+								]
+							},
+							{
+								"key": "canceled",
+								"objectStateTransitions": [
+									{
+										"key": "approved"
+									}
+								]
+							},
+							{
+								"key": "draft",
+								"objectStateTransitions": [
+									{
+										"key": "pendingMarketingReview"
+									},
+									{
+										"key": "canceled"
+									},
+									{
+										"key": "marketingDirectorReview"
+									}
+								]
+							}
+						]
+					}
+				}
+			],
+			"required": true,
+			"state": true,
+			"system": false,
 			"type": "String"
 		}
 	],

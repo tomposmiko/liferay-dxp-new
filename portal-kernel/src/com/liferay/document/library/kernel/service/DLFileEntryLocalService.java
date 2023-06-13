@@ -145,7 +145,7 @@ public interface DLFileEntryLocalService
 
 	public DLFileEntry copyFileEntry(
 			long userId, long groupId, long repositoryId, long fileEntryId,
-			long destFolderId, ServiceContext serviceContext)
+			long destFolderId, String fileName, ServiceContext serviceContext)
 		throws PortalException;
 
 	public void copyFileEntryMetadata(
@@ -492,6 +492,10 @@ public interface DLFileEntryLocalService
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<DLFileEntry> getFileEntries(long folderId, String name);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<DLFileEntry> getFileEntriesByClassNameIdAndTreePath(
+		long classNameId, String treePath);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getFileEntriesCount();

@@ -21,8 +21,8 @@
 <%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
 taglib uri="http://liferay.com/tld/clay" prefix="clay" %><%@
 taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
-taglib uri="http://liferay.com/tld/layout" prefix="liferay-layout" %><%@
 taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %><%@
+taglib uri="http://liferay.com/tld/react" prefix="react" %><%@
 taglib uri="http://liferay.com/tld/staging" prefix="liferay-staging" %><%@
 taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
 taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %><%@
@@ -71,7 +71,6 @@ page import="com.liferay.portal.kernel.language.LanguageUtil" %><%@
 page import="com.liferay.portal.kernel.language.UnicodeLanguageUtil" %><%@
 page import="com.liferay.portal.kernel.lock.DuplicateLockException" %><%@
 page import="com.liferay.portal.kernel.model.Group" %><%@
-page import="com.liferay.portal.kernel.model.LayoutConstants" %><%@
 page import="com.liferay.portal.kernel.model.LayoutRevision" %><%@
 page import="com.liferay.portal.kernel.model.LayoutRevisionConstants" %><%@
 page import="com.liferay.portal.kernel.model.LayoutSetBranch" %><%@
@@ -117,6 +116,7 @@ page import="com.liferay.portal.kernel.util.UnicodeProperties" %><%@
 page import="com.liferay.portal.kernel.util.Validator" %><%@
 page import="com.liferay.staging.configuration.StagingConfiguration" %><%@
 page import="com.liferay.staging.constants.StagingProcessesWebKeys" %><%@
+page import="com.liferay.staging.taglib.internal.display.context.LayoutsTreeDisplayContext" %><%@
 page import="com.liferay.staging.taglib.internal.display.context.ProcessListDisplayContext" %>
 
 <%@ page import="java.io.Serializable" %>

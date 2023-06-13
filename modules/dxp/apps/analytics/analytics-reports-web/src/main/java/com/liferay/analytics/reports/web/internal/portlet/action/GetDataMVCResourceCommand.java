@@ -26,6 +26,7 @@ import com.liferay.analytics.reports.web.internal.model.TimeSpan;
 import com.liferay.analytics.reports.web.internal.util.AnalyticsReportsUtil;
 import com.liferay.info.item.ClassPKInfoItemIdentifier;
 import com.liferay.info.item.InfoItemReference;
+import com.liferay.info.type.WebImage;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.NoSuchModelException;
@@ -64,14 +65,12 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Stream;
 
@@ -110,19 +109,27 @@ public class GetDataMVCResourceCommand extends BaseMVCResourceCommand {
 			InfoItemReference infoItemReference = _getInfoItemReference(
 				httpServletRequest);
 
-			Object analyticsReportsInfoItemObject = Optional.ofNullable(
-				_analyticsReportsInfoItemObjectProviderRegistry.
-					getAnalyticsReportsInfoItemObjectProvider(
-						infoItemReference.getClassName())
-			).map(
-				analyticsReportsInfoItemObjectProvider ->
-					analyticsReportsInfoItemObjectProvider.
-						getAnalyticsReportsInfoItemObject(infoItemReference)
-			).orElseThrow(
-				() -> new NoSuchModelException(
+			AnalyticsReportsInfoItemObjectProvider<?>
+				analyticsReportsInfoItemObjectProvider =
+					_analyticsReportsInfoItemObjectProviderRegistry.
+						getAnalyticsReportsInfoItemObjectProvider(
+							infoItemReference.getClassName());
+
+			if (analyticsReportsInfoItemObjectProvider == null) {
+				throw new NoSuchModelException(
 					"No analytics reports info item object provider found " +
-						"for " + infoItemReference)
-			);
+						"for " + infoItemReference);
+			}
+
+			Object analyticsReportsInfoItemObject =
+				analyticsReportsInfoItemObjectProvider.
+					getAnalyticsReportsInfoItemObject(infoItemReference);
+
+			if (analyticsReportsInfoItemObject == null) {
+				throw new NoSuchModelException(
+					"No analytics reports info item object provider found " +
+						"for " + infoItemReference);
+			}
 
 			AnalyticsReportsInfoItem<Object> analyticsReportsInfoItem =
 				(AnalyticsReportsInfoItem<Object>)
@@ -188,35 +195,31 @@ public class GetDataMVCResourceCommand extends BaseMVCResourceCommand {
 		AnalyticsReportsInfoItem<Object> analyticsReportsInfoItem,
 		Locale locale, Object object) {
 
-		return Optional.ofNullable(
-			analyticsReportsInfoItem.getAuthorWebImage(object, locale)
-		).filter(
-			webImage -> Validator.isNotNull(webImage.getUrl())
-		).map(
-			webImage -> {
-				long portraitId = GetterUtil.getLong(
-					HttpComponentsUtil.getParameter(
-						HtmlUtil.escape(webImage.getUrl()), "img_id"));
+		WebImage webImage = analyticsReportsInfoItem.getAuthorWebImage(
+			object, locale);
 
-				if (portraitId > 0) {
-					return JSONUtil.put(
-						"authorId",
-						analyticsReportsInfoItem.getAuthorUserId(object)
-					).put(
-						"name", analyticsReportsInfoItem.getAuthorName(object)
-					).put(
-						"url", webImage.getUrl()
-					);
-				}
+		if ((webImage == null) || Validator.isNull(webImage.getUrl())) {
+			return null;
+		}
 
-				return JSONUtil.put(
-					"authorId", analyticsReportsInfoItem.getAuthorUserId(object)
-				).put(
-					"name", analyticsReportsInfoItem.getAuthorName(object)
-				);
-			}
-		).orElse(
-			null
+		long portraitId = GetterUtil.getLong(
+			HttpComponentsUtil.getParameter(
+				HtmlUtil.escape(webImage.getUrl()), "img_id"));
+
+		if (portraitId > 0) {
+			return JSONUtil.put(
+				"authorId", analyticsReportsInfoItem.getAuthorUserId(object)
+			).put(
+				"name", analyticsReportsInfoItem.getAuthorName(object)
+			).put(
+				"url", webImage.getUrl()
+			);
+		}
+
+		return JSONUtil.put(
+			"authorId", analyticsReportsInfoItem.getAuthorUserId(object)
+		).put(
+			"name", analyticsReportsInfoItem.getAuthorName(object)
 		);
 	}
 
@@ -255,20 +258,22 @@ public class GetDataMVCResourceCommand extends BaseMVCResourceCommand {
 
 		JSONObject jsonObject = _jsonFactory.createJSONObject();
 
-		Optional.ofNullable(
-			analyticsReportsInfoItem.getActions()
-		).orElseGet(
-			Collections::emptyList
-		).stream(
-		).map(
-			_objectValuePairs::get
-		).forEach(
-			objectValuePair -> jsonObject.put(
+		for (AnalyticsReportsInfoItem.Action action :
+				analyticsReportsInfoItem.getActions()) {
+
+			ObjectValuePair<String, String> objectValuePair =
+				_objectValuePairs.get(action);
+
+			if (objectValuePair == null) {
+				continue;
+			}
+
+			jsonObject.put(
 				objectValuePair.getKey(),
 				_getResourceURL(
 					canonicalURL, locale, resourceRequest, resourceResponse,
-					objectValuePair.getValue()))
-		);
+					objectValuePair.getValue()));
+		}
 
 		return jsonObject;
 	}
@@ -276,20 +281,18 @@ public class GetDataMVCResourceCommand extends BaseMVCResourceCommand {
 	private InfoItemReference _getInfoItemReference(
 		HttpServletRequest httpServletRequest) {
 
-		return Optional.ofNullable(
-			_getClassTypeName(httpServletRequest)
-		).filter(
-			Validator::isNotNull
-		).map(
-			classTypeName -> new InfoItemReference(
+		String classTypeName = _getClassTypeName(httpServletRequest);
+
+		if (Validator.isNull(classTypeName)) {
+			return new InfoItemReference(
 				_getClassName(httpServletRequest),
-				new ClassNameClassPKInfoItemIdentifier(
-					classTypeName, _getClassPK(httpServletRequest)))
-		).orElseGet(
-			() -> new InfoItemReference(
-				_getClassName(httpServletRequest),
-				_getClassPK(httpServletRequest))
-		);
+				_getClassPK(httpServletRequest));
+		}
+
+		return new InfoItemReference(
+			_getClassName(httpServletRequest),
+			new ClassNameClassPKInfoItemIdentifier(
+				classTypeName, _getClassPK(httpServletRequest)));
 	}
 
 	private JSONObject _getJSONObject(

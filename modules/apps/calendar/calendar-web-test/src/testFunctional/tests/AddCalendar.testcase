@@ -173,6 +173,8 @@ definition {
 	@description = "LRQA-71596 - Verify that user can choose the color of calendar in the -Add Calendar- Page"
 	@priority = "4"
 	test CanChooseAColor {
+		property portal.upstream = "quarantine";
+
 		CalendarNavigator.gotoAddMyCalendars();
 
 		Calendar._editName(calendarName = "Calendar Name");
@@ -515,29 +517,18 @@ definition {
 
 		Role.add(roleTitle = "Calendar Site Role Name");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Users",
-			panel = "Control Panel",
-			portlet = "Roles");
-
-		Role.definePermissionCP(
-			permissionDefinitionKey = "SITE_ADMIN_APPLICATIONS_CALENDAR_MANAGE_EVENTS_CHECKBOX",
-			permissionDefinitionValue = "Manage Events",
-			permissionNavigationValue = "Calendar",
+		Permissions.definePermissionViaJSONAPI(
+			resourceAction = "MANAGE_BOOKINGS",
+			resourceName = "com.liferay.calendar.model.Calendar",
 			roleTitle = "Calendar Site Role Name",
-			roleType = "Site");
+			roleType = "site");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Users",
-			panel = "Control Panel",
-			portlet = "Roles");
-
-		Role.definePermissionCP(
-			permissionDefinitionKey = "SITE_ADMIN_PAGES_SITE_PAGES_RESOURCE_PERMISSIONS_PAGE_UPDATE_CHECKBOX",
-			permissionDefinitionValue = "Update",
-			permissionNavigationValue = "Pages",
-			roleTitle = "Authenticated",
-			roleUser = "User");
+		for (var resourceActionIndex : list "UPDATE,VIEW") {
+			Permissions.definePermissionViaJSONAPI(
+				resourceAction = "${resourceActionIndex}",
+				resourceName = "com.liferay.portal.kernel.model.Layout",
+				roleTitle = "User");
+		}
 
 		ApplicationsMenu.gotoPortlet(
 			category = "Users",

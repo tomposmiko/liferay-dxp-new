@@ -175,6 +175,154 @@ definition {
 		AssetPublisherPortlet.viewAssetPG(assetTitle = "WC WebContent Title");
 	}
 
+	@description = "This ensures that Users can re-add the same friendly URL for different languages in a layout."
+	@priority = "5"
+	test CanReAddSameFriendlyURLForDifferentLanguageInLayoutAfterRemoveTheTranslation {
+		var portalURL = PropsUtil.get("portal.url");
+
+		PagesAdmin.openToConfigurePublicPage(
+			groupName = "Test Site Name",
+			layoutName = "Test Source Page",
+			siteURLKey = "test-site-name");
+
+		PagesAdmin.addLocalizedFriendlyURL(
+			friendlyURLLocalizedList = "es-ES",
+			localizedFriendlyURLList = "/prueba",
+			localizedNameList = "Prueba");
+
+		PagesAdmin.addLocalizedFriendlyURL(
+			friendlyURLLocalizedList = "ca-ES",
+			localizedFriendlyURLList = "/prueba",
+			localizedNameList = "Prueba");
+
+		Navigator.openSpecificURL(url = "${portalURL}/es/web/test-site-name/prueba");
+
+		AssertLocation(value1 = "${portalURL}/es/web/test-site-name/prueba");
+
+		Navigator.openSpecificURL(url = "${portalURL}/en/web/test-site-name");
+
+		PagesAdmin.openToConfigurePublicPage(
+			groupName = "Test Site Name",
+			layoutName = "Test Source Page",
+			siteURLKey = "test-site-name");
+
+		PagesAdmin.addLocalizedFriendlyURL(
+			configureWithoutSave = "true",
+			friendlyURLLocalizedList = "es-ES",
+			localizedFriendlyURLList = "",
+			localizedNameList = "");
+
+		PagesAdmin.addLocalizedFriendlyURL(
+			configureWithoutSave = "true",
+			friendlyURLLocalizedList = "ca-ES",
+			localizedFriendlyURLList = "",
+			localizedNameList = "");
+
+		PortletEntry.changeLocale(
+			fieldName = "Friendly URL",
+			locale = "en-US");
+
+		PortletEntry.save();
+
+		PagesAdmin.addLocalizedFriendlyURL(
+			friendlyURLLocalizedList = "es-ES",
+			localizedFriendlyURLList = "/prueba",
+			localizedNameList = "Prueba");
+
+		PagesAdmin.addLocalizedFriendlyURL(
+			friendlyURLLocalizedList = "ca-ES",
+			localizedFriendlyURLList = "/prueba",
+			localizedNameList = "Prueba");
+
+		Navigator.openSpecificURL(url = "${portalURL}/es/web/test-site-name/prueba");
+
+		AssertLocation(value1 = "${portalURL}/es/web/test-site-name/prueba");
+	}
+
+	@description = "This ensures that Users can re-add the same friendly URL for different languages in web content."
+	@priority = "5"
+	test CanReAddSameFriendlyURLForDifferentLanguageInWebContentAfterRemoveTheTranslation {
+		var portalURL = PropsUtil.get("portal.url");
+
+		JSONLayout.addWidgetToPublicLayout(
+			groupName = "Test Site Name",
+			layoutName = "Test Source Page",
+			widgetName = "Asset Publisher");
+
+		Navigator.openSitePage(
+			pageName = "Test Source Page",
+			siteName = "Test Site Name");
+
+		AssetPublisherPortlet.configureDisplaySettings(displaySettings = "Set as the Default Asset Publisher for This Page");
+
+		JSONWebcontent.addWebContent(
+			content = "Web Content Content",
+			groupName = "Test Site Name",
+			title = "Web Content Article");
+
+		WebContentNavigator.openToEditWCInSite(
+			groupName = "Test Site Name",
+			siteURLKey = "test-site-name",
+			version = "1.1",
+			webContentTitle = "Web Content Article");
+
+		WebContent.editDisplayPage(
+			pageName = "Test Source Page",
+			pageType = "Pages");
+
+		PortletEntry.changeLocale(locale = "es-ES");
+
+		WebContent.editFriendlyURL(webContentFriendlyURL = "prueba");
+
+		PortletEntry.changeLocale(locale = "ca-ES");
+
+		WebContent.editFriendlyURL(webContentFriendlyURL = "prueba");
+
+		PortletEntry.publish();
+
+		Navigator.openSpecificURL(url = "${portalURL}/es/web/test-site-name/-/prueba");
+
+		AssetPublisherPortlet.viewAssetPG(assetTitle = "Web Content Article");
+
+		Navigator.openSpecificURL(url = "${portalURL}/en/web/test-site-name");
+
+		WebContentNavigator.openToEditWCInSite(
+			groupName = "Test Site Name",
+			siteURLKey = "test-site-name",
+			version = "1.1",
+			webContentTitle = "Web Content Article");
+
+		PortletEntry.changeLocale(locale = "es-ES");
+
+		WebContent.editFriendlyURL(webContentFriendlyURL = "");
+
+		PortletEntry.changeLocale(locale = "ca-ES");
+
+		WebContent.editFriendlyURL(webContentFriendlyURL = "");
+
+		PortletEntry.publish();
+
+		WebContentNavigator.openToEditWCInSite(
+			groupName = "Test Site Name",
+			siteURLKey = "test-site-name",
+			version = "1.1",
+			webContentTitle = "Web Content Article");
+
+		PortletEntry.changeLocale(locale = "es-ES");
+
+		WebContent.editFriendlyURL(webContentFriendlyURL = "prueba");
+
+		PortletEntry.changeLocale(locale = "ca-ES");
+
+		WebContent.editFriendlyURL(webContentFriendlyURL = "prueba");
+
+		PortletEntry.publish();
+
+		Navigator.openSpecificURL(url = "${portalURL}/es/web/test-site-name/-/prueba");
+
+		AssetPublisherPortlet.viewAssetPG(assetTitle = "Web Content Article");
+	}
+
 	@description = "This ensures that a user is redirected to the updated friendlyURL when he accesses the former friendlyURL."
 	@priority = "5"
 	test CanRedirectToUpdatedFriendlyURL {

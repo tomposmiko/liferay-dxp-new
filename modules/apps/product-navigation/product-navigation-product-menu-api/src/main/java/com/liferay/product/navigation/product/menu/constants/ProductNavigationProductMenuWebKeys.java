@@ -19,14 +19,14 @@ package com.liferay.product.navigation.product.menu.constants;
  */
 public class ProductNavigationProductMenuWebKeys {
 
+	public static final String LOAD_MORE_PARENT_LAYOUT_ID =
+		"LOAD_MORE_PARENT_LAYOUT_ID";
+
 	public static final String PAGE_TYPE_SELECTED_OPTION =
 		"PAGE_TYPE_SELECTED_OPTION";
 
 	public static final String PRIVATE_LAYOUT = "PRIVATE_LAYOUT";
 
 	public static final String PUBLIC_LAYOUT = "PUBLIC_LAYOUT";
-
-	public static final String RETURN_LAYOUTS_AS_ARRAY =
-		"RETURN_LAYOUTS_AS_ARRAY";
 
 }

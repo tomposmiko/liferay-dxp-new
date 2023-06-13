@@ -59,6 +59,7 @@ TypeFacetPortletPreferences typeFacetPortletPreferences = new com.liferay.portal
 	action="<%= configurationActionURL %>"
 	method="post"
 	name="fm"
+	onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "saveConfiguration();" %>'
 >
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.UPDATE %>" />
 	<aui:input name="redirect" type="hidden" value="<%= configurationRenderURL %>" />
@@ -87,6 +88,13 @@ TypeFacetPortletPreferences typeFacetPortletPreferences = new com.liferay.portal
 
 			<aui:input label="frequency-threshold" name="<%= PortletPreferencesJspUtil.getInputName(TypeFacetPortletPreferences.PREFERENCE_KEY_FREQUENCY_THRESHOLD) %>" value="<%= typeFacetPortletPreferences.getFrequencyThreshold() %>" />
 
+			<aui:select label="order-terms-by" name="<%= PortletPreferencesJspUtil.getInputName(TypeFacetPortletPreferences.PREFERENCE_KEY_ORDER) %>" value="<%= typeFacetPortletPreferences.getOrder() %>">
+				<aui:option label="term-frequency-descending" value="count:desc" />
+				<aui:option label="term-frequency-ascending" value="count:asc" />
+				<aui:option label="term-value-ascending" value="key:asc" />
+				<aui:option label="term-value-descending" value="key:desc" />
+			</aui:select>
+
 			<aui:input label="display-frequencies" name="<%= PortletPreferencesJspUtil.getInputName(TypeFacetPortletPreferences.PREFERENCE_KEY_FREQUENCIES_VISIBLE) %>" type="checkbox" value="<%= typeFacetPortletPreferences.isFrequenciesVisible() %>" />
 
 			<aui:input name="<%= PortletPreferencesJspUtil.getInputName(TypeFacetPortletPreferences.PREFERENCE_KEY_ASSET_TYPES) %>" type="hidden" value="<%= typeFacetPortletPreferences.getAssetTypesString() %>" />
@@ -108,21 +116,22 @@ TypeFacetPortletPreferences typeFacetPortletPreferences = new com.liferay.portal
 </liferay-frontend:edit-form>
 
 <script>
-	var form = document.<portlet:namespace />fm;
+	function <portlet:namespace />saveConfiguration() {
+		var form = document.<portlet:namespace />fm;
 
-	var currentAssetTypes = Liferay.Util.getFormElement(form, 'currentAssetTypes');
+		var currentAssetTypes = Liferay.Util.getFormElement(
+			form,
+			'currentAssetTypes'
+		);
 
-	if (currentAssetTypes) {
-		form.addEventListener('submit', (event) => {
-			event.preventDefault();
+		var data = {};
 
-			var data = {};
-
+		if (currentAssetTypes) {
 			data[
 				'<%= PortletPreferencesJspUtil.getInputName(TypeFacetPortletPreferences.PREFERENCE_KEY_ASSET_TYPES) %>'
 			] = Liferay.Util.getSelectedOptionValues(currentAssetTypes);
+		}
 
-			Liferay.Util.postForm(form, {data: data});
-		});
+		Liferay.Util.postForm(form, {data: data});
 	}
 </script>

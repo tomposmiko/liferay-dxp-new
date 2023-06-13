@@ -91,7 +91,8 @@ create unique index IX_EC00543C on Company (webId[$COLUMN_LENGTH:75$]);
 create unique index IX_85C63FD7 on CompanyInfo (companyId);
 
 create index IX_791914FA on Contact_ (classNameId, classPK);
-create index IX_66D496A3 on Contact_ (companyId);
+create index IX_FD2E9BDD on Contact_ (companyId, userId);
+create index IX_42F94F9F on Contact_ (userId);
 
 create index IX_25D734CD on Country (active_);
 create unique index IX_742FFB11 on Country (companyId, a2[$COLUMN_LENGTH:75$]);
@@ -277,6 +278,7 @@ create unique index IX_52D84D95 on Layout (uuid_[$COLUMN_LENGTH:75$], groupId, p
 
 create index IX_A705FF94 on LayoutBranch (layoutSetBranchId, plid, master);
 create unique index IX_FD57097D on LayoutBranch (layoutSetBranchId, plid, name[$COLUMN_LENGTH:75$]);
+create index IX_72FC531D on LayoutBranch (plid);
 
 create index IX_1C55E26 on LayoutFriendlyURL (companyId, ctCollectionId);
 create index IX_7ED3F2A8 on LayoutFriendlyURL (groupId, ctCollectionId);

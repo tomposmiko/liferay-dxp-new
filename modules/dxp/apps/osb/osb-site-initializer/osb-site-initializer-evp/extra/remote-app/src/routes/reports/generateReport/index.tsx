@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -18,38 +17,89 @@ import Form from '../../../common/components/Form';
 import yupSchema, {yupResolver} from '../../../common/schema/yup';
 import {getPicklistByName} from '../../../common/services/picklist';
 import {getRequestsByFilter} from '../../../common/services/request';
+import {
+	FIELDSREPORT,
+	LiferayBranchType,
+	Statustype,
+} from '../../../types/index';
 
 import './index.scss';
 
-type generateReportsType = typeof yupSchema.report.__outputType;
+export type generateReportsType = typeof yupSchema.report.__outputType;
 
 const GenerateReport = () => {
 	const [statuses, setStatuses] = useState<any>([]);
 	const [branches, setBranches] = useState<any>([]);
+
 	const {
+		clearErrors,
 		formState: {errors},
 		handleSubmit,
 		register,
+		setError,
 		setValue,
 		watch,
 	} = useForm<generateReportsType>({
 		defaultValues: {
-			branchRequest: [],
-			statusRequest: [],
+			liferayBranch: [],
+			requestStatus: [],
 		},
 		resolver: yupResolver(yupSchema.report),
 	});
-	const onSubmit: SubmitHandler<generateReportsType> = (data) => {
-		// eslint-disable-next-line no-console
-		console.log('data', data);
 
-		getRequestsByFilter().then((response) =>
-			console.log('response', response)
-		);
+	const validateDate = (dateInitial: string, dateFinal: string) => {
+		const regexValidate = /^[\d]{4}-[\d]{2}-[\d]{2}$/;
+
+		if (dateInitial && dateFinal) {
+			if (dateInitial > dateFinal) {
+				setError('initialRequestDate', {
+					message:
+						'Initial Request Date cannot be greater than Final Request Date',
+					type: 'custom',
+				});
+
+				return false;
+			}
+		}
+
+		if (dateInitial && !regexValidate.test(dateInitial)) {
+			setError(FIELDSREPORT.INITIALREQUESTDATE, {
+				message:
+					'Initial Request Date is not recognized. Please enter a valid date',
+				type: 'custom',
+			});
+
+			return false;
+		}
+
+		if (dateFinal && !regexValidate.test(dateFinal)) {
+			setError(FIELDSREPORT.FINALREQUESTDATE, {
+				message:
+					'Final Request Date is not recognized. Please enter a valid date',
+				type: 'custom',
+			});
+
+			return false;
+		}
+
+		return true;
 	};
 
-	const branchesWatch = watch('branchRequest') as number[];
-	const statusesWatch = watch('statusRequest') as number[];
+	const onSubmit: SubmitHandler<generateReportsType> = (data: any) => {
+		const dateCheck = validateDate(
+			data.initialRequestDate,
+			data.finalRequestDate
+		);
+
+		if (dateCheck === false) {
+			return;
+		}
+
+		getRequestsByFilter(data).then((response) => response);
+	};
+
+	const branchesWatch = watch('liferayBranch') as string[];
+	const statusesWatch = watch('requestStatus') as string[];
 
 	const formProps = {
 		errors,
@@ -65,31 +115,31 @@ const GenerateReport = () => {
 		setBranches(branchList);
 	};
 
-	const onClickBranches = (event: any) => {
-		const value = Number(event.target.value);
+	const fieldsChecked = (
+		event: {target: HTMLInputElement},
+		fieldWatch: string[],
+		field: keyof generateReportsType
+	) => {
+		const value = event.target.value;
 
-		const brachesFiltered = branchesWatch?.includes(value)
-			? branchesWatch.filter((branchId) => branchId !== value)
-			: [...branchesWatch, value];
+		const fildChecked = fieldWatch?.includes(value)
+			? fieldWatch.filter((fieldWatchId) => fieldWatchId !== value)
+			: [...fieldWatch, value];
 
-		setValue('branchRequest', brachesFiltered);
+		setValue(field, fildChecked);
 	};
 
-	const onClickStatus = (event: any) => {
-		const value = Number(event.target.value);
+	const onClickBranches = (event: {target: HTMLInputElement}) => {
+		return fieldsChecked(event, branchesWatch, 'liferayBranch');
+	};
 
-		const statusesFiltered = statusesWatch?.includes(value)
-			? statusesWatch.filter((statusId) => statusId !== value)
-			: [...statusesWatch, value];
-
-		setValue('statusRequest', statusesFiltered);
+	const onClickStatus = (event: {target: HTMLInputElement}) => {
+		return fieldsChecked(event, statusesWatch, 'requestStatus');
 	};
 
 	useEffect(() => {
 		loadPickLists();
 	}, []);
-
-	console.log('errors', errors);
 
 	return (
 		<>
@@ -97,19 +147,27 @@ const GenerateReport = () => {
 				<div className="row">
 					<div className="col">
 						<Form.DatePicker
-							{...formProps}
+							clearErrors={clearErrors}
+							errors={errors}
+							id="initialRequestDate"
 							label="Initial Request Date"
+							{...register('initialRequestDate')}
 							name="initialRequestDate"
 							placeholder="YYYY-MM-DD"
+							setValue={setValue}
 						/>
 					</div>
 
 					<div className="col">
 						<Form.DatePicker
-							{...formProps}
+							clearErrors={clearErrors}
+							errors={errors}
+							id="finalRequestDate"
 							label="Final Request Date"
+							{...register('finalRequestDate')}
 							name="finalRequestDate"
 							placeholder="YYYY-MM-DD"
+							setValue={setValue}
 						/>
 					</div>
 				</div>
@@ -118,18 +176,9 @@ const GenerateReport = () => {
 					<div className="col">
 						<Form.Input
 							{...formProps}
-							label="Initial User Name"
-							name="initialUserName"
-							placeholder="User name"
-						/>
-					</div>
-
-					<div className="col">
-						<Form.Input
-							{...formProps}
-							label="Final User Name"
-							name="finalUserName"
-							placeholder="User name"
+							label="Full Name"
+							name="fullName"
+							placeholder="Full name"
 						/>
 					</div>
 				</div>
@@ -139,8 +188,10 @@ const GenerateReport = () => {
 						<Form.Input
 							{...formProps}
 							label="Initial Company ID"
+							min={0}
 							name="initialCompanyId"
 							placeholder="Company ID"
+							type="number"
 						/>
 					</div>
 
@@ -148,8 +199,10 @@ const GenerateReport = () => {
 						<Form.Input
 							{...formProps}
 							label="Final Company ID"
+							min={0}
 							name="finalCompanyId"
 							placeholder="Initial Company ID"
+							type="number"
 						/>
 					</div>
 				</div>
@@ -158,18 +211,9 @@ const GenerateReport = () => {
 					<div className="col">
 						<Form.Input
 							{...formProps}
-							label="Initial Company Name"
-							name="initialCompanyName"
+							label="Company Name"
+							name="organizationName"
 							placeholder="Company Name"
-						/>
-					</div>
-
-					<div className="col">
-						<Form.Input
-							{...formProps}
-							label="Final Company Name"
-							name="finalCompanyName"
-							placeholder="Initial Company Name"
 						/>
 					</div>
 				</div>
@@ -178,18 +222,20 @@ const GenerateReport = () => {
 					<div className="col">
 						<label>Statuses</label>
 
-						{statuses.map((status: any, index: string) => (
+						{statuses.map((status: Statustype, index: number) => (
 							<div
 								className="align-items-center d-flex"
 								key={index}
 							>
 								<Form.Checkbox
-									checked={statusesWatch?.includes(status.id)}
-									id="statusRequest"
+									checked={statusesWatch?.includes(
+										status.key
+									)}
+									id="requestStatus"
 									label={status.name}
-									name="statusRequest"
+									name="requestStatus"
 									onChange={onClickStatus}
-									value={status.id}
+									value={status.key}
 								/>
 							</div>
 						))}
@@ -198,21 +244,25 @@ const GenerateReport = () => {
 					<div className="col">
 						<label>Liferay Branch</label>
 
-						{branches.map((branch: any, index: string) => (
-							<div
-								className="align-items-center d-flex"
-								key={index}
-							>
-								<Form.Checkbox
-									checked={branchesWatch?.includes(branch.id)}
-									id="branchRequest"
-									label={branch.name}
-									name="branchRequest"
-									onChange={onClickBranches}
-									value={branch.id}
-								/>
-							</div>
-						))}
+						{branches.map(
+							(branch: LiferayBranchType, index: number) => (
+								<div
+									className="align-items-center d-flex"
+									key={index}
+								>
+									<Form.Checkbox
+										checked={branchesWatch?.includes(
+											branch.key
+										)}
+										id="liferayBranch"
+										label={branch.name}
+										name="liferayBranch"
+										onChange={onClickBranches}
+										value={branch.key}
+									/>
+								</div>
+							)
+						)}
 					</div>
 				</div>
 

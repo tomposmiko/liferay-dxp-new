@@ -15,9 +15,7 @@
 package com.liferay.portal.kernel.layoutconfiguration.util;
 
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.layoutconfiguration.util.xml.RuntimeLogic;
 import com.liferay.portal.kernel.model.LayoutTemplate;
-import com.liferay.portal.kernel.template.TemplateResource;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,41 +35,19 @@ public interface RuntimePage {
 	public StringBundler getProcessedTemplate(
 			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse, String portletId,
-			TemplateResource templateResource)
+			String templateId, String content)
 		throws Exception;
 
 	public void processTemplate(
 			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse, String portletId,
-			TemplateResource templateResource)
+			String templateId, String content)
 		throws Exception;
 
 	public void processTemplate(
 			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse, String portletId,
-			TemplateResource templateResource, String langType)
-		throws Exception;
-
-	public void processTemplate(
-			HttpServletRequest httpServletRequest,
-			HttpServletResponse httpServletResponse,
-			TemplateResource templateResource)
-		throws Exception;
-
-	public void processTemplate(
-			HttpServletRequest httpServletRequest,
-			HttpServletResponse httpServletResponse,
-			TemplateResource templateResource, String langType)
-		throws Exception;
-
-	public String processXML(
-			HttpServletRequest httpServletRequest,
-			HttpServletResponse httpServletResponse, String content)
-		throws Exception;
-
-	public String processXML(
-			HttpServletRequest httpServletRequest, String content,
-			RuntimeLogic runtimeLogic)
+			String templateId, String content, String langType)
 		throws Exception;
 
 }

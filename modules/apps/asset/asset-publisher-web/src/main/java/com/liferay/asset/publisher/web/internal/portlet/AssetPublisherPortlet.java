@@ -21,6 +21,7 @@ import com.liferay.asset.kernel.model.ClassType;
 import com.liferay.asset.kernel.model.ClassTypeField;
 import com.liferay.asset.kernel.model.ClassTypeReader;
 import com.liferay.asset.list.asset.entry.provider.AssetListAssetEntryProvider;
+import com.liferay.asset.list.service.AssetListEntrySegmentsEntryRelLocalService;
 import com.liferay.asset.publisher.constants.AssetPublisherPortletKeys;
 import com.liferay.asset.publisher.constants.AssetPublisherWebKeys;
 import com.liferay.asset.publisher.util.AssetPublisherHelper;
@@ -52,6 +53,7 @@ import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
@@ -284,11 +286,12 @@ public class AssetPublisherPortlet extends MVCPortlet {
 				new AssetPublisherDisplayContext(
 					assetEntryActionRegistry, assetHelper,
 					assetListAssetEntryProvider,
+					assetListEntrySegmentsEntryRelLocalService,
 					assetPublisherCustomizerRegistry.
 						getAssetPublisherCustomizer(rootPortletId),
 					assetPublisherHelper, assetPublisherWebConfiguration,
 					assetPublisherWebHelper, infoItemServiceRegistry,
-					itemSelector, resourceRequest, resourceResponse,
+					itemSelector, portal, resourceRequest, resourceResponse,
 					resourceRequest.getPreferences(), requestContextMapper,
 					segmentsEntryRetriever);
 
@@ -379,16 +382,29 @@ public class AssetPublisherPortlet extends MVCPortlet {
 			String rootPortletId = PortletIdCodec.decodePortletName(
 				portal.getPortletId(renderRequest));
 
+			PortletPreferences portletPreferences =
+				renderRequest.getPreferences();
+
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
+			PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
+
+			if (portletDisplay != null) {
+				portletPreferences = portletDisplay.getPortletSetup();
+			}
+
 			AssetPublisherDisplayContext assetPublisherDisplayContext =
 				new AssetPublisherDisplayContext(
 					assetEntryActionRegistry, assetHelper,
 					assetListAssetEntryProvider,
+					assetListEntrySegmentsEntryRelLocalService,
 					assetPublisherCustomizerRegistry.
 						getAssetPublisherCustomizer(rootPortletId),
 					assetPublisherHelper, assetPublisherWebConfiguration,
 					assetPublisherWebHelper, infoItemServiceRegistry,
-					itemSelector, renderRequest, renderResponse,
-					renderRequest.getPreferences(), requestContextMapper,
+					itemSelector, portal, renderRequest, renderResponse,
+					portletPreferences, requestContextMapper,
 					segmentsEntryRetriever);
 
 			renderRequest.setAttribute(
@@ -436,6 +452,10 @@ public class AssetPublisherPortlet extends MVCPortlet {
 
 	@Reference
 	protected AssetListAssetEntryProvider assetListAssetEntryProvider;
+
+	@Reference
+	protected AssetListEntrySegmentsEntryRelLocalService
+		assetListEntrySegmentsEntryRelLocalService;
 
 	@Reference
 	protected AssetPublisherCustomizerRegistry assetPublisherCustomizerRegistry;

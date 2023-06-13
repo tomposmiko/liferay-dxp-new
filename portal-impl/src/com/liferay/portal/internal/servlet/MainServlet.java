@@ -45,7 +45,6 @@ import com.liferay.portal.kernel.module.util.SystemBundleUtil;
 import com.liferay.portal.kernel.plugin.PluginPackage;
 import com.liferay.portal.kernel.portlet.PortletConfigFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletInstanceFactoryUtil;
-import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
@@ -107,6 +106,7 @@ import java.io.InputStream;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -139,17 +139,17 @@ public class MainServlet extends HttpServlet {
 			_log.debug("Destroy plugins");
 		}
 
-		_licenseInstallModuleServiceLifecycleServiceRegistration.unregister();
+		ListIterator<ServiceRegistration<?>> listIterator =
+			_serviceRegistrations.listIterator(_serviceRegistrations.size());
 
-		_systemCheckModuleServiceLifecycleServiceRegistration.unregister();
+		while (listIterator.hasPrevious()) {
+			ServiceRegistration<?> serviceRegistration =
+				listIterator.previous();
 
-		_servletContextServiceRegistration.unregister();
+			serviceRegistration.unregister();
 
-		_portalPortletsInitializedModuleServiceLifecycleServiceRegistration.
-			unregister();
-
-		_portalInitializedModuleServiceLifecycleServiceRegistration.
-			unregister();
+			listIterator.remove();
+		}
 
 		PortalLifecycleUtil.flushDestroys();
 
@@ -756,26 +756,18 @@ public class MainServlet extends HttpServlet {
 				0, true);
 		}
 
-		ServletContext servletContext = getServletContext();
+		String[] webIds = PortalInstances.getWebIds();
 
-		try {
-			String[] webIds = PortalInstances.getWebIds();
+		for (String webId : webIds) {
+			boolean skipCheck = false;
 
-			for (String webId : webIds) {
-				boolean skipCheck = false;
+			if (StartupHelperUtil.isDBNew() &&
+				webId.equals(PropsValues.COMPANY_DEFAULT_WEB_ID)) {
 
-				if (StartupHelperUtil.isDBNew() &&
-					webId.equals(PropsValues.COMPANY_DEFAULT_WEB_ID)) {
-
-					skipCheck = true;
-				}
-
-				PortalInstances.initCompany(servletContext, webId, skipCheck);
+				skipCheck = true;
 			}
-		}
-		finally {
-			CompanyThreadLocal.setCompanyId(
-				PortalInstances.getDefaultCompanyId());
+
+			PortalInstances.initCompany(webId, skipCheck);
 		}
 	}
 
@@ -1233,7 +1225,7 @@ public class MainServlet extends HttpServlet {
 	private void _registerPortalInitialized() {
 		BundleContext bundleContext = SystemBundleUtil.getBundleContext();
 
-		_portalInitializedModuleServiceLifecycleServiceRegistration =
+		_serviceRegistrations.add(
 			bundleContext.registerService(
 				ModuleServiceLifecycle.class,
 				new ModuleServiceLifecycle() {
@@ -1244,9 +1236,9 @@ public class MainServlet extends HttpServlet {
 					"service.vendor", ReleaseInfo.getVendor()
 				).put(
 					"service.version", ReleaseInfo.getVersion()
-				).build());
+				).build()));
 
-		_portalPortletsInitializedModuleServiceLifecycleServiceRegistration =
+		_serviceRegistrations.add(
 			bundleContext.registerService(
 				ModuleServiceLifecycle.class,
 				new ModuleServiceLifecycle() {
@@ -1257,19 +1249,20 @@ public class MainServlet extends HttpServlet {
 					"service.vendor", ReleaseInfo.getVendor()
 				).put(
 					"service.version", ReleaseInfo.getVersion()
-				).build());
+				).build()));
 
-		_servletContextServiceRegistration = bundleContext.registerService(
-			ServletContext.class, getServletContext(),
-			HashMapDictionaryBuilder.<String, Object>put(
-				"bean.id", ServletContext.class.getName()
-			).put(
-				"original.bean", Boolean.TRUE
-			).put(
-				"service.vendor", ReleaseInfo.getVendor()
-			).build());
+		_serviceRegistrations.add(
+			bundleContext.registerService(
+				ServletContext.class, getServletContext(),
+				HashMapDictionaryBuilder.<String, Object>put(
+					"bean.id", ServletContext.class.getName()
+				).put(
+					"original.bean", Boolean.TRUE
+				).put(
+					"service.vendor", ReleaseInfo.getVendor()
+				).build()));
 
-		_systemCheckModuleServiceLifecycleServiceRegistration =
+		_serviceRegistrations.add(
 			bundleContext.registerService(
 				ModuleServiceLifecycle.class,
 				new ModuleServiceLifecycle() {
@@ -1280,9 +1273,9 @@ public class MainServlet extends HttpServlet {
 					"service.vendor", ReleaseInfo.getVendor()
 				).put(
 					"service.version", ReleaseInfo.getVersion()
-				).build());
+				).build()));
 
-		_licenseInstallModuleServiceLifecycleServiceRegistration =
+		_serviceRegistrations.add(
 			bundleContext.registerService(
 				ModuleServiceLifecycle.class,
 				new ModuleServiceLifecycle() {
@@ -1293,7 +1286,7 @@ public class MainServlet extends HttpServlet {
 					"service.vendor", ReleaseInfo.getVendor()
 				).put(
 					"service.version", ReleaseInfo.getVersion()
-				).build());
+				).build()));
 	}
 
 	private static final boolean _HTTP_HEADER_VERSION_VERBOSITY_DEFAULT =
@@ -1317,16 +1310,8 @@ public class MainServlet extends HttpServlet {
 		ServiceProxyFactory.newServiceTrackedInstance(
 			ReleaseManager.class, MainServlet.class, "_releaseManager", false);
 
-	private ServiceRegistration<ModuleServiceLifecycle>
-		_licenseInstallModuleServiceLifecycleServiceRegistration;
-	private ServiceRegistration<ModuleServiceLifecycle>
-		_portalInitializedModuleServiceLifecycleServiceRegistration;
-	private ServiceRegistration<ModuleServiceLifecycle>
-		_portalPortletsInitializedModuleServiceLifecycleServiceRegistration;
 	private PortalRequestProcessor _portalRequestProcessor;
-	private ServiceRegistration<ServletContext>
-		_servletContextServiceRegistration;
-	private ServiceRegistration<ModuleServiceLifecycle>
-		_systemCheckModuleServiceLifecycleServiceRegistration;
+	private final List<ServiceRegistration<?>> _serviceRegistrations =
+		new ArrayList<>();
 
 }

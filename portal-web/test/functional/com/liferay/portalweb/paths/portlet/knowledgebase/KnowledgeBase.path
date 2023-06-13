@@ -26,6 +26,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>SIDE_PANEL_INFO</td>
+	<td>//dt[contains(@class,'sidebar-dt') and contains (.,'${key_sectionTitle}')]/following-sibling::dd[contains(.,'${key_sectionContent}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -105,6 +110,11 @@
 <tr>
 	<td>DESCRIPTIVE_VIEW_CHILD_ARTICLE_LINK</td>
 	<td>//dd[contains(.,'${key_kbArticleTitle}')]//a[contains(.,'Child Article')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DESCRIPTIVE_VIEW_ENTRY_INFO</td>
+	<td>//*[@data-qa-id='row'][contains(.,'${key_entryTitle}')]//span[contains(@class,'text-default')][contains(normalize-space(),'${key_infoText}')]</td>
 	<td></td>
 </tr>
 <tr>

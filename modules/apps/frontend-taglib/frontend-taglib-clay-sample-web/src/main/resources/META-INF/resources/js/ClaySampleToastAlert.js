@@ -17,14 +17,12 @@ import {openToast} from 'frontend-js-web';
 import React from 'react';
 
 export default function ClaySampleToastAlert() {
-	const onClickSuccess = () => {
+	const onClick5Seconds = () => {
 		openToast({
-			autoClose: false,
 			message: Liferay.Language.get(
 				'your-request-completed-successfully'
 			),
-			title: Liferay.Language.get('success'),
-			type: 'success',
+			type: 'info',
 		});
 	};
 
@@ -34,6 +32,17 @@ export default function ClaySampleToastAlert() {
 			message: Liferay.Language.get('an-unexpected-error-occurred'),
 			title: Liferay.Language.get('error'),
 			type: 'danger',
+		});
+	};
+
+	const onClickSuccess = () => {
+		openToast({
+			autoClose: false,
+			message: Liferay.Language.get(
+				'your-request-completed-successfully'
+			),
+			title: Liferay.Language.get('success'),
+			type: 'success',
 		});
 	};
 
@@ -53,6 +62,10 @@ export default function ClaySampleToastAlert() {
 						type="submit"
 					>
 						{Liferay.Language.get('fail-submit')}
+					</ClayButton>
+
+					<ClayButton onClick={onClick5Seconds} type="submit">
+						{Liferay.Language.get('disappear-after-5-secs')}
 					</ClayButton>
 				</ClayButton.Group>
 			</div>

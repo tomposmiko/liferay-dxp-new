@@ -788,21 +788,13 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 			String colorSchemeId = _getColorSchemeId(
 				layout.getCompanyId(), themeId, StringPool.BLANK);
 
-			draftLayout = _layoutLocalService.updateLookAndFeel(
+			_layoutLocalService.updateLookAndFeel(
 				groupId, privateLayout, draftLayout.getLayoutId(), themeId,
 				colorSchemeId, StringPool.BLANK);
 
 			layout = _layoutLocalService.updateLookAndFeel(
 				groupId, privateLayout, layout.getLayoutId(), themeId,
 				colorSchemeId, StringPool.BLANK);
-		}
-
-		if (status == WorkflowConstants.STATUS_DRAFT) {
-			_layoutLocalService.updateStatus(
-				userId, draftLayout.getPlid(), status, serviceContext);
-
-			layout = _layoutLocalService.updateStatus(
-				userId, layout.getPlid(), status, serviceContext);
 		}
 
 		return layout;
@@ -853,7 +845,7 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 
 		DLFileEntry copyDLFileEntry = _dlFileEntryLocalService.copyFileEntry(
 			userId, dlFileEntry.getGroupId(), dlFileEntry.getRepositoryId(),
-			previewFileEntryId, folder.getFolderId(), serviceContext);
+			previewFileEntryId, folder.getFolderId(), null, serviceContext);
 
 		return copyDLFileEntry.getFileEntryId();
 	}

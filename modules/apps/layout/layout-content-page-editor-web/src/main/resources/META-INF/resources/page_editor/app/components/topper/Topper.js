@@ -276,8 +276,11 @@ function TopperContent({
 						{item.type === LAYOUT_DATA_ITEM_TYPES.fragment && (
 							<li className="page-editor__topper__item tbar-item">
 								<ClayButton
+									aria-label={Liferay.Language.get(
+										'comments'
+									)}
 									displayType="unstyled"
-									small
+									size="sm"
 									title={Liferay.Language.get('comments')}
 								>
 									<ClayIcon

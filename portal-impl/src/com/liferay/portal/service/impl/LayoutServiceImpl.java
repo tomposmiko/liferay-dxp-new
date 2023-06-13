@@ -747,6 +747,18 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 
 	@Override
 	public List<Layout> getLayouts(
+			long groupId, boolean privateLayout, long parentLayoutId, int start,
+			int end)
+		throws PortalException {
+
+		return filterLayouts(
+			layoutLocalService.getLayouts(
+				groupId, privateLayout, parentLayoutId),
+			start, end);
+	}
+
+	@Override
+	public List<Layout> getLayouts(
 			long groupId, boolean privateLayout, String type)
 		throws PortalException {
 
@@ -1503,6 +1515,23 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 		}
 
 		return filteredLayouts;
+	}
+
+	protected List<Layout> filterLayouts(
+			List<Layout> layouts, int start, int end)
+		throws PortalException {
+
+		List<Layout> filteredLayouts = filterLayouts(layouts);
+
+		if (filteredLayouts.size() < end) {
+			end = filteredLayouts.size();
+		}
+
+		if (end <= start) {
+			return Collections.emptyList();
+		}
+
+		return filteredLayouts.subList(start, end);
 	}
 
 	protected List<String> getPortletIds(Layout layout, String typeSettings) {

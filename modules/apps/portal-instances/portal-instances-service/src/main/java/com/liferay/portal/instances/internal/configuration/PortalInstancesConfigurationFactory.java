@@ -28,8 +28,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 
 import java.util.Map;
 
-import javax.servlet.ServletContext;
-
 import org.osgi.framework.Constants;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -41,7 +39,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.portal.instances.internal.configuration.PortalInstancesConfiguration",
-	configurationPolicy = ConfigurationPolicy.REQUIRE, immediate = true,
+	configurationPolicy = ConfigurationPolicy.REQUIRE,
 	service = PortalInstancesConfigurationFactory.class
 )
 public class PortalInstancesConfigurationFactory {
@@ -81,8 +79,7 @@ public class PortalInstancesConfigurationFactory {
 
 				_portalInstancesLocalService.initializePortalInstance(
 					company.getCompanyId(),
-					portalInstancesConfiguration.siteInitializerKey(),
-					_servletContext);
+					portalInstancesConfiguration.siteInitializerKey());
 			}
 		}
 		else {
@@ -120,10 +117,5 @@ public class PortalInstancesConfigurationFactory {
 
 	@Reference
 	private PortalInstancesLocalService _portalInstancesLocalService;
-
-	@Reference(
-		target = "(&(original.bean=true)(bean.id=javax.servlet.ServletContext))"
-	)
-	private ServletContext _servletContext;
 
 }

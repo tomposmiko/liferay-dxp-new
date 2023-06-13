@@ -46,22 +46,22 @@
 			%>
 
 			<div class="d-inline-flex order-by-type-container">
-				<liferay-ui:icon
+				<clay:button
+					borderless="<%= true %>"
 					cssClass='<%= StringUtil.equalsIgnoreCase(orderByType1, "DESC") ? "hide icon" : "icon" %>'
+					displayType="secondary"
 					icon="order-list-up"
-					linkCssClass="btn btn-outline-borderless btn-outline-secondary"
-					markupView="lexicon"
-					message="descending"
-					url="javascript:void(0);"
+					monospaced="<%= true %>"
+					title="descending"
 				/>
 
-				<liferay-ui:icon
+				<clay:button
+					borderless="<%= true %>"
 					cssClass='<%= StringUtil.equalsIgnoreCase(orderByType1, "ASC") ? "hide icon" : "icon" %>'
+					displayType="secondary"
 					icon="order-list-down"
-					linkCssClass="btn btn-outline-borderless btn-outline-secondary"
-					markupView="lexicon"
-					message="ascending"
-					url="javascript:void(0);"
+					monospaced="<%= true %>"
+					title="ascending"
 				/>
 
 				<aui:input cssClass="order-by-type-field" name="TypeSettingsProperties--orderByType1--" type="hidden" value="<%= orderByType1 %>" />
@@ -92,22 +92,22 @@
 			%>
 
 			<div class="d-inline-flex order-by-type-container">
-				<liferay-ui:icon
+				<clay:button
+					borderless="<%= true %>"
 					cssClass='<%= StringUtil.equalsIgnoreCase(orderByType2, "DESC") ? "hide icon" : "icon" %>'
+					displayType="secondary"
 					icon="order-list-up"
-					linkCssClass="btn btn-outline-borderless btn-outline-secondary"
-					markupView="lexicon"
-					message="descending"
-					url="javascript:void(0);"
+					monospaced="<%= true %>"
+					title="descending"
 				/>
 
-				<liferay-ui:icon
+				<clay:button
+					borderless="<%= true %>"
 					cssClass='<%= StringUtil.equalsIgnoreCase(orderByType2, "ASC") ? "hide icon" : "icon" %>'
+					displayType="secondary"
 					icon="order-list-down"
-					linkCssClass="btn btn-outline-borderless btn-outline-secondary"
-					markupView="lexicon"
-					message="ascending"
-					url="javascript:void(0);"
+					monospaced="<%= true %>"
+					title="ascending"
 				/>
 
 				<aui:input cssClass="order-by-type-field" name="TypeSettingsProperties--orderByType2--" type="hidden" value="<%= orderByType2 %>" />

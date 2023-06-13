@@ -20,15 +20,19 @@ definition {
 			value1 = "${feedTitle}");
 
 		if ("${feedType}" == "file") {
-			Type(
-				locator1 = "RSSFeed#FEEDS_URL_NAME_FIELD",
-				value1 = "file:////");
-
+			var projectDir = PropsUtil.get("project.dir");
 			var dependencyFilePath = TestCase.getDependenciesDirPath(fileName = "${feedURLLink}");
 
-			UploadFile(
-				locator1 = "RSSFeed#FEEDS_URL_NAME_FIELD",
-				value1 = "${dependencyFilePath}");
+			if (contains("${dependencyFilePath}", "tests")) {
+				Type(
+					locator1 = "RSSFeed#FEEDS_URL_NAME_FIELD",
+					value1 = "file:////${dependencyFilePath}");
+			}
+			else {
+				Type(
+					locator1 = "RSSFeed#FEEDS_URL_NAME_FIELD",
+					value1 = "file:////${projectDir}/portal-web/${dependencyFilePath}");
+			}
 		}
 		else {
 			Type(

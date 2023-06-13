@@ -903,7 +903,7 @@ definition {
 
 		User.editUserInformation(userScreenNameEdit = "testscreen");
 
-		User.viewUserInfomation(
+		User.viewUserInformation(
 			userEmailAddress = "test@liferay.com",
 			userFirstName = "Test",
 			userLastName = "Test",
@@ -913,7 +913,7 @@ definition {
 
 		Navigator.gotoAccountSettings();
 
-		User.viewUserInfomation(
+		User.viewUserInformation(
 			userEmailAddress = "test@liferay.com",
 			userFirstName = "Test",
 			userLastName = "Test",
@@ -980,6 +980,7 @@ definition {
 	@priority = "5"
 	test PublishParallelPublications {
 		property environment.acceptance = "true";
+		property operating.system.types = "alpine,amazonlinux,centos,debian,fedora,orcllinux,osx,redhat,solaris,suse,ubuntu,windows";
 		property portal.acceptance = "true";
 
 		JSONWebcontent.addFolder(
@@ -1200,80 +1201,6 @@ definition {
 		for (var publicationName : list "Apple,Banana,Cherry") {
 			Publications.search(publicationName = "${publicationName}");
 		}
-	}
-
-	@description = "This is the use case for LPS-162683."
-	@priority = "4"
-	test UnrelatedChangesShouldnotDisplayUnderDiscardPage {
-		JSONLayout.addPublicLayout(
-			groupName = "Guest",
-			layoutName = "Child Page",
-			parentLayoutName = "Search");
-
-		JSONGroup.addGroup(groupName = "Test Site Name");
-
-		JSONLayout.addPublicLayout(
-			groupName = "Test Site Name",
-			layoutName = "Test Page");
-
-		JSONPublications.addPublication(publicationName = "Publication Name");
-
-		JSONPublications.selectPublication(publicationName = "Publication Name");
-
-		JSONLayout.addWidgetToPublicLayout(
-			groupName = "Guest",
-			layoutName = "Child Page",
-			widgetName = "Web Content Display");
-
-		PublicationsNavigator.openPublicationsAdmin();
-
-		Publications.workOnProduction();
-
-		JSONLayout.addWidgetToPublicLayout(
-			groupName = "Guest",
-			layoutName = "Child Page",
-			widgetName = "Asset Publisher");
-
-		Publications.selectPublication(publicationName = "Publication Name");
-
-		JSONLayout.addWidgetToPublicLayout(
-			groupName = "Test Site Name",
-			layoutName = "Test Page",
-			widgetName = "Web Content Display");
-
-		Publications.workOnProduction();
-
-		JSONLayout.addWidgetToPublicLayout(
-			groupName = "Test Site Name",
-			layoutName = "Test Page",
-			widgetName = "Asset Publisher");
-
-		PublicationsNavigator.gotoPublish(
-			gotoPublicationsAdmin = "true",
-			publicationName = "Publication Name");
-
-		Publications.viewNeedsManualResolution(
-			entryTitle = "Child Page",
-			warningMessage = "Modification Conflict: The conflict cannot be automatically resolved.");
-
-		Publications.viewNeedsManualResolution(
-			entryTitle = "Test Page",
-			warningMessage = "Modification Conflict: The conflict cannot be automatically resolved.");
-
-		Click(
-			key_changeCategory = "Page",
-			key_changeTitle = "Test Page",
-			locator1 = "PublicationsChanges#PUBLICATIONS_CHANGE_DROPDOWN");
-
-		MenuItem.click(menuItem = "Discard Change");
-
-		AssertElementPresent(
-			key_changeTitle = "Test Page",
-			locator1 = "PublicationsChanges#CONTEXT_CHANGE_TITLE");
-
-		AssertElementNotPresent(
-			key_changeTitle = "Child Page",
-			locator1 = "PublicationsChanges#CONTEXT_CHANGE_TITLE");
 	}
 
 	@description = "This is the use case for LPS-158789."

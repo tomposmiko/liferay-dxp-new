@@ -123,12 +123,15 @@ export function HideFragmentField({
 					{field.responsive &&
 						selectedViewportSize !== VIEWPORT_SIZES.desktop && (
 							<ClayButtonWithIcon
+								aria-label={Liferay.Language.get(
+									'restore-default'
+								)}
 								data-tooltip-align="bottom"
 								displayType="secondary"
 								onClick={() => {
 									onValueSelect(field.name, null);
 								}}
-								small
+								size="sm"
 								symbol="restore"
 								title={Liferay.Language.get('restore-default')}
 							/>

@@ -167,6 +167,7 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
+import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ServiceProxyFactory;
 import com.liferay.portal.kernel.util.SetUtil;
@@ -189,7 +190,6 @@ import com.liferay.portal.security.pwd.PwdAuthenticator;
 import com.liferay.portal.security.pwd.PwdToolkitUtil;
 import com.liferay.portal.security.pwd.RegExpToolkit;
 import com.liferay.portal.service.base.UserLocalServiceBaseImpl;
-import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.ratings.kernel.service.RatingsStatsLocalService;
 import com.liferay.social.kernel.model.SocialRelation;
@@ -3675,7 +3675,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			user.getCompanyId(), PropsKeys.ADMIN_EMAIL_FROM_NAME);
 
 		PortletPreferences companyPortletPreferences =
-			PrefsPropsUtil.getPreferences(user.getCompanyId(), true);
+			PrefsPropsUtil.getPreferences(user.getCompanyId());
 
 		Map<Locale, String> localizedSubjectMap =
 			LocalizationUtil.getLocalizationMap(
@@ -6098,7 +6098,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		String portalURL = serviceContext.getPortalURL();
 
 		PortletPreferences companyPortletPreferences =
-			PrefsPropsUtil.getPreferences(user.getCompanyId(), true);
+			PrefsPropsUtil.getPreferences(user.getCompanyId());
 
 		Map<Locale, String> localizedSubjectMap =
 			LocalizationUtil.getLocalizationMap(
@@ -6278,7 +6278,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		String toAddress = user.getEmailAddress();
 
 		PortletPreferences companyPortletPreferences =
-			PrefsPropsUtil.getPreferences(companyId, true);
+			PrefsPropsUtil.getPreferences(companyId);
 
 		String bodyProperty = null;
 		String prefix = null;

@@ -87,7 +87,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -412,8 +411,8 @@ public class JournalFolderLocalServiceImpl
 		QueryDefinition<?> queryDefinition = new QueryDefinition<>(
 			WorkflowConstants.STATUS_ANY);
 
-		return journalFolderFinder.findF_A_ByG_F(
-			groupId, folderId, queryDefinition);
+		return journalFolderFinder.findF_A_ByG_F_DDMSK(
+			groupId, folderId, StringPool.BLANK, queryDefinition);
 	}
 
 	@Override
@@ -422,8 +421,8 @@ public class JournalFolderLocalServiceImpl
 
 		QueryDefinition<?> queryDefinition = new QueryDefinition<>(status);
 
-		return journalFolderFinder.findF_A_ByG_F(
-			groupId, folderId, queryDefinition);
+		return journalFolderFinder.findF_A_ByG_F_DDMSK(
+			groupId, folderId, StringPool.BLANK, queryDefinition);
 	}
 
 	@Override
@@ -434,8 +433,8 @@ public class JournalFolderLocalServiceImpl
 		QueryDefinition<?> queryDefinition = new QueryDefinition<>(
 			status, start, end, (OrderByComparator<Object>)orderByComparator);
 
-		return journalFolderFinder.findF_A_ByG_F(
-			groupId, folderId, queryDefinition);
+		return journalFolderFinder.findF_A_ByG_F_DDMSK(
+			groupId, folderId, StringPool.BLANK, queryDefinition);
 	}
 
 	@Override
@@ -480,8 +479,8 @@ public class JournalFolderLocalServiceImpl
 		QueryDefinition<?> queryDefinition = new QueryDefinition<>(
 			WorkflowConstants.STATUS_ANY);
 
-		return journalFolderFinder.countF_A_ByG_F(
-			groupId, folderId, queryDefinition);
+		return journalFolderFinder.countF_A_ByG_F_DDMSK(
+			groupId, folderId, StringPool.BLANK, queryDefinition);
 	}
 
 	@Override
@@ -491,8 +490,8 @@ public class JournalFolderLocalServiceImpl
 		QueryDefinition<?> queryDefinition = new QueryDefinition<>(
 			status, 0, false);
 
-		return journalFolderFinder.countF_A_ByG_F(
-			groupId, folderId, queryDefinition);
+		return journalFolderFinder.countF_A_ByG_F_DDMSK(
+			groupId, folderId, StringPool.BLANK, queryDefinition);
 	}
 
 	@Override
@@ -1434,13 +1433,16 @@ public class JournalFolderLocalServiceImpl
 							JournalFolder.class),
 						restrictedAncestorFolder.getFolderId());
 
-				Stream<DDMStructureLink> ancestorDDMStructureLinksStream =
-					ancestorDDMStructureLinks.stream();
-
 				long[] ancestorDDMStructureIds =
-					ancestorDDMStructureLinksStream.mapToLong(
-						DDMStructureLink::getStructureId
-					).toArray();
+					new long[ancestorDDMStructureLinks.size()];
+
+				for (int i = 0; i < ancestorDDMStructureLinks.size(); i++) {
+					DDMStructureLink ddmStructureLink =
+						ancestorDDMStructureLinks.get(i);
+
+					ancestorDDMStructureIds[i] =
+						ddmStructureLink.getStructureId();
+				}
 
 				_validateArticleDDMStructures(
 					folderId, ancestorDDMStructureIds);

@@ -215,6 +215,7 @@ definition {
 	@refactordone
 	test CanAddAutoTagAfterEnablingOpenNLP {
 		property environment.acceptance = "true";
+		property operating.system.types = "alpine,amazonlinux,centos,debian,fedora,orcllinux,osx,redhat,solaris,suse,ubuntu,windows";
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "AutoTaggingFramework#CanAddAutoTagAfterEnablingOpenNLP";
 		property websphere.ssl.truststore.enabled = "true";
@@ -230,12 +231,11 @@ definition {
 			groupName = "Guest",
 			siteURLKey = "guest");
 
-		DMNavigator.openToEntryInAdmin(
-			dmDocumentTitle = "DM Document DOCX",
-			groupName = "Guest",
-			siteURLKey = "guest");
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
-		DMDocument.viewCP(dmDocumentTitle = "DM Document DOCX");
+		LexiconCard.checkCardCheckbox(card = "DM Document DOCX");
+
+		ManagementBar.clickInfo();
 
 		for (var tagName : list "alice,adventures") {
 			DMDocument.viewTagInfo(tagName = "${tagName}");

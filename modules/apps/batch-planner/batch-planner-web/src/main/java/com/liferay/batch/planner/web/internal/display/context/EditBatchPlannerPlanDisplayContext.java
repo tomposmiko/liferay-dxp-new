@@ -15,19 +15,29 @@
 package com.liferay.batch.planner.web.internal.display.context;
 
 import com.liferay.batch.engine.BatchEngineTaskContentType;
+import com.liferay.batch.engine.constants.CreateStrategy;
+import com.liferay.batch.engine.constants.UpdateStrategy;
 import com.liferay.batch.planner.model.BatchPlannerMapping;
 import com.liferay.batch.planner.model.BatchPlannerPlan;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.SelectOption;
-import com.liferay.object.entry.util.ObjectEntryNameUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+
+import javax.portlet.RenderRequest;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Igor Beslic
@@ -38,9 +48,11 @@ public class EditBatchPlannerPlanDisplayContext {
 	public EditBatchPlannerPlanDisplayContext(
 			List<BatchPlannerPlan> batchPlannerPlans,
 			Map<String, String> internalClassNameCategories,
+			RenderRequest renderRequest,
 			BatchPlannerPlan selectedBatchPlannerPlan)
 		throws PortalException {
 
+		_httpServletRequest = PortalUtil.getHttpServletRequest(renderRequest);
 		_internalClassNameSelectOptions = _getInternalClassNameSelectOptions(
 			internalClassNameCategories);
 
@@ -63,6 +75,19 @@ public class EditBatchPlannerPlanDisplayContext {
 		}
 
 		_templateSelectOptions = _getTemplateSelectOptions(batchPlannerPlans);
+	}
+
+	public List<SelectOption> getCreateStrategySelectOptions() {
+		List<SelectOption> selectOptions = new ArrayList<>();
+
+		for (CreateStrategy createStrategy : CreateStrategy.values()) {
+			selectOptions.add(
+				new SelectOption(
+					LanguageUtil.get(getLocale(), createStrategy.getLabel()),
+					createStrategy.name(), createStrategy.isDefaultStrategy()));
+		}
+
+		return selectOptions;
 	}
 
 	public List<SelectOption> getExternalTypeSelectOptions() {
@@ -92,6 +117,16 @@ public class EditBatchPlannerPlanDisplayContext {
 		return _internalClassNameSelectOptions;
 	}
 
+	public Locale getLocale() {
+		if (_locale == null) {
+			ThemeDisplay themeDisplay = getThemeDisplay();
+
+			_locale = themeDisplay.getLocale();
+		}
+
+		return _locale;
+	}
+
 	public long getSelectedBatchPlannerPlanId() {
 		return _selectedBatchPlannerPlanId;
 	}
@@ -114,6 +149,28 @@ public class EditBatchPlannerPlanDisplayContext {
 
 	public List<SelectOption> getTemplateSelectOptions() {
 		return _templateSelectOptions;
+	}
+
+	public ThemeDisplay getThemeDisplay() {
+		if (_themeDisplay == null) {
+			_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+		}
+
+		return _themeDisplay;
+	}
+
+	public List<SelectOption> getUpdateStrategySelectOptions() {
+		List<SelectOption> selectOptions = new ArrayList<>();
+
+		for (UpdateStrategy updateStrategy : UpdateStrategy.values()) {
+			selectOptions.add(
+				new SelectOption(
+					LanguageUtil.get(getLocale(), updateStrategy.getLabel()),
+					updateStrategy.name(), updateStrategy.isDefaultStrategy()));
+		}
+
+		return selectOptions;
 	}
 
 	private List<SelectOption> _getInternalClassNameSelectOptions(
@@ -198,16 +255,18 @@ public class EditBatchPlannerPlanDisplayContext {
 			return internalClassName;
 		}
 
-		return ObjectEntryNameUtil.fromTechnicalName(
-			internalClassName.substring(index + 1));
+		return internalClassName.substring(index + 1);
 	}
 
+	private final HttpServletRequest _httpServletRequest;
 	private final List<SelectOption> _internalClassNameSelectOptions;
+	private Locale _locale;
 	private final Map<String, String> _selectedBatchPlannerMappings;
 	private final long _selectedBatchPlannerPlanId;
 	private final String _selectedBatchPlannerPlanName;
 	private final String _selectedExternalType;
 	private final String _selectedInternalClassName;
 	private final List<SelectOption> _templateSelectOptions;
+	private ThemeDisplay _themeDisplay;
 
 }

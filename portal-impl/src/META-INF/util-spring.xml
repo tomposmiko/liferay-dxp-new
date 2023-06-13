@@ -12,8 +12,6 @@
 		<property name="expandoColumnPermission" ref="com.liferay.expando.kernel.service.permission.ExpandoColumnPermission" />
 	</bean>
 	<bean class="com.liferay.portal.bean.BeanPropertiesImpl" id="com.liferay.portal.bean.BeanPropertiesImpl" />
-	<bean class="com.liferay.portal.convert.documentlibrary.DocumentLibraryConvertProcess" />
-	<bean class="com.liferay.portal.convert.documentlibrary.DocumentLibraryExtraSettingsConvertProcess" />
 	<bean class="com.liferay.portal.dao.jdbc.CurrentConnectionImpl" id="com.liferay.portal.dao.jdbc.CurrentConnectionImpl" />
 	<bean class="com.liferay.portal.format.IdenticalPhoneNumberFormatImpl" id="com.liferay.portal.format.IdenticalPhoneNumberFormatImpl" />
 	<bean class="com.liferay.portal.image.GhostscriptImpl" id="com.liferay.portal.image.GhostscriptImpl" />
@@ -194,12 +192,6 @@
 			<bean class="com.liferay.portal.upgrade.util.MemoryValueMapperFactoryImpl" />
 		</property>
 	</bean>
-	<bean class="com.liferay.portal.util.CalendarFactoryImpl" id="com.liferay.portal.kernel.util.CalendarFactory" />
-	<bean class="com.liferay.portal.kernel.util.CalendarFactoryUtil" id="com.liferay.portal.kernel.util.CalendarFactoryUtil">
-		<property name="calendarFactory">
-			<bean class="com.liferay.portal.util.CalendarFactoryImpl" />
-		</property>
-	</bean>
 	<bean class="com.liferay.portal.util.ColorSchemeFactoryImpl" id="com.liferay.portal.kernel.util.ColorSchemeFactory" />
 	<bean class="com.liferay.portal.kernel.util.ColorSchemeFactoryUtil" id="com.liferay.portal.kernel.util.ColorSchemeFactoryUtil">
 		<property name="colorSchemeFactory" ref="com.liferay.portal.kernel.util.ColorSchemeFactory" />
@@ -238,11 +230,6 @@
 	</bean>
 	<bean class="com.liferay.portal.kernel.util.PortalUtil" id="com.liferay.portal.kernel.util.PortalUtil">
 		<property name="portal" ref="com.liferay.portal.util.Portal" />
-	</bean>
-	<bean class="com.liferay.portal.kernel.util.PortletListerFactoryUtil" id="com.liferay.portal.kernel.util.PortletListerFactoryUtil">
-		<property name="portletListerFactory">
-			<bean class="com.liferay.portal.util.PortletListerFactoryImpl" />
-		</property>
 	</bean>
 	<bean class="com.liferay.portal.util.ThemeFactoryImpl" id="com.liferay.portal.kernel.util.ThemeFactory" />
 	<bean class="com.liferay.portal.kernel.util.ThemeFactoryUtil" id="com.liferay.portal.kernel.util.ThemeFactoryUtil">

@@ -808,7 +808,7 @@ public class LayoutsImporterImpl implements LayoutsImporter {
 	}
 
 	private long _getPreviewFileEntryId(
-			long groupId, long layoutPageTemplateEntryId, ZipEntry zipEntry,
+			long groupId, String className, long classPK, ZipEntry zipEntry,
 			ZipFile zipFile)
 		throws Exception {
 
@@ -828,8 +828,7 @@ public class LayoutsImporterImpl implements LayoutsImporter {
 		}
 
 		String imageFileName =
-			layoutPageTemplateEntryId + "_preview." +
-				FileUtil.getExtension(zipEntry.getName());
+			classPK + "_preview." + FileUtil.getExtension(zipEntry.getName());
 
 		byte[] bytes = null;
 
@@ -846,8 +845,7 @@ public class LayoutsImporterImpl implements LayoutsImporter {
 		}
 
 		fileEntry = _portletFileRepository.addPortletFileEntry(
-			groupId, serviceContext.getUserId(),
-			LayoutPageTemplateEntry.class.getName(), layoutPageTemplateEntryId,
+			groupId, serviceContext.getUserId(), className, classPK,
 			LayoutAdminPortletKeys.GROUP_PAGES, repository.getDlFolderId(),
 			bytes, imageFileName, MimeTypesUtil.getContentType(imageFileName),
 			false);
@@ -1094,7 +1092,7 @@ public class LayoutsImporterImpl implements LayoutsImporter {
 					warningMessages);
 
 				long previewFileEntryId = _getPreviewFileEntryId(
-					groupId,
+					groupId, LayoutPageTemplateEntry.class.getName(),
 					layoutPageTemplateEntry.getLayoutPageTemplateEntryId(),
 					thumbnailZipEntry, zipFile);
 
@@ -1195,7 +1193,7 @@ public class LayoutsImporterImpl implements LayoutsImporter {
 			String externalReferenceCode, long groupId,
 			LayoutUtilityPageEntry layoutUtilityPageEntry, String name,
 			PageDefinition pageDefinition, String type, boolean overwrite,
-			String zipPath)
+			ZipEntry thumbnailZipEntry, String zipPath, ZipFile zipFile)
 		throws Exception {
 
 		try {
@@ -1227,6 +1225,17 @@ public class LayoutsImporterImpl implements LayoutsImporter {
 				_processPageDefinition(
 					layoutUtilityPageEntry.getPlid(), pageDefinition,
 					warningMessages);
+
+				long previewFileEntryId = _getPreviewFileEntryId(
+					groupId, LayoutUtilityPageEntry.class.getName(),
+					layoutUtilityPageEntry.getLayoutUtilityPageEntryId(),
+					thumbnailZipEntry, zipFile);
+
+				if (previewFileEntryId > 0) {
+					_layoutUtilityPageEntryService.updateLayoutUtilityPageEntry(
+						layoutUtilityPageEntry.getLayoutUtilityPageEntryId(),
+						previewFileEntryId);
+				}
 
 				_layoutsImporterResultEntries.add(
 					new LayoutsImporterResultEntry(
@@ -2106,7 +2115,8 @@ public class LayoutsImporterImpl implements LayoutsImporter {
 				_utilityPageTemplateEntry.getPageDefinition(),
 				UtilityPageTemplateUtil.convertToInternalValue(
 					utilityPageTemplate.getTypeAsString()),
-				_overwrite, _utilityPageTemplateEntry.getZipPath());
+				_overwrite, _utilityPageTemplateEntry.getThumbnailZipEntry(),
+				_utilityPageTemplateEntry.getZipPath(), _zipFile);
 
 			return null;
 		}

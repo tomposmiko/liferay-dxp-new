@@ -14,7 +14,10 @@
 
 package com.liferay.portal.workflow.kaleo.runtime.internal.node;
 
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.workflow.kaleo.definition.NodeType;
 import com.liferay.portal.workflow.kaleo.model.KaleoCondition;
 import com.liferay.portal.workflow.kaleo.model.KaleoInstanceToken;
@@ -30,7 +33,10 @@ import com.liferay.portal.workflow.kaleo.service.KaleoInstanceLocalService;
 
 import java.util.List;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -42,6 +48,17 @@ public class ConditionNodeExecutor extends BaseNodeExecutor {
 	@Override
 	public NodeType getNodeType() {
 		return NodeType.CONDITION;
+	}
+
+	@Activate
+	protected void activate(BundleContext bundleContext) {
+		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
+			bundleContext, ConditionEvaluator.class, "component.name");
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		_serviceTrackerMap.close();
 	}
 
 	@Override
@@ -64,8 +81,7 @@ public class ConditionNodeExecutor extends BaseNodeExecutor {
 			_kaleoConditionLocalService.getKaleoNodeKaleoCondition(
 				currentKaleoNode.getKaleoNodeId());
 
-		String transitionName = _conditionEvaluator.evaluate(
-			kaleoCondition, executionContext);
+		String transitionName = _evaluate(kaleoCondition, executionContext);
 
 		_kaleoInstanceLocalService.updateKaleoInstance(
 			kaleoInstanceToken.getKaleoInstanceId(),
@@ -92,13 +108,31 @@ public class ConditionNodeExecutor extends BaseNodeExecutor {
 		List<PathElement> remainingPathElements) {
 	}
 
-	@Reference(target = "(!(scripting.language=*))")
-	private ConditionEvaluator _conditionEvaluator;
+	private String _evaluate(
+			KaleoCondition kaleoCondition, ExecutionContext executionContext)
+		throws PortalException {
+
+		ConditionEvaluator conditionEvaluator = _serviceTrackerMap.getService(
+			StringUtil.trim(kaleoCondition.getScript()));
+
+		if ((conditionEvaluator == null) ||
+			!conditionEvaluator.canEvaluate(
+				kaleoCondition.getScriptLanguage())) {
+
+			throw new IllegalArgumentException(
+				"No condition evaluator found for script language " +
+					kaleoCondition.getScriptLanguage());
+		}
+
+		return conditionEvaluator.evaluate(kaleoCondition, executionContext);
+	}
 
 	@Reference
 	private KaleoConditionLocalService _kaleoConditionLocalService;
 
 	@Reference
 	private KaleoInstanceLocalService _kaleoInstanceLocalService;
+
+	private ServiceTrackerMap<String, ConditionEvaluator> _serviceTrackerMap;
 
 }

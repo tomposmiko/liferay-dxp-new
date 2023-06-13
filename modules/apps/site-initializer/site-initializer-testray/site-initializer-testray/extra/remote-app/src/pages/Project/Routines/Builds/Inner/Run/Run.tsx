@@ -12,10 +12,11 @@
  * details.
  */
 
-import {useNavigate, useOutletContext, useParams} from 'react-router-dom';
+import {useParams} from 'react-router-dom';
 
 import Container from '../../../../../../components/Layout/Container';
 import ListViewRest from '../../../../../../components/ListView';
+import useRuns from '../../../../../../hooks/useRuns';
 import i18n from '../../../../../../i18n';
 import {filters} from '../../../../../../schema/filter';
 import {testrayRunImpl} from '../../../../../../services/rest';
@@ -23,17 +24,10 @@ import {searchUtil} from '../../../../../../util/search';
 import RunFormModal from './RunFormModal';
 import useRunActions from './useRunActions';
 
-interface BuildOutlet {
-	runId?: number;
-	setRunId: React.Dispatch<React.SetStateAction<Number>>;
-}
-
 const Runs = () => {
 	const {actions, formModal} = useRunActions();
 	const {buildId} = useParams();
-	const navigate = useNavigate();
-
-	const {setRunId} = useOutletContext<BuildOutlet>();
+	const {setRunId} = useRuns();
 
 	return (
 		<Container className="mt-4">
@@ -58,36 +52,34 @@ const Runs = () => {
 						{
 							clickable: true,
 							key: 'applicationServer',
-							render: (applicationServer, run) => (
-								<div
-									onClick={() => {
-										setRunId(run.id);
-
-										navigate('..');
-									}}
-								>
-									{applicationServer}
-								</div>
-							),
 							value: i18n.translate('application-server'),
 						},
 						{
+							clickable: true,
 							key: 'browser',
 							value: i18n.translate('browser'),
 						},
 						{
+							clickable: true,
 							key: 'database',
 							value: i18n.translate('database'),
 						},
 						{
+							clickable: true,
 							key: 'javaJDK',
 							value: 'javaJDK',
 						},
 						{
+							clickable: true,
 							key: 'operatingSystem',
 							value: i18n.translate('operating-system'),
 						},
 					],
+					navigateTo: (run) => {
+						setRunId(run.id);
+
+						return '..';
+					},
 				}}
 				transformData={(response) =>
 					testrayRunImpl.transformDataFromList(response)
