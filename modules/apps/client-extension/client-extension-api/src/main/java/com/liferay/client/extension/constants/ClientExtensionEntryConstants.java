@@ -29,6 +29,8 @@ public class ClientExtensionEntryConstants {
 
 	public static final String TYPE_IFRAME = "iframe";
 
+	public static final String TYPE_JS_IMPORT_MAPS_ENTRY = "jsImportMapsEntry";
+
 	public static final String TYPE_STATIC_CONTENT = "staticContent";
 
 	public static final String TYPE_THEME_CSS = "themeCSS";

@@ -64,8 +64,15 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.users.admin.item.selector.UserItemSelectorCriterion;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -356,6 +363,17 @@ public class ContentDashboardAdminDisplayContext {
 			"com.liferay.content.dashboard.web_panelState", "closed");
 	}
 
+	public String getReviewDateString() {
+		if (_reviewDateString != null) {
+			return _reviewDateString;
+		}
+
+		_reviewDateString = ParamUtil.getString(
+			_liferayPortletRequest, "reviewDate");
+
+		return _reviewDateString;
+	}
+
 	public long getScopeId() {
 		if (_scopeId > 0) {
 			return _scopeId;
@@ -482,6 +500,16 @@ public class ContentDashboardAdminDisplayContext {
 		return _swapConfigurationEnabled;
 	}
 
+	public String toString(Date date) {
+		Instant instant = date.toInstant();
+
+		ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
+
+		LocalDateTime localDateTime = zonedDateTime.toLocalDateTime();
+
+		return localDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+	}
+
 	private Map<String, Object> _getContext() {
 		return HashMapBuilder.<String, Object>put(
 			"languageDirection", _languageDirection
@@ -530,6 +558,7 @@ public class ContentDashboardAdminDisplayContext {
 	private final LiferayPortletResponse _liferayPortletResponse;
 	private final Portal _portal;
 	private final ResourceBundle _resourceBundle;
+	private String _reviewDateString;
 	private long _scopeId;
 	private final SearchContainer<ContentDashboardItem<?>> _searchContainer;
 	private Integer _status;

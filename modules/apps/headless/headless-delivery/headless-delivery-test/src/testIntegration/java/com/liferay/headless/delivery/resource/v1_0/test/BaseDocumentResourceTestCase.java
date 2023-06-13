@@ -214,6 +214,7 @@ public abstract class BaseDocumentResourceTestCase {
 		document.setEncodingFormat(regex);
 		document.setExternalReferenceCode(regex);
 		document.setFileExtension(regex);
+		document.setFileName(regex);
 		document.setTitle(regex);
 
 		String json = DocumentSerDes.toJSON(document);
@@ -229,6 +230,7 @@ public abstract class BaseDocumentResourceTestCase {
 		Assert.assertEquals(regex, document.getEncodingFormat());
 		Assert.assertEquals(regex, document.getExternalReferenceCode());
 		Assert.assertEquals(regex, document.getFileExtension());
+		Assert.assertEquals(regex, document.getFileName());
 		Assert.assertEquals(regex, document.getTitle());
 	}
 
@@ -2907,6 +2909,14 @@ public abstract class BaseDocumentResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("fileName", additionalAssertFieldName)) {
+				if (document.getFileName() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("keywords", additionalAssertFieldName)) {
 				if (document.getKeywords() == null) {
 					valid = false;
@@ -3331,6 +3341,16 @@ public abstract class BaseDocumentResourceTestCase {
 				if (!Objects.deepEquals(
 						document1.getFileExtension(),
 						document2.getFileExtension())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("fileName", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						document1.getFileName(), document2.getFileName())) {
 
 					return false;
 				}
@@ -3796,6 +3816,14 @@ public abstract class BaseDocumentResourceTestCase {
 			return sb.toString();
 		}
 
+		if (entityFieldName.equals("fileName")) {
+			sb.append("'");
+			sb.append(String.valueOf(document.getFileName()));
+			sb.append("'");
+
+			return sb.toString();
+		}
+
 		if (entityFieldName.equals("id")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
@@ -3920,6 +3948,8 @@ public abstract class BaseDocumentResourceTestCase {
 				externalReferenceCode = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
 				fileExtension = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
+				fileName = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
 				id = RandomTestUtil.randomLong();
 				numberOfComments = RandomTestUtil.randomInt();

@@ -20,22 +20,34 @@ import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
 import com.liferay.headless.delivery.client.dto.v1_0.Creator;
 import com.liferay.headless.delivery.client.dto.v1_0.Document;
 import com.liferay.headless.delivery.client.http.HttpInvoker;
+import com.liferay.headless.delivery.client.resource.v1_0.DocumentResource;
 import com.liferay.headless.delivery.client.serdes.v1_0.DocumentSerDes;
 import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.model.ResourceConstants;
+import com.liferay.portal.kernel.model.Role;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
+import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.test.constants.TestDataConstants;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.ratings.kernel.service.RatingsEntryLocalService;
@@ -77,6 +89,53 @@ public class DocumentResourceTest extends BaseDocumentResourceTestCase {
 			404,
 			documentResource.deleteDocumentMyRatingHttpResponse(
 				irrelevantDocument.getId()));
+	}
+
+	@Override
+	@Test
+	public void testGetDocument() throws Exception {
+		super.testGetDocument();
+
+		Document document1 = documentResource.postSiteDocument(
+			testGroup.getGroupId(), randomDocument(), getMultipartFiles());
+
+		Assert.assertTrue(Validator.isNotNull(document1.getContentUrl()));
+
+		Document document2 = documentResource.postSiteDocument(
+			testGroup.getGroupId(), randomDocument(),
+			HashMapBuilder.put(
+				"file", () -> FileUtil.createTempFile(new byte[0])
+			).build());
+
+		Assert.assertTrue(Validator.isNull(document2.getContentUrl()));
+
+		Role guestRole = _roleLocalService.getRole(
+			testCompany.getCompanyId(), RoleConstants.GUEST);
+
+		_resourcePermissionLocalService.removeResourcePermission(
+			testCompany.getCompanyId(), DLFileEntry.class.getName(),
+			ResourceConstants.SCOPE_INDIVIDUAL,
+			String.valueOf(document1.getId()), guestRole.getRoleId(),
+			ActionKeys.DOWNLOAD);
+
+		DocumentResource.Builder builder = DocumentResource.builder();
+
+		String password = StringUtil.randomString();
+
+		User user = UserTestUtil.addUser(
+			testCompany.getCompanyId(), testCompany.getUserId(), password,
+			RandomTestUtil.randomString() + "@liferay.com",
+			RandomTestUtil.randomString(), LocaleUtil.getDefault(),
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(), null,
+			ServiceContextTestUtil.getServiceContext());
+
+		DocumentResource regularUserDocumentResource = builder.authentication(
+			user.getLogin(), password
+		).build();
+
+		document1 = regularUserDocumentResource.getDocument(document1.getId());
+
+		Assert.assertTrue(Validator.isNull(document1.getContentUrl()));
 	}
 
 	@Override
@@ -146,7 +205,7 @@ public class DocumentResourceTest extends BaseDocumentResourceTestCase {
 
 	@Override
 	protected String[] getAdditionalAssertFieldNames() {
-		return new String[] {"description", "title"};
+		return new String[] {"description", "fileName", "title"};
 	}
 
 	@Override
@@ -321,5 +380,11 @@ public class DocumentResourceTest extends BaseDocumentResourceTestCase {
 
 	@Inject
 	private RatingsEntryLocalService _ratingsEntryLocalService;
+
+	@Inject
+	private ResourcePermissionLocalService _resourcePermissionLocalService;
+
+	@Inject
+	private RoleLocalService _roleLocalService;
 
 }

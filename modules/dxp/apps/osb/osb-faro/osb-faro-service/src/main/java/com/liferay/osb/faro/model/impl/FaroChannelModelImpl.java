@@ -71,8 +71,8 @@ public class FaroChannelModelImpl
 	public static final Object[][] TABLE_COLUMNS = {
 		{"mvccVersion", Types.BIGINT}, {"faroChannelId", Types.BIGINT},
 		{"groupId", Types.BIGINT}, {"companyId", Types.BIGINT},
-		{"createTime", Types.BIGINT}, {"userId", Types.BIGINT},
-		{"userName", Types.VARCHAR}, {"modifiedTime", Types.BIGINT},
+		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
+		{"createTime", Types.BIGINT}, {"modifiedTime", Types.BIGINT},
 		{"channelId", Types.VARCHAR}, {"name", Types.VARCHAR},
 		{"permissionType", Types.INTEGER}, {"workspaceGroupId", Types.BIGINT}
 	};
@@ -85,9 +85,9 @@ public class FaroChannelModelImpl
 		TABLE_COLUMNS_MAP.put("faroChannelId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("groupId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
-		TABLE_COLUMNS_MAP.put("createTime", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("userId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("userName", Types.VARCHAR);
+		TABLE_COLUMNS_MAP.put("createTime", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("modifiedTime", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("channelId", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("name", Types.VARCHAR);
@@ -96,7 +96,7 @@ public class FaroChannelModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table OSBFaro_FaroChannel (mvccVersion LONG default 0 not null,faroChannelId LONG not null primary key,groupId LONG,companyId LONG,createTime LONG,userId LONG,userName VARCHAR(75) null,modifiedTime LONG,channelId VARCHAR(75) null,name VARCHAR(75) null,permissionType INTEGER,workspaceGroupId LONG)";
+		"create table OSBFaro_FaroChannel (mvccVersion LONG default 0 not null,faroChannelId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createTime LONG,modifiedTime LONG,channelId VARCHAR(75) null,name VARCHAR(75) null,permissionType INTEGER,workspaceGroupId LONG)";
 
 	public static final String TABLE_SQL_DROP =
 		"drop table OSBFaro_FaroChannel";
@@ -260,10 +260,10 @@ public class FaroChannelModelImpl
 			attributeGetterFunctions.put("groupId", FaroChannel::getGroupId);
 			attributeGetterFunctions.put(
 				"companyId", FaroChannel::getCompanyId);
-			attributeGetterFunctions.put(
-				"createTime", FaroChannel::getCreateTime);
 			attributeGetterFunctions.put("userId", FaroChannel::getUserId);
 			attributeGetterFunctions.put("userName", FaroChannel::getUserName);
+			attributeGetterFunctions.put(
+				"createTime", FaroChannel::getCreateTime);
 			attributeGetterFunctions.put(
 				"modifiedTime", FaroChannel::getModifiedTime);
 			attributeGetterFunctions.put(
@@ -302,14 +302,14 @@ public class FaroChannelModelImpl
 				"companyId",
 				(BiConsumer<FaroChannel, Long>)FaroChannel::setCompanyId);
 			attributeSetterBiConsumers.put(
-				"createTime",
-				(BiConsumer<FaroChannel, Long>)FaroChannel::setCreateTime);
-			attributeSetterBiConsumers.put(
 				"userId",
 				(BiConsumer<FaroChannel, Long>)FaroChannel::setUserId);
 			attributeSetterBiConsumers.put(
 				"userName",
 				(BiConsumer<FaroChannel, String>)FaroChannel::setUserName);
+			attributeSetterBiConsumers.put(
+				"createTime",
+				(BiConsumer<FaroChannel, Long>)FaroChannel::setCreateTime);
 			attributeSetterBiConsumers.put(
 				"modifiedTime",
 				(BiConsumer<FaroChannel, Long>)FaroChannel::setModifiedTime);
@@ -399,20 +399,6 @@ public class FaroChannelModelImpl
 	}
 
 	@Override
-	public long getCreateTime() {
-		return _createTime;
-	}
-
-	@Override
-	public void setCreateTime(long createTime) {
-		if (_columnOriginalValues == Collections.EMPTY_MAP) {
-			_setColumnOriginalValues();
-		}
-
-		_createTime = createTime;
-	}
-
-	@Override
 	public long getUserId() {
 		return _userId;
 	}
@@ -468,6 +454,20 @@ public class FaroChannelModelImpl
 		}
 
 		_userName = userName;
+	}
+
+	@Override
+	public long getCreateTime() {
+		return _createTime;
+	}
+
+	@Override
+	public void setCreateTime(long createTime) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_createTime = createTime;
 	}
 
 	@Override
@@ -629,9 +629,9 @@ public class FaroChannelModelImpl
 		faroChannelImpl.setFaroChannelId(getFaroChannelId());
 		faroChannelImpl.setGroupId(getGroupId());
 		faroChannelImpl.setCompanyId(getCompanyId());
-		faroChannelImpl.setCreateTime(getCreateTime());
 		faroChannelImpl.setUserId(getUserId());
 		faroChannelImpl.setUserName(getUserName());
+		faroChannelImpl.setCreateTime(getCreateTime());
 		faroChannelImpl.setModifiedTime(getModifiedTime());
 		faroChannelImpl.setChannelId(getChannelId());
 		faroChannelImpl.setName(getName());
@@ -655,11 +655,11 @@ public class FaroChannelModelImpl
 			this.<Long>getColumnOriginalValue("groupId"));
 		faroChannelImpl.setCompanyId(
 			this.<Long>getColumnOriginalValue("companyId"));
-		faroChannelImpl.setCreateTime(
-			this.<Long>getColumnOriginalValue("createTime"));
 		faroChannelImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
 		faroChannelImpl.setUserName(
 			this.<String>getColumnOriginalValue("userName"));
+		faroChannelImpl.setCreateTime(
+			this.<Long>getColumnOriginalValue("createTime"));
 		faroChannelImpl.setModifiedTime(
 			this.<Long>getColumnOriginalValue("modifiedTime"));
 		faroChannelImpl.setChannelId(
@@ -753,8 +753,6 @@ public class FaroChannelModelImpl
 
 		faroChannelCacheModel.companyId = getCompanyId();
 
-		faroChannelCacheModel.createTime = getCreateTime();
-
 		faroChannelCacheModel.userId = getUserId();
 
 		faroChannelCacheModel.userName = getUserName();
@@ -764,6 +762,8 @@ public class FaroChannelModelImpl
 		if ((userName != null) && (userName.length() == 0)) {
 			faroChannelCacheModel.userName = null;
 		}
+
+		faroChannelCacheModel.createTime = getCreateTime();
 
 		faroChannelCacheModel.modifiedTime = getModifiedTime();
 
@@ -852,9 +852,9 @@ public class FaroChannelModelImpl
 	private long _faroChannelId;
 	private long _groupId;
 	private long _companyId;
-	private long _createTime;
 	private long _userId;
 	private String _userName;
+	private long _createTime;
 	private long _modifiedTime;
 	private String _channelId;
 	private String _name;
@@ -893,9 +893,9 @@ public class FaroChannelModelImpl
 		_columnOriginalValues.put("faroChannelId", _faroChannelId);
 		_columnOriginalValues.put("groupId", _groupId);
 		_columnOriginalValues.put("companyId", _companyId);
-		_columnOriginalValues.put("createTime", _createTime);
 		_columnOriginalValues.put("userId", _userId);
 		_columnOriginalValues.put("userName", _userName);
+		_columnOriginalValues.put("createTime", _createTime);
 		_columnOriginalValues.put("modifiedTime", _modifiedTime);
 		_columnOriginalValues.put("channelId", _channelId);
 		_columnOriginalValues.put("name", _name);
@@ -922,11 +922,11 @@ public class FaroChannelModelImpl
 
 		columnBitmasks.put("companyId", 8L);
 
-		columnBitmasks.put("createTime", 16L);
+		columnBitmasks.put("userId", 16L);
 
-		columnBitmasks.put("userId", 32L);
+		columnBitmasks.put("userName", 32L);
 
-		columnBitmasks.put("userName", 64L);
+		columnBitmasks.put("createTime", 64L);
 
 		columnBitmasks.put("modifiedTime", 128L);
 

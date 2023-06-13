@@ -45,8 +45,8 @@ public class FaroNotificationWrapper
 		attributes.put("faroNotificationId", getFaroNotificationId());
 		attributes.put("groupId", getGroupId());
 		attributes.put("companyId", getCompanyId());
-		attributes.put("createTime", getCreateTime());
 		attributes.put("userId", getUserId());
+		attributes.put("createTime", getCreateTime());
 		attributes.put("modifiedTime", getModifiedTime());
 		attributes.put("ownerId", getOwnerId());
 		attributes.put("scope", getScope());
@@ -83,16 +83,16 @@ public class FaroNotificationWrapper
 			setCompanyId(companyId);
 		}
 
-		Long createTime = (Long)attributes.get("createTime");
-
-		if (createTime != null) {
-			setCreateTime(createTime);
-		}
-
 		Long userId = (Long)attributes.get("userId");
 
 		if (userId != null) {
 			setUserId(userId);
+		}
+
+		Long createTime = (Long)attributes.get("createTime");
+
+		if (createTime != null) {
+			setCreateTime(createTime);
 		}
 
 		Long modifiedTime = (Long)attributes.get("modifiedTime");

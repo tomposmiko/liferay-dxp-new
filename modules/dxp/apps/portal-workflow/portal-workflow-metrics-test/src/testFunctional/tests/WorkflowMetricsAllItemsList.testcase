@@ -160,8 +160,6 @@ definition {
 	@description = "Verify that the user is able to click on the Current Node link and the node will be in evidence"
 	@priority = 3
 	test CanClickCurrentNodeLink {
-		property portal.upstream = "quarantine";
-
 		Workflow.openWorkflowListView();
 
 		Navigator.gotoNavItem(navItem = "Configuration");
@@ -189,8 +187,6 @@ definition {
 	@description = "Verify that the users are able to identify the current node of the instance in the workflow"
 	@priority = 4
 	test CanIdentifyCurrentNode {
-		property portal.upstream = "quarantine";
-
 		Workflow.openWorkflowListView();
 
 		Navigator.gotoNavItem(navItem = "Configuration");
@@ -1023,8 +1019,6 @@ definition {
 	@description = "Verify that the component displays the entire workflow that the instance is in"
 	@priority = 5
 	test DisplaysEntireWorkflow {
-		property portal.upstream = "quarantine";
-
 		Workflow.openWorkflowListView();
 
 		Navigator.gotoNavItem(navItem = "Configuration");
@@ -1445,6 +1439,8 @@ definition {
 	@description = "Verify that, in the item detail modal, when an item is completed with No SLA, the icon on modal title will keep informing the SLA status but styled in grey color"
 	@priority = 3
 	test IconOnModalTitleIsGreyWhenItemIsCompletedNoSLA {
+		property ci.retries.disabled = "true";
+
 		ApplicationsMenu.gotoPortlet(
 			category = "Workflow",
 			panel = "Applications",
@@ -1490,6 +1486,8 @@ definition {
 	@description = "LPS-92053 - Verify that, in the item detail modal, when an item is completed On Time, the icon on modal title will keep informing the SLA status but styled in grey color"
 	@priority = 3
 	test IconOnModalTitleIsGreyWhenItemIsCompletedOnTime {
+		property test.name.skip.portal.instance = "WorkflowMetricsAllItemsList#IconOnModalTitleIsGreyWhenItemIsCompletedOnTime";
+
 		WorkflowMetrics.goToWorkflowSLASettings(workflowProcessName = "Single Approver");
 
 		Click(locator1 = "WorkflowMetricsSLA#ADD_NEW_SLA_BUTTON");
@@ -1546,6 +1544,8 @@ definition {
 	@description = "LPS-92053 - Verify that, in the item detail modal, when an item is completed Overdue, the icon on modal title will keep informing the SLA status but styled in grey color "
 	@priority = 3
 	test IconOnModalTitleIsGreyWhenItemIsCompletedOverdue {
+		property test.name.skip.portal.instance = "WorkflowMetricsAllItemsList#IconOnModalTitleIsGreyWhenItemIsCompletedOverdue";
+
 		WorkflowMetrics.goToWorkflowSLASettings(workflowProcessName = "Single Approver");
 
 		Click(locator1 = "WorkflowMetricsSLA#ADD_NEW_SLA_BUTTON");
@@ -1760,7 +1760,7 @@ definition {
 	@description = "LPS-92053 - Verify that the item modal places an icon before the modal title referring to the SLA status: On Time"
 	@priority = 3
 	test ItemModalPlacesIconReferringToSlaStatusOnTime {
-		property portal.upstream = "quarantine";
+		property test.name.skip.portal.instance = "WorkflowMetricsAllItemsList#ItemModalPlacesIconReferringToSlaStatusOnTime";
 
 		ApplicationsMenu.gotoPortlet(
 			category = "Workflow",
@@ -3181,6 +3181,8 @@ definition {
 	@description = "LPS-92053 - Verify that, in the item detail modal, Open when an SLA is paused, the SLA status will be related to the moment when it triggered the pause timer"
 	@priority = 4
 	test WhenSlaIsPausedSlaStatusIsRelatedToThePauseTimer {
+		property ci.retries.disabled = "true";
+
 		task ("Given a Single Approver SLA with a pause") {
 			WorkflowMetrics.goToWorkflowSLASettings(workflowProcessName = "Single Approver");
 

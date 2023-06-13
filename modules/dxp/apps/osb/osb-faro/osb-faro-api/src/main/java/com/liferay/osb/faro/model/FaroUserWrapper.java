@@ -45,9 +45,9 @@ public class FaroUserWrapper
 		attributes.put("faroUserId", getFaroUserId());
 		attributes.put("groupId", getGroupId());
 		attributes.put("companyId", getCompanyId());
-		attributes.put("createTime", getCreateTime());
 		attributes.put("userId", getUserId());
 		attributes.put("userName", getUserName());
+		attributes.put("createTime", getCreateTime());
 		attributes.put("modifiedTime", getModifiedTime());
 		attributes.put("liveUserId", getLiveUserId());
 		attributes.put("roleId", getRoleId());
@@ -84,12 +84,6 @@ public class FaroUserWrapper
 			setCompanyId(companyId);
 		}
 
-		Long createTime = (Long)attributes.get("createTime");
-
-		if (createTime != null) {
-			setCreateTime(createTime);
-		}
-
 		Long userId = (Long)attributes.get("userId");
 
 		if (userId != null) {
@@ -100,6 +94,12 @@ public class FaroUserWrapper
 
 		if (userName != null) {
 			setUserName(userName);
+		}
+
+		Long createTime = (Long)attributes.get("createTime");
+
+		if (createTime != null) {
+			setCreateTime(createTime);
 		}
 
 		Long modifiedTime = (Long)attributes.get("modifiedTime");

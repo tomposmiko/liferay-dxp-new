@@ -78,8 +78,14 @@ public class SiteResourceTest extends BaseSiteResourceTestCase {
 		super.testPostSite();
 
 		_testPostSiteFailureDuplicateName();
+		_testPostSiteFailureInvalidKey();
 		_testPostSiteFailureNoName();
+		_testPostSiteFailureParentSiteNotFound();
+		_testPostSiteFailureSiteInitializerNotFound();
 		_testPostSiteFailureSiteTemplateInactive();
+		_testPostSiteFailureSiteTemplateNotFound();
+		_testPostSiteFailureTemplateKeyNoTemplateType();
+		_testPostSiteFailureTemplateTypeNoTemplateKey();
 		_testPostSiteSuccessChild();
 		_testPostSiteSuccessMembershipTypePrivate();
 		_testPostSiteSuccessSiteInitializer();
@@ -121,7 +127,27 @@ public class SiteResourceTest extends BaseSiteResourceTestCase {
 		catch (Problem.ProblemException problemException) {
 			Problem problem = problemException.getProblem();
 
-			Assert.assertEquals("INTERNAL_SERVER_ERROR", problem.getStatus());
+			Assert.assertEquals("CONFLICT", problem.getStatus());
+			Assert.assertEquals(
+				"A site with the same key already exists", problem.getTitle());
+		}
+	}
+
+	private void _testPostSiteFailureInvalidKey() throws Exception {
+		Site randomSite = randomSite();
+
+		randomSite.setName("*");
+
+		try {
+			testPostSite_addSite(randomSite);
+
+			Assert.fail();
+		}
+		catch (Problem.ProblemException problemException) {
+			Problem problem = problemException.getProblem();
+
+			Assert.assertEquals("BAD_REQUEST", problem.getStatus());
+			Assert.assertEquals("Site key is invalid", problem.getTitle());
 		}
 	}
 
@@ -143,6 +169,52 @@ public class SiteResourceTest extends BaseSiteResourceTestCase {
 			String title = problem.getTitle();
 
 			Assert.assertTrue(title.contains("name must not be empty"));
+		}
+	}
+
+	private void _testPostSiteFailureParentSiteNotFound() throws Exception {
+		Site randomSite = randomSite();
+
+		randomSite.setParentSiteKey(
+			StringUtil.toLowerCase(RandomTestUtil.randomString()));
+
+		try {
+			testPostSite_addSite(randomSite);
+
+			Assert.fail();
+		}
+		catch (Problem.ProblemException problemException) {
+			Problem problem = problemException.getProblem();
+
+			Assert.assertEquals("NOT_FOUND", problem.getStatus());
+			Assert.assertEquals(
+				"No site exists for site key " + randomSite.getParentSiteKey(),
+				problem.getTitle());
+		}
+	}
+
+	private void _testPostSiteFailureSiteInitializerNotFound()
+		throws Exception {
+
+		Site randomSite = randomSite();
+
+		randomSite.setTemplateKey(
+			StringUtil.toLowerCase(RandomTestUtil.randomString()));
+		randomSite.setTemplateType(Site.TemplateType.SITE_INITIALIZER);
+
+		try {
+			testPostSite_addSite(randomSite);
+
+			Assert.fail();
+		}
+		catch (Problem.ProblemException problemException) {
+			Problem problem = problemException.getProblem();
+
+			Assert.assertEquals("BAD_REQUEST", problem.getStatus());
+			Assert.assertEquals(
+				"No site initializer was found for site template key " +
+					randomSite.getTemplateKey(),
+				problem.getTitle());
 		}
 	}
 
@@ -175,7 +247,78 @@ public class SiteResourceTest extends BaseSiteResourceTestCase {
 		catch (Problem.ProblemException problemException) {
 			Problem problem = problemException.getProblem();
 
-			Assert.assertEquals("INTERNAL_SERVER_ERROR", problem.getStatus());
+			Assert.assertEquals("BAD_REQUEST", problem.getStatus());
+			Assert.assertEquals(
+				"Site template with site template key " +
+					randomSite.getTemplateKey() + " is inactive",
+				problem.getTitle());
+		}
+	}
+
+	private void _testPostSiteFailureSiteTemplateNotFound() throws Exception {
+		Site randomSite = randomSite();
+
+		randomSite.setTemplateKey(String.valueOf(RandomTestUtil.randomLong()));
+		randomSite.setTemplateType(Site.TemplateType.SITE_TEMPLATE);
+
+		try {
+			testPostSite_addSite(randomSite);
+
+			Assert.fail();
+		}
+		catch (Problem.ProblemException problemException) {
+			Problem problem = problemException.getProblem();
+
+			Assert.assertEquals("BAD_REQUEST", problem.getStatus());
+			Assert.assertEquals(
+				"No site template was found for site template key " +
+					randomSite.getTemplateKey(),
+				problem.getTitle());
+		}
+	}
+
+	private void _testPostSiteFailureTemplateKeyNoTemplateType()
+		throws Exception {
+
+		Site randomSite = randomSite();
+
+		randomSite.setTemplateKey(
+			StringUtil.toLowerCase(RandomTestUtil.randomString()));
+
+		try {
+			testPostSite_addSite(randomSite);
+
+			Assert.fail();
+		}
+		catch (Problem.ProblemException problemException) {
+			Problem problem = problemException.getProblem();
+
+			Assert.assertEquals("BAD_REQUEST", problem.getStatus());
+			Assert.assertEquals(
+				"Template type cannot be empty if template key is specified",
+				problem.getTitle());
+		}
+	}
+
+	private void _testPostSiteFailureTemplateTypeNoTemplateKey()
+		throws Exception {
+
+		Site randomSite = randomSite();
+
+		randomSite.setTemplateType(Site.TemplateType.SITE_INITIALIZER);
+
+		try {
+			testPostSite_addSite(randomSite);
+
+			Assert.fail();
+		}
+		catch (Problem.ProblemException problemException) {
+			Problem problem = problemException.getProblem();
+
+			Assert.assertEquals("BAD_REQUEST", problem.getStatus());
+			Assert.assertEquals(
+				"Template key cannot be empty if template type is specified",
+				problem.getTitle());
 		}
 	}
 

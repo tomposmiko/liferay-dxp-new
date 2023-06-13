@@ -28,10 +28,8 @@ export default async function createMDFRequestActivitiesProxyAPI(
 		| undefined = undefined;
 
 	if (
-		mdfRequestActivity.externalReferenceCode &&
-		mdfRequestActivity.externalReferenceCodeSF &&
-		mdfRequestActivity.externalReferenceCode ===
-			mdfRequestActivity.externalReferenceCodeSF
+		mdfRequestActivity.externalReferenceCode ||
+		mdfRequestActivity.externalReferenceCodeSF
 	) {
 		dtoMDFRequestActivitySFResponse = await updateMDFRequestActivitiesSF(
 			ResourceName.ACTIVITY_SALESFORCE,
@@ -47,13 +45,14 @@ export default async function createMDFRequestActivitiesProxyAPI(
 			mdfRequestActivity,
 			company,
 			mdfRequestId,
-			mdFRequestExternalReferenceCode
+			mdFRequestExternalReferenceCode,
+			mdfRequestActivity.externalReferenceCode
 		);
 	}
 
 	let dtoMDFRequestResponse: MDFRequestActivityDTO | undefined = undefined;
 
-	if (dtoMDFRequestActivitySFResponse.externalReferenceCode) {
+	if (dtoMDFRequestActivitySFResponse?.externalReferenceCode) {
 		if (mdfRequestActivity.id) {
 			dtoMDFRequestResponse = await updateMDFRequestActivities(
 				ResourceName.ACTIVITY_DXP,
@@ -61,7 +60,6 @@ export default async function createMDFRequestActivitiesProxyAPI(
 				company,
 				mdfRequestId,
 				mdFRequestExternalReferenceCode,
-				dtoMDFRequestActivitySFResponse.externalReferenceCode,
 				dtoMDFRequestActivitySFResponse.externalReferenceCode
 			);
 		}
@@ -72,7 +70,6 @@ export default async function createMDFRequestActivitiesProxyAPI(
 				company,
 				mdfRequestId,
 				mdFRequestExternalReferenceCode,
-				dtoMDFRequestActivitySFResponse.externalReferenceCode,
 				dtoMDFRequestActivitySFResponse.externalReferenceCode
 			);
 		}

@@ -104,24 +104,24 @@ renderResponse.setTitle(editJournalFeedDisplayContext.getTitle());
 			</liferay-frontend:fieldset>
 		</c:if>
 
+		<%
+		List<DDMTemplate> ddmTemplates = editJournalFeedDisplayContext.getDDMTemplates();
+		%>
+
 		<liferay-frontend:fieldset
 			collapsed="<%= true %>"
 			collapsible="<%= true %>"
 			label="web-content-constraints"
 		>
 			<div class="form-group">
-				<aui:input name="ddmStructureId" required="<%= true %>" type="hidden" value="<%= editJournalFeedDisplayContext.getDDMStructureId() %>" />
+				<aui:input name="ddmStructureId" type="hidden" value="<%= editJournalFeedDisplayContext.getDDMStructureId() %>" />
 
-				<aui:input name="structure" required="<%= true %>" type="resource" value="<%= editJournalFeedDisplayContext.getDDMStructureName() %>" />
+				<aui:input name="structure" type="resource" value="<%= editJournalFeedDisplayContext.getDDMStructureName() %>" />
 
 				<aui:button name="selectDDMStructureButton" onClick='<%= liferayPortletResponse.getNamespace() + "openDDMStructureSelector();" %>' value="select" />
 
 				<aui:button disabled="<%= editJournalFeedDisplayContext.getDDMStructureId() == 0 %>" name="removeDDMStructureButton" onClick='<%= liferayPortletResponse.getNamespace() + "removeDDMStructure();" %>' value="remove" />
 			</div>
-
-			<%
-			List<DDMTemplate> ddmTemplates = editJournalFeedDisplayContext.getDDMTemplates();
-			%>
 
 			<c:choose>
 				<c:when test="<%= ddmTemplates.isEmpty() %>">
@@ -162,10 +162,6 @@ renderResponse.setTitle(editJournalFeedDisplayContext.getTitle());
 		>
 			<aui:select label="feed-item-content" name="contentFieldSelector">
 				<aui:option label="<%= JournalFeedConstants.WEB_CONTENT_DESCRIPTION %>" selected="<%= Objects.equals(editJournalFeedDisplayContext.getContentField(), JournalFeedConstants.WEB_CONTENT_DESCRIPTION) %>" />
-
-				<%
-				List<DDMTemplate> ddmTemplates = editJournalFeedDisplayContext.getDDMTemplates();
-				%>
 
 				<optgroup label="<liferay-ui:message key="<%= JournalFeedConstants.RENDERED_WEB_CONTENT %>" />">
 					<aui:option data-contentField="<%= JournalFeedConstants.RENDERED_WEB_CONTENT %>" label="use-default-template" selected="<%= Objects.equals(editJournalFeedDisplayContext.getContentField(), JournalFeedConstants.RENDERED_WEB_CONTENT) %>" value="" />

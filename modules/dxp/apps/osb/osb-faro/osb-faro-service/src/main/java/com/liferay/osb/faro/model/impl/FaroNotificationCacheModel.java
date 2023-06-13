@@ -86,10 +86,10 @@ public class FaroNotificationCacheModel
 		sb.append(groupId);
 		sb.append(", companyId=");
 		sb.append(companyId);
-		sb.append(", createTime=");
-		sb.append(createTime);
 		sb.append(", userId=");
 		sb.append(userId);
+		sb.append(", createTime=");
+		sb.append(createTime);
 		sb.append(", modifiedTime=");
 		sb.append(modifiedTime);
 		sb.append(", ownerId=");
@@ -115,8 +115,8 @@ public class FaroNotificationCacheModel
 		faroNotificationImpl.setFaroNotificationId(faroNotificationId);
 		faroNotificationImpl.setGroupId(groupId);
 		faroNotificationImpl.setCompanyId(companyId);
-		faroNotificationImpl.setCreateTime(createTime);
 		faroNotificationImpl.setUserId(userId);
+		faroNotificationImpl.setCreateTime(createTime);
 		faroNotificationImpl.setModifiedTime(modifiedTime);
 		faroNotificationImpl.setOwnerId(ownerId);
 
@@ -158,9 +158,9 @@ public class FaroNotificationCacheModel
 
 		companyId = objectInput.readLong();
 
-		createTime = objectInput.readLong();
-
 		userId = objectInput.readLong();
+
+		createTime = objectInput.readLong();
 
 		modifiedTime = objectInput.readLong();
 
@@ -182,9 +182,9 @@ public class FaroNotificationCacheModel
 
 		objectOutput.writeLong(companyId);
 
-		objectOutput.writeLong(createTime);
-
 		objectOutput.writeLong(userId);
+
+		objectOutput.writeLong(createTime);
 
 		objectOutput.writeLong(modifiedTime);
 
@@ -218,8 +218,8 @@ public class FaroNotificationCacheModel
 	public long faroNotificationId;
 	public long groupId;
 	public long companyId;
-	public long createTime;
 	public long userId;
+	public long createTime;
 	public long modifiedTime;
 	public long ownerId;
 	public String scope;

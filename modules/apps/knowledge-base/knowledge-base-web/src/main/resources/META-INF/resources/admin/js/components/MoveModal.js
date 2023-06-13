@@ -15,13 +15,12 @@
 import {TreeView as ClayTreeView} from '@clayui/core';
 import ClayIcon from '@clayui/icon';
 import classnames from 'classnames';
-import {fetch, objectToFormData, openToast} from 'frontend-js-web';
+import {getOpener} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useMemo, useState} from 'react';
 
 import getSearchItems from '../utils/getSearchItems';
 import normalizeItems from '../utils/normalizeItems';
-import showSuccessMessage from '../utils/showSuccessMessage';
 import SearchField from './SearchField';
 
 const ITEM_TYPES_SYMBOL = {
@@ -29,17 +28,9 @@ const ITEM_TYPES_SYMBOL = {
 	folder: 'folder',
 };
 
-const ITEM_TYPES = {
-	article: 'article',
-	folder: 'folder',
-};
+const SELECT_EVENT_NAME = 'selectKBMoveFolder';
 
-export default function MoveModal({
-	items: initialItems,
-	moveKBObjectURL,
-	portletNamespace,
-	selectedItemId,
-}) {
+export default function MoveModal({itemToMoveId, items: initialItems}) {
 	const items = useMemo(() => normalizeItems(initialItems), [initialItems]);
 
 	const searchItems = useMemo(() => getSearchItems(initialItems), [
@@ -48,60 +39,18 @@ export default function MoveModal({
 
 	const [searchActive, setSearchActive] = useState(false);
 
-	const handleItemMove = (item, parentItem, index) => {
-		if (
-			item.type === ITEM_TYPES.folder &&
-			parentItem.type === ITEM_TYPES.article
-		) {
-			openToast({
-				message: Liferay.Language.get(
-					'folders-cannot-be-moved-into-articles'
-				),
-				type: 'danger',
-			});
+	const handleItemMove = (currentItem, destinationItem, index) => {
+		getOpener().Liferay.fire(SELECT_EVENT_NAME, {
+			destinationItem,
+			index,
+		});
+	};
 
-			return false;
-		}
+	const onItemClick = (destinationItem, event) => {
+		event.stopPropagation();
 
-		fetch(moveKBObjectURL, {
-			body: objectToFormData({
-				[`${portletNamespace}dragAndDrop`]: true,
-				[`${portletNamespace}position`]: index?.next ?? -1,
-				[`${portletNamespace}resourceClassNameId`]: item.classNameId,
-				[`${portletNamespace}resourcePrimKey`]: item.id,
-				[`${portletNamespace}parentResourceClassNameId`]: parentItem.classNameId,
-				[`${portletNamespace}parentResourcePrimKey`]: parentItem.id,
-			}),
-			method: 'POST',
-		})
-			.then((response) => {
-				if (!response.ok) {
-					throw new Error();
-				}
-
-				return response.json();
-			})
-			.then((response) => {
-				if (!response.success) {
-					throw new Error(response.errorMessage);
-				}
-
-				showSuccessMessage(portletNamespace);
-			})
-			.catch(
-				({
-					message = Liferay.Language.get(
-						'an-unexpected-error-occurred'
-					),
-				}) => {
-					openToast({
-						message,
-						type: 'danger',
-					});
-				}
-			);
-
-		return true;
+		const index = {next: destinationItem.children.length};
+		getOpener().Liferay.fire(SELECT_EVENT_NAME, {destinationItem, index});
 	};
 
 	const handleSearchChange = ({isSearchActive}) => {
@@ -118,7 +67,7 @@ export default function MoveModal({
 			{!searchActive && (
 				<ClayTreeView
 					defaultItems={items}
-					defaultSelectedKeys={new Set([selectedItemId])}
+					defaultSelectedKeys={new Set([itemToMoveId])}
 					dragAndDrop
 					nestedKey="children"
 					onItemMove={handleItemMove}
@@ -129,8 +78,11 @@ export default function MoveModal({
 							<ClayTreeView.Item
 								className={classnames({
 									'knowledge-base-navigation-item-active':
-										item.id === selectedItemId,
+										item.id === itemToMoveId,
 								})}
+								onClick={(event) => {
+									onItemClick(item, event);
+								}}
 							>
 								<ClayTreeView.ItemStack>
 									<ClayIcon
@@ -177,6 +129,6 @@ const itemShape = {
 itemShape.children = PropTypes.arrayOf(PropTypes.shape(itemShape));
 
 MoveModal.propTypes = {
+	itemToMoveId: PropTypes.string,
 	items: PropTypes.arrayOf(PropTypes.shape(itemShape)),
-	selectedItemId: PropTypes.string,
 };

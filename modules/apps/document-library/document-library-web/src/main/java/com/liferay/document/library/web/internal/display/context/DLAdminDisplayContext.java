@@ -579,6 +579,8 @@ public class DLAdminDisplayContext {
 			_httpServletRequest, "fileEntryTypeId", -1);
 		String[] extensions = ParamUtil.getStringValues(
 			_httpServletRequest, "extension");
+		String[] assetTagIds = ParamUtil.getStringValues(
+			_httpServletRequest, "assetTagId");
 
 		int status = WorkflowConstants.STATUS_APPROVED;
 
@@ -626,8 +628,9 @@ public class DLAdminDisplayContext {
 		dlSearchContainer.setOrderByCol(getOrderByCol());
 		dlSearchContainer.setOrderByType(getOrderByType());
 
-		if ((fileEntryTypeId >= 0) || ArrayUtil.isNotEmpty(extensions) ||
-			navigation.equals("mine") || navigation.equals("recent")) {
+		if ((fileEntryTypeId >= 0) || ArrayUtil.isNotEmpty(assetTagIds) ||
+			ArrayUtil.isNotEmpty(extensions) || navigation.equals("mine") ||
+			navigation.equals("recent")) {
 
 			if (navigation.equals("recent")) {
 				dlSearchContainer.setOrderByCol("modifiedDate");
@@ -636,8 +639,8 @@ public class DLAdminDisplayContext {
 
 			SearchContext searchContext = _getSearchContext(dlSearchContainer);
 
-			if (folderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
-				searchContext.setFolderIds(new long[] {folderId});
+			if (ArrayUtil.isNotEmpty(assetTagIds)) {
+				searchContext.setAssetTagNames(assetTagIds);
 			}
 
 			long userId = 0;
@@ -650,6 +653,10 @@ public class DLAdminDisplayContext {
 			searchContext.setAttribute("status", status);
 			searchContext.setBooleanClauses(
 				_getBooleanClauses(extensions, fileEntryTypeId, userId));
+
+			if (folderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+				searchContext.setFolderIds(new long[] {folderId});
+			}
 
 			Indexer<?> indexer = IndexerRegistryUtil.getIndexer(
 				DLFileEntryConstants.getClassName());

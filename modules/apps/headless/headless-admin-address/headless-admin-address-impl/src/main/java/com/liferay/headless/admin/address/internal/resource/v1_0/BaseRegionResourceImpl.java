@@ -724,8 +724,7 @@ public abstract class BaseRegionResourceImpl
 		if ("INSERT".equalsIgnoreCase(createStrategy)) {
 			if (parameters.containsKey("countryId")) {
 				regionUnsafeConsumer = region -> postCountryRegion(
-					Long.parseLong((String)parameters.get("countryId")),
-					region);
+					_parseLong((String)parameters.get("countryId")), region);
 			}
 			else {
 				throw new NotSupportedException(
@@ -794,13 +793,13 @@ public abstract class BaseRegionResourceImpl
 
 		if (parameters.containsKey("countryId")) {
 			return getCountryRegionsPage(
-				Long.parseLong((String)parameters.get("countryId")),
-				Boolean.parseBoolean((String)parameters.get("active")), search,
+				_parseLong((String)parameters.get("countryId")),
+				_parseBoolean((String)parameters.get("active")), search,
 				pagination, sorts);
 		}
 		else {
 			return getRegionsPage(
-				Boolean.parseBoolean((String)parameters.get("active")), search,
+				_parseBoolean((String)parameters.get("active")), search,
 				pagination, sorts);
 		}
 	}
@@ -840,14 +839,14 @@ public abstract class BaseRegionResourceImpl
 		if ("PARTIAL_UPDATE".equalsIgnoreCase(updateStrategy)) {
 			regionUnsafeConsumer = region -> patchRegion(
 				region.getId() != null ? region.getId() :
-					Long.parseLong((String)parameters.get("regionId")),
+					_parseLong((String)parameters.get("regionId")),
 				region);
 		}
 
 		if ("UPDATE".equalsIgnoreCase(updateStrategy)) {
 			regionUnsafeConsumer = region -> putRegion(
 				region.getId() != null ? region.getId() :
-					Long.parseLong((String)parameters.get("regionId")),
+					_parseLong((String)parameters.get("regionId")),
 				region);
 		}
 
@@ -865,6 +864,22 @@ public abstract class BaseRegionResourceImpl
 				regionUnsafeConsumer.accept(region);
 			}
 		}
+	}
+
+	private Boolean _parseBoolean(String value) {
+		if (value != null) {
+			return Boolean.parseBoolean(value);
+		}
+
+		return null;
+	}
+
+	private Long _parseLong(String value) {
+		if (value != null) {
+			return Long.parseLong(value);
+		}
+
+		return null;
 	}
 
 	public void setContextAcceptLanguage(AcceptLanguage contextAcceptLanguage) {

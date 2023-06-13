@@ -51,7 +51,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -64,6 +63,7 @@ import org.gradle.api.file.RegularFile;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.Input;
+import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.TaskOutputs;
 
@@ -73,10 +73,8 @@ import org.gradle.api.tasks.TaskOutputs;
 public class CreateClientExtensionConfigTask extends DefaultTask {
 
 	public CreateClientExtensionConfigTask() {
-		Project project = getProject();
-
 		_clientExtensionConfigFile = _addTaskOutputFile(
-			project.getName() + _CLIENT_EXTENSION_CONFIG_FILE_NAME);
+			_project.getName() + _CLIENT_EXTENSION_CONFIG_FILE_NAME);
 
 		_dockerFile = _addTaskOutputFile("Dockerfile");
 		_lcpJsonFile = _addTaskOutputFile("LCP.json");
@@ -111,7 +109,7 @@ public class CreateClientExtensionConfigTask extends DefaultTask {
 		Properties pluginPackageProperties = _getPluginPackageProperties();
 
 		Set<ClientExtension> clientExtensions = _clientExtensionsMap.get(
-			GradleUtil.getProperty(getProject(), "profileName", "default"));
+			GradleUtil.getProperty(_project, "profileName", "default"));
 
 		if (clientExtensions == null) {
 			clientExtensions = _clientExtensionsMap.get("default");
@@ -151,8 +149,6 @@ public class CreateClientExtensionConfigTask extends DefaultTask {
 
 		_storePluginPackageProperties(pluginPackageProperties);
 
-		Project project = getProject();
-
 		Stream<ClientExtension> stream = clientExtensions.stream();
 
 		Map<String, String> substitutionMap = stream.flatMap(
@@ -176,29 +172,47 @@ public class CreateClientExtensionConfigTask extends DefaultTask {
 
 		substitutionMap.put(
 			"__CLIENT_EXTENSION_ID__",
-			StringUtil.toAlphaNumericLowerCase(project.getName()));
+			StringUtil.toAlphaNumericLowerCase(_project.getName()));
 
-		_createDockerConfig(project, classificationGrouping, substitutionMap);
-
-		_createLCPJSONConfig(project, classificationGrouping, substitutionMap);
+		_writeToOutputFile(
+			classificationGrouping, getInputDockerfileFile(), getDockerFile(),
+			substitutionMap);
+		_writeToOutputFile(
+			classificationGrouping, getInputLcpJsonFile(), getLcpJsonFile(),
+			substitutionMap);
 
 		_createClientExtensionConfigFile(jsonMap);
 	}
 
 	public File getClientExtensionConfigFile() {
-		return GradleUtil.toFile(getProject(), _clientExtensionConfigFile);
+		return GradleUtil.toFile(_project, _clientExtensionConfigFile);
 	}
 
 	public File getDockerFile() {
-		return GradleUtil.toFile(getProject(), _dockerFile);
+		return GradleUtil.toFile(_project, _dockerFile);
+	}
+
+	@InputFiles
+	public File getInputDockerfileFile() {
+		return GradleUtil.toFile(_project, "Dockerfile");
+	}
+
+	@InputFiles
+	public File getInputLcpJsonFile() {
+		return GradleUtil.toFile(_project, "LCP.json");
+	}
+
+	@InputFiles
+	public File getInputPluginPackagePropertiesFile() {
+		return GradleUtil.toFile(_project, "liferay-plugin-package.properties");
 	}
 
 	public File getLcpJsonFile() {
-		return GradleUtil.toFile(getProject(), _lcpJsonFile);
+		return GradleUtil.toFile(_project, _lcpJsonFile);
 	}
 
 	public File getPluginPackagePropertiesFile() {
-		return GradleUtil.toFile(getProject(), _pluginPackagePropertiesFile);
+		return GradleUtil.toFile(_project, _pluginPackagePropertiesFile);
 	}
 
 	@Input
@@ -219,9 +233,7 @@ public class CreateClientExtensionConfigTask extends DefaultTask {
 	}
 
 	private Provider<RegularFile> _addTaskOutputFile(String path) {
-		Project project = getProject();
-
-		ProjectLayout projectLayout = project.getLayout();
+		ProjectLayout projectLayout = _project.getLayout();
 
 		DirectoryProperty buildDirectoryProperty =
 			projectLayout.getBuildDirectory();
@@ -261,66 +273,9 @@ public class CreateClientExtensionConfigTask extends DefaultTask {
 		}
 	}
 
-	private void _createDockerConfig(
-		Project project, String classificationGrouping,
-		Map<String, String> substitutionMap) {
-
-		File outputDockerFile = getDockerFile();
-
-		try {
-			String dockerFileContent = _getFileContentFromProject(
-				project, "Dockerfile");
-
-			if (dockerFileContent == null) {
-				dockerFileContent = _loadTemplate(
-					"templates/" + classificationGrouping + "/Dockerfile.tpl",
-					substitutionMap);
-			}
-
-			if (dockerFileContent == null) {
-				throw new GradleException("Dockerfile not specified");
-			}
-
-			Files.write(
-				outputDockerFile.toPath(), dockerFileContent.getBytes());
-		}
-		catch (IOException ioException) {
-			throw new GradleException(ioException.getMessage(), ioException);
-		}
-	}
-
-	private void _createLCPJSONConfig(
-		Project project, String classificationGrouping,
-		Map<String, String> substitutionMap) {
-
-		File outputLcpJsonFile = getLcpJsonFile();
-
-		try {
-			String lcpJsonContent = _getFileContentFromProject(
-				project, "LCP.json");
-
-			if (lcpJsonContent == null) {
-				lcpJsonContent = _loadTemplate(
-					"templates/" + classificationGrouping + "/LCP.json.tpl",
-					substitutionMap);
-			}
-
-			if (lcpJsonContent == null) {
-				throw new GradleException("LCP.json not specified");
-			}
-
-			Files.write(outputLcpJsonFile.toPath(), lcpJsonContent.getBytes());
-		}
-		catch (IOException ioException) {
-			throw new GradleException(ioException.getMessage(), ioException);
-		}
-	}
-
 	private void _expandWildcards(Map<String, Object> typeSettings) {
-		Project project = getProject();
-
 		File clientExtensionBuildDir = new File(
-			project.getBuildDir(),
+			_project.getBuildDir(),
 			ClientExtensionProjectConfigurator.CLIENT_EXTENSION_BUILD_DIR);
 
 		File staticDir = new File(clientExtensionBuildDir, "static");
@@ -358,9 +313,7 @@ public class CreateClientExtensionConfigTask extends DefaultTask {
 		}
 	}
 
-	private String _getFileContentFromProject(Project project, String path) {
-		File file = project.file(path);
-
+	private String _getFileContent(File file) {
 		if (file.exists()) {
 			try {
 				return new String(Files.readAllBytes(file.toPath()));
@@ -420,9 +373,8 @@ public class CreateClientExtensionConfigTask extends DefaultTask {
 		Properties pluginPackageProperties = new Properties();
 
 		try {
-			String pluginPackagePropertiesFileContent =
-				_getFileContentFromProject(
-					getProject(), "liferay-plugin-package.properties");
+			String pluginPackagePropertiesFileContent = _getFileContent(
+				getInputPluginPackagePropertiesFile());
 
 			if (pluginPackagePropertiesFileContent != null) {
 				pluginPackageProperties.load(
@@ -442,34 +394,6 @@ public class CreateClientExtensionConfigTask extends DefaultTask {
 		}
 
 		return false;
-	}
-
-	private String _loadTemplate(
-		String name, Map<String, String> substitutionMap) {
-
-		try (InputStream inputStream =
-				CreateClientExtensionConfigTask.class.getResourceAsStream(
-					"dependencies/" + name)) {
-
-			Set<Map.Entry<String, String>> entrySet =
-				substitutionMap.entrySet();
-
-			Stream<Map.Entry<String, String>> substitutions = entrySet.stream();
-
-			return substitutions.map(
-				entry -> (Function<String, String>)s -> s.replace(
-					entry.getKey(), entry.getValue())
-			).reduce(
-				Function::andThen
-			).orElse(
-				Function.identity()
-			).apply(
-				StringUtil.read(inputStream)
-			);
-		}
-		catch (Exception exception) {
-			return null;
-		}
 	}
 
 	private void _storePluginPackageProperties(
@@ -544,6 +468,42 @@ public class CreateClientExtensionConfigTask extends DefaultTask {
 		return "frontend";
 	}
 
+	private void _writeToOutputFile(
+		String classificationGrouping, File inputFile, File outputFile,
+		Map<String, String> substitutionMap) {
+
+		if (inputFile.exists()) {
+			_project.copy(
+				copy -> {
+					copy.from(inputFile);
+					copy.into(outputFile.getParentFile());
+				});
+
+			return;
+		}
+
+		String templatePath = String.format(
+			"dependencies/templates/%s/%s.tpl", classificationGrouping,
+			inputFile.getName());
+
+		try (InputStream inputStream =
+				CreateClientExtensionConfigTask.class.getResourceAsStream(
+					templatePath)) {
+
+			String fileContent = StringUtil.read(inputStream);
+
+			for (Map.Entry<String, String> entry : substitutionMap.entrySet()) {
+				fileContent = fileContent.replace(
+					entry.getKey(), entry.getValue());
+			}
+
+			Files.write(outputFile.toPath(), fileContent.getBytes());
+		}
+		catch (IOException ioException) {
+			throw new GradleException(inputFile.getName() + " not specified");
+		}
+	}
+
 	private static final String _CLIENT_EXTENSION_CONFIG_FILE_NAME =
 		".client-extension-config.json";
 
@@ -566,6 +526,7 @@ public class CreateClientExtensionConfigTask extends DefaultTask {
 	private Object _dockerFile;
 	private Object _lcpJsonFile;
 	private final Object _pluginPackagePropertiesFile;
+	private final Project _project = getProject();
 	private String _type = "frontend";
 
 }

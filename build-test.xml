@@ -1787,6 +1787,7 @@ jdbc.default.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 	<macrodef name="get-test-url">
 		<sequential>
 			<get-operating-system-property property.name="operating.system.docker.image" />
+
 			<get-testcase-property property.name="analytics.cloud.enabled" />
 			<get-testcase-property property.name="testcase.url" />
 
@@ -1849,6 +1850,7 @@ jdbc.default.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 			</if>
 
 			<get-testcase-property property.name="portal.context" />
+			<propertycopy from="portal.context[${env.CI_TEST_SUITE}]" name="portal.context" silent="true" />
 
 			<if>
 				<isset property="portal.context" />
@@ -1858,6 +1860,7 @@ jdbc.default.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 			</if>
 
 			<get-testcase-property property.name="portal.proxy.path" />
+			<propertycopy from="portal.proxy.path[${env.CI_TEST_SUITE}]" name="portal.proxy.path" silent="true" />
 
 			<if>
 				<isset property="portal.proxy.path" />
@@ -2254,6 +2257,7 @@ war.path=${app.server.portal.dir}/</echo>
 						/>
 
 						<get-testcase-property property.name="portal.proxy.path" />
+						<propertycopy from="portal.proxy.path[${env.CI_TEST_SUITE}]" name="portal.proxy.path" silent="true" />
 
 						<if>
 							<isset property="portal.proxy.path" />
@@ -2387,7 +2391,7 @@ accessKey=&quot;${aws.s3.access.key.id}&quot;
 cacheDirCleanUpFrequency=&quot;100&quot;
 connectionTimeout=&quot;10000&quot;
 multipartUploadThreshold=&quot;10485760&quot;
-bucketName=&quot;lfr-qa-poshi-test-${aws.bucket.id}&quot;
+bucketName=&quot;lfr-qa-poshi-test-${s3.bucket.id}&quot;
 minimumUploadPartSize=&quot;5242880&quot;
 proxyPassword=&quot;&quot;
 maxPoolSize=&quot;20&quot;
@@ -2899,6 +2903,17 @@ jdbc.default.password=${database.password}</echo>
 			</if>
 
 			<echo append="true" file="${liferay.home}/tools/portal-tools-db-upgrade-client/portal-upgrade-ext.properties">${line.separator}liferay.home=${liferay.home}</echo>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="prepare-ibm-s3-configuration">
+		<sequential>
+			<echo file="${liferay.home}/osgi/configs/com.liferay.portal.store.s3.configuration.S3StoreConfiguration.config">
+bucketName=&quot;lfr-qa-poshi-test-${s3.bucket.id}&quot;
+accessKey=&quot;${ibm.s3.access.key.id}&quot;
+secretKey=&quot;${ibm.s3.secret.access.key}&quot;
+s3Endpoint=&quot;https://s3.us-east.cloud-object-storage.appdomain.cloud&quot;
+s3Region=&quot;us-east&quot;</echo>
 		</sequential>
 	</macrodef>
 
@@ -7486,8 +7501,12 @@ ${docker.start.error}</fail>
 									<local name="app.server.waiting.url" />
 
 									<get-operating-system-property property.name="operating.system.docker.image" />
+
 									<get-testcase-property property.name="portal.context" />
+									<propertycopy from="portal.context[${env.CI_TEST_SUITE}]" name="portal.context" silent="true" />
+
 									<get-testcase-property property.name="portal.proxy.path" />
+									<propertycopy from="portal.proxy.path[${env.CI_TEST_SUITE}]" name="portal.proxy.path" silent="true" />
 
 									<if>
 										<isset property="portal.context" />
@@ -8084,8 +8103,12 @@ war.path=${app.server.portal.dir}/</echo>
 			<local name="app.server.waiting.url" />
 
 			<get-operating-system-property property.name="operating.system.docker.image" />
+
 			<get-testcase-property property.name="portal.context" />
+			<propertycopy from="portal.context[${env.CI_TEST_SUITE}]" name="portal.context" silent="true" />
+
 			<get-testcase-property property.name="portal.proxy.path" />
+			<propertycopy from="portal.proxy.path[${env.CI_TEST_SUITE}]" name="portal.proxy.path" silent="true" />
 
 			<if>
 				<isset property="portal.context" />
@@ -11421,6 +11444,26 @@ company.default.web.id=www.able.com</echo>
 			</then>
 		</if>
 
+		<if>
+			<or>
+				<equals arg1="ibm.store.enabled" arg2="" />
+				<not>
+					<isset property="ibm.store.enabled" />
+				</not>
+			</or>
+			<then>
+				<get-testcase-property property.name="ibm.store.enabled" />
+			</then>
+		</if>
+
+		<if>
+			<equals arg1="${ibm.store.enabled}" arg2="true" />
+			<then>
+				<echo append="true" file="portal-impl/src/portal-ext.properties">
+dl.store.impl=com.liferay.portal.store.s3.IBMS3Store</echo>
+			</then>
+		</if>
+
 		<get-testcase-property property.name="liferay.online.properties" />
 		<propertycopy from="liferay.online.properties[${env.CI_TEST_SUITE}]" name="liferay.online.properties" silent="true" />
 
@@ -11605,6 +11648,7 @@ session.cookie.use.full.hostname=true
 		</if>
 
 		<get-testcase-property property.name="portal.proxy.path" />
+		<propertycopy from="portal.proxy.path[${env.CI_TEST_SUITE}]" name="portal.proxy.path" silent="true" />
 
 		<if>
 			<isset property="portal.proxy.path" />
@@ -11975,6 +12019,8 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 
 		<get-ip-address />
 
+		<property location="${liferay.home}" name="liferay.home.absolute" />
+
 		<echo append="true" file="${test.ext.properties.file}">
 			app.server.bin.dir=${app.server.bin.dir}
 			app.server.dir=${app.server.dir}
@@ -11985,7 +12031,7 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 			get.location.timeout=${test.get.location.timeout}
 			ignore.errors.file.name=${project.dir}/portal-web/test-ignorable-error-lines.xml
 			ip.address=${ip.address}
-			liferay.home.dir.name=${liferay.home}
+			liferay.home.dir.name=${liferay.home.absolute}
 			liferay.app.server.global.lib.dir=${app.server.lib.global.dir}
 			liferay.app.server.portal.lib.dir=${app.server.lib.portal.dir}
 			liferay.app.server.shielded.container.lib.portal.dir=${app.server.shielded-container-lib.portal.dir}
@@ -12006,10 +12052,10 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 		</echo>
 
 		<if>
-			<isset property="aws.bucket.id" />
+			<isset property="s3.bucket.id" />
 			<then>
 				<echo append="true" file="${test.ext.properties.file}">
-					aws.bucket.id=${aws.bucket.id}
+					s3.bucket.id=${s3.bucket.id}
 				</echo>
 			</then>
 		</if>
@@ -12543,8 +12589,30 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 				</echo>
 			</then>
 			<else>
+				<get-testcase-property property.name="portal.context" />
+				<propertycopy from="portal.context[${env.CI_TEST_SUITE}]" name="portal.context" silent="true" />
+
+				<get-testcase-property property.name="portal.proxy.path" />
+				<propertycopy from="portal.proxy.path[${env.CI_TEST_SUITE}]" name="portal.proxy.path" silent="true" />
+
+				<if>
+					<isset property="portal.context" />
+					<then>
+						<property name="default.portal.url" value="http://localhost:8080/${portal.context}" />
+					</then>
+					<elseif>
+						<isset property="portal.proxy.path" />
+						<then>
+							<property name="default.portal.url" value="http://localhost:88/${portal.proxy.path}" />
+						</then>
+					</elseif>
+					<else>
+						<property name="default.portal.url" value="http://localhost:8080" />
+					</else>
+				</if>
+
 				<echo append="true" file="${test.ext.properties.file}">
-					default.portal.url=http://localhost:8080
+					default.portal.url=${default.portal.url}
 					portal.hostname=localhost
 				</echo>
 			</else>
@@ -14303,12 +14371,12 @@ if (ppstate.equals("normal")) {
 			<then>
 				<poshi-execute
 					build.gradle.dir="${workspace.dir}"
-					build.gradle.file="${workspace.dir}/build.gradle"
+					build.gradle.file="${workspace.dir}/poshi/build.gradle"
 					task="writePoshiProperties"
 				/>
 
 				<move
-					file="${workspace.dir}/test.case.method.names.properties"
+					file="${workspace.dir}/poshi/test.case.method.names.properties"
 					tofile="test.case.method.names.properties"
 				/>
 			</then>
@@ -14407,12 +14475,12 @@ if (ppstate.equals("normal")) {
 					<then>
 						<poshi-execute
 							build.gradle.dir="${workspace.dir}"
-							build.gradle.file="${workspace.dir}/build.gradle"
+							build.gradle.file="${workspace.dir}/poshi/build.gradle"
 							task="writePoshiProperties"
 						/>
 
 						<move
-							file="${workspace.dir}/test.generated.properties"
+							file="${workspace.dir}/poshi/test.generated.properties"
 							tofile="test.generated.properties"
 						/>
 					</then>
@@ -14746,7 +14814,7 @@ jdbc.default.password=${database.mysql.password}</echo>
 			<then>
 				<poshi-execute
 					build.gradle.dir="${workspace.dir}"
-					build.gradle.file="${workspace.dir}/build.gradle"
+					build.gradle.file="${workspace.dir}/poshi/build.gradle"
 					task="runPoshi"
 				/>
 			</then>
@@ -14856,44 +14924,8 @@ mail.send.blacklist=</echo>
 			</then>
 		</if>
 
-		<get-testcase-property property.name="portal.context" />
-
-		<if>
-			<isset property="portal.context" />
-			<then>
-				<if>
-					<equals arg1="${app.server.type}" arg2="tomcat" />
-					<then>
-						<move
-							todir="${app.server.dir}/webapps/${portal.context}"
-						>
-							<fileset
-								dir="${app.server.dir}/webapps/ROOT"
-							/>
-						</move>
-						<move
-							file="${app.server.dir}/conf/Catalina/localhost/ROOT.xml"
-							tofile="${app.server.dir}/conf/Catalina/localhost/${portal.context}.xml"
-						/>
-						<replace
-							file="${app.server.dir}/conf/Catalina/localhost/${portal.context}.xml"
-							token="path=&quot;&quot;"
-							value="path=&quot;/${portal.context}&quot;"
-						/>
-						<replace
-							file="${app.server.dir}/conf/catalina.properties"
-							token="common.loader=&quot;${catalina.home}/webapps/ROOT/WEB-INF/lib/support-tomcat.jar&quot;"
-							value="common.loader=&quot;${catalina.home}/webapps/${portal.context}/WEB-INF/lib/support-tomcat.jar&quot;"
-						/>
-					</then>
-					<else>
-						<fail message="Changing the portal context for ${app.server.type} is not supported." />
-					</else>
-				</if>
-			</then>
-		</if>
-
 		<get-testcase-property property.name="portal.proxy.path" />
+		<propertycopy from="portal.proxy.path[${env.CI_TEST_SUITE}]" name="portal.proxy.path" silent="true" />
 
 		<if>
 			<isset property="portal.proxy.path" />
@@ -15058,6 +15090,7 @@ mail.send.blacklist=</echo>
 		</if>
 
 		<get-testcase-property property.name="skip.clean-app-server-deploy-dir" />
+		<propertycopy from="skip.clean-app-server-deploy-dir[${env.CI_TEST_SUITE}]" name="skip.clean-app-server-deploy-dir" silent="true" />
 
 		<if>
 			<not>
@@ -15108,12 +15141,12 @@ mail.send.blacklist=</echo>
 			<equals arg1="${aws.store.enabled}" arg2="true" />
 			<then>
 				<tstamp>
-					<format pattern="yyyyMMddkkmmssSSS" property="aws.bucket.id" />
+					<format pattern="yyyyMMddkkmmssSSS" property="s3.bucket.id" />
 				</tstamp>
 
-				<ant antfile="build-test-aws-s3.xml" target="configure-aws-cli" />
+				<ant antfile="build-test-s3-store.xml" target="configure-aws-cli" />
 
-				<ant antfile="build-test-aws-s3.xml" target="create-s3-bucket" />
+				<ant antfile="build-test-s3-store.xml" target="create-s3-bucket" />
 
 				<if>
 					<not>
@@ -15154,6 +15187,23 @@ mail.send.blacklist=</echo>
 			<equals arg1="${cas.enabled}" arg2="true" />
 			<then>
 				<ant antfile="build-test-cas.xml" target="setup-cas" />
+			</then>
+		</if>
+
+		<get-testcase-property property.name="ibm.store.enabled" />
+
+		<if>
+			<equals arg1="${ibm.store.enabled}" arg2="true" />
+			<then>
+				<tstamp>
+					<format pattern="yyyyMMddkkmmssSSS" property="s3.bucket.id" />
+				</tstamp>
+
+				<ant antfile="build-test-s3-store.xml" target="configure-ibm-aws-cli" />
+
+				<ant antfile="build-test-s3-store.xml" target="create-s3-bucket" />
+
+				<prepare-ibm-s3-configuration />
 			</then>
 		</if>
 
@@ -15468,6 +15518,44 @@ mail.send.blacklist=</echo>
 			</then>
 		</if>
 
+		<get-testcase-property property.name="portal.context" />
+		<propertycopy from="portal.context[${env.CI_TEST_SUITE}]" name="portal.context" silent="true" />
+
+		<if>
+			<isset property="portal.context" />
+			<then>
+				<if>
+					<equals arg1="${app.server.type}" arg2="tomcat" />
+					<then>
+						<move
+							todir="${app.server.dir}/webapps/${portal.context}"
+						>
+							<fileset
+								dir="${app.server.dir}/webapps/ROOT"
+							/>
+						</move>
+						<move
+							file="${app.server.dir}/conf/Catalina/localhost/ROOT.xml"
+							tofile="${app.server.dir}/conf/Catalina/localhost/${portal.context}.xml"
+						/>
+						<replace
+							file="${app.server.dir}/conf/Catalina/localhost/${portal.context}.xml"
+							token="path=&quot;&quot;"
+							value="path=&quot;/${portal.context}&quot;"
+						/>
+						<replace
+							file="${app.server.dir}/conf/catalina.properties"
+							token="common.loader=&quot;${catalina.home}/webapps/ROOT/WEB-INF/lib/support-tomcat.jar&quot;"
+							value="common.loader=&quot;${catalina.home}/webapps/${portal.context}/WEB-INF/lib/support-tomcat.jar&quot;"
+						/>
+					</then>
+					<else>
+						<fail message="Changing the portal context for ${app.server.type} is not supported." />
+					</else>
+				</if>
+			</then>
+		</if>
+
 		<get-testcase-property property.name="skip.start.app.server" />
 
 		<if>
@@ -15695,7 +15783,7 @@ mail.send.blacklist=</echo>
 		<if>
 			<equals arg1="${aws.store.enabled}" arg2="true" />
 			<then>
-				<ant antfile="build-test-aws-s3.xml" target="delete-s3-bucket" />
+				<ant antfile="build-test-s3-store.xml" target="delete-s3-bucket" />
 			</then>
 		</if>
 
@@ -15708,7 +15796,17 @@ mail.send.blacklist=</echo>
 			</then>
 		</if>
 
+		<get-testcase-property property.name="ibm.store.enabled" />
+
+		<if>
+			<equals arg1="${ibm.store.enabled}" arg2="true" />
+			<then>
+				<ant antfile="build-test-s3-store.xml" target="delete-s3-bucket" />
+			</then>
+		</if>
+
 		<get-testcase-property property.name="portal.proxy.path" />
+		<propertycopy from="portal.proxy.path[${env.CI_TEST_SUITE}]" name="portal.proxy.path" silent="true" />
 
 		<if>
 			<isset property="portal.proxy.path" />

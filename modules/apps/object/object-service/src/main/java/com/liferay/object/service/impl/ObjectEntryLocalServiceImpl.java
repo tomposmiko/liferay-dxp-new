@@ -185,6 +185,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Timestamp;
 import java.sql.Types;
 
@@ -240,10 +241,10 @@ public class ObjectEntryLocalServiceImpl
 
 		_insertIntoTable(
 			_getDynamicObjectDefinitionTable(objectDefinitionId), objectEntryId,
-			values);
+			user, values);
 		_insertIntoTable(
 			_getExtensionDynamicObjectDefinitionTable(objectDefinitionId),
-			objectEntryId, values);
+			objectEntryId, user, values);
 
 		ObjectEntry objectEntry = objectEntryPersistence.create(objectEntryId);
 
@@ -319,7 +320,8 @@ public class ObjectEntryLocalServiceImpl
 			objectDefinition.getClassName(), serviceContext, userId, values);
 
 		insertIntoOrUpdateExtensionTable(
-			objectDefinition.getObjectDefinitionId(), primaryKey, values);
+			userId, objectDefinition.getObjectDefinitionId(), primaryKey,
+			values);
 	}
 
 	@Override
@@ -472,6 +474,12 @@ public class ObjectEntryLocalServiceImpl
 			ObjectDefinition objectDefinition2 =
 				_objectDefinitionPersistence.findByPrimaryKey(
 					objectRelationship.getObjectDefinitionId2());
+
+			if (WorkflowConstants.STATUS_DRAFT ==
+					objectDefinition2.getStatus()) {
+
+				continue;
+			}
 
 			ObjectRelatedModelsProvider objectRelatedModelsProvider =
 				_objectRelatedModelsProviderRegistry.
@@ -1041,7 +1049,7 @@ public class ObjectEntryLocalServiceImpl
 
 	@Override
 	public void insertIntoOrUpdateExtensionTable(
-			long objectDefinitionId, long primaryKey,
+			long userId, long objectDefinitionId, long primaryKey,
 			Map<String, Serializable> values)
 		throws PortalException {
 
@@ -1075,11 +1083,15 @@ public class ObjectEntryLocalServiceImpl
 			throw new SystemException(sqlException);
 		}
 
+		User user = _userLocalService.getUser(userId);
+
 		if (count > 0) {
-			_updateTable(dynamicObjectDefinitionTable, primaryKey, values);
+			_updateTable(
+				dynamicObjectDefinitionTable, primaryKey, user, values);
 		}
 		else {
-			_insertIntoTable(dynamicObjectDefinitionTable, primaryKey, values);
+			_insertIntoTable(
+				dynamicObjectDefinitionTable, primaryKey, user, values);
 		}
 	}
 
@@ -1212,11 +1224,11 @@ public class ObjectEntryLocalServiceImpl
 		_updateTable(
 			_getDynamicObjectDefinitionTable(
 				objectEntry.getObjectDefinitionId()),
-			objectEntryId, values);
+			objectEntryId, user, values);
 		_updateTable(
 			_getExtensionDynamicObjectDefinitionTable(
 				objectEntry.getObjectDefinitionId()),
-			objectEntryId, values);
+			objectEntryId, user, values);
 
 		objectEntryPersistence.clearCache(SetUtil.fromArray(objectEntryId));
 
@@ -1809,7 +1821,7 @@ public class ObjectEntryLocalServiceImpl
 
 		return new DynamicObjectDefinitionTable(
 			objectDefinition,
-			_objectFieldPersistence.findByODI_DTN(
+			_objectFieldLocalService.getObjectFields(
 				objectDefinitionId, objectDefinition.getDBTableName()),
 			objectDefinition.getDBTableName());
 	}
@@ -1826,7 +1838,7 @@ public class ObjectEntryLocalServiceImpl
 
 		return new DynamicObjectDefinitionTable(
 			objectDefinition,
-			_objectFieldPersistence.findByODI_DTN(
+			_objectFieldLocalService.getObjectFields(
 				objectDefinitionId, objectDefinition.getExtensionDBTableName()),
 			objectDefinition.getExtensionDBTableName());
 	}
@@ -2626,7 +2638,7 @@ public class ObjectEntryLocalServiceImpl
 
 	private void _insertIntoTable(
 			DynamicObjectDefinitionTable dynamicObjectDefinitionTable,
-			long objectEntryId, Map<String, Serializable> values)
+			long objectEntryId, User user, Map<String, Serializable> values)
 		throws PortalException {
 
 		StringBundler sb = new StringBundler();
@@ -2725,6 +2737,15 @@ public class ObjectEntryLocalServiceImpl
 
 			FinderCacheUtil.clearDSLQueryCache(
 				dynamicObjectDefinitionTable.getTableName());
+		}
+		catch (SQLIntegrityConstraintViolationException
+					sqlIntegrityConstraintViolationException) {
+
+			_validateUniqueValueConstraintViolation(
+				dynamicObjectDefinitionTable, objectFields,
+				sqlIntegrityConstraintViolationException, user, values);
+
+			throw new SystemException(sqlIntegrityConstraintViolationException);
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
@@ -3075,7 +3096,7 @@ public class ObjectEntryLocalServiceImpl
 
 	private void _updateTable(
 			DynamicObjectDefinitionTable dynamicObjectDefinitionTable,
-			long objectEntryId, Map<String, Serializable> values)
+			long objectEntryId, User user, Map<String, Serializable> values)
 		throws PortalException {
 
 		StringBundler sb = new StringBundler();
@@ -3182,6 +3203,15 @@ public class ObjectEntryLocalServiceImpl
 
 			FinderCacheUtil.clearDSLQueryCache(
 				dynamicObjectDefinitionTable.getTableName());
+		}
+		catch (SQLIntegrityConstraintViolationException
+					sqlIntegrityConstraintViolationException) {
+
+			_validateUniqueValueConstraintViolation(
+				dynamicObjectDefinitionTable, objectFields,
+				sqlIntegrityConstraintViolationException, user, values);
+
+			throw new SystemException(sqlIntegrityConstraintViolationException);
 		}
 		catch (Exception exception) {
 			throw new SystemException(exception);
@@ -3417,6 +3447,54 @@ public class ObjectEntryLocalServiceImpl
 		if (objectEntryValue.length() > maxLength) {
 			throw new ObjectEntryValuesException.ExceedsTextMaxLength(
 				maxLength, objectFieldName);
+		}
+	}
+
+	private void _validateUniqueValueConstraintViolation(
+			DynamicObjectDefinitionTable dynamicObjectDefinitionTable,
+			List<ObjectField> objectFields,
+			SQLIntegrityConstraintViolationException
+				sqlIntegrityConstraintViolationException,
+			User user, Map<String, Serializable> values)
+		throws PortalException {
+
+		for (ObjectField objectField : objectFields) {
+			if (!GetterUtil.getBoolean(
+					ObjectFieldSettingUtil.getValue(
+						ObjectFieldSettingConstants.NAME_UNIQUE_VALUES,
+						objectField))) {
+
+				continue;
+			}
+
+			Column<DynamicObjectDefinitionTable, Object> column =
+				(Column<DynamicObjectDefinitionTable, Object>)
+					dynamicObjectDefinitionTable.getColumn(
+						objectField.getDBColumnName());
+
+			Serializable value = values.get(objectField.getName());
+
+			if (column.getSQLType() == Types.INTEGER) {
+				value = GetterUtil.getInteger(value);
+			}
+
+			int count = objectEntryPersistence.dslQueryCount(
+				DSLQueryFactoryUtil.countDistinct(
+					column
+				).from(
+					dynamicObjectDefinitionTable
+				).where(
+					column.eq(value)
+				));
+
+			if (count > 0) {
+				throw new ObjectEntryValuesException.
+					UniqueValueConstraintViolation(
+						objectField.getDBColumnName(), value,
+						objectField.getLabel(user.getLocale()),
+						dynamicObjectDefinitionTable.getTableName(),
+						sqlIntegrityConstraintViolationException);
+			}
 		}
 	}
 

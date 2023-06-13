@@ -86,12 +86,12 @@ public class FaroPreferencesCacheModel
 		sb.append(groupId);
 		sb.append(", companyId=");
 		sb.append(companyId);
-		sb.append(", createTime=");
-		sb.append(createTime);
 		sb.append(", userId=");
 		sb.append(userId);
 		sb.append(", userName=");
 		sb.append(userName);
+		sb.append(", createTime=");
+		sb.append(createTime);
 		sb.append(", modifiedTime=");
 		sb.append(modifiedTime);
 		sb.append(", ownerId=");
@@ -111,7 +111,6 @@ public class FaroPreferencesCacheModel
 		faroPreferencesImpl.setFaroPreferencesId(faroPreferencesId);
 		faroPreferencesImpl.setGroupId(groupId);
 		faroPreferencesImpl.setCompanyId(companyId);
-		faroPreferencesImpl.setCreateTime(createTime);
 		faroPreferencesImpl.setUserId(userId);
 
 		if (userName == null) {
@@ -121,6 +120,7 @@ public class FaroPreferencesCacheModel
 			faroPreferencesImpl.setUserName(userName);
 		}
 
+		faroPreferencesImpl.setCreateTime(createTime);
 		faroPreferencesImpl.setModifiedTime(modifiedTime);
 		faroPreferencesImpl.setOwnerId(ownerId);
 
@@ -146,10 +146,10 @@ public class FaroPreferencesCacheModel
 
 		companyId = objectInput.readLong();
 
-		createTime = objectInput.readLong();
-
 		userId = objectInput.readLong();
 		userName = objectInput.readUTF();
+
+		createTime = objectInput.readLong();
 
 		modifiedTime = objectInput.readLong();
 
@@ -167,8 +167,6 @@ public class FaroPreferencesCacheModel
 
 		objectOutput.writeLong(companyId);
 
-		objectOutput.writeLong(createTime);
-
 		objectOutput.writeLong(userId);
 
 		if (userName == null) {
@@ -177,6 +175,8 @@ public class FaroPreferencesCacheModel
 		else {
 			objectOutput.writeUTF(userName);
 		}
+
+		objectOutput.writeLong(createTime);
 
 		objectOutput.writeLong(modifiedTime);
 
@@ -194,9 +194,9 @@ public class FaroPreferencesCacheModel
 	public long faroPreferencesId;
 	public long groupId;
 	public long companyId;
-	public long createTime;
 	public long userId;
 	public String userName;
+	public long createTime;
 	public long modifiedTime;
 	public long ownerId;
 	public String preferences;

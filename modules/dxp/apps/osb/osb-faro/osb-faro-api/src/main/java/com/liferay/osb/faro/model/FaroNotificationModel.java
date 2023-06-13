@@ -117,20 +117,6 @@ public interface FaroNotificationModel
 	public void setCompanyId(long companyId);
 
 	/**
-	 * Returns the create time of this faro notification.
-	 *
-	 * @return the create time of this faro notification
-	 */
-	public long getCreateTime();
-
-	/**
-	 * Sets the create time of this faro notification.
-	 *
-	 * @param createTime the create time of this faro notification
-	 */
-	public void setCreateTime(long createTime);
-
-	/**
 	 * Returns the user ID of this faro notification.
 	 *
 	 * @return the user ID of this faro notification
@@ -157,6 +143,20 @@ public interface FaroNotificationModel
 	 * @param userUuid the user uuid of this faro notification
 	 */
 	public void setUserUuid(String userUuid);
+
+	/**
+	 * Returns the create time of this faro notification.
+	 *
+	 * @return the create time of this faro notification
+	 */
+	public long getCreateTime();
+
+	/**
+	 * Sets the create time of this faro notification.
+	 *
+	 * @param createTime the create time of this faro notification
+	 */
+	public void setCreateTime(long createTime);
 
 	/**
 	 * Returns the modified time of this faro notification.

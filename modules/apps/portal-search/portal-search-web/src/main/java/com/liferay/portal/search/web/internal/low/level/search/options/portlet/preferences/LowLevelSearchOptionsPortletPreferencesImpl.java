@@ -70,39 +70,30 @@ public class LowLevelSearchOptionsPortletPreferencesImpl
 	}
 
 	@Override
-	public Optional<String> getConnectionIdOptional() {
-		return _portletPreferencesHelper.getString(
+	public String getConnectionId() {
+		Optional<String> optional = _portletPreferencesHelper.getString(
 			LowLevelSearchOptionsPortletPreferences.
 				PREFERENCE_KEY_CONNECTION_ID);
+
+		return optional.orElse(StringPool.BLANK);
 	}
 
 	@Override
-	public String getConnectionIdString() {
-		return getConnectionIdOptional().orElse(StringPool.BLANK);
-	}
-
-	@Override
-	public Optional<String> getContributorsToExcludeOptional() {
-		return _portletPreferencesHelper.getString(
+	public String getContributorsToExclude() {
+		Optional<String> optional = _portletPreferencesHelper.getString(
 			LowLevelSearchOptionsPortletPreferences.
 				PREFERENCE_KEY_CONTRIBUTORS_TO_EXCLUDE);
+
+		return optional.orElse(StringPool.BLANK);
 	}
 
 	@Override
-	public String getContributorsToExcludeString() {
-		return getContributorsToExcludeOptional().orElse(StringPool.BLANK);
-	}
-
-	@Override
-	public Optional<String> getContributorsToIncludeOptional() {
-		return _portletPreferencesHelper.getString(
+	public String getContributorsToInclude() {
+		Optional<String> optional = _portletPreferencesHelper.getString(
 			LowLevelSearchOptionsPortletPreferences.
 				PREFERENCE_KEY_CONTRIBUTORS_TO_INCLUDE);
-	}
 
-	@Override
-	public String getContributorsToIncludeString() {
-		return getContributorsToIncludeOptional().orElse(StringPool.BLANK);
+		return optional.orElse(StringPool.BLANK);
 	}
 
 	@Override
@@ -113,26 +104,20 @@ public class LowLevelSearchOptionsPortletPreferencesImpl
 	}
 
 	@Override
-	public Optional<String> getFieldsToReturnOptional() {
-		return _portletPreferencesHelper.getString(
+	public String getFieldsToReturn() {
+		Optional<String> optional = _portletPreferencesHelper.getString(
 			LowLevelSearchOptionsPortletPreferences.
 				PREFERENCE_KEY_FIELDS_TO_RETURN);
+
+		return optional.orElse(StringPool.BLANK);
 	}
 
 	@Override
-	public String getFieldsToReturnString() {
-		return getFieldsToReturnOptional().orElse(StringPool.BLANK);
-	}
-
-	@Override
-	public Optional<String> getIndexesOptional() {
-		return _portletPreferencesHelper.getString(
+	public String getIndexes() {
+		Optional<String> optional = _portletPreferencesHelper.getString(
 			LowLevelSearchOptionsPortletPreferences.PREFERENCE_KEY_INDEXES);
-	}
 
-	@Override
-	public String getIndexesString() {
-		return getIndexesOptional().orElse(StringPool.BLANK);
+		return optional.orElse(StringPool.BLANK);
 	}
 
 	private JSONArray _getDefaultAttributesJSONArray() {

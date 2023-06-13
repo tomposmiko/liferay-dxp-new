@@ -71,8 +71,8 @@ public class FaroUserModelImpl
 	public static final Object[][] TABLE_COLUMNS = {
 		{"mvccVersion", Types.BIGINT}, {"faroUserId", Types.BIGINT},
 		{"groupId", Types.BIGINT}, {"companyId", Types.BIGINT},
-		{"createTime", Types.BIGINT}, {"userId", Types.BIGINT},
-		{"userName", Types.VARCHAR}, {"modifiedTime", Types.BIGINT},
+		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
+		{"createTime", Types.BIGINT}, {"modifiedTime", Types.BIGINT},
 		{"liveUserId", Types.BIGINT}, {"roleId", Types.BIGINT},
 		{"emailAddress", Types.VARCHAR}, {"key_", Types.VARCHAR},
 		{"status", Types.INTEGER}
@@ -86,9 +86,9 @@ public class FaroUserModelImpl
 		TABLE_COLUMNS_MAP.put("faroUserId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("groupId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
-		TABLE_COLUMNS_MAP.put("createTime", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("userId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("userName", Types.VARCHAR);
+		TABLE_COLUMNS_MAP.put("createTime", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("modifiedTime", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("liveUserId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("roleId", Types.BIGINT);
@@ -98,7 +98,7 @@ public class FaroUserModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table OSBFaro_FaroUser (mvccVersion LONG default 0 not null,faroUserId LONG not null primary key,groupId LONG,companyId LONG,createTime LONG,userId LONG,userName VARCHAR(75) null,modifiedTime LONG,liveUserId LONG,roleId LONG,emailAddress VARCHAR(75) null,key_ VARCHAR(75) null,status INTEGER)";
+		"create table OSBFaro_FaroUser (mvccVersion LONG default 0 not null,faroUserId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createTime LONG,modifiedTime LONG,liveUserId LONG,roleId LONG,emailAddress VARCHAR(75) null,key_ VARCHAR(75) null,status INTEGER)";
 
 	public static final String TABLE_SQL_DROP = "drop table OSBFaro_FaroUser";
 
@@ -269,9 +269,9 @@ public class FaroUserModelImpl
 			attributeGetterFunctions.put("faroUserId", FaroUser::getFaroUserId);
 			attributeGetterFunctions.put("groupId", FaroUser::getGroupId);
 			attributeGetterFunctions.put("companyId", FaroUser::getCompanyId);
-			attributeGetterFunctions.put("createTime", FaroUser::getCreateTime);
 			attributeGetterFunctions.put("userId", FaroUser::getUserId);
 			attributeGetterFunctions.put("userName", FaroUser::getUserName);
+			attributeGetterFunctions.put("createTime", FaroUser::getCreateTime);
 			attributeGetterFunctions.put(
 				"modifiedTime", FaroUser::getModifiedTime);
 			attributeGetterFunctions.put("liveUserId", FaroUser::getLiveUserId);
@@ -308,13 +308,13 @@ public class FaroUserModelImpl
 				"companyId",
 				(BiConsumer<FaroUser, Long>)FaroUser::setCompanyId);
 			attributeSetterBiConsumers.put(
-				"createTime",
-				(BiConsumer<FaroUser, Long>)FaroUser::setCreateTime);
-			attributeSetterBiConsumers.put(
 				"userId", (BiConsumer<FaroUser, Long>)FaroUser::setUserId);
 			attributeSetterBiConsumers.put(
 				"userName",
 				(BiConsumer<FaroUser, String>)FaroUser::setUserName);
+			attributeSetterBiConsumers.put(
+				"createTime",
+				(BiConsumer<FaroUser, Long>)FaroUser::setCreateTime);
 			attributeSetterBiConsumers.put(
 				"modifiedTime",
 				(BiConsumer<FaroUser, Long>)FaroUser::setModifiedTime);
@@ -419,20 +419,6 @@ public class FaroUserModelImpl
 	}
 
 	@Override
-	public long getCreateTime() {
-		return _createTime;
-	}
-
-	@Override
-	public void setCreateTime(long createTime) {
-		if (_columnOriginalValues == Collections.EMPTY_MAP) {
-			_setColumnOriginalValues();
-		}
-
-		_createTime = createTime;
-	}
-
-	@Override
 	public long getUserId() {
 		return _userId;
 	}
@@ -479,6 +465,20 @@ public class FaroUserModelImpl
 		}
 
 		_userName = userName;
+	}
+
+	@Override
+	public long getCreateTime() {
+		return _createTime;
+	}
+
+	@Override
+	public void setCreateTime(long createTime) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_createTime = createTime;
 	}
 
 	@Override
@@ -698,9 +698,9 @@ public class FaroUserModelImpl
 		faroUserImpl.setFaroUserId(getFaroUserId());
 		faroUserImpl.setGroupId(getGroupId());
 		faroUserImpl.setCompanyId(getCompanyId());
-		faroUserImpl.setCreateTime(getCreateTime());
 		faroUserImpl.setUserId(getUserId());
 		faroUserImpl.setUserName(getUserName());
+		faroUserImpl.setCreateTime(getCreateTime());
 		faroUserImpl.setModifiedTime(getModifiedTime());
 		faroUserImpl.setLiveUserId(getLiveUserId());
 		faroUserImpl.setRoleId(getRoleId());
@@ -724,11 +724,11 @@ public class FaroUserModelImpl
 		faroUserImpl.setGroupId(this.<Long>getColumnOriginalValue("groupId"));
 		faroUserImpl.setCompanyId(
 			this.<Long>getColumnOriginalValue("companyId"));
-		faroUserImpl.setCreateTime(
-			this.<Long>getColumnOriginalValue("createTime"));
 		faroUserImpl.setUserId(this.<Long>getColumnOriginalValue("userId"));
 		faroUserImpl.setUserName(
 			this.<String>getColumnOriginalValue("userName"));
+		faroUserImpl.setCreateTime(
+			this.<Long>getColumnOriginalValue("createTime"));
 		faroUserImpl.setModifiedTime(
 			this.<Long>getColumnOriginalValue("modifiedTime"));
 		faroUserImpl.setLiveUserId(
@@ -821,8 +821,6 @@ public class FaroUserModelImpl
 
 		faroUserCacheModel.companyId = getCompanyId();
 
-		faroUserCacheModel.createTime = getCreateTime();
-
 		faroUserCacheModel.userId = getUserId();
 
 		faroUserCacheModel.userName = getUserName();
@@ -832,6 +830,8 @@ public class FaroUserModelImpl
 		if ((userName != null) && (userName.length() == 0)) {
 			faroUserCacheModel.userName = null;
 		}
+
+		faroUserCacheModel.createTime = getCreateTime();
 
 		faroUserCacheModel.modifiedTime = getModifiedTime();
 
@@ -922,9 +922,9 @@ public class FaroUserModelImpl
 	private long _faroUserId;
 	private long _groupId;
 	private long _companyId;
-	private long _createTime;
 	private long _userId;
 	private String _userName;
+	private long _createTime;
 	private long _modifiedTime;
 	private long _liveUserId;
 	private long _roleId;
@@ -966,9 +966,9 @@ public class FaroUserModelImpl
 		_columnOriginalValues.put("faroUserId", _faroUserId);
 		_columnOriginalValues.put("groupId", _groupId);
 		_columnOriginalValues.put("companyId", _companyId);
-		_columnOriginalValues.put("createTime", _createTime);
 		_columnOriginalValues.put("userId", _userId);
 		_columnOriginalValues.put("userName", _userName);
+		_columnOriginalValues.put("createTime", _createTime);
 		_columnOriginalValues.put("modifiedTime", _modifiedTime);
 		_columnOriginalValues.put("liveUserId", _liveUserId);
 		_columnOriginalValues.put("roleId", _roleId);
@@ -1006,11 +1006,11 @@ public class FaroUserModelImpl
 
 		columnBitmasks.put("companyId", 8L);
 
-		columnBitmasks.put("createTime", 16L);
+		columnBitmasks.put("userId", 16L);
 
-		columnBitmasks.put("userId", 32L);
+		columnBitmasks.put("userName", 32L);
 
-		columnBitmasks.put("userName", 64L);
+		columnBitmasks.put("createTime", 64L);
 
 		columnBitmasks.put("modifiedTime", 128L);
 

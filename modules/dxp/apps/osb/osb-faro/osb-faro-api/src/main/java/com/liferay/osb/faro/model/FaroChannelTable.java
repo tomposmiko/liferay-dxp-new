@@ -38,12 +38,12 @@ public class FaroChannelTable extends BaseTable<FaroChannelTable> {
 		"groupId", Long.class, Types.BIGINT, Column.FLAG_DEFAULT);
 	public final Column<FaroChannelTable, Long> companyId = createColumn(
 		"companyId", Long.class, Types.BIGINT, Column.FLAG_DEFAULT);
-	public final Column<FaroChannelTable, Long> createTime = createColumn(
-		"createTime", Long.class, Types.BIGINT, Column.FLAG_DEFAULT);
 	public final Column<FaroChannelTable, Long> userId = createColumn(
 		"userId", Long.class, Types.BIGINT, Column.FLAG_DEFAULT);
 	public final Column<FaroChannelTable, String> userName = createColumn(
 		"userName", String.class, Types.VARCHAR, Column.FLAG_DEFAULT);
+	public final Column<FaroChannelTable, Long> createTime = createColumn(
+		"createTime", Long.class, Types.BIGINT, Column.FLAG_DEFAULT);
 	public final Column<FaroChannelTable, Long> modifiedTime = createColumn(
 		"modifiedTime", Long.class, Types.BIGINT, Column.FLAG_DEFAULT);
 	public final Column<FaroChannelTable, String> channelId = createColumn(

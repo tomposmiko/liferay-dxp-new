@@ -189,7 +189,7 @@ public class ClientExtensionEntryLocalServiceImpl
 
 		undeployClientExtensionEntry(clientExtensionEntry);
 
-		_serviceRegistrationsMaps.put(
+		_serviceRegistrationsMap.put(
 			clientExtensionEntry.getClientExtensionEntryId(),
 			_cetDeployer.deploy(_cetFactory.create(clientExtensionEntry)));
 	}
@@ -288,7 +288,7 @@ public class ClientExtensionEntryLocalServiceImpl
 		ClientExtensionEntry clientExtensionEntry) {
 
 		List<ServiceRegistration<?>> serviceRegistrations =
-			_serviceRegistrationsMaps.remove(
+			_serviceRegistrationsMap.remove(
 				clientExtensionEntry.getClientExtensionEntryId());
 
 		if (serviceRegistrations != null) {
@@ -514,7 +514,7 @@ public class ClientExtensionEntryLocalServiceImpl
 	private ResourceLocalService _resourceLocalService;
 
 	private final Map<Long, List<ServiceRegistration<?>>>
-		_serviceRegistrationsMaps = new ConcurrentHashMap<>();
+		_serviceRegistrationsMap = new ConcurrentHashMap<>();
 
 	@Reference
 	private UserLocalService _userLocalService;

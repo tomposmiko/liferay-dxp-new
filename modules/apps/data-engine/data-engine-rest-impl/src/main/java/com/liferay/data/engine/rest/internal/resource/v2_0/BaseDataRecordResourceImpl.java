@@ -830,14 +830,13 @@ public abstract class BaseDataRecordResourceImpl
 			if (parameters.containsKey("dataDefinitionId")) {
 				dataRecordUnsafeConsumer =
 					dataRecord -> postDataDefinitionDataRecord(
-						Long.parseLong(
-							(String)parameters.get("dataDefinitionId")),
+						_parseLong((String)parameters.get("dataDefinitionId")),
 						dataRecord);
 			}
 			else if (parameters.containsKey("dataRecordCollectionId")) {
 				dataRecordUnsafeConsumer =
 					dataRecord -> postDataRecordCollectionDataRecord(
-						Long.parseLong(
+						_parseLong(
 							(String)parameters.get("dataRecordCollectionId")),
 						dataRecord);
 			}
@@ -910,15 +909,14 @@ public abstract class BaseDataRecordResourceImpl
 
 		if (parameters.containsKey("dataDefinitionId")) {
 			return getDataDefinitionDataRecordsPage(
-				Long.parseLong((String)parameters.get("dataDefinitionId")),
-				Long.parseLong((String)parameters.get("dataListViewId")),
+				_parseLong((String)parameters.get("dataDefinitionId")),
+				_parseLong((String)parameters.get("dataListViewId")),
 				(String)parameters.get("keywords"), pagination, sorts);
 		}
 		else if (parameters.containsKey("dataRecordCollectionId")) {
 			return getDataRecordCollectionDataRecordsPage(
-				Long.parseLong(
-					(String)parameters.get("dataRecordCollectionId")),
-				Long.parseLong((String)parameters.get("dataListViewId")),
+				_parseLong((String)parameters.get("dataRecordCollectionId")),
+				_parseLong((String)parameters.get("dataListViewId")),
 				(String)parameters.get("keywords"), pagination, sorts);
 		}
 		else {
@@ -963,14 +961,14 @@ public abstract class BaseDataRecordResourceImpl
 		if ("PARTIAL_UPDATE".equalsIgnoreCase(updateStrategy)) {
 			dataRecordUnsafeConsumer = dataRecord -> patchDataRecord(
 				dataRecord.getId() != null ? dataRecord.getId() :
-					Long.parseLong((String)parameters.get("dataRecordId")),
+					_parseLong((String)parameters.get("dataRecordId")),
 				dataRecord);
 		}
 
 		if ("UPDATE".equalsIgnoreCase(updateStrategy)) {
 			dataRecordUnsafeConsumer = dataRecord -> putDataRecord(
 				dataRecord.getId() != null ? dataRecord.getId() :
-					Long.parseLong((String)parameters.get("dataRecordId")),
+					_parseLong((String)parameters.get("dataRecordId")),
 				dataRecord);
 		}
 
@@ -989,6 +987,14 @@ public abstract class BaseDataRecordResourceImpl
 				dataRecordUnsafeConsumer.accept(dataRecord);
 			}
 		}
+	}
+
+	private Long _parseLong(String value) {
+		if (value != null) {
+			return Long.parseLong(value);
+		}
+
+		return null;
 	}
 
 	public void setContextAcceptLanguage(AcceptLanguage contextAcceptLanguage) {

@@ -6,7 +6,7 @@ classes {
 
 copyPackageJson {
 	from new File(projectDir, "package.json")
-	into new File(sourceSets.main.java.outputDir, "com/liferay/frontend/taglib/clay/internal/importmap/dependencies")
+	into new File(sourceSets.main.java.outputDir, "com/liferay/frontend/taglib/clay/internal/js/importmaps/extender/dependencies")
 }
 
 dependencies {
@@ -32,7 +32,6 @@ dependencies {
 	compileOnly group: "org.osgi", name: "osgi.core", version: "6.0.0"
 	compileOnly project(":apps:frontend-js:frontend-js-importmaps-extender-api")
 	compileOnly project(":apps:frontend-js:frontend-js-loader-modules-extender-api")
-	compileOnly project(":apps:frontend-js:frontend-js-module-launcher-api")
 	compileOnly project(":apps:frontend-taglib:frontend-taglib-react")
 	compileOnly project(":apps:frontend-taglib:frontend-taglib-soy")
 	compileOnly project(":apps:portal-template:portal-template-react-renderer-api")

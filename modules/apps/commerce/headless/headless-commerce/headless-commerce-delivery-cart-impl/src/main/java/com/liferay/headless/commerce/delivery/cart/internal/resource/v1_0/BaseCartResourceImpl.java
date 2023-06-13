@@ -645,14 +645,14 @@ public abstract class BaseCartResourceImpl
 		if ("PARTIAL_UPDATE".equalsIgnoreCase(updateStrategy)) {
 			cartUnsafeConsumer = cart -> patchCart(
 				cart.getId() != null ? cart.getId() :
-					Long.parseLong((String)parameters.get("cartId")),
+					_parseLong((String)parameters.get("cartId")),
 				cart);
 		}
 
 		if ("UPDATE".equalsIgnoreCase(updateStrategy)) {
 			cartUnsafeConsumer = cart -> putCart(
 				cart.getId() != null ? cart.getId() :
-					Long.parseLong((String)parameters.get("cartId")),
+					_parseLong((String)parameters.get("cartId")),
 				cart);
 		}
 
@@ -670,6 +670,14 @@ public abstract class BaseCartResourceImpl
 				cartUnsafeConsumer.accept(cart);
 			}
 		}
+	}
+
+	private Long _parseLong(String value) {
+		if (value != null) {
+			return Long.parseLong(value);
+		}
+
+		return null;
 	}
 
 	public void setContextAcceptLanguage(AcceptLanguage contextAcceptLanguage) {

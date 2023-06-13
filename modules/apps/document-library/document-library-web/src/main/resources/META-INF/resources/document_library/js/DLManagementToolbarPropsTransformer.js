@@ -32,6 +32,7 @@ export default function propsTransformer({
 		editEntryURL,
 		folderConfiguration,
 		openViewMoreFileEntryTypesURL,
+		selectAssetTagsURL,
 		selectExtensionURL,
 		selectFileEntryTypeURL,
 		selectFolderURL,
@@ -220,6 +221,32 @@ export default function propsTransformer({
 		});
 	};
 
+	const filterByTag = (tagsFilterURL) => {
+		openSelectionModal({
+			buttonAddLabel: Liferay.Language.get('select'),
+			height: '70vh',
+			multiple: true,
+			onSelect: (selectedItem) => {
+				if (selectedItem) {
+					const url = selectedItem.reduce(
+						(acc, item) =>
+							addParams(
+								`${portletNamespace}assetTagId=${item.value}`,
+								acc
+							),
+						selectAssetTagsURL
+					);
+
+					navigate(url);
+				}
+			},
+			selectEventName: `${portletNamespace}selectedAssetTag`,
+			size: 'lg',
+			title: Liferay.Language.get('filter-by-tags'),
+			url: tagsFilterURL,
+		});
+	};
+
 	const move = () => {
 		const searchContainer = Liferay.SearchContainer.get(
 			otherProps.searchContainerId
@@ -367,6 +394,9 @@ export default function propsTransformer({
 			}
 			else if (item?.data?.action === 'openExtensionSelector') {
 				filterByExtension(item?.data?.extensionsFilterURL);
+			}
+			else if (item?.data?.action === 'openTagsSelector') {
+				filterByTag(item?.data?.tagsFilterURL);
 			}
 		},
 		onShowMoreButtonClick() {

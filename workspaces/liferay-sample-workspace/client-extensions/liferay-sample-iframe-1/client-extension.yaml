@@ -1,5 +1,4 @@
 liferay-sample-iframe-1-counter-app:
-    erc:
     name: Counter App
     type: iframe
     url: https://arnab-datta.github.io/counter-app

@@ -33,11 +33,16 @@ PortletURL portletURL = PortletURLBuilder.createRenderURL(
 	"toolbarItem", toolbarItem
 ).setParameter(
 	"usersListView", usersListView
-).buildPortletURL();
+).setParameter(
+	"viewUsersRedirect",
+	() -> {
+		if (Validator.isNull(viewUsersRedirect)) {
+			return null;
+		}
 
-if (Validator.isNotNull(viewUsersRedirect)) {
-	portletURL.setParameter("viewUsersRedirect", viewUsersRedirect);
-}
+		return viewUsersRedirect;
+	}
+).buildPortletURL();
 
 request.setAttribute("view.jsp-portletURL", portletURL);
 
@@ -51,6 +56,11 @@ if (organizationId != 0) {
 	organization = OrganizationServiceUtil.getOrganization(organizationId);
 }
 
+if (Validator.isNotNull(backURL)) {
+	portletDisplay.setShowBackIcon(true);
+	portletDisplay.setURLBack(backURL);
+}
+
 if (!usersListView.equals(UserConstants.LIST_VIEW_FLAT_USERS)) {
 	portletDisplay.setShowExportImportIcon(true);
 }
@@ -61,7 +71,7 @@ else {
 
 <liferay-ui:error exception="<%= CompanyMaxUsersException.class %>" message="unable-to-activate-user-because-that-would-exceed-the-maximum-number-of-users-allowed" />
 
-<c:if test="<%= !portletName.equals(UsersAdminPortletKeys.MY_ORGANIZATIONS) && !usersListView.equals(UserConstants.LIST_VIEW_TREE) %>">
+<c:if test="<%= !portletName.equals(UsersAdminPortletKeys.MY_ORGANIZATIONS) && !portletName.equals(UsersAdminPortletKeys.SERVICE_ACCOUNTS) && !usersListView.equals(UserConstants.LIST_VIEW_TREE) %>">
 	<clay:navigation-bar
 		navigationItems="<%= userDisplayContext.getViewNavigationItems() %>"
 	/>

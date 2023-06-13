@@ -371,6 +371,11 @@
 		<td></td>
 	</tr>
 	<tr>
+		<td>SIDEBAR_ADVANCED_TAB</td>
+		<td>//div[contains(@class,'lfr-objects')]//button[contains(text(),'Advanced')]</td>
+		<td></td>
+	</tr>
+	<tr>
 		<td>SIDEBAR_ELEMENT_BUTTON</td>
 		<td>//button[contains(@class, 'sidebar-element-button')and contains(.,'${key_element}')]</td>
 		<td></td>
@@ -603,6 +608,11 @@
 	<tr>
 		<td>ENTRY_CHOOSE_OPTIONS_MULTIPICKLIST</td>
 		<td>//div[contains(text(),'Choose Options')]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>PICKLIST_INPUT_AS_VALUE_OR_EXPRESSION</td>
+		<td>//div[contains(@class,'card-body')]//button[contains(text(), '${key_optionDefaulValue}')]</td>
 		<td></td>
 	</tr>
 </tbody>

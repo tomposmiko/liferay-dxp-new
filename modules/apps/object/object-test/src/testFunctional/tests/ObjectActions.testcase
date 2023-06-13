@@ -106,6 +106,53 @@ definition {
 		}
 	}
 
+	@description = "LPS-180070 - Verify creating a Commerce Product entry triggers an action to add a user"
+	@priority = 5
+	test CanAddUserAfterCreatingCommerceProductEntry {
+		property portal.acceptance = "true";
+
+		task ("Given a Commerce Product object") {
+			ObjectAdmin.openObjectAdmin();
+
+			ObjectPortlet.selectSystemObject(label = "Commerce Product");
+		}
+
+		task ("And given an action to add a new User after creating a Commerce Product entry") {
+			ObjectAdmin.goToActionsTab();
+
+			ObjectAdmin.addObjectActionViaUI(
+				actionLabel = "Custom Action",
+				actionName = "customAction",
+				active = "true",
+				inputMethod = "true",
+				inputValue = "newusertest,newuser@test.com,newUserTest,newUserTest",
+				objectLabel = "User",
+				thenAction = "Add an Object Entry",
+				whenAction = "On After Add");
+		}
+
+		task ("When the user creates a Commerce Product entry") {
+			ApplicationsMenu.gotoPortlet(
+				category = "Product Management",
+				panel = "Commerce",
+				portlet = "Products");
+
+			CPCommerceCatalog.newProductsEntry(
+				productCatalog = "Master",
+				productName = "Simple T-Shirt",
+				productType = "Simple");
+		}
+
+		task ("Then the action is triggered and a user is added") {
+			ApplicationsMenu.gotoPortlet(
+				category = "Users",
+				panel = "Control Panel",
+				portlet = "Users and Organizations");
+
+			LexiconEntry.viewEntryName(rowEntry = "newusertest");
+		}
+	}
+
 	@description = "LPS-139008 - Verify it is possible to cancel the creation of an Action"
 	@priority = 4
 	test CanCancelAction {
@@ -177,6 +224,10 @@ definition {
 			pluralLabelName = "Custom Objects 183");
 
 		ObjectAdmin.openObjectAdmin();
+
+		while ((IsElementNotPresent(label = "Custom Object 183", locator1 = "ObjectPortlet#SELECT_CUSTOM_OBJECT")) && (maxIterations = "5")) {
+			Refresh();
+		}
 
 		ObjectPortlet.selectCustomObject(label = "Custom Object 183");
 
@@ -1861,6 +1912,10 @@ definition {
 
 			Account.openAccountsAdmin();
 
+			WaitForElementPresent(
+				key_rowEntry = "Accounts Name",
+				locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME");
+
 			LexiconEntry.gotoEntry(rowEntry = "Accounts Name");
 
 			Account.gotoAssigneeTab(assigneeTab = "Addresses");
@@ -2452,6 +2507,77 @@ definition {
 			actionLabel = "Action Label");
 	}
 
+	@description = "LPS-169994 - Verify users are able to manage standalone action permissions on the role page"
+	@priority = 5
+	test CanManageStandalonePermissionsInRoles {
+		property portal.acceptance = "true";
+
+		task ("Given an object with a standalone action") {
+			ObjectAdmin.addObjectViaAPI(
+				labelName = "Custom Object 173723",
+				objectName = "CustomObject173723",
+				pluralLabelName = "Custom Objects 173723");
+
+			ObjectAdmin.addObjectFieldViaAPI(
+				fieldBusinessType = "Text",
+				fieldLabelName = "Custom Field",
+				fieldName = "customObjectField",
+				fieldType = "String",
+				isRequired = "true",
+				objectName = "CustomObject173723");
+
+			ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject173723");
+
+			ObjectAdmin.openObjectAdmin();
+
+			ObjectPortlet.selectCustomObject(label = "Custom Object 173723");
+
+			ObjectAdmin.goToActionsTab();
+
+			ObjectAdmin.addObjectActionViaUI(
+				actionLabel = "Action Label",
+				actionName = "ActionName",
+				active = "true",
+				errorMessage = "Error Message",
+				inputMethod = "true",
+				inputValue = "New Entry Test",
+				objectLabel = "Custom Object 173723",
+				thenAction = "Add an Object Entry",
+				whenAction = "Standalone");
+
+			ObjectAdmin.addObjectSingleFieldEntryViaAPI(
+				fieldName = "customObjectField",
+				objectName = "CustomObject173723",
+				value = "Entry Test");
+		}
+
+		task ("When the user creates a regular role and navigates to the role permissions") {
+			JSONRole.addRegularRole(roleTitle = "Regular Role");
+
+			Role.openRolesAdmin();
+
+			LexiconEntry.gotoEntry(rowEntry = "Regular Role");
+
+			Navigator.gotoNavItem(navItem = "Define Permissions");
+		}
+
+		task ("Then the user is able to manage the standalone action permissions") {
+			ObjectAdmin.searchInDefinePermissions(search = "Custom Objects 173723");
+
+			Click(
+				key_wikiPageVersionNew = "action.ActionName",
+				locator1 = "WikiTable#SELECT_VERSION_NEW_VERSION_CHECKBOX");
+
+			PortletEntry.save();
+
+			ObjectAdmin.searchInDefinePermissions(search = "Custom Objects 173723");
+
+			Check.toggleSwitch(
+				key_wikiPageVersionNew = "action.ActionName",
+				locator1 = "WikiTable#SELECT_VERSION_NEW_VERSION_CHECKBOX");
+		}
+	}
+
 	@description = "LPS-139008 - Verify it is not possible to leave the Action Name field blank"
 	@priority = 3
 	test CannotLeaveActionNameBlank {
@@ -2682,6 +2808,76 @@ definition {
 		AssertTextEquals(
 			locator1 = "Message#EMPTY_STATE_INFO",
 			value1 = "No Results Found");
+	}
+
+	@description = "LPS-169994 - Verify a deactivated standalone action isn't displayed in the dropdown menu"
+	@priority = 5
+	test CanNotSeeDeactivatedStandaloneAction {
+		property portal.acceptance = "true";
+
+		task ("Given an object with a standalone action") {
+			ObjectAdmin.addObjectViaAPI(
+				labelName = "Custom Object 173773",
+				objectName = "CustomObject173773",
+				pluralLabelName = "Custom Objects 173773");
+
+			ObjectAdmin.addObjectFieldViaAPI(
+				fieldBusinessType = "Text",
+				fieldLabelName = "Custom Field",
+				fieldName = "customObjectField",
+				fieldType = "String",
+				isRequired = "true",
+				objectName = "CustomObject173773");
+
+			ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject173773");
+
+			ObjectAdmin.openObjectAdmin();
+
+			ObjectPortlet.selectCustomObject(label = "Custom Object 173773");
+
+			ObjectAdmin.goToActionsTab();
+
+			ObjectAdmin.addObjectActionViaUI(
+				actionLabel = "Action Label",
+				actionName = "ActionName",
+				active = "true",
+				errorMessage = "Error message",
+				inputMethod = "true",
+				inputValue = "New Entry Test",
+				objectLabel = "Custom Object 173773",
+				thenAction = "Add an Object Entry",
+				whenAction = "Standalone");
+
+			ObjectAdmin.addObjectSingleFieldEntryViaAPI(
+				fieldName = "customObjectField",
+				objectName = "CustomObject173773",
+				value = "Entry Test");
+		}
+
+		task ("When the standalone action is deactivated") {
+			ObjectAdmin.openObjectAdmin();
+
+			ObjectPortlet.selectCustomObject(label = "Custom Object 173773");
+
+			ObjectAdmin.goToActionsTab();
+
+			ObjectAdmin.editObjectAction(
+				active = "false",
+				click = "save",
+				viewEntry = "Action Label");
+		}
+
+		task ("Then the standalone action isn't present in the dropdown menu") {
+			ObjectAdmin.goToCustomObject(objectName = "CustomObject173773");
+
+			Click(
+				key_entry = "Entry Test",
+				locator1 = "ObjectPortlet#ENTRY_KEBAB_MENU");
+
+			AssertElementNotPresent(
+				key_dropdownItem = "Action Label",
+				locator1 = "ObjectPortlet#CHECK_UNCHECK_DROPDOWN_ITEM");
+		}
 	}
 
 	@description = "LPS-139008 - Verify that it is possible to reactivate an Action"
@@ -3206,6 +3402,43 @@ definition {
 				locator1 = "ObjectPortlet#CHECK_UNCHECK_DROPDOWN_ITEM");
 
 			ObjectPortlet.viewEntry(entry = "New Entry Test");
+		}
+	}
+
+	@description = "LPS-173537 - Verify creating an Account entry triggers an action to update the Account entry"
+	@priority = 5
+	test CanUpdateAccountEntryAfterCreatingAccountEntry {
+		property portal.acceptance = "true";
+
+		task ("Given an Account object") {
+			ObjectAdmin.openObjectAdmin();
+
+			ObjectPortlet.selectCustomObject(label = "Account");
+		}
+
+		task ("And given an action to update an Account entry after creating an Account entry") {
+			ObjectAdmin.goToActionsTab();
+
+			ObjectAdmin.addObjectActionViaUI(
+				actionLabel = "Custom Action",
+				active = "true",
+				fieldName = "Name",
+				inputMethod = "true",
+				inputValue = "Updated Accounts Name",
+				thenAction = "Update an Object Entry",
+				whenAction = "On After Add");
+		}
+
+		task ("When the user creates an Account entry") {
+			JSONAccountEntry.addAccountEntry(
+				accountEntryName = "Account Name",
+				accountEntryType = "Person");
+		}
+
+		task ("Then the action is triggered and the created Account entry is updated") {
+			Account.openAccountsAdmin();
+
+			LexiconEntry.viewEntryName(rowEntry = "Updated Accounts Name");
 		}
 	}
 

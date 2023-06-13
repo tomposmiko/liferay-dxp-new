@@ -187,3 +187,8 @@ d3e7aa15e26afe0d1adb3e546ca6c0dcb6a03b3c^..e4add7434c1e9bc6818716c58d93461c87ad0
 # Bundle Version 13.5.1
 #
 e4add7434c1e9bc6818716c58d93461c87ad0361^..abaead8b1baa774c1fc4882bec49f8c67df409d4=LPS-178826
+
+#
+# Bundle Version 13.6.0
+#
+abaead8b1baa774c1fc4882bec49f8c67df409d4^..551bc48b31ccfefdec6e70d54ce7f8f9f187af78=LPS-182705

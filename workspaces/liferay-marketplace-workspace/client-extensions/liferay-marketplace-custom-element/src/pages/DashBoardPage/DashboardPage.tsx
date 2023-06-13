@@ -6,6 +6,7 @@ import {Header} from '../../components/Header/Header';
 import {AppDetailsPage} from '../AppDetailsPage/AppDetailsPage';
 
 import './DashboardPage.scss';
+import { Liferay } from '../../liferay/liferay';
 
 export interface DashboardListItems {
 	itemIcon: string;
@@ -16,30 +17,40 @@ export interface DashboardListItems {
 }
 
 interface DashBoardPageProps {
+	buttonHref?: string;
 	buttonMessage?: string;
 	children: ReactNode;
 	dashboardNavigationItems: DashboardListItems[];
 	messages: {
 		description: string;
-		emptyStateMessage: {
+		emptyStateMessage?: {
 			description1: string;
 			description2: string;
 			title: string;
 		};
 		title: string;
 	};
+	onButtonClick?: () => void;
 	setSelectedApp?: (value: AppProps | undefined) => void;
 	selectedApp?: AppProps;
 }
 
 export function DashboardPage({
+	buttonHref,
 	buttonMessage,
 	children,
 	dashboardNavigationItems,
 	messages,
+	onButtonClick,
 	selectedApp,
 	setSelectedApp,
 }: DashBoardPageProps) {
+
+	const baseURL = `${Liferay.ThemeDisplay.getCanonicalURL().replace(
+		`/customer-dashboard` || `/publisher-dashboard`,
+		''
+	)}`;
+	
 	return (
 		<div className="dashboard-page-container">
 			<div>
@@ -59,8 +70,13 @@ export function DashboardPage({
 								/>
 
 								{buttonMessage && (
-									<a href="/create-new-app">
-										<button className="dashboard-page-body-header-button">
+									<a href={buttonHref ?? `${baseURL}/create-new-app`}>
+										<button
+											className="dashboard-page-body-header-button"
+											onClick={() =>
+												onButtonClick && onButtonClick()
+											}
+										>
 											{buttonMessage}
 										</button>
 									</a>

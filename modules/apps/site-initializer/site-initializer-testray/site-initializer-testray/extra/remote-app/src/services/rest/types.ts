@@ -39,7 +39,7 @@ type ObjectActions = {
 	updateBatch?: ActionPermissionProperties;
 };
 
-type ObjectActionsItems = {
+export type ObjectActionsItems = {
 	delete?: ActionPermissionProperties;
 	get?: ActionPermissionProperties;
 	replace?: ActionPermissionProperties;
@@ -242,6 +242,7 @@ export type TestrayProductVersion = {
 };
 
 export type TestrayProject = {
+	actions: ObjectActionsItems;
 	creator: {
 		name: string;
 	};
@@ -292,6 +293,7 @@ export type TestrayRun = {
 } & CaseResultAggregation;
 
 export type TestraySubTask = {
+	actions: ObjectActionsItems;
 	dateCreated: string;
 	dateModified: string;
 	dueStatus: PickList;
@@ -355,6 +357,7 @@ export type TestraySuiteCase = {
 };
 
 export type TestrayTask = {
+	actions: ObjectActionsItems;
 	build?: TestrayBuild;
 	dateCreated: string;
 	dispatchTriggerId: number;
@@ -422,6 +425,7 @@ export type TestrayFactorCategory = {
 };
 
 export type TestrayRoutine = {
+	actions: ObjectActionsItems;
 	builds: TestrayBuild[];
 	dateCreated: string;
 	id: number;

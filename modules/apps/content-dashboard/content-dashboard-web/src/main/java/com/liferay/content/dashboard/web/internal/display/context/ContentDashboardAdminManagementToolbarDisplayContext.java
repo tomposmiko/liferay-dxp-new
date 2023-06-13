@@ -54,6 +54,7 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
@@ -176,6 +177,13 @@ public class ContentDashboardAdminManagementToolbarDisplayContext
 					_getFilterStatusDropdownItems());
 				dropdownGroupItem.setLabel(
 					_language.get(httpServletRequest, "filter-by-status"));
+			}
+		).addGroup(
+			dropdownGroupItem -> {
+				dropdownGroupItem.setDropdownItems(
+					_getFilterByReviewDateDropdownItems());
+				dropdownGroupItem.setLabel(
+					_language.get(httpServletRequest, "filter-by-review-date"));
 			}
 		).addGroup(
 			dropdownGroupItem -> {
@@ -318,6 +326,20 @@ public class ContentDashboardAdminManagementToolbarDisplayContext
 					_getLabel("status", _getStatusLabel(status)));
 			});
 
+		labelItemListWrapper.add(
+			() -> Validator.isNotNull(
+				_contentDashboardAdminDisplayContext.getReviewDateString()),
+			labelItem -> {
+				labelItem.putData(
+					"removeLabelURL",
+					_getRemoveLabelURL("reviewDate", (String)null));
+				labelItem.setCloseable(true);
+				labelItem.setLabel(
+					_getLabel(
+						"review-date",
+						_language.get(httpServletRequest, "to-be-reviewed")));
+			});
+
 		Set<String> assetTagIds =
 			_contentDashboardAdminDisplayContext.getAssetTagIds();
 
@@ -412,6 +434,9 @@ public class ContentDashboardAdminManagementToolbarDisplayContext
 		portletURL.setParameter("orderByCol", getOrderByCol());
 		portletURL.setParameter("orderByType", getOrderByType());
 		portletURL.setParameter(
+			"reviewDate",
+			_contentDashboardAdminDisplayContext.getReviewDateString());
+		portletURL.setParameter(
 			"scopeId",
 			String.valueOf(_contentDashboardAdminDisplayContext.getScopeId()));
 		portletURL.setParameter(
@@ -433,7 +458,7 @@ public class ContentDashboardAdminManagementToolbarDisplayContext
 
 	@Override
 	protected String[] getOrderByKeys() {
-		return new String[] {"title", "modified-date"};
+		return new String[] {"title", "modified-date", "review-date"};
 	}
 
 	private void _addContentDashboardItemFilterProviders(
@@ -657,6 +682,27 @@ public class ContentDashboardAdminManagementToolbarDisplayContext
 				_language.get(httpServletRequest, "author") +
 					StringPool.TRIPLE_PERIOD
 			).build());
+	}
+
+	private List<DropdownItem> _getFilterByReviewDateDropdownItems() {
+		String reviewDate =
+			_contentDashboardAdminDisplayContext.getReviewDateString();
+
+		return DropdownItemListBuilder.add(
+			dropdownItem -> {
+				dropdownItem.setActive(Validator.isNull(reviewDate));
+				dropdownItem.setHref(getPortletURL(), "reviewDate", null);
+				dropdownItem.setLabel(_language.get(httpServletRequest, "all"));
+			}
+		).add(
+			dropdownItem -> {
+				dropdownItem.setActive(Validator.isNotNull(reviewDate));
+				dropdownItem.setHref(
+					getPortletURL(), "reviewDate", "toBeReviewed");
+				dropdownItem.setLabel(
+					_language.get(httpServletRequest, "to-be-reviewed"));
+			}
+		).build();
 	}
 
 	private List<DropdownItem> _getFilterDropdownItems() {
