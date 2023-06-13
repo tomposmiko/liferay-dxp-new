@@ -16,7 +16,8 @@
 
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 
-<%@ taglib uri="http://liferay.com/tld/react" prefix="react" %>
+<%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
+taglib uri="http://liferay.com/tld/react" prefix="react" %>
 
 <%@ page import="com.liferay.learn.LearnMessageUtil" %><%@
 page import="com.liferay.portal.kernel.util.HashMapBuilder" %><%@
@@ -45,6 +46,8 @@ SemanticSearchCompanyConfigurationDisplayContext semanticSearchCompanyConfigurat
 			).put(
 				"availableTextTruncationStrategies", semanticSearchCompanyConfigurationDisplayContext.getAvailableTextTruncationStrategies()
 			).put(
+				"formName", liferayPortletResponse.getNamespace() + "fm"
+			).put(
 				"initialTextEmbeddingCacheTimeout", semanticSearchCompanyConfigurationDisplayContext.getTextEmbeddingCacheTimeout()
 			).put(
 				"initialTextEmbeddingProviderConfigurationJSONs", semanticSearchCompanyConfigurationDisplayContext.getTextEmbeddingProviderConfigurationJSONs()
@@ -54,7 +57,27 @@ SemanticSearchCompanyConfigurationDisplayContext semanticSearchCompanyConfigurat
 				"learnMessages", LearnMessageUtil.getJSONObject("search-experiences-web")
 			).put(
 				"namespace", liferayPortletResponse.getNamespace()
+			).put(
+				"redirectURL", String.valueOf(liferayPortletResponse.createRenderURL())
 			).build()
 		%>'
 	/>
 </div>
+
+<aui:script>
+	function <portlet:namespace />removeExistingFormSubmitButtons() {
+		const formElement = document.getElementById('<portlet:namespace />fm');
+
+		if (formElement) {
+			const submitButtonGroupElement = formElement.querySelector(
+				'.button-holder'
+			);
+
+			if (submitButtonGroupElement) {
+				submitButtonGroupElement.remove();
+			}
+		}
+	}
+
+	<portlet:namespace />removeExistingFormSubmitButtons();
+</aui:script>

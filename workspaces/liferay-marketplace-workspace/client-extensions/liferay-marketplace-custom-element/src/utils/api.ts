@@ -19,6 +19,7 @@ export function createApp({
 			catalogId,
 			description: {en_US: appDescription},
 			name: {en_US: appName},
+			productStatus: 2,
 			productType: 'virtual',
 		}),
 		headers,
