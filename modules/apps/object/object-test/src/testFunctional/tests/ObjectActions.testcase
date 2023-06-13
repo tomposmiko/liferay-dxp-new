@@ -1,6 +1,7 @@
 @component-name = "portal-object"
 definition {
 
+	property portal.acceptance = "true";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Object";
@@ -145,17 +146,43 @@ definition {
 	}
 
 	@description = "LPS-139008 - Verify that it is possible to inactivate an Action"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanInactivateAction {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-145723 CanInactivateAction pending implementation
+		ObjectAdmin.openObjectAdmin();
 
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
+
+		ObjectAdmin.goToActionsTab();
+
+		ObjectAdmin.addObjectActionViaUI(
+			actionName = "Action Name",
+			thenAction = "Webhook",
+			urlAction = "http://localhost:8080",
+			whenAction = "On After Add");
+
+		ObjectAdmin.editObjectAction(viewEntry = "Action Name");
+
+		CreateObject.checkToggleInactive();
+
+		Button.clickSave();
+
+		Refresh();
+
+		ObjectAdmin.assertObjectActions(
+			actionActive = "No",
+			actionName = "Action Name");
 	}
 
 	@description = "LPS-139008 - Verify it is not possible to leave the Action Name field blank"
 	@priority = "3"
 	test CannotLeaveActionNameBlank {
+		property portal.acceptance = "false";
+
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object",
 			objectName = "CustomObject",
@@ -179,6 +206,8 @@ definition {
 	@description = "LPS-139008 - Verify it is not possible to leave the Action Then field blank"
 	@priority = "3"
 	test CannotLeaveActionThenBlank {
+		property portal.acceptance = "false";
+
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object",
 			objectName = "CustomObject",
@@ -200,6 +229,8 @@ definition {
 	@description = "LPS-139008 - Verify it is not possible to leave the Action When field blank"
 	@priority = "3"
 	test CannotLeaveActionWhenBlank {
+		property portal.acceptance = "false";
+
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object",
 			objectName = "CustomObject",
@@ -222,6 +253,8 @@ definition {
 	@description = "LPS-139008 - Verify it is not possible to leave the URL field blank when Webhook is selected"
 	@priority = "3"
 	test CannotLeaveURLBlank {
+		property portal.acceptance = "false";
+
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object",
 			objectName = "CustomObject",
@@ -242,12 +275,44 @@ definition {
 	}
 
 	@description = "LPS-139008 - Verify that it is possible to reactivate an Action"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanReactivateAction {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-145747 CanReactivateAction pending implementation
+		ObjectAdmin.openObjectAdmin();
 
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
+
+		ObjectAdmin.goToActionsTab();
+
+		ObjectAdmin.addObjectActionViaUI(
+			actionName = "Action Name",
+			thenAction = "Webhook",
+			urlAction = "http://localhost:8080",
+			whenAction = "On After Add");
+
+		ObjectAdmin.editObjectAction(viewEntry = "Action Name");
+
+		CreateObject.checkToggleInactive();
+
+		Button.clickSave();
+
+		Refresh();
+
+		ObjectAdmin.editObjectAction(viewEntry = "Action Name");
+
+		CreateObject.checkToggleActive();
+
+		Button.clickSave();
+
+		Refresh();
+
+		ObjectAdmin.assertObjectActions(
+			actionActive = "Yes",
+			actionName = "Action Name");
 	}
 
 	@description = "LPS-139008 - Verify it is possible to search for an Action"

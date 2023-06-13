@@ -171,10 +171,7 @@ function appendXMLAssignments(
 						XMLUtil.create('name', roleName)
 					);
 
-					if (
-						dataAssignments.autoCreate[index] !== null &&
-						dataAssignments.autoCreate[index] !== undefined
-					) {
+					if (dataAssignments.autoCreate?.[index]) {
 						buffer.push(
 							XMLUtil.create(
 								'autoCreate',
@@ -345,18 +342,6 @@ function appendXMLNotifications(buffer, notifications, nodeName) {
 			) {
 				recipientsAttrs.receptionType = recipients[index].receptionType;
 			}
-
-			// if (
-			// 	isObject(recipients[index]) &&
-			// 	!isObjectEmpty(recipients[index])
-			// ) {
-			// 	appendXMLAssignments(
-			// 		buffer,
-			// 		recipients[index],
-			// 		'recipients',
-			// 		recipientsAttrs
-			// 	);
-			// }
 
 			if (executionType) {
 				buffer.push(
@@ -556,6 +541,8 @@ function serializeDefinition(
 			appendXMLNotifications(buffer, item.data.notifications);
 		}
 
+		appendXMLTaskTimers(buffer, item.data.taskTimers);
+
 		if (initial) {
 			buffer.push(XMLUtil.create('initial', initial));
 		}
@@ -579,7 +566,9 @@ function serializeDefinition(
 			buffer.push(XMLUtil.create('script', cdata(script)));
 		}
 
-		appendXMLTaskTimers(buffer, item.data.taskTimers);
+		if (xmlType === 'condition') {
+			buffer.push(XMLUtil.create('scriptLanguage', DEFAULT_LANGUAGE));
+		}
 
 		const nodeTransitions = transitions.filter(
 			(transition) => transition.source === id

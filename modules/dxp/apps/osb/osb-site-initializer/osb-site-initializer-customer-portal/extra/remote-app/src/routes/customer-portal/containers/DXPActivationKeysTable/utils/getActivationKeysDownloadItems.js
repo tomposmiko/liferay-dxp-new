@@ -18,7 +18,9 @@ export function getActivationKeysDownloadItems(
 	selectedKeysIDs,
 	licenseKeyDownloadURL,
 	sessionId,
-	handleAlertStatus
+	handleAlertStatus,
+	selectedKeysObjects,
+	projectName
 ) {
 	return [
 		{
@@ -31,7 +33,9 @@ export function getActivationKeysDownloadItems(
 				const downloadedAggregated = await downloadAggregatedActivationKey(
 					selectedKeysIDs,
 					licenseKeyDownloadURL,
-					sessionId
+					sessionId,
+					selectedKeysObjects,
+					projectName
 				);
 
 				return handleAlertStatus(downloadedAggregated);

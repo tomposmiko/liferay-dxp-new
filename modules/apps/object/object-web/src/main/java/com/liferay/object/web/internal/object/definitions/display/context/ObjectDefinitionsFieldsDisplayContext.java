@@ -20,8 +20,8 @@ import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
 import com.liferay.object.field.business.type.ObjectFieldBusinessTypeServicesTracker;
 import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.model.ObjectField;
 import com.liferay.object.web.internal.configuration.FFBusinessTypeAttachmentConfiguration;
-import com.liferay.object.web.internal.configuration.activator.FFObjectFieldBusinessTypeConfigurationActivator;
 import com.liferay.object.web.internal.constants.ObjectWebKeys;
 import com.liferay.object.web.internal.display.context.helper.ObjectRequestHelper;
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
@@ -54,8 +54,6 @@ public class ObjectDefinitionsFieldsDisplayContext {
 	public ObjectDefinitionsFieldsDisplayContext(
 		FFBusinessTypeAttachmentConfiguration
 			ffBusinessTypeAttachmentConfiguration,
-		FFObjectFieldBusinessTypeConfigurationActivator
-			ffObjectFieldBusinessTypeConfigurationActivator,
 		HttpServletRequest httpServletRequest,
 		ModelResourcePermission<ObjectDefinition>
 			objectDefinitionModelResourcePermission,
@@ -64,8 +62,6 @@ public class ObjectDefinitionsFieldsDisplayContext {
 
 		_ffBusinessTypeAttachmentConfiguration =
 			ffBusinessTypeAttachmentConfiguration;
-		_ffObjectFieldBusinessTypeConfigurationActivator =
-			ffObjectFieldBusinessTypeConfigurationActivator;
 		_objectDefinitionModelResourcePermission =
 			objectDefinitionModelResourcePermission;
 		_objectFieldBusinessTypeServicesTracker =
@@ -171,6 +167,16 @@ public class ObjectDefinitionsFieldsDisplayContext {
 		return objectFieldBusinessTypeMaps;
 	}
 
+	public Map<String, Object> getObjectFieldProperties(
+		Locale locale, ObjectField objectField) {
+
+		ObjectFieldBusinessType objectFieldBusinessType =
+			_objectFieldBusinessTypeServicesTracker.getObjectFieldBusinessType(
+				objectField.getBusinessType());
+
+		return objectFieldBusinessType.getProperties(locale, objectField);
+	}
+
 	public PortletURL getPortletURL() throws PortletException {
 		return PortletURLUtil.clone(
 			PortletURLUtil.getCurrent(
@@ -187,14 +193,8 @@ public class ObjectDefinitionsFieldsDisplayContext {
 			getObjectDefinitionId(), ActionKeys.UPDATE);
 	}
 
-	public boolean isFFObjectFieldBusinessTypeConfigurationEnabled() {
-		return _ffObjectFieldBusinessTypeConfigurationActivator.enabled();
-	}
-
 	private final FFBusinessTypeAttachmentConfiguration
 		_ffBusinessTypeAttachmentConfiguration;
-	private final FFObjectFieldBusinessTypeConfigurationActivator
-		_ffObjectFieldBusinessTypeConfigurationActivator;
 	private final ModelResourcePermission<ObjectDefinition>
 		_objectDefinitionModelResourcePermission;
 	private final ObjectFieldBusinessTypeServicesTracker

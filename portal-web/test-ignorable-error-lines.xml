@@ -176,14 +176,6 @@
 			<contains>There are no actions associated with the resource com.liferay.portal.workflow.kaleo.model.KaleoDefinitionVersion</contains>
 			<matches></matches>
 		</ignore-error>
-		<ignore-error description="LPS-88391, LPS-88417">
-			<contains></contains>
-			<matches>Attempting to upgrade table .* by recreating the table [\s\S]*</matches>
-		</ignore-error>
-		<ignore-error description="LPS-88391, LPS-88417">
-			<contains></contains>
-			<matches>Successfully recreated and upgraded table .*</matches>
-		</ignore-error>
 		<ignore-error description="LPS-88412 - temporarily ignore until fixed">
 			<contains>drop table if exists Kaleo</contains>
 			<matches></matches>
@@ -243,6 +235,10 @@
 		<ignore-error description="LPS-123610">
 			<contains>No default user was found for company</contains>
 			<matches></matches>
+		</ignore-error>
+		<ignore-error description="LPS-134196">
+			<contains></contains>
+			<matches>Attempting to upgrade table .* by adding a temporary column [\s\S]*</matches>
 		</ignore-error>
 		<ignore-error description="LPS-141256 - temporarily ignore until fixed">
 			<contains>The following session is not valid</contains>

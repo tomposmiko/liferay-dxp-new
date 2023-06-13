@@ -105,10 +105,8 @@
 			"type": "Integer"
 		}
 	],
-	"panelAppOrder": "100",
-	"panelCategoryKey": "site_administration.content",
 	"pluralLabel": {
 		"en_US": "Testray Cases Results"
 	},
-	"scope": "site"
+	"scope": "company"
 }

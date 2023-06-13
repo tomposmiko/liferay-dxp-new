@@ -26,6 +26,7 @@ const DXPActivationKeysTableHeader = ({
 	accountKey,
 	activationKeys,
 	licenseKeyDownloadURL,
+	project,
 	selectedKeys,
 	sessionId,
 	setActivationKeys,
@@ -64,6 +65,10 @@ const DXPActivationKeysTableHeader = ({
 		return keyCanBeDownloaded;
 	}, [activationKeys, selectedKeys]);
 
+	const selectedKeysObjects = activationKeys.filter((key) => {
+		return selectedKeys.includes(key.id);
+	});
+
 	const handleAlertStatus = (hasSuccessfullyDownloadedKeys) => {
 		setActivationKeysDownloadStatus(
 			hasSuccessfullyDownloadedKeys
@@ -84,7 +89,9 @@ const DXPActivationKeysTableHeader = ({
 		selectedKeysIDs,
 		licenseKeyDownloadURL,
 		sessionId,
-		handleAlertStatus
+		handleAlertStatus,
+		selectedKeysObjects,
+		project.name
 	);
 
 	const getCurrentButton = () => {
@@ -109,7 +116,10 @@ const DXPActivationKeysTableHeader = ({
 							selectedKeys,
 							licenseKeyDownloadURL,
 							sessionId,
-							handleAlertStatus
+							handleAlertStatus,
+							selectedKeysObjects[0]?.productName,
+							selectedKeysObjects[0]?.productVersion,
+							project.name
 						)
 					}
 				>

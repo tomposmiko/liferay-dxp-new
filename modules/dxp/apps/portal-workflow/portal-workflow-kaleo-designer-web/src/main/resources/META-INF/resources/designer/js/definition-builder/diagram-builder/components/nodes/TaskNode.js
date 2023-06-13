@@ -16,7 +16,7 @@ import {defaultLanguageId} from '../../../constants';
 import BaseNode from './BaseNode';
 
 export default function TaskNode({
-	data: {actions, assignments, description, label, newNode} = {},
+	data: {actions, assignments, description, label, newNode, taskTimers} = {},
 	descriptionSidebar,
 	id,
 	...otherProps
@@ -25,6 +25,10 @@ export default function TaskNode({
 		label = {
 			[defaultLanguageId]: Liferay.Language.get('task'),
 		};
+	}
+
+	if (!assignments) {
+		assignments = {assignmentType: ['user']};
 	}
 
 	return (
@@ -38,6 +42,7 @@ export default function TaskNode({
 			id={id}
 			label={label}
 			newNode={newNode}
+			taskTimers={taskTimers}
 			type="task"
 			{...otherProps}
 		/>

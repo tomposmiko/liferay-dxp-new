@@ -20,7 +20,6 @@ import com.liferay.frontend.data.set.view.table.FDSTableSchema;
 import com.liferay.frontend.data.set.view.table.FDSTableSchemaBuilder;
 import com.liferay.frontend.data.set.view.table.FDSTableSchemaBuilderFactory;
 import com.liferay.frontend.data.set.view.table.FDSTableSchemaField;
-import com.liferay.object.web.internal.configuration.activator.FFObjectFieldBusinessTypeConfigurationActivator;
 import com.liferay.object.web.internal.object.definitions.constants.ObjectDefinitionsFDSNames;
 
 import java.util.Locale;
@@ -46,15 +45,9 @@ public class ObjectFieldsTableFDSView extends BaseTableFDSView {
 		FDSTableSchemaField labelFDSTableSchemaField =
 			fdsTableSchemaBuilder.addFDSTableSchemaField("label.LANG", "label");
 
-		labelFDSTableSchemaField.setContentRenderer("actionLink");
+		fdsTableSchemaBuilder.addFDSTableSchemaField("businessType", "type");
 
-		if (_ffObjectFieldBusinessTypeConfigurationActivator.enabled()) {
-			fdsTableSchemaBuilder.addFDSTableSchemaField(
-				"businessType", "type");
-		}
-		else {
-			fdsTableSchemaBuilder.addFDSTableSchemaField("DBType", "type");
-		}
+		labelFDSTableSchemaField.setContentRenderer("actionLink");
 
 		FDSTableSchemaField requiredFDSTableSchemaField =
 			fdsTableSchemaBuilder.addFDSTableSchemaField(
@@ -67,9 +60,5 @@ public class ObjectFieldsTableFDSView extends BaseTableFDSView {
 
 	@Reference
 	private FDSTableSchemaBuilderFactory _fdsTableSchemaBuilderFactory;
-
-	@Reference
-	private FFObjectFieldBusinessTypeConfigurationActivator
-		_ffObjectFieldBusinessTypeConfigurationActivator;
 
 }

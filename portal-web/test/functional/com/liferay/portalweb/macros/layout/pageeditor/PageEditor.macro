@@ -1056,7 +1056,27 @@ definition {
 	macro clickPublish {
 		Button.click(button = "Publish");
 
-		Alert.viewSuccessMessage();
+		if (IsElementPresent(locator1 = "Modal#BODY")) {
+			AssertTextEquals(
+				locator1 = "Modal#BODY",
+				value1 = "Some of the fields have invalid values. If you continue publishing, the latest valid values will display.");
+
+			if ("${publishing}" == "Cancel") {
+				Click(
+					key_text = "Cancel",
+					locator1 = "Modal#MODAL_FOOTER_BUTTON");
+			}
+			else {
+				Click(
+					key_text = "Continue",
+					locator1 = "Modal#MODAL_FOOTER_BUTTON");
+
+				Alert.viewSuccessMessage();
+			}
+		}
+		else {
+			Alert.viewSuccessMessage();
+		}
 	}
 
 	macro closeSidebar {
@@ -2492,7 +2512,7 @@ definition {
 
 			if (isSet(height)) {
 				Type(
-					key_borderBottom = "Size",
+					key_borderBottom = "Frame",
 					key_fieldLabel = "Height",
 					locator1 = "TextInput#BORDER_BOTTOM_INPUT_FIELD",
 					value1 = "${height}");
@@ -2779,7 +2799,7 @@ definition {
 
 			if (isSet(height)) {
 				Type(
-					key_borderBottom = "Size",
+					key_borderBottom = "Frame",
 					key_fieldLabel = "Height",
 					locator1 = "TextInput#BORDER_BOTTOM_INPUT_FIELD",
 					value1 = "${height}");

@@ -1,6 +1,7 @@
 @component-name = "portal-object"
 definition {
 
+	property portal.acceptance = "true";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Object";
@@ -75,6 +76,8 @@ definition {
 	@description = "LPS-136595 - Verify it is possible to display a specific entry of Picklist type for a specific Object"
 	@priority = "4"
 	test DisplaySpecificEntryPicklist {
+		property portal.upstream = "quarantine";
+
 		Picklist.addPicklistViaAPI(picklistName = "Picklist Test");
 
 		Picklist.addPicklistItemViaAPI(

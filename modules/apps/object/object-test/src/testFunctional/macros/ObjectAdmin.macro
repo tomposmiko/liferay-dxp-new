@@ -126,9 +126,13 @@ definition {
 				value1 = "${fieldName}");
 		}
 
-		Select(
-			locator1 = "ObjectAdmin#OBJECT_FIELDS_TYPE",
-			value1 = "${fieldType}");
+		if (isSet(fieldType)) {
+			Click(locator1 = "ObjectAdmin#OBJECT_FIELDS_TYPE");
+
+			Click(
+				key_fieldType = "${fieldType}",
+				locator1 = "ObjectAdmin#OBJECT_FIELDS_TYPE_OPTION");
+		}
 
 		if ("${isMandatory}" == "true") {
 			Check.checkToggleSwitch(locator1 = "ObjectAdmin#OBJECT_FIELDS_MANDATORY_TOGGLE_SWITCH");
@@ -767,11 +771,11 @@ definition {
 			Type(
 				locator1 = "ObjectAdmin#VIEW_ACTION_NAME_ON_SIDE_PANEL",
 				value1 = "${newActionName}");
+
+			Button.clickSave();
+
+			Refresh();
 		}
-
-		Button.clickSave();
-
-		Refresh();
 	}
 
 	macro goToActionDetails {
@@ -949,6 +953,14 @@ definition {
 		Select(
 			locator1 = "ObjectAdmin#SELECT_OBJECT_SCOPE",
 			value1 = "${fieldOption}");
+	}
+
+	macro selectSpecificKebabMenuOption {
+		Click(
+			key_objectLabel = "${objectLabel}",
+			locator1 = "ObjectAdmin#OBJECT_KEBAB_MENU");
+
+		MenuItem.click(menuItem = "${kebabOption}");
 	}
 
 	macro viewCustomObject {

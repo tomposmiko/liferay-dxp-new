@@ -45,10 +45,8 @@
 			"type": "Long"
 		}
 	],
-	"panelAppOrder": "100",
-	"panelCategoryKey": "site_administration.content",
 	"pluralLabel": {
 		"en_US": "Testray Components"
 	},
-	"scope": "site"
+	"scope": "company"
 }
