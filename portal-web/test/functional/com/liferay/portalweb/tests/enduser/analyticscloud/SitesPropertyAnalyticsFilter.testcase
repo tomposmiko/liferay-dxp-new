@@ -37,7 +37,6 @@ definition {
 	@ignore = "true"
 	@priority = "5"
 	test CustomRangeTimePeriodFilterSites {
-		property portal.upstream = "quarantine";
 
 		// AC Refactor: the test needs data from a past date
 		// AC Refactor ticket: LRAC-8744
@@ -95,7 +94,6 @@ definition {
 	@ignore = "true"
 	@priority = "4"
 	test FirstAccessAndNoProperty {
-		property portal.upstream = "quarantine";
 
 		// AC Refactor: this test needs to simulate the first access
 		// AC Refactor ticket: LRAC-8752
@@ -132,7 +130,6 @@ definition {
 	@ignore = "true"
 	@priority = "3"
 	test PeriodFilter180Days {
-		property portal.upstream = "quarantine";
 
 		// AC Refactor: the test needs data from a past date
 		// AC Refactor ticket: LRAC-8723
@@ -187,7 +184,6 @@ definition {
 	@ignore = "true"
 	@priority = "3"
 	test PeriodFilterLastYear {
-		property portal.upstream = "quarantine";
 
 		// AC Refactor: the test needs data from a past date
 		// AC Refactor ticket: LRAC-8726

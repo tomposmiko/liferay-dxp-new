@@ -534,9 +534,31 @@ definition {
 			locator1 = "Button#PUBLISH",
 			value1 = "Publish");
 
-		AssertElementPresent.pauseAssertVisible(locator1 = "DocumentsAndMedia#BREADCRUMB_HOME");
+		if (isSet(validationError)) {
+			var list1 = ListUtil.newListFromString("${dmDocumentFileFailed}");
+			var list2 = ListUtil.newListFromString("${validationError}");
+			var size = ListUtil.size("${list1}");
+			var i = "0";
 
-		VerifyElementPresent(locator1 = "Message#SUCCESS");
+			while ("${i}" != "${size}") {
+				var dmDocumentFileFailed = ListUtil.get("${list1}", "${i}");
+				var validationError = ListUtil.get("${list2}", "${i}");
+
+				AssertTextEquals.assertPartialText(
+					dmDocumentFile = "${dmDocumentFileFailed}",
+					key_alertMessage = "${validationError}",
+					locator1 = "Message#ERROR_MULTIPLE_UPLOAD_INVALID",
+					value1 = "${validationError}");
+
+				var i = ${i} + 1;
+				var i = StringUtil.valueOf("${i}");
+			}
+		}
+		else {
+			AssertElementPresent.pauseAssertVisible(locator1 = "DocumentsAndMedia#BREADCRUMB_HOME");
+
+			VerifyElementPresent(locator1 = "Message#SUCCESS");
+		}
 	}
 
 	macro addMultiplePG {
@@ -1060,6 +1082,61 @@ definition {
 		AssertTextEquals(
 			locator1 = "Message#CHECKOUT_SUCCESS",
 			value1 = "You now have a lock on this document. No one else can edit this document until you unlock it. This lock will automatically expire in 1 day.");
+	}
+
+	macro configureCacheControl {
+		DMNavigator.openToConfigInSystemSettings(portlet = "Cache Control");
+
+		if (isSet(cacheControl)) {
+			AssertTextEquals(
+				key_fieldName = "cacheControl",
+				locator1 = "FormFields#HELP_TEXT",
+				value1 = "Set the cache control policy for documents with view permissions for guests.");
+
+			Click(locator1 = "Dropdown#TRIGGER");
+
+			DropdownMenuItem.click(menuItem = "${cacheControl}");
+
+			AssertTextEquals(
+				locator1 = "Dropdown#SELECTED_VALUE",
+				value1 = "${cacheControl}");
+		}
+
+		if (isSet(maxAge)) {
+			AssertTextEquals(
+				key_fieldName = "maxAge",
+				locator1 = "FormFields#HELP_TEXT",
+				value1 = "Set the number of seconds after a response is generated in which a response will be considered fresh.");
+
+			Type(
+				key_text = "Max Age",
+				locator1 = "TextInput#ANY",
+				value1 = "${maxAge}");
+		}
+
+		if (isSet(uncacheableMimeTypes)) {
+			AssertTextEquals(
+				key_fieldName = "notCacheableMimeTypes",
+				locator1 = "FormFields#HELP_TEXT",
+				value1 = "Set a list of mime types that will be uncacheable.");
+
+			var count = "1";
+
+			for (var uncacheableMimeType : list "${uncacheableMimeTypes}") {
+				if ("${count}" != "1") {
+					Click(locator1 = "Icon#PLUS_LAST");
+				}
+
+				Type(
+					key_position = "${count}",
+					locator1 = "DDMField#CUSTOM_TEXT_BOX",
+					value1 = "${uncacheableMimeType}");
+
+				var count = ${count} + 1;
+			}
+		}
+
+		SystemSettings.saveConfiguration();
 	}
 
 	macro configureDocumentEmailTemplate {
@@ -1720,6 +1797,27 @@ definition {
 		return "${dmDocumentURL}";
 	}
 
+	macro getFileResponseHeader {
+		WaitForElementPresent(
+			key_dmDocumentFileName = "${dmDocumentFileName}",
+			locator1 = "DocumentsAndMediaDocument#DOCUMENT_DETAILS_IMAGE_PREVIEW");
+
+		var dmDocumentURL = selenium.getAttribute("//img[contains(@class,'preview-file-image') and contains(@src,'${dmDocumentFileName}')]@src");
+
+		var curl = '''${dmDocumentURL} -I''';
+		var responseHeader = JSONCurlUtil.post("${curl}");
+
+		return "${responseHeader}";
+	}
+
+	macro getLatestVersionURL {
+		var latestVersionURL = selenium.getAttribute("//input[contains(@id,'urlInput')]@value");
+
+		return "${latestVersionURL}";
+
+		echo("## * latestVersionURL: ${latestVersionURL}");
+	}
+
 	macro gotoEntry {
 		Click(
 			key_card = "${dmDocumentTitle}",
@@ -2331,7 +2429,7 @@ definition {
 	}
 
 	macro updateMaximumFileSize {
-		DMNavigator.openToConfigInSystemSettings(portlet = "Service");
+		DMNavigator.openToConfigInSystemSettings(portlet = "Documents and Media Size Limits");
 
 		Type(
 			key_fieldLabel = "Maximum File Size",
@@ -2348,6 +2446,31 @@ definition {
 			key_fieldLabel = "Maximum Number Of Versions",
 			locator1 = "TextInput#GENERIC_TEXT_INPUT",
 			value1 = "${fieldValue}");
+
+		SystemSettings.saveConfiguration();
+	}
+
+	macro updateMimeTypeSizeLimit {
+		PortalSettings.gotoConfiguration(
+			configurationCategory = "Documents and Media",
+			configurationName = "Size Limits by Mime Type",
+			configurationScope = "Virtual Instance Scope");
+
+		if ("${indexNumber}" == "2") {
+			Click(locator1 = "Button#DUPLICATE");
+
+			Type(
+				key_indexNumber = "${indexNumber}",
+				key_label = "Mime Type Size Limit",
+				locator1 = "TextArea#ANY_LABELED_N",
+				value1 = "${fieldValue}");
+		}
+		else {
+			Type(
+				key_label = "Mime Type Size Limit",
+				locator1 = "TextArea#ANY_LABELED",
+				value1 = "${fieldValue}");
+		}
 
 		SystemSettings.saveConfiguration();
 	}
@@ -2406,6 +2529,27 @@ definition {
 				Pause(locator1 = "1000");
 
 				Refresh();
+			}
+		}
+	}
+
+	macro viewCacheControlConfigurationInConsole {
+		if (isSet(uncacheableMimeType)) {
+			if (contains("${responseHeader}", "Cache-Control: private, no-cache, no-store, must-revalidate")) {
+				echo("This file can not be cached");
+			}
+			else {
+				fail("The cache control setting is incorrect");
+			}
+		}
+		else {
+			var cacheControlAttribute = "Cache-Control: ${cacheControl}, max-age: ${maxAge}";
+
+			if (contains("${responseHeader}", "${cacheControlAttribute}")) {
+				echo("The cache control setting is correct");
+			}
+			else {
+				fail("The cache control setting is incorrect");
 			}
 		}
 	}

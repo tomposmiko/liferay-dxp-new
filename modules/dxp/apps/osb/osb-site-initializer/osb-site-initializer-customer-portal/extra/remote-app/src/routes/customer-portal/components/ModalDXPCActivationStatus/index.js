@@ -9,11 +9,115 @@
  * distribution rights of the Software.
  */
 
-import {ClayInput} from '@clayui/form';
+import ClayForm, {ClayInput} from '@clayui/form';
 import ClayModal from '@clayui/modal';
-import {Button} from '../../../../common/components';
+import classNames from 'classnames';
+import {useState} from 'react';
+import client from '../../../../apolloClient';
+import {Badge, Button} from '../../../../common/components';
+import {
+	getDXPCloudEnvironment,
+	updateAccountSubscriptionGroups,
+	updateDXPCloudEnvironment,
+} from '../../../../common/services/liferay/graphql/queries';
+import {isLowercaseAndNumbers} from '../../../../common/utils/validations.form';
+import {useCustomerPortal} from '../../context';
 
-const ModalDXPCActivationStatus = ({observer, onClose, projectID}) => {
+import {actionTypes} from '../../context/reducer';
+
+import {PRODUCT_TYPES, STATUS_TAG_TYPE_NAMES} from '../../utils/constants';
+
+const ModalDXPCActivationStatus = ({
+	accountKey,
+	observer,
+	onClose,
+	projectID,
+	projectIdValue,
+	setHasFinishedUpdate,
+	setProjectIdValue,
+	setSubscriptionGroupActivationStatus,
+}) => {
+	const [hasError, setHasError] = useState();
+
+	const [{subscriptionGroups}, dispatch] = useCustomerPortal();
+
+	const handleOnConfirm = () => {
+		const errorMessageProductId = isLowercaseAndNumbers(projectIdValue);
+
+		if (errorMessageProductId) {
+			setHasError(errorMessageProductId);
+
+			return;
+		}
+		updateSubscriptionGroupsStatus();
+		updateProjectId(accountKey);
+		onClose();
+	};
+
+	const updateSubscriptionGroupsStatus = async () => {
+		const dxpCloudSubscriptionGroup = subscriptionGroups.find(
+			(subscription) => subscription.name === PRODUCT_TYPES.dxpCloud
+		);
+
+		await client.mutate({
+			mutation: updateAccountSubscriptionGroups,
+			variables: {
+				accountSubscriptionGroup: {
+					activationStatus: STATUS_TAG_TYPE_NAMES.active,
+				},
+				id: dxpCloudSubscriptionGroup?.accountSubscriptionGroupId,
+			},
+		});
+
+		setSubscriptionGroupActivationStatus(STATUS_TAG_TYPE_NAMES.active);
+		setHasFinishedUpdate(true);
+
+		const newSubscriptionGroups = subscriptionGroups.map((subscription) => {
+			if (
+				subscription.accountSubscriptionGroupId ===
+				dxpCloudSubscriptionGroup?.accountSubscriptionGroupId
+			) {
+				return {
+					...subscription,
+					activationStatus: STATUS_TAG_TYPE_NAMES.active,
+				};
+			}
+
+			return subscription;
+		});
+
+		dispatch({
+			payload: newSubscriptionGroups,
+			type: actionTypes.UPDATE_SUBSCRIPTION_GROUPS,
+		});
+	};
+
+	const updateProjectId = async (accountKey) => {
+		const {data: dataDXPCEnvironment} = await client.query({
+			query: getDXPCloudEnvironment,
+			variables: {
+				filter: `accountKey eq '${accountKey}'`,
+				scopeKey: Liferay.ThemeDisplay.getScopeGroupId(),
+			},
+		});
+
+		const dxpCloudEnvironment =
+			dataDXPCEnvironment?.c?.dXPCloudEnvironments?.items[0];
+
+		if (dxpCloudEnvironment) {
+			await client.mutate({
+				mutation: updateDXPCloudEnvironment,
+				variables: {
+					DXPCloudEnvironment: {
+						projectId: projectIdValue,
+					},
+					dxpCloudEnvironmentId:
+						dxpCloudEnvironment.dxpCloudEnvironmentId,
+				},
+			});
+		}
+	};
+
 	return (
 		<>
 			<ClayModal center observer={observer}>
@@ -42,17 +146,35 @@ const ModalDXPCActivationStatus = ({observer, onClose, projectID}) => {
 						customer&apos;s DXP Cloud environments.
 					</p>
 
-					<div className="mx-4">
-						<ClayInput
-							id="basicInputText"
-							placeholder={projectID}
-							type="text"
-						/>
-					</div>
+					<div className="mx-2">
+						<ClayForm.Group
+							className={classNames('w-100 mb-1', {
+								'has-error': hasError,
+							})}
+						>
+							<label>
+								<ClayInput
+									id="basicInputText"
+									onChange={({target}) =>
+										setProjectIdValue(target.value)
+									}
+									placeholder={projectID}
+									type="text"
+									value={projectIdValue}
+								/>
+							</label>
+						</ClayForm.Group>
 
-					<p className="ml-4 mt-1 px-3 text-neutral-7 text-paragraph-sm">
-						Please enter the Project ID here.
-					</p>
+						{hasError ? (
+							<Badge>
+								<span className="pl-1">{hasError}</span>
+							</Badge>
+						) : (
+							<p className="pl-3 pr-2 text-neutral-7 text-paragraph-sm">
+								Please enter the Project ID here.
+							</p>
+						)}
+					</div>
 
 					<div className="d-flex my-4 px-4">
 						<Button
@@ -62,7 +184,13 @@ const ModalDXPCActivationStatus = ({observer, onClose, projectID}) => {
 							Cancel
 						</Button>
 
-						<Button displayType="primary ml-3 mt-2">Confirm</Button>
+						<Button
+							disabled={!projectIdValue}
+							displayType="primary ml-3 mt-2"
+							onClick={handleOnConfirm}
+						>
+							Confirm
+						</Button>
 					</div>
 				</div>
 			</ClayModal>

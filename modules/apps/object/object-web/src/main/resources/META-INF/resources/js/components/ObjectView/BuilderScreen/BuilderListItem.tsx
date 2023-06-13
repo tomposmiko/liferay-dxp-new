@@ -56,13 +56,9 @@ const BuilderListItem: React.FC<Iprops> = ({
 	onVisibleEditModal,
 }) => {
 	const [active, setActive] = useState<boolean>(false);
-	const [
-		{
-			isFFObjectViewColumnAliasEnabled,
-			isFFObjectViewSortColumnConfigurationEnabled,
-		},
-		dispatch,
-	] = useContext(ViewContext);
+	const [{isFFObjectViewColumnAliasEnabled}, dispatch] = useContext(
+		ViewContext
+	);
 
 	const ref = useRef<HTMLLIElement>(null);
 
@@ -135,12 +131,10 @@ const BuilderListItem: React.FC<Iprops> = ({
 				type: TYPES.DELETE_OBJECT_VIEW_COLUMN,
 			});
 
-			if (isFFObjectViewSortColumnConfigurationEnabled) {
-				dispatch({
-					payload: {objectFieldName},
-					type: TYPES.DELETE_OBJECT_VIEW_SORT_COLUMN,
-				});
-			}
+			dispatch({
+				payload: {objectFieldName},
+				type: TYPES.DELETE_OBJECT_VIEW_SORT_COLUMN,
+			});
 		}
 	};
 

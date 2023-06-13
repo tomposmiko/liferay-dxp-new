@@ -183,7 +183,6 @@ definition {
 	@ignore = "true"
 	@priority = "3"
 	test AssertNoIndividualsInterestsResults {
-		property portal.upstream = "quarantine";
 
 		// AC Refactor: The interest list data takes a long time to appear.
 		// AC Refactor ticket: LRAC-9645
@@ -377,8 +376,6 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9032 | Test Summary: Search and Clear Field"
 	@priority = "1"
 	test SearchAndClearField {
-		property portal.upstream = "quarantine";
-
 		var usernameList = "user1,user2";
 		var emailList = "user1@liferay.com,user2@liferay.com";
 		var nameList = "user1 user1,user2 user2";
@@ -441,7 +438,7 @@ definition {
 	@priority = "4"
 	test SearchIndividualDetails {
 		task ("Get site assigned property name") {
-			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
+			ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 
 			var dataSource = StringUtil.extractFirst("${propertyName}", " ");
 		}
@@ -472,7 +469,7 @@ definition {
 
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = "${propertyName}");
+			ACProperties.switchProperty(propertyName = "${assignedPropertyName}");
 		}
 
 		task ("Go to the Individual > KnownIndividual > Details") {
@@ -498,7 +495,7 @@ definition {
 				ACIndividualsDashboard.assertIndividualAttribute(key_individualAttribute = "${individualAttribute}");
 			}
 
-			for (var individualAttribute : list "createDate,givenName,modifiedDate,timeZoneId,userId,uuid") {
+			for (var individualAttribute : list "birthDate,classPK,contactId,createDate,givenName,modifiedDate") {
 				ACIndividualsDashboard.assertIndividualAttributeNotPresent(key_individualAttribute = "${individualAttribute}");
 			}
 		}
@@ -510,7 +507,7 @@ definition {
 				ACIndividualsDashboard.assertIndividualAttribute(key_individualAttribute = "${individualAttribute}");
 			}
 
-			for (var individualAttribute : list "createDate,familyName,modifiedDate,timeZoneId,userId,uuid") {
+			for (var individualAttribute : list "birthDate,classPK,contactId,createDate,familyName,modifiedDate") {
 				ACIndividualsDashboard.assertIndividualAttributeNotPresent(key_individualAttribute = "${individualAttribute}");
 			}
 		}
@@ -520,7 +517,7 @@ definition {
 
 			ACIndividualsDashboard.assertIndividualAttribute(key_individualAttribute = "createDate");
 
-			for (var individualAttribute : list "email,familyName,givenName,modifiedDate,timeZoneId,userId,uuid") {
+			for (var individualAttribute : list "birthDate,classPK,contactId,email,familyName,givenName,modifiedDate") {
 				ACIndividualsDashboard.assertIndividualAttributeNotPresent(key_individualAttribute = "${individualAttribute}");
 			}
 		}
@@ -528,7 +525,7 @@ definition {
 		task ("Search for data source") {
 			ACUtils.searchBar(searchItem = "${dataSource}");
 
-			for (var individualAttribute : list "createDate,email,familyName,givenName,modifiedDate,timeZoneId,userId,uuid") {
+			for (var individualAttribute : list "birthDate,classPK,contactId,createDate,email,familyName,givenName,modifiedDate") {
 				ACIndividualsDashboard.assertIndividualAttribute(key_individualAttribute = "${individualAttribute}");
 			}
 		}
@@ -540,7 +537,7 @@ definition {
 				ACIndividualsDashboard.assertIndividualAttribute(key_individualAttribute = "familyName");
 			}
 
-			for (var individualAttribute : list "createDate,email,givenName,modifiedDate,timeZoneId,userId,uuid") {
+			for (var individualAttribute : list "birthDate,classPK,contactId,createDate,email,givenName,modifiedDate") {
 				ACIndividualsDashboard.assertIndividualAttributeNotPresent(key_individualAttribute = "${individualAttribute}");
 			}
 		}
@@ -640,8 +637,6 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9022 | Test Summary: Search an Individual's Activities List"
 	@priority = "4"
 	test SearchIndividualsActivitiesList {
-		property portal.upstream = "quarantine";
-
 		task ("Create a Document And Media") {
 			ACUtils.createDMAndAddToPage();
 		}
@@ -705,7 +700,6 @@ definition {
 	@ignore = "true"
 	@priority = "4"
 	test SearchIndividualsInterests {
-		property portal.upstream = "quarantine";
 
 		// AC Refactor: data doesn't appear on time
 		// AC Refactor ticket: LRAC-9184
@@ -838,8 +832,6 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9030 | Test Summary: Sorting a List Returns a User to the First Page"
 	@priority = "3"
 	test SortingReturnsUserToFirstPage {
-		property portal.upstream = "quarantine";
-
 		var usernameList = "user1,user2,user3,user4,user5,user6,user7";
 
 		task ("Get site assigned property name") {
@@ -917,8 +909,6 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-9031 | Test Summary: Table Pagination"
 	@priority = "4"
 	test TablePagination {
-		property portal.upstream = "quarantine";
-
 		var usernameList = "user1,user2,user3,user4,user5,user6";
 
 		task ("Get site assigned property name") {

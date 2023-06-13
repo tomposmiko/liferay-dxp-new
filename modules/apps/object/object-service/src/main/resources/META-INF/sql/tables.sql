@@ -97,7 +97,6 @@ create table ObjectFieldSetting (
 	modifiedDate DATE null,
 	objectFieldId LONG,
 	name VARCHAR(75) null,
-	required BOOLEAN,
 	value VARCHAR(75) null
 );
 
@@ -233,6 +232,7 @@ create table ObjectViewColumn (
 	createDate DATE null,
 	modifiedDate DATE null,
 	objectViewId LONG,
+	label STRING null,
 	objectFieldName VARCHAR(75) null,
 	priority INTEGER
 );

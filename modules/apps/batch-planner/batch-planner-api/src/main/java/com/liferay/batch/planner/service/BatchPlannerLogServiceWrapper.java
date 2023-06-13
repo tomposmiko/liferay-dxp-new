@@ -69,6 +69,21 @@ public class BatchPlannerLogServiceWrapper
 	@Override
 	public java.util.List<com.liferay.batch.planner.model.BatchPlannerLog>
 			getCompanyBatchPlannerLogs(
+				long companyId, boolean export, String searchByField,
+				String searchByKeyword, int start, int end,
+				com.liferay.portal.kernel.util.OrderByComparator
+					<com.liferay.batch.planner.model.BatchPlannerLog>
+						orderByComparator)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _batchPlannerLogService.getCompanyBatchPlannerLogs(
+			companyId, export, searchByField, searchByKeyword, start, end,
+			orderByComparator);
+	}
+
+	@Override
+	public java.util.List<com.liferay.batch.planner.model.BatchPlannerLog>
+			getCompanyBatchPlannerLogs(
 				long companyId, int start, int end,
 				com.liferay.portal.kernel.util.OrderByComparator
 					<com.liferay.batch.planner.model.BatchPlannerLog>
@@ -77,6 +92,21 @@ public class BatchPlannerLogServiceWrapper
 
 		return _batchPlannerLogService.getCompanyBatchPlannerLogs(
 			companyId, start, end, orderByComparator);
+	}
+
+	@Override
+	public java.util.List<com.liferay.batch.planner.model.BatchPlannerLog>
+			getCompanyBatchPlannerLogs(
+				long companyId, String searchByField, String searchByKeyword,
+				int start, int end,
+				com.liferay.portal.kernel.util.OrderByComparator
+					<com.liferay.batch.planner.model.BatchPlannerLog>
+						orderByComparator)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _batchPlannerLogService.getCompanyBatchPlannerLogs(
+			companyId, searchByField, searchByKeyword, start, end,
+			orderByComparator);
 	}
 
 	@Override
@@ -93,6 +123,25 @@ public class BatchPlannerLogServiceWrapper
 
 		return _batchPlannerLogService.getCompanyBatchPlannerLogsCount(
 			companyId, export);
+	}
+
+	@Override
+	public int getCompanyBatchPlannerLogsCount(
+			long companyId, boolean export, String searchByField,
+			String searchByKeyword)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _batchPlannerLogService.getCompanyBatchPlannerLogsCount(
+			companyId, export, searchByField, searchByKeyword);
+	}
+
+	@Override
+	public int getCompanyBatchPlannerLogsCount(
+			long companyId, String searchByField, String searchByKeyword)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _batchPlannerLogService.getCompanyBatchPlannerLogsCount(
+			companyId, searchByField, searchByKeyword);
 	}
 
 	/**

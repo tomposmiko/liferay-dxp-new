@@ -22,7 +22,9 @@ import com.liferay.batch.planner.model.BatchPlannerPlan;
 import com.liferay.batch.planner.model.BatchPlannerPlanTable;
 import com.liferay.batch.planner.service.base.BatchPlannerLogLocalServiceBaseImpl;
 import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
-import com.liferay.petra.sql.dsl.expression.Predicate;
+import com.liferay.petra.sql.dsl.query.FromStep;
+import com.liferay.petra.sql.dsl.query.JoinStep;
+import com.liferay.petra.string.CharPool;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.GroupConstants;
@@ -30,6 +32,7 @@ import com.liferay.portal.kernel.model.ModelHintsUtil;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.List;
@@ -181,16 +184,42 @@ public class BatchPlannerLogLocalServiceImpl
 		OrderByComparator<BatchPlannerLog> orderByComparator) {
 
 		return batchPlannerLogPersistence.dslQuery(
-			DSLQueryFactoryUtil.select(
-				BatchPlannerLogTable.INSTANCE
-			).from(
-				BatchPlannerLogTable.INSTANCE
-			).innerJoinON(
-				BatchPlannerPlanTable.INSTANCE,
-				BatchPlannerLogTable.INSTANCE.batchPlannerPlanId.eq(
-					BatchPlannerPlanTable.INSTANCE.batchPlannerPlanId)
+			_getJoinStep(
+				DSLQueryFactoryUtil.select(BatchPlannerLogTable.INSTANCE)
 			).where(
-				_getPredicate(companyId, export)
+				BatchPlannerPlanTable.INSTANCE.companyId.eq(
+					companyId
+				).and(
+					BatchPlannerPlanTable.INSTANCE.export.eq(export)
+				)
+			).orderBy(
+				BatchPlannerLogTable.INSTANCE, orderByComparator
+			).limit(
+				start, end
+			));
+	}
+
+	@Override
+	public List<BatchPlannerLog> getCompanyBatchPlannerLogs(
+		long companyId, boolean export, String searchByField,
+		String searchByKeyword, int start, int end,
+		OrderByComparator<BatchPlannerLog> orderByComparator) {
+
+		return batchPlannerLogPersistence.dslQuery(
+			_getJoinStep(
+				DSLQueryFactoryUtil.select(BatchPlannerLogTable.INSTANCE)
+			).where(
+				BatchPlannerPlanTable.INSTANCE.companyId.eq(
+					companyId
+				).and(
+					BatchPlannerPlanTable.INSTANCE.export.eq(export)
+				).and(
+					BatchPlannerPlanTable.INSTANCE.getColumn(
+						searchByField
+					).like(
+						StringUtil.quote(searchByKeyword, CharPool.PERCENT)
+					)
+				)
 			).orderBy(
 				BatchPlannerLogTable.INSTANCE, orderByComparator
 			).limit(
@@ -208,6 +237,31 @@ public class BatchPlannerLogLocalServiceImpl
 	}
 
 	@Override
+	public List<BatchPlannerLog> getCompanyBatchPlannerLogs(
+		long companyId, String searchByField, String searchByKeyword, int start,
+		int end, OrderByComparator<BatchPlannerLog> orderByComparator) {
+
+		return batchPlannerLogPersistence.dslQuery(
+			_getJoinStep(
+				DSLQueryFactoryUtil.select(BatchPlannerLogTable.INSTANCE)
+			).where(
+				BatchPlannerPlanTable.INSTANCE.companyId.eq(
+					companyId
+				).and(
+					BatchPlannerPlanTable.INSTANCE.getColumn(
+						searchByField
+					).like(
+						StringUtil.quote(searchByKeyword, CharPool.PERCENT)
+					)
+				)
+			).orderBy(
+				BatchPlannerLogTable.INSTANCE, orderByComparator
+			).limit(
+				start, end
+			));
+	}
+
+	@Override
 	public int getCompanyBatchPlannerLogsCount(long companyId) {
 		return batchPlannerLogPersistence.countByCompanyId(companyId);
 	}
@@ -215,15 +269,57 @@ public class BatchPlannerLogLocalServiceImpl
 	@Override
 	public int getCompanyBatchPlannerLogsCount(long companyId, boolean export) {
 		return dslQueryCount(
-			DSLQueryFactoryUtil.count(
-			).from(
-				BatchPlannerLogTable.INSTANCE
-			).innerJoinON(
-				BatchPlannerPlanTable.INSTANCE,
-				BatchPlannerLogTable.INSTANCE.batchPlannerPlanId.eq(
-					BatchPlannerPlanTable.INSTANCE.batchPlannerPlanId)
+			_getJoinStep(
+				DSLQueryFactoryUtil.count()
 			).where(
-				_getPredicate(companyId, export)
+				BatchPlannerPlanTable.INSTANCE.companyId.eq(
+					companyId
+				).and(
+					BatchPlannerPlanTable.INSTANCE.export.eq(export)
+				)
+			));
+	}
+
+	@Override
+	public int getCompanyBatchPlannerLogsCount(
+		long companyId, boolean export, String searchByField,
+		String searchByKeyword) {
+
+		return dslQueryCount(
+			_getJoinStep(
+				DSLQueryFactoryUtil.count()
+			).where(
+				BatchPlannerPlanTable.INSTANCE.companyId.eq(
+					companyId
+				).and(
+					BatchPlannerPlanTable.INSTANCE.export.eq(export)
+				).and(
+					BatchPlannerPlanTable.INSTANCE.getColumn(
+						searchByField
+					).like(
+						StringUtil.quote(searchByKeyword, CharPool.PERCENT)
+					)
+				)
+			));
+	}
+
+	@Override
+	public int getCompanyBatchPlannerLogsCount(
+		long companyId, String searchByField, String searchByKeyword) {
+
+		return dslQueryCount(
+			_getJoinStep(
+				DSLQueryFactoryUtil.count()
+			).where(
+				BatchPlannerLogTable.INSTANCE.companyId.eq(
+					companyId
+				).and(
+					BatchPlannerPlanTable.INSTANCE.getColumn(
+						searchByField
+					).like(
+						StringUtil.quote(searchByKeyword, CharPool.PERCENT)
+					)
+				)
 			));
 	}
 
@@ -253,11 +349,13 @@ public class BatchPlannerLogLocalServiceImpl
 		return batchPlannerLogPersistence.update(batchPlannerLog);
 	}
 
-	private Predicate _getPredicate(long companyId, boolean export) {
-		return BatchPlannerLogTable.INSTANCE.companyId.eq(
-			companyId
-		).and(
-			BatchPlannerPlanTable.INSTANCE.export.eq(export)
+	private JoinStep _getJoinStep(FromStep fromStep) {
+		return fromStep.from(
+			BatchPlannerLogTable.INSTANCE
+		).innerJoinON(
+			BatchPlannerPlanTable.INSTANCE,
+			BatchPlannerLogTable.INSTANCE.batchPlannerPlanId.eq(
+				BatchPlannerPlanTable.INSTANCE.batchPlannerPlanId)
 		);
 	}
 

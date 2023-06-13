@@ -237,6 +237,7 @@ definition {
 		MessageboardsThread.viewNoPG(threadSubject = "Thread Subject");
 	}
 
+	@description = "This ensures that the thread can be deleted, also covers LPS-82675."
 	@priority = "5"
 	@refactordone
 	test CanDeleteThread {
@@ -247,6 +248,12 @@ definition {
 
 		JSONMBMessage.moveThreadToTrash(
 			groupName = "Guest",
+			threadSubject = "MB Thread Message Subject");
+
+		RecycleBin.openRecycleBinAdmin(siteURLKey = "guest");
+
+		MessageboardsThread.viewThreadInRecycleBin(
+			threadBody = "MB Thread Message Body",
 			threadSubject = "MB Thread Message Subject");
 
 		RecycleBin.openRecycleBinAdmin(siteURLKey = "guest");
@@ -534,6 +541,15 @@ definition {
 			threadSubject = '''<script>alert(123);</script>''');
 
 		AssertAlertNotPresent();
+	}
+
+	@description = "This is a test for LPS-87376. It ensures that a user can publish a thread with a tag."
+	@ignore = "Test Stub"
+	@priority = "4"
+	test CanPublishThreadWithTag {
+
+		// TODO LPS-149484 CanPublishThreadWithTag pending implementation
+
 	}
 
 	@priority = "5"

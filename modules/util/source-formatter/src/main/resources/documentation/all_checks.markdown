@@ -344,6 +344,7 @@ PropertiesPortalEnvironmentVariablesCheck | [Documentation](documentation_checks
 PropertiesPortalFileCheck | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | .eslintignore, .prettierignore or .properties | Performs several checks on `portal.properties` or `portal-*.properties` file. |
 PropertiesPortletFileCheck | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | .eslintignore, .prettierignore or .properties | Performs several checks on `portlet.properties` file. |
 PropertiesReleaseBuildCheck | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | .eslintignore, .prettierignore or .properties | Verifies that the information in `release.properties` matches the information in `ReleaseInfo.java`. |
+PropertiesSQLStylingCheck | [Styling](styling_checks.markdown#styling-checks) | .eslintignore, .prettierignore or .properties | Applies rules to enforce consisteny in code style. |
 PropertiesServiceKeysCheck | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | .eslintignore, .prettierignore or .properties | Finds usage of legacy properties in `service.properties`. |
 PropertiesSourceFormatterContentCheck | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | .eslintignore, .prettierignore or .properties | Performs several checks on `source-formatter.properties` file. |
 PropertiesSourceFormatterFileCheck | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | .eslintignore, .prettierignore or .properties | Performs several checks on `source-formatter.properties` file. |
@@ -364,6 +365,7 @@ SQLEmptyLinesCheck | [Styling](styling_checks.markdown#styling-checks) | .sql | 
 SQLStylingCheck | [Styling](styling_checks.markdown#styling-checks) | .sql | Applies rules to enforce consisteny in code style. |
 SelfReferenceCheck | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | .java | Finds cases of unnecessary reference to its own class. |
 SemiColonCheck | [Styling](styling_checks.markdown#styling-checks) | .java, .jsp, .jspf, .jspx, .tag, .tpl or .vm | Finds cases of unnecessary semicolon. |
+[ServiceProxyFactoryCheck](check/service_proxy_factory_check.markdown#serviceproxyfactorycheck) | [Bug Prevention](bug_prevention_checks.markdown#bug-prevention-checks) | .java | Finds incorrect parameter in method call. |
 SessionKeysCheck | [Naming Conventions](naming_conventions_checks.markdown#naming-conventions-checks) | .java | Checks that messages send to `SessionsErrors` or `SessionMessages` follow naming conventions. |
 SetUtilMethodsCheck | [Performance](performance_checks.markdown#performance-checks) | .java, .jsp, .jspf, .jspx, .tag, .tpl or .vm | Finds cases of inefficient SetUtil operations. |
 SingleStatementClauseCheck | [Styling](styling_checks.markdown#styling-checks) | .java | Verifies that `for`, `if` or `while` statement always uses curly braces. |

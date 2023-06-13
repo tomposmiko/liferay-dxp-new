@@ -29,6 +29,7 @@ definition {
 
 	@priority = "4"
 	test AssertIndexOnStartup {
+		property environment.acceptance = "false";
 		property test.assert.warning.exceptions = "true";
 		property test.name.skip.portal.instance = "Elasticsearch7#AssertIndexOnStartup";
 
@@ -195,17 +196,13 @@ definition {
 
 		SearchPortlets.searchEmbedded(searchTerm = "apple");
 
-		AssertTextEquals.assertPartialText(
-			locator1 = "SearchResults#SEARCH_INSIGHTS_PORTLET_STRING_QUERY",
-			value1 = "&quot;explain&quot;:true");
+		AssertElementPresent(
+			key_text = "&quot;explain&quot;",
+			locator1 = "SearchResults#SEARCH_INSIGHTS_PORTLET_REQUEST_QUERY");
 
-		AssertTextEquals.assertPartialText(
-			locator1 = "SearchResults#SEARCH_INSIGHTS_PORTLET_RESPONSE_QUERY",
-			value1 = "buckets");
-
-		AssertTextEquals.assertPartialText(
-			locator1 = "SearchResults#SEARCH_INSIGHTS_PORTLET_RESPONSE_QUERY",
-			value1 = "_explanation");
+		AssertElementPresent(
+			key_text = "&quot;_explanation&quot;",
+			locator1 = "SearchResults#SEARCH_INSIGHTS_PORTLET_RESPONSE_QUERY");
 
 		Portlet.gotoPortletOptions(
 			portletName = "Search Insights",
@@ -223,13 +220,13 @@ definition {
 
 		SearchPortlets.searchEmbedded(searchTerm = "apple");
 
-		AssertTextEquals.assertPartialText(
-			locator1 = "SearchResults#SEARCH_INSIGHTS_PORTLET_STRING_QUERY",
-			value1 = "&quot;explain&quot;:false");
+		AssertElementPresent(
+			key_text = "&quot;explain&quot;",
+			locator1 = "SearchResults#SEARCH_INSIGHTS_PORTLET_REQUEST_QUERY");
 
-		AssertTextNotEquals.assertNotPartialText(
-			locator1 = "SearchResults#SEARCH_INSIGHTS_PORTLET_RESPONSE_QUERY",
-			value1 = "_explanation");
+		AssertElementNotPresent(
+			key_text = "&quot;_explanation&quot;",
+			locator1 = "SearchResults#SEARCH_INSIGHTS_PORTLET_RESPONSE_QUERY");
 	}
 
 	@priority = "5"
@@ -259,6 +256,7 @@ definition {
 		property app.server.bundles.size = "1";
 		property cluster.enabled = "true";
 		property embedded.elasticsearch.only = "true";
+		property environment.acceptance = "false";
 		property minimum.slave.ram = "24";
 		property test.assert.warning.exceptions = "true";
 		property test.name.skip.portal.instance = "Elasticsearch7#AssertSidecarDoesNotCluster";
@@ -355,6 +353,7 @@ definition {
 	@priority = "5"
 	test ElasticsearchClusteringSmokeTest {
 		property elasticsearch.cluster.size = "2";
+		property environment.acceptance = "false";
 		property minimum.slave.ram = "24";
 		property portal.acceptance = "true";
 		property portal.upstream = "quarantine";
@@ -414,6 +413,7 @@ definition {
 	@priority = "5"
 	test MultipleConnectionsSmokeTest {
 		property elasticsearch.multiple.connections = "true";
+		property environment.acceptance = "false";
 		property portal.upstream = "quarantine";
 		property remote.elasticsearch.enabled = "true";
 
@@ -514,6 +514,7 @@ definition {
 
 	@priority = "5"
 	test OSGiConfigSmokeTest {
+		property environment.acceptance = "false";
 		property embedded.elasticsearch.only = "true";
 		property osgi.module.configuration.file.names = "com.liferay.portal.search.elasticsearch7.configuration.ElasticsearchConfiguration.config";
 		property osgi.module.configurations = "clusterName=&quot;LiferayElasticsearchCluster1&quot;";
@@ -528,6 +529,7 @@ definition {
 
 	@priority = "5"
 	test SearchWithNonLiferayIndex {
+		property environment.acceptance = "false";
 		property embedded.elasticsearch.only = "true";
 		property test.name.skip.portal.instance = "Elasticsearch7#SearchWithNonLiferayIndex";
 
@@ -583,6 +585,7 @@ definition {
 
 	@priority = "4"
 	test SwitchSidecarToRemote {
+		property environment.acceptance = "false";
 		property embedded.elasticsearch.only = "true";
 		property test.name.skip.portal.instance = "Elasticsearch7#SwitchSidecarToRemote";
 

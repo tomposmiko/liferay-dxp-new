@@ -25,9 +25,11 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
+import com.liferay.portal.util.PropsUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -598,7 +600,7 @@ public class LayoutStructure {
 					true);
 			}
 
-			for (ViewportSize viewportSize : ViewportSize.values()) {
+			for (ViewportSize viewportSize : _viewportSizes) {
 				if (viewportSize.equals(ViewportSize.DESKTOP) ||
 					!itemConfigJSONObject.has(
 						viewportSize.getViewportSizeId())) {
@@ -646,7 +648,7 @@ public class LayoutStructure {
 		rowStyledLayoutStructureItem.setModulesPerRow(numberOfColumns);
 		rowStyledLayoutStructureItem.setNumberOfColumns(numberOfColumns);
 
-		for (ViewportSize viewportSize : ViewportSize.values()) {
+		for (ViewportSize viewportSize : _viewportSizes) {
 			if (viewportSize.equals(ViewportSize.DESKTOP)) {
 				continue;
 			}
@@ -725,6 +727,12 @@ public class LayoutStructure {
 			new ColumnLayoutStructureItem(parentItemId);
 
 		columnLayoutStructureItem.setSize(size);
+
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-119551"))) {
+			columnLayoutStructureItem.setViewportConfiguration(
+				ViewportSize.MOBILE_LANDSCAPE.getViewportSizeId(),
+				JSONUtil.put("size", 12));
+		}
 
 		_updateLayoutStructure(columnLayoutStructureItem, position);
 	}
@@ -819,6 +827,19 @@ public class LayoutStructure {
 				continue;
 			}
 
+			if (!updateEmpty &&
+				GetterUtil.getBoolean(
+					PropsUtil.get("feature.flag.LPS-119551")) &&
+				Objects.equals(
+					ViewportSize.MOBILE_LANDSCAPE.getViewportSizeId(),
+					viewportSizeId)) {
+
+				columnLayoutStructureItem.setViewportConfiguration(
+					viewportSizeId, JSONUtil.put("size", 12));
+
+				continue;
+			}
+
 			Map<String, JSONObject> columnViewportConfigurations =
 				columnLayoutStructureItem.getViewportConfigurations();
 
@@ -831,6 +852,19 @@ public class LayoutStructure {
 
 			if (!columnViewportConfigurationJSONObject.has("size") &&
 				!updateEmpty) {
+
+				continue;
+			}
+
+			if (columnViewportConfigurationJSONObject.has("size") &&
+				!updateEmpty &&
+				GetterUtil.getBoolean(
+					PropsUtil.get("feature.flag.LPS-119551")) &&
+				Objects.equals(
+					ViewportSize.PORTRAIT_MOBILE.getViewportSizeId(),
+					viewportSizeId)) {
+
+				columnViewportConfigurationJSONObject.remove("size");
 
 				continue;
 			}
@@ -875,7 +909,23 @@ public class LayoutStructure {
 
 		viewportConfigurationJSONObject.put("numberOfColumns", numberOfColumns);
 
-		if (viewportConfigurationJSONObject.has("modulesPerRow")) {
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-119551")) &&
+			Objects.equals(
+				ViewportSize.MOBILE_LANDSCAPE.getViewportSizeId(),
+				viewportSizeId)) {
+
+			viewportConfigurationJSONObject.put("modulesPerRow", 1);
+		}
+		else if (GetterUtil.getBoolean(
+					PropsUtil.get("feature.flag.LPS-119551")) &&
+				 Objects.equals(
+					 ViewportSize.PORTRAIT_MOBILE.getViewportSizeId(),
+					 viewportSizeId) &&
+				 viewportConfigurationJSONObject.has("modulesPerRow")) {
+
+			viewportConfigurationJSONObject.remove("modulesPerRow");
+		}
+		else if (viewportConfigurationJSONObject.has("modulesPerRow")) {
 			viewportConfigurationJSONObject.put(
 				"modulesPerRow", numberOfColumns);
 		}
@@ -895,6 +945,8 @@ public class LayoutStructure {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		LayoutStructure.class);
+
+	private static final ViewportSize[] _viewportSizes = ViewportSize.values();
 
 	private final Map<String, DeletedLayoutStructureItem>
 		_deletedLayoutStructureItems;

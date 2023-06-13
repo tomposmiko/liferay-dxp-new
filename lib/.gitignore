@@ -12,6 +12,7 @@
 /development/com.liferay.ant.manifest.helper.jar
 /development/com.liferay.jenkins.results.parser.jar
 /development/com.liferay.poshi.core.jar
+/development/commons-collections4.jar
 /development/commons-lang3.jar
 /development/db2jcc.jar
 /development/db2jcc_license_cu.jar
@@ -98,7 +99,6 @@
 /portal/commons-beanutils.jar
 /portal/commons-codec.jar
 /portal/commons-collections.jar
-/portal/commons-collections4.jar
 /portal/commons-compress.jar
 /portal/commons-configuration.jar
 /portal/commons-dbcp.jar
@@ -108,7 +108,6 @@
 /portal/commons-logging.jar
 /portal/commons-math.jar
 /portal/commons-pool.jar
-/portal/crypt.jar
 /portal/dom4j.jar
 /portal/hibernate-core.jar
 /portal/hikaricp.jar
@@ -148,15 +147,11 @@
 /portal/persistence.jar
 /portal/portlet.jar
 /portal/portletmvc4spring-framework.jar
-/portal/rometools-utils.jar
-/portal/rometools.jar
 /portal/saaj-api.jar
 /portal/saaj-impl.jar
-/portal/serializer.jar
 /portal/simplecaptcha.jar
 /portal/slf4j-api.jar
 /portal/soap-api.jar
-/portal/soap.jar
 /portal/spring-aop.jar
 /portal/spring-aspects.jar
 /portal/spring-beans.jar

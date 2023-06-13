@@ -25,6 +25,7 @@ import com.liferay.object.exception.ObjectFieldDBTypeException;
 import com.liferay.object.exception.ObjectFieldLabelException;
 import com.liferay.object.exception.ObjectFieldNameException;
 import com.liferay.object.exception.ObjectFieldRelationshipTypeException;
+import com.liferay.object.exception.ObjectFieldSettingValueException;
 import com.liferay.object.exception.RequiredObjectFieldException;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
@@ -522,15 +523,17 @@ public class ObjectFieldLocalServiceTest {
 			objectDefinition.getObjectDefinitionId(), "Attachment", "Long",
 			true, false, null,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			"upload", false, Collections.emptyList());
-
-		String fileContent = StringUtil.merge(RandomTestUtil.randomStrings(20));
+			"upload", false,
+			Arrays.asList(
+				_createObjectFieldSetting("acceptedFileExtensions", "txt"),
+				_createObjectFieldSetting("fileSource", "userComputer"),
+				_createObjectFieldSetting("maximumFileSize", "100")));
 
 		FileEntry fileEntry = _dlAppLocalService.addFileEntry(
 			null, TestPropsValues.getUserId(), TestPropsValues.getGroupId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			StringUtil.randomString() + ".txt", ContentTypes.TEXT_PLAIN,
-			fileContent.getBytes(), null, null,
+			RandomTestUtil.randomBytes(), null, null,
 			ServiceContextTestUtil.getServiceContext());
 
 		_objectEntryLocalService.addObjectEntry(
@@ -575,50 +578,74 @@ public class ObjectFieldLocalServiceTest {
 				ObjectDefinitionConstants.SCOPE_COMPANY,
 				Collections.emptyList());
 
+		try {
+			_objectFieldLocalService.addCustomObjectField(
+				TestPropsValues.getUserId(), 0,
+				objectDefinition.getObjectDefinitionId(), "Attachment", "Long",
+				true, false, null,
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				"upload", false, Collections.emptyList());
+		}
+		catch (ObjectFieldSettingValueException.MissingRequiredValues
+					objectFieldSettingValueException) {
+
+			Assert.assertEquals(
+				"The settings acceptedFileExtensions, fileSource, " +
+					"maximumFileSize are required for object field upload",
+				objectFieldSettingValueException.getMessage());
+		}
+
 		ObjectField objectField = _objectFieldLocalService.addCustomObjectField(
 			TestPropsValues.getUserId(), 0,
-			objectDefinition.getObjectDefinitionId(), "Text", "String", true,
+			objectDefinition.getObjectDefinitionId(), "Attachment", "Long",
+			true, false, null,
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+			StringUtil.randomId(), false,
+			Arrays.asList(
+				_createObjectFieldSetting("acceptedFileExtensions", "jpg, png"),
+				_createObjectFieldSetting("fileSource", "userComputer"),
+				_createObjectFieldSetting("maximumFileSize", "100")));
+
+		_assertObjectFieldSetting(
+			"acceptedFileExtensions", objectField.getObjectFieldId(),
+			"jpg, png");
+		_assertObjectFieldSetting(
+			"fileSource", objectField.getObjectFieldId(), "userComputer");
+		_assertObjectFieldSetting(
+			"maximumFileSize", objectField.getObjectFieldId(), "100");
+
+		objectField = _objectFieldLocalService.updateCustomObjectField(
+			objectField.getObjectFieldId(), 0, "Attachment", "Long", true,
 			false, null,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 			StringUtil.randomId(), false,
 			Arrays.asList(
-				_createObjectFieldSetting("helpText", true, "Help Text"),
-				_createObjectFieldSetting("repeatable", false, "True")));
+				_createObjectFieldSetting("acceptedFileExtensions", "jpg"),
+				_createObjectFieldSetting("fileSource", "documentsAndMedia"),
+				_createObjectFieldSetting("maximumFileSize", "10")));
 
 		_assertObjectFieldSetting(
-			"helpText", objectField.getObjectFieldId(), true, "Help Text");
+			"acceptedFileExtensions", objectField.getObjectFieldId(), "jpg");
 		_assertObjectFieldSetting(
-			"repeatable", objectField.getObjectFieldId(), false, "True");
+			"fileSource", objectField.getObjectFieldId(), "documentsAndMedia");
+		_assertObjectFieldSetting(
+			"maximumFileSize", objectField.getObjectFieldId(), "10");
 
 		objectField = _objectFieldLocalService.updateCustomObjectField(
 			objectField.getObjectFieldId(), 0, "Text", "String", true, false,
 			null,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			StringUtil.randomId(), false,
-			Arrays.asList(
-				_createObjectFieldSetting("helpText", true, "New Help Text"),
-				_createObjectFieldSetting(
-					"placeholder", false, "Placeholder")));
-
-		_assertObjectFieldSetting(
-			"helpText", objectField.getObjectFieldId(), true, "New Help Text");
-		_assertObjectFieldSetting(
-			"placeholder", objectField.getObjectFieldId(), false,
-			"Placeholder");
+			StringUtil.randomId(), false, Collections.emptyList());
 
 		Assert.assertNull(
 			_objectFieldSettingLocalService.fetchObjectFieldSetting(
-				objectField.getObjectFieldId(), "repeatable"));
-
-		_objectFieldLocalService.deleteObjectField(
-			objectField.getObjectFieldId());
-
+				objectField.getObjectFieldId(), "acceptedFileExtensions"));
 		Assert.assertNull(
 			_objectFieldSettingLocalService.fetchObjectFieldSetting(
-				objectField.getObjectFieldId(), "helpText"));
+				objectField.getObjectFieldId(), "fileSource"));
 		Assert.assertNull(
 			_objectFieldSettingLocalService.fetchObjectFieldSetting(
-				objectField.getObjectFieldId(), "placeholder"));
+				objectField.getObjectFieldId(), "maximumFileSize"));
 
 		_objectDefinitionLocalService.deleteObjectDefinition(
 			objectDefinition.getObjectDefinitionId());
@@ -716,7 +743,7 @@ public class ObjectFieldLocalServiceTest {
 	}
 
 	private void _assertObjectFieldSetting(
-			String name, long objectFieldId, boolean required, String value)
+			String name, long objectFieldId, String value)
 		throws Exception {
 
 		ObjectFieldSetting objectFieldSetting =
@@ -724,18 +751,16 @@ public class ObjectFieldLocalServiceTest {
 				objectFieldId, name);
 
 		Assert.assertEquals(name, objectFieldSetting.getName());
-		Assert.assertEquals(required, objectFieldSetting.isRequired());
 		Assert.assertEquals(value, objectFieldSetting.getValue());
 	}
 
 	private ObjectFieldSetting _createObjectFieldSetting(
-		String name, boolean required, String value) {
+		String name, String value) {
 
 		ObjectFieldSetting objectFieldSetting =
 			_objectFieldSettingLocalService.createObjectFieldSetting(0L);
 
 		objectFieldSetting.setName(name);
-		objectFieldSetting.setRequired(required);
 		objectFieldSetting.setValue(value);
 
 		return objectFieldSetting;

@@ -384,10 +384,7 @@ definition {
 
 		SiteTemplates.addCP(siteTemplateName = "Site Template Name");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Sites",
-			panel = "Control Panel",
-			portlet = "Site Templates");
+		SiteTemplatesNavigator.openSiteTemplatesAdmin();
 
 		SiteTemplates.gotoViewPages(
 			siteName = "${siteName}",
@@ -398,6 +395,10 @@ definition {
 		PageEditor.addWidget(portletName = "Message Boards");
 
 		PageEditor.clickPublish();
+
+		MessageboardsThread.addPG(
+			threadBody = "Message Boards Body",
+			threadSubject = "Message Boards Subject");
 
 		JSONUser.addUser(
 			userEmailAddress = "userea@liferay.com",
@@ -422,19 +423,26 @@ definition {
 			password = "test",
 			userEmailAddress = "userea@liferay.com");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Users",
-			panel = "Control Panel",
-			portlet = "User Groups");
+		UserGroup.openUserGroupsAdmin();
 
 		UserGroup.addCP(
 			selectSiteTemplate = "true",
 			siteTemplateName = "Site Template Name",
-			userGroupName = "UG UserGroup Name");
+			userGroupName = "User Group Test");
 
-		User.firstLoginPG(
-			password = "test",
-			userEmailAddress = "test@liferay.com");
+		UserGroup.gotoProfilePages(
+			siteName = "${siteName}",
+			userGroupName = "User Group Test");
+
+		MessageboardsThread.gotoPG(
+			lastPostUserName = "Test Test",
+			replyCount = "0",
+			threadBody = "Message Boards Body",
+			threadSubject = "Message Boards Subject");
+
+		MessageboardsThread.viewPG(
+			threadBody = "Message Boards Body",
+			threadSubject = "Message Boards Subject");
 	}
 
 	@description = "This is a use case for LRQA-73458. The preferences and contents of a personal site will inherit from site templates."
@@ -594,24 +602,17 @@ definition {
 	@description = "This is a use case for LPS-74081. Site pages with numeric friendly URL's can be imported from LAR files."
 	@priority = "4"
 	test ViewImportedSitePageWithNumericFriendlyURL {
+		property test.name.skip.portal.instance = "SitetemplatesUsecase#ViewImportedSitePageWithNumericFriendlyURL";
+
 		var portalURL = PropsUtil.get("portal.url");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Sites",
-			panel = "Control Panel",
-			portlet = "Sites");
-
-		Site.addCP(
-			siteName = "Export",
-			siteType = "Blank");
+		JSONGroup.addGroup(groupName = "Export");
 
 		JSONLayout.addPublicLayout(
 			groupName = "Export",
 			layoutName = "1");
 
-		ProductMenu.gotoPortlet(
-			category = "Site Builder",
-			portlet = "Pages");
+		PagesAdmin.openPagesAdmin(siteURLKey = "export");
 
 		PagesAdmin.gotoPageEllipsisMenuItem(
 			menuItem = "Configure",
@@ -626,9 +627,7 @@ definition {
 			groupName = "Export",
 			layoutName = "2");
 
-		ProductMenu.gotoPortlet(
-			category = "Site Builder",
-			portlet = "Pages");
+		PagesAdmin.openPagesAdmin(siteURLKey = "export");
 
 		PagesAdmin.gotoPageEllipsisMenuItem(
 			menuItem = "Configure",
@@ -643,9 +642,7 @@ definition {
 			groupName = "Export",
 			layoutName = "Hello");
 
-		ProductMenu.gotoPortlet(
-			category = "Site Builder",
-			portlet = "Pages");
+		PagesAdmin.openPagesAdmin(siteURLKey = "export");
 
 		PagesAdmin.gotoPageEllipsisMenuItem(
 			menuItem = "Configure",
@@ -664,24 +661,19 @@ definition {
 
 		LAR.downloadLar();
 
-		SiteTemplates.addCP(siteTemplateName = "Template Site");
+		SiteTemplates.addCP(siteTemplateName = "New Site Template");
 
-		ApplicationsMenu.gotoPortlet(
-			category = "Sites",
-			panel = "Control Panel",
-			portlet = "Sites");
+		Site.openSitesAdmin();
 
 		Site.addCP(
 			siteName = "New Site",
-			siteType = "Template");
+			siteTemplateName = "New Site Template");
 
 		LAR.importSiteCP(
 			larFileName = "${larFileName}",
 			siteName = "New Site");
 
-		ProductMenu.gotoPortlet(
-			category = "Site Builder",
-			portlet = "Pages");
+		PagesAdmin.openPagesAdmin(siteURLKey = "new-site");
 
 		PagesAdmin.viewPagesOrder(
 			depth = "2",

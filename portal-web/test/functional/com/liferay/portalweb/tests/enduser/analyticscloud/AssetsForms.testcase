@@ -38,14 +38,8 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8433 | Test Summary: Form appears on card shows the pages that the form appears on"
-	@ignore = "true"
 	@priority = "5"
 	test AssertAppearsOnListShowsPagesFormsExists {
-		property portal.upstream = "quarantine";
-
-		// AC Refactor: It is not possible to perform the assert because this test presents timing problems.
-		// AC Refactor ticket: LRAC-9467
-
 		task ("Submit the form") {
 			ACUtils.navigateToSitePage(
 				actionType = "Submit Form",
@@ -94,8 +88,6 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8423 | Test Summary: Forms audience card shows expected amount of known and anonymous individuals"
 	@priority = "5"
 	test AudienceCardShowsExpectedAmountKnowAndAnonymousIndividualsInForms {
-		property portal.upstream = "quarantine";
-
 		var usernameList = "ac,ac2";
 		var emailList = "ac@liferay.com,ac2@liferay.com";
 
@@ -257,8 +249,6 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8417 | Test Summary: Forms list is searchable"
 	@priority = "5"
 	test CanFormsListSearchable {
-		property portal.upstream = "quarantine";
-
 		var formNameList = "Created Form Name,Created Form Name 1";
 
 		ACUtils.addPage(layoutName = "AC Page 1");
@@ -307,8 +297,6 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8121 | Test Summary: Assert clicking a form in the forms list navigates to the form overview page"
 	@priority = "5"
 	test CanNavigatesToFormsOverviewPage {
-		property portal.upstream = "quarantine";
-
 		Navigator.openURL();
 
 		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
@@ -368,7 +356,6 @@ definition {
 	@ignore = "true"
 	@priority = "5"
 	test CanTimeFilterUseCustomRangeInFormsBehaviourReport {
-		property portal.upstream = "quarantine";
 
 		// AC Refactor: Timing issues may happen on this test case
 		// AC Refactor ticket: LRAC-8813
@@ -486,7 +473,6 @@ definition {
 	@ignore = "true"
 	@priority = "5"
 	test FormsLocationCardShowsViewsByExpectedLocation {
-		property portal.upstream = "quarantine";
 
 		// AC Refactor: Location data issues happen in this ticket
 		// AC Refactor ticket: LRAC-8750
@@ -630,8 +616,6 @@ definition {
 	@description = "Form known individuals shows which individuals interact with the form"
 	@priority = "5"
 	test KnownIndividualsShowsWhichIndividualsInteractWithForm {
-		property portal.upstream = "quarantine";
-
 		var nameList = "ac ac,liferay liferay,dxp dxp";
 		var usernameList = "ac,liferay,dxp";
 		var emailList = "ac@liferay.com,liferay@liferay.com,dxp@liferay.com";

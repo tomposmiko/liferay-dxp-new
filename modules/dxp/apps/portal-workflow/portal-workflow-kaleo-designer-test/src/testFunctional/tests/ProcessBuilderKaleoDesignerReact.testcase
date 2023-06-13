@@ -1,12 +1,12 @@
 @component-name = "portal-workflow-ee"
 definition {
 
+	property osgi.module.configuration.file.names = "com.liferay.portal.workflow.kaleo.designer.web.internal.configuration.FFKaleoDesignerConfiguration_default.config";
+	property osgi.module.configurations = "newKaleoDesignerEnabled=&quot;true&quot;";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property test.run.environment = "EE";
 	property testray.main.component.name = "Kaleo Designer";
-	property osgi.module.configuration.file.names = "com.liferay.portal.workflow.kaleo.designer.web.internal.configuration.FFKaleoDesignerConfiguration_default.config";
-	property osgi.module.configurations = "newKaleoDesignerEnabled=&quot;true&quot;";
 
 	setUp {
 		TestCase.setUpPortalInstance();
@@ -79,7 +79,9 @@ definition {
 
 		ProcessBuilderKaleoDesignerReact.viewAndFillNotification(
 			name = "Liferay Notification",
-			notificationTemplateValue = "Notification Template");
+			newNotification = "true",
+			notificationTemplateValue = "Notification Template",
+			notificationTypeOption = "userNotification");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
 
@@ -602,12 +604,29 @@ definition {
 	}
 
 	@description = "Verify that the is able to select who receives the notification: Scripted Recipient"
-	@ignore = "Test Stub"
 	@priority = "5"
 	test CanSelectScriptedRecipientAsNotificationRecipientType {
+		property test.name.skip.portal.instance = "ProcessBuilderKaleoDesignerReact#CanSelectScriptedRecipientAsNotificationRecipientType";
 
-		// TODO LRQA-73850 CanSelectScriptedRecipientAsNotificationRecipientType pending implementation
+		Workflow.openWorkflowListView();
 
+		Workflow.addNewDefinition(workflowDefinitionTitle = "New Workflow Title");
+
+		ProcessBuilderKaleoDesignerReact.selectNode(nodeType = "start");
+
+		ProcessBuilderKaleoDesignerReact.viewAndFillNotification(
+			name = "New Notification",
+			newNotification = "true",
+			notificationScript = '''returnValue = "Transition Name";''',
+			notificationTemplateValue = '''${userName} sent you a ${entryType} for review in the workflow.''',
+			notificationTypeOption = "userNotification",
+			recipientTypeOption = "Scripted Recipient");
+
+		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
+
+		ProcessBuilderKaleoDesignerReact.gotoNotification(notificationName = "New Notification");
+
+		ProcessBuilderKaleoDesignerReact.viewNotificationInfo(notificationRecipientType = "Scripted Recipient");
 	}
 
 	@description = "Verify that the is able to select who receives the notification: Task Assignees"
@@ -1003,11 +1022,11 @@ definition {
 
 		ProcessBuilderKaleoDesignerReact.selectNode(nodeType = "start");
 
-		ProcessBuilderKaleoDesignerReact.viewAndFillNotification();
+		ProcessBuilderKaleoDesignerReact.viewAndFillNotification(newNotification = "true");
 
 		ProcessBuilderKaleoDesignerReact.selectNode(nodeType = "end");
 
-		ProcessBuilderKaleoDesignerReact.viewAndFillNotification();
+		ProcessBuilderKaleoDesignerReact.viewAndFillNotification(newNotification = "true");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
 
@@ -1020,7 +1039,7 @@ definition {
 
 		ProcessBuilderKaleoDesignerReact.selectNode(nodeType = "fork");
 
-		ProcessBuilderKaleoDesignerReact.viewAndFillNotification();
+		ProcessBuilderKaleoDesignerReact.viewAndFillNotification(newNotification = "true");
 
 		ProcessBuilderKaleoDesignerReact.backArrowOnSidebar();
 
@@ -1033,7 +1052,7 @@ definition {
 
 		ProcessBuilderKaleoDesignerReact.selectNode(nodeType = "condition");
 
-		ProcessBuilderKaleoDesignerReact.viewAndFillNotification();
+		ProcessBuilderKaleoDesignerReact.viewAndFillNotification(newNotification = "true");
 	}
 
 	@description = "LPS-141713 - Verify that the imported workflow definition is shown in the Process Builder"

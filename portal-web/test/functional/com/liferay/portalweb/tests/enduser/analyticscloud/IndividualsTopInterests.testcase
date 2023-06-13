@@ -42,11 +42,6 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8920 | Test Summary: Assert individuals overview top interest"
 	@priority = "5"
 	test AssertIndividualOverviewTopInterest {
-		property portal.upstream = "quarantine";
-
-		// AC Refactor: data doesn't appear on time and the test needs data from a past date
-		// AC Refactor ticket: LRAC-9266
-
 		task ("Connect DXP to AC") {
 			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 		}
@@ -132,7 +127,6 @@ definition {
 	@ignore = "true"
 	@priority = "5"
 	test ShowsTop5InterestTopicsForAllIndividuals {
-		property portal.upstream = "quarantine";
 
 		// AC Refactor: data doesn't appear on time and the test needs data from a past date
 		// AC Refactor ticket: LRAC-9267

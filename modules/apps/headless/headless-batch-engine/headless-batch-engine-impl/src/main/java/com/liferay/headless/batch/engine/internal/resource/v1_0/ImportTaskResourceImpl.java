@@ -25,6 +25,7 @@ import com.liferay.batch.engine.configuration.BatchEngineTaskConfiguration;
 import com.liferay.batch.engine.constants.BatchEngineImportTaskConstants;
 import com.liferay.batch.engine.model.BatchEngineImportTask;
 import com.liferay.batch.engine.model.BatchEngineImportTaskError;
+import com.liferay.batch.engine.service.BatchEngineImportTaskErrorLocalService;
 import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.headless.batch.engine.dto.v1_0.FailedItem;
 import com.liferay.headless.batch.engine.dto.v1_0.ImportTask;
@@ -34,6 +35,8 @@ import com.liferay.petra.executor.PortalExecutorManager;
 import com.liferay.petra.io.StreamUtil;
 import com.liferay.petra.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.petra.io.unsync.UnsyncByteArrayOutputStream;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.util.File;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -44,8 +47,10 @@ import com.liferay.portal.vulcan.multipart.BinaryFile;
 import com.liferay.portal.vulcan.multipart.MultipartBody;
 import com.liferay.portal.vulcan.util.TransformUtil;
 
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 
 import java.util.AbstractMap;
 import java.util.Arrays;
@@ -62,6 +67,8 @@ import java.util.zip.ZipOutputStream;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -111,6 +118,74 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 		return _toImportTask(
 			_batchEngineImportTaskLocalService.getBatchEngineImportTask(
 				importTaskId));
+	}
+
+	@Override
+	public Response getImportTaskContent(Long importTaskId) throws Exception {
+		BatchEngineImportTask batchEngineImportTask =
+			_batchEngineImportTaskLocalService.getBatchEngineImportTask(
+				importTaskId);
+
+		BatchEngineTaskExecuteStatus batchEngineTaskExecuteStatus =
+			BatchEngineTaskExecuteStatus.valueOf(
+				batchEngineImportTask.getExecuteStatus());
+
+		if (batchEngineTaskExecuteStatus !=
+				BatchEngineTaskExecuteStatus.COMPLETED) {
+
+			return Response.status(
+				Response.Status.NOT_FOUND
+			).build();
+		}
+
+		StreamingOutput streamingOutput = outputStream -> StreamUtil.transfer(
+			_batchEngineImportTaskLocalService.openContentInputStream(
+				importTaskId),
+			outputStream);
+
+		return Response.ok(
+			streamingOutput
+		).header(
+			"content-disposition",
+			"attachment; filename=" + StringUtil.randomString() + ".zip"
+		).build();
+	}
+
+	@Override
+	public Response getImportTaskFailedItemReport(Long importTaskId)
+		throws Exception {
+
+		StreamingOutput streamingOutput = outputStream -> {
+			try (BufferedWriter bufferedWriter = new BufferedWriter(
+					new OutputStreamWriter(outputStream))) {
+
+				bufferedWriter.write("item, itemIndex, message");
+
+				bufferedWriter.newLine();
+
+				for (BatchEngineImportTaskError batchEngineImportTaskError :
+						_batchEngineImportTaskErrorLocalService.
+							getBatchEngineImportTaskErrors(importTaskId)) {
+
+					bufferedWriter.write(
+						StringBundler.concat(
+							batchEngineImportTaskError.getItem(),
+							StringPool.COMMA_AND_SPACE,
+							batchEngineImportTaskError.getItemIndex(),
+							StringPool.COMMA_AND_SPACE,
+							batchEngineImportTaskError.getMessage()));
+
+					bufferedWriter.newLine();
+				}
+			}
+		};
+
+		return Response.ok(
+			streamingOutput
+		).header(
+			"Content-Disposition",
+			"attachment; filename=" + StringUtil.randomString() + ".csv"
+		).build();
 	}
 
 	@Override
@@ -417,6 +492,10 @@ public class ImportTaskResourceImpl extends BaseImportTaskResourceImpl {
 
 	private static final Set<String> _ignoredParameters = new HashSet<>(
 		Arrays.asList("callbackURL", "fieldNameMapping"));
+
+	@Reference
+	private BatchEngineImportTaskErrorLocalService
+		_batchEngineImportTaskErrorLocalService;
 
 	@Reference
 	private BatchEngineImportTaskExecutor _batchEngineImportTaskExecutor;

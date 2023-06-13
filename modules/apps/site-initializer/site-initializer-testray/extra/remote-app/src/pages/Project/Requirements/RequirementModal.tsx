@@ -23,24 +23,26 @@ import Input from '../../../components/Input';
 import Container from '../../../components/Layout/Container';
 import MarkdownPreview from '../../../components/Markdown';
 import Modal from '../../../components/Modal';
-import {CreateTestrayRequirement} from '../../../graphql/mutations/TestrayRequirement';
+import {CreateRequirement} from '../../../graphql/mutations';
 import {
 	CTypePagination,
 	TestrayComponent,
-	getTestrayComponents,
+	getComponents,
 } from '../../../graphql/queries';
 import {FormModalOptions} from '../../../hooks/useFormModal';
 import i18n from '../../../i18n';
 
-type RequirementsForm = {
-	components: string;
-	description: string;
-	descriptionType: string;
-	key: string;
-	linkTitle: string;
-	linkURL: string;
-	summary: string;
+const requirementFormDefault = {
+	components: '',
+	description: '',
+	descriptionType: '',
+	key: '',
+	linkTitle: '',
+	linkURL: '',
+	summary: '',
 };
+
+type RequirementsForm = typeof requirementFormDefault;
 
 const descriptionTypes = [
 	{
@@ -94,6 +96,7 @@ const RequirementsForm: React.FC<RequirementsFormProps> = ({
 								name="key"
 								onChange={onChange}
 								required
+								value={form.key}
 							/>
 
 							<Input
@@ -101,6 +104,7 @@ const RequirementsForm: React.FC<RequirementsFormProps> = ({
 								name="summary"
 								onChange={onChange}
 								required
+								value={form.summary}
 							/>
 
 							<Input
@@ -108,6 +112,7 @@ const RequirementsForm: React.FC<RequirementsFormProps> = ({
 								name="linkURL"
 								onChange={onChange}
 								required
+								value={form.linkURL}
 							/>
 
 							<Input
@@ -115,6 +120,7 @@ const RequirementsForm: React.FC<RequirementsFormProps> = ({
 								name="linkTitle"
 								onChange={onChange}
 								required
+								value={form.linkTitle}
 							/>
 
 							<label
@@ -177,21 +183,13 @@ type RequirementsModalProps = {
 const RequirementsModal: React.FC<RequirementsModalProps> = ({
 	modal: {observer, onClose, onError, onSave, visible},
 }) => {
-	const [form, setForm] = useState<RequirementsForm>({
-		components: '',
-		description: '',
-		descriptionType: '',
-		key: '',
-		linkTitle: '',
-		linkURL: '',
-		summary: '',
-	});
+	const [form, setForm] = useState<RequirementsForm>(requirementFormDefault);
 
-	const [onCreateTestrayRequirement] = useMutation(CreateTestrayRequirement);
+	const [onCreateRequirement] = useMutation(CreateRequirement);
 
 	const {data: testrayComponentsData} = useQuery<
-		CTypePagination<'testrayComponents', TestrayComponent>
-	>(getTestrayComponents);
+		CTypePagination<'components', TestrayComponent>
+	>(getComponents);
 
 	function onchange({target}: any): void {
 		const {name, value} = target;
@@ -202,8 +200,7 @@ const RequirementsModal: React.FC<RequirementsModalProps> = ({
 		});
 	}
 
-	const testrayComponents =
-		testrayComponentsData?.c?.testrayComponents.items || [];
+	const testrayComponents = testrayComponentsData?.c?.components.items || [];
 
 	const onSubmit = async () => {
 		const newForm: RequirementsForm = {
@@ -218,7 +215,7 @@ const RequirementsModal: React.FC<RequirementsModalProps> = ({
 		};
 
 		try {
-			await onCreateTestrayRequirement({
+			await onCreateRequirement({
 				variables: {
 					TestrayRequirement: newForm,
 				},
@@ -257,4 +254,5 @@ const RequirementsModal: React.FC<RequirementsModalProps> = ({
 		</Modal>
 	);
 };
+
 export default RequirementsModal;

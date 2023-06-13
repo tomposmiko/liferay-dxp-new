@@ -30,27 +30,33 @@ const isValidEmail = (value, bannedEmailDomains) => {
 		return 'Please insert a valid e-mail.';
 	}
 
-	if (bannedEmailDomains.includes(value.split('@')[1])) {
+	if (bannedEmailDomains.length) {
 		return 'E-mail domain not allowed.';
 	}
 };
 
+const isValidEmailDomain = (bannedEmailDomains) => {
+	if (bannedEmailDomains.length) {
+		return 'Domain not allowed.';
+	}
+};
+
 const isLowercaseAndNumbers = (value) => {
-	if (!LOWCASE_NUMBERS_REGEX.test(value)) {
+	if (value && !LOWCASE_NUMBERS_REGEX.test(value)) {
 		return 'Lowercase letters and numbers only.';
 	}
 };
 
 const isValidFriendlyURL = (value) => {
-	if (value[0] !== '/') {
+	if (value && value[0] !== '/') {
 		return 'The Workspace URL should start with "/".';
 	}
 
-	if (value.indexOf(' ') > 0) {
+	if (value && value.indexOf(' ') > 0) {
 		return 'The Workspace URL most not have spaces.';
 	}
 
-	if (!FRIENDLY_URL_REGEX.test(value)) {
+	if (value && !FRIENDLY_URL_REGEX.test(value)) {
 		return 'Lowercase letters, numbers and dashes only.';
 	}
 };
@@ -75,6 +81,7 @@ export {
 	isLowercaseAndNumbers,
 	isValidEmail,
 	isValidFriendlyURL,
+	isValidEmailDomain,
 	maxLength,
 	required,
 	validate,

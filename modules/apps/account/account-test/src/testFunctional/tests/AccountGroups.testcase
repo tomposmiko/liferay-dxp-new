@@ -76,6 +76,123 @@ definition {
 			accountGroupName = "Edited Account Group Name");
 	}
 
+	@description = "This test assert user can filter the assigned accounts in Account Group by status."
+	@priority = "3"
+	test CanFilterAccountsBelongToAccountGroupByStatus {
+		task ("Given Add a new Account Group and Accounts with different status") {
+			JSONAccountGroup.addAccountGroup(
+				accountGroupDescription = "Filter the assigned Accounts by Status.",
+				accountGroupName = "AG Filter by Status");
+
+			JSONAccountEntry.addAccountEntry(
+				accountEntryName = "Inactive Business Account",
+				accountEntryStatus = "Inactive",
+				accountEntryType = "Business");
+
+			JSONAccountEntry.addAccountEntry(
+				accountEntryName = "Active Person Account",
+				accountEntryType = "Person");
+		}
+
+		task ("When assign the active account to account group") {
+			AccountGroups.openAccountGroupsAdmin();
+
+			LexiconEntry.gotoEntry(rowEntry = "AG Filter by Status");
+
+			AccountGroups.viewDefault(tabName = "Accounts");
+
+			AccountGroups.addAssignee(
+				accountGroupName = "AG Filter by Status",
+				assigneeNames = "Active Person Account");
+
+			AccountGroups.viewAssignee(assigneeName = "Active Person Account");
+
+			task ("And assign the inactive account to account group") {
+				LexiconEntry.gotoAdd();
+
+				Pause(locator1 = "3000");
+
+				SelectFrame(
+					key_title = "Assign Accounts to AG Filter by Status",
+					locator1 = "IFrame#MODAL_ANY");
+
+				ManagementBar.setFilterAndOrder(filterBy = "Inactive");
+
+				Check(
+					key_tableEntry = "Inactive Business Account",
+					locator1 = "LexiconTable#TABLE_ENTRY_CHECKBOX");
+
+				SelectFrameTop();
+
+				Button.click(button = "Assign");
+
+				Alert.viewSuccessMessage();
+			}
+		}
+
+		task ("Then filter the accounts assigned to account group by Status returns proper results") {
+			ManagementBar.setFilterAndOrder(filterBy = "Inactive");
+
+			AccountGroups.viewAssignee(assigneeName = "Inactive Business Account");
+
+			ManagementBar.setFilterAndOrder(filterBy = "Active");
+
+			AccountGroups.viewAssignee(assigneeName = "Active Person Account");
+		}
+	}
+
+	@description = "This test assert user can filter the assigned accounts in Account Group by type."
+	@priority = "3"
+	test CanFilterAccountsBelongToAccountGroupByType {
+		task ("Given Add a new Account Group and Accounts with different type") {
+			JSONAccountGroup.addAccountGroup(
+				accountGroupDescription = "Filter the assigned Accounts by Type.",
+				accountGroupName = "AG Filter by Type");
+
+			for (var accountNum : list "1,2") {
+				JSONAccountEntry.addAccountEntry(
+					accountEntryName = "Business Account ${accountNum} for Account Group",
+					accountEntryType = "Business");
+			}
+
+			JSONAccountEntry.addAccountEntry(
+				accountEntryName = "Person Account for Account Group",
+				accountEntryType = "Person");
+		}
+
+		task ("When assign the accounts to account group") {
+			AccountGroups.openAccountGroupsAdmin();
+
+			LexiconEntry.gotoEntry(rowEntry = "AG Filter by Type");
+
+			AccountGroups.viewDefault(tabName = "Accounts");
+
+			AccountGroups.addAssignee(
+				accountGroupName = "AG Filter by Type",
+				assigneeAll = "true");
+
+			for (var assigneeName : list "Business Account 1 for Account Group,Business Account 2 for Account Group,Person Account for Account Group") {
+				AccountGroups.viewAssignee(assigneeName = "${assigneeName}");
+			}
+		}
+
+		task ("Then filter the accounts assigned to account group by Type returns proper results") {
+			ManagementBar.setFilterAndOrder(filterBy = "Business");
+
+			for (var assigneeNameNum : list "1,2") {
+				AccountGroups.viewAssignee(assigneeName = "Business Account ${assigneeNameNum} for Account Group");
+			}
+
+			ManagementBar.setFilterAndOrder(filterBy = "Person");
+
+			AccountGroups.viewAssignee(assigneeName = "Person Account for Account Group");
+
+			ManagementBar.setFilterAndOrder(filterBy = "Guest");
+
+			AccountGroups.viewDefault(tabName = "Accounts");
+		}
+	}
+
 	@description = "This test assigns an account to Account Group"
 	@priority = "4"
 	test CanManuallyAssignAccountToGroup {
@@ -144,9 +261,7 @@ definition {
 
 		AccountGroups.addAssignee(
 			accountGroupName = "Multiple Accounts AG",
-			assigneeAll = "true",
-			assigneeNames = "Accounts ${accountNumber} for AG",
-			assigneeType = "Accounts");
+			assigneeAll = "true");
 
 		AccountGroups.openAccountGroupsAdmin();
 
@@ -179,9 +294,11 @@ definition {
 
 		AccountGroups.addAssignee(
 			accountGroupName = "Remove Account AG",
-			assigneeAll = "All",
-			assigneeNames = "Delete Accounts 1 from AG,Delete Accounts 2 from AG,Delete Accounts 3 from AG",
-			assigneeType = "Accounts");
+			assigneeAll = "All");
+
+		for (var assigneeName : list "Delete Accounts 1 from AG,Delete Accounts 2 from AG,Delete Accounts 3 from AG") {
+			AccountGroups.viewAssignee(assigneeName = "${assigneeName}");
+		}
 
 		AccountGroups.openAccountGroupsAdmin();
 

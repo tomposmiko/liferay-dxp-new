@@ -87,17 +87,14 @@ export default function ObjectFieldFormBase({
 				? [
 						{
 							name: 'acceptedFileExtensions',
-							required: true,
 							value: 'jpeg, jpg, pdf, png',
 						},
 						{
 							name: 'fileSource',
-							required: true,
 							value: 'userComputer',
 						},
 						{
 							name: 'maximumFileSize',
-							required: true,
 							value: 100,
 						},
 				  ]
@@ -220,6 +217,14 @@ export function useObjectFieldForm({
 			}
 			if (!settings.maximumFileSize) {
 				errors.maximumFileSize = REQUIRED_MSG;
+			}
+			else if (settings.maximumFileSize < 0) {
+				errors.maximumFileSize = Liferay.Util.sub(
+					Liferay.Language.get(
+						'only-integers-greater-than-or-equal-to-x-are-allowed'
+					),
+					0
+				);
 			}
 		}
 		else if (field.businessType === 'Picklist') {

@@ -54,6 +54,7 @@ import formatXML from './util/format_xml.es';
 import getCropRegion from './util/get_crop_region.es';
 import getDOM from './util/get_dom';
 import getElement from './util/get_element';
+import getLexiconIcon from './util/get_lexicon_icon';
 import getPortletId from './util/get_portlet_id';
 import getPortletNamespace from './util/get_portlet_namespace.es';
 import {
@@ -152,6 +153,15 @@ Liferay.Util.MAP_HTML_CHARS_ESCAPED = MAP_HTML_CHARS_ESCAPED;
  */
 Liferay.Util.addParams = addParams;
 
+Liferay.Util.openAlertModal = (...args) => {
+	Liferay.Loader.require(
+		'frontend-js-web/liferay/modal/Modal',
+		(commands) => {
+			commands.openAlertModal(...args);
+		}
+	);
+};
+
 /**
  * @deprecated As of Athanasius (7.3.x), with no direct replacement
  */
@@ -185,6 +195,7 @@ Liferay.Util.getDOM = getDOM;
 Liferay.Util.getElement = getElement;
 
 Liferay.Util.getFormElement = getFormElement;
+Liferay.Util.getLexiconIcon = getLexiconIcon;
 
 /**
  * @deprecated As of Athanasius (7.3.x), replaced by `import {getPortletId} from 'frontend-js-web'`

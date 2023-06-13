@@ -142,6 +142,10 @@ public class OpenGraphTopHeadDynamicIncludeTest {
 
 		_layout = LayoutTestUtil.addTypeContentLayout(_group);
 
+		_layout.setDescriptionMap(RandomTestUtil.randomLocaleStringMap());
+
+		_layout = _layoutLocalService.updateLayout(_layout);
+
 		_serviceContext = ServiceContextTestUtil.getServiceContext(
 			_group.getGroupId());
 

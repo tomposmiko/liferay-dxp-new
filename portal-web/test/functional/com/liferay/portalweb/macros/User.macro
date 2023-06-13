@@ -311,6 +311,18 @@ definition {
 				value1 = "${userComment}");
 		}
 
+		if (isSet(destination)) {
+			var origin = Geolocation.getMarkerPosition();
+
+			Geolocation.setMarkerPosition(destination = "${destination}");
+
+			var current = Geolocation.getMarkerPosition();
+
+			TestUtils.assertNotEquals(
+				actual = "${current}",
+				expected = "${origin}");
+		}
+
 		var browserType = PropsUtil.get("browser.type");
 
 		if ("${browserType}" == "safari") {
@@ -2019,9 +2031,11 @@ definition {
 			SignIn.agreeToTermsOfUse();
 		}
 
-		User.resetPassword(
-			localizedSaveButton = "${localizedSaveButton}",
-			newPassword = "${newPassword}");
+		if (IsElementPresent(locator1 = "TextInput#PASSWORD_2")) {
+			User.resetPassword(
+				localizedSaveButton = "${localizedSaveButton}",
+				newPassword = "${newPassword}");
+		}
 
 		if (isSet(localizedAnswer)) {
 			User.answerPasswordReminderLocalized(
