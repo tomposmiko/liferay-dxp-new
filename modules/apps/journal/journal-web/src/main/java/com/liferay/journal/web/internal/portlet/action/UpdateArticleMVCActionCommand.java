@@ -39,7 +39,7 @@ import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactory;
-import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
@@ -56,7 +56,6 @@ import com.liferay.portal.kernel.upload.LiferayFileItemException;
 import com.liferay.portal.kernel.upload.UploadException;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizer;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Html;
 import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
@@ -67,7 +66,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 
 import java.io.File;
@@ -300,11 +298,9 @@ public class UpdateArticleMVCActionCommand extends BaseMVCActionCommand {
 		String articleURL = ParamUtil.getString(
 			uploadPortletRequest, "articleURL");
 
-		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-150762"))) {
-			serviceContext.setAttribute(
-				"updateAutoTags",
-				ParamUtil.getBoolean(actionRequest, "updateAutoTags"));
-		}
+		serviceContext.setAttribute(
+			"updateAutoTags",
+			ParamUtil.getBoolean(actionRequest, "updateAutoTags"));
 
 		JournalArticle article = null;
 		String oldUrlTitle = StringPool.BLANK;
@@ -477,7 +473,7 @@ public class UpdateArticleMVCActionCommand extends BaseMVCActionCommand {
 				!currentFriendlyURL.equals(normalizedOriginalFriendlyURL)) {
 
 				messages.add(
-					LanguageUtil.format(
+					_language.format(
 						httpServletRequest, "for-locale-x-x-was-changed-to-x",
 						new Object[] {
 							"<strong>" + locale.getLanguage() + "</strong>",
@@ -491,7 +487,7 @@ public class UpdateArticleMVCActionCommand extends BaseMVCActionCommand {
 		if (!messages.isEmpty()) {
 			messages.add(
 				0,
-				LanguageUtil.get(
+				_language.get(
 					httpServletRequest,
 					"the-following-friendly-urls-were-changed-to-ensure-" +
 						"uniqueness"));
@@ -678,6 +674,9 @@ public class UpdateArticleMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private JSONFactory _jsonFactory;
+
+	@Reference
+	private Language _language;
 
 	@Reference
 	private LayoutClassedModelUsageLocalService

@@ -39,6 +39,7 @@ const FormWithControls = React.forwardRef(({children, item, ...rest}, ref) => {
 	);
 
 	const showMessagePreview = item.config?.showMessagePreview;
+	const showLoadingState = item.config?.loading;
 
 	return (
 		<form
@@ -51,6 +52,8 @@ const FormWithControls = React.forwardRef(({children, item, ...rest}, ref) => {
 			<ContainerWithControls {...rest} item={item}>
 				{showMessagePreview ? (
 					<FormSuccessMessage item={item} />
+				) : showLoadingState ? (
+					<FormLoadingState />
 				) : isEmpty || !isMapped ? (
 					<FormEmptyState isMapped={isMapped} item={item} />
 				) : (
@@ -77,20 +80,6 @@ function FormEmptyState({isMapped, item}) {
 		[dispatch, item.itemId]
 	);
 
-	if (item.config.loading) {
-		return (
-			<div className="bg-lighter page-editor__no-fragments-state">
-				<ClayLoadingIndicator />
-
-				<p className="m-0 page-editor__no-fragments-state__message">
-					{Liferay.Language.get(
-						'your-form-is-being-loaded.-this-may-take-some-time'
-					)}
-				</p>
-			</div>
-		);
-	}
-
 	if (isMapped) {
 		return (
 			<div className="page-editor__no-fragments-state">
@@ -102,7 +91,7 @@ function FormEmptyState({isMapped, item}) {
 	}
 
 	return (
-		<div className="align-items-center bg-lighter d-flex flex-column page-editor__no-fragments-state">
+		<div className="align-items-center bg-lighter d-flex flex-column page-editor__form-unmapped-state page-editor__no-fragments-state">
 			<p className="page-editor__no-fragments-state__title">
 				{Liferay.Language.get('map-your-form')}
 			</p>
@@ -120,6 +109,20 @@ function FormEmptyState({isMapped, item}) {
 					onValueSelect={onValueSelect}
 				/>
 			</div>
+		</div>
+	);
+}
+
+function FormLoadingState() {
+	return (
+		<div className="bg-lighter page-editor__no-fragments-state">
+			<ClayLoadingIndicator />
+
+			<p className="m-0 page-editor__no-fragments-state__message">
+				{Liferay.Language.get(
+					'your-form-is-being-loaded.-this-may-take-some-time'
+				)}
+			</p>
 		</div>
 	);
 }

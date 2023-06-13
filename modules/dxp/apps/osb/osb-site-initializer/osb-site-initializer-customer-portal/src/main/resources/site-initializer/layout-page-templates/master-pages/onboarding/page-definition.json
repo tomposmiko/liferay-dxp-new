@@ -82,8 +82,6 @@
 													}
 												},
 												"fragmentLink": {
-													"value_i18n": {
-													}
 												}
 											}
 										}
@@ -137,11 +135,19 @@
 					{
 						"definition": {
 							"fragmentStyle": {
-								"borderWidth": "0"
+								"borderColor": "colorNeutral1",
+								"borderWidth": "1",
+								"height": "82px",
+								"shadow": "boxShadow",
+								"textAlign": ""
 							},
 							"indexed": true,
 							"layout": {
-								"borderWidth": 0,
+								"align": "Center",
+								"borderColor": "colorNeutral1",
+								"borderWidth": 1,
+								"contentDisplay": "FlexRow",
+								"justify": "SpaceBetween",
 								"marginBottom": 0,
 								"marginLeft": 0,
 								"marginRight": 0,
@@ -157,17 +163,12 @@
 							{
 								"definition": {
 									"fragmentStyle": {
-										"borderColor": "colorNeutral1",
-										"borderWidth": "1",
-										"height": "82px",
-										"shadow": "boxShadow",
-										"textAlign": ""
+										"height": "82px"
 									},
 									"indexed": true,
 									"layout": {
 										"align": "Center",
-										"borderColor": "colorNeutral1",
-										"borderWidth": 1,
+										"borderWidth": 0,
 										"contentDisplay": "FlexRow",
 										"marginBottom": 0,
 										"marginLeft": 0,
@@ -237,8 +238,6 @@
 																	}
 																},
 																"fragmentLink": {
-																	"value_i18n": {
-																	}
 																}
 															}
 														}
@@ -390,6 +389,46 @@
 											}
 										],
 										"type": "Section"
+									}
+								],
+								"type": "Section"
+							},
+							{
+								"definition": {
+									"fragmentStyle": {
+										"borderWidth": "0",
+										"height": "50px",
+										"marginRight": "6",
+										"textAlign": ""
+									},
+									"indexed": true,
+									"layout": {
+										"align": "Center",
+										"borderWidth": 0,
+										"contentDisplay": "FlexRow",
+										"flexWrap": "Wrap",
+										"marginBottom": 0,
+										"marginLeft": 0,
+										"marginRight": 6,
+										"marginTop": 0,
+										"paddingBottom": 0,
+										"paddingLeft": 0,
+										"paddingRight": 0,
+										"paddingTop": 0,
+										"widthType": "Fluid"
+									}
+								},
+								"pageElements": [
+									{
+										"definition": {
+											"widgetInstance": {
+												"widgetConfig": {
+													"languageIds": "en_US,ja_JP,pt_BR,es_ES"
+												},
+												"widgetName": "com_liferay_site_navigation_language_web_portlet_SiteNavigationLanguagePortlet"
+											}
+										},
+										"type": "Widget"
 									}
 								],
 								"type": "Section"

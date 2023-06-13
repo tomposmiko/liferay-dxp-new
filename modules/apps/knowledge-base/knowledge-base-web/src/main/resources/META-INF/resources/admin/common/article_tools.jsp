@@ -201,11 +201,10 @@ int status = (Integer)request.getAttribute(KBWebKeys.KNOWLEDGE_BASE_STATUS);
 
 		<c:if test="<%= KBArticlePermission.contains(permissionChecker, kbArticle, KBActionKeys.DELETE) %>">
 			<liferay-portlet:renderURL var="homeURL">
-				<portlet:param name="mvcPath" value='<%= templatePath + "view.jsp" %>' />
+				<portlet:param name="mvcRenderCommandName" value="/knowledge_base/view" />
 			</liferay-portlet:renderURL>
 
 			<liferay-portlet:actionURL name="/knowledge_base/delete_kb_article" var="deleteURL">
-				<portlet:param name="mvcPath" value='<%= templatePath + "view_article.jsp" %>' />
 				<portlet:param name="redirect" value="<%= homeURL %>" />
 				<portlet:param name="resourceClassNameId" value="<%= String.valueOf(kbArticle.getClassNameId()) %>" />
 				<portlet:param name="resourcePrimKey" value="<%= String.valueOf(kbArticle.getResourcePrimKey()) %>" />

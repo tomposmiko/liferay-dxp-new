@@ -73,8 +73,8 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.expiration-cache=0",
 		"javax.portlet.init-param.always-send-redirect=true",
 		"javax.portlet.init-param.copy-request-parameters=true",
-		"javax.portlet.init-param.template-path=/display/",
-		"javax.portlet.init-param.view-template=/display/view.jsp",
+		"javax.portlet.init-param.template-path=/META-INF/resources/",
+		"javax.portlet.init-param.view-template=/knowledge_base/view",
 		"javax.portlet.name=" + KBPortletKeys.KNOWLEDGE_BASE_DISPLAY,
 		"javax.portlet.resource-bundle=content.Language",
 		"javax.portlet.security-role-ref=administrator,guest,power-user,user",
@@ -141,9 +141,11 @@ public class DisplayPortlet extends BaseKBPortlet {
 				WorkflowConstants.STATUS_APPROVED);
 
 			String mvcPath = ParamUtil.getString(renderRequest, "mvcPath");
+			String mvcRenderCommandName = ParamUtil.getString(
+				renderRequest, "mvcRenderCommandName");
 
 			if ((mvcPath.equals("") ||
-				 mvcPath.equals("/display/view_article.jsp")) &&
+				 mvcRenderCommandName.equals("/knowledge_base/view_article")) &&
 				!kbArticleSelection.isExactMatch()) {
 
 				HttpServletResponse httpServletResponse =

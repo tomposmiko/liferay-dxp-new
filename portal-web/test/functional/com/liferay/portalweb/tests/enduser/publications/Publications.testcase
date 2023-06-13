@@ -201,6 +201,49 @@ definition {
 		AssertElementNotPresent(locator1 = "Publications#PUBLICATIONS_INDICATOR_BUTTON");
 	}
 
+	@description = "This is the use case for LPS-158789. Allow you to change publication via URL parameter"
+	@priority = "4"
+	test CanChangePublicationViaURLParameter {
+		JSONGroup.addGroup(groupName = "Site Name");
+
+		JSONLayout.addPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Test Page Name");
+
+		JSONPublications.addPublication(publicationName = "Publication Name");
+
+		JSONPublications.selectPublication(publicationName = "Publication Name");
+
+		JSONWebcontent.addWebContent(
+			content = "Web Content Content",
+			groupName = "Site Name",
+			title = "Web Content Title");
+
+		JSONLayout.addWidgetToPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Test Page Name",
+			widgetName = "Web Content Display");
+
+		Navigator.openSitePage(
+			pageName = "Test Page Name",
+			siteName = "Site Name");
+
+		WebContentDisplayPortlet.selectWebContent(webContentTitle = "Web Content Title");
+
+		PublicationsNavigator.openPublicationsAdmin();
+
+		Publications.workOnProduction();
+
+		var ctCollectionId = JSONPublicationsAPI._getCTCollectionId(publicationName = "Publication Name");
+		var portalURL = PropsUtil.get("portal.url");
+
+		Navigator.openSpecificURL(url = "${portalURL}/web/site-name/test-page-name?previewCTCollectionId=${ctCollectionId}");
+
+		WebContentDisplayPortlet.viewContent(
+			webContentContent = "Web Content Content",
+			webContentTitle = "Web Content Title");
+	}
+
 	@description = "Filter Publications Changes."
 	@priority = "4"
 	test CanFilterChangesInReview {
@@ -391,6 +434,94 @@ definition {
 		PublicationsChanges.viewChangesResultNotPresent(
 			changeCategory = "Document",
 			changeTitle = "DM Document Title Edit");
+	}
+
+	@description = "This is the use case for LPS-158789."
+	@priority = "4"
+	test CannotChangePublicationViaURLWithNonexistentCollectionId {
+		JSONGroup.addGroup(groupName = "Site Name");
+
+		JSONLayout.addPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Test Page Name");
+
+		JSONPublications.addPublication(publicationName = "Publication Name");
+
+		JSONPublications.selectPublication(publicationName = "Publication Name");
+
+		JSONWebcontent.addWebContent(
+			content = "Web Content Content",
+			groupName = "Site Name",
+			title = "Web Content Title");
+
+		JSONLayout.addWidgetToPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Test Page Name",
+			widgetName = "Web Content Display");
+
+		Navigator.openSitePage(
+			pageName = "Test Page Name",
+			siteName = "Site Name");
+
+		WebContentDisplayPortlet.selectWebContent(webContentTitle = "Web Content Title");
+
+		PublicationsNavigator.openPublicationsAdmin();
+
+		Publications.workOnProduction();
+
+		var ctCollectionId1 = JSONPublicationsAPI._getCTCollectionId(publicationName = "Publication Name");
+
+		var ctCollectionId2 = ${ctCollectionId1} + 1;
+		var portalURL = PropsUtil.get("portal.url");
+
+		Open.openRedirect(locator1 = "${portalURL}/web/site-name/test-page-name?previewCTCollectionId=${ctCollectionId2}");
+
+		Alert.viewErrorMessage(errorMessage = "Your request failed to complete.");
+
+		AssertConsoleTextPresent(value1 = "A class com.liferay.change.tracking.exception.NoSuchCollectionException");
+	}
+
+	@description = "This is the use case for LPS-158789."
+	@priority = "4"
+	test CannotPreviewPublishedPublicationViaURL {
+		JSONGroup.addGroup(groupName = "Site Name");
+
+		JSONLayout.addPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Test Page Name");
+
+		JSONPublications.addPublication(publicationName = "Publication Name");
+
+		JSONPublications.selectPublication(publicationName = "Publication Name");
+
+		JSONWebcontent.addWebContent(
+			content = "Web Content Content",
+			groupName = "Site Name",
+			title = "Web Content Title");
+
+		JSONLayout.addWidgetToPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Test Page Name",
+			widgetName = "Web Content Display");
+
+		Navigator.openSitePage(
+			pageName = "Test Page Name",
+			siteName = "Site Name");
+
+		WebContentDisplayPortlet.selectWebContent(webContentTitle = "Web Content Title");
+
+		var ctCollectionId = JSONPublicationsAPI._getCTCollectionId(publicationName = "Publication Name");
+		var portalURL = PropsUtil.get("portal.url");
+
+		JSONPublications.publishPublication(publicationName = "Publication Name");
+
+		Publications.viewPublicationPublished(publicationName = "Publication Name");
+
+		Open.openRedirect(locator1 = "${portalURL}/web/site-name/test-page-name?previewCTCollectionId=${ctCollectionId}");
+
+		Alert.viewErrorMessage(errorMessage = "Your request failed to complete.");
+
+		AssertConsoleTextPresent(value1 = "A class com.liferay.portal.kernel.exception.PortalException");
 	}
 
 	@description = "LPS-136380 - Add localization for translated titles and content."
@@ -1049,6 +1180,53 @@ definition {
 		for (var publicationName : list "Apple,Banana,Cherry") {
 			Publications.search(publicationName = "${publicationName}");
 		}
+	}
+
+	@description = "This is the use case for LPS-158789."
+	@priority = "4"
+	test UserWithoutAccessCannotChangePublicationViaURL {
+		JSONGroup.addGroup(groupName = "Site Name");
+
+		JSONLayout.addPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Test Page Name");
+
+		JSONPublications.addPublication(publicationName = "Publication Name");
+
+		JSONPublications.selectPublication(publicationName = "Publication Name");
+
+		JSONWebcontent.addWebContent(
+			content = "Web Content Content",
+			groupName = "Site Name",
+			title = "Web Content Title");
+
+		JSONLayout.addWidgetToPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Test Page Name",
+			widgetName = "Web Content Display");
+
+		Navigator.openSitePage(
+			pageName = "Test Page Name",
+			siteName = "Site Name");
+
+		WebContentDisplayPortlet.selectWebContent(webContentTitle = "Web Content Title");
+
+		Navigator.openSitePage(
+			pageName = "Test Page Name",
+			siteName = "Site Name");
+
+		Publications.workOnProduction();
+
+		var ctCollectionId = JSONPublicationsAPI._getCTCollectionId(publicationName = "Publication Name");
+		var portalURL = PropsUtil.get("portal.url");
+
+		User.logoutPG();
+
+		Open.openRedirect(locator1 = "${portalURL}/web/site-name/test-page-name?previewCTCollectionId=${ctCollectionId}");
+
+		Alert.viewErrorMessage(errorMessage = "Your request failed to complete.");
+
+		AssertConsoleTextPresent(value1 = "A class com.liferay.portal.kernel.security.auth.PrincipalException");
 	}
 
 	@description = "Assert Publications change details on Display Data Parents and Children Tabs"

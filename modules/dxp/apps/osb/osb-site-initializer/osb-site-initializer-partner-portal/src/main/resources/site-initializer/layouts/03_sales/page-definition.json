@@ -56,7 +56,8 @@
 					{
 						"definition": {
 							"fragmentStyle": {
-								"borderWidth": "0"
+								"borderWidth": "0",
+								"textAlign": ""
 							},
 							"indexed": true,
 							"layout": {
@@ -1372,26 +1373,26 @@
 																				},
 																				"text": {
 																					"value_i18n": {
-																						"ar_SA": "See a revenue snapshot of your new business and renewal as well as projections. Keep of your QSP accrual and goal.",
-																						"ca_ES": "See a revenue snapshot of your new business and renewal as well as projections. Keep of your QSP accrual and goal.",
-																						"de_DE": "See a revenue snapshot of your new business and renewal as well as projections. Keep of your QSP accrual and goal.",
-																						"en_US": "See a revenue snapshot of your new business and renewal as well as projections. Keep of your QSP accrual and goal.",
-																						"es_ES": "See a revenue snapshot of your new business and renewal as well as projections. Keep of your QSP accrual and goal.",
-																						"fi_FI": "See a revenue snapshot of your new business and renewal as well as projections. Keep of your QSP accrual and goal.",
-																						"fr_FR": "See a revenue snapshot of your new business and renewal as well as projections. Keep of your QSP accrual and goal.",
-																						"hu_HU": "See a revenue snapshot of your new business and renewal as well as projections. Keep of your QSP accrual and goal.",
-																						"ja_JP": "See a revenue snapshot of your new business and renewal as well as projections. Keep of your QSP accrual and goal.",
-																						"nl_NL": "See a revenue snapshot of your new business and renewal as well as projections. Keep of your QSP accrual and goal.",
-																						"pt_BR": "See a revenue snapshot of your new business and renewal as well as projections. Keep of your QSP accrual and goal.",
-																						"sv_SE": "See a revenue snapshot of your new business and renewal as well as projections. Keep of your QSP accrual and goal.",
-																						"zh_CN": "See a revenue snapshot of your new business and renewal as well as projections. Keep of your QSP accrual and goal."
+																						"ar_SA": "See a revenue snapshot of your new business and renewal as well as projections. Keep of your QSP actual and goal.",
+																						"ca_ES": "See a revenue snapshot of your new business and renewal as well as projections. Keep of your QSP actual and goal.",
+																						"de_DE": "See a revenue snapshot of your new business and renewal as well as projections. Keep of your QSP actual and goal.",
+																						"en_US": "See a revenue snapshot of your new business and renewal as well as projections. Keep of your QSP actual and goal.",
+																						"es_ES": "See a revenue snapshot of your new business and renewal as well as projections. Keep of your QSP actual and goal.",
+																						"fi_FI": "See a revenue snapshot of your new business and renewal as well as projections. Keep of your QSP actual and goal.",
+																						"fr_FR": "See a revenue snapshot of your new business and renewal as well as projections. Keep of your QSP actual and goal.",
+																						"hu_HU": "See a revenue snapshot of your new business and renewal as well as projections. Keep of your QSP actual and goal.",
+																						"ja_JP": "See a revenue snapshot of your new business and renewal as well as projections. Keep of your QSP actual and goal.",
+																						"nl_NL": "See a revenue snapshot of your new business and renewal as well as projections. Keep of your QSP actual and goal.",
+																						"pt_BR": "See a revenue snapshot of your new business and renewal as well as projections. Keep of your QSP actual and goal.",
+																						"sv_SE": "See a revenue snapshot of your new business and renewal as well as projections. Keep of your QSP actual and goal.",
+																						"zh_CN": "See a revenue snapshot of your new business and renewal as well as projections. Keep of your QSP actual and goal."
 																					}
 																				}
 																			}
 																		}
 																	],
 																	"fragmentStyle": {
-																		"height": "72px",
+																		"height": "60px",
 																		"overflow": "auto",
 																		"paddingBottom": "2",
 																		"paddingTop": "2",
@@ -1407,7 +1408,19 @@
 																	"fragmentLink": {
 																		"href": {
 																			"value_i18n": {
-																				"en_US": "https://www.liferay.com/pt/home"
+																				"ar_SA": "https://www.liferay.com/",
+																				"ca_ES": "https://www.liferay.com/",
+																				"de_DE": "https://www.liferay.com/",
+																				"en_US": "https://www.liferay.com/",
+																				"es_ES": "https://www.liferay.com/",
+																				"fi_FI": "https://www.liferay.com/",
+																				"fr_FR": "https://www.liferay.com/",
+																				"hu_HU": "https://www.liferay.com/",
+																				"ja_JP": "https://www.liferay.com/",
+																				"nl_NL": "https://www.liferay.com/",
+																				"pt_BR": "https://www.liferay.com/",
+																				"sv_SE": "https://www.liferay.com/",
+																				"zh_CN": "https://www.liferay.com/"
 																			}
 																		}
 																	},
@@ -1753,7 +1766,7 @@
 																		}
 																	],
 																	"fragmentStyle": {
-																		"height": "72px",
+																		"height": "60px",
 																		"paddingBottom": "2",
 																		"paddingTop": "2",
 																		"textAlign": "",
@@ -1816,7 +1829,19 @@
 																							"value": {
 																								"href": {
 																									"value_i18n": {
-																										"en_US": "https://www.liferay.com/pt/home"
+																										"ar_SA": "https://www.liferay.com/",
+																										"ca_ES": "https://www.liferay.com/",
+																										"de_DE": "https://www.liferay.com/",
+																										"en_US": "https://www.liferay.com/",
+																										"es_ES": "https://www.liferay.com/",
+																										"fi_FI": "https://www.liferay.com/",
+																										"fr_FR": "https://www.liferay.com/",
+																										"hu_HU": "https://www.liferay.com/",
+																										"ja_JP": "https://www.liferay.com/",
+																										"nl_NL": "https://www.liferay.com/",
+																										"pt_BR": "https://www.liferay.com/",
+																										"sv_SE": "https://www.liferay.com/",
+																										"zh_CN": "https://www.liferay.com/"
 																									}
 																								}
 																							}
@@ -2139,11 +2164,11 @@
 																		}
 																	],
 																	"fragmentStyle": {
-																		"height": "72px",
+																		"height": "60px",
 																		"paddingBottom": "2",
 																		"paddingTop": "2",
 																		"textAlign": "",
-																		"textColor": "gray700Color"
+																		"textColor": "colorNeutral8"
 																	},
 																	"indexed": true
 																},
@@ -2195,7 +2220,19 @@
 																							"value": {
 																								"href": {
 																									"value_i18n": {
-																										"en_US": "https://www.liferay.com/pt/home"
+																										"ar_SA": "https://www.liferay.com/",
+																										"ca_ES": "https://www.liferay.com/",
+																										"de_DE": "https://www.liferay.com/",
+																										"en_US": "https://www.liferay.com/",
+																										"es_ES": "https://www.liferay.com/",
+																										"fi_FI": "https://www.liferay.com/",
+																										"fr_FR": "https://www.liferay.com/",
+																										"hu_HU": "https://www.liferay.com/",
+																										"ja_JP": "https://www.liferay.com/",
+																										"nl_NL": "https://www.liferay.com/",
+																										"pt_BR": "https://www.liferay.com/",
+																										"sv_SE": "https://www.liferay.com/",
+																										"zh_CN": "https://www.liferay.com/"
 																									}
 																								}
 																							}
@@ -2447,6 +2484,8 @@
 																	],
 																	"fragmentStyle": {
 																		"fontWeight": "fontWeightBold",
+																		"maxHeight": "60px",
+																		"minHeight": "28px",
 																		"textAlign": "",
 																		"textColor": "colorNeutral10"
 																	},
@@ -2497,11 +2536,11 @@
 																		}
 																	],
 																	"fragmentStyle": {
-																		"height": "72px",
+																		"height": "60px",
 																		"paddingBottom": "2",
 																		"paddingTop": "2",
 																		"textAlign": "",
-																		"textColor": "btnOutlineSecondaryColor"
+																		"textColor": "colorNeutral8"
 																	},
 																	"indexed": true
 																},
@@ -2512,7 +2551,19 @@
 																	"fragmentLink": {
 																		"href": {
 																			"value_i18n": {
-																				"en_US": "https://www.liferay.com/pt/home"
+																				"ar_SA": "https://www.liferay.com/",
+																				"ca_ES": "https://www.liferay.com/",
+																				"de_DE": "https://www.liferay.com/",
+																				"en_US": "https://www.liferay.com/",
+																				"es_ES": "https://www.liferay.com/",
+																				"fi_FI": "https://www.liferay.com/",
+																				"fr_FR": "https://www.liferay.com/",
+																				"hu_HU": "https://www.liferay.com/",
+																				"ja_JP": "https://www.liferay.com/",
+																				"nl_NL": "https://www.liferay.com/",
+																				"pt_BR": "https://www.liferay.com/",
+																				"sv_SE": "https://www.liferay.com/",
+																				"zh_CN": "https://www.liferay.com/"
 																			}
 																		}
 																	},
@@ -2780,6 +2831,7 @@
 															],
 															"indexed": true,
 															"layout": {
+																"align": "Start",
 																"contentDisplay": "FlexColumn",
 																"marginBottom": 0,
 																"marginLeft": 0,
@@ -2829,7 +2881,8 @@
 																	],
 																	"fragmentStyle": {
 																		"fontWeight": "fontWeightBold",
-																		"height": "28px",
+																		"maxHeight": "60px",
+																		"minHeight": "28px",
 																		"textAlign": "",
 																		"textColor": "colorNeutral10"
 																	},
@@ -2880,11 +2933,11 @@
 																		}
 																	],
 																	"fragmentStyle": {
-																		"height": "72px",
+																		"height": "60px",
 																		"paddingBottom": "2",
 																		"paddingTop": "2",
 																		"textAlign": "",
-																		"textColor": "gray700Color"
+																		"textColor": "colorNeutral8"
 																	},
 																	"indexed": true
 																},
@@ -2936,7 +2989,19 @@
 																							"value": {
 																								"href": {
 																									"value_i18n": {
-																										"en_US": "https://www.liferay.com/pt/home"
+																										"ar_SA": "https://www.liferay.com/",
+																										"ca_ES": "https://www.liferay.com/",
+																										"de_DE": "https://www.liferay.com/",
+																										"en_US": "https://www.liferay.com/",
+																										"es_ES": "https://www.liferay.com/",
+																										"fi_FI": "https://www.liferay.com/",
+																										"fr_FR": "https://www.liferay.com/",
+																										"hu_HU": "https://www.liferay.com/",
+																										"ja_JP": "https://www.liferay.com/",
+																										"nl_NL": "https://www.liferay.com/",
+																										"pt_BR": "https://www.liferay.com/",
+																										"sv_SE": "https://www.liferay.com/",
+																										"zh_CN": "https://www.liferay.com/"
 																									}
 																								}
 																							}
@@ -3189,6 +3254,8 @@
 																	],
 																	"fragmentStyle": {
 																		"fontWeight": "fontWeightBold",
+																		"maxHeight": "60px",
+																		"minHeight": "28px",
 																		"textAlign": "",
 																		"textColor": "colorNeutral10"
 																	},
@@ -3239,11 +3306,11 @@
 																		}
 																	],
 																	"fragmentStyle": {
-																		"height": "72px",
+																		"height": "60px",
 																		"paddingBottom": "2",
 																		"paddingTop": "2",
 																		"textAlign": "",
-																		"textColor": "btnOutlineSecondaryColor"
+																		"textColor": "colorNeutral8"
 																	},
 																	"indexed": true
 																},
@@ -3295,7 +3362,19 @@
 																							"value": {
 																								"href": {
 																									"value_i18n": {
-																										"en_US": "https://www.liferay.com/pt/home"
+																										"ar_SA": "https://www.liferay.com/",
+																										"ca_ES": "https://www.liferay.com/",
+																										"de_DE": "https://www.liferay.com/",
+																										"en_US": "https://www.liferay.com/",
+																										"es_ES": "https://www.liferay.com/",
+																										"fi_FI": "https://www.liferay.com/",
+																										"fr_FR": "https://www.liferay.com/",
+																										"hu_HU": "https://www.liferay.com/",
+																										"ja_JP": "https://www.liferay.com/",
+																										"nl_NL": "https://www.liferay.com/",
+																										"pt_BR": "https://www.liferay.com/",
+																										"sv_SE": "https://www.liferay.com/",
+																										"zh_CN": "https://www.liferay.com/"
 																									}
 																								}
 																							}
@@ -3848,7 +3927,19 @@
 																							"value": {
 																								"href": {
 																									"value_i18n": {
-																										"en_US": "https://www.liferay.com/pt/home"
+																										"ar_SA": "https://www.liferay.com/",
+																										"ca_ES": "https://www.liferay.com/",
+																										"de_DE": "https://www.liferay.com/",
+																										"en_US": "https://www.liferay.com/",
+																										"es_ES": "https://www.liferay.com/",
+																										"fi_FI": "https://www.liferay.com/",
+																										"fr_FR": "https://www.liferay.com/",
+																										"hu_HU": "https://www.liferay.com/",
+																										"ja_JP": "https://www.liferay.com/",
+																										"nl_NL": "https://www.liferay.com/",
+																										"pt_BR": "https://www.liferay.com/",
+																										"sv_SE": "https://www.liferay.com/",
+																										"zh_CN": "https://www.liferay.com/"
 																									}
 																								}
 																							}
@@ -4230,7 +4321,19 @@
 																							"value": {
 																								"href": {
 																									"value_i18n": {
-																										"en_US": "https://www.liferay.com/pt/home"
+																										"ar_SA": "https://www.liferay.com/",
+																										"ca_ES": "https://www.liferay.com/",
+																										"de_DE": "https://www.liferay.com/",
+																										"en_US": "https://www.liferay.com/",
+																										"es_ES": "https://www.liferay.com/",
+																										"fi_FI": "https://www.liferay.com/",
+																										"fr_FR": "https://www.liferay.com/",
+																										"hu_HU": "https://www.liferay.com/",
+																										"ja_JP": "https://www.liferay.com/",
+																										"nl_NL": "https://www.liferay.com/",
+																										"pt_BR": "https://www.liferay.com/",
+																										"sv_SE": "https://www.liferay.com/",
+																										"zh_CN": "https://www.liferay.com/"
 																									}
 																								}
 																							}
@@ -4568,7 +4671,7 @@
 																		"paddingBottom": "2",
 																		"paddingTop": "2",
 																		"textAlign": "",
-																		"textColor": "gray700Color"
+																		"textColor": "colorNeutral8"
 																	},
 																	"indexed": true
 																},
@@ -4613,7 +4716,19 @@
 																							"value": {
 																								"href": {
 																									"value_i18n": {
-																										"en_US": "https://www.liferay.com/pt/home"
+																										"ar_SA": "https://www.liferay.com/",
+																										"ca_ES": "https://www.liferay.com/",
+																										"de_DE": "https://www.liferay.com/",
+																										"en_US": "https://www.liferay.com/",
+																										"es_ES": "https://www.liferay.com/",
+																										"fi_FI": "https://www.liferay.com/",
+																										"fr_FR": "https://www.liferay.com/",
+																										"hu_HU": "https://www.liferay.com/",
+																										"ja_JP": "https://www.liferay.com/",
+																										"nl_NL": "https://www.liferay.com/",
+																										"pt_BR": "https://www.liferay.com/",
+																										"sv_SE": "https://www.liferay.com/",
+																										"zh_CN": "https://www.liferay.com/"
 																									}
 																								}
 																							}
@@ -4941,7 +5056,7 @@
 																		"paddingBottom": "2",
 																		"paddingTop": "2",
 																		"textAlign": "",
-																		"textColor": "btnOutlineSecondaryColor"
+																		"textColor": "colorNeutral8"
 																	},
 																	"indexed": true
 																},
@@ -4986,7 +5101,19 @@
 																							"value": {
 																								"href": {
 																									"value_i18n": {
-																										"en_US": "https://www.liferay.com/pt/home"
+																										"ar_SA": "https://www.liferay.com/",
+																										"ca_ES": "https://www.liferay.com/",
+																										"de_DE": "https://www.liferay.com/",
+																										"en_US": "https://www.liferay.com/",
+																										"es_ES": "https://www.liferay.com/",
+																										"fi_FI": "https://www.liferay.com/",
+																										"fr_FR": "https://www.liferay.com/",
+																										"hu_HU": "https://www.liferay.com/",
+																										"ja_JP": "https://www.liferay.com/",
+																										"nl_NL": "https://www.liferay.com/",
+																										"pt_BR": "https://www.liferay.com/",
+																										"sv_SE": "https://www.liferay.com/",
+																										"zh_CN": "https://www.liferay.com/"
 																									}
 																								}
 																							}
@@ -5322,7 +5449,7 @@
 																		"paddingBottom": "2",
 																		"paddingTop": "2",
 																		"textAlign": "",
-																		"textColor": "gray700Color"
+																		"textColor": "colorNeutral8"
 																	},
 																	"indexed": true
 																},
@@ -5367,7 +5494,19 @@
 																							"value": {
 																								"href": {
 																									"value_i18n": {
-																										"en_US": "https://www.liferay.com/pt/home"
+																										"ar_SA": "https://www.liferay.com/",
+																										"ca_ES": "https://www.liferay.com/",
+																										"de_DE": "https://www.liferay.com/",
+																										"en_US": "https://www.liferay.com/",
+																										"es_ES": "https://www.liferay.com/",
+																										"fi_FI": "https://www.liferay.com/",
+																										"fr_FR": "https://www.liferay.com/",
+																										"hu_HU": "https://www.liferay.com/",
+																										"ja_JP": "https://www.liferay.com/",
+																										"nl_NL": "https://www.liferay.com/",
+																										"pt_BR": "https://www.liferay.com/",
+																										"sv_SE": "https://www.liferay.com/",
+																										"zh_CN": "https://www.liferay.com/"
 																									}
 																								}
 																							}
@@ -5697,7 +5836,7 @@
 																		"paddingBottom": "2",
 																		"paddingTop": "2",
 																		"textAlign": "",
-																		"textColor": "btnOutlineSecondaryColor"
+																		"textColor": "colorNeutral8"
 																	},
 																	"indexed": true
 																},
@@ -5742,7 +5881,19 @@
 																							"value": {
 																								"href": {
 																									"value_i18n": {
-																										"en_US": "https://www.liferay.com/pt/home"
+																										"ar_SA": "https://www.liferay.com/",
+																										"ca_ES": "https://www.liferay.com/",
+																										"de_DE": "https://www.liferay.com/",
+																										"en_US": "https://www.liferay.com/",
+																										"es_ES": "https://www.liferay.com/",
+																										"fi_FI": "https://www.liferay.com/",
+																										"fr_FR": "https://www.liferay.com/",
+																										"hu_HU": "https://www.liferay.com/",
+																										"ja_JP": "https://www.liferay.com/",
+																										"nl_NL": "https://www.liferay.com/",
+																										"pt_BR": "https://www.liferay.com/",
+																										"sv_SE": "https://www.liferay.com/",
+																										"zh_CN": "https://www.liferay.com/"
 																									}
 																								}
 																							}

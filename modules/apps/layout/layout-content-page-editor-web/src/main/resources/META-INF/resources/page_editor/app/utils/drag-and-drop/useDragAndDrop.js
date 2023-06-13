@@ -319,6 +319,15 @@ export function DragAndDropContextProvider({children}) {
 		return throttle(reducerDispatch, 100);
 	}, [reducerDispatch]);
 
+	useEffect(() => {
+		if (!state.droppable) {
+			document.body.classList.add('invalid-drop');
+		}
+		else {
+			document.body.classList.remove('invalid-drop');
+		}
+	}, [state.droppable]);
+
 	const layoutDataRef = useSelectorRef((state) => state.layoutData);
 
 	const dragAndDropContext = useMemo(
@@ -342,20 +351,30 @@ export function DragAndDropContextProvider({children}) {
 
 function computeDrop({dispatch, layoutDataRef, onDragEnd, state}) {
 	if (!state.droppable) {
+		let message = Liferay.Language.get('an-unexpected-error-occurred');
+
 		if (state.dropItem.fragmentEntryType === FRAGMENT_ENTRY_TYPES.input) {
-			openToast({
-				message: Liferay.Language.get(
-					'form-components-can-only-be-placed-inside-a-mapped-form-container'
-				),
-				type: 'danger',
-			});
+			message = Liferay.Language.get(
+				'form-components-can-only-be-placed-inside-a-mapped-form-container'
+			);
 		}
-		else {
-			openToast({
-				message: Liferay.Language.get('an-unexpected-error-occurred'),
-				type: 'danger',
-			});
+		else if (
+			state.dropTargetItem.type === LAYOUT_DATA_ITEM_TYPES.collection
+		) {
+			message = Liferay.Language.get(
+				'fragments-cannot-be-placed-inside-an-unmapped-collection-display'
+			);
 		}
+		else if (state.dropTargetItem.type === LAYOUT_DATA_ITEM_TYPES.form) {
+			message = Liferay.Language.get(
+				'fragments-cannot-be-placed-inside-an-unmapped-form-container'
+			);
+		}
+
+		openToast({
+			message,
+			type: 'danger',
+		});
 
 		dispatch(initialDragDrop.state);
 

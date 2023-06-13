@@ -25,7 +25,7 @@ if (AdminPermission.contains(permissionChecker, scopeGroupId, KBActionKeys.VIEW_
 	showAdminSuggestionView = true;
 }
 
-KBArticleURLHelper kbArticleURLHelper = new KBArticleURLHelper(renderRequest, renderResponse, templatePath);
+KBArticleURLHelper kbArticleURLHelper = new KBArticleURLHelper(renderRequest, renderResponse);
 
 int kbCommentsCount = 0;
 int pendingKBCommentsCount = 0;
@@ -125,7 +125,7 @@ if (ratingsType == null) {
 			<c:when test="<%= showAdminSuggestionView %>">
 
 				<%
-				KBSuggestionListDisplayContext kbSuggestionListDisplayContext = new KBSuggestionListDisplayContext(request, templatePath, kbArticle);
+				KBSuggestionListDisplayContext kbSuggestionListDisplayContext = new KBSuggestionListDisplayContext(request, kbArticle);
 
 				request.setAttribute(KBWebKeys.KNOWLEDGE_BASE_KB_SUGGESTION_LIST_DISPLAY_CONTEXT, kbSuggestionListDisplayContext);
 

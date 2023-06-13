@@ -40,6 +40,12 @@ definition {
 			locator1 = "Card#CARD");
 	}
 
+	macro assertHelpText {
+		AssertElementPresent(
+			key_helpText = "${helpText}",
+			locator1 = "ObjectField#HELP_TEXT");
+	}
+
 	macro assertLabel {
 		AssertTextEquals(
 			locator1 = "ObjectField#LABEL_LOCALIZED",
@@ -182,6 +188,13 @@ definition {
 		Type(
 			locator1 = "ObjectField#TYPE_MAXIMUM_NUMBER_CHARACTERS",
 			value1 = "${newValue}");
+	}
+
+	macro viewCountCharactersOnEntries {
+		AssertElementPresent(
+			key_fieldName = "${fieldName}",
+			key_viewCountCharacters = "${viewCountCharacters}",
+			locator1 = "ObjectField#VIEW_COUNT_CHARACTERS_ON_ENTRIES");
 	}
 
 	macro viewToogleOnSidePanelShowFilesInDM {

@@ -1,5 +1,3 @@
-import {fetch} from 'frontend-js-web';
-
 const RAPID_TEXT_DELAY = 300;
 
 let rapidText = '';
@@ -13,7 +11,10 @@ const defaultOptionLabel = document.getElementById(
 	`${fragmentNamespace}-option--`
 ).textContent;
 const dropdown = wrapper.querySelector('.dropdown-menu');
-const inputElement = wrapper.querySelector('input');
+const inputElement = wrapper.querySelector(`input[name="${input.name}"]`);
+const labelInputElement = wrapper.querySelector(
+	`input[name="${input.name}-label"]`
+);
 const listbox = wrapper.querySelector('.list-unstyled');
 const loadingResultsMessage = wrapper.querySelector(
 	'.forms-select-from-list-loading-results'
@@ -145,6 +146,7 @@ function setActiveDescendant(element) {
 
 		listbox.setAttribute('aria-activedescendant', element.id);
 		inputElement.value = element.dataset.optionValue;
+		labelInputElement.value = element.textContent;
 
 		element.classList.add('active');
 		element.setAttribute('aria-selected', 'true');
@@ -332,7 +334,7 @@ function fetchRemoteOptions(query, abortController) {
 	const url = new URL(input.attributes.relationshipURL);
 	url.searchParams.set('search', query);
 
-	return fetch(url, {
+	return Liferay.Util.fetch(url, {
 		headers: new Headers({
 			'Accept': 'application/json',
 			'Content-Type': 'application/json',

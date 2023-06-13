@@ -1519,7 +1519,11 @@ definition {
 			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
 		}
 
+		WaitForPageLoad();
+
 		WebContentNavigator.gotoEditCP(webContentTitle = "${webContentTitle}");
+
+		WaitForPageLoad();
 
 		Panel.expandPanel(panel = "Categorization");
 
@@ -1532,7 +1536,11 @@ definition {
 			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
 		}
 
+		WaitForPageLoad();
+
 		WebContentNavigator.gotoEditCP(webContentTitle = "${webContentTitle}");
+
+		WaitForPageLoad();
 
 		Panel.expandPanel(panel = "Categorization");
 
@@ -1556,6 +1564,8 @@ definition {
 		else {
 			WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
 		}
+
+		WaitForPageLoad();
 
 		WebContent.moveToRecycleBinCP(webContentTitle = "${webContentTitle}");
 	}
@@ -2141,6 +2151,10 @@ definition {
 			webContentTitle = "Web Content Title");
 
 		Staging.gotoPublishToLive();
+
+		Staging.configurePublishToLive(
+			checkContentNameList = "Web Content",
+			contentDateRange = "All");
 
 		Staging.publishToLive();
 
@@ -5876,6 +5890,14 @@ definition {
 		NestedPortlets.viewPG(
 			nestedColumnNumber = "1",
 			portletName = "Blogs");
+	}
+
+	macro viewSynonymsEntry {
+		SearchTuning.openSynonymsAdmin();
+
+		AssertElementPresent(
+			key_synonyms = "apple, banana",
+			locator1 = "SearchTuning#SYNONYMS_ENTRY");
 	}
 
 	macro viewSystemSettings {

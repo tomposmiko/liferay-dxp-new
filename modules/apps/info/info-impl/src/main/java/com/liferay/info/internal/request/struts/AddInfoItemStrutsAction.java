@@ -28,6 +28,7 @@ import com.liferay.info.exception.InfoFormValidationException;
 import com.liferay.info.field.InfoField;
 import com.liferay.info.field.InfoFieldValue;
 import com.liferay.info.field.type.DateInfoFieldType;
+import com.liferay.info.field.type.RelationshipInfoFieldType;
 import com.liferay.info.internal.request.helper.InfoRequestFieldValuesProviderHelper;
 import com.liferay.info.item.InfoItemFieldValues;
 import com.liferay.info.item.InfoItemReference;
@@ -54,6 +55,7 @@ import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.struts.StrutsAction;
+import com.liferay.portal.kernel.upload.UploadServletRequest;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -223,18 +225,32 @@ public class AddInfoItemStrutsAction implements StrutsAction {
 		}
 
 		if (!success && (infoFieldValues != null)) {
-			Map<String, String> formParameterMap = new HashMap<>();
+			Map<String, String> infoFormParameterMap = new HashMap<>();
 
 			for (InfoFieldValue<Object> infoFieldValue : infoFieldValues) {
 				InfoField<?> infoField = infoFieldValue.getInfoField();
 
-				formParameterMap.put(
+				infoFormParameterMap.put(
 					infoField.getName(), _getValue(infoFieldValue));
+
+				if (infoField.getInfoFieldType() ==
+						RelationshipInfoFieldType.INSTANCE) {
+
+					UploadServletRequest uploadServletRequest =
+						_portal.getUploadServletRequest(httpServletRequest);
+
+					String labelParameterName = infoField.getName() + "-label";
+
+					String label = ParamUtil.getString(
+						uploadServletRequest, labelParameterName);
+
+					infoFormParameterMap.put(labelParameterName, label);
+				}
 			}
 
 			SessionMessages.add(
 				httpServletRequest, "infoFormParameterMap" + formItemId,
-				formParameterMap);
+				infoFormParameterMap);
 		}
 
 		if (Validator.isNull(redirect)) {

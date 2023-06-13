@@ -538,6 +538,37 @@ definition {
 		}
 	}
 
+	macro executePingbackViacURL {
+		var ip = "${ip}";
+		var portalURL = "${portalURL}";
+
+		var curl = '''
+			${portalURL}/xmlrpc/pingback \
+			-H 'Content-Type: text/xml' \
+			-u test@liferay.com:test \
+			-d '
+			<?xml version="1.0" encoding="iso-8859-1"?>
+			<methodCall>
+			<methodName>pingback.ping</methodName>
+			<params>
+			<param><value><string>http://${ip}</string></value></param>
+			<param><value><string>${portalURL}/web/guest/home/-/blogs/${entryTitle}</string></value></param>
+			</params>
+			</methodCall>'
+		''';
+
+		echo("${curl}");
+
+		var returnValue = JSONCurlUtil.post("${curl}");
+
+		if (contains("${returnValue}", "Access Denied")) {
+			echo("The return value is Access Denied");
+		}
+		else {
+			fail("FAIL!");
+		}
+	}
+
 	macro flagPG {
 		var key_entryTitle = "${entryTitle}";
 
@@ -1087,6 +1118,14 @@ definition {
 
 		if (isSet(entryInlineImage)) {
 			BlogsEntry.viewInlineImage(uploadFileName = "${entryInlineImage}");
+		}
+
+		if (isSet(entrySmallImage)) {
+			Panel.expandPanel(panel = "Configuration");
+
+			AssertVisible(
+				key_smallImage = "${entrySmallImage}",
+				locator1 = "BlogsEntry#SMALL_IMAGE");
 		}
 	}
 

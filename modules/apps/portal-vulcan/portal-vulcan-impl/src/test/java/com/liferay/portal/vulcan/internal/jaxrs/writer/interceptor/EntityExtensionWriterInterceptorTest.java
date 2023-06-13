@@ -16,6 +16,7 @@ package com.liferay.portal.vulcan.internal.jaxrs.writer.interceptor;
 
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.portal.vulcan.internal.extension.EntityExtensionHandler;
 import com.liferay.portal.vulcan.internal.extension.EntityExtensionThreadLocal;
@@ -50,6 +51,8 @@ public class EntityExtensionWriterInterceptorTest {
 
 	@Before
 	public void setUp() {
+		EntityExtensionThreadLocal.setExtendedProperties(null);
+
 		ReflectionTestUtil.setFieldValue(
 			_entityExtensionWriterInterceptor, "_company", _company);
 		ReflectionTestUtil.setFieldValue(
@@ -59,7 +62,7 @@ public class EntityExtensionWriterInterceptorTest {
 	@Test
 	public void testAroundWrite() throws Exception {
 		Map<String, Serializable> extendedProperties = Collections.singletonMap(
-			"test", "test");
+			RandomTestUtil.randomString(), RandomTestUtil.randomString());
 
 		EntityExtensionThreadLocal.setExtendedProperties(extendedProperties);
 
@@ -104,15 +107,6 @@ public class EntityExtensionWriterInterceptorTest {
 		_entityExtensionWriterInterceptor.aroundWriteTo(
 			_writerInterceptorContext);
 
-		EntityExtensionThreadLocal.setExtendedProperties(null);
-
-		Mockito.verify(
-			_entityExtensionHandler
-		).setExtendedProperties(
-			Mockito.eq(_COMPANY_ID), Mockito.eq(_TEST_ENTITY),
-			Mockito.eq(extendedProperties)
-		);
-
 		Mockito.verify(
 			_entityExtensionHandler
 		).getExtendedProperties(
@@ -140,14 +134,14 @@ public class EntityExtensionWriterInterceptorTest {
 
 		Mockito.verify(
 			_writerInterceptorContext
-		).setGenericType(
-			ExtendedEntity.class
+		).setEntity(
+			Mockito.any(ExtendedEntity.class)
 		);
 
 		Mockito.verify(
 			_writerInterceptorContext
-		).setEntity(
-			Mockito.any(ExtendedEntity.class)
+		).setGenericType(
+			ExtendedEntity.class
 		);
 	}
 
@@ -169,10 +163,8 @@ public class EntityExtensionWriterInterceptorTest {
 			_writerInterceptorContext);
 
 		Mockito.verify(
-			_writerInterceptorContext, Mockito.never()
-		).setGenericType(
-			Mockito.any()
-		);
+			_writerInterceptorContext
+		).proceed();
 
 		Mockito.verify(
 			_writerInterceptorContext, Mockito.never()
@@ -181,14 +173,14 @@ public class EntityExtensionWriterInterceptorTest {
 		);
 
 		Mockito.verify(
-			_writerInterceptorContext
-		).proceed();
+			_writerInterceptorContext, Mockito.never()
+		).setGenericType(
+			Mockito.any()
+		);
 	}
 
 	@Test
 	public void testAroundWriteWithNoExtendedProperties() throws Exception {
-		EntityExtensionThreadLocal.setExtendedProperties(null);
-
 		Mockito.when(
 			_company.getCompanyId()
 		).thenReturn(
@@ -230,12 +222,6 @@ public class EntityExtensionWriterInterceptorTest {
 			_writerInterceptorContext);
 
 		Mockito.verify(
-			_entityExtensionHandler, Mockito.never()
-		).setExtendedProperties(
-			Mockito.anyLong(), Mockito.any(), Mockito.any()
-		);
-
-		Mockito.verify(
 			_entityExtensionHandler
 		).getExtendedProperties(
 			Mockito.eq(_COMPANY_ID), Mockito.eq(_TEST_ENTITY)
@@ -262,18 +248,18 @@ public class EntityExtensionWriterInterceptorTest {
 
 		Mockito.verify(
 			_writerInterceptorContext
-		).setGenericType(
-			ExtendedEntity.class
-		);
-
-		Mockito.verify(
-			_writerInterceptorContext
 		).proceed();
 
 		Mockito.verify(
 			_writerInterceptorContext
 		).setEntity(
 			Mockito.any(ExtendedEntity.class)
+		);
+
+		Mockito.verify(
+			_writerInterceptorContext
+		).setGenericType(
+			ExtendedEntity.class
 		);
 	}
 

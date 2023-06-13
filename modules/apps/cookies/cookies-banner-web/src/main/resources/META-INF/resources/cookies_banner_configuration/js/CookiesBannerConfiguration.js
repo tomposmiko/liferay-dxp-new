@@ -12,11 +12,14 @@
  * details.
  */
 
+import {getOpener} from 'frontend-js-web';
+
 import {
 	acceptAllCookies,
 	declineAllCookies,
 	getCookie,
 	setCookie,
+	setUserConfigCookie,
 } from '../../js/CookiesUtil';
 
 export default function ({
@@ -35,7 +38,7 @@ export default function ({
 		const cookieKey = toggleSwitch.dataset.cookieKey;
 
 		toggleSwitch.addEventListener('click', () => {
-			Liferay.Util.getOpener().Liferay.fire('cookiePreferenceUpdate', {
+			getOpener().Liferay.fire('cookiePreferenceUpdate', {
 				key: cookieKey,
 				value: toggleSwitch.checked ? 'true' : 'false',
 			});
@@ -70,6 +73,8 @@ export default function ({
 				requiredConsentCookieTypeNames
 			);
 
+			setUserConfigCookie();
+
 			window.location.reload();
 		});
 
@@ -87,6 +92,8 @@ export default function ({
 				}
 			);
 
+			setUserConfigCookie();
+
 			window.location.reload();
 		});
 
@@ -95,6 +102,8 @@ export default function ({
 				optionalConsentCookieTypeNames,
 				requiredConsentCookieTypeNames
 			);
+
+			setUserConfigCookie();
 
 			window.location.reload();
 		});
