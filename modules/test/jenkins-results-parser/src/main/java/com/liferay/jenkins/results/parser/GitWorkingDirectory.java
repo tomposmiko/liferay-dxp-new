@@ -418,29 +418,48 @@ public class GitWorkingDirectory {
 	}
 
 	public String createPullRequest(
-			String body, String pullRequestBranchName, String receiverUserName,
-			String senderUserName, String title)
+			final String body, final String pullRequestBranchName,
+			final String receiverUserName, final String senderUserName,
+			final String title)
 		throws IOException {
 
-		JSONObject requestJSONObject = new JSONObject();
+		Retryable<String> retryable = new Retryable<String>(true, 3, 0, true) {
 
-		requestJSONObject.put("base", _upstreamBranchName);
-		requestJSONObject.put("body", body);
-		requestJSONObject.put(
-			"head", senderUserName + ":" + pullRequestBranchName);
-		requestJSONObject.put("title", title);
+			@Override
+			public String execute() {
+				JSONObject requestJSONObject = new JSONObject();
 
-		String url = JenkinsResultsParserUtil.getGitHubApiUrl(
-			_gitRepositoryName, receiverUserName, "pulls");
+				requestJSONObject.put("base", _upstreamBranchName);
+				requestJSONObject.put("body", body);
+				requestJSONObject.put(
+					"head", senderUserName + ":" + pullRequestBranchName);
+				requestJSONObject.put("title", title);
 
-		JSONObject responseJSONObject = JenkinsResultsParserUtil.toJSONObject(
-			url, requestJSONObject.toString());
+				String url = JenkinsResultsParserUtil.getGitHubApiUrl(
+					_gitRepositoryName, receiverUserName, "pulls");
 
-		String pullRequestURL = responseJSONObject.getString("html_url");
+				JSONObject responseJSONObject;
 
-		System.out.println("Created a pull request at " + pullRequestURL);
+				try {
+					responseJSONObject = JenkinsResultsParserUtil.toJSONObject(
+						url, requestJSONObject.toString());
+				}
+				catch (IOException ioException) {
+					throw new RuntimeException(ioException);
+				}
 
-		return pullRequestURL;
+				String pullRequestURL = responseJSONObject.getString(
+					"html_url");
+
+				System.out.println(
+					"Created a pull request at " + pullRequestURL);
+
+				return pullRequestURL;
+			}
+
+		};
+
+		return retryable.executeWithRetries();
 	}
 
 	public void deleteLocalGitBranch(LocalGitBranch localGitBranch) {

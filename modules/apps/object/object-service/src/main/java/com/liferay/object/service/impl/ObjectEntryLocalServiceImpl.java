@@ -14,9 +14,6 @@
 
 package com.liferay.object.service.impl;
 
-import com.liferay.account.constants.AccountConstants;
-import com.liferay.account.model.AccountEntry;
-import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetLinkConstants;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
@@ -35,7 +32,6 @@ import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldValidationConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.exception.NoSuchObjectFieldException;
-import com.liferay.object.exception.ObjectDefinitionAccountEntryRestrictedException;
 import com.liferay.object.exception.ObjectDefinitionScopeException;
 import com.liferay.object.exception.ObjectEntryValuesException;
 import com.liferay.object.internal.petra.sql.dsl.DynamicObjectDefinitionTable;
@@ -77,7 +73,6 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.db.DBType;
 import com.liferay.portal.kernel.dao.jdbc.CurrentConnection;
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -118,6 +113,7 @@ import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -190,7 +186,6 @@ public class ObjectEntryLocalServiceImpl
 		ObjectDefinition objectDefinition =
 			_objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
 
-		_validateAccountEntry(userId, objectDefinition, values);
 		_validateGroupId(groupId, objectDefinition.getScope());
 
 		User user = _userLocalService.getUser(userId);
@@ -966,7 +961,6 @@ public class ObjectEntryLocalServiceImpl
 			_objectDefinitionPersistence.findByPrimaryKey(
 				objectEntry.getObjectDefinitionId());
 
-		_validateAccountEntry(userId, objectDefinition, values);
 		_validateValues(
 			user.isDefaultUser(), objectEntry.getObjectDefinitionId(),
 			objectDefinition.getPortletId(), serviceContext, userId, values);
@@ -983,6 +977,10 @@ public class ObjectEntryLocalServiceImpl
 			_getExtensionDynamicObjectDefinitionTable(
 				objectEntry.getObjectDefinitionId()),
 			objectEntryId, values);
+
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-158821"))) {
+			_setExternalReferenceCode(objectEntry, values);
+		}
 
 		objectEntry.setModifiedDate(serviceContext.getModifiedDate(null));
 		objectEntry.setValues(null);
@@ -2031,6 +2029,29 @@ public class ObjectEntryLocalServiceImpl
 		}
 	}
 
+	private void _setExternalReferenceCode(
+			ObjectEntry objectEntry, Map<String, Serializable> values)
+		throws PortalException {
+
+		for (Map.Entry<String, Serializable> entry : values.entrySet()) {
+			if (StringUtil.equals(entry.getKey(), "externalReferenceCode")) {
+				String externalReferenceCode = String.valueOf(entry.getValue());
+
+				if (Validator.isNull(externalReferenceCode)) {
+					externalReferenceCode = String.valueOf(
+						objectEntry.getObjectEntryId());
+				}
+
+				_validateExternalReferenceCode(
+					objectEntry.getCompanyId(), externalReferenceCode,
+					objectEntry.getObjectDefinitionId(),
+					objectEntry.getObjectEntryId());
+
+				objectEntry.setExternalReferenceCode(externalReferenceCode);
+			}
+		}
+	}
+
 	private void _startWorkflowInstance(
 			long userId, ObjectEntry objectEntry, ServiceContext serviceContext)
 		throws PortalException {
@@ -2149,46 +2170,20 @@ public class ObjectEntryLocalServiceImpl
 		}
 	}
 
-	private void _validateAccountEntry(
-			long userId, ObjectDefinition objectDefinition,
-			Map<String, Serializable> values)
+	private void _validateExternalReferenceCode(
+			long companyId, String externalReferenceCode,
+			long objectDefinitionId, long objectEntryId)
 		throws PortalException {
 
-		if (!objectDefinition.isAccountEntryRestricted()) {
-			return;
+		ObjectEntry objectEntry = objectEntryPersistence.fetchByC_ERC_ODI(
+			companyId, externalReferenceCode, objectDefinitionId);
+
+		if ((objectEntry != null) &&
+			(objectEntry.getObjectEntryId() != objectEntryId)) {
+
+			throw new ObjectEntryValuesException.MustNotBeDuplicate(
+				externalReferenceCode);
 		}
-
-		ObjectField objectField = _objectFieldLocalService.getObjectField(
-			objectDefinition.getAccountEntryRestrictedObjectFieldId());
-
-		if (!values.containsKey(objectField.getName())) {
-			return;
-		}
-
-		List<AccountEntry> accountEntries =
-			_accountEntryLocalService.getUserAccountEntries(
-				userId, AccountConstants.PARENT_ACCOUNT_ENTRY_ID_DEFAULT, null,
-				new String[] {
-					AccountConstants.ACCOUNT_ENTRY_TYPE_BUSINESS,
-					AccountConstants.ACCOUNT_ENTRY_TYPE_PERSON
-				},
-				WorkflowConstants.STATUS_APPROVED, QueryUtil.ALL_POS,
-				QueryUtil.ALL_POS);
-
-		long accountEntryId = GetterUtil.getLong(
-			values.get(objectField.getName()));
-
-		for (AccountEntry accountEntry : accountEntries) {
-			if (accountEntryId == accountEntry.getAccountEntryId()) {
-				return;
-			}
-		}
-
-		throw new ObjectDefinitionAccountEntryRestrictedException(
-			StringBundler.concat(
-				"The account entry ", accountEntryId,
-				" does not exist or the user ", userId,
-				" does not belong to it"));
 	}
 
 	private void _validateFileExtension(
@@ -2511,14 +2506,13 @@ public class ObjectEntryLocalServiceImpl
 		ObjectEntryTable.INSTANCE.objectEntryId,
 		ObjectEntryTable.INSTANCE.userName,
 		ObjectEntryTable.INSTANCE.createDate,
-		ObjectEntryTable.INSTANCE.modifiedDate, ObjectEntryTable.INSTANCE.status
+		ObjectEntryTable.INSTANCE.modifiedDate,
+		ObjectEntryTable.INSTANCE.externalReferenceCode,
+		ObjectEntryTable.INSTANCE.status
 	};
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ObjectEntryLocalServiceImpl.class);
-
-	@Reference
-	private AccountEntryLocalService _accountEntryLocalService;
 
 	@Reference
 	private AssetEntryLocalService _assetEntryLocalService;

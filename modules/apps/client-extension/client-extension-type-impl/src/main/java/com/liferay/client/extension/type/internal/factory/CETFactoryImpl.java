@@ -70,9 +70,13 @@ public class CETFactoryImpl implements CETFactory {
 		).put(
 			ClientExtensionEntryConstants.TYPE_THEME_FAVICON,
 			new ThemeFaviconCETImplFactoryImpl()
-		).put(
+
+		// TODO
+
+		/*).put(
 			ClientExtensionEntryConstants.TYPE_THEME_JS,
-			new ThemeJSCETImplFactoryImpl()
+			new ThemeJSCETImplFactoryImpl()*/
+
 		).build();
 
 		_types = Collections.unmodifiableSortedSet(

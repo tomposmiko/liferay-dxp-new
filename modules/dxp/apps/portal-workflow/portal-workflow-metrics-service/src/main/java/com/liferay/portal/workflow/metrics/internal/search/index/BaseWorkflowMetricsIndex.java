@@ -21,20 +21,13 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
-import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.engine.adapter.index.CreateIndexRequest;
 import com.liferay.portal.search.engine.adapter.index.DeleteIndexRequest;
 import com.liferay.portal.search.engine.adapter.index.IndicesExistsIndexRequest;
 import com.liferay.portal.search.engine.adapter.index.IndicesExistsIndexResponse;
-import com.liferay.portal.workflow.metrics.internal.petra.executor.WorkflowMetricsPortalExecutor;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
@@ -47,50 +40,26 @@ public abstract class BaseWorkflowMetricsIndex implements WorkflowMetricsIndex {
 
 	@Override
 	public void createIndex(long companyId) throws PortalException {
-		workflowMetricsPortalExecutor.execute(
-			() -> {
-				if (searchEngineAdapter == null) {
-					return;
-				}
+		if ((searchEngineAdapter == null) ||
+			_hasIndex(getIndexName(companyId))) {
 
-				_indexesMap.computeIfAbsent(
-					getIndexName(companyId),
-					indexName -> _createIndex(indexName));
-			});
+			return;
+		}
+
+		_createIndex(getIndexName(companyId));
 	}
 
 	@Override
 	public void removeIndex(long companyId) throws PortalException {
-		workflowMetricsPortalExecutor.execute(
-			() -> {
-				if (searchEngineAdapter == null) {
-					return;
-				}
+		if ((searchEngineAdapter == null) ||
+			!_hasIndex(getIndexName(companyId))) {
 
-				String indexName = _indexesMap.remove(getIndexName(companyId));
+			return;
+		}
 
-				if (indexName != null) {
-					searchEngineAdapter.execute(
-						new DeleteIndexRequest(indexName));
-				}
-			});
+		searchEngineAdapter.execute(
+			new DeleteIndexRequest(getIndexName(companyId)));
 	}
-
-	@Activate
-	protected void activate() throws Exception {
-		companyLocalService.forEachCompanyId(
-			companyId -> createIndex(companyId));
-	}
-
-	@Reference(
-		target = ModuleServiceLifecycle.PORTLETS_INITIALIZED, unbind = "-"
-	)
-	protected void setModuleServiceLifecycle(
-		ModuleServiceLifecycle moduleServiceLifecycle) {
-	}
-
-	@Reference
-	protected CompanyLocalService companyLocalService;
 
 	@Reference(
 		cardinality = ReferenceCardinality.OPTIONAL,
@@ -99,9 +68,6 @@ public abstract class BaseWorkflowMetricsIndex implements WorkflowMetricsIndex {
 		target = "(search.engine.impl=Elasticsearch)"
 	)
 	protected volatile SearchEngineAdapter searchEngineAdapter;
-
-	@Reference
-	protected WorkflowMetricsPortalExecutor workflowMetricsPortalExecutor;
 
 	private String _createIndex(String indexName) {
 		IndicesExistsIndexResponse indicesExistsIndexResponse =
@@ -142,6 +108,16 @@ public abstract class BaseWorkflowMetricsIndex implements WorkflowMetricsIndex {
 		return null;
 	}
 
+	private boolean _hasIndex(String indexName) {
+		IndicesExistsIndexRequest indicesExistsIndexRequest =
+			new IndicesExistsIndexRequest(indexName);
+
+		IndicesExistsIndexResponse indicesExistsIndexResponse =
+			searchEngineAdapter.execute(indicesExistsIndexRequest);
+
+		return indicesExistsIndexResponse.isExists();
+	}
+
 	private JSONObject _readJSONObject(String fileName) throws JSONException {
 		return JSONFactoryUtil.createJSONObject(
 			StringUtil.read(getClass(), "/META-INF/search/" + fileName));
@@ -149,8 +125,5 @@ public abstract class BaseWorkflowMetricsIndex implements WorkflowMetricsIndex {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		BaseWorkflowMetricsIndex.class);
-
-	private static final Map<String, String> _indexesMap =
-		new ConcurrentHashMap<>();
 
 }

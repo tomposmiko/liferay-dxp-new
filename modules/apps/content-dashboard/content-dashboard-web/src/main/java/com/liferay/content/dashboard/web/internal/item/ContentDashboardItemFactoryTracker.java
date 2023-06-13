@@ -14,11 +14,19 @@
 
 package com.liferay.content.dashboard.web.internal.item;
 
+import com.liferay.asset.kernel.model.AssetVocabularyConstants;
+import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
+import com.liferay.content.dashboard.web.internal.constants.ContentDashboardConstants;
+import com.liferay.content.dashboard.web.internal.util.AssetVocabularyUtil;
 import com.liferay.osgi.service.tracker.collections.map.ServiceReferenceMapperFactory;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.petra.reflect.GenericUtil;
+import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
+import com.liferay.portal.kernel.service.CompanyLocalService;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -26,10 +34,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 /**
  * @author Cristina González
@@ -37,7 +47,7 @@ import org.osgi.service.component.annotations.Reference;
 @Component(service = ContentDashboardItemFactoryTracker.class)
 public class ContentDashboardItemFactoryTracker {
 
-	public Collection<Long> getClassIds() {
+	public Collection<Long> getClassNameIds() {
 		Collection<String> classNames = getClassNames();
 
 		Stream<String> stream = classNames.stream();
@@ -66,9 +76,11 @@ public class ContentDashboardItemFactoryTracker {
 				bundleContext, ContentDashboardItemFactory.class, null,
 				ServiceReferenceMapperFactory.create(
 					bundleContext,
-					(contentDashboardItem, emitter) -> emitter.emit(
+					(contentDashboardItemFactory, emitter) -> emitter.emit(
 						GenericUtil.getGenericClassName(
-							contentDashboardItem))));
+							contentDashboardItemFactory))),
+				new ContentDashboardItemFactoryTrackerCustomizer(
+					bundleContext));
 	}
 
 	@Deactivate
@@ -76,10 +88,79 @@ public class ContentDashboardItemFactoryTracker {
 		_serviceTrackerMap.close();
 	}
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		ContentDashboardItemFactoryTracker.class);
+
+	@Reference
+	private AssetVocabularyLocalService _assetVocabularyLocalService;
+
 	@Reference
 	private ClassNameLocalService _classNameLocalService;
 
+	@Reference
+	private CompanyLocalService _companyLocalService;
+
+	@Reference
+	private Language _language;
+
 	private volatile ServiceTrackerMap<String, ContentDashboardItemFactory<?>>
 		_serviceTrackerMap;
+
+	private class ContentDashboardItemFactoryTrackerCustomizer
+		implements ServiceTrackerCustomizer
+			<ContentDashboardItemFactory, ContentDashboardItemFactory> {
+
+		public ContentDashboardItemFactoryTrackerCustomizer(
+			BundleContext bundleContext) {
+
+			_bundleContext = bundleContext;
+		}
+
+		@Override
+		public ContentDashboardItemFactory addingService(
+			ServiceReference<ContentDashboardItemFactory> serviceReference) {
+
+			ContentDashboardItemFactory contentDashboardItemFactory =
+				_bundleContext.getService(serviceReference);
+
+			long classNameId = _classNameLocalService.getClassNameId(
+				GenericUtil.getGenericClassName(contentDashboardItemFactory));
+
+			for (ContentDashboardConstants.DefaultInternalAssetVocabularyName
+					defaultInternalAssetVocabularyName :
+						ContentDashboardConstants.
+							DefaultInternalAssetVocabularyName.values()) {
+
+				try {
+					_companyLocalService.forEachCompany(
+						company -> AssetVocabularyUtil.addAssetVocabulary(
+							_assetVocabularyLocalService,
+							Collections.singletonList(classNameId), company,
+							defaultInternalAssetVocabularyName.toString(),
+							AssetVocabularyConstants.VISIBILITY_TYPE_INTERNAL));
+				}
+				catch (Exception exception) {
+					_log.error(exception);
+				}
+			}
+
+			return contentDashboardItemFactory;
+		}
+
+		@Override
+		public void modifiedService(
+			ServiceReference<ContentDashboardItemFactory> serviceReference,
+			ContentDashboardItemFactory contentDashboardItemFactory) {
+		}
+
+		@Override
+		public void removedService(
+			ServiceReference<ContentDashboardItemFactory> serviceReference,
+			ContentDashboardItemFactory contentDashboardItemFactory) {
+		}
+
+		private final BundleContext _bundleContext;
+
+	}
 
 }

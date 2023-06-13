@@ -535,7 +535,7 @@ definition {
 		PageEditor.gotoTabsFragmentNavItem(navItem = "${navItem}");
 
 		AssertVisible(
-			key_content = "Place fragments here.",
+			key_content = "Place fragments or widgets here.",
 			key_fragmentClass = "content",
 			key_position = "${position}",
 			locator1 = "Fragment#DROP_ZONE_NO_FRAGMENTS_MESSAGE");
@@ -1228,6 +1228,27 @@ definition {
 				key_fieldLabel = "Border Radius",
 				locator1 = "Select#GENERIC_SELECT_FIELD",
 				value1 = "${borderRadius}");
+
+			PageEditor.waitForAutoSave();
+		}
+
+		if (isSet(unit)) {
+			Click(
+				key_fieldLabel = "${fieldLabel}",
+				locator1 = "Dropdown#DROPDOWN_TOGGLE_BUTTON_WITH_LABEL");
+
+			MenuItem.click(menuItem = "${unit}");
+		}
+
+		if (isSet(borderWidth)) {
+			Type(
+				key_text = "Border Width",
+				locator1 = "TextInput#ANY",
+				value1 = "${borderWidth}");
+
+			Click(
+				key_sidebarButton = "Browser",
+				locator1 = "PageEditor#FRAGMENT_SIDEBAR_TITLE");
 
 			PageEditor.waitForAutoSave();
 		}
@@ -2964,20 +2985,11 @@ definition {
 			}
 
 			if (isSet(borderWidth)) {
-				Type(
-					key_fieldLabel = "Border Width",
-					locator1 = "FormFields#NUMBER_FIELD",
-					value1 = "${borderWidth}");
-
-				Click(
-					key_sidebarButton = "Browser",
-					locator1 = "PageEditor#FRAGMENT_SIDEBAR_TITLE");
-
-				PageEditor.waitForAutoSave();
+				PageEditor.configureFragment(borderWidth = "${borderWidth}");
 
 				AssertTextEquals(
-					key_fieldLabel = "Border Width",
-					locator1 = "FormFields#NUMBER_FIELD",
+					key_text = "Border Width",
+					locator1 = "TextInput#ANY",
 					value1 = "${borderWidth}");
 			}
 
@@ -3301,20 +3313,11 @@ definition {
 			}
 
 			if (isSet(borderWidth)) {
-				Type(
-					key_fieldLabel = "Border Width",
-					locator1 = "FormFields#NUMBER_FIELD",
-					value1 = "${borderWidth}");
-
-				Click(
-					key_sidebarButton = "Browser",
-					locator1 = "PageEditor#FRAGMENT_SIDEBAR_TITLE");
-
-				PageEditor.waitForAutoSave();
+				PageEditor.configureFragment(borderWidth = "${borderWidth}");
 
 				AssertTextEquals(
-					key_fieldLabel = "Border Width",
-					locator1 = "FormFields#NUMBER_FIELD",
+					key_text = "Border Width",
+					locator1 = "TextInput#ANY",
 					value1 = "${borderWidth}");
 			}
 
@@ -4059,7 +4062,11 @@ return	Array.from(getWebElement("(//div[@aria-label='${fragmentName}'])[${index}
 	macro searchFragmentViaSidebar {
 		WaitForPageLoad();
 
-		PageEditor.gotoTab(tabName = "Fragments");
+		if (IsElementPresent(locator1 = "Icon#TIMES")) {
+			Click(locator1 = "Icon#TIMES");
+		}
+
+		Navigator.gotoNavTab(navTab = "Fragments");
 
 		Type(
 			locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_SEARCH_FIELD",
@@ -4188,7 +4195,7 @@ return	Array.from(getWebElement("(//div[@aria-label='${fragmentName}'])[${index}
 	macro viewCannotAddFragmentToOutsideOfDropZone {
 		WaitForPageLoad();
 
-		PageEditor.gotoTab(tabName = "Fragments");
+		Navigator.gotoNavTab(navTab = "Fragments");
 
 		PageEditor.expandFragmentCollection(collectionName = "${collectionName}");
 
@@ -4819,6 +4826,14 @@ return	Array.from(getWebElement("(//div[@aria-label='${fragmentName}'])[${index}
 				locator1 = "Fragment#BOTTOM_SPACING");
 		}
 
+		if (isSet(borderWidth)) {
+			PageEditor.viewFragmentCommonStyle(
+				fragmentName = "${fragmentName}",
+				index = "${position}",
+				styleName = "borderWidth",
+				styleValue = "${borderWidth}");
+		}
+
 		if (isSet(boxShadow)) {
 			PageEditor.viewFragmentTopperStyle(
 				fragmentName = "${fragmentName}",
@@ -5136,6 +5151,21 @@ return	Array.from(getWebElement("(//div[@aria-label='${fragmentName}'])[${index}
 		AssertTextEquals(
 			locator1 = "ControlMenu#VIEW_COLLECTION_ITEMS_BUTTON",
 			value1 = "${numberOfItems}");
+	}
+
+	macro viewOrderOfSideBarButtons {
+		if (!(isSet(i))) {
+			var i = "1";
+		}
+
+		for (var buttonName : list "${buttonNameList}") {
+			AssertVisible(
+				index = "${i}",
+				key_tabName = "${buttonName}",
+				locator1 = "PageEditor#FRAGMENT_SIDEBAR_TAB_BUTTON_BY_INDEX");
+
+			var i = ${i} + 1;
+		}
 	}
 
 	macro waitForAutoSave {

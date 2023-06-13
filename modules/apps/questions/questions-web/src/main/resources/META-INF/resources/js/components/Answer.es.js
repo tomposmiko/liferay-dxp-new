@@ -25,7 +25,7 @@ import {
 	markAsAnswerMessageBoardMessageQuery,
 } from '../utils/client.es';
 import lang from '../utils/lang.es';
-import {getDateFormatted} from '../utils/time.es';
+import {dateToInternationalHuman} from '../utils/utils.es';
 import ArticleBodyRenderer from './ArticleBodyRenderer.es';
 import Comments from './Comments.es';
 import Link from './Link.es';
@@ -105,7 +105,10 @@ export default withRouter(
 
 							<span className="text-secondary">
 								{lang.sub(Liferay.Language.get('answered-x'), [
-									getDateFormatted(answer.dateCreated),
+									`- ${dateToInternationalHuman(
+										answer.dateCreated,
+										Liferay.ThemeDisplay.getBCP47LanguageId()
+									)}`,
 								])}
 							</span>
 
@@ -124,10 +127,7 @@ export default withRouter(
 							<div className="d-flex justify-content-between">
 								<div>
 									{editable && (
-										<div
-											className="font-weight-bold text-secondary"
-											spaced={true}
-										>
+										<div className="font-weight-bold text-secondary">
 											{answer.actions[
 												'reply-to-message'
 											] &&

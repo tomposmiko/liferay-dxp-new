@@ -60,7 +60,7 @@ definition {
 
 			PortletEntry.inputName(name = "${siteName}");
 
-			Button.clickAdd();
+			Button.click(button = "Add");
 
 			SelectFrameTop();
 
@@ -1301,8 +1301,6 @@ definition {
 		PortletEntry.inputName(name = "${siteName}");
 
 		Button.clickAdd();
-
-		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
 		if ("${siteNameInvalid}" == "Duplicate") {
 			Alert.viewErrorMessage(errorMessage = "Please enter a unique name.");

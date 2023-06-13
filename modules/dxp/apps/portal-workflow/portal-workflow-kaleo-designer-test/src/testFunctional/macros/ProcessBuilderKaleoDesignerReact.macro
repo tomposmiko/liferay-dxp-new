@@ -104,8 +104,20 @@ definition {
 			locator1 = "ProcessBuilderKaleoDesignerReact#CONNECTOR_SOURCE");
 	}
 
+	macro addLanguage {
+		Click(locator1 = "Button#PLUS");
+
+		Click(
+			key_translationOptionSelected = "${translationOptionSelected}",
+			locator1 = "ProcessBuilderKaleoDesignerReact#LANGUAGE_MANAGE_TRANSLATIONS_BUTTON");
+	}
+
 	macro backArrowOnSidebar {
 		Click(locator1 = "ProcessBuilderKaleoDesignerReact#BACK_TO_SIDEBAR_BUTTON");
+	}
+
+	macro clickButtonDone {
+		Click(locator1 = "ProcessBuilderKaleoDesignerReact#BUTTON_DONE_MODAL");
 	}
 
 	macro clickDefaultToggle {
@@ -838,7 +850,7 @@ definition {
 					Type(
 						key_inputOption = "Name",
 						key_sectionOption = "${sectionOption}",
-						locator1 = "ProcessBuilderKaleoDesignerReact#PROPERTIES_INPUT_BY_POSITION",
+						locator1 = "ProcessBuilderKaleoDesignerReact#PROPERTIES_INPUT_TIMERS_BY_POSITION",
 						value1 = "${name}");
 				}
 
@@ -846,7 +858,7 @@ definition {
 					Type(
 						key_inputOption = "Description",
 						key_sectionOption = "${sectionOption}",
-						locator1 = "ProcessBuilderKaleoDesignerReact#PROPERTIES_INPUT_BY_POSITION",
+						locator1 = "ProcessBuilderKaleoDesignerReact#PROPERTIES_INPUT_TIMERS_BY_POSITION",
 						value1 = "${description}");
 				}
 
@@ -854,7 +866,7 @@ definition {
 					Select(
 						key_sectionOption = "${sectionOption}",
 						key_selectorField = "Scale",
-						locator1 = "ProcessBuilderKaleoDesignerReact#PROPERTIES_SELECTORS_BY_POSITION",
+						locator1 = "ProcessBuilderKaleoDesignerReact#PROPERTIES_SELECTORS_TIMERS_BY_POSITION",
 						value1 = "${scaleTypeOption}");
 				}
 
@@ -862,7 +874,7 @@ definition {
 					Type(
 						key_inputOption = "Duration",
 						key_sectionOption = "${sectionOption}",
-						locator1 = "ProcessBuilderKaleoDesignerReact#PROPERTIES_INPUT_BY_POSITION",
+						locator1 = "ProcessBuilderKaleoDesignerReact#PROPERTIES_INPUT_TIMERS_BY_POSITION",
 						value1 = "${durationValue} ${sectionOption}");
 				}
 
@@ -870,7 +882,7 @@ definition {
 					Select(
 						key_sectionOption = "${sectionOption}",
 						key_selectorField = "Type",
-						locator1 = "ProcessBuilderKaleoDesignerReact#PROPERTIES_SELECTORS_BY_POSITION",
+						locator1 = "ProcessBuilderKaleoDesignerReact#PROPERTIES_SELECTORS_TIMERS_BY_POSITION",
 						value1 = "${actionTypeOption}");
 				}
 
@@ -878,7 +890,7 @@ definition {
 					Type(
 						key_inputOption = "Name*",
 						key_sectionOption = "${sectionOption}",
-						locator1 = "ProcessBuilderKaleoDesignerReact#PROPERTIES_INPUT_BY_POSITION",
+						locator1 = "ProcessBuilderKaleoDesignerReact#PROPERTIES_INPUT_TIMERS_BY_POSITION",
 						value1 = "${actionName}");
 				}
 
@@ -886,14 +898,14 @@ definition {
 					Type(
 						key_inputOption = "Description",
 						key_sectionOption = "${sectionOption}",
-						locator1 = "ProcessBuilderKaleoDesignerReact#PROPERTIES_INPUT_BY_POSITION",
+						locator1 = "ProcessBuilderKaleoDesignerReact#PROPERTIES_INPUT_TIMERS_BY_POSITION",
 						value1 = "${actionDescription}");
 				}
 
 				if (isSet(actionsTemplateValue)) {
 					Type(
 						key_sectionOption = "${sectionOption}",
-						locator1 = "ProcessBuilderKaleoDesignerReact#PROPERTIES_TEMPLATE_TEXTAREA_BY_POSITION",
+						locator1 = "ProcessBuilderKaleoDesignerReact#PROPERTIES_TEMPLATE_TEXTAREA_TIMERS_BY_POSITION",
 						value1 = "${actionsTemplateValue}");
 				}
 
@@ -901,7 +913,7 @@ definition {
 					Type(
 						key_inputOption = "Priority",
 						key_sectionOption = "${sectionOption}",
-						locator1 = "ProcessBuilderKaleoDesignerReact#PROPERTIES_INPUT_BY_POSITION",
+						locator1 = "ProcessBuilderKaleoDesignerReact#PROPERTIES_INPUT_TIMERS_BY_POSITION",
 						value1 = "${priorityValue}");
 				}
 
@@ -1095,10 +1107,29 @@ definition {
 			locator1 = "ProcessBuilderKaleoDesignerReact#SELECTED_NODE");
 	}
 
+	macro viewInformationDetailsPresent {
+		AssertVisible(
+			key_fieldInformation = "${fieldInformation}",
+			key_fieldOption = "${fieldOption}",
+			locator1 = "ProcessBuilderKaleoDesignerReact#INFORMATION_DETAILS");
+	}
+
 	macro viewLanguageNotPresentAtManageTranslations {
 		AssertElementNotPresent(
 			key_language = "${languageName}",
 			locator1 = "ManageTranslations#LIST_ITEM_LANGUAGE");
+	}
+
+	macro viewLanguageOptionNotPresent {
+		AssertElementNotPresent(
+			key_language = "${languageOption}",
+			locator1 = "ProcessBuilderKaleoDesignerReact#LANGUAGE_OPTION");
+	}
+
+	macro viewLanguageOptionPresent {
+		AssertElementPresent(
+			key_language = "${languageOption}",
+			locator1 = "ProcessBuilderKaleoDesignerReact#LANGUAGE_OPTION");
 	}
 
 	macro viewLanguagePresentAtManageTranslations {

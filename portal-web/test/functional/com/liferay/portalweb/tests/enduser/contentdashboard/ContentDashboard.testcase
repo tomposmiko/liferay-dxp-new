@@ -5134,6 +5134,34 @@ definition {
 		}
 	}
 
+	@description = "LPS-152905: Add a Preview to the Info Panel of Blogs in the Content Dashboard :"
+	@priority = "3"
+	test PreviewBlogsImage {
+		task ("Given a blog contains only an image") {
+			var imageId = JSONBlog.uploadBlogImage(
+				groupName = "Test Site Name",
+				sourceFileName = "Document_1.jpg");
+
+			JSONBlog.addEntryWithImage(
+				coverImageId = "${imageId}",
+				entryContent = "Blogs Content",
+				entryTitle = "Blogs Title",
+				groupName = "Test Site Name");
+		}
+
+		task ("When the user opens asset Info Panel at Content Dashboard ") {
+			ContentDashboard.goToContentDashboard();
+
+			ContentDashboard.openInfoPanelByDropdownMenu();
+		}
+
+		task ("Then a preview of the blog image must appear in the Info Panel") {
+			AssertVisible(
+				assetName = "Document_1.jpg",
+				locator1 = "ContentDashboard#PREVIEW_IMAGE");
+		}
+	}
+
 	@description = "Validate if the user can open de Info side panel of a web content"
 	@priority = "5"
 	test SaveFiltersAfterEditing {

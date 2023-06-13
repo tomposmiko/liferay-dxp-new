@@ -15,19 +15,16 @@
 import ClayButton from '@clayui/button';
 import ClayDropDown from '@clayui/drop-down';
 import ClayForm, {ClayCheckbox, ClaySelectWithOption} from '@clayui/form';
-import ClayIcon from '@clayui/icon';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useState} from 'react';
 
 import useControlledState from '../../../core/hooks/useControlledState';
 import {useStyleBook} from '../../../plugins/page-design-options/hooks/useStyleBook';
 import {ConfigurationFieldPropTypes} from '../../../prop-types/index';
-import {useActiveItemId} from '../../contexts/ControlsContext';
-import {useGlobalContext} from '../../contexts/GlobalContext';
-import getLayoutDataItemUniqueClassName from '../../utils/getLayoutDataItemUniqueClassName';
 import isNullOrUndefined from '../../utils/isNullOrUndefined';
 import {useId} from '../../utils/useId';
+import {AdvancedSelectField} from './AdvancedSelectField';
 
 export function SelectField({
 	className,
@@ -38,9 +35,7 @@ export function SelectField({
 }) {
 	const {tokenValues} = useStyleBook();
 
-	const validValues = field.typeOptions
-		? field.typeOptions.validValues
-		: field.validValues;
+	const validValues = field.typeOptions?.validValues || field.validValues;
 
 	const multiSelect = field.typeOptions?.multiSelect ?? false;
 
@@ -82,11 +77,12 @@ export function SelectField({
 					}
 				/>
 			) : field.icon && Liferay.FeatureFlags['LPS-143206'] ? (
-				<SingleSelectWithIcon
+				<AdvancedSelectField
 					disabled={disabled}
 					field={field}
 					onValueSelect={onValueSelect}
 					options={getOptions(validValues)}
+					tokenValues={tokenValues}
 					value={
 						isNullOrUndefined(value) ? field.defaultValue : value
 					}
@@ -240,121 +236,6 @@ const SingleSelect = ({disabled, field, onValueSelect, options, value}) => {
 				</div>
 			) : null}
 		</>
-	);
-};
-
-const SingleSelectWithIcon = ({
-	disabled,
-	field,
-	onValueSelect,
-	options,
-	value,
-}) => {
-	const activeItemId = useActiveItemId();
-
-	const globalContext = useGlobalContext();
-	const helpTextId = useId();
-	const inputId = useId();
-
-	const [defaultOptionComputedValue, setDefaultComputedValue] = useState('');
-	const [nextValue, setNextValue] = useControlledState(value);
-
-	const defaultOptionLabel = useMemo(
-		() =>
-			options.find((option) => option.value === field.defaultValue).label,
-		[field.defaultValue, options]
-	);
-
-	const selectedOptionLabel = useMemo(() => {
-		if (nextValue === field.defaultValue) {
-			if (defaultOptionComputedValue) {
-				return `${defaultOptionLabel} · ${defaultOptionComputedValue}`;
-			}
-
-			return defaultOptionLabel;
-		}
-
-		return (
-			options.find((option) => option.value === nextValue)?.label ||
-			defaultOptionLabel
-		);
-	}, [
-		defaultOptionComputedValue,
-		defaultOptionLabel,
-		field.defaultValue,
-		nextValue,
-		options,
-	]);
-
-	const handleChange = (event) => {
-		const nextValue =
-			event.target.options[event.target.selectedIndex].value;
-
-		setNextValue(nextValue);
-		onValueSelect(field.name, nextValue);
-	};
-
-	useEffect(() => {
-		if (!field.cssProperty) {
-			return;
-		}
-
-		const element = globalContext.document.querySelector(
-			`.${getLayoutDataItemUniqueClassName(activeItemId)}`
-		);
-
-		if (!element) {
-			return;
-		}
-
-		setDefaultComputedValue(
-			globalContext.window
-				.getComputedStyle(element)
-				.getPropertyValue(field.cssProperty)
-		);
-	}, [activeItemId, field.cssProperty, globalContext]);
-
-	return (
-		<div className="btn btn-unstyled p-0 page-editor__single-select-with-icon">
-			<label
-				className="mb-0 page-editor__single-select-with-icon__label-icon px-1 py-2 text-center"
-				htmlFor={inputId}
-			>
-				<ClayIcon
-					className="lfr-portal-tooltip"
-					data-title={field.label}
-					symbol={field.icon}
-				/>
-
-				<span className="sr-only">{field.label}</span>
-			</label>
-
-			<ClaySelectWithOption
-				aria-describedby={helpTextId}
-				className="page-editor__single-select-with-icon__select"
-				disabled={Boolean(disabled)}
-				id={inputId}
-				onChange={handleChange}
-				options={options}
-				value={nextValue}
-			/>
-
-			<div
-				className={classNames(
-					'page-editor__single-select-with-icon__label pl-2 pr-3 py-2 text-truncate w-100',
-					{disabled}
-				)}
-				role="presentation"
-			>
-				<span>{selectedOptionLabel}</span>
-			</div>
-
-			{field.description ? (
-				<div className="mt-1 small text-secondary" id={helpTextId}>
-					{field.description}
-				</div>
-			) : null}
-		</div>
 	);
 };
 

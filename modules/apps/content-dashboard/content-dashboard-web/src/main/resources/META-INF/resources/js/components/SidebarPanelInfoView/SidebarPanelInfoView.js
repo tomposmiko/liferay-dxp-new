@@ -30,6 +30,7 @@ import ItemVocabularies from './ItemVocabularies';
 import ManageCollaborators from './ManageCollaborators';
 import Preview from './Preview';
 import Share from './Share';
+import Subscribe from './Subscribe';
 import {
 	getCategoriesCountFromVocabularies,
 	groupVocabulariesBy,
@@ -54,10 +55,12 @@ const SidebarPanelInfoView = ({
 	classPK,
 	createDate,
 	description,
+	downloadURL,
 	clipboard,
 	languageTag = 'en',
 	modifiedDate,
 	specificFields = {},
+	subscribe,
 	subType,
 	tags = [],
 	title,
@@ -95,7 +98,7 @@ const SidebarPanelInfoView = ({
 
 	const showClipboard = clipboard && Object.keys(clipboard).length !== 0;
 
-	const hasActions = preview?.downloadURL || fetchSharingButtonURL;
+	const hasActions = downloadURL || fetchSharingButtonURL;
 
 	const handleError = useCallback(() => {
 		setError(true);
@@ -103,7 +106,9 @@ const SidebarPanelInfoView = ({
 
 	return (
 		<>
-			<Sidebar.Header title={title} />
+			<Sidebar.Header title={title}>
+				{subscribe && <Subscribe {...subscribe} />}
+			</Sidebar.Header>
 
 			<Sidebar.Body className="px-0">
 				{error && (
@@ -190,7 +195,7 @@ const SidebarPanelInfoView = ({
 						)}
 					</div>
 
-					{preview && preview.url && (
+					{preview && preview.imageURL && (
 						<Preview
 							compressed={!!hasActions}
 							imageURL={preview.imageURL}
@@ -201,10 +206,10 @@ const SidebarPanelInfoView = ({
 
 					{hasActions && (
 						<div className="sidebar-section">
-							{preview?.downloadURL && (
+							{downloadURL && (
 								<ClayLink
 									className="btn btn-primary"
-									href={preview?.downloadURL}
+									href={downloadURL}
 								>
 									{Liferay.Language.get('download')}
 								</ClayLink>

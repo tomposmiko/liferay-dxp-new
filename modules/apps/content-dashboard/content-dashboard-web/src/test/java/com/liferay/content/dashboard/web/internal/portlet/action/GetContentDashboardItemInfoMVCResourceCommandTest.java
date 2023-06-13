@@ -19,11 +19,11 @@ import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
 import com.liferay.content.dashboard.item.action.ContentDashboardItemAction;
+import com.liferay.content.dashboard.item.type.ContentDashboardItemSubtype;
+import com.liferay.content.dashboard.item.type.ContentDashboardItemSubtypeFactory;
 import com.liferay.content.dashboard.web.internal.item.ContentDashboardItem;
 import com.liferay.content.dashboard.web.internal.item.ContentDashboardItemFactory;
 import com.liferay.content.dashboard.web.internal.item.ContentDashboardItemFactoryTracker;
-import com.liferay.content.dashboard.web.internal.item.type.ContentDashboardItemSubtype;
-import com.liferay.content.dashboard.web.internal.item.type.ContentDashboardItemSubtypeFactory;
 import com.liferay.info.item.InfoItemReference;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.json.JSONFactoryImpl;
@@ -735,7 +735,6 @@ public class GetContentDashboardItemInfoMVCResourceCommandTest {
 				@Override
 				public Preview getPreview() {
 					return new Preview(
-						"www.preview.com/downloadURL",
 						"www.preview.com/imageURL",
 						"www.viewURL.url.com/viewURL");
 				}

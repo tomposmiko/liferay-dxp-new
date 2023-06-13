@@ -75,8 +75,6 @@ definition {
 			entryContent = "${entryContent}",
 			entryTitle = "${entryTitle}");
 
-		Pause(locator1 = "3000");
-
 		Navigator.openWithAppendToBaseURL(urlAppend = "web/site-name/test-page");
 
 		AssertClick.assertTextClickAt(
@@ -102,8 +100,6 @@ definition {
 			dmDocumentFile = "${dmDocumentFile}",
 			dmDocumentTitle = "${dmDocumentTitle}");
 
-		Pause(locator1 = "3000");
-
 		if (isSet(depotName)) {
 			DepotNavigator.openDepotDocumentsAndMediaAdmin(depotName = "Test Depot Name");
 		}
@@ -128,9 +124,11 @@ definition {
 
 		WebContentNavigator.gotoAddCP();
 
-		WebContent.addCP(
-			webContentContent = "${webContentContent}",
-			webContentTitle = "${webContentTitle}");
+		PortletEntry.inputTitle(title = "${webContentTitle}");
+
+		CKEditor.addContentInWebContent(
+			content = "${webContentContent}",
+			fieldLabel = "content");
 
 		PortletEntry.publish();
 
@@ -1086,8 +1084,9 @@ definition {
 
 			DisplayPageTemplate.clickPencilItem(item = "Edit Webcontent Title");
 
-			WebContent.addCP(
-				webContentContent = "Webcontent Content Edit",
+			WebContent.addWithStructureCP(
+				webContentRichText = "Webcontent Content Edit",
+				webContentRichTextFieldLabel = "content",
 				webContentTitle = "Webcontent Title Edit");
 
 			PortletEntry.publish();
@@ -2690,8 +2689,6 @@ definition {
 			category = "Content & Data",
 			portlet = "Blogs");
 
-		Pause(locator1 = "3000");
-
 		Blogs.addWithWorkflow(
 			entryContent = "Blogs Entry Content",
 			entrySubtitle = "Subtitle",
@@ -4094,6 +4091,8 @@ definition {
 		}
 
 		task ("Assert styles of Container in view mode") {
+			SetWindowSize(value1 = "1800,1040");
+
 			var screenWidth = selenium.getElementWidth("//body");
 			var containerWidth = selenium.getElementWidth("xpath=(//div[contains(@class,'lfr-layout-structure-item-container')])[2]");
 
@@ -4596,7 +4595,7 @@ definition {
 
 		var key_imageSourceURL = "${portalURL}/documents/${siteId}/0/DM";
 
-		AssertElementPresent.pauseAssertVisible(locator1 = "DocumentsAndMediaDocument#DOCUMENT_VIEWPORT_PREVIEW");
+		WaitForVisible(locator1 = "DocumentsAndMediaDocument#DOCUMENT_VIEWPORT_PREVIEW");
 
 		Navigator.gotoPage(pageName = "Documents");
 
@@ -5892,6 +5891,117 @@ definition {
 			portletName = "Blogs");
 	}
 
+	macro viewSXPBlueprintAndElements {
+		SearchAdministration.executeReindex(action = "Reindex com.liferay.search.experiences.model.SXPBlueprint.");
+
+		SearchAdministration.executeReindex(action = "Reindex com.liferay.search.experiences.model.SXPElement.");
+
+		Blueprints.openBlueprintsAdmin();
+
+		Navigator.gotoNavItem(navItem = "Elements");
+
+		while (IsElementNotPresent(locator1 = "Pagination#RESULTS")) {
+			Refresh();
+		}
+
+		var paginationResults = selenium.getText("Pagination#RESULTS");
+
+		var totalElements = StringUtil.extractLast("${paginationResults}", " ");
+
+		var difference = ${totalElements} - 39;
+
+		if ("${difference}" != "0") {
+			TestUtils.fail(message = "FAILED: Actual total elements '${totalElements}' is not equal to expected total elements of 39");
+		}
+
+		Search.searchCP(searchTerm = "Test Element");
+
+		AssertElementPresent(
+			entryTitle = "Test Element",
+			locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_TITLE");
+
+		Search.searchCP(searchTerm = "Boost Contents in a Category for User Segments");
+
+		AssertElementPresent(
+			entryTitle = "Boost Contents in a Category for User Segments",
+			locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_TITLE");
+
+		AssertTextEquals(
+			entryTitle = "Boost Contents in a Category for User Segments",
+			locator1 = "Blueprints#BLUEPRINTS_ADMIN_ENTRY_DESCRIPTION",
+			value1 = "Boost contents in a category for users belonging to the given user segments.");
+
+		Navigator.gotoNavItem(navItem = "Blueprints");
+
+		Blueprints.gotoBlueprint(title = "Test Blueprint");
+
+		AssertElementPresent(
+			element = "Test Element",
+			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT");
+
+		AssertElementPresent(
+			element = "Boost Contents in a Category for the Time of Day",
+			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT");
+
+		AssertElementPresent(
+			element = "Boost Contents in a Category for User Segments",
+			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT");
+
+		AssertElementPresent(
+			element = "Boost Contents in a Category for a Period of Time",
+			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT");
+
+		AssertElementPresent(
+			element = "Search with Query String Syntax",
+			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT");
+
+		AssertElementPresent(
+			elementName = "Boost Contents in a Category for the Time of Day",
+			fieldLabel = "Asset Category ID",
+			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_INPUT_FIELD",
+			value1 = "12345");
+
+		AssertElementPresent(
+			dropdownName = "Time of Day",
+			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_GENERIC_DROPDOWN_OPTION",
+			option = "Morning (4am - 12pm)");
+
+		AssertElementPresent(
+			elementName = "Boost Contents in a Category for the Time of Day",
+			fieldLabel = "Boost",
+			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_INPUT_FIELD",
+			value1 = "100");
+
+		AssertTextPresent(
+			element = "Boost Contents in a Category for User Segments",
+			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT",
+			value1 = "Boost contents in a category for users belonging to the given user segments.");
+
+		AssertElementPresent(
+			elementName = "Boost Contents in a Category for a Period of Time",
+			fieldName = "Date: From",
+			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_FIELD_LABEL");
+
+		AssertElementNotPresent(
+			elementName = "Boost Contents in a Category for a Period of Time",
+			fieldName = "Create Date: From",
+			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_FIELD_LABEL");
+
+		AssertElementPresent(
+			elementName = "Boost Contents in a Category for a Period of Time",
+			fieldName = "Date: To",
+			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_FIELD_LABEL");
+
+		AssertElementNotPresent(
+			elementName = "Boost Contents in a Category for a Period of Time",
+			fieldName = "Create Date: To",
+			locator1 = "Blueprints#BLUEPRINTS_ADDED_ELEMENT_FIELD_LABEL");
+
+		Blueprints.searchBlueprintsPreview(searchTerm = "test");
+
+		AssertElementNotPresent(locator1 = "Message#ERROR");
+	}
+
 	macro viewSynonymsEntry {
 		SearchTuning.openSynonymsAdmin();
 
@@ -6095,6 +6205,7 @@ definition {
 		PortletEntry.changeLocale(locale = "es-ES");
 
 		WebContent.viewCP(
+			upgradedFieldLabel = "true",
 			webContentContent = "Contenidoweb",
 			webContentDescription = "Descripcion",
 			webContentTitle = "Titulodelcontenidoweb");
@@ -6106,6 +6217,7 @@ definition {
 		PortletEntry.changeLocale(locale = "ja-JP");
 
 		WebContent.viewCP(
+			upgradedFieldLabel = "true",
 			webContentContent = "wc webcontentコンテンツ",
 			webContentDescription = "wc webcontent記述",
 			webContentTitle = "wc webcontentタイトルを並べて");

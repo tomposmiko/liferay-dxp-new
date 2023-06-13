@@ -19,6 +19,7 @@ import ClayIcon from '@clayui/icon';
 import PropTypes from 'prop-types';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 
+import isValidStyleValue from '../../app/utils/isValidStyleValue';
 import {useId} from '../../app/utils/useId';
 import useControlledState from '../../core/hooks/useControlledState';
 import {ConfigurationFieldPropTypes} from '../../prop-types/index';
@@ -39,7 +40,6 @@ const UNITS = ['px', '%', 'em', 'rem', 'vw', 'vh', CUSTOM];
 
 export function LengthField({field, onValueSelect, value}) {
 	const inputId = useId();
-	const isCustomRef = useRef(false);
 
 	const initialValue = useMemo(() => {
 		if (!value) {
@@ -64,16 +64,15 @@ export function LengthField({field, onValueSelect, value}) {
 	}, [value]);
 
 	return (
-		<ClayForm.Group>
+		<ClayForm.Group className="page-editor__length-field">
 			<label className={field.icon ? 'sr-only' : null} htmlFor={inputId}>
 				{field.label}
 			</label>
 
-			<Field
+			<LengthInput
 				field={field}
 				id={inputId}
 				initialValue={initialValue}
-				isCustomRef={isCustomRef}
 				onValueSelect={onValueSelect}
 				value={value}
 			/>
@@ -87,15 +86,10 @@ LengthField.propTypes = {
 	value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
-const Field = ({
-	field,
-	id,
-	initialValue,
-	isCustomRef,
-	onValueSelect,
-	value,
-}) => {
+const LengthInput = ({field, id, initialValue, onValueSelect, value}) => {
 	const [active, setActive] = useState(false);
+	const [error, setError] = useState(false);
+	const inputRef = useRef();
 	const [nextValue, setNextValue] = useControlledState(initialValue.value);
 	const [nextUnit, setNextUnit] = useState(initialValue.unit);
 	const triggerId = useId();
@@ -104,19 +98,29 @@ const Field = ({
 		setActive(false);
 		setNextUnit(unit);
 
-		isCustomRef.current = unit === CUSTOM;
-
-		if (!nextValue) {
+		if (!nextValue || unit === nextUnit) {
 			return;
 		}
 
 		let valueWithUnits = `${nextValue}${unit}`;
 
 		if (unit === CUSTOM) {
-			valueWithUnits = nextValue;
+			inputRef.current.focus();
+
+			setNextValue('');
+
+			return;
 		}
 		else if (isNaN(nextValue)) {
 			valueWithUnits = '';
+
+			inputRef.current.focus();
+
+			if (field.typeOptions?.showLengthField) {
+				setNextValue(valueWithUnits);
+
+				return;
+			}
 		}
 
 		if (valueWithUnits !== value) {
@@ -139,6 +143,22 @@ const Field = ({
 			valueWithUnits = `${nextValue}${nextUnit}`;
 		}
 
+		if (
+			field.typeOptions?.showLengthField &&
+			(!valueWithUnits ||
+				!isValidStyleValue(field.cssProperty, valueWithUnits))
+		) {
+			const [, number, unit] = value.toLowerCase().match(REGEX) || [];
+
+			setNextValue(number || value);
+			setNextUnit(unit || CUSTOM);
+			setError(true);
+
+			setTimeout(() => setError(false), 1000);
+
+			return;
+		}
+
 		if (valueWithUnits !== value) {
 			onValueSelect(field.name, valueWithUnits);
 		}
@@ -159,9 +179,9 @@ const Field = ({
 			return;
 		}
 
-		const match = value.toLowerCase().match(REGEX);
+		const [, , unit] = value.toLowerCase().match(REGEX) || [];
 
-		setNextUnit(match ? match[2] : CUSTOM);
+		setNextUnit(unit || CUSTOM);
 	}, [value]);
 
 	return (
@@ -171,26 +191,31 @@ const Field = ({
 					aria-label={field.label}
 					id={id}
 					insetBefore={Boolean(field.icon)}
-					onBlur={() => {
-						handleValueSelect();
-					}}
+					onBlur={handleValueSelect}
 					onChange={(event) => {
 						setNextValue(event.target.value);
 					}}
 					onKeyDown={handleKeyDown}
+					ref={inputRef}
 					sizing="sm"
 					type={nextUnit === CUSTOM ? 'text' : 'number'}
 					value={nextValue}
 				/>
 
 				{field.icon ? (
-					<ClayInput.GroupInsetItem before className="pl-2 pr-3 py-2">
-						<ClayIcon
-							className="lfr-portal-tooltip"
-							data-title={field.label}
-							small
-							symbol={field.icon}
-						/>
+					<ClayInput.GroupInsetItem before>
+						<label
+							className="mb-0 page-editor__input-with-icon__label-icon pl-1 pr-3 text-center"
+							htmlFor={id}
+						>
+							<ClayIcon
+								className="lfr-portal-tooltip"
+								data-title={field.label}
+								symbol={field.icon}
+							/>
+
+							<span className="sr-only">{field.label}</span>
+						</label>
 					</ClayInput.GroupInsetItem>
 				) : null}
 			</ClayInput.GroupItem>
@@ -240,6 +265,14 @@ const Field = ({
 					</ClayDropDown.ItemList>
 				</ClayDropDown>
 			</ClayInput.GroupItem>
+
+			{error ? (
+				<span aria-live="assertive" className="sr-only">
+					{Liferay.Language.get(
+						'this-style-does-not-exist-or-is-empty'
+					)}
+				</span>
+			) : null}
 		</ClayInput.Group>
 	);
 };

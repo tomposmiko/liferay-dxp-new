@@ -21,6 +21,7 @@ import com.liferay.mail.kernel.model.SMTPAccount;
 import com.liferay.mail.kernel.service.MailServiceUtil;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -60,9 +61,11 @@ import javax.mail.Part;
 import javax.mail.SendFailedException;
 import javax.mail.Session;
 import javax.mail.Transport;
+import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.InternetHeaders;
 import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 /**
@@ -122,7 +125,7 @@ public class MailEngine {
 			InternetAddress[] replyTo, String messageId, String inReplyTo,
 			List<FileAttachment> fileAttachments, SMTPAccount smtpAccount,
 			InternetHeaders internetHeaders)
-		throws MailEngineException {
+		throws PortalException {
 
 		long startTime = System.currentTimeMillis();
 
@@ -158,26 +161,26 @@ public class MailEngine {
 		}
 
 		try {
-			InternetAddressUtil.validateAddress(from);
+			_validateAddress(from);
 
 			if (ArrayUtil.isNotEmpty(to)) {
-				InternetAddressUtil.validateAddresses(to);
+				_validateAddresses(to);
 			}
 
 			if (ArrayUtil.isNotEmpty(cc)) {
-				InternetAddressUtil.validateAddresses(cc);
+				_validateAddresses(cc);
 			}
 
 			if (ArrayUtil.isNotEmpty(bcc)) {
-				InternetAddressUtil.validateAddresses(bcc);
+				_validateAddresses(bcc);
 			}
 
 			if (ArrayUtil.isNotEmpty(replyTo)) {
-				InternetAddressUtil.validateAddresses(replyTo);
+				_validateAddresses(replyTo);
 			}
 
 			if (ArrayUtil.isNotEmpty(bulkAddresses)) {
-				InternetAddressUtil.validateAddresses(bulkAddresses);
+				_validateAddresses(bulkAddresses);
 			}
 
 			Session session = null;
@@ -309,18 +312,15 @@ public class MailEngine {
 
 			_send(session, message, bulkAddresses, batchSize);
 		}
-		catch (MailEngineException mailEngineException) {
-			throw mailEngineException;
-		}
 		catch (SendFailedException sendFailedException) {
 			_log.error(sendFailedException);
 
 			if (_isThrowsExceptionOnFailure()) {
-				throw new MailEngineException(sendFailedException);
+				throw new PortalException(sendFailedException);
 			}
 		}
 		catch (Exception exception) {
-			throw new MailEngineException(exception);
+			throw new PortalException(exception);
 		}
 
 		if (_log.isDebugEnabled()) {
@@ -330,9 +330,7 @@ public class MailEngine {
 		}
 	}
 
-	public static void send(MailMessage mailMessage)
-		throws MailEngineException {
-
+	public static void send(MailMessage mailMessage) throws PortalException {
 		send(
 			mailMessage.getFrom(), mailMessage.getTo(), mailMessage.getCC(),
 			mailMessage.getBCC(), mailMessage.getBulkAddresses(),
@@ -425,7 +423,7 @@ public class MailEngine {
 	private static void _send(
 			Session session, Message message, InternetAddress[] bulkAddresses,
 			int batchSize)
-		throws MailEngineException {
+		throws PortalException {
 
 		if ((_DATA_LIMIT_MAIL_MESSAGE_MAX_PERIOD > 0) &&
 			(_DATA_LIMIT_MAIL_MESSAGE_MAX_COUNT > 0)) {
@@ -446,7 +444,7 @@ public class MailEngine {
 			if (mailMessageCount.incrementAndGet() >
 					_DATA_LIMIT_MAIL_MESSAGE_MAX_COUNT) {
 
-				throw new MailEngineException(
+				throw new PortalException(
 					"Unable to exceed maximum number of allowed mail messages");
 			}
 		}
@@ -533,8 +531,39 @@ public class MailEngine {
 			}
 
 			if (_isThrowsExceptionOnFailure()) {
-				throw new MailEngineException(messagingException);
+				throw new PortalException(messagingException);
 			}
+		}
+	}
+
+	private static void _validateAddress(Address address)
+		throws AddressException {
+
+		if (address == null) {
+			throw new AddressException("Email address is null");
+		}
+
+		String addressString = address.toString();
+
+		for (char c : addressString.toCharArray()) {
+			if ((c == CharPool.NEW_LINE) || (c == CharPool.RETURN)) {
+				throw new AddressException(
+					StringBundler.concat(
+						"Email address ", addressString,
+						" is invalid because it contains line breaks"));
+			}
+		}
+	}
+
+	private static void _validateAddresses(Address[] addresses)
+		throws AddressException {
+
+		if (addresses == null) {
+			throw new AddressException();
+		}
+
+		for (Address internetAddress : addresses) {
+			_validateAddress(internetAddress);
 		}
 	}
 
@@ -561,5 +590,27 @@ public class MailEngine {
 	private static final AtomicLong _lastResetTime = new AtomicLong();
 	private static final Map<Long, AtomicLong> _mailMessageCounts =
 		new ConcurrentHashMap<>();
+
+	private static class LiferayMimeMessage extends MimeMessage {
+
+		@Override
+		protected void updateMessageID() throws MessagingException {
+			String[] messageIds = getHeader("Message-ID");
+
+			if (ArrayUtil.isNotEmpty(messageIds)) {
+
+				// Keep current value
+
+				return;
+			}
+
+			super.updateMessageID();
+		}
+
+		private LiferayMimeMessage(Session session) {
+			super(session);
+		}
+
+	}
 
 }

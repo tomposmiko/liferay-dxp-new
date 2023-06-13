@@ -8096,146 +8096,6 @@ war.path=${app.server.portal.dir}/</echo>
 	</macrodef>
 
 	<target name="build-sql-file">
-		<get-testcase-property property.name="portal.version" />
-
-		<if>
-			<isset property="portal.version" />
-			<then>
-				<if>
-					<equals arg1="${portal.version}" arg2="6.1.2" />
-					<then>
-						<property name="portal.version.url.path" value="6.1.2-ga3" />
-					</then>
-					<elseif>
-						<equals arg1="${portal.version}" arg2="6.2.3" />
-						<then>
-							<property name="portal.version.url.path" value="6.2.3-ga4" />
-						</then>
-					</elseif>
-					<elseif>
-						<equals arg1="${portal.version}" arg2="6.2.5" />
-						<then>
-							<property name="portal.version.url.path" value="6.2.5-ga6" />
-						</then>
-					</elseif>
-					<elseif>
-						<equals arg1="${portal.version}" arg2="7.0.4" />
-						<then>
-							<property name="portal.version.url.path" value="7.0.4-ga5" />
-						</then>
-					</elseif>
-					<elseif>
-						<equals arg1="${portal.version}" arg2="7.0.6" />
-						<then>
-							<property name="portal.version.url.path" value="7.0.6-ga7" />
-						</then>
-					</elseif>
-					<elseif>
-						<equals arg1="${portal.version}" arg2="7.1.3" />
-						<then>
-							<property name="portal.version.url.path" value="7.1.3-ga4" />
-						</then>
-					</elseif>
-					<elseif>
-						<equals arg1="${portal.version}" arg2="7.2.0" />
-						<then>
-							<property name="portal.version.url.path" value="7.2.0-ga1" />
-						</then>
-					</elseif>
-					<elseif>
-						<equals arg1="${portal.version}" arg2="7.2.1" />
-						<then>
-							<property name="portal.version.url.path" value="7.2.1-ga2" />
-						</then>
-					</elseif>
-					<elseif>
-						<equals arg1="${portal.version}" arg2="7.3.0" />
-						<then>
-							<property name="portal.version.url.path" value="7.3.0-ga1" />
-						</then>
-					</elseif>
-					<elseif>
-						<equals arg1="${portal.version}" arg2="7.3.5" />
-						<then>
-							<property name="portal.version.url.path" value="7.3.5-ga6" />
-						</then>
-					</elseif>
-					<elseif>
-						<equals arg1="${portal.version}" arg2="7.4.0" />
-						<then>
-							<property name="portal.version.url.path" value="7.4.0-ga1" />
-						</then>
-					</elseif>
-					<elseif>
-						<equals arg1="${portal.version}" arg2="7.4.1" />
-						<then>
-							<property name="portal.version.url.path" value="7.4.1-ga2" />
-						</then>
-					</elseif>
-					<elseif>
-						<equals arg1="${portal.version}" arg2="7.4.3.21" />
-						<then>
-							<property name="portal.version.url.path" value="7.4.3.21-ga21" />
-						</then>
-					</elseif>
-					<else>
-						<property name="portal.version.url.path" value="${portal.version}" />
-					</else>
-				</if>
-
-				<if>
-					<or>
-						<equals arg1="${portal.version}" arg2="6.0.6" />
-						<equals arg1="${portal.version}" arg2="6.1.2" />
-						<equals arg1="${portal.version}" arg2="6.2.3" />
-						<equals arg1="${portal.version}" arg2="6.2.5" />
-						<equals arg1="${portal.version}" arg2="7.0.4" />
-						<equals arg1="${portal.version}" arg2="7.0.6" />
-						<equals arg1="${portal.version}" arg2="7.1.3" />
-						<equals arg1="${portal.version}" arg2="7.2.0" />
-						<equals arg1="${portal.version}" arg2="7.2.1" />
-						<equals arg1="${portal.version}" arg2="7.3.0" />
-						<equals arg1="${portal.version}" arg2="7.3.5" />
-						<equals arg1="${portal.version}" arg2="7.4.0" />
-						<equals arg1="${portal.version}" arg2="7.4.1" />
-						<equals arg1="${portal.version}" arg2="7.4.3.21" />
-					</or>
-					<then>
-						<propertycopy from="sql.legacy.base.url[ce]" name="sql.legacy.base.url" />
-					</then>
-					<else>
-						<propertycopy from="sql.legacy.base.url[ee]" name="sql.legacy.base.url" />
-					</else>
-				</if>
-
-				<propertycopy from="sql.legacy.zip[${portal.version}]" name="sql.legacy.zip" />
-
-				<delete dir="sql/legacy" failonerror="false" />
-
-				<tstamp>
-					<format pattern="yyyyMMddkkmmssSSS" property="tstamp.value" />
-				</tstamp>
-
-				<mirrors-get
-					dest="${tstamp.value}.zip"
-					src="${sql.legacy.base.url}/${portal.version.url.path}/${sql.legacy.zip}"
-				/>
-
-				<unzip
-					dest="sql/legacy/${portal.version}"
-					src="${tstamp.value}.zip"
-				>
-					<mapper
-						from="[^/]+/(.*)"
-						to="\1"
-						type="regexp"
-					/>
-				</unzip>
-
-				<delete file="${tstamp.value}.zip" />
-			</then>
-		</if>
-
 		<if>
 			<not>
 				<equals arg1="${database.type}" arg2="hypersonic" />
@@ -9600,8 +9460,8 @@ virtualHostname="localhost"
 										<move
 											failonerror="false"
 											file="@{app.dir}/settings.gradle"
+											quiet="true"
 											tofile="@{app.dir}/settings.gradle.temp"
-											verbose="true"
 										/>
 
 										<for param="module.dir.path">
@@ -9661,6 +9521,7 @@ virtualHostname="localhost"
 										<move
 											failonerror="false"
 											file="@{app.dir}/settings.gradle.temp"
+											quiet="true"
 											tofile="@{app.dir}/settings.gradle"
 										/>
 									</else>
@@ -11431,6 +11292,53 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 		</echo>
 	</target>
 
+	<target name="prepare-portal-test-object-storage-salesforce-properties">
+		<if>
+			<isset property="object.storage.salesforce.consumer.key" />
+			<then>
+				<echo append="true" file="${project.dir}/portal-test/src/test-portal-impl-ext.properties">
+					object.storage.salesforce.consumer.key=${object.storage.salesforce.consumer.key}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="object.storage.salesforce.consumer.secret" />
+			<then>
+				<echo append="true" file="${project.dir}/portal-test/src/test-portal-impl-ext.properties">
+					object.storage.salesforce.consumer.secret=${object.storage.salesforce.consumer.secret}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="object.storage.salesforce.login.url" />
+			<then>
+				<echo append="true" file="${project.dir}/portal-test/src/test-portal-impl-ext.properties">
+					object.storage.salesforce.login.url=${object.storage.salesforce.login.url}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="object.storage.salesforce.password" />
+			<then>
+				<echo append="true" file="${project.dir}/portal-test/src/test-portal-impl-ext.properties">
+					object.storage.salesforce.password=${object.storage.salesforce.password}
+				</echo>
+			</then>
+		</if>
+
+		<if>
+			<isset property="object.storage.salesforce.username" />
+			<then>
+				<echo append="true" file="${project.dir}/portal-test/src/test-portal-impl-ext.properties">
+					object.storage.salesforce.username=${object.storage.salesforce.username}
+				</echo>
+			</then>
+		</if>
+	</target>
+
 	<target name="prepare-portlet-ext-properties">
 		<for list="${test.case.available.property.names}" param="test.case.available.property.name">
 			<sequential>
@@ -11492,6 +11400,7 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 		<get-ip-address />
 
 		<echo append="true" file="${test.ext.properties.file}">
+			app.server.temp.dir=${app.server.tomcat.temp.dir}
 			app.server.type=${app.server.type}
 			component.names=${component.names}
 			get.location.max.retries=${test.get.location.max.retries}
