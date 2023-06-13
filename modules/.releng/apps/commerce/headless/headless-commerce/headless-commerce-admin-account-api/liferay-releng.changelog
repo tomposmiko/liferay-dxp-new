@@ -97,3 +97,8 @@ e7de1bea220ad6a8d100c675ec47708f6accbc9a^..81789dff2af4a1c8ecfc68db07dc7216a6f9d
 # Bundle Version 17.1.0
 #
 81789dff2af4a1c8ecfc68db07dc7216a6f9dc94^..c002e1a3e416bd2ef189019298a1e50b2b06ac39=COMMERCE-6836
+
+#
+# Bundle Version 17.1.1
+#
+c002e1a3e416bd2ef189019298a1e50b2b06ac39^..86387b2c3dc3c6ad1d1a0a0f1dd603a3265f3a93=LPS-165622

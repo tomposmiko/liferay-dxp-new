@@ -116,6 +116,8 @@ AUI.add(
 
 			p_l_id: {},
 
+			portletId: {},
+
 			portletNamespace: {},
 		};
 
@@ -232,6 +234,7 @@ AUI.add(
 					p_p_resource_id:
 						'/dynamic_data_mapping/render_structure_field',
 					p_p_state: 'pop_up',
+					portletId: instance.get('portletId'),
 					portletNamespace: instance.get('portletNamespace'),
 					readOnly: instance.get('readOnly'),
 				};
@@ -3810,19 +3813,22 @@ AUI.add(
 
 					var editor = instance.getEditor();
 
-					var editorValue = editor.getHTML();
+					var editorValue = editor.getHTML;
 
 					var localizationMap = instance.get('localizationMap');
 
-					if (
+					if (isNode(editor)) {
+						return A.one(editor).val();
+					}
+					else if (
 						!editor.instanceReady &&
 						localizationMap[instance.get('displayLocale')]
 					) {
-						editorValue =
-							localizationMap[instance.get('displayLocale')];
+						return localizationMap[instance.get('displayLocale')];
 					}
-
-					return isNode(editor) ? A.one(editor).val() : editorValue;
+					else {
+						return editorValue();
+					}
 				},
 
 				initializer() {
@@ -4163,6 +4169,8 @@ AUI.add(
 					validator: Lang.isBoolean,
 					value: true,
 				},
+
+				webContentSelectorURL: {},
 			},
 
 			AUGMENTS: [DDMPortletSupport, FieldsSupport],
@@ -4410,6 +4418,11 @@ AUI.add(
 								Liferay.on(
 									'submitForm',
 									instance._onLiferaySubmitForm,
+									instance
+								),
+								Liferay.on(
+									'updateDDMFormInputValue',
+									instance._onSubmitForm,
 									instance
 								)
 							);

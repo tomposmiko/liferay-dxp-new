@@ -63,6 +63,10 @@ JournalArticleItemSelectorViewDisplayContext journalArticleItemSelectorViewDispl
 					<%
 					row.setCssClass("articles " + row.getCssClass());
 
+					if (!journalArticleItemSelectorViewDisplayContext.isRefererArticle(curArticle)) {
+						row.setCssClass("selector-button " + row.getCssClass());
+					}
+
 					JSONObject articleJSONObject = JSONUtil.put(
 						"className", JournalArticle.class.getName()
 					).put(
@@ -95,7 +99,9 @@ JournalArticleItemSelectorViewDisplayContext journalArticleItemSelectorViewDispl
 						<c:when test='<%= Objects.equals(journalArticleItemSelectorViewDisplayContext.getDisplayStyle(), "descriptive") %>'>
 
 							<%
-							row.setCssClass("item-preview " + row.getCssClass());
+							if (!journalArticleItemSelectorViewDisplayContext.isRefererArticle(curArticle)) {
+								row.setCssClass("item-preview " + row.getCssClass());
+							}
 							%>
 
 							<liferay-ui:search-container-column-text>
@@ -151,7 +157,9 @@ JournalArticleItemSelectorViewDisplayContext journalArticleItemSelectorViewDispl
 						<c:otherwise>
 
 							<%
-							row.setCssClass("item-preview " + row.getCssClass());
+							if (!journalArticleItemSelectorViewDisplayContext.isRefererArticle(curArticle)) {
+								row.setCssClass("item-preview " + row.getCssClass());
+							}
 							%>
 
 							<c:if test="<%= journalArticleItemSelectorViewDisplayContext.showArticleId() %>">

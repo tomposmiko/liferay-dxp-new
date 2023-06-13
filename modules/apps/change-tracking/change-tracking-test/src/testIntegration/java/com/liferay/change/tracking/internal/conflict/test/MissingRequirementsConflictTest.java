@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.change.tracking.internal.reference.test;
+package com.liferay.change.tracking.internal.conflict.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.change.tracking.conflict.ConflictInfo;
@@ -109,6 +109,8 @@ public class MissingRequirementsConflictTest {
 
 		Assert.assertEquals(
 			childFolder.getFolderId(), conflictInfo.getSourcePrimaryKey());
+
+		Assert.assertFalse(conflictInfo.isResolved());
 
 		Assert.assertTrue(conflictsMap.toString(), conflictsMap.isEmpty());
 	}

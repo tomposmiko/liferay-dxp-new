@@ -277,6 +277,7 @@ JournalEditArticleDisplayContext journalEditArticleDisplayContext = new JournalE
 								ignoreRequestValue="<%= journalEditArticleDisplayContext.isChangeStructure() %>"
 								imageSelectorURL="<%= String.valueOf(journalItemSelectorHelper.getImageSelectorURL()) %>"
 								requestedLocale="<%= locale %>"
+								webContentSelectorURL="<%= String.valueOf(journalItemSelectorHelper.getWebContentSelectorURL()) %>"
 							/>
 						</c:otherwise>
 					</c:choose>

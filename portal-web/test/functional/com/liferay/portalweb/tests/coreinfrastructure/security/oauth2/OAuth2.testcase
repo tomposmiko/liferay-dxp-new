@@ -308,7 +308,7 @@ definition {
 
 		var curl = '''
 			http://localhost:9080/o/oauth2/token \
-				 --data client_id=abc123&client_secret=abc123&grant_type=authorization_code&code=${authorizationCode}
+				--data client_id=abc123&client_secret=abc123&grant_type=authorization_code&code=${authorizationCode}
 		''';
 
 		var reponse = JSONCurlUtil.post("${curl}");
@@ -1025,6 +1025,7 @@ definition {
 		property app.server.types = "jboss,tcserver,tomcat,weblogic,websphere,wildfly";
 		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
 		property environment.acceptance = "true";
+		property operating.system.types = "alpine,amazonlinux,centos,debian,fedora,orcllinux,osx,redhat,solaris,suse,ubuntu,windows";
 		property portal.acceptance = "true";
 		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "OAuth2#ViewAndRevokeGrantedAuthorizations";

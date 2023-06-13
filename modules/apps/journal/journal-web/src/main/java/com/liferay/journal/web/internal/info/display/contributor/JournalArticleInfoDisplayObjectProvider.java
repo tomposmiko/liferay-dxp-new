@@ -16,14 +16,11 @@ package com.liferay.journal.web.internal.info.display.contributor;
 
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRenderer;
-import com.liferay.asset.kernel.service.AssetCategoryLocalServiceUtil;
-import com.liferay.asset.kernel.service.AssetTagLocalServiceUtil;
+import com.liferay.asset.util.AssetHelper;
 import com.liferay.info.display.contributor.InfoDisplayObjectProvider;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.web.internal.asset.model.JournalArticleAssetRendererFactory;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 
 import java.util.Locale;
 
@@ -34,12 +31,13 @@ public class JournalArticleInfoDisplayObjectProvider
 	implements InfoDisplayObjectProvider<JournalArticle> {
 
 	public JournalArticleInfoDisplayObjectProvider(
-			JournalArticle article,
+			JournalArticle article, AssetHelper assetHelper,
 			JournalArticleAssetRendererFactory
 				journalArticleAssetRendererFactory)
 		throws PortalException {
 
 		_article = article;
+		_assetHelper = assetHelper;
 		_journalArticleAssetRendererFactory =
 			journalArticleAssetRendererFactory;
 
@@ -78,18 +76,8 @@ public class JournalArticleInfoDisplayObjectProvider
 
 	@Override
 	public String getKeywords(Locale locale) {
-		String[] assetTagNames = AssetTagLocalServiceUtil.getTagNames(
-			_assetEntry.getClassName(), _assetEntry.getClassPK());
-		String[] assetCategoryNames =
-			AssetCategoryLocalServiceUtil.getCategoryNames(
-				_assetEntry.getClassName(), _assetEntry.getClassPK());
-
-		String[] keywords =
-			new String[assetTagNames.length + assetCategoryNames.length];
-
-		ArrayUtil.combine(assetTagNames, assetCategoryNames, keywords);
-
-		return StringUtil.merge(keywords);
+		return _assetHelper.getAssetKeywords(
+			_assetEntry.getClassName(), _assetEntry.getClassPK(), locale);
 	}
 
 	@Override
@@ -114,6 +102,7 @@ public class JournalArticleInfoDisplayObjectProvider
 
 	private final JournalArticle _article;
 	private final AssetEntry _assetEntry;
+	private final AssetHelper _assetHelper;
 	private final JournalArticleAssetRendererFactory
 		_journalArticleAssetRendererFactory;
 

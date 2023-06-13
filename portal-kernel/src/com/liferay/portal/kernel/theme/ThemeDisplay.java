@@ -1864,6 +1864,10 @@ public class ThemeDisplay
 			}
 		}
 
+		if (layout.getCtCollectionId() != 0) {
+			return layout.getFriendlyURL(_locale);
+		}
+
 		String layoutFriendlyURL = _layoutFriendlyURLs.get(layout.getPlid());
 
 		if (layoutFriendlyURL == null) {

@@ -162,15 +162,15 @@ public class CTConflictChecker<T extends CTModel<T>> {
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
 				StringBundler.concat(
-					"select ", ctPersistence.getTableName(), ".",
-					primaryKeyName, " from ", ctPersistence.getTableName(),
-					" inner join CTEntry on CTEntry.modelClassPK = ",
-					ctPersistence.getTableName(), ".", primaryKeyName,
+					"select publication.", primaryKeyName, " from ",
+					ctPersistence.getTableName(),
+					" publication inner join CTEntry on CTEntry.modelClassPK ",
+					"= publication.", primaryKeyName,
 					" where CTEntry.ctCollectionId = ", _sourceCTCollectionId,
 					" and CTEntry.modelClassNameId = ", _modelClassNameId,
 					" and CTEntry.changeType = ",
-					CTConstants.CT_CHANGE_TYPE_ADDITION, " and ",
-					ctPersistence.getTableName(), ".ctCollectionId = ",
+					CTConstants.CT_CHANGE_TYPE_ADDITION,
+					" and publication.ctCollectionId = ",
 					_targetCTCollectionId));
 			ResultSet resultSet = preparedStatement.executeQuery()) {
 
@@ -424,22 +424,8 @@ public class CTConflictChecker<T extends CTModel<T>> {
 		Connection connection, CTPersistence<T> ctPersistence,
 		List<ConflictInfo> conflictInfos, String primaryKeyName) {
 
-		String selectSQL = StringBundler.concat(
-			"select t1.", primaryKeyName, " from ",
-			ctPersistence.getTableName(), " t1 inner join ",
-			ctPersistence.getTableName(), " t2 on t1.", primaryKeyName,
-			" = t2.", primaryKeyName, " and t1.ctCollectionId = ",
-			_sourceCTCollectionId, " and t2.ctCollectionId = ",
-			_targetCTCollectionId,
-			" inner join CTEntry ctEntry on ctEntry.ctCollectionId = ",
-			_sourceCTCollectionId, " and ctEntry.modelClassNameId = ",
-			_modelClassNameId, " and ctEntry.modelClassPK = t2.",
-			primaryKeyName, " and ctEntry.changeType = ",
-			CTConstants.CT_CHANGE_TYPE_MODIFICATION);
-
 		List<Long> resolvedPrimaryKeys = _getModifiedPrimaryKeys(
-			connection, ctPersistence, CTColumnResolutionType.IGNORE,
-			selectSQL);
+			connection, ctPersistence, primaryKeyName, true);
 
 		for (Long resolvedPrimaryKey : resolvedPrimaryKeys) {
 			conflictInfos.add(
@@ -450,8 +436,7 @@ public class CTConflictChecker<T extends CTModel<T>> {
 			connection, ctPersistence, primaryKeyName, resolvedPrimaryKeys);
 
 		List<Long> unresolvedPrimaryKeys = _getModifiedPrimaryKeys(
-			connection, ctPersistence, CTColumnResolutionType.STRICT,
-			selectSQL + " and ctEntry.modelMvccVersion != t2.mvccVersion");
+			connection, ctPersistence, primaryKeyName, false);
 
 		for (Long unresolvedPrimaryKey : unresolvedPrimaryKeys) {
 			conflictInfos.add(
@@ -529,16 +514,14 @@ public class CTConflictChecker<T extends CTModel<T>> {
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
 				StringBundler.concat(
 					"select CTEntry.modelClassPK from CTEntry left join ",
-					ctPersistence.getTableName(), " on ",
-					ctPersistence.getTableName(), ".", primaryKeyName,
-					" = CTEntry.modelClassPK and ",
-					ctPersistence.getTableName(), ".ctCollectionId = ",
+					ctPersistence.getTableName(), " publication on ",
+					"publication.", primaryKeyName,
+					" = CTEntry.modelClassPK and publication.ctCollectionId = ",
 					_targetCTCollectionId, " where CTEntry.ctCollectionId = ",
 					_sourceCTCollectionId, " and CTEntry.modelClassNameId = ",
 					_modelClassNameId, " and CTEntry.changeType = ",
 					CTConstants.CT_CHANGE_TYPE_MODIFICATION, " and ",
-					ctPersistence.getTableName(), ".", primaryKeyName,
-					" is null"));
+					"publication.", primaryKeyName, " is null"));
 			ResultSet resultSet = preparedStatement.executeQuery()) {
 
 			List<Long> primaryKeys = new ArrayList<>();
@@ -556,58 +539,101 @@ public class CTConflictChecker<T extends CTModel<T>> {
 
 	private List<Long> _getModifiedPrimaryKeys(
 		Connection connection, CTPersistence<T> ctPersistence,
-		CTColumnResolutionType ctColumnResolutionType, String sql) {
+		String primaryKeyName, boolean resolved) {
 
-		Set<String> conflictingColumnNames = ctPersistence.getCTColumnNames(
-			ctColumnResolutionType);
+		Set<String> strictColumnNames = ctPersistence.getCTColumnNames(
+			CTColumnResolutionType.STRICT);
 
-		if (conflictingColumnNames.isEmpty()) {
-			return Collections.emptyList();
-		}
+		StringBundler sb = new StringBundler();
+
+		sb.append("select publication.");
+		sb.append(primaryKeyName);
+		sb.append(" from ");
+		sb.append(ctPersistence.getTableName());
+		sb.append(" publication inner join ");
+		sb.append(ctPersistence.getTableName());
+		sb.append(" production on publication.");
+		sb.append(primaryKeyName);
+		sb.append(" = production.");
+		sb.append(primaryKeyName);
+		sb.append(" and publication.ctCollectionId = ");
+		sb.append(_sourceCTCollectionId);
+		sb.append(" and production.ctCollectionId = ");
+		sb.append(_targetCTCollectionId);
+		sb.append(" inner join CTEntry ctEntry on ctEntry.ctCollectionId = ");
+		sb.append(_sourceCTCollectionId);
+		sb.append(" and ctEntry.modelClassNameId = ");
+		sb.append(_modelClassNameId);
+		sb.append(" and ctEntry.modelClassPK = production.");
+		sb.append(primaryKeyName);
+		sb.append(" and ctEntry.changeType = ");
+		sb.append(CTConstants.CT_CHANGE_TYPE_MODIFICATION);
+		sb.append(" and ctEntry.modelMvccVersion != production.mvccVersion");
 
 		Map<String, Integer> columnsMap = new HashMap<>(
 			ctPersistence.getTableColumnsMap());
 
 		Set<String> columnNames = columnsMap.keySet();
 
-		columnNames.retainAll(conflictingColumnNames);
+		columnNames.retainAll(strictColumnNames);
 
 		Collection<Integer> columnTypes = columnsMap.values();
 
-		if ((ctColumnResolutionType != CTColumnResolutionType.STRICT) ||
-			!columnTypes.contains(Types.BLOB)) {
+		String andOr = " or ";
+		String comparison = " != ";
 
-			StringBundler sb = new StringBundler(sql);
+		if (resolved) {
+			andOr = " and ";
+			comparison = " = ";
+		}
 
+		if (!columnTypes.contains(Types.BLOB)) {
 			sb.append(" where ");
 
 			for (Map.Entry<String, Integer> entry : columnsMap.entrySet()) {
 				String conflictColumnName = entry.getKey();
 
+				sb.append("((");
+
 				if (entry.getValue() == Types.CLOB) {
-					sb.append("CAST_CLOB_TEXT(t1.");
+					sb.append("CAST_CLOB_TEXT(publication.");
 					sb.append(conflictColumnName);
-					sb.append(") != CAST_CLOB_TEXT(t2.");
+					sb.append(")");
+					sb.append(comparison);
+					sb.append("CAST_CLOB_TEXT(production.");
 					sb.append(conflictColumnName);
 					sb.append(")");
 				}
 				else {
-					sb.append("t1.");
+					sb.append("publication.");
 					sb.append(conflictColumnName);
-					sb.append(" != t2.");
+					sb.append(comparison);
+					sb.append("production.");
 					sb.append(conflictColumnName);
 				}
 
-				sb.append(" or ");
+				sb.append(") or (publication.");
+				sb.append(conflictColumnName);
+				sb.append(" is null and production.");
+				sb.append(conflictColumnName);
+
+				if (!resolved) {
+					sb.append(" is not null) or (publication.");
+					sb.append(conflictColumnName);
+					sb.append(" is not null and production.");
+					sb.append(conflictColumnName);
+				}
+
+				sb.append(" is null))");
+
+				sb.append(andOr);
 			}
 
 			sb.setIndex(sb.index() - 1);
-
-			sql = sb.toString();
 		}
 
 		try (PreparedStatement preparedStatement = connection.prepareStatement(
-				SQLTransformer.transform(sql));
+				SQLTransformer.transform(sb.toString()));
 			ResultSet resultSet = preparedStatement.executeQuery()) {
 
 			List<Long> primaryKeys = new ArrayList<>();
@@ -691,19 +717,30 @@ public class CTConflictChecker<T extends CTModel<T>> {
 		Set<String> ignoredColumnNames = ctPersistence.getCTColumnNames(
 			CTColumnResolutionType.IGNORE);
 
+		Set<String> maxColumnNames = ctPersistence.getCTColumnNames(
+			CTColumnResolutionType.MAX);
+
+		Set<String> minColumnNames = ctPersistence.getCTColumnNames(
+			CTColumnResolutionType.MIN);
+
 		for (String name : tableColumnsMap.keySet()) {
 			if (name.equals("ctCollectionId")) {
 				sb.append(_sourceCTCollectionId);
 				sb.append(" as ");
 			}
 			else if (name.equals("mvccVersion")) {
-				sb.append("(t1.mvccVersion + 1) ");
+				sb.append("(publication.mvccVersion + 1) ");
 			}
 			else if (ignoredColumnNames.contains(name)) {
-				sb.append("t2.");
+				sb.append("production.");
+			}
+			else if (maxColumnNames.contains(name) ||
+					 minColumnNames.contains(name)) {
+
+				sb.append("composite.");
 			}
 			else {
-				sb.append("t1.");
+				sb.append("publication.");
 			}
 
 			sb.append(name);
@@ -713,15 +750,48 @@ public class CTConflictChecker<T extends CTModel<T>> {
 		sb.setStringAt(" from ", sb.index() - 1);
 
 		sb.append(ctPersistence.getTableName());
-		sb.append(" t1, ");
+		sb.append(" production inner join ");
 		sb.append(ctPersistence.getTableName());
-		sb.append(" t2 where t1.");
+		sb.append(" publication on production.");
 		sb.append(primaryKeyName);
-		sb.append(" = t2.");
+		sb.append(" = publication.");
 		sb.append(primaryKeyName);
-		sb.append(" and t1.ctCollectionId = ");
+
+		if (!maxColumnNames.isEmpty() || !minColumnNames.isEmpty()) {
+			sb.append(" inner join (select ");
+			sb.append(primaryKeyName);
+
+			for (String maxColumnName : maxColumnNames) {
+				sb.append(", max(");
+				sb.append(maxColumnName);
+				sb.append(") ");
+				sb.append(maxColumnName);
+			}
+
+			for (String minColumnName : minColumnNames) {
+				sb.append(", min(");
+				sb.append(minColumnName);
+				sb.append(") ");
+				sb.append(minColumnName);
+			}
+
+			sb.append(" from ");
+			sb.append(ctPersistence.getTableName());
+			sb.append(" where ctCollectionId in (");
+			sb.append(_targetCTCollectionId);
+			sb.append(", ");
+			sb.append(tempCTCollectionId);
+			sb.append(") group by ");
+			sb.append(primaryKeyName);
+			sb.append(") composite on composite.");
+			sb.append(primaryKeyName);
+			sb.append(" = production.");
+			sb.append(primaryKeyName);
+		}
+
+		sb.append(" where publication.ctCollectionId = ");
 		sb.append(tempCTCollectionId);
-		sb.append(" and t2.ctCollectionId = ");
+		sb.append(" and production.ctCollectionId = ");
 		sb.append(_targetCTCollectionId);
 
 		try {
@@ -750,11 +820,11 @@ public class CTConflictChecker<T extends CTModel<T>> {
 		StringBundler sb = new StringBundler(
 			(2 * unresolvedPrimaryKeys.size()) + 18);
 
-		sb.append("select t1.");
+		sb.append("select publication.");
 		sb.append(primaryKeyName);
-		sb.append(", t1.mvccVersion from ");
+		sb.append(", publication.mvccVersion from ");
 		sb.append(tableName);
-		sb.append(" t1 inner join CTEntry on t1.");
+		sb.append(" publication inner join CTEntry on publication.");
 		sb.append(primaryKeyName);
 		sb.append(" = CTEntry.modelClassPK and CTEntry.changeType = ");
 		sb.append(CTConstants.CT_CHANGE_TYPE_MODIFICATION);
@@ -762,12 +832,12 @@ public class CTConflictChecker<T extends CTModel<T>> {
 		sb.append(_sourceCTCollectionId);
 		sb.append(" and CTEntry.modelClassNameId = ");
 		sb.append(_modelClassNameId);
-		sb.append(" and t1.mvccVersion != CTEntry.modelMvccVersion");
-		sb.append(" where t1.ctCollectionId = ");
+		sb.append(" and publication.mvccVersion != CTEntry.modelMvccVersion");
+		sb.append(" where publication.ctCollectionId = ");
 		sb.append(_targetCTCollectionId);
 
 		if (!unresolvedPrimaryKeys.isEmpty()) {
-			sb.append(" and t1.");
+			sb.append(" and publication.");
 			sb.append(primaryKeyName);
 			sb.append(" not in (");
 

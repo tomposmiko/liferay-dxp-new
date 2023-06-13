@@ -332,14 +332,34 @@ public class AssetPublisherHelperImpl implements AssetPublisherHelper {
 			_assetListEntryService.fetchAssetListEntry(assetListEntryId);
 
 		if (selectionStyle.equals("asset-list") && (assetListEntry != null)) {
+			List<AssetEntry> viewableAssetEntries = new ArrayList<>();
+
 			long[] segmentsEntryIds = _getSegmentsEntryIds(portletRequest);
 
 			String acClientUserId = GetterUtil.getString(
 				portletRequest.getAttribute(
 					SegmentsWebKeys.SEGMENTS_ANONYMOUS_USER_ID));
 
-			return _assetListAssetEntryProvider.getAssetEntries(
-				assetListEntry, segmentsEntryIds, acClientUserId);
+			List<AssetEntry> assetEntries =
+				_assetListAssetEntryProvider.getAssetEntries(
+					assetListEntry, segmentsEntryIds, acClientUserId);
+
+			for (AssetEntry assetEntry : assetEntries) {
+				AssetRendererFactory<?> assetRendererFactory =
+					AssetRendererFactoryRegistryUtil.
+						getAssetRendererFactoryByClassName(
+							assetEntry.getClassName());
+
+				AssetRenderer<?> assetRenderer =
+					assetRendererFactory.getAssetRenderer(
+						assetEntry.getClassPK());
+
+				if (assetRenderer.hasViewPermission(permissionChecker)) {
+					viewableAssetEntries.add(assetEntry);
+				}
+			}
+
+			return viewableAssetEntries;
 		}
 
 		List<AssetEntry> assetEntries = getAssetEntries(

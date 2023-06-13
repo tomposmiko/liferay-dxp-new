@@ -6489,6 +6489,7 @@ public class PortletPreferencesPersistenceImpl
 
 	static {
 		Set<String> ctControlColumnNames = new HashSet<String>();
+		Set<String> ctMergeColumnNames = new HashSet<String>();
 		Set<String> ctStrictColumnNames = new HashSet<String>();
 
 		ctControlColumnNames.add("mvccVersion");
@@ -6498,10 +6499,11 @@ public class PortletPreferencesPersistenceImpl
 		ctStrictColumnNames.add("ownerType");
 		ctStrictColumnNames.add("plid");
 		ctStrictColumnNames.add("portletId");
-		ctStrictColumnNames.add("preferences");
+		ctMergeColumnNames.add("preferences");
 
 		_ctColumnNamesMap.put(
 			CTColumnResolutionType.CONTROL, ctControlColumnNames);
+		_ctColumnNamesMap.put(CTColumnResolutionType.MERGE, ctMergeColumnNames);
 		_ctColumnNamesMap.put(
 			CTColumnResolutionType.PK,
 			Collections.singleton("portletPreferencesId"));

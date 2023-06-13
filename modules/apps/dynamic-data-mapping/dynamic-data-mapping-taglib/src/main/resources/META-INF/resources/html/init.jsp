@@ -37,6 +37,7 @@ java.util.Locale requestedLocale = (java.util.Locale)request.getAttribute("lifer
 boolean showEmptyFieldLabel = GetterUtil.getBoolean(String.valueOf(request.getAttribute("liferay-ddm:html:showEmptyFieldLabel")), true);
 boolean showLanguageSelector = GetterUtil.getBoolean(String.valueOf(request.getAttribute("liferay-ddm:html:showLanguageSelector")), true);
 boolean synchronousFormSubmission = GetterUtil.getBoolean(String.valueOf(request.getAttribute("liferay-ddm:html:synchronousFormSubmission")), true);
+java.lang.String webContentSelectorURL = GetterUtil.getString((java.lang.String)request.getAttribute("liferay-ddm:html:webContentSelectorURL"));
 Map<String, Object> dynamicAttributes = (Map<String, Object>)request.getAttribute("liferay-ddm:html:dynamicAttributes");
 %>
 

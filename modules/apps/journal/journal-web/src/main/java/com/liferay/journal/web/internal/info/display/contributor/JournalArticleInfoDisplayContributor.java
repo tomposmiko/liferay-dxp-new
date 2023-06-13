@@ -20,6 +20,7 @@ import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.BaseDDMStructureClassTypeReader;
 import com.liferay.asset.kernel.model.ClassType;
+import com.liferay.asset.util.AssetHelper;
 import com.liferay.dynamic.data.mapping.info.display.field.DDMFormValuesInfoDisplayFieldProvider;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
@@ -177,7 +178,7 @@ public class JournalArticleInfoDisplayContributor
 		}
 
 		return new JournalArticleInfoDisplayObjectProvider(
-			article, journalArticleAssetRendererFactory);
+			article, assetHelper, journalArticleAssetRendererFactory);
 	}
 
 	@Override
@@ -194,7 +195,7 @@ public class JournalArticleInfoDisplayContributor
 		}
 
 		return new JournalArticleInfoDisplayObjectProvider(
-			article, journalArticleAssetRendererFactory);
+			article, assetHelper, journalArticleAssetRendererFactory);
 	}
 
 	@Override
@@ -217,7 +218,7 @@ public class JournalArticleInfoDisplayContributor
 		}
 
 		return new JournalArticleInfoDisplayObjectProvider(
-			article, journalArticleAssetRendererFactory);
+			article, assetHelper, journalArticleAssetRendererFactory);
 	}
 
 	@Override
@@ -235,6 +236,9 @@ public class JournalArticleInfoDisplayContributor
 	@Reference
 	protected AssetEntryInfoDisplayFieldProvider
 		assetEntryInfoDisplayFieldProvider;
+
+	@Reference
+	protected AssetHelper assetHelper;
 
 	@Reference
 	protected ClassTypesInfoDisplayFieldProvider

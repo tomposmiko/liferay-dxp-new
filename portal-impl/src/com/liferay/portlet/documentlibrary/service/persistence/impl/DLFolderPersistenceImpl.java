@@ -15264,6 +15264,8 @@ public class DLFolderPersistenceImpl
 	static {
 		Set<String> ctControlColumnNames = new HashSet<String>();
 		Set<String> ctIgnoreColumnNames = new HashSet<String>();
+		Set<String> ctMaxColumnNames = new HashSet<String>();
+		Set<String> ctMergeColumnNames = new HashSet<String>();
 		Set<String> ctStrictColumnNames = new HashSet<String>();
 
 		ctControlColumnNames.add("mvccVersion");
@@ -15280,8 +15282,8 @@ public class DLFolderPersistenceImpl
 		ctStrictColumnNames.add("parentFolderId");
 		ctStrictColumnNames.add("treePath");
 		ctStrictColumnNames.add("name");
-		ctStrictColumnNames.add("description");
-		ctStrictColumnNames.add("lastPostDate");
+		ctMergeColumnNames.add("description");
+		ctMaxColumnNames.add("lastPostDate");
 		ctStrictColumnNames.add("defaultFileEntryTypeId");
 		ctStrictColumnNames.add("hidden_");
 		ctStrictColumnNames.add("restrictionType");
@@ -15296,6 +15298,8 @@ public class DLFolderPersistenceImpl
 			CTColumnResolutionType.CONTROL, ctControlColumnNames);
 		_ctColumnNamesMap.put(
 			CTColumnResolutionType.IGNORE, ctIgnoreColumnNames);
+		_ctColumnNamesMap.put(CTColumnResolutionType.MAX, ctMaxColumnNames);
+		_ctColumnNamesMap.put(CTColumnResolutionType.MERGE, ctMergeColumnNames);
 		_ctColumnNamesMap.put(
 			CTColumnResolutionType.PK, Collections.singleton("folderId"));
 		_ctColumnNamesMap.put(

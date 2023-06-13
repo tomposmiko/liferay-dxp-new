@@ -14,6 +14,7 @@
 
 package com.liferay.portlet.expando.service.impl;
 
+import com.liferay.expando.kernel.exception.MissingDefaultLocaleValueException;
 import com.liferay.expando.kernel.model.ExpandoColumn;
 import com.liferay.expando.kernel.model.ExpandoColumnConstants;
 import com.liferay.expando.kernel.model.ExpandoRow;
@@ -27,6 +28,7 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.typeconverter.DateArrayConverter;
 import com.liferay.portal.typeconverter.NumberArrayConverter;
 import com.liferay.portal.typeconverter.NumberConverter;
@@ -580,7 +582,7 @@ public class ExpandoValueLocalServiceImpl
 
 		return expandoValueLocalService.addValue(
 			companyId, className, tableName, columnName, classPK,
-			(Map<Locale, ?>)data, LocaleUtil.getDefault());
+			(Map<Locale, ?>)data, LocaleUtil.getSiteDefault());
 	}
 
 	@Override
@@ -820,9 +822,22 @@ public class ExpandoValueLocalServiceImpl
 				value.setStringArray((String[])attributeValue);
 			}
 			else if (type == ExpandoColumnConstants.STRING_LOCALIZED) {
+				Map<Locale, String> defaultValuesMap =
+					(Map<Locale, String>)attributeValue;
+
+				Locale defaultLocale = LocaleUtil.getSiteDefault();
+
+				if (Validator.isNull(defaultValuesMap.get(defaultLocale))) {
+					for (String defaultValue : defaultValuesMap.values()) {
+						if (Validator.isNotNull(defaultValue)) {
+							throw new MissingDefaultLocaleValueException(
+								defaultLocale);
+						}
+					}
+				}
+
 				value.setStringMap(
-					(Map<Locale, String>)attributeValue,
-					LocaleUtil.getDefault());
+					(Map<Locale, String>)attributeValue, defaultLocale);
 			}
 			else {
 				value.setString((String)attributeValue);

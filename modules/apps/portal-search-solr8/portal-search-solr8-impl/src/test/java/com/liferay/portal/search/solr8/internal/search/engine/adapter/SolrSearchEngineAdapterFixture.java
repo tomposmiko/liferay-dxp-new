@@ -64,10 +64,10 @@ public class SolrSearchEngineAdapterFixture {
 		DocumentRequestExecutorFixture documentRequestExecutorFixture =
 			new DocumentRequestExecutorFixture() {
 				{
+					setProperties(properties);
+					setQueryTranslator(queryTranslator);
 					setSolrClientManager(solrClientManager);
 					setSolrDocumentFactory(solrDocumentFactory);
-					setQueryTranslator(queryTranslator);
-					setProperties(properties);
 				}
 			};
 
@@ -82,8 +82,8 @@ public class SolrSearchEngineAdapterFixture {
 			new SearchRequestExecutorFixture() {
 				{
 					setFacetProcessor(facetProcessor);
-					setSolrClientManager(solrClientManager);
 					setQueryTranslator(queryTranslator);
+					setSolrClientManager(solrClientManager);
 				}
 			};
 
@@ -96,10 +96,10 @@ public class SolrSearchEngineAdapterFixture {
 				setDocumentRequestExecutor(
 					documentRequestExecutorFixture.
 						getDocumentRequestExecutor());
-				setSearchRequestExecutor(
-					searchRequestExecutorFixture.getSearchRequestExecutor());
 				setIndexRequestExecutor(
 					indexRequestExecutorFixture.getIndexRequestExecutor());
+				setSearchRequestExecutor(
+					searchRequestExecutorFixture.getSearchRequestExecutor());
 				setThrowOriginalExceptions(true);
 			}
 		};

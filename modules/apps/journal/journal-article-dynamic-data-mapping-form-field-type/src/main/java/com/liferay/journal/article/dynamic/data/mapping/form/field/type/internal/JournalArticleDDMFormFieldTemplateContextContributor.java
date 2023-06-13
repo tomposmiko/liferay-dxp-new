@@ -19,12 +19,18 @@ import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.render.DDMFormFieldRenderingContext;
 import com.liferay.item.selector.ItemSelector;
+import com.liferay.item.selector.constants.ItemSelectorPortletKeys;
 import com.liferay.item.selector.criteria.JournalArticleItemSelectorReturnType;
 import com.liferay.item.selector.criteria.info.item.criterion.InfoItemItemSelectorCriterion;
+import com.liferay.journal.model.JournalArticle;
+import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.Map;
 
@@ -101,10 +107,34 @@ public class JournalArticleDDMFormFieldTemplateContextContributor
 				"selectJournalArticle",
 			infoItemItemSelectorCriterion);
 
+		long articleId = ParamUtil.getLong(httpServletRequest, "articleId");
+
+		if (articleId > 0) {
+			long groupId = ParamUtil.getLong(httpServletRequest, "groupId");
+
+			JournalArticle journalArticle =
+				_journalArticleLocalService.fetchLatestArticle(
+					groupId, String.valueOf(articleId),
+					WorkflowConstants.STATUS_APPROVED);
+
+			String itemSelectorNamespace = _portal.getPortletNamespace(
+				ItemSelectorPortletKeys.ITEM_SELECTOR);
+
+			itemSelectorURL.setParameter(
+				itemSelectorNamespace + "refererClassPK",
+				String.valueOf(journalArticle.getResourcePrimKey()));
+		}
+
 		return itemSelectorURL.toString();
 	}
 
 	@Reference
 	private ItemSelector _itemSelector;
+
+	@Reference
+	private JournalArticleLocalService _journalArticleLocalService;
+
+	@Reference
+	private Portal _portal;
 
 }

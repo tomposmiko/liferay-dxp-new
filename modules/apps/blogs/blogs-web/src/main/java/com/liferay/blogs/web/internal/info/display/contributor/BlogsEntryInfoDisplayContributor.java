@@ -16,6 +16,7 @@ package com.liferay.blogs.web.internal.info.display.contributor;
 
 import com.liferay.asset.info.display.field.AssetEntryInfoDisplayFieldProvider;
 import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.util.AssetHelper;
 import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.blogs.service.BlogsEntryService;
 import com.liferay.info.display.contributor.InfoDisplayContributor;
@@ -97,7 +98,7 @@ public class BlogsEntryInfoDisplayContributor
 			return null;
 		}
 
-		return new BlogsInfoDisplayObjectProvider(blogsEntry);
+		return new BlogsInfoDisplayObjectProvider(blogsEntry, _assetHelper);
 	}
 
 	@Override
@@ -111,7 +112,7 @@ public class BlogsEntryInfoDisplayContributor
 			return null;
 		}
 
-		return new BlogsInfoDisplayObjectProvider(blogsEntry);
+		return new BlogsInfoDisplayObjectProvider(blogsEntry, _assetHelper);
 	}
 
 	@Override
@@ -122,6 +123,9 @@ public class BlogsEntryInfoDisplayContributor
 	@Reference
 	private AssetEntryInfoDisplayFieldProvider
 		_assetEntryInfoDisplayFieldProvider;
+
+	@Reference
+	private AssetHelper _assetHelper;
 
 	@Reference
 	private BlogsEntryService _blogsEntryService;

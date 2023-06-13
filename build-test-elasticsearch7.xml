@@ -129,6 +129,16 @@ xpack.license.self_generated.type: trial</echo>
 ingest.geoip.downloader.enabled: false</echo>
 				</then>
 			</if>
+
+			<get-browser-property property.name="browser.docker.image" />
+
+			<if>
+				<isset property="browser.docker.image" />
+				<then>
+					<echo append="true" file="${elasticsearch.dir}/config/elasticsearch.yml">
+					${line.separator}http.host: _local_,_site_</echo>
+				</then>
+			</if>
 		</sequential>
 	</macrodef>
 

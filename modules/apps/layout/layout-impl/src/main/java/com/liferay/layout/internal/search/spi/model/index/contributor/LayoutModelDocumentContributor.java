@@ -20,6 +20,7 @@ import com.liferay.layout.crawler.LayoutCrawler;
 import com.liferay.layout.internal.search.util.LayoutPageTemplateStructureRenderUtil;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -273,7 +274,9 @@ public class LayoutModelDocumentContributor
 			return;
 		}
 
-		content = _html.stripHtml(_getWrapper(content));
+		content = _getWrapper(content);
+
+		content = _html.stripHtml(_removePortletToppers(content));
 
 		if (Validator.isNull(content)) {
 			return;
@@ -401,6 +404,33 @@ public class LayoutModelDocumentContributor
 
 		return false;
 	}
+
+	private String _removePortletToppers(String layoutContent) {
+		int topperIndex = layoutContent.indexOf(_TOPPER_ELEMENT);
+
+		while (topperIndex != -1) {
+			int topperEnd = layoutContent.indexOf(
+				_TOPPER_END_ELEMENT, topperIndex);
+
+			StringBundler sb = new StringBundler(
+				layoutContent.substring(0, topperIndex));
+
+			sb.append(
+				layoutContent.substring(
+					topperEnd + _TOPPER_END_ELEMENT.length()));
+
+			layoutContent = sb.toString();
+
+			topperIndex = layoutContent.indexOf(_TOPPER_ELEMENT, topperIndex);
+		}
+
+		return layoutContent;
+	}
+
+	private static final String _TOPPER_ELEMENT =
+		"menu class=\"portlet-topper-toolbar\"";
+
+	private static final String _TOPPER_END_ELEMENT = "</menu>";
 
 	private static final String _WRAPPER_ELEMENT = "id=\"wrapper\">";
 

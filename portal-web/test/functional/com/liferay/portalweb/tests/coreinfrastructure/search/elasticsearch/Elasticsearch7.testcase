@@ -61,14 +61,14 @@ definition {
 
 		var curl = '''
 			http://localhost:${port}/liferay-${companyId}/_delete_by_query?pretty \
-			-H 'Content-Type: application/json' \
-			-d '{
-				"query": {
-					"match": {
+				-H 'Content-Type: application/json' \
+				-d '{
+					"query": {
+						"match": {
 							"_type": "LiferayDocumentType"
+						}
 					}
-				}
-			}'
+				}'
 		''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
@@ -238,6 +238,7 @@ definition {
 		property delete.sidecar.bundle = "true";
 		property embedded.elasticsearch.only = "true";
 		property environment.acceptance = "true";
+		property operating.system.types = "alpine,amazonlinux,centos,debian,fedora,orcllinux,osx,redhat,solaris,suse,ubuntu,windows";
 		property portal.acceptance = "true";
 		property test.assert.warning.exceptions = "true";
 

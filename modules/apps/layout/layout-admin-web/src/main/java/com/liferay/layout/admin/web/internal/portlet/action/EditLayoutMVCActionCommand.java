@@ -151,6 +151,19 @@ public class EditLayoutMVCActionCommand extends BaseMVCActionCommand {
 					"layout.instanceable.allowed", Boolean.TRUE);
 			}
 
+			if (layout.isSystem() && (layout.getClassPK() > 0) &&
+				(layout.getClassNameId() == _portal.getClassNameId(
+					Layout.class))) {
+
+				UnicodeProperties layoutTypeSettingsUnicodeProperties =
+					layout.getTypeSettingsProperties();
+
+				serviceContext.setAttribute(
+					Sites.LAYOUT_UPDATEABLE,
+					layoutTypeSettingsUnicodeProperties.get(
+						Sites.LAYOUT_UPDATEABLE));
+			}
+
 			layout = _layoutService.updateLayout(
 				groupId, privateLayout, layoutId, layout.getParentLayoutId(),
 				nameMap, layout.getTitleMap(), layout.getDescriptionMap(),

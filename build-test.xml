@@ -454,6 +454,18 @@ jdbc.counter.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 		</sequential>
 	</macrodef>
 
+	<macrodef name="get-docker-container-ip-address">
+		<attribute name="container.name" />
+		<attribute name="property.name" />
+
+		<sequential>
+			<exec executable="/bin/bash" outputproperty="@{property.name}">
+				<arg value="-c" />
+				<arg value="docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' @{container.name}" />
+			</exec>
+		</sequential>
+	</macrodef>
+
 	<macrodef name="get-dxp-license-product-name">
 		<sequential>
 			<get-testcase-property property.name="dxp.license.file" />
@@ -1966,58 +1978,6 @@ sendPasswordCaptchaEnabled=&quot;false&quot;</echo>
 		</sequential>
 	</macrodef>
 
-	<macrodef name="prepare-chrome-driver">
-		<sequential>
-			<if>
-				<os family="mac" />
-				<then>
-					<property name="selenium.chrome.driver.zip" value="chromedriver_mac64.zip" />
-				</then>
-				<elseif>
-					<os family="unix" />
-					<then>
-						<property name="selenium.chrome.driver.zip" value="chromedriver_linux64.zip" />
-					</then>
-				</elseif>
-				<elseif>
-					<os family="windows" />
-					<then>
-						<property name="selenium.chrome.driver.zip" value="chromedriver_win32.zip" />
-					</then>
-				</elseif>
-				<else>
-					<then>
-						<fail message="Operating system is not supported." />
-					</then>
-				</else>
-			</if>
-
-			<propertycopy from="selenium.chrome.driver.version[${browser.chrome.version}]" name="selenium.chrome.driver.version" silent="true" />
-
-			<mirrors-get
-				dest="tools/selenium/${selenium.chrome.driver.zip}"
-				src="http://chromedriver.storage.googleapis.com/${selenium.chrome.driver.version}/${selenium.chrome.driver.zip}"
-			/>
-
-			<stop-chrome-driver />
-
-			<unzip
-				dest="tools/selenium"
-				src="tools/selenium/${selenium.chrome.driver.zip}"
-			/>
-
-			<if>
-				<os family="unix" />
-				<then>
-					<chmod
-						file="tools/selenium/chromedriver"
-						perm="a+x"
-					/>
-				</then>
-			</if>
-		</sequential>
-	</macrodef>
-
 	<macrodef name="prepare-custom-properties">
 		<attribute name="custom.properties" />
 		<attribute default="portal-impl/src/portal-ext.properties" name="properties.file" />
@@ -2428,134 +2388,6 @@ jdbc.default.password=${database.password}</echo>
 		</sequential>
 	</macrodef>
 
-	<macrodef name="prepare-edge-driver">
-		<sequential>
-			<if>
-				<os family="windows" />
-				<then>
-					<stop-edge-driver />
-
-					<mirrors-get
-						dest="tools/selenium/edgedriver.zip"
-						src="${selenium.edge.driver.zip.url}"
-					/>
-
-					<unzip
-						dest="tools/selenium"
-						src="tools/selenium/edgedriver.zip"
-					>
-						<globmapper
-							from="*/${selenium.edge.driver.executable}"
-							to="${selenium.edge.driver.executable}"
-						/>
-						<patternset>
-							<include name="${selenium.edge.driver.executable}" />
-							<exclude name="*/*" />
-						</patternset>
-					</unzip>
-				</then>
-				<else>
-					<if>
-						<not>
-							<isset property="selenium.remote.driver.url" />
-						</not>
-						<then>
-							<fail message="Operating system is not supported." />
-						</then>
-					</if>
-				</else>
-			</if>
-		</sequential>
-	</macrodef>
-
-	<macrodef name="prepare-gecko-driver">
-		<sequential>
-			<stop-gecko-driver />
-
-			<if>
-				<os family="mac" />
-				<then>
-					<property name="selenium.gecko.driver.archive" value="geckodriver-v${selenium.gecko.driver.version}-macos.tar.gz" />
-				</then>
-				<elseif>
-					<os family="unix" />
-					<then>
-						<property name="selenium.gecko.driver.archive" value="geckodriver-v${selenium.gecko.driver.version}-linux32.tar.gz" />
-					</then>
-				</elseif>
-				<elseif>
-					<os family="windows" />
-					<then>
-						<property name="selenium.gecko.driver.archive" value="geckodriver-v${selenium.gecko.driver.version}-win32.zip" />
-					</then>
-				</elseif>
-				<else>
-					<then>
-						<fail message="Operating system is not supported." />
-					</then>
-				</else>
-			</if>
-
-			<mirrors-get
-				dest="tools/selenium/${selenium.gecko.driver.archive}"
-				src="https://github.com/mozilla/geckodriver/releases/download/v${selenium.gecko.driver.version}/${selenium.gecko.driver.archive}"
-			/>
-
-			<if>
-				<os family="unix" />
-				<then>
-					<untar
-						compression="gzip"
-						dest="tools/selenium"
-						src="tools/selenium/${selenium.gecko.driver.archive}"
-					/>
-
-					<chmod
-						file="tools/selenium/geckodriver"
-						perm="a+x"
-					/>
-				</then>
-				<else>
-					<unzip
-						dest="tools/selenium"
-						src="tools/selenium/${selenium.gecko.driver.archive}"
-					/>
-				</else>
-			</if>
-		</sequential>
-	</macrodef>
-
-	<macrodef name="prepare-ie-driver">
-		<sequential>
-			<if>
-				<os family="windows" />
-				<then>
-					<stop-ie-driver />
-
-					<mirrors-get
-						dest="tools/selenium/iedriver.zip"
-						src="${selenium.ie.driver.zip.url}"
-					/>
-
-					<unzip
-						dest="tools/selenium"
-						src="tools/selenium/iedriver.zip"
-					/>
-				</then>
-				<else>
-					<if>
-						<not>
-							<isset property="selenium.remote.driver.url" />
-						</not>
-						<then>
-							<fail message="Operating system is not supported." />
-						</then>
-					</if>
-				</else>
-			</if>
-		</sequential>
-	</macrodef>
-
 	<macrodef name="prepare-jboss-module-configuration">
 		<sequential>
 			<local name="module.configuration.path" />
@@ -2910,22 +2742,7 @@ tell application "Safari" to quit
 			</if>
 
 			<if>
-				<equals arg1="${browser.type}" arg2="edge" />
-				<then>
-					<prepare-edge-driver />
-
-					<echo append="true" file="${test.ext.properties.file}">
-					selenium.edge.driver.executable=${selenium.edge.driver.executable}
-					selenium.executable.dir.name=${selenium.executable.dir.name}
-					</echo>
-				</then>
-			</if>
-
-			<if>
-				<and>
-					<equals arg1="${browser.firefox.version}" arg2="52.0" />
-					<equals arg1="${browser.type}" arg2="firefox" />
-				</and>
+				<equals arg1="${browser.type}" arg2="firefox" />
 				<then>
 					<propertycopy from="browser.firefox.bin.file[${browser.firefox.version}]" name="browser.firefox.bin.file" silent="true" />
 
@@ -2937,26 +2754,6 @@ tell application "Safari" to quit
 							</echo>
 						</then>
 					</if>
-
-					<prepare-gecko-driver />
-
-					<echo append="true" file="${test.ext.properties.file}">
-					selenium.executable.dir.name=${selenium.executable.dir.name}
-					selenium.gecko.driver.executable=${selenium.gecko.driver.executable}
-					</echo>
-				</then>
-			</if>
-
-			<if>
-				<equals arg1="${browser.type}" arg2="internetexplorer" />
-				<then>
-					<prepare-ie-driver />
-
-					<echo append="true" file="${test.ext.properties.file}">
-					selenium.executable.dir.name=${selenium.executable.dir.name}
-					selenium.ie.driver.executable=${selenium.ie.driver.executable}
-					selenium.ie.driver.version=${selenium.ie.driver.version}
-					</echo>
 				</then>
 			</if>
 
@@ -6371,10 +6168,7 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 				<else>
 					<get-operating-system-property property.name="operating.system.host" />
 
-					<exec executable="/bin/bash" outputproperty="ip.address">
-						<arg value="-c" />
-						<arg value="docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${operating.system.host}" />
-					</exec>
+					<get-docker-container-ip-address container.name="${operating.system.host}" property.name="ip.address" />
 				</else>
 			</if>
 
@@ -6407,6 +6201,13 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 
 			<wait-for-docker-browser shell.condition="(: &lt;/dev/tcp/127.0.0.1/4444) &amp;> /dev/null &amp;&amp; (: &lt;/dev/tcp/127.0.0.1/22) &amp;> /dev/null" />
 
+			<if>
+				<isset property="env.JENKINS_HOME" />
+				<then>
+					<docker-copy dest.path="${browser.host}:/root/.ssh" src.path="/root/.ssh/." />
+				</then>
+			</if>
+
 			<docker-execute container="${browser.host}">
 				ssh -fN -4 -L 8080:${ip.address}:8080 ${browser.host}
 				ssh -fN -4 -L 8282:${ip.address}:8282 ${browser.host}
@@ -6417,6 +6218,8 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 				ssh -fN -4 -L 9202:${ip.address}:9202 ${browser.host}
 				ssh -fN -4 -L 10080:${ip.address}:10080 ${browser.host}
 				ssh -fN -4 -L 12080:${ip.address}:12080 ${browser.host}
+				ssh -fN -4 -L 18080:${ip.address}:18080 ${browser.host}
+				ssh -fN -4 -L 18443:${ip.address}:18443 ${browser.host}
 			</docker-execute>
 		</sequential>
 	</macrodef>
@@ -6479,9 +6282,12 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 			</exec>
 
 			<if>
-				<not>
-					<equals arg1="${docker.start.result}" arg2="0" />
-				</not>
+				<or>
+					<contains string="${docker.start.error}" substring="Error" />
+					<not>
+						<equals arg1="${docker.start.result}" arg2="0" />
+					</not>
+				</or>
 				<then>
 					<fail>Unable to start docker container:
 ${docker.start.error}</fail>
@@ -7002,65 +6808,6 @@ ${docker.start.error}</fail>
 			<get-operating-system-property property.name="operating.system.host" />
 
 			<stop-docker-container name="${operating.system.host}" />
-		</sequential>
-	</macrodef>
-
-	<macrodef name="stop-edge-driver">
-		<sequential>
-			<exec executable="taskkill.exe">
-				<arg line="/F /IM ${selenium.edge.driver.executable}" />
-			</exec>
-		</sequential>
-	</macrodef>
-
-	<macrodef name="stop-gecko-driver">
-		<sequential>
-			<if>
-				<os family="unix" />
-				<then>
-					<execute failonerror="false">
-						killall geckodriver
-					</execute>
-				</then>
-				<else>
-					<execute failonerror="false">
-						taskkill.exe /F /IM geckodriver.exe
-					</execute>
-				</else>
-			</if>
-		</sequential>
-	</macrodef>
-
-	<macrodef name="stop-ie-driver">
-		<sequential>
-			<exec executable="taskkill.exe">
-				<arg line="/F /IM IEDriverServer.exe" />
-			</exec>
-		</sequential>
-	</macrodef>
-
-	<macrodef name="stop-lcs-app-server">
-		<attribute default="${app.server.bin.dir}" name="app.server.bin.dir" />
-		<attribute default="0" name="app.server.bundle.index" />
-		<attribute default="8" name="app.server.leading.port.number" />
-
-		<sequential>
-			<if>
-				<equals arg1="@{app.server.bundle.index}" arg2="0" />
-				<then>
-					<record action="start" name="${project.dir}/log" />
-				</then>
-			</if>
-
-			<exec dir="@{app.server.bin.dir}" executable="${app.server.stop.executable}" resolveexecutable="true">
-				<arg line="${app.server.stop.executable.arg.line}" />
-			</exec>
-
-			<waitfor maxwait="1" maxwaitunit="minute">
-				<not>
-					<socket port="@{app.server.leading.port.number}080" server="localhost" />
-				</not>
-			</waitfor>
 		</sequential>
 	</macrodef>
 
@@ -8303,27 +8050,6 @@ go</echo>
 				<stop-chrome-driver />
 			</then>
 		</if>
-
-		<if>
-			<equals arg1="${browser.type}" arg2="edge" />
-			<then>
-				<stop-edge-driver />
-			</then>
-		</if>
-
-		<if>
-			<equals arg1="${browser.type}" arg2="firefox" />
-			<then>
-				<stop-gecko-driver />
-			</then>
-		</if>
-
-		<if>
-			<equals arg1="${browser.type}" arg2="internetexplorer" />
-			<then>
-				<stop-ie-driver />
-			</then>
-		</if>
 	</target>
 
 	<target name="clean-up-sybase-processes">
@@ -8818,40 +8544,6 @@ go</echo>
 				zip -d '${liferayHome}/osgi/marketplace/Liferay Static - Impl.lpkg' com.liferay.portal.license.enterprise.app.jar
 			]]>
 		</execute>
-	</target>
-
-	<target name="deploy-analytics-cloud-demo-data-creator">
-		<if>
-			<equals arg1="${functional.test.type}" arg2="analytics-cloud" />
-			<then>
-				<ant dir="portal-kernel" target="clean" />
-
-				<ant dir="portal-kernel" target="compile" />
-
-				<ant dir="portal-kernel" target="deploy" />
-
-				<ant dir="portal-kernel" target="install-portal-snapshot" />
-
-				<mirrors-get
-					dest="${app.server.parent.dir}/osgi/modules/com.liferay.analytics.demo.data.creator.api.jar"
-					src="${baseline.jar.url}/com/liferay/com.liferay.analytics.demo.data.creator.api/${analytics.cloud.faro.data.creator.api}/com.liferay.analytics.demo.data.creator.api-${analytics.cloud.faro.data.creator.api}.jar"
-				/>
-
-				<mirrors-get
-					dest="${app.server.parent.dir}/osgi/modules/com.liferay.analytics.demo.data.creator.impl.jar"
-					src="${baseline.jar.url}/com/liferay/com.liferay.analytics.demo.data.creator.impl/${analytics.cloud.faro.data.creator.impl}/com.liferay.analytics.demo.data.creator.impl-${analytics.cloud.faro.data.creator.impl}.jar"
-				/>
-
-				<property location="${analytics.cloud.faro.data.csv}" name="analytics.cloud.faro.data.csv.file.path" />
-
-				<echo file="${app.server.parent.dir}/osgi/modules/com.liferay.analytics.demo.data.creator.configuration.AnalyticsDemoDataCreatorConfiguration.config">
-pathToUsersCSV="${analytics.cloud.faro.data.csv.file.path}"
-virtualHostname="localhost"
-				</echo>
-
-				<print-file file.name="${app.server.parent.dir}/osgi/modules/com.liferay.analytics.demo.data.creator.configuration.AnalyticsDemoDataCreatorConfiguration.config" />
-			</then>
-		</if>
 	</target>
 
 	<target name="deploy-dependency-jars">
@@ -10334,10 +10026,6 @@ ${update.properties}</echo>
 		</if>
 	</target>
 
-	<target name="prepare-chrome-driver">
-		<prepare-chrome-driver />
-	</target>
-
 	<target name="prepare-encryption-PCKS12-certificate">
 		<if>
 			<equals arg1="${app.server.type}" arg2="tomcat" />
@@ -11421,6 +11109,7 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 			liferay.app.server.portal.lib.dir=${app.server.lib.portal.dir}
 			liferay.app.server.portal.web.dir=${app.server.portal.dir}
 			logger.resources.url=${test.poshi.logger.resources.url}
+			operating.system.type=${operating.system.type}
 			output.dir.name=${selenium.output.dir.name}
 			product.names=${product.names}
 			project.dir=${project.dir}
@@ -11673,6 +11362,26 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 		<prepare-selenium-required-properties />
 		<prepare-selenium-sharepoint-properties />
 		<prepare-selenium-testcase-properties />
+
+		<get-browser-property property.name="browser.docker.image" />
+
+		<if>
+			<isset property="browser.docker.image" />
+			<then>
+				<get-browser-property property.name="browser.host" />
+
+				<get-docker-container-ip-address container.name="${browser.host}" property.name="browser.ip.address" />
+
+				<echo append="true" file="${test.ext.properties.file}">
+					browser.ip.address=${browser.ip.address}
+				</echo>
+			</then>
+			<else>
+				<echo append="true" file="${test.ext.properties.file}">
+					browser.ip.address=127.0.0.1
+				</echo>
+			</else>
+		</if>
 
 		<get-operating-system-property property.name="operating.system.docker.image" />
 
@@ -14224,13 +13933,6 @@ module.framework.properties.blacklist.portal.profile.names=${blacklist.portal.pr
 
 		<antcall target="deploy-osgi-modules" />
 
-		<if>
-			<equals arg1="${functional.test.type}" arg2="analytics-cloud" />
-			<then>
-				<antcall target="deploy-analytics-cloud-demo-data-creator" />
-			</then>
-		</if>
-
 		<antcall target="deploy-specific-plugins">
 			<param name="test.class" value="${test.class}" />
 		</antcall>
@@ -14255,6 +13957,15 @@ module.framework.properties.blacklist.portal.profile.names=${blacklist.portal.pr
 			</and>
 			<then>
 				<antcall target="deploy-osgi-module-configurations" />
+			</then>
+		</if>
+
+		<get-browser-property property.name="browser.docker.image" />
+
+		<if>
+			<isset property="browser.docker.image" />
+			<then>
+				<echo append="true" file="${liferay.home}/osgi/configs/com.liferay.portal.search.elasticsearch7.configuration.ElasticsearchConfiguration.config">${line.separator}additionalConfigurations="http.host:\ _local_,_site_"</echo>
 			</then>
 		</if>
 
@@ -14433,94 +14144,16 @@ module.framework.properties.blacklist.portal.profile.names=${blacklist.portal.pr
 		<get-testcase-property property.name="analytics.cloud.enabled" />
 
 		<if>
-			<or>
-				<equals arg1="${analytics.cloud.enabled}" arg2="true" />
-				<equals arg1="${functional.test.type}" arg2="analytics-cloud" />
-			</or>
+			<equals arg1="${analytics.cloud.enabled}" arg2="true" />
 			<then>
 				<ant antfile="build-test-analytics-cloud.xml" target="start-analytics-cloud" />
 			</then>
 		</if>
 
-		<if>
-			<equals arg1="${functional.test.type}" arg2="analytics-cloud" />
-			<then>
-				<trycatch property="analytics.cloud.error">
-					<try>
-						<property location="${analytics.cloud.faro.dir}/osb-faro-functional-test/test_analytics_cloud.sh" name="analytics.cloud.test.sh" />
-
-						<property location="${basedir.unix}/portal-web/${selenium.executable.dir.name}" name="selenium.executable.dir.path" />
-
-						<propertycopy from="browser.chrome.bin.file[${browser.chrome.version}]" name="browser.chrome.bin.file" override="true" />
-
-						<get-ip-address />
-
-						<propertyregex
-							input="${env.HOSTNAME}"
-							override="true"
-							property="short.hostname"
-							regexp="([^\.]+)(\..*)?"
-							select="\1"
-						/>
-
-						<echo file="${analytics.cloud.faro.dir}/osb-faro-functional-test/src/testIntegration/resources/ngrok.properties">
-ip=${ip.address}
-url=${short.hostname}:8080</echo>
-
-						<prepare-chrome-driver />
-
-						<echo file="${analytics.cloud.test.sh}">
-							#!/bin/bash
-
-							../gradlew \
-								-Danalytics.cloud.url=${analytics.cloud.faro.frontend.url} \
-								-Dbrowser.chrome.bin.args="${browser.chrome.bin.args}" \
-								-Dbrowser.chrome.bin.file=${browser.chrome.bin.file} \
-								-Dbrowser.type=chrome \
-								-Dchrome.driver.version=${selenium.chrome.driver.version} \
-								-Dcucumber.options='${analytics.cloud.cucumber.options}' \
-								-Dliferay.ci=true \
-								-Dportal.url=http://${short.hostname}:8080 \
-								-Dselenium.chrome.driver.executable=${selenium.chrome.driver.executable} \
-								-Dselenium.executable.dir.name=${selenium.executable.dir.path}/ \
-								-Dwebdriver.chrome.driver=${selenium.executable.dir.path}/${selenium.chrome.driver.executable} \
-								\
-								testIntegration
-						</echo>
-
-						<exec dir="${analytics.cloud.faro.dir}/osb-faro-functional-test" executable="/bin/bash" failonerror="true">
-							<arg value="${analytics.cloud.test.sh}" />
-						</exec>
-
-						<delete file="${analytics.cloud.test.sh}" />
-					</try>
-					<catch>
-						<ant antfile="build-test-analytics-cloud.xml" target="stop-analytics-cloud" />
-
-						<fail message="${analytics.cloud.error}" />
-					</catch>
-					<finally>
-						<stop-chrome-driver />
-					</finally>
-				</trycatch>
-			</then>
-			<else>
-				<antcall target="run-selenium-test" />
-
-				<if>
-					<equals arg1="${deploy.lcs.token.file}" arg2="true" />
-					<then>
-						<antcall target="print-lcs-log-content" />
-					</then>
-				</if>
-			</else>
-		</if>
+		<antcall target="run-selenium-test" />
 
 		<if>
-			<or>
-				<equals arg1="${analytics.cloud.enabled}" arg2="true" />
-				<equals arg1="${functional.test.type}" arg2="analytics-cloud" />
-			</or>
+			<equals arg1="${analytics.cloud.enabled}" arg2="true" />
 			<then>
 				<ant antfile="build-test-analytics-cloud.xml" target="stop-analytics-cloud" />
 			</then>

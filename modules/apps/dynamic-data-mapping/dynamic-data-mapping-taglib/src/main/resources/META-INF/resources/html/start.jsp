@@ -187,11 +187,13 @@
 					initialChildren: <%= PropsValues.LAYOUT_MANAGE_PAGES_INITIAL_CHILDREN %>,
 					mode: '<%= HtmlUtil.escapeJS(mode) %>',
 					p_l_id: <%= themeDisplay.getPlid() %>,
+					portletId: '<%= themeDisplay.getPpid() %>',
 					portletNamespace: '<portlet:namespace />',
 					repeatable: <%= repeatable %>,
 					requestedLocale:
 						'<%= (requestedLocale == null) ? StringPool.BLANK : HtmlUtil.escapeJS(requestedLocale.toString()) %>',
 					synchronousFormSubmission: <%= synchronousFormSubmission %>,
+					webContentSelectorURL: '<%= webContentSelectorURL %>',
 
 					<c:if test="<%= ddmFormValues != null %>">
 						values: <%= DDMUtil.getDDMFormValuesJSONString(ddmFormValues) %>,
