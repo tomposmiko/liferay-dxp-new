@@ -10,7 +10,7 @@ dependencies {
 	compileOnly group: "com.liferay", name: "com.liferay.fragment.api", version: "1.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.html.preview.api", version: "1.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.layout.admin.api", version: "1.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.layout.page.template.api", version: "1.2.0"
+	compileOnly group: "com.liferay", name: "com.liferay.layout.page.template.api", version: "1.4.0"
 	compileOnly group: "com.liferay", name: "com.liferay.petra.function", version: "2.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.petra.string", version: "2.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.portal.dao.orm.custom.sql.api", version: "1.0.0"

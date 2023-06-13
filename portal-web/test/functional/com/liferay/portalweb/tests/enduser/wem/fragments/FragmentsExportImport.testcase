@@ -1,0 +1,130 @@
+@component-name = "portal-wcm"
+definition {
+	property portal.release = "true";
+	property portal.upstream = "true";
+	property testray.main.component.name = "Fragments";
+
+	setUp {
+		TestCase.setUpPortalInstance();
+
+		User.firstLoginPG();
+
+		JSONGroup.addGroup(groupName = "Test Site Name");
+
+		FragmentsAdmin.openFragmentsAdmin(siteURLKey = "test-site-name");
+	}
+
+	tearDown {
+		var testPortalInstance = PropsUtil.get("test.portal.instance");
+
+		if ("${testPortalInstance}" == "true") {
+			PortalInstances.tearDownCP();
+		}
+		else {
+			JSONGroup.deleteGroupByName(groupName = "Test Site Name");
+
+			Navigator.openURL();
+
+			Site.tearDownCP();
+		}
+	}
+
+	@description = "This is a test case for LPS-80625."
+	@priority = "5"
+	test CannotImportInvalidZip {
+		property portal.acceptance = "true";
+
+		FragmentsAdmin.gotoImportCollection();
+
+		UploadCommonFile(
+			locator1 = "TextInput#FILE",
+			value1 = "fragment-invalid-zip.zip"
+		);
+
+		Button.click(button = "Import");
+
+		Alert.viewErrorMessage(
+			errorMessage = "The selected file is not a valid zip file."
+		);
+
+		IFrame.closeFrame();
+	}
+
+	@description = "This is a test case for LPS-80625."
+	@priority = "5"
+	test CannotImportNonZip {
+		property portal.acceptance = "true";
+
+		FragmentsAdmin.gotoImportCollection();
+
+		UploadCommonFile(locator1 = "TextInput#FILE", value1 = "Document_1.doc");
+
+		AssertTextEquals(
+			locator1 = "Message#ERROR_FORM_VALIDATION",
+			value1 = "Please enter a file with a valid extension (zip)."
+		);
+
+		IFrame.closeFrame();
+	}
+
+	@priority = "5"
+	test ExportImportCollectionViewFragment {
+		property portal.acceptance = "true";
+
+		FragmentsAdmin.addCollection(
+			collectionDescription = "Collection Description",
+			collectionName = "Collection Name"
+		);
+
+		Navigator.gotoNavNested(navNested = "Collection Name");
+
+		FragmentsAdmin.addFragment(fragmentName = "Fragment Name");
+
+		var htmlSnippet = TestCase.getFileContent(fileName = "fragment_button.html");
+
+		Type.typeAceEditorNoError(
+			locator1 = "FragmentEditor#HTML_EDITOR",
+			value1 = "${htmlSnippet}"
+		);
+
+		var cssSnippet = TestCase.getFileContent(fileName = "fragment_button.css");
+
+		Type.typeAceEditorNoError(
+			locator1 = "FragmentEditor#CSS_EDITOR",
+			value1 = "${cssSnippet}"
+		);
+
+		var javascriptSnippet = TestCase.getFileContent(fileName = "fragment_button.js");
+
+		Type.typeAceEditorNoError(
+			locator1 = "FragmentEditor#JAVASCRIPT_EDITOR",
+			value1 = "${javascriptSnippet}"
+		);
+
+		PortletEntry.publish();
+
+		FragmentsAdmin.exportCollection(collectionName = "Collection Name");
+
+		JSONGroup.addGroup(groupName = "New Site Name");
+
+		FragmentsAdmin.openFragmentsAdmin(siteURLKey = "new-site-name");
+
+		FragmentsAdmin.importCollectionFromTempFolder();
+
+		Navigator.gotoNavNested(navNested = "Collection Name");
+
+		LexiconEntry.gotoEntryMenuItem(menuItem = "Edit", rowEntry = "Fragment Name");
+
+		SelectFrame(locator1 = "FragmentEditor#PREVIEW_IFRAME");
+
+		for (var button : list "Submit,Cancel") {
+			Button.viewPresent(button = "${button}");
+		}
+
+		Button.clickNoError(button = "Submit");
+
+		AssertConfirm(value1 = "Form submitted");
+
+		IFrame.selectTopFrame();
+	}
+}

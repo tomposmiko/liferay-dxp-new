@@ -92,6 +92,22 @@
 	<td></td>
 </tr>
 <tr>
+	<td>SIMPLE_PUBLICATION_DELETION</td>
+	<td>//span[contains(@class,'deletions') and contains(.,'${key_itemName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--DELETIONS-->
+<tr>
+	<td>DELETIONS_REPLICATE_INDIVIDUAL_DELETIONS_CHECKBOX</td>
+	<td>//input[contains(@id,'StagingProcessesPortlet_DELETIONS')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -105,17 +121,6 @@
 <tr>
 	<td>SCHEDULED_TABLE_END_DATE</td>
 	<td>//tr[contains(.,'${key_scheduleTitleName}')]/td[4]</td>
-	<td></td>
-</tr>
-<tr>
-	<td></td>
-	<td></td>
-	<td></td>
-</tr>
-<!--PUBLISH_TEMPLATES-->
-<tr>
-	<td>PUBLISH_TEMPLATES_NAME_FIELD</td>
-	<td>//div[contains(@class,'form-group')]//input[contains(@id,'name')]</td>
 	<td></td>
 </tr>
 <tr>

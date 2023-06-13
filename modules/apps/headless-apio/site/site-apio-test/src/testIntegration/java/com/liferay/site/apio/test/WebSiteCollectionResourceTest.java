@@ -17,23 +17,28 @@ package com.liferay.site.apio.test;
 import com.liferay.apio.architect.pagination.PageItems;
 import com.liferay.apio.architect.pagination.Pagination;
 import com.liferay.apio.architect.resource.CollectionResource;
-import com.liferay.apio.architect.test.util.pagination.PaginationRequest;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.apio.test.util.PaginationRequest;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
+import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerTestRule;
+import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.util.test.LayoutTestUtil;
 
 import java.lang.reflect.Method;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -61,15 +66,29 @@ public class WebSiteCollectionResourceTest {
 		Group group = GroupTestUtil.addGroup();
 
 		try {
-			ThemeDisplay themeDisplay = getThemeDisplay(
-				group, Locale.getDefault());
+			Company company = _companyLocalService.getCompany(
+				group.getCompanyId());
 
 			PageItems<Group> pageItems = _getPageItems(
-				PaginationRequest.of(10, 1), themeDisplay);
+				PaginationRequest.of(50, 1), company);
 
 			List<Group> groups = (List<Group>)pageItems.getItems();
 
 			Assert.assertTrue(groups.contains(group));
+		}
+		finally {
+			_groupLocalService.deleteGroup(group);
+		}
+	}
+
+	@Test
+	public void testGetGroup() throws Throwable {
+		Group group = GroupTestUtil.addGroup();
+
+		try {
+			Group finalGroup = _getGroup(group.getGroupId());
+
+			Assert.assertEquals(group.getName(), finalGroup.getName());
 		}
 		finally {
 			_groupLocalService.deleteGroup(group);
@@ -83,11 +102,11 @@ public class WebSiteCollectionResourceTest {
 		try {
 			_deactivateGroup(group);
 
-			ThemeDisplay themeDisplay = getThemeDisplay(
-				group, Locale.getDefault());
+			Company company = _companyLocalService.getCompany(
+				group.getCompanyId());
 
 			PageItems<Group> pageItems = _getPageItems(
-				PaginationRequest.of(10, 1), themeDisplay);
+				PaginationRequest.of(50, 1), company);
 
 			List<Group> groups = (List<Group>)pageItems.getItems();
 
@@ -98,20 +117,98 @@ public class WebSiteCollectionResourceTest {
 		}
 	}
 
-	protected ThemeDisplay getThemeDisplay(Group group, Locale locale)
-		throws Exception {
+	@Test
+	public void testGetPrivateURL() throws Throwable {
+		Group group = GroupTestUtil.addGroup();
 
-		ThemeDisplay themeDisplay = new ThemeDisplay();
+		try {
+			LayoutTestUtil.addLayout(
+				group.getGroupId(), true,
+				new HashMap<Locale, String>() {
+					{
+						put(LocaleUtil.SPAIN, RandomTestUtil.randomString());
+						put(LocaleUtil.US, RandomTestUtil.randomString());
+					}
+				},
+				new HashMap<Locale, String>() {
+					{
+						put(
+							LocaleUtil.SPAIN,
+							StringPool.SLASH + RandomTestUtil.randomString());
+						put(
+							LocaleUtil.US,
+							StringPool.SLASH + RandomTestUtil.randomString());
+					}
+				});
 
-		Company company = CompanyLocalServiceUtil.getCompanyById(
-			group.getCompanyId());
+			String privateURL = _getPrivateURL(group);
 
-		themeDisplay.setCompany(company);
+			Assert.assertTrue(
+				"PrivateURL " + privateURL,
+				privateURL.endsWith(
+					PropsValues.
+						LAYOUT_FRIENDLY_URL_PRIVATE_GROUP_SERVLET_MAPPING +
+							group.getFriendlyURL()));
+		}
+		finally {
+			_groupLocalService.deleteGroup(group);
+		}
+	}
 
-		themeDisplay.setLocale(locale);
-		themeDisplay.setScopeGroupId(group.getGroupId());
+	@Test
+	public void testGetPrivateURLWithNoPrivateLayouts() throws Throwable {
+		Group group = GroupTestUtil.addGroup();
 
-		return themeDisplay;
+		try {
+			Assert.assertNull(_getPrivateURL(group));
+		}
+		finally {
+			_groupLocalService.deleteGroup(group);
+		}
+	}
+
+	@Test
+	public void testGetPublicURL() throws Throwable {
+		Group group = GroupTestUtil.addGroup();
+
+		try {
+			LayoutTestUtil.addLayout(
+				group.getGroupId(), false,
+				new HashMap<Locale, String>() {
+					{
+						put(LocaleUtil.US, RandomTestUtil.randomString());
+					}
+				},
+				new HashMap<Locale, String>() {
+					{
+						put(
+							LocaleUtil.US,
+							StringPool.SLASH + RandomTestUtil.randomString());
+					}
+				});
+
+			String publicURL = _getPublicURL(group);
+
+			Assert.assertTrue(
+				publicURL.endsWith(
+					PropsValues.LAYOUT_FRIENDLY_URL_PUBLIC_SERVLET_MAPPING +
+						group.getFriendlyURL()));
+		}
+		finally {
+			_groupLocalService.deleteGroup(group);
+		}
+	}
+
+	@Test
+	public void testGetPublicURLWithNoPuplicLayouts() throws Throwable {
+		Group group = GroupTestUtil.addGroup();
+
+		try {
+			Assert.assertNull(_getPublicURL(group));
+		}
+		finally {
+			_groupLocalService.deleteGroup(group);
+		}
 	}
 
 	private Group _deactivateGroup(Group group) throws PortalException {
@@ -123,26 +220,62 @@ public class WebSiteCollectionResourceTest {
 			new ServiceContext());
 	}
 
+	private Group _getGroup(long groupId) throws Exception {
+		Class<? extends CollectionResource> clazz =
+			_collectionResource.getClass();
+
+		Method method = clazz.getDeclaredMethod("_getGroup", long.class);
+
+		method.setAccessible(true);
+
+		return (Group)method.invoke(_collectionResource, groupId);
+	}
+
 	private PageItems<Group> _getPageItems(
-			Pagination pagination, ThemeDisplay themeDisplay)
+			Pagination pagination, Company company)
 		throws Exception {
 
 		Class<? extends CollectionResource> clazz =
 			_collectionResource.getClass();
 
 		Method method = clazz.getDeclaredMethod(
-			"_getPageItems", Pagination.class, ThemeDisplay.class);
+			"_getPageItems", Pagination.class, Company.class);
 
 		method.setAccessible(true);
 
 		return (PageItems)method.invoke(
-			_collectionResource, pagination, themeDisplay);
+			_collectionResource, pagination, company);
+	}
+
+	private String _getPrivateURL(Group group) throws Exception {
+		Class<? extends CollectionResource> clazz =
+			_collectionResource.getClass();
+
+		Method method = clazz.getDeclaredMethod("_getPrivateURL", Group.class);
+
+		method.setAccessible(true);
+
+		return (String)method.invoke(_collectionResource, group);
+	}
+
+	private String _getPublicURL(Group group) throws Exception {
+		Class<? extends CollectionResource> clazz =
+			_collectionResource.getClass();
+
+		Method method = clazz.getDeclaredMethod("_getPublicURL", Group.class);
+
+		method.setAccessible(true);
+
+		return (String)method.invoke(_collectionResource, group);
 	}
 
 	@Inject(
 		filter = "component.name=com.liferay.site.apio.internal.architect.resource.WebSiteCollectionResource"
 	)
 	private CollectionResource _collectionResource;
+
+	@Inject
+	private CompanyLocalService _companyLocalService;
 
 	@Inject
 	private GroupLocalService _groupLocalService;

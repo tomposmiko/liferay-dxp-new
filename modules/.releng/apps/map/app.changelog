@@ -27,3 +27,18 @@ app.artifacts-1.0.1=\
 app.change.log-1.0.1=LPS-77699 LPS-79679 LPS-83461 LPS-84092 LPS-85096 LPS-85244 LPS-85296 LPS-86572 
 
 app.git.id-1.0.1=d59ce79221c643decf87d83e00ee825c21cf49a0
+
+#
+# Liferay App Version 1.0.2
+#
+
+app.artifacts-1.0.2=\
+	com.liferay.map.api-3.0.0.jar,\
+	com.liferay.map.common-3.0.3.jar,\
+	com.liferay.map.google.maps-2.0.11.jar,\
+	com.liferay.map.openstreetmap-3.0.7.jar,\
+	com.liferay.map.taglib-2.0.4.jar
+
+app.change.log-1.0.2=LPS-79653 LPS-80213 LPS-80332 LPS-80517 LPS-85296 LPS-86572
+
+app.git.id-1.0.2=1ad0206eec8462b94638d545f9f0df37163ccdfd

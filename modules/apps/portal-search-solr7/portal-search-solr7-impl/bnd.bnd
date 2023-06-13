@@ -1,6 +1,6 @@
 Bundle-Name: Liferay Portal Search Solr 7 Implementation
 Bundle-SymbolicName: com.liferay.portal.search.solr7.impl
-Bundle-Version: 1.0.0
+Bundle-Version: 1.0.6
 Import-Package:\
 	!com.sun.management.*,\
 	!com.sun.msv.*,\
@@ -8,7 +8,6 @@ Import-Package:\
 	!jline.*,\
 	\
 	!org.apache.commons.math3.*,\
-	!org.apache.log4j.*,\
 	!org.apache.lucene.sandbox.*,\
 	\
 	!org.jboss.netty.*,\
@@ -19,3 +18,4 @@ Import-Package:\
 	\
 	*
 -dsannotations-options: inherit
+-fixupmessages: Classes found in the wrong directory: ...;is:=ignore

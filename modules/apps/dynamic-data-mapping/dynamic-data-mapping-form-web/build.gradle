@@ -1,10 +1,8 @@
-apply plugin: "com.liferay.lang.merger"
-
 dependencies {
 	compileOnly group: "biz.aQute.bnd", name: "biz.aQute.bndlib", version: "3.1.0"
 	compileOnly group: "com.liferay", name: "com.liferay.application.list.api", version: "3.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.captcha.api", version: "2.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.dynamic.data.mapping.api", version: "4.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.dynamic.data.mapping.api", version: "4.8.0"
 	compileOnly group: "com.liferay", name: "com.liferay.dynamic.data.mapping.form.taglib", version: "1.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.exportimport.api", version: "3.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.frontend.taglib", version: "3.0.0"

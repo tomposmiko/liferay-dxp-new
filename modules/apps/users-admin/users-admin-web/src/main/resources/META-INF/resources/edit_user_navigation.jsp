@@ -61,29 +61,27 @@ if (!portletName.equals(UsersAdminPortletKeys.MY_ACCOUNT)) {
 
 <portlet:actionURL name="<%= actionCommandName %>" var="actionCommandURL" />
 
-<aui:form action="<%= actionCommandURL %>" cssClass="container-fluid-1280 portlet-users-admin-edit-user" data-senna-off="true" method="post" name="fm">
+<aui:form action="<%= actionCommandURL %>" cssClass="portlet-users-admin-edit-user" data-senna-off="true" method="post" name="fm">
 	<aui:input name="redirect" type="hidden" value="<%= redirect.toString() %>" />
 	<aui:input name="p_u_i_d" type="hidden" value="<%= selUserId %>" />
 	<aui:input name="screenNavigationCategoryKey" type="hidden" value="<%= screenNavigationCategoryKey %>" />
 	<aui:input name="screenNavigationEntryKey" type="hidden" value="<%= screenNavigationEntryKey %>" />
 
-	<aui:fieldset-group markupView="lexicon">
-		<div class="sheet">
-			<h2 class="sheet-title"><%= formLabel %></h2>
+	<div class="sheet sheet-lg">
+		<h2 class="sheet-title"><%= formLabel %></h2>
 
-			<div class="sheet-section">
-				<liferay-util:include page="<%= jspPath %>" servletContext="<%= application %>" />
-			</div>
-
-			<c:if test="<%= editable %>">
-				<div class="sheet-footer">
-					<aui:button primary="<%= true %>" type="submit" />
-
-					<c:if test="<%= !portletName.equals(UsersAdminPortletKeys.MY_ACCOUNT) %>">
-						<aui:button href="<%= backURL %>" type="cancel" />
-					</c:if>
-				</div>
-			</c:if>
+		<div class="sheet-section">
+			<liferay-util:include page="<%= jspPath %>" servletContext="<%= application %>" />
 		</div>
-	</aui:fieldset-group>
+
+		<c:if test="<%= editable %>">
+			<div class="sheet-footer">
+				<aui:button primary="<%= true %>" type="submit" />
+
+				<c:if test="<%= !portletName.equals(UsersAdminPortletKeys.MY_ACCOUNT) %>">
+					<aui:button href="<%= backURL %>" type="cancel" />
+				</c:if>
+			</div>
+		</c:if>
+	</div>
 </aui:form>

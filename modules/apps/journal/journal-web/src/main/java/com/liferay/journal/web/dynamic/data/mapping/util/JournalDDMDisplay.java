@@ -78,12 +78,14 @@ public class JournalDDMDisplay extends BaseDDMDisplay {
 		return "Liferay.FormBuilder.AVAILABLE_FIELDS.WCM_STRUCTURE";
 	}
 
+	@Override
 	public String getConfirmSelectStructureMessage(Locale locale) {
 		return LanguageUtil.get(
 			getResourceBundle(locale),
 			"selecting-a-new-structure-deletes-all-unsaved-content");
 	}
 
+	@Override
 	public String getConfirmSelectTemplateMessage(Locale locale) {
 		return LanguageUtil.get(
 			getResourceBundle(locale),
@@ -275,8 +277,9 @@ public class JournalDDMDisplay extends BaseDDMDisplay {
 					LanguageUtil.get(resourceBundle, "templates"));
 				portletURL.setParameter(
 					"showAncestorScopes",
-					String.valueOf(_journalWebConfiguration.
-						showAncestorScopesByDefault()));
+					String.valueOf(
+						_journalWebConfiguration.
+							showAncestorScopesByDefault()));
 				portletURL.setParameter(
 					"showCacheableInput", Boolean.TRUE.toString());
 				portletURL.setParameter("showHeader", Boolean.FALSE.toString());
@@ -398,8 +401,9 @@ public class JournalDDMDisplay extends BaseDDMDisplay {
 					getTitle(liferayPortletRequest, liferayPortletResponse));
 				portletURL.setParameter(
 					"showAncestorScopes",
-					String.valueOf(_journalWebConfiguration.
-						showAncestorScopesByDefault()));
+					String.valueOf(
+						_journalWebConfiguration.
+							showAncestorScopesByDefault()));
 				portletURL.setParameter(
 					"showCacheableInput", Boolean.TRUE.toString());
 				portletURL.setParameter(

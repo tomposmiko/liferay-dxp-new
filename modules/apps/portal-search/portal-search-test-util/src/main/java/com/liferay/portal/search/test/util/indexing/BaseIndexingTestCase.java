@@ -45,6 +45,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -115,37 +116,60 @@ public abstract class BaseIndexingTestCase {
 		return Collections.singletonMap(key, value);
 	}
 
-	protected void addDocument(DocumentCreationHelper documentCreationHelper)
-		throws Exception {
-
+	protected void addDocument(DocumentCreationHelper documentCreationHelper) {
 		Document document = DocumentFixture.newDocument(
 			COMPANY_ID, GROUP_ID, _entryClassName);
 
 		documentCreationHelper.populate(document);
 
-		_indexWriter.addDocument(createSearchContext(), document);
-	}
+		try {
+			_indexWriter.addDocument(createSearchContext(), document);
+		}
+		catch (SearchException se) {
+			Throwable t = se.getCause();
 
-	protected void addDocuments(
-			Function<String, DocumentCreationHelper> function,
-			Collection<String> values)
-		throws Exception {
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
 
-		for (String value : values) {
-			addDocument(function.apply(value));
+			throw new RuntimeException(se);
 		}
 	}
 
-	protected void assertSearch(Consumer<IndexingTestHelper> consumer)
-		throws Exception {
+	protected void addDocuments(
+		Function<String, DocumentCreationHelper> function,
+		Collection<String> values) {
 
-		IdempotentRetryAssert.retryAssert(
-			10, TimeUnit.SECONDS,
-			() -> {
-				consumer.accept(new IndexingTestHelper());
+		addDocuments(function, values.stream());
+	}
 
-				return null;
-			});
+	protected void addDocuments(
+		Function<String, DocumentCreationHelper> function,
+		Stream<String> stream) {
+
+		stream.map(
+			function
+		).forEach(
+			this::addDocument
+		);
+	}
+
+	protected void assertSearch(Consumer<IndexingTestHelper> consumer) {
+		try {
+			IdempotentRetryAssert.retryAssert(
+				10, TimeUnit.SECONDS,
+				() -> {
+					consumer.accept(new IndexingTestHelper());
+
+					return null;
+				});
+		}
+		catch (RuntimeException re) {
+			throw (RuntimeException)re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	protected abstract IndexingFixture createIndexingFixture() throws Exception;
@@ -195,6 +219,21 @@ public abstract class BaseIndexingTestCase {
 		}
 	}
 
+	protected long searchCount(SearchContext searchContext, Query query) {
+		try {
+			return _indexSearcher.searchCount(searchContext, query);
+		}
+		catch (SearchException se) {
+			Throwable t = se.getCause();
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+
+			throw new RuntimeException(se);
+		}
+	}
+
 	protected void setPreBooleanFilter(Filter filter, Query query) {
 		BooleanFilter booleanFilter = new BooleanFilter();
 
@@ -217,7 +256,9 @@ public abstract class BaseIndexingTestCase {
 			Document[] documents = _hits.getDocs();
 
 			Assert.assertEquals(
-				Arrays.toString(documents), expected, documents.length);
+				(String)_searchContext.getAttribute("queryString") + "->" +
+					Arrays.toString(documents),
+				expected, documents.length);
 		}
 
 		public void assertValues(
@@ -241,25 +282,13 @@ public abstract class BaseIndexingTestCase {
 		}
 
 		public void search() {
-			Query query = _query;
+			_hits = BaseIndexingTestCase.this.search(
+				_searchContext, getQuery());
+		}
 
-			if (query == null) {
-				query = getDefaultQuery();
-			}
-
-			if (_queryContributor != null) {
-				_queryContributor.contribute(query);
-			}
-
-			if (_filter != null) {
-				setPreBooleanFilter(_filter, query);
-			}
-
-			if (_postFilter != null) {
-				query.setPostFilter(_postFilter);
-			}
-
-			_hits = BaseIndexingTestCase.this.search(_searchContext, query);
+		public long searchCount() {
+			return BaseIndexingTestCase.this.searchCount(
+				_searchContext, getQuery());
 		}
 
 		public void setFilter(Filter filter) {
@@ -284,6 +313,28 @@ public abstract class BaseIndexingTestCase {
 
 		public void verify(Consumer<Hits> consumer) {
 			consumer.accept(_hits);
+		}
+
+		protected Query getQuery() {
+			Query query = _query;
+
+			if (query == null) {
+				query = getDefaultQuery();
+			}
+
+			if (_queryContributor != null) {
+				_queryContributor.contribute(query);
+			}
+
+			if (_filter != null) {
+				setPreBooleanFilter(_filter, query);
+			}
+
+			if (_postFilter != null) {
+				query.setPostFilter(_postFilter);
+			}
+
+			return query;
 		}
 
 		private Filter _filter;

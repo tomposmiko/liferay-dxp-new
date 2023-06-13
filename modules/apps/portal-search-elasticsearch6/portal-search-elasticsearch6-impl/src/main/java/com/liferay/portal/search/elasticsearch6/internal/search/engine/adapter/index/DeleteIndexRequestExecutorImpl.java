@@ -20,6 +20,7 @@ import com.liferay.portal.search.engine.adapter.index.DeleteIndexResponse;
 
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequestBuilder;
 import org.elasticsearch.action.support.IndicesOptions;
+import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.AdminClient;
 import org.elasticsearch.client.IndicesAdminClient;
 
@@ -38,28 +39,10 @@ public class DeleteIndexRequestExecutorImpl
 		DeleteIndexRequestBuilder deleteIndexRequestBuilder =
 			createDeleteIndexRequestBuilder(deleteIndexRequest);
 
-		org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse
-			elasticsearchDeleteIndexResponse = deleteIndexRequestBuilder.get();
+		AcknowledgedResponse acknowledgedResponse =
+			deleteIndexRequestBuilder.get();
 
-		DeleteIndexResponse deleteIndexResponse = new DeleteIndexResponse(
-			elasticsearchDeleteIndexResponse.isAcknowledged());
-
-		return deleteIndexResponse;
-	}
-
-	protected IndicesOptions convert(
-		com.liferay.portal.search.engine.adapter.index.IndicesOptions
-			indicesOptions) {
-
-		if (indicesOptions == null) {
-			return IndicesOptions.fromOptions(false, true, true, true);
-		}
-
-		return IndicesOptions.fromOptions(
-			indicesOptions.isIgnoreUnavailable(),
-			indicesOptions.isAllowNoIndices(),
-			indicesOptions.isExpandToOpenIndices(),
-			indicesOptions.isExpandToClosedIndices());
+		return new DeleteIndexResponse(acknowledgedResponse.isAcknowledged());
 	}
 
 	protected DeleteIndexRequestBuilder createDeleteIndexRequestBuilder(

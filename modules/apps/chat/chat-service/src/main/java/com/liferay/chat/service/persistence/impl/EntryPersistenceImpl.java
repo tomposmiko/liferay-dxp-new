@@ -22,8 +22,6 @@ import com.liferay.chat.model.impl.EntryImpl;
 import com.liferay.chat.model.impl.EntryModelImpl;
 import com.liferay.chat.service.persistence.EntryPersistence;
 
-import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -36,6 +34,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
@@ -3878,6 +3877,8 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	public List<Entry> findByF_T_C(long fromUserId, long toUserId,
 		String content, int start, int end,
 		OrderByComparator<Entry> orderByComparator, boolean retrieveFromCache) {
+		content = Objects.toString(content, "");
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -3907,7 +3908,7 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 				for (Entry entry : list) {
 					if ((fromUserId != entry.getFromUserId()) ||
 							(toUserId != entry.getToUserId()) ||
-							!Objects.equals(content, entry.getContent())) {
+							!content.equals(entry.getContent())) {
 						list = null;
 
 						break;
@@ -3935,10 +3936,7 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 
 			boolean bindContent = false;
 
-			if (content == null) {
-				query.append(_FINDER_COLUMN_F_T_C_CONTENT_1);
-			}
-			else if (content.equals("")) {
+			if (content.isEmpty()) {
 				query.append(_FINDER_COLUMN_F_T_C_CONTENT_3);
 			}
 			else {
@@ -4148,6 +4146,8 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	public Entry[] findByF_T_C_PrevAndNext(long entryId, long fromUserId,
 		long toUserId, String content,
 		OrderByComparator<Entry> orderByComparator) throws NoSuchEntryException {
+		content = Objects.toString(content, "");
+
 		Entry entry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -4197,10 +4197,7 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 
 		boolean bindContent = false;
 
-		if (content == null) {
-			query.append(_FINDER_COLUMN_F_T_C_CONTENT_1);
-		}
-		else if (content.equals("")) {
+		if (content.isEmpty()) {
 			query.append(_FINDER_COLUMN_F_T_C_CONTENT_3);
 		}
 		else {
@@ -4328,6 +4325,8 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 	 */
 	@Override
 	public int countByF_T_C(long fromUserId, long toUserId, String content) {
+		content = Objects.toString(content, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_F_T_C;
 
 		Object[] finderArgs = new Object[] { fromUserId, toUserId, content };
@@ -4345,10 +4344,7 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 
 			boolean bindContent = false;
 
-			if (content == null) {
-				query.append(_FINDER_COLUMN_F_T_C_CONTENT_1);
-			}
-			else if (content.equals("")) {
+			if (content.isEmpty()) {
 				query.append(_FINDER_COLUMN_F_T_C_CONTENT_3);
 			}
 			else {
@@ -4395,7 +4391,6 @@ public class EntryPersistenceImpl extends BasePersistenceImpl<Entry>
 
 	private static final String _FINDER_COLUMN_F_T_C_FROMUSERID_2 = "entry.fromUserId = ? AND ";
 	private static final String _FINDER_COLUMN_F_T_C_TOUSERID_2 = "entry.toUserId = ? AND ";
-	private static final String _FINDER_COLUMN_F_T_C_CONTENT_1 = "entry.content IS NULL";
 	private static final String _FINDER_COLUMN_F_T_C_CONTENT_2 = "entry.content = ?";
 	private static final String _FINDER_COLUMN_F_T_C_CONTENT_3 = "(entry.content IS NULL OR entry.content = '')";
 

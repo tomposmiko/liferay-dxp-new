@@ -33,7 +33,7 @@ public class WebSiteProperty extends BaseContextAwareStringProperty {
 		URI webSiteURI = uriBuilder.path(
 			"p"
 		).path(
-			"web-site"
+			"commerce-web-site"
 		).path(
 			"{webSiteId}"
 		).build(

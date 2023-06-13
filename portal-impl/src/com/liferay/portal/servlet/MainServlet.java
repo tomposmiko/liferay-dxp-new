@@ -143,6 +143,8 @@ public class MainServlet extends ActionServlet {
 
 		_portalInitializedModuleServiceLifecycleServiceRegistration.
 			unregister();
+		_portalPortletsInitializedModuleServiceLifecycleServiceRegistration.
+			unregister();
 		_servletContextServiceRegistration.unregister();
 		_systemCheckModuleServiceLifecycleServiceRegistration.unregister();
 
@@ -1308,7 +1310,22 @@ public class MainServlet extends ActionServlet {
 
 		_portalInitializedModuleServiceLifecycleServiceRegistration =
 			registry.registerService(
-				ModuleServiceLifecycle.class, new ModuleServiceLifecycle() {},
+				ModuleServiceLifecycle.class,
+				new ModuleServiceLifecycle() {
+				},
+				properties);
+
+		properties = new HashMap<>();
+
+		properties.put("module.service.lifecycle", "portlets.initialized");
+		properties.put("service.vendor", ReleaseInfo.getVendor());
+		properties.put("service.version", ReleaseInfo.getVersion());
+
+		_portalPortletsInitializedModuleServiceLifecycleServiceRegistration =
+			registry.registerService(
+				ModuleServiceLifecycle.class,
+				new ModuleServiceLifecycle() {
+				},
 				properties);
 
 		properties = new HashMap<>();
@@ -1328,7 +1345,9 @@ public class MainServlet extends ActionServlet {
 
 		_systemCheckModuleServiceLifecycleServiceRegistration =
 			registry.registerService(
-				ModuleServiceLifecycle.class, new ModuleServiceLifecycle() {},
+				ModuleServiceLifecycle.class,
+				new ModuleServiceLifecycle() {
+				},
 				properties);
 	}
 
@@ -1357,7 +1376,7 @@ public class MainServlet extends ActionServlet {
 
 	private static final boolean _HTTP_HEADER_VERSION_VERBOSITY_DEFAULT =
 		StringUtil.equalsIgnoreCase(
-			PropsValues.HTTP_HEADER_VERSION_VERBOSITY, ReleaseInfo.getName());
+			PropsValues.HTTP_HEADER_VERSION_VERBOSITY, "off");
 
 	private static final boolean _HTTP_HEADER_VERSION_VERBOSITY_PARTIAL =
 		StringUtil.equalsIgnoreCase(
@@ -1375,6 +1394,8 @@ public class MainServlet extends ActionServlet {
 
 	private ServiceRegistration<ModuleServiceLifecycle>
 		_portalInitializedModuleServiceLifecycleServiceRegistration;
+	private ServiceRegistration<ModuleServiceLifecycle>
+		_portalPortletsInitializedModuleServiceLifecycleServiceRegistration;
 	private PortalRequestProcessor _portalRequestProcessor;
 	private ServiceRegistration<ServletContext>
 		_servletContextServiceRegistration;

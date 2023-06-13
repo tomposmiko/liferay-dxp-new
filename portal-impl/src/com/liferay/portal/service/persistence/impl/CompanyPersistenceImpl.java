@@ -16,8 +16,6 @@ package com.liferay.portal.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -34,6 +32,7 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.impl.CompanyImpl;
 import com.liferay.portal.model.impl.CompanyModelImpl;
@@ -147,6 +146,8 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 	 */
 	@Override
 	public Company fetchByWebId(String webId, boolean retrieveFromCache) {
+		webId = Objects.toString(webId, "");
+
 		Object[] finderArgs = new Object[] { webId };
 
 		Object result = null;
@@ -171,10 +172,7 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 
 			boolean bindWebId = false;
 
-			if (webId == null) {
-				query.append(_FINDER_COLUMN_WEBID_WEBID_1);
-			}
-			else if (webId.equals("")) {
+			if (webId.isEmpty()) {
 				query.append(_FINDER_COLUMN_WEBID_WEBID_3);
 			}
 			else {
@@ -252,6 +250,8 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 	 */
 	@Override
 	public int countByWebId(String webId) {
+		webId = Objects.toString(webId, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_WEBID;
 
 		Object[] finderArgs = new Object[] { webId };
@@ -266,10 +266,7 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 
 			boolean bindWebId = false;
 
-			if (webId == null) {
-				query.append(_FINDER_COLUMN_WEBID_WEBID_1);
-			}
-			else if (webId.equals("")) {
+			if (webId.isEmpty()) {
 				query.append(_FINDER_COLUMN_WEBID_WEBID_3);
 			}
 			else {
@@ -310,7 +307,6 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_WEBID_WEBID_1 = "company.webId IS NULL";
 	private static final String _FINDER_COLUMN_WEBID_WEBID_2 = "company.webId = ?";
 	private static final String _FINDER_COLUMN_WEBID_WEBID_3 = "(company.webId IS NULL OR company.webId = '')";
 	public static final FinderPath FINDER_PATH_FETCH_BY_MX = new FinderPath(CompanyModelImpl.ENTITY_CACHE_ENABLED,
@@ -374,6 +370,8 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 	 */
 	@Override
 	public Company fetchByMx(String mx, boolean retrieveFromCache) {
+		mx = Objects.toString(mx, "");
+
 		Object[] finderArgs = new Object[] { mx };
 
 		Object result = null;
@@ -398,10 +396,7 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 
 			boolean bindMx = false;
 
-			if (mx == null) {
-				query.append(_FINDER_COLUMN_MX_MX_1);
-			}
-			else if (mx.equals("")) {
+			if (mx.isEmpty()) {
 				query.append(_FINDER_COLUMN_MX_MX_3);
 			}
 			else {
@@ -489,6 +484,8 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 	 */
 	@Override
 	public int countByMx(String mx) {
+		mx = Objects.toString(mx, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_MX;
 
 		Object[] finderArgs = new Object[] { mx };
@@ -503,10 +500,7 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 
 			boolean bindMx = false;
 
-			if (mx == null) {
-				query.append(_FINDER_COLUMN_MX_MX_1);
-			}
-			else if (mx.equals("")) {
+			if (mx.isEmpty()) {
 				query.append(_FINDER_COLUMN_MX_MX_3);
 			}
 			else {
@@ -547,7 +541,6 @@ public class CompanyPersistenceImpl extends BasePersistenceImpl<Company>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_MX_MX_1 = "company.mx IS NULL";
 	private static final String _FINDER_COLUMN_MX_MX_2 = "company.mx = ?";
 	private static final String _FINDER_COLUMN_MX_MX_3 = "(company.mx IS NULL OR company.mx = '')";
 	public static final FinderPath FINDER_PATH_FETCH_BY_LOGOID = new FinderPath(CompanyModelImpl.ENTITY_CACHE_ENABLED,

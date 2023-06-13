@@ -29,3 +29,19 @@ app.artifacts-1.0.1=\
 app.change.log-1.0.1=LPS-53189 LPS-77699 LPS-78155 LPS-78938 LPS-79549 LPS-79549: LPS-79656 LPS-79679 LPS-80374 LPS-80608 LPS-82140 LPS-82667 LPS-82744 LPS-83103 LPS-83241 LPS-83644 LPS-83697 LPS-83705 LPS-84093 LPS-84119 LPS-84399 LPS-84465 LPS-84585 LPS-85045 LPS-85117 LPS-85126 LPS-85129 LPS-85296 LPS-85324 LPS-86408 LPS-86413 
 
 app.git.id-1.0.1=54fb63f30dfd65263b7d69a582ab26ef9e48fbb4
+
+#
+# Liferay App Version 1.0.2
+#
+
+app.artifacts-1.0.2=\
+	com.liferay.users.admin.api-3.0.16.jar,\
+	com.liferay.users.admin.impl-2.0.6.jar,\
+	com.liferay.users.admin.item.selector.api-1.0.1.jar,\
+	com.liferay.users.admin.item.selector.web-1.0.1.jar,\
+	com.liferay.users.admin.uad-3.0.1.jar,\
+	com.liferay.users.admin.web-3.0.36.jar
+
+app.change.log-1.0.2=LPS-77699 LPS-79653 LPS-80332 LPS-84399 LPS-86408 LPS-86413 
+
+app.git.id-1.0.2=1ad0206eec8462b94638d545f9f0df37163ccdfd

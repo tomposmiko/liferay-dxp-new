@@ -16,8 +16,6 @@ package com.liferay.push.notifications.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -33,6 +31,7 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
@@ -155,6 +154,8 @@ public class PushNotificationsDevicePersistenceImpl extends BasePersistenceImpl<
 	@Override
 	public PushNotificationsDevice fetchByToken(String token,
 		boolean retrieveFromCache) {
+		token = Objects.toString(token, "");
+
 		Object[] finderArgs = new Object[] { token };
 
 		Object result = null;
@@ -179,10 +180,7 @@ public class PushNotificationsDevicePersistenceImpl extends BasePersistenceImpl<
 
 			boolean bindToken = false;
 
-			if (token == null) {
-				query.append(_FINDER_COLUMN_TOKEN_TOKEN_1);
-			}
-			else if (token.equals("")) {
+			if (token.isEmpty()) {
 				query.append(_FINDER_COLUMN_TOKEN_TOKEN_3);
 			}
 			else {
@@ -260,6 +258,8 @@ public class PushNotificationsDevicePersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public int countByToken(String token) {
+		token = Objects.toString(token, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_TOKEN;
 
 		Object[] finderArgs = new Object[] { token };
@@ -273,10 +273,7 @@ public class PushNotificationsDevicePersistenceImpl extends BasePersistenceImpl<
 
 			boolean bindToken = false;
 
-			if (token == null) {
-				query.append(_FINDER_COLUMN_TOKEN_TOKEN_1);
-			}
-			else if (token.equals("")) {
+			if (token.isEmpty()) {
 				query.append(_FINDER_COLUMN_TOKEN_TOKEN_3);
 			}
 			else {
@@ -317,7 +314,6 @@ public class PushNotificationsDevicePersistenceImpl extends BasePersistenceImpl<
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_TOKEN_TOKEN_1 = "pushNotificationsDevice.token IS NULL";
 	private static final String _FINDER_COLUMN_TOKEN_TOKEN_2 = "pushNotificationsDevice.token = ?";
 	private static final String _FINDER_COLUMN_TOKEN_TOKEN_3 = "(pushNotificationsDevice.token IS NULL OR pushNotificationsDevice.token = '')";
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_U_P = new FinderPath(PushNotificationsDeviceModelImpl.ENTITY_CACHE_ENABLED,
@@ -419,6 +415,8 @@ public class PushNotificationsDevicePersistenceImpl extends BasePersistenceImpl<
 		String platform, int start, int end,
 		OrderByComparator<PushNotificationsDevice> orderByComparator,
 		boolean retrieveFromCache) {
+		platform = Objects.toString(platform, "");
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -447,7 +445,7 @@ public class PushNotificationsDevicePersistenceImpl extends BasePersistenceImpl<
 			if ((list != null) && !list.isEmpty()) {
 				for (PushNotificationsDevice pushNotificationsDevice : list) {
 					if ((userId != pushNotificationsDevice.getUserId()) ||
-							!Objects.equals(platform,
+							!platform.equals(
 								pushNotificationsDevice.getPlatform())) {
 						list = null;
 
@@ -474,10 +472,7 @@ public class PushNotificationsDevicePersistenceImpl extends BasePersistenceImpl<
 
 			boolean bindPlatform = false;
 
-			if (platform == null) {
-				query.append(_FINDER_COLUMN_U_P_PLATFORM_1);
-			}
-			else if (platform.equals("")) {
+			if (platform.isEmpty()) {
 				query.append(_FINDER_COLUMN_U_P_PLATFORM_3);
 			}
 			else {
@@ -678,6 +673,8 @@ public class PushNotificationsDevicePersistenceImpl extends BasePersistenceImpl<
 		long pushNotificationsDeviceId, long userId, String platform,
 		OrderByComparator<PushNotificationsDevice> orderByComparator)
 		throws NoSuchDeviceException {
+		platform = Objects.toString(platform, "");
+
 		PushNotificationsDevice pushNotificationsDevice = findByPrimaryKey(pushNotificationsDeviceId);
 
 		Session session = null;
@@ -727,10 +724,7 @@ public class PushNotificationsDevicePersistenceImpl extends BasePersistenceImpl<
 
 		boolean bindPlatform = false;
 
-		if (platform == null) {
-			query.append(_FINDER_COLUMN_U_P_PLATFORM_1);
-		}
-		else if (platform.equals("")) {
+		if (platform.isEmpty()) {
 			query.append(_FINDER_COLUMN_U_P_PLATFORM_3);
 		}
 		else {
@@ -918,6 +912,8 @@ public class PushNotificationsDevicePersistenceImpl extends BasePersistenceImpl<
 			Arrays.sort(userIds);
 		}
 
+		platform = Objects.toString(platform, "");
+
 		if (userIds.length == 1) {
 			return findByU_P(userIds[0], platform, start, end, orderByComparator);
 		}
@@ -948,7 +944,7 @@ public class PushNotificationsDevicePersistenceImpl extends BasePersistenceImpl<
 				for (PushNotificationsDevice pushNotificationsDevice : list) {
 					if (!ArrayUtil.contains(userIds,
 								pushNotificationsDevice.getUserId()) ||
-							!Objects.equals(platform,
+							!platform.equals(
 								pushNotificationsDevice.getPlatform())) {
 						list = null;
 
@@ -979,10 +975,7 @@ public class PushNotificationsDevicePersistenceImpl extends BasePersistenceImpl<
 
 			boolean bindPlatform = false;
 
-			if (platform == null) {
-				query.append(_FINDER_COLUMN_U_P_PLATFORM_1);
-			}
-			else if (platform.equals("")) {
+			if (platform.isEmpty()) {
 				query.append(_FINDER_COLUMN_U_P_PLATFORM_3);
 			}
 			else {
@@ -1073,6 +1066,8 @@ public class PushNotificationsDevicePersistenceImpl extends BasePersistenceImpl<
 	 */
 	@Override
 	public int countByU_P(long userId, String platform) {
+		platform = Objects.toString(platform, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_U_P;
 
 		Object[] finderArgs = new Object[] { userId, platform };
@@ -1088,10 +1083,7 @@ public class PushNotificationsDevicePersistenceImpl extends BasePersistenceImpl<
 
 			boolean bindPlatform = false;
 
-			if (platform == null) {
-				query.append(_FINDER_COLUMN_U_P_PLATFORM_1);
-			}
-			else if (platform.equals("")) {
+			if (platform.isEmpty()) {
 				query.append(_FINDER_COLUMN_U_P_PLATFORM_3);
 			}
 			else {
@@ -1152,6 +1144,8 @@ public class PushNotificationsDevicePersistenceImpl extends BasePersistenceImpl<
 			Arrays.sort(userIds);
 		}
 
+		platform = Objects.toString(platform, "");
+
 		Object[] finderArgs = new Object[] { StringUtil.merge(userIds), platform };
 
 		Long count = (Long)finderCache.getResult(FINDER_PATH_WITH_PAGINATION_COUNT_BY_U_P,
@@ -1178,10 +1172,7 @@ public class PushNotificationsDevicePersistenceImpl extends BasePersistenceImpl<
 
 			boolean bindPlatform = false;
 
-			if (platform == null) {
-				query.append(_FINDER_COLUMN_U_P_PLATFORM_1);
-			}
-			else if (platform.equals("")) {
+			if (platform.isEmpty()) {
 				query.append(_FINDER_COLUMN_U_P_PLATFORM_3);
 			}
 			else {
@@ -1229,7 +1220,6 @@ public class PushNotificationsDevicePersistenceImpl extends BasePersistenceImpl<
 
 	private static final String _FINDER_COLUMN_U_P_USERID_2 = "pushNotificationsDevice.userId = ? AND ";
 	private static final String _FINDER_COLUMN_U_P_USERID_7 = "pushNotificationsDevice.userId IN (";
-	private static final String _FINDER_COLUMN_U_P_PLATFORM_1 = "pushNotificationsDevice.platform IS NULL";
 	private static final String _FINDER_COLUMN_U_P_PLATFORM_2 = "pushNotificationsDevice.platform = ?";
 	private static final String _FINDER_COLUMN_U_P_PLATFORM_3 = "(pushNotificationsDevice.platform IS NULL OR pushNotificationsDevice.platform = '')";
 

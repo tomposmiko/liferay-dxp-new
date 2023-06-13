@@ -69,3 +69,39 @@ app.artifacts-1.0.1=\
 app.change.log-1.0.1=LPS-45495 LPS-70394 LPS-74544 LPS-78938 LPS-80017 LPS-80388 LPS-82828 LPS-83162 LPS-83261 LPS-83292 LPS-83346 LPS-83470 LPS-83697 LPS-84093 LPS-84095 LPS-84119 LPS-84399 LPS-84409 LPS-85107 LPS-85212 LPS-85256 LPS-85296 LPS-85612 LPS-85683 LPS-85686 LPS-85689 LPS-85722 LPS-85772 LPS-85796 LPS-86034 LPS-86338 LPS-86408 LPS-86448 LPS-86509 LPS-86538 LPS-86625 
 
 app.git.id-1.0.1=cf6228c57e4e31d433795d0c99435bc0f9d870f4
+
+#
+# Liferay App Version 1.0.2
+#
+
+app.artifacts-1.0.2=\
+	com.liferay.portal.cluster.multiple-2.0.17.jar,\
+	com.liferay.portal.compound.session.id-3.0.1.jar,\
+	com.liferay.portal.custom.jsp.bag.api-2.0.0.jar,\
+	com.liferay.portal.dao.orm.custom.sql.api-1.0.1.jar,\
+	com.liferay.portal.dao.orm.custom.sql.impl-1.0.6.jar,\
+	com.liferay.portal.executor-3.0.1.jar,\
+	com.liferay.portal.inactive.request.handler-1.0.5.jar,\
+	com.liferay.portal.init.servlet.filter-3.0.1.jar,\
+	com.liferay.portal.instance.lifecycle.api-1.0.2.jar,\
+	com.liferay.portal.instance.lifecycle.impl-1.0.4.jar,\
+	com.liferay.portal.jmx-5.0.2.jar,\
+	com.liferay.portal.jmx.api-2.0.0.jar,\
+	com.liferay.portal.license.deployer-2.0.4.jar,\
+	com.liferay.portal.messaging-5.0.11.jar,\
+	com.liferay.portal.monitoring-6.0.9.jar,\
+	com.liferay.portal.output.stream.container-4.0.1.jar,\
+	com.liferay.portal.output.stream.container.api-2.0.0.jar,\
+	com.liferay.portal.pop.notifications-3.0.1.jar,\
+	com.liferay.portal.spring.extender.api-3.0.0.jar,\
+	com.liferay.portal.spring.extender.impl-1.0.15.jar,\
+	com.liferay.portal.uad-3.0.1.jar,\
+	com.liferay.portal.upgrade.api-2.0.3.jar,\
+	com.liferay.portal.upgrade.impl-2.0.13.jar,\
+	com.liferay.portal.upload-1.0.4.jar,\
+	com.liferay.portal.verify.extender-4.0.4.jar,\
+	com.liferay.portal.weblogic.support-3.0.1.jar
+
+app.change.log-1.0.2=LPS-70394 LPS-80332 LPS-80517 LPS-80843 LPS-84093 LPS-84119 LPS-84399 LPS-84409 LPS-85008 LPS-85296 LPS-86338 LPS-86408 LPS-86448 LPS-86509 LPS-86625 
+
+app.git.id-1.0.2=1ad0206eec8462b94638d545f9f0df37163ccdfd

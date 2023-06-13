@@ -340,7 +340,7 @@ public class KBArticleLocalServiceTest {
 		int urlTitleMaxSize = ModelHintsUtil.getMaxLength(
 			KBArticle.class.getName(), "urlTitle");
 
-		String invalidURLTitle = StringUtil.randomString(urlTitleMaxSize);
+		String invalidURLTitle = StringUtil.randomString(urlTitleMaxSize + 1);
 
 		KBArticleLocalServiceUtil.addKBArticle(
 			_user.getUserId(), _kbFolderClassNameId,

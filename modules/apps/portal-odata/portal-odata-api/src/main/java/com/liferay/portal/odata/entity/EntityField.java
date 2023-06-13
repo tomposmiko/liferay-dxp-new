@@ -14,7 +14,7 @@
 
 package com.liferay.portal.odata.entity;
 
-import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Locale;
@@ -184,7 +184,8 @@ public class EntityField {
 
 	public enum Type {
 
-		COMPLEX, DATE, ID, STRING
+		BOOLEAN, COLLECTION, COMPLEX, DATE, DATE_TIME, DOUBLE, ID, INTEGER,
+		STRING
 
 	}
 

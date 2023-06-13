@@ -56,6 +56,7 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class BundleManagerImpl implements BundleManager {
 
+	@Override
 	public Bundle getBundle(String symbolicName, String versionString) {
 		Version version = Version.parseVersion(versionString);
 
@@ -70,6 +71,7 @@ public class BundleManagerImpl implements BundleManager {
 		return null;
 	}
 
+	@Override
 	public List<Bundle> getBundles() {
 		return ListUtil.fromArray(_bundleContext.getBundles());
 	}
@@ -214,8 +216,9 @@ public class BundleManagerImpl implements BundleManager {
 		return false;
 	}
 
-	private static final int[] _INSTALLED_BUNDLE_STATES =
-		{Bundle.ACTIVE, Bundle.INSTALLED, Bundle.RESOLVED};
+	private static final int[] _INSTALLED_BUNDLE_STATES = {
+		Bundle.ACTIVE, Bundle.INSTALLED, Bundle.RESOLVED
+	};
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		BundleManagerImpl.class);

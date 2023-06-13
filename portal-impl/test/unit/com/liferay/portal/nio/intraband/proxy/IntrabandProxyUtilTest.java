@@ -656,8 +656,9 @@ public class IntrabandProxyUtilTest {
 
 		ClassNode classNode = _loadClass(TestClass.class);
 
-		String[] proxyMethodSignatures =
-			{"testSignature1", "testSignature2", "testSignature3"};
+		String[] proxyMethodSignatures = {
+			"testSignature1", "testSignature2", "testSignature3"
+		};
 
 		IntrabandProxyUtil.rewriteGetProxyMethodSignaturesMethodNode(
 			classNode, proxyMethodSignatures);
@@ -1681,7 +1682,7 @@ public class IntrabandProxyUtilTest {
 							"Unknow method index ", String.valueOf(i),
 							" for proxy methods mappings ",
 							ReflectionTestUtil.getFieldValue(
-									skeletonClass, "_PROXY_METHODS_MAPPING")),
+								skeletonClass, "_PROXY_METHODS_MAPPING")),
 						throwable.getMessage());
 				}
 

@@ -1,12 +1,9 @@
-<definition>
-	<command name="gotoOrganizations">
-		<execute function="Pause" locator1="1000" />
+definition {
+	macro gotoOrganizations {
+		Pause(locator1 = "1000");
 
-		<if>
-			<condition function="IsElementPresent" locator1="NavBar#ORGANIZATIONS" />
-			<then>
-				<execute function="AssertClick" locator1="NavBar#ORGANIZATIONS" value1="Organizations" />
-			</then>
-		</if>
-	</command>
-</definition>
+		if (IsElementPresent(locator1 = "NavBar#ORGANIZATIONS")) {
+			AssertClick(locator1 = "NavBar#ORGANIZATIONS", value1 = "Organizations");
+		}
+	}
+}

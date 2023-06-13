@@ -23,7 +23,6 @@ import com.liferay.dynamic.data.mapping.kernel.DDMFormValues;
 import com.liferay.dynamic.data.mapping.kernel.Value;
 import com.liferay.dynamic.data.mapping.util.FieldsToDDMFormValuesConverter;
 import com.liferay.journal.model.JournalArticle;
-import com.liferay.journal.util.JournalContent;
 import com.liferay.journal.util.JournalConverter;
 import com.liferay.journal.web.asset.JournalArticleDDMFormValuesReader;
 import com.liferay.petra.string.StringPool;
@@ -33,7 +32,6 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.HashMap;
@@ -41,7 +39,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.ResourceBundle;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -51,17 +48,11 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(immediate = true, service = AssetDisplayContributor.class)
 public class JournalArticleAssetDisplayContributor
-	extends BaseAssetDisplayContributor<JournalArticle>
-	implements AssetDisplayContributor {
+	extends BaseAssetDisplayContributor<JournalArticle> {
 
 	@Override
 	public String getClassName() {
 		return JournalArticle.class.getName();
-	}
-
-	@Override
-	protected String[] getAssetEntryModelFields() {
-		return null;
 	}
 
 	@Override
@@ -85,8 +76,8 @@ public class JournalArticleAssetDisplayContributor
 			Map<String, List<DDMFormFieldValue>> ddmFormFieldsValuesMap =
 				ddmFormValues.getDDMFormFieldValuesMap();
 
-			for (Map.Entry<String, List<DDMFormFieldValue>>
-					entry: ddmFormFieldsValuesMap.entrySet()) {
+			for (Map.Entry<String, List<DDMFormFieldValue>> entry :
+					ddmFormFieldsValuesMap.entrySet()) {
 
 				List<DDMFormFieldValue> ddmFormFieldValues = entry.getValue();
 
@@ -111,18 +102,6 @@ public class JournalArticleAssetDisplayContributor
 		}
 
 		return classTypeValues;
-	}
-
-	@Override
-	protected Object getFieldValue(
-		JournalArticle article, String field, Locale locale) {
-
-		return StringPool.BLANK;
-	}
-
-	@Override
-	protected ResourceBundle getResourceBundle(Locale locale) {
-		return ResourceBundleUtil.getBundle(locale, "com.liferay.journal.lang");
 	}
 
 	private String _transformFileEntryURL(String data) {
@@ -158,9 +137,6 @@ public class JournalArticleAssetDisplayContributor
 
 	@Reference
 	private FieldsToDDMFormValuesConverter _fieldsToDDMFormValuesConverter;
-
-	@Reference
-	private JournalContent _journalContent;
 
 	@Reference
 	private JournalConverter _journalConverter;

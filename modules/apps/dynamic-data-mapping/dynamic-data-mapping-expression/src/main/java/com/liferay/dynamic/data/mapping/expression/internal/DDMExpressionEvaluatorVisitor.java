@@ -229,7 +229,7 @@ public class DDMExpressionEvaluatorVisitor
 
 		Number number = visitChild(context, 1);
 
-		return -(number.doubleValue());
+		return -number.doubleValue();
 	}
 
 	@Override

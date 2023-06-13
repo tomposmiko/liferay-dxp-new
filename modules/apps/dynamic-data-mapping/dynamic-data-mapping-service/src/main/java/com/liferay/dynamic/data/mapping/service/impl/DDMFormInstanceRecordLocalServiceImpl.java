@@ -776,8 +776,9 @@ public class DDMFormInstanceRecordLocalServiceImpl
 	@ServiceReference(type = StorageEngineAccessor.class)
 	protected StorageEngineAccessor storageEngineAccessor;
 
-	private static final String[] _SELECTED_FIELD_NAMES =
-		{Field.COMPANY_ID, Field.ENTRY_CLASS_PK, Field.UID};
+	private static final String[] _SELECTED_FIELD_NAMES = {
+		Field.COMPANY_ID, Field.ENTRY_CLASS_PK, Field.UID
+	};
 
 	private static final String _VERSION_DEFAULT = "1.0";
 

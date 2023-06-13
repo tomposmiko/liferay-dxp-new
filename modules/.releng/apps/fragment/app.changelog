@@ -39,3 +39,24 @@ app.artifacts-1.0.1=\
 app.change.log-1.0.1=LPS-77699 LPS-78938 LPS-79410 LPS-79679 LPS-82480 LPS-82855 LPS-83007 LPS-83038 LPS-83194 LPS-83195 LPS-83196 LPS-83197 LPS-83494 LPS-83705 LPS-84090 LPS-84119 LPS-84549 LPS-84600 LPS-85296 LPS-85849 LPS-86408 LPS-86501 
 
 app.git.id-1.0.1=0e7c1a988fbd3d89bf614bffc471608fd51077c2
+
+#
+# Liferay App Version 1.0.2
+#
+
+app.artifacts-1.0.2=\
+	com.liferay.fragment.api-1.1.4.jar,\
+	com.liferay.fragment.display.web-1.0.7.jar,\
+	com.liferay.fragment.entry.processor.editable-1.0.7.jar,\
+	com.liferay.fragment.entry.processor.nullable-1.0.2.jar,\
+	com.liferay.fragment.entry.processor.portlet-1.0.8.jar,\
+	com.liferay.fragment.impl-1.0.2.jar,\
+	com.liferay.fragment.item.selector.api-1.0.1.jar,\
+	com.liferay.fragment.item.selector.web-1.0.6.jar,\
+	com.liferay.fragment.service-1.0.18.jar,\
+	com.liferay.fragment.taglib-1.0.2.jar,\
+	com.liferay.fragment.web-1.0.36.jar
+
+app.change.log-1.0.2=LPS-77699 LPS-80332 LPS-83038 LPS-84119 LPS-85296 LPS-85849 LPS-86408 LPS-86501 
+
+app.git.id-1.0.2=1ad0206eec8462b94638d545f9f0df37163ccdfd

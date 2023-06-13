@@ -27,11 +27,15 @@ public interface SchemaOrgConstants {
 
 	public interface Type {
 
+		public static final String COMMERCE_WEB_SITE = "CommerceWebSite";
+
 		public static final String WEB_SITE = "WebSite";
 
 	}
 
 	public interface Vocabulary {
+
+		public static final String COMMERCE_WEB_SITE = "commerce-web-site";
 
 		public static final String WEB_SITE = "web-site";
 

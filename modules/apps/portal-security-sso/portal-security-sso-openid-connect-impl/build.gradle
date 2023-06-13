@@ -14,7 +14,7 @@ dependencies {
 	compileOnly group: "com.google.inject", name: "guice", version: "2.0"
 	compileOnly group: "com.liferay", name: "com.liferay.petra.string", version: "2.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.portal.configuration.metatype.api", version: "1.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.portal.security.sso.openid.connect.api", version: "2.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.portal.security.sso.openid.connect.api", version: "2.1.0"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.impl", version: "3.0.0"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "3.0.0"
 	compileOnly group: "commons-codec", name: "commons-codec", version: "1.4"

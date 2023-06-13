@@ -83,8 +83,8 @@ public class PortalCapabilityLocatorImpl implements PortalCapabilityLocator {
 			resourceGenerationStrategy) {
 
 		if (resourceGenerationStrategy ==
-				ProcessorCapability.
-					ResourceGenerationStrategy.ALWAYS_GENERATE) {
+				ProcessorCapability.ResourceGenerationStrategy.
+					ALWAYS_GENERATE) {
 
 			return _alwaysGeneratingProcessorCapability;
 		}

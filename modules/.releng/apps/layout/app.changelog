@@ -59,3 +59,34 @@ app.artifacts-1.0.1=\
 app.change.log-1.0.1=LPS-0 LPS-74544 LPS-75655 LPS-77699 LPS-78938 LPS-79410 LPS-79679 LPS-82733 LPS-82855 LPS-82861 LPS-82866 LPS-82998 LPS-83007 LPS-83038 LPS-83072 LPS-83097 LPS-83105 LPS-83126 LPS-83221 LPS-83224 LPS-83237 LPS-83241 LPS-83283 LPS-83355 LPS-83395 LPS-83477 LPS-83494 LPS-83548 LPS-83596 LPS-83629 LPS-83668 LPS-83676 LPS-83686 LPS-83697 LPS-83705 LPS-83762 LPS-83817 LPS-83843 LPS-83950 LPS-83959 LPS-83960 LPS-83972 LPS-84092 LPS-84119 LPS-84120 LPS-84121 LPS-84200 LPS-84308 LPS-84399 LPS-84512 LPS-84549 LPS-84585 LPS-84784 LPS-84836 LPS-85101 LPS-85116 LPS-85149 LPS-85296 LPS-85318 LPS-85497 LPS-85796 LPS-85849 LPS-86142 LPS-86165 LPS-86408 
 
 app.git.id-1.0.1=a511b90cfe3fc54e83162afa4ac30904c7f0938f
+
+#
+# Liferay App Version 1.0.2
+#
+
+app.artifacts-1.0.2=\
+	com.liferay.layout.admin.api-1.1.0.jar,\
+	com.liferay.layout.admin.web-2.0.60.jar,\
+	com.liferay.layout.api-1.0.3.jar,\
+	com.liferay.layout.impl-3.0.7.jar,\
+	com.liferay.layout.item.selector.api-2.0.0.jar,\
+	com.liferay.layout.item.selector.web-2.0.2.jar,\
+	com.liferay.layout.page.template.api-1.4.0.jar,\
+	com.liferay.layout.page.template.service-1.0.19.jar,\
+	com.liferay.layout.prototype.api-2.0.0.jar,\
+	com.liferay.layout.prototype.impl-2.0.1.jar,\
+	com.liferay.layout.set.prototype.api-2.0.0.jar,\
+	com.liferay.layout.set.prototype.impl-3.0.1.jar,\
+	com.liferay.layout.set.prototype.web-2.0.6.jar,\
+	com.liferay.layout.taglib-3.0.11.jar,\
+	com.liferay.layout.type.controller.asset.display-1.0.5.jar,\
+	com.liferay.layout.type.controller.content-1.0.9.jar,\
+	com.liferay.layout.type.controller.control.panel-3.0.0.jar,\
+	com.liferay.layout.type.controller.full.page.application-3.0.0.jar,\
+	com.liferay.layout.type.controller.link.to.page-1.0.2.jar,\
+	com.liferay.layout.type.controller.node-3.0.0.jar,\
+	com.liferay.layout.uad-3.0.1.jar
+
+app.change.log-1.0.2=LPS-77699 LPS-79653 LPS-79679 LPS-80295 LPS-80332 LPS-81383 LPS-81897 LPS-82048 LPS-82343 LPS-82401 LPS-83038 LPS-83237 LPS-83241 LPS-84092 LPS-84119 LPS-84399 LPS-85296 LPS-85796 LPS-85849 LPS-86142 LPS-86408 
+
+app.git.id-1.0.2=1ad0206eec8462b94638d545f9f0df37163ccdfd

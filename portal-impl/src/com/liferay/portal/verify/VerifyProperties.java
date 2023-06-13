@@ -78,6 +78,12 @@ public class VerifyProperties extends VerifyProcess {
 		propertiesResourceNames.add(0, "portal.properties");
 
 		for (String propertyResourceName : propertiesResourceNames) {
+			if (propertyResourceName.contains("${") &&
+				propertyResourceName.contains("}")) {
+
+				continue;
+			}
+
 			try (InputStream inputStream = getPropertiesResourceAsStream(
 					propertyResourceName)) {
 
@@ -1713,6 +1719,10 @@ public class VerifyProperties extends VerifyProcess {
 		"ehcache.cache.manager.peer.provider.factory",
 		"ehcache.cache.manager.statistics.thread.pool.size",
 		"ehcache.multi.vm.config.location.peerProviderProperties",
+		"ehcache.rmi.peer.listener.factory.class",
+		"ehcache.rmi.peer.listener.factory.properties",
+		"ehcache.rmi.peer.provider.factory.class",
+		"ehcache.rmi.peer.provider.factory.properties",
 		"ehcache.statistics.enabled",
 		"hot.deploy.hook.custom.jsp.verification.enabled",
 		"hibernate.cache.region.factory_class",
@@ -1870,10 +1880,7 @@ public class VerifyProperties extends VerifyProcess {
 			"default.user.layout.template.id",
 			"default.user.public.layout.template.id"
 		},
-		{
-			"default.user.private.layout.lar",
-			"default.user.private.layouts.lar"
-		},
+		{"default.user.private.layout.lar", "default.user.private.layouts.lar"},
 		{"default.user.public.layout.lar", "default.user.public.layouts.lar"},
 		{
 			"dl.hook.cmis.credentials.password",
@@ -1889,10 +1896,7 @@ public class VerifyProperties extends VerifyProcess {
 		{"dl.hook.impl", "dl.store.impl"},
 		{"dl.hook.jcr.fetch.delay", "dl.store.jcr.fetch.delay"},
 		{"dl.hook.jcr.fetch.max.failures", "dl.store.jcr.fetch.max.failures"},
-		{
-			"dl.hook.jcr.move.version.labels",
-			"dl.store.jcr.move.version.labels"
-		},
+		{"dl.hook.jcr.move.version.labels", "dl.store.jcr.move.version.labels"},
 		{"dl.hook.s3.access.key", "dl.store.s3.access.key"},
 		{"dl.hook.s3.bucket.name", "dl.store.s3.bucket.name"},
 		{"dl.hook.s3.secret.key", "dl.store.s3.secret.key"},

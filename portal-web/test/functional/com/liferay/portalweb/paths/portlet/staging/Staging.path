@@ -56,6 +56,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>STAGING_PUBLISH_PAGE_FIRST_MESSAGE</td>
+	<td>//div[@class='portlet-body']/div[2]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>STAGING_PUBLISH_TO_LIVE_BUTTON</td>
 	<td>//button[contains(.,'Publish to Live')]</td>
 	<td></td>
@@ -157,6 +162,11 @@
 <tr>
 	<td>HISTORY_VERSION</td>
 	<td>//span[contains(@class,'layout-revision')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>HISTORY_VERSION_2</td>
+	<td>xpath=(//a[contains(@class,'layout-revision')])[2]</td>
 	<td></td>
 </tr>
 <tr>

@@ -244,6 +244,12 @@ public class HtmlImpl implements Html {
 						else if (c == CharPool.APOSTROPHE) {
 							replacement = "&#39;";
 						}
+						else if (c == CharPool.GREATER_THAN) {
+							replacement = "&gt;";
+						}
+						else if (c == CharPool.LESS_THAN) {
+							replacement = "&lt;";
+						}
 						else if (c == CharPool.QUOTE) {
 							replacement = "&quot;";
 						}
@@ -944,11 +950,13 @@ public class HtmlImpl implements Html {
 		'e', 'f'
 	};
 
-	private static final String[] _MS_WORD_HTML =
-		{"&reg;", StringPool.APOSTROPHE, StringPool.QUOTE, StringPool.QUOTE};
+	private static final String[] _MS_WORD_HTML = {
+		"&reg;", StringPool.APOSTROPHE, StringPool.QUOTE, StringPool.QUOTE
+	};
 
-	private static final String[] _MS_WORD_UNICODE =
-		{"\u00ae", "\u2019", "\u201c", "\u201d"};
+	private static final String[] _MS_WORD_UNICODE = {
+		"\u00ae", "\u2019", "\u201c", "\u201d"
+	};
 
 	private static final char[] _TAG_SCRIPT = {'s', 'c', 'r', 'i', 'p', 't'};
 

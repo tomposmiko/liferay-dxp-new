@@ -141,8 +141,9 @@ public class KBSuggestionListManagementToolbarDisplayContext {
 		return new DropdownItemList() {
 			{
 				String navigation = _getNavigation();
-				String[] navigationKeys =
-					{"all", "new", "in-progress", "resolved"};
+				String[] navigationKeys = {
+					"all", "new", "in-progress", "resolved"
+				};
 
 				PortletURL navigationURL = PortletURLUtil.clone(
 					_currentURLObj, _liferayPortletResponse);

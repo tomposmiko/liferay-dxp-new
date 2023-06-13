@@ -1,0 +1,75 @@
+@component-name = "portal-wcm"
+definition {
+	property portal.release = "true";
+	property portal.upstream = "true";
+	property testray.main.component.name = "Sitemap";
+
+	setUp {
+		TestCase.setUpPortalInstance();
+
+		User.firstLoginPG();
+
+		ProductMenu.gotoPortlet(
+			category = "Sites",
+			panel = "Control Panel",
+			portlet = "Sites"
+		);
+
+		Site.addBlankCP(siteName = "Site Name");
+
+		ProductMenu.gotoPortlet(
+			category = "Build",
+			panel = "Site Administration",
+			portlet = "Pages"
+		);
+
+		SitePages.addPrivatePage(pageName = "Site Page Name");
+
+		SitePages.addPrivateChildPage(
+			childPageName = "Child Page Name",
+			parentPageName = "Site Page Name"
+		);
+	}
+
+	tearDown {
+		var testPortalInstance = PropsUtil.get("test.portal.instance");
+
+		if ("${testPortalInstance}" == "true") {
+			PortalInstances.tearDownCP();
+		}
+		else {
+			Site.tearDownCP(siteName = "Site Name");
+		}
+	}
+
+	@priority = "4"
+	test DisplayPrivatePageWithChildPage {
+		ProductMenu.gotoPortlet(
+			category = "Build",
+			panel = "Site Administration",
+			portlet = "Navigation Menus"
+		);
+
+		LexiconEntry.gotoEntry(rowEntry = "Default Private");
+
+		NavigationMenusAdmin.addItem(
+			item = "Page",
+			pageNames = "Child Page Name",
+			privacy = "Private Pages"
+		);
+
+		Navigator.gotoPrivateSitePage(
+			pageName = "Child Page Name",
+			siteName = "Site Name"
+		);
+
+		Portlet.addPG(portletName = "Site Map");
+
+		Portlet.viewSpecificPG(portletName = "Site Map");
+
+		SiteMapPortlet.viewDefaultPG(
+			listChildPageName = "Child Page Name",
+			listPageName = "Site Page Name"
+		);
+	}
+}

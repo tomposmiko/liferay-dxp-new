@@ -18,8 +18,8 @@ import com.liferay.apio.architect.language.AcceptLanguage;
 import com.liferay.apio.architect.pagination.PageItems;
 import com.liferay.apio.architect.pagination.Pagination;
 import com.liferay.apio.architect.resource.CollectionResource;
-import com.liferay.apio.architect.test.util.pagination.PaginationRequest;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.portal.apio.test.util.PaginationRequest;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
@@ -65,11 +65,27 @@ public class ContentSpaceCollectionResourceTest {
 				group.getCompanyId());
 
 			PageItems<Group> groupPageItems = _getPageItems(
-				PaginationRequest.of(10, 1), company, _acceptLanguage);
+				PaginationRequest.of(50, 1), company, _acceptLanguage);
 
 			List<Group> groups = (List<Group>)groupPageItems.getItems();
 
 			Assert.assertTrue(groups.contains(group));
+		}
+		finally {
+			_groupLocalService.deleteGroup(group);
+		}
+	}
+
+	@Test
+	public void testGetGroup() throws Throwable {
+		Group group = GroupTestUtil.addGroup();
+
+		try {
+			Group finalGroup = _getGroup(group.getGroupId());
+
+			Assert.assertNotNull(finalGroup);
+
+			Assert.assertEquals(group.getName(), finalGroup.getName());
 		}
 		finally {
 			_groupLocalService.deleteGroup(group);
@@ -87,7 +103,7 @@ public class ContentSpaceCollectionResourceTest {
 				group.getCompanyId());
 
 			PageItems<Group> groupPageItems = _getPageItems(
-				PaginationRequest.of(10, 1), company, _acceptLanguage);
+				PaginationRequest.of(50, 1), company, _acceptLanguage);
 
 			List<Group> groups = (List<Group>)groupPageItems.getItems();
 
@@ -105,6 +121,17 @@ public class ContentSpaceCollectionResourceTest {
 			group.isManualMembership(), group.getMembershipRestriction(),
 			group.getFriendlyURL(), group.isInheritContent(), false,
 			new ServiceContext());
+	}
+
+	private Group _getGroup(long groupId) throws Exception {
+		Class<? extends CollectionResource> clazz =
+			_collectionResource.getClass();
+
+		Method method = clazz.getDeclaredMethod("_getGroup", long.class);
+
+		method.setAccessible(true);
+
+		return (Group)method.invoke(_collectionResource, groupId);
 	}
 
 	private PageItems<Group> _getPageItems(

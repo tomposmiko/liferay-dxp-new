@@ -14,6 +14,7 @@
 
 package com.liferay.oauth2.provider.shortcut.internal.instance.lifecycle;
 
+import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.oauth2.provider.constants.ClientProfile;
 import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.model.OAuth2Application;
@@ -29,6 +30,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.io.BigEndianCodec;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.security.SecureRandomUtil;
 import com.liferay.portal.kernel.service.CompanyService;
 import com.liferay.portal.kernel.service.ContactService;
@@ -209,11 +211,12 @@ public class OAuth2ProviderShortcutPortalInstanceLifecycleListener
 				GroupService.class.getName(), "#getGroups\n",
 				GroupService.class.getName(), "#getGroupsCount\n",
 				GroupService.class.getName(), "#getGtGroups\n",
-				OrganizationService.class.getName(), "#fetchOrganizations\n",
+				OrganizationService.class.getName(), "#fetchOrganization\n",
 				OrganizationService.class.getName(), "#getGtOrganizations\n",
 				OrganizationService.class.getName(), "#getOrganization\n",
 				OrganizationService.class.getName(), "#getOrganizations\n",
 				OrganizationService.class.getName(), "#getOrganizationsCount\n",
+				OrganizationService.class.getName(), "#getUserOrganizations\n",
 				PortalService.class.getName(), "#getBuildNumber\n",
 				UserService.class.getName(), "#getCompanyUsers\n",
 				UserService.class.getName(), "#getCompanyUsersCount\n",
@@ -231,7 +234,8 @@ public class OAuth2ProviderShortcutPortalInstanceLifecycleListener
 				UserGroupService.class.getName(), "#getGtUserGroups\n",
 				UserGroupService.class.getName(), "#getUserGroup\n",
 				UserGroupService.class.getName(), "#getUserGroups\n",
-				UserGroupService.class.getName(), "#getUserGroupsCount")
+				UserGroupService.class.getName(), "#getUserGroupsCount\n",
+				UserGroupService.class.getName(), "#getUserUserGroups")
 		},
 		{
 			"OAUTH2_analytics.write",
@@ -241,6 +245,11 @@ public class OAuth2ProviderShortcutPortalInstanceLifecycleListener
 
 	private static final Pattern _baseIdPattern = Pattern.compile(
 		"(.{8})(.{4})(.{4})(.{4})(.*)");
+
+	@Reference(
+		target = "(indexer.class.name=com.liferay.document.library.kernel.model.DLFileEntry)"
+	)
+	private Indexer<DLFileEntry> _indexer;
 
 	@Reference
 	private OAuth2ApplicationLocalService _oAuth2ApplicationLocalService;

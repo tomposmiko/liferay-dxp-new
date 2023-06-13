@@ -22,8 +22,6 @@ import com.liferay.mail.reader.model.impl.AccountImpl;
 import com.liferay.mail.reader.model.impl.AccountModelImpl;
 import com.liferay.mail.reader.service.persistence.AccountPersistence;
 
-import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -41,6 +39,7 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
@@ -663,6 +662,8 @@ public class AccountPersistenceImpl extends BasePersistenceImpl<Account>
 	@Override
 	public Account fetchByU_A(long userId, String address,
 		boolean retrieveFromCache) {
+		address = Objects.toString(address, "");
+
 		Object[] finderArgs = new Object[] { userId, address };
 
 		Object result = null;
@@ -690,10 +691,7 @@ public class AccountPersistenceImpl extends BasePersistenceImpl<Account>
 
 			boolean bindAddress = false;
 
-			if (address == null) {
-				query.append(_FINDER_COLUMN_U_A_ADDRESS_1);
-			}
-			else if (address.equals("")) {
+			if (address.isEmpty()) {
 				query.append(_FINDER_COLUMN_U_A_ADDRESS_3);
 			}
 			else {
@@ -786,6 +784,8 @@ public class AccountPersistenceImpl extends BasePersistenceImpl<Account>
 	 */
 	@Override
 	public int countByU_A(long userId, String address) {
+		address = Objects.toString(address, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_U_A;
 
 		Object[] finderArgs = new Object[] { userId, address };
@@ -801,10 +801,7 @@ public class AccountPersistenceImpl extends BasePersistenceImpl<Account>
 
 			boolean bindAddress = false;
 
-			if (address == null) {
-				query.append(_FINDER_COLUMN_U_A_ADDRESS_1);
-			}
-			else if (address.equals("")) {
+			if (address.isEmpty()) {
 				query.append(_FINDER_COLUMN_U_A_ADDRESS_3);
 			}
 			else {
@@ -848,7 +845,6 @@ public class AccountPersistenceImpl extends BasePersistenceImpl<Account>
 	}
 
 	private static final String _FINDER_COLUMN_U_A_USERID_2 = "account.userId = ? AND ";
-	private static final String _FINDER_COLUMN_U_A_ADDRESS_1 = "account.address IS NULL";
 	private static final String _FINDER_COLUMN_U_A_ADDRESS_2 = "account.address = ?";
 	private static final String _FINDER_COLUMN_U_A_ADDRESS_3 = "(account.address IS NULL OR account.address = '')";
 

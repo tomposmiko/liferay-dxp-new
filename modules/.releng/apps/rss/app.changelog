@@ -25,3 +25,17 @@ app.artifacts-1.0.1=\
 app.change.log-1.0.1=LPS-74544 LPS-77699 LPS-79679 LPS-83705 LPS-84093 LPS-84119 LPS-85226 LPS-85296 LPS-86408 
 
 app.git.id-1.0.1=d9613f74dd6fe7cfcd5aa20a4bcf2a4f0f5ccf76
+
+#
+# Liferay App Version 1.0.2
+#
+
+app.artifacts-1.0.2=\
+	com.liferay.rss.api-2.0.0.jar,\
+	com.liferay.rss.impl-1.0.6.jar,\
+	com.liferay.rss.taglib-1.0.2.jar,\
+	com.liferay.rss.web-4.0.12.jar
+
+app.change.log-1.0.2=LPS-79653 LPS-80332 LPS-84119 LPS-85296 LPS-86408 
+
+app.git.id-1.0.2=1ad0206eec8462b94638d545f9f0df37163ccdfd

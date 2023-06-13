@@ -14,15 +14,15 @@
 
 package com.liferay.asset.display.contributor;
 
+import com.liferay.asset.display.contributor.util.AssetDisplayContributorFieldHelperUtil;
 import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
-import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -32,8 +32,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Jürgen Kappler
@@ -46,35 +45,17 @@ public abstract class BaseAssetDisplayContributor<T>
 			long classTypeId, Locale locale)
 		throws PortalException {
 
-		Set<AssetDisplayField> assetDisplayFields = new LinkedHashSet<>();
+		// Fields for asset entry
 
-		ResourceBundle resourceBundle = getResourceBundle(locale);
-
-		// Default fields for asset entry
-
-		for (Map.Entry<String, String> assetEntryModelField :
-				_assetEntryModelFieldsMap.entrySet()) {
-
-			assetDisplayFields.add(
-				new AssetDisplayField(
-					assetEntryModelField.getKey(),
-					LanguageUtil.get(
-						resourceBundle, assetEntryModelField.getValue())));
-		}
+		Set<AssetDisplayField> assetDisplayFields = _getAssetDisplayFields(
+			AssetEntry.class.getName(), locale);
 
 		// Fields for the specific asset type
 
-		String[] assetEntryModelFields = getAssetEntryModelFields();
+		Set<AssetDisplayField> assetTypeAssetDisplayFields =
+			_getAssetDisplayFields(getClassName(), locale);
 
-		if (assetEntryModelFields != null) {
-			for (String assetEntryModelField : assetEntryModelFields) {
-				assetDisplayFields.add(
-					new AssetDisplayField(
-						assetEntryModelField,
-						LanguageUtil.get(
-							resourceBundle, assetEntryModelField)));
-			}
-		}
+		assetDisplayFields.addAll(assetTypeAssetDisplayFields);
 
 		// Fields for the class type
 
@@ -91,34 +72,35 @@ public abstract class BaseAssetDisplayContributor<T>
 			AssetEntry assetEntry, Locale locale)
 		throws PortalException {
 
-		// Default fields for asset entry
+		// Field values for asset entry
 
-		Map<String, Object> parameterMap = _getDefaultParameterMap(
-			assetEntry, locale);
+		Map<String, Object> parameterMap =
+			_getAssetEntryAssetDisplayFieldsValues(assetEntry, locale);
 
-		// Fields for the specific asset type
+		// Field values for the specific asset type
 
 		AssetRendererFactory assetRendererFactory =
 			AssetRendererFactoryRegistryUtil.
 				getAssetRendererFactoryByClassNameId(
 					assetEntry.getClassNameId());
 
+		List<AssetDisplayContributorField> assetDisplayContributorFields =
+			AssetDisplayContributorFieldHelperUtil.
+				getAssetDisplayContributorFields(getClassName());
+
 		AssetRenderer<T> assetRenderer = assetRendererFactory.getAssetRenderer(
 			assetEntry.getClassPK());
 
-		String[] assetEntryModelFields = getAssetEntryModelFields();
+		for (AssetDisplayContributorField assetDisplayContributorField :
+				assetDisplayContributorFields) {
 
-		if (assetEntryModelFields != null) {
-			for (String assetEntryModelField : assetEntryModelFields) {
-				parameterMap.put(
-					assetEntryModelField,
-					getFieldValue(
-						assetRenderer.getAssetObject(), assetEntryModelField,
-						locale));
-			}
+			parameterMap.put(
+				assetDisplayContributorField.getKey(),
+				assetDisplayContributorField.getValue(
+					assetRenderer.getAssetObject(), locale));
 		}
 
-		// Fields for the class type
+		// Field values for the class type
 
 		Map<String, Object> classTypeValues = getClassTypeValues(
 			assetRenderer.getAssetObject(), locale);
@@ -133,23 +115,42 @@ public abstract class BaseAssetDisplayContributor<T>
 		return ResourceActionsUtil.getModelResource(locale, getClassName());
 	}
 
-	protected abstract String[] getAssetEntryModelFields();
+	/**
+	 * @deprecated As of Judson (7.1.x), replaced by {@link
+	 *             #getAssetEntryModelFieldsMap()}
+	 */
+	@Deprecated
+	protected String[] getAssetEntryModelFields() {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * @deprecated As of Judson (7.1.x), }
+	 */
+	@Deprecated
+	protected Map<String, String> getAssetEntryModelFieldsMap() {
+		throw new UnsupportedOperationException();
+	}
 
 	protected abstract Map<String, Object> getClassTypeValues(
 		T assetEntryObject, Locale locale);
 
-	protected abstract Object getFieldValue(
-		T assetEntryObject, String field, Locale locale);
+	/**
+	 * @deprecated As of Judson (7.1.x), }
+	 */
+	@Deprecated
+	protected Object getFieldValue(
+		T assetEntryObject, String field, Locale locale) {
 
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * @deprecated As of Judson (7.1.x), }
+	 */
+	@Deprecated
 	protected ResourceBundle getResourceBundle(Locale locale) {
-		if (resourceBundleLoader == null) {
-			Bundle bundle = FrameworkUtil.getBundle(getClass());
-
-			return ResourceBundleUtil.getBundle(
-				locale, bundle.getSymbolicName());
-		}
-
-		return resourceBundleLoader.loadResourceBundle(locale);
+		throw new UnsupportedOperationException();
 	}
 
 	/**
@@ -160,36 +161,61 @@ public abstract class BaseAssetDisplayContributor<T>
 	protected void setResourceBundleLoader(
 		ResourceBundleLoader resourceBundleLoader) {
 
-		this.resourceBundleLoader = resourceBundleLoader;
+		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * @deprecated As of Judson (7.1.x), }
+	 */
+	@Deprecated
 	protected ResourceBundleLoader resourceBundleLoader;
 
-	private Map<String, Object> _getDefaultParameterMap(
-		AssetEntry assetEntry, Locale locale) {
+	/**
+	 * @deprecated As of Judson (7.1.x), }
+	 */
+	@Deprecated
+	@Reference
+	protected UserLocalService userLocalService;
 
-		Map<String, Object> parameterMap = new HashMap<>();
+	private List<AssetDisplayContributorField>
+		_getAssetDisplayContributorFields(String className) {
 
-		parameterMap.put("categoryIds", assetEntry.getCategoryIds());
-		parameterMap.put("description", assetEntry.getDescription(locale));
-		parameterMap.put("publishDate", assetEntry.getPublishDate());
-		parameterMap.put("summary", assetEntry.getSummary(locale));
-		parameterMap.put("tagNames", assetEntry.getTagNames());
-		parameterMap.put("title", assetEntry.getTitle(locale));
-
-		return parameterMap;
+		return AssetDisplayContributorFieldHelperUtil.
+			getAssetDisplayContributorFields(className);
 	}
 
-	private static final Map<String, String> _assetEntryModelFieldsMap =
-		new HashMap<String, String>() {
-			{
-				put("categoryIds", "categories");
-				put("description", "description");
-				put("publishDate", "publish-date");
-				put("summary", "summary");
-				put("tagNames", "tags");
-				put("title", "title");
-			}
-		};
+	private Set<AssetDisplayField> _getAssetDisplayFields(
+		String className, Locale locale) {
+
+		Set<AssetDisplayField> assetDisplayFields = new LinkedHashSet<>();
+
+		for (AssetDisplayContributorField assetDisplayContributorField :
+				_getAssetDisplayContributorFields(className)) {
+
+			assetDisplayFields.add(
+				new AssetDisplayField(
+					assetDisplayContributorField.getKey(),
+					assetDisplayContributorField.getLabel(locale),
+					assetDisplayContributorField.getType()));
+		}
+
+		return assetDisplayFields;
+	}
+
+	private Map<String, Object> _getAssetEntryAssetDisplayFieldsValues(
+		AssetEntry assetEntry, Locale locale) {
+
+		Map<String, Object> assetDisplayFieldsValues = new HashMap<>();
+
+		for (AssetDisplayContributorField assetDisplayContributorField :
+				_getAssetDisplayContributorFields(AssetEntry.class.getName())) {
+
+			assetDisplayFieldsValues.put(
+				assetDisplayContributorField.getKey(),
+				assetDisplayContributorField.getValue(assetEntry, locale));
+		}
+
+		return assetDisplayFieldsValues;
+	}
 
 }

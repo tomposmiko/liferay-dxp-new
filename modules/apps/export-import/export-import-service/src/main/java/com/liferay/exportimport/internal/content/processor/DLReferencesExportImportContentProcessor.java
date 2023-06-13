@@ -55,6 +55,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -156,22 +158,21 @@ public class DLReferencesExportImportContentProcessor
 			if ("portlet_file_entry".equals(pathArray[2])) {
 				map.put("groupId", new String[] {pathArray[3]});
 				map.put("title", new String[] {_http.decodeURL(pathArray[4])});
-				map.put("uuid", new String[] {pathArray[5]});
 			}
 			else {
 				map.put("groupId", new String[] {pathArray[2]});
 
-				if (pathArray.length == 4) {
-					map.put("uuid", new String[] {pathArray[3]});
-				}
-				else if (pathArray.length == 5) {
+				if (pathArray.length == 5) {
 					map.put("folderId", new String[] {pathArray[3]});
 					map.put(
 						"title", new String[] {_http.decodeURL(pathArray[4])});
 				}
-				else if (pathArray.length > 5) {
-					map.put("uuid", new String[] {pathArray[5]});
-				}
+			}
+
+			String uuid = _getUuid(dlReference);
+
+			if (Validator.isNotNull(uuid)) {
+				map.put("uuid", new String[] {uuid});
 			}
 		}
 		else {
@@ -632,6 +633,16 @@ public class DLReferencesExportImportContentProcessor
 		}
 	}
 
+	private String _getUuid(String s) {
+		Matcher matcher = _uuidPattern.matcher(s);
+
+		if (matcher.find()) {
+			return matcher.group(0);
+		}
+
+		return StringPool.BLANK;
+	}
+
 	private static final String[] _DL_REFERENCE_LEGACY_STOP_STRINGS = {
 		StringPool.APOSTROPHE, StringPool.APOSTROPHE_ENCODED,
 		StringPool.CLOSE_BRACKET, StringPool.CLOSE_CURLY_BRACE,
@@ -654,6 +665,10 @@ public class DLReferencesExportImportContentProcessor
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		DLReferencesExportImportContentProcessor.class);
+
+	private static final Pattern _uuidPattern = Pattern.compile(
+		"[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-" +
+			"[a-fA-F0-9]{12}");
 
 	@Reference
 	private CompanyLocalService _companyLocalService;

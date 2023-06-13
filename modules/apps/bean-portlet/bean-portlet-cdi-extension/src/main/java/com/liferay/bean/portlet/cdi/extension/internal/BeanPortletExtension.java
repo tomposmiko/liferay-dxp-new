@@ -32,6 +32,8 @@ import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.portlet.async.PortletAsyncListenerFactory;
+import com.liferay.portal.kernel.portlet.async.PortletAsyncScopeManagerFactory;
 import com.liferay.portal.kernel.servlet.PortletServlet;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
@@ -69,13 +71,16 @@ import javax.enterprise.context.SessionScoped;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
 import javax.enterprise.inject.spi.AnnotatedType;
+import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
 
 import javax.portlet.Portlet;
+import javax.portlet.PortletAsyncListener;
 import javax.portlet.PortletConfig;
+import javax.portlet.PortletException;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletSession;
 import javax.portlet.annotations.ContextPath;
@@ -274,8 +279,8 @@ public class BeanPortletExtension implements Extension {
 
 	@SuppressWarnings({"serial", "unchecked"})
 	public void step4ApplicationScopedInitialized(
-		@Initialized(ApplicationScoped.class)
-			@Observes ServletContext servletContext,
+		@Initialized(ApplicationScoped.class) @Observes ServletContext
+			servletContext,
 		BeanManager beanManager) {
 
 		BundleContext bundleContext =
@@ -405,7 +410,10 @@ public class BeanPortletExtension implements Extension {
 
 		_serviceRegistrations.add(
 			bundleContext.registerService(
-				Servlet.class, new PortletServlet() {}, properties));
+				Servlet.class,
+				new PortletServlet() {
+				},
+				properties));
 
 		Set<String> portletNames = descriptorDisplayCategories.keySet();
 
@@ -420,10 +428,57 @@ public class BeanPortletExtension implements Extension {
 		if (_log.isInfoEnabled()) {
 			_log.info(
 				StringBundler.concat(
-					"Discovered ", _beanPortlets.size(), " bean portlets and ",
+					"Registered ", _beanPortlets.size(), " bean portlets and ",
 					_beanFilters.size(), " bean filters for ",
 					servletContext.getServletContextName()));
 		}
+
+		properties = new HashMapDictionary<>();
+
+		properties.put(
+			"servlet.context.name", servletContext.getServletContextName());
+
+		_serviceRegistrations.add(
+			bundleContext.registerService(
+				PortletAsyncScopeManagerFactory.class,
+				PortletAsyncScopeManagerImpl::new, properties));
+
+		_serviceRegistrations.add(
+			bundleContext.registerService(
+				PortletAsyncListenerFactory.class,
+				new PortletAsyncListenerFactory() {
+
+					@Override
+					public <T extends PortletAsyncListener> T
+							getPortletAsyncListener(Class<T> clazz)
+						throws PortletException {
+
+						Set<Bean<?>> beans = beanManager.getBeans(clazz);
+
+						Bean<?> bean = beanManager.resolve(beans);
+
+						if (bean == null) {
+							throw new PortletException(
+								"Unable to create an instance of " +
+									clazz.getName());
+						}
+
+						try {
+							return clazz.cast(
+								beanManager.getReference(
+									bean, bean.getBeanClass(),
+									beanManager.createCreationalContext(bean)));
+						}
+						catch (Exception e) {
+							throw new PortletException(
+								"Unable to create an instance of " +
+									clazz.getName(),
+								e);
+						}
+					}
+
+				},
+				properties));
 	}
 
 	public void step5SessionScopeBeforeDestroyed(
@@ -447,7 +502,7 @@ public class BeanPortletExtension implements Extension {
 	}
 
 	public void step6ApplicationScopedBeforeDestroyed(
-		@Destroyed(ApplicationScoped.class) @Observes Object ignore) {
+		@Destroyed(ApplicationScoped.class) @Observes Object contextObject) {
 
 		for (ServiceRegistration<?> serviceRegistration :
 				_serviceRegistrations) {
@@ -456,6 +511,17 @@ public class BeanPortletExtension implements Extension {
 		}
 
 		_serviceRegistrations.clear();
+
+		ServletContext servletContext = (ServletContext)contextObject;
+
+		if (_log.isInfoEnabled()) {
+			_log.info(
+				StringBundler.concat(
+					"Unregistered ", _beanPortlets.size(),
+					" bean portlets and ", _beanFilters.size(),
+					" bean filters for ",
+					servletContext.getServletContextName()));
+		}
 	}
 
 	private void _addBeanFiltersFromAnnotatedClasses() {
@@ -605,9 +671,8 @@ public class BeanPortletExtension implements Extension {
 		Map<String, PublicRenderParameter> publicRenderParameters =
 			new HashMap<>();
 
-		for (PublicRenderParameterDefinition
-				publicRenderParameterDefinition:
-					portletApplication.publicParams()) {
+		for (PublicRenderParameterDefinition publicRenderParameterDefinition :
+				portletApplication.publicParams()) {
 
 			PortletQName portletQName = publicRenderParameterDefinition.qname();
 
@@ -867,8 +932,8 @@ public class BeanPortletExtension implements Extension {
 
 		Set<BeanMethod> beanMethods = new HashSet<>();
 
-		for (Map.Entry<MethodType, List<BeanMethod>>
-				entry: beanMethodMap.entrySet()) {
+		for (Map.Entry<MethodType, List<BeanMethod>> entry :
+				beanMethodMap.entrySet()) {
 
 			beanMethods.addAll(entry.getValue());
 		}
@@ -876,8 +941,8 @@ public class BeanPortletExtension implements Extension {
 		Map<MethodType, List<BeanMethod>> descriptorBeanMethodMap =
 			descriptorBeanPortlet.getBeanMethods();
 
-		for (Map.Entry<MethodType, List<BeanMethod>>
-				entry: descriptorBeanMethodMap.entrySet()) {
+		for (Map.Entry<MethodType, List<BeanMethod>> entry :
+				descriptorBeanMethodMap.entrySet()) {
 
 			beanMethods.addAll(entry.getValue());
 		}

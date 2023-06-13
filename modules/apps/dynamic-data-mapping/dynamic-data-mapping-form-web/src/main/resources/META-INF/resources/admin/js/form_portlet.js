@@ -144,7 +144,8 @@ AUI.add(
 							formBuilder._layoutBuilder.after('layout-builder:moveStart', A.bind(instance._afterFormBuilderLayoutBuilderMoveStart, instance)),
 							instance.one('.back-url-link').on('click', A.bind('_onBack', instance)),
 							instance.one('#save').on('click', A.bind('_onSaveButtonClick', instance)),
-							Liferay.on('destroyPortlet', A.bind('_onDestroyPortlet', instance))
+							Liferay.on('destroyPortlet', A.bind('_onDestroyPortlet', instance)),
+							instance.get('ruleBuilder').on('*:saveRule', A.bind('_autosave', instance, true))
 						);
 
 						if (instance._isFormView()) {
@@ -588,7 +589,9 @@ AUI.add(
 													}
 												);
 
-												callback.call();
+												if (callback) {
+													callback.call();
+												}
 											}
 										},
 										data: formData,
@@ -607,7 +610,9 @@ AUI.add(
 								);
 							}
 							else {
-								callback.call();
+								if (callback) {
+									callback.call();
+								}
 							}
 						}
 					},

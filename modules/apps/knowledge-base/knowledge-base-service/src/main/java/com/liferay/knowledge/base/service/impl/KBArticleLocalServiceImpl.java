@@ -2046,7 +2046,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 		int urlTitleMaxSize = ModelHintsUtil.getMaxLength(
 			KBArticle.class.getName(), "urlTitle");
 
-		if (urlTitle.length() > urlTitleMaxSize) {
+		if (urlTitle.length() > (urlTitleMaxSize + 1)) {
 			throw new KBArticleUrlTitleException.MustNotExceedMaximumSize(
 				urlTitle, urlTitleMaxSize);
 		}
@@ -2083,8 +2083,9 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 	@ServiceReference(type = SubscriptionLocalService.class)
 	protected SubscriptionLocalService subscriptionLocalService;
 
-	private static final int[] _STATUSES =
-		{WorkflowConstants.STATUS_APPROVED, WorkflowConstants.STATUS_PENDING};
+	private static final int[] _STATUSES = {
+		WorkflowConstants.STATUS_APPROVED, WorkflowConstants.STATUS_PENDING
+	};
 
 	private static final long _TICKET_EXPIRATION = Time.HOUR;
 

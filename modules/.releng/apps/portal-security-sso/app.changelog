@@ -49,3 +49,29 @@ app.artifacts-1.0.1=\
 app.change.log-1.0.1=LPS-68220 LPS-74544 LPS-77699 LPS-79679 LPS-84039 LPS-84093 LPS-84119 LPS-85296 LPS-85990 LPS-86055 LPS-86069 LPS-86355 LPS-86408 LPS-86556 LRQA-44033 
 
 app.git.id-1.0.1=0a24469fc0bf3a994e7812d6414c60c7066cd3e2
+
+#
+# Liferay App Version 1.0.2
+#
+
+app.artifacts-1.0.2=\
+	com.liferay.portal.security.sso.cas.api-2.0.2.jar,\
+	com.liferay.portal.security.sso.cas.impl-1.0.7.jar,\
+	com.liferay.portal.security.sso.facebook.connect.api-2.0.1.jar,\
+	com.liferay.portal.security.sso.facebook.connect.impl-1.0.3.jar,\
+	com.liferay.portal.security.sso.google.api-2.0.2.jar,\
+	com.liferay.portal.security.sso.google.impl-1.0.5.jar,\
+	com.liferay.portal.security.sso.ntlm.api-2.0.2.jar,\
+	com.liferay.portal.security.sso.ntlm.impl-1.0.6.jar,\
+	com.liferay.portal.security.sso.openid.api-2.0.1.jar,\
+	com.liferay.portal.security.sso.openid.connect.api-2.1.0.jar,\
+	com.liferay.portal.security.sso.openid.connect.impl-1.0.14.jar,\
+	com.liferay.portal.security.sso.openid.impl-1.0.6.jar,\
+	com.liferay.portal.security.sso.opensso.api-2.1.1.jar,\
+	com.liferay.portal.security.sso.opensso.impl-1.0.8.jar,\
+	com.liferay.portal.security.sso.token.api-2.0.0.jar,\
+	com.liferay.portal.security.sso.token.impl-2.0.8.jar
+
+app.change.log-1.0.2=LPS-68220 LPS-77699 LPS-79679 LPS-80332 LPS-81901 LPS-84119 LPS-85296 LPS-86055 LPS-86069 LPS-86355 LPS-86408 LPS-86556 LRQA-44033 
+
+app.git.id-1.0.2=1ad0206eec8462b94638d545f9f0df37163ccdfd

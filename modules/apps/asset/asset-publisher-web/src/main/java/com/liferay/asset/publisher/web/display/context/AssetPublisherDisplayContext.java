@@ -109,8 +109,9 @@ public class AssetPublisherDisplayContext {
 
 	public static final String PAGINATION_TYPE_SIMPLE = "simple";
 
-	public static final String[] PAGINATION_TYPES =
-		{PAGINATION_TYPE_NONE, PAGINATION_TYPE_REGULAR, PAGINATION_TYPE_SIMPLE};
+	public static final String[] PAGINATION_TYPES = {
+		PAGINATION_TYPE_NONE, PAGINATION_TYPE_REGULAR, PAGINATION_TYPE_SIMPLE
+	};
 
 	public AssetPublisherDisplayContext(
 			AssetPublisherCustomizer assetPublisherCustomizer,

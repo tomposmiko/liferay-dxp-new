@@ -380,13 +380,20 @@ public class MBMessageIndexer
 	protected void doReindex(String className, long classPK) throws Exception {
 		MBMessage message = mbMessageLocalService.getMessage(classPK);
 
-		doReindex(message);
-
 		if (message.isRoot()) {
-			List<MBMessage> messages = mbMessageLocalService.getThreadMessages(
-				message.getThreadId(), WorkflowConstants.STATUS_APPROVED);
+			for (MBMessage curMessage :
+					mbMessageLocalService.getThreadMessages(
+						message.getThreadId(),
+						WorkflowConstants.STATUS_APPROVED)) {
 
-			for (MBMessage curMessage : messages) {
+				reindex(curMessage);
+			}
+
+			for (MBMessage curMessage :
+					mbMessageLocalService.getThreadMessages(
+						message.getThreadId(),
+						WorkflowConstants.STATUS_IN_TRASH)) {
+
 				reindex(curMessage);
 			}
 		}

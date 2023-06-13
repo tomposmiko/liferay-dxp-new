@@ -420,8 +420,9 @@ public class KBAdminManagementToolbarDisplayContext {
 				orderColumnsMap.put("title", "title");
 				orderColumnsMap.put("viewCount", "view-count");
 
-				String[] orderColumns =
-					{"priority", "modifiedDate", "title", "viewCount"};
+				String[] orderColumns = {
+					"priority", "modifiedDate", "title", "viewCount"
+				};
 
 				for (String orderByCol : orderColumns) {
 					add(

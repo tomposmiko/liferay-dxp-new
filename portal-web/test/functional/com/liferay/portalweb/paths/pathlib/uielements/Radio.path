@@ -45,7 +45,7 @@
 </tr>
 <tr>
 	<td>MAJOR_VERSION</td>
-	<td>//input[contains(@id,'MajorVersion_1')]</td>
+	<td>//label[contains(.,'Major Version')]/input</td>
 	<td></td>
 </tr>
 <tr>
@@ -66,6 +66,21 @@
 <tr>
 	<td>SOCIAL_BOOKMARKS_DISPLAY_STYLE</td>
 	<td>//label[contains(.,'${key_displayStyle}')]/input[@type='radio']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>WORKFLOW_DEFAULT_WORKFLOW</td>
+	<td>//input[contains(@id,'restrictionTypeWorkflow')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>WORKFLOW_PARENT_FOLDER</td>
+	<td>//input[contains(@id,'restrictionTypeInherit')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>WORKFLOW_SPECIFIC_RESTRICTIONS</td>
+	<td>//input[contains(@id,'restrictionTypeDefined')]</td>
 	<td></td>
 </tr>
 </tbody>

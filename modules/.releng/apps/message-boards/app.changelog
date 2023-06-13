@@ -33,3 +33,21 @@ app.artifacts-1.0.1=\
 app.change.log-1.0.1=LPS-69953 LPS-74544 LPS-77699 LPS-78173 LPS-78938 LPS-79312 LPS-79819 LPS-80048 LPS-81668 LPS-81743 LPS-82079 LPS-82089 LPS-82303 LPS-82318 LPS-82422 LPS-82675 LPS-82827 LPS-83297 LPS-83697 LPS-83705 LPS-83745 LPS-83816 LPS-83976 LPS-84009 LPS-84092 LPS-84112 LPS-84119 LPS-84377 LPS-84399 LPS-84521 LPS-84602 LPS-85296 LPS-85564 LPS-85849 LPS-86408 LPS-86413 
 
 app.git.id-1.0.1=8411d50856230ab886d420caf348cd78a90e8a65
+
+#
+# Liferay App Version 1.0.2
+#
+
+app.artifacts-1.0.2=\
+	com.liferay.message.boards.api-4.2.3.jar,\
+	com.liferay.message.boards.comment-3.0.7.jar,\
+	com.liferay.message.boards.editor.configuration-2.0.0.jar,\
+	com.liferay.message.boards.layout.set.prototype-2.0.2.jar,\
+	com.liferay.message.boards.parser.bbcode-3.0.4.jar,\
+	com.liferay.message.boards.service-2.0.27.jar,\
+	com.liferay.message.boards.uad-3.0.1.jar,\
+	com.liferay.message.boards.web-2.0.33.jar
+
+app.change.log-1.0.2=LPS-79653 LPS-80332 LPS-84119 LPS-84399 LPS-84602 LPS-85564 LPS-85849 LPS-86413 
+
+app.git.id-1.0.2=1ad0206eec8462b94638d545f9f0df37163ccdfd

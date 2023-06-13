@@ -32,8 +32,8 @@ public class PortletSessionBeanContext extends BaseContextImpl {
 	public <T> T get(
 		Contextual<T> contextual, CreationalContext<T> creationalContext) {
 
-		ScopedBeanHolder scopedBeanHolder =
-			ScopedBeanHolder.getCurrentInstance();
+		ScopedBeanManager scopedBeanManager =
+			ScopedBeanManagerThreadLocal.getCurrentScopedBeanManager();
 
 		Bean<T> bean = (Bean<T>)contextual;
 
@@ -48,7 +48,7 @@ public class PortletSessionBeanContext extends BaseContextImpl {
 			scope = portletSessionScoped.value();
 		}
 
-		return scopedBeanHolder.getPortletSessionScopedBean(
+		return scopedBeanManager.getPortletSessionScopedBean(
 			scope, bean, creationalContext);
 	}
 

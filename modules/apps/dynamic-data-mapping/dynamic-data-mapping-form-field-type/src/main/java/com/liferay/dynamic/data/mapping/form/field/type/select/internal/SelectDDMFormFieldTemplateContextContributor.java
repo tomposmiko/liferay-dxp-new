@@ -144,8 +144,9 @@ public class SelectDDMFormFieldTemplateContextContributor
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
 
 		DDMFormFieldEvaluationResult ddmFormFieldEvaluationResult =
-			(DDMFormFieldEvaluationResult)ddmFormFieldRenderingContext.
-				getProperty("ddmFormFieldEvaluationResult");
+			(DDMFormFieldEvaluationResult)
+				ddmFormFieldRenderingContext.getProperty(
+					"ddmFormFieldEvaluationResult");
 
 		if (ddmFormFieldEvaluationResult != null) {
 			Boolean multiple = ddmFormFieldEvaluationResult.getProperty(

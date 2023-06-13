@@ -78,26 +78,6 @@ dependencies {
 	compileOnly group: "org.osgi", name: "osgi.core", version: "6.0.0"
 
 	compileOnly group: "biz.aQute.bnd", name: "biz.aQute.bndlib", version: "3.1.0"
-	compileOnly group: "com.liferay", name: "com.liferay.jaxws.osgi.bridge", version: "2.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.osgi.felix.util", version: "2.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.osgi.service.tracker.collections", version: "3.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.petra.concurrent", version: "2.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.petra.content", version: "2.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.petra.encryptor", version: "2.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.petra.executor", version: "2.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.petra.function", version: "2.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.petra.io", version: "2.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.petra.lang", version: "2.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.petra.log4j", version: "2.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.petra.mail", version: "2.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.petra.memory", version: "2.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.petra.nio", version: "2.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.petra.process", version: "2.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.petra.reflect", version: "2.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.petra.string", version: "2.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.petra.xml", version: "2.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.registry.api", version: "2.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.registry.impl", version: "2.0.0"
 	compileOnly group: "com.liferay", name: "org.eclipse.osgi", version: "3.13.0.LIFERAY-PATCHED-4"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.impl", version: "default"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "default"
@@ -105,7 +85,27 @@ dependencies {
 	compileOnly group: "org.springframework", name: "spring-beans", version: "4.1.9.RELEASE"
 	compileOnly group: "org.springframework", name: "spring-context", version: "4.1.9.RELEASE"
 	compileOnly group: "org.springframework", name: "spring-core", version: "4.1.9.RELEASE"
+	compileOnly project(":apps:petra:petra-content")
+	compileOnly project(":apps:petra:petra-encryptor")
+	compileOnly project(":apps:petra:petra-log4j")
+	compileOnly project(":apps:petra:petra-mail")
+	compileOnly project(":apps:petra:petra-xml")
+	compileOnly project(":core:jaxws-osgi-bridge")
+	compileOnly project(":core:osgi-felix-util")
+	compileOnly project(":core:osgi-service-tracker-collections")
+	compileOnly project(":core:petra:petra-concurrent")
+	compileOnly project(":core:petra:petra-executor")
+	compileOnly project(":core:petra:petra-function")
+	compileOnly project(":core:petra:petra-io")
+	compileOnly project(":core:petra:petra-lang")
+	compileOnly project(":core:petra:petra-memory")
+	compileOnly project(":core:petra:petra-nio")
+	compileOnly project(":core:petra:petra-process")
+	compileOnly project(":core:petra:petra-reflect")
+	compileOnly project(":core:petra:petra-string")
 	compileOnly project(":core:portal-app-license-api")
+	compileOnly project(":core:registry-api")
+	compileOnly project(":core:registry-impl")
 }
 
 liferay {

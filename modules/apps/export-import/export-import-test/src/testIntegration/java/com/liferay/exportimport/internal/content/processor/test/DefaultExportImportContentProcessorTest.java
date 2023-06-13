@@ -107,7 +107,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -743,7 +742,39 @@ public class DefaultExportImportContentProcessorTest {
 		Assert.assertEquals(expectedContent, importedContent);
 	}
 
-	@Ignore
+	@Test
+	public void testImportLinksToLayoutsInLayoutSetPrototype()
+		throws Exception {
+
+		LayoutTestUtil.addLayout(_liveGroup, true);
+
+		exportImportLayouts(true);
+
+		Layout importedPrivateLayout =
+			LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
+				_stagingPrivateLayout.getUuid(), _liveGroup.getGroupId(), true);
+
+		Map<Long, Layout> layouts =
+			(Map<Long, Layout>)_portletDataContextImport.getNewPrimaryKeysMap(
+				Layout.class + ".layout");
+
+		layouts.put(3L, importedPrivateLayout);
+
+		String contentInFile = getContent(
+			"layout_links_in_layoutset_prototype.txt");
+
+		String content = replaceLinksToLayoutsParametersInLayoutSetPrototype(
+			contentInFile);
+
+		String importedContent =
+			_exportImportContentProcessor.replaceImportContentReferences(
+				_portletDataContextImport, _referrerStagedModel, content);
+
+		Assert.assertTrue(
+			"Template ID should have been replaced in the imported content",
+			!importedContent.contains("template"));
+	}
+
 	@Test
 	public void testInvalidLayoutReferencesCauseNoSuchLayoutException()
 		throws Exception {
@@ -781,7 +812,11 @@ public class DefaultExportImportContentProcessorTest {
 			catch (ExportImportContentValidationException eicve) {
 				Throwable cause = eicve.getCause();
 
-				if (cause instanceof NoSuchLayoutException) {
+				if ((cause instanceof NoSuchLayoutException) ||
+					(eicve.getType() ==
+						ExportImportContentValidationException.
+							LAYOUT_GROUP_NOT_FOUND)) {
+
 					noSuchLayoutExceptionThrown = true;
 				}
 			}
@@ -1032,6 +1067,25 @@ public class DefaultExportImportContentProcessorTest {
 			});
 	}
 
+	protected String replaceLinksToLayoutsParametersInLayoutSetPrototype(
+		String content) {
+
+		String portalURL = TestPropsValues.PORTAL_URL;
+
+		String portalURLPlaceholderToReplace = "[$PORTAL_URL$]";
+
+		String templateIdPlaceholderToReplace = "[$ID$]";
+
+		return StringUtil.replace(
+			content,
+			new String[] {
+				portalURLPlaceholderToReplace, templateIdPlaceholderToReplace
+			},
+			new String[] {
+				portalURL, String.valueOf(_stagingGroup.getGroupId())
+			});
+	}
+
 	protected String replaceMultiLocaleLayoutFriendlyURLs(String content) {
 		return duplicateLinesWithParamNames(
 			content, _MULTI_LOCALE_LAYOUT_VARIABLES,
@@ -1234,8 +1288,9 @@ public class DefaultExportImportContentProcessorTest {
 		"[$NON_DEFAULT_PUBLIC_LAYOUT_FRIENDLY_URL$]"
 	};
 
-	private static final Locale[] _locales =
-		{LocaleUtil.US, LocaleUtil.GERMANY, LocaleUtil.SPAIN};
+	private static final Locale[] _locales = {
+		LocaleUtil.US, LocaleUtil.GERMANY, LocaleUtil.SPAIN
+	};
 	private static String _oldLayoutFriendlyURLPrivateUserServletMapping;
 	private static final Pattern _pattern = Pattern.compile("href=|\\{|\\[");
 	private static ServiceTracker

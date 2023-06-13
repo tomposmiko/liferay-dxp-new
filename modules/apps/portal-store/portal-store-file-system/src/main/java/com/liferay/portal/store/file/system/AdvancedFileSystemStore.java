@@ -38,6 +38,7 @@ import java.util.Map;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
+import org.osgi.service.component.annotations.Modified;
 
 /**
  * <p>
@@ -52,7 +53,10 @@ import org.osgi.service.component.annotations.ConfigurationPolicy;
 @Component(
 	configurationPid = "com.liferay.portal.store.file.system.configuration.AdvancedFileSystemStoreConfiguration",
 	configurationPolicy = ConfigurationPolicy.REQUIRE, immediate = true,
-	property = "store.type=com.liferay.portal.store.file.system.AdvancedFileSystemStore",
+	property = {
+		"service.ranking:Integer=0",
+		"store.type=com.liferay.portal.store.file.system.AdvancedFileSystemStore"
+	},
 	service = Store.class
 )
 public class AdvancedFileSystemStore extends FileSystemStore {
@@ -97,6 +101,7 @@ public class AdvancedFileSystemStore extends FileSystemStore {
 	}
 
 	@Activate
+	@Modified
 	@Override
 	protected void activate(Map<String, Object> properties) {
 		_advancedFileSystemStoreConfiguration =

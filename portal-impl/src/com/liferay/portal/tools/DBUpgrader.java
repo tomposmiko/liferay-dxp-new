@@ -116,6 +116,8 @@ public class DBUpgrader {
 
 			_registerModuleServiceLifecycle("portal.initialized");
 
+			_registerModuleServiceLifecycle("portlets.initialized");
+
 			System.out.println(
 				"\nCompleted Liferay core upgrade and verify processes in " +
 					(stopWatch.getTime() / Time.SECOND) + " seconds");
@@ -442,7 +444,9 @@ public class DBUpgrader {
 		properties.put("service.version", ReleaseInfo.getVersion());
 
 		registry.registerService(
-			ModuleServiceLifecycle.class, new ModuleServiceLifecycle() {},
+			ModuleServiceLifecycle.class,
+			new ModuleServiceLifecycle() {
+			},
 			properties);
 	}
 

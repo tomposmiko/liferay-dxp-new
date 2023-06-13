@@ -21,3 +21,15 @@ app.artifacts-1.0.1=\
 app.change.log-1.0.1=LPS-83161 LPS-84093 LPS-85296 LPS-85722 LPS-86408
 
 app.git.id-1.0.1=f27058565368cda250b2071e10ab61e5f48fb5c1
+
+#
+# Liferay App Version 1.0.2
+#
+
+app.artifacts-1.0.2=\
+	com.liferay.portal.portlet.bridge.soy.api-1.0.2.jar,\
+	com.liferay.portal.portlet.bridge.soy.impl-1.0.8.jar
+
+app.change.log-1.0.2=LPS-86408
+
+app.git.id-1.0.2=1ad0206eec8462b94638d545f9f0df37163ccdfd

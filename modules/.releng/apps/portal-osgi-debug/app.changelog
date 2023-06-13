@@ -25,3 +25,17 @@ app.artifacts-1.0.1=\
 app.change.log-1.0.1=LPS-70394 LPS-78938 LPS-83673 LPS-84093 LPS-84119 LPS-85003 LPS-85206 LPS-85296 LPS-86408 
 
 app.git.id-1.0.1=e3ebda0e8758e077e3ad14891c27eaed515cfc25
+
+#
+# Liferay App Version 1.0.2
+#
+
+app.artifacts-1.0.2=\
+	com.liferay.portal.osgi.debug.api-1.0.1.jar,\
+	com.liferay.portal.osgi.debug.declarative.service-2.0.7.jar,\
+	com.liferay.portal.osgi.debug.impl-1.0.5.jar,\
+	com.liferay.portal.osgi.debug.spring.extender-2.0.7.jar
+
+app.change.log-1.0.2=LPS-70394 LPS-80332 LPS-84119 LPS-86408 
+
+app.git.id-1.0.2=1ad0206eec8462b94638d545f9f0df37163ccdfd

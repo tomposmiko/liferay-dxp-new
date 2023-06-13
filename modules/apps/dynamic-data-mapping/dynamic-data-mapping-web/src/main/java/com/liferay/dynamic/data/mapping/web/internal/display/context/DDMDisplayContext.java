@@ -136,8 +136,8 @@ public class DDMDisplayContext {
 
 		if (DDMTemplatePermission.containsAddTemplatePermission(
 				_ddmWebRequestHelper.getPermissionChecker(),
-				_ddmWebRequestHelper.getScopeGroupId(),
-				getClassNameId(), scopeClassNameId) &&
+				_ddmWebRequestHelper.getScopeGroupId(), getClassNameId(),
+				scopeClassNameId) &&
 			(Validator.isNull(expectedTemplateTypeValue) ||
 			 expectedTemplateTypeValue.equals(actualTemplateTypeValue))) {
 
@@ -1084,16 +1084,13 @@ public class DDMDisplayContext {
 		long[] groupIds = ddmDisplay.getTemplateGroupIds(
 			themeDisplay, showAncestorScopes());
 
-		long[] classPKs = ddmDisplay.getTemplateClassPKs(
-			_ddmWebRequestHelper.getCompanyId(), getStructureClassNameId(),
-			getClassPK());
-
 		List<DDMTemplate> results = _ddmTemplateService.search(
 			_ddmWebRequestHelper.getCompanyId(), groupIds,
-			getTemplateClassNameIds(), classPKs, getResourceClassNameId(),
-			searchTerms.getKeywords(), searchTerms.getType(), getTemplateMode(),
-			searchTerms.getStatus(), templateSearch.getStart(),
-			templateSearch.getEnd(), templateSearch.getOrderByComparator());
+			getTemplateClassNameIds(), _getDDMTemplateClassPKs(),
+			getResourceClassNameId(), searchTerms.getKeywords(),
+			searchTerms.getType(), getTemplateMode(), searchTerms.getStatus(),
+			templateSearch.getStart(), templateSearch.getEnd(),
+			templateSearch.getOrderByComparator());
 
 		templateSearch.setResults(results);
 	}
@@ -1112,21 +1109,25 @@ public class DDMDisplayContext {
 		long[] groupIds = ddmDisplay.getTemplateGroupIds(
 			themeDisplay, showAncestorScopes());
 
-		long[] classPKs = ddmDisplay.getTemplateClassPKs(
-			_ddmWebRequestHelper.getCompanyId(), getStructureClassNameId(),
-			getClassPK());
-
 		int total = _ddmTemplateService.searchCount(
 			_ddmWebRequestHelper.getCompanyId(), groupIds,
-			getTemplateClassNameIds(), classPKs, getResourceClassNameId(),
-			searchTerms.getKeywords(), searchTerms.getType(), getTemplateMode(),
-			searchTerms.getStatus());
+			getTemplateClassNameIds(), _getDDMTemplateClassPKs(),
+			getResourceClassNameId(), searchTerms.getKeywords(),
+			searchTerms.getType(), getTemplateMode(), searchTerms.getStatus());
 
 		templateSearch.setTotal(total);
 	}
 
 	protected boolean showAncestorScopes() {
 		return ParamUtil.getBoolean(_renderRequest, "showAncestorScopes");
+	}
+
+	private long[] _getDDMTemplateClassPKs() {
+		if (getClassPK() > 0) {
+			return new long[] {getClassPK()};
+		}
+
+		return null;
 	}
 
 	private final DDMDisplayRegistry _ddmDisplayRegistry;

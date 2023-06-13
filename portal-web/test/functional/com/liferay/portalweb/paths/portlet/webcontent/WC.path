@@ -38,17 +38,6 @@
 	<td></td>
 	<td></td>
 </tr>
-<!--SEARCH-->
-<tr>
-	<td>SEARCH_TITLE</td>
-	<td>//li[contains(@data-title,'${key_webContentTitle}')]//*[@data-qa-id='rowItemContent']//a</td>
-	<td></td>
-</tr>
-<tr>
-	<td></td>
-	<td></td>
-	<td></td>
-</tr>
 <!--ENTRY_CARDS-->
 <tr>
 	<td>ENTRY_CARDS_THUMBNAIL</td>
@@ -107,6 +96,11 @@
 	<td></td>
 </tr>
 <!--ENTRY_TABLE-->
+<tr>
+	<td>ENTRY_TABLE_ID</td>
+	<td>//tr[contains(@data-title,'${key_webContentTitle}')]/td[2]</td>
+	<td></td>
+</tr>
 <tr>
 	<td>ENTRY_TABLE_TITLE</td>
 	<td>//tr[contains(.,'${key_webContentTitle}')]//a</td>

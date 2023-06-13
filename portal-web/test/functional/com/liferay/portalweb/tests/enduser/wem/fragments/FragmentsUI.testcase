@@ -1,0 +1,169 @@
+@component-name = "portal-wcm"
+definition {
+	property portal.release = "true";
+	property portal.upstream = "true";
+	property testray.main.component.name = "Fragments";
+
+	setUp {
+		TestCase.setUpPortalInstance();
+
+		User.firstLoginPG();
+
+		JSONGroup.addGroup(groupName = "Test Site Name");
+
+		FragmentsAdmin.openFragmentsAdmin(siteURLKey = "test-site-name");
+
+		FragmentsAdmin.addCollection(collectionName = "Collection Name");
+
+		Navigator.gotoNavNested(navNested = "Collection Name");
+
+		FragmentsAdmin.addFragment(fragmentName = "Fragment Name");
+
+		var htmlSnippet = TestCase.getFileContent(fileName = "fragment_button.html");
+
+		Type.typeAceEditorNoError(
+			locator1 = "FragmentEditor#HTML_EDITOR",
+			value1 = "${htmlSnippet}"
+		);
+
+		var cssSnippet = TestCase.getFileContent(fileName = "fragment_button.css");
+
+		Type.typeAceEditorNoError(
+			locator1 = "FragmentEditor#CSS_EDITOR",
+			value1 = "${cssSnippet}"
+		);
+
+		var javascriptSnippet = TestCase.getFileContent(fileName = "fragment_button.js");
+
+		Type.typeAceEditorNoError(
+			locator1 = "FragmentEditor#JAVASCRIPT_EDITOR",
+			value1 = "${javascriptSnippet}"
+		);
+	}
+
+	tearDown {
+		var testPortalInstance = PropsUtil.get("test.portal.instance");
+
+		if ("${testPortalInstance}" == "true") {
+			PortalInstances.tearDownCP();
+		}
+		else {
+			JSONGroup.deleteGroupByName(groupName = "Test Site Name");
+		}
+	}
+
+	@description = "Add a fragment in the UI and then assert that it displays properly when added to a content page."
+	@priority = "5"
+	test AddFragmentToContentPage {
+		property app.server.types = "jboss,resin,tcserver,tomcat,weblogic,websphere,wildfly";
+		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
+		property environment.acceptance = "true";
+		property portal.acceptance = "true";
+
+		PortletEntry.publish();
+
+		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+
+		ContentPages.addPage(pageName = "Test Content Page Name");
+
+		PageEditor.addFragment(
+			collectionName = "Collection Name",
+			fragmentName = "Fragment Name"
+		);
+
+		Navigator.openWithAppendToBaseURL(
+			urlAppend = "web/test-site-name/test-content-page-name"
+		);
+
+		AssertVisible(
+			locator1 = "Fragment#FRAGMENT",
+			key_content = "Submit",
+			key_fragmentClass = "footer",
+			key_position = "1"
+		);
+
+		AssertVisible(
+			locator1 = "Fragment#FRAGMENT",
+			key_content = "Cancel",
+			key_fragmentClass = "footer",
+			key_position = "1"
+		);
+
+		AssertElementPresent(locator1 = "Button#SUBMIT");
+
+		AssertElementPresent(locator1 = "Button#CANCEL");
+
+		AssertClickNoError(locator1 = "Button#SUBMIT", value1 = "Submit");
+
+		AssertConfirm(value1 = "Form submitted");
+	}
+
+	@description = "Edit a fragment and assert the edits persist."
+	@priority = "5"
+	test EditFragment {
+		property portal.acceptance = "true";
+
+		PortletEntry.publish();
+
+		LexiconEntry.gotoEntryMenuItem(menuItem = "Edit", rowEntry = "Fragment Name");
+
+		var htmlSnippet = TestCase.getFileContent(fileName = "fragment_title.html");
+
+		Type.typeAceEditorNoError(
+			locator1 = "FragmentEditor#HTML_EDITOR",
+			value1 = "${htmlSnippet}"
+		);
+
+		var cssSnippet = TestCase.getFileContent(fileName = "fragment_title.css");
+
+		Type.typeAceEditorNoError(
+			locator1 = "FragmentEditor#CSS_EDITOR",
+			value1 = "${cssSnippet}"
+		);
+
+		Type.typeAceEditorNoError(
+			locator1 = "FragmentEditor#JAVASCRIPT_EDITOR",
+			value1 = ""
+		);
+
+		SelectFrame(locator1 = "FragmentEditor#PREVIEW_IFRAME");
+
+		AssertTextEquals(
+			locator1 = "//div[@class='fragment-header']/h1[@class='title']",
+			value1 = "LOREM IPSUM DOLOR SIT AMET"
+		);
+
+		SelectFrameTop();
+
+		PortletEntry.publish();
+
+		LexiconEntry.gotoEntryMenuItem(menuItem = "Edit", rowEntry = "Fragment Name");
+
+		SelectFrame(locator1 = "FragmentEditor#PREVIEW_IFRAME");
+
+		AssertTextEquals(
+			locator1 = "//div[@class='fragment-header']/h1[@class='title']",
+			value1 = "LOREM IPSUM DOLOR SIT AMET"
+		);
+
+		SelectFrameTop();
+	}
+
+	@description = "Fragment editor should show an accurate preview of the fragment."
+	@priority = "5"
+	test ViewFragmentEditorPreview {
+		property portal.acceptance = "true";
+
+		SelectFrame(locator1 = "FragmentEditor#PREVIEW_IFRAME");
+
+		AssertElementPresent(locator1 = "Button#SUBMIT");
+
+		AssertElementPresent(locator1 = "Button#CANCEL");
+
+		AssertClickNoError(locator1 = "Button#SUBMIT", value1 = "Submit");
+
+		AssertConfirm(value1 = "Form submitted");
+
+		SelectFrameTop();
+	}
+}

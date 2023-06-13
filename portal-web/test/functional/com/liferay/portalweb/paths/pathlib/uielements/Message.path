@@ -179,6 +179,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>INFO_SPECIFIC</td>
+	<td>//div[contains(@class,'alert alert-info') and not(contains(@class,'hide'))][contains(.,'${key_infoMessage}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>INFO_LINK</td>
 	<td>//div[contains(@class,'alert') and contains(@class,'alert-info')]/a</td>
 	<td></td>
@@ -244,11 +249,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>RECYCLE_BIN_INFO</td>
-	<td>//div[contains(@class,'tooltip-content')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>REQUIRED_INFO</td>
 	<td>//div[contains(@class,'required') and contains(@role,'alert')]</td>
 	<td></td>
@@ -276,11 +276,6 @@
 <tr>
 	<td>SUCCESS_2</td>
 	<td>//span[contains(@class,'alert-success') and contains(@class,'message')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>SUCCESS_3</td>
-	<td>//div[contains(@class,'alert') and contains(@class,'alert-success')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -316,6 +311,11 @@
 <tr>
 	<td>USER_BLOCKED</td>
 	<td>//div[contains(@class,'alert-block')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>WARNING_SPECIFIC</td>
+	<td>//div[contains(@class,'alert') and (contains(@class,'alert-warning'))][contains(.,'${key_warningMessage}')]</td>
 	<td></td>
 </tr>
 <tr>

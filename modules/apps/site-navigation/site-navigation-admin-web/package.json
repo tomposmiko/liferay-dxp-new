@@ -17,5 +17,5 @@
 		"csf": "csf src/**/*.es.js src/**/*.scss src/**/*.jsp",
 		"format": "npm run csf -- -i"
 	},
-	"version": "1.0.20"
+	"version": "1.0.22"
 }

@@ -18,10 +18,8 @@ import com.fasterxml.jackson.databind.util.ISO8601Utils;
 
 import com.liferay.apio.architect.language.AcceptLanguage;
 import com.liferay.apio.architect.pagination.PageItems;
-import com.liferay.apio.architect.test.util.pagination.PaginationRequest;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.dynamic.data.mapping.io.DDMFormJSONDeserializer;
-import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMStructureConstants;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
@@ -35,7 +33,7 @@ import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.apio.test.util.PaginationRequest;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.filter.TermFilter;
@@ -50,7 +48,6 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.filter.Filter;
 import com.liferay.portal.odata.filter.FilterParser;
 import com.liferay.portal.odata.sort.Sort;
@@ -60,8 +57,6 @@ import com.liferay.portal.test.rule.PermissionCheckerTestRule;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.ServiceTracker;
-
-import java.io.InputStream;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -108,22 +103,6 @@ public class StructuredContentNestedCollectionResourceFilteringTest
 		_serviceTracker.open();
 
 		_group = GroupTestUtil.addGroup();
-
-		DDMStructureTestHelper ddmStructureTestHelper =
-			new DDMStructureTestHelper(
-				PortalUtil.getClassNameId(JournalArticle.class), _group);
-
-		_ddmStructure = ddmStructureTestHelper.addStructure(
-			PortalUtil.getClassNameId(JournalArticle.class),
-			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
-			deserialize(_read("test-journal-structured-text-field.json")),
-			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
-
-		_ddmTemplate = DDMTemplateTestUtil.addTemplate(
-			_group.getGroupId(), _ddmStructure.getStructureId(),
-			PortalUtil.getClassNameId(JournalArticle.class),
-			TemplateConstants.LANG_TYPE_VM,
-			_read("test-journal-template-text-field.xsl"), LocaleUtil.US);
 	}
 
 	@After
@@ -818,10 +797,226 @@ public class StructuredContentNestedCollectionResourceFilteringTest
 	}
 
 	@Test
-	public void testGetPageItemsFilterByDescription() throws Exception {
+	public void testGetPageItemsFilterByDateStructureField() throws Exception {
+		DDMStructureTestHelper ddmStructureTestHelper =
+			new DDMStructureTestHelper(
+				PortalUtil.getClassNameId(JournalArticle.class), _group);
+
+		DDMStructure ddmStructure = ddmStructureTestHelper.addStructure(
+			PortalUtil.getClassNameId(JournalArticle.class),
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			deserialize(
+				_ddmFormJSONDeserializer,
+				read("test-journal-all-fields-structure.json")),
+			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
+
+		DDMTemplate ddmTemplate = DDMTemplateTestUtil.addTemplate(
+			_group.getGroupId(), ddmStructure.getStructureId(),
+			PortalUtil.getClassNameId(JournalArticle.class),
+			TemplateConstants.LANG_TYPE_VM,
+			read("test-journal-all-fields-template.xsl"), LocaleUtil.US);
+
 		Map<Locale, String> stringMap1 = new HashMap<>();
 
-		stringMap1.put(LocaleUtil.getDefault(), "description1");
+		stringMap1.put(LocaleUtil.getDefault(), RandomTestUtil.randomString());
+
+		JournalArticle journalArticle =
+			JournalArticleLocalServiceUtil.addArticle(
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
+				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
+				null, read("test-journal-all-fields-content-1.xml"),
+				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
+				ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
+
+		FilterParser filterParser = _getFilterParser();
+
+		PageItems<JournalArticle> pageItems = getPageItems(
+			PaginationRequest.of(10, 1), _group.getGroupId(), _acceptLanguage,
+			getThemeDisplay(_group, LocaleUtil.getDefault()),
+			new Filter(
+				filterParser.parse(
+					StringBundler.concat(
+						"(values/_", ddmStructure.getStructureId(),
+						StringPool.UNDERLINE, "MyDate eq 2018-10-13)"))),
+			Sort.emptySort());
+
+		Assert.assertEquals(1, pageItems.getTotalCount());
+
+		List<JournalArticle> journalArticles =
+			(List<JournalArticle>)pageItems.getItems();
+
+		Assert.assertEquals(journalArticle, journalArticles.get(0));
+	}
+
+	@Test
+	public void testGetPageItemsFilterByDecimalStructureField()
+		throws Exception {
+
+		DDMStructureTestHelper ddmStructureTestHelper =
+			new DDMStructureTestHelper(
+				PortalUtil.getClassNameId(JournalArticle.class), _group);
+
+		DDMStructure ddmStructure = ddmStructureTestHelper.addStructure(
+			PortalUtil.getClassNameId(JournalArticle.class),
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			deserialize(
+				_ddmFormJSONDeserializer,
+				read("test-journal-all-fields-structure.json")),
+			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
+
+		DDMTemplate ddmTemplate = DDMTemplateTestUtil.addTemplate(
+			_group.getGroupId(), ddmStructure.getStructureId(),
+			PortalUtil.getClassNameId(JournalArticle.class),
+			TemplateConstants.LANG_TYPE_VM,
+			read("test-journal-all-fields-template.xsl"), LocaleUtil.US);
+
+		Map<Locale, String> stringMap1 = new HashMap<>();
+
+		stringMap1.put(LocaleUtil.getDefault(), RandomTestUtil.randomString());
+
+		JournalArticle journalArticle =
+			JournalArticleLocalServiceUtil.addArticle(
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
+				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
+				null, read("test-journal-all-fields-content-1.xml"),
+				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
+				ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
+
+		FilterParser filterParser = _getFilterParser();
+
+		PageItems<JournalArticle> pageItems = getPageItems(
+			PaginationRequest.of(10, 1), _group.getGroupId(), _acceptLanguage,
+			getThemeDisplay(_group, LocaleUtil.getDefault()),
+			new Filter(
+				filterParser.parse(
+					StringBundler.concat(
+						"(values/_", ddmStructure.getStructureId(),
+						StringPool.UNDERLINE, "MyDecimal eq 1.2)"))),
+			Sort.emptySort());
+
+		Assert.assertEquals(1, pageItems.getTotalCount());
+
+		List<JournalArticle> journalArticles =
+			(List<JournalArticle>)pageItems.getItems();
+
+		Assert.assertEquals(journalArticle, journalArticles.get(0));
+	}
+
+	@Test
+	public void testGetPageItemsFilterByFalseCheckboxStructureField()
+		throws Exception {
+
+		DDMStructureTestHelper ddmStructureTestHelper =
+			new DDMStructureTestHelper(
+				PortalUtil.getClassNameId(JournalArticle.class), _group);
+
+		DDMStructure ddmStructure = ddmStructureTestHelper.addStructure(
+			PortalUtil.getClassNameId(JournalArticle.class),
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			deserialize(
+				_ddmFormJSONDeserializer,
+				read("test-journal-all-fields-structure.json")),
+			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
+
+		DDMTemplate ddmTemplate = DDMTemplateTestUtil.addTemplate(
+			_group.getGroupId(), ddmStructure.getStructureId(),
+			PortalUtil.getClassNameId(JournalArticle.class),
+			TemplateConstants.LANG_TYPE_VM,
+			read("test-journal-all-fields-template.xsl"), LocaleUtil.US);
+
+		Map<Locale, String> stringMap1 = new HashMap<>();
+
+		stringMap1.put(LocaleUtil.getDefault(), RandomTestUtil.randomString());
+
+		JournalArticle journalArticle =
+			JournalArticleLocalServiceUtil.addArticle(
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
+				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
+				null, read("test-journal-all-fields-content-2.xml"),
+				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
+				ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
+
+		FilterParser filterParser = _getFilterParser();
+
+		PageItems<JournalArticle> pageItems = getPageItems(
+			PaginationRequest.of(10, 1), _group.getGroupId(), _acceptLanguage,
+			getThemeDisplay(_group, LocaleUtil.getDefault()),
+			new Filter(
+				filterParser.parse(
+					StringBundler.concat(
+						"(values/_", ddmStructure.getStructureId(),
+						StringPool.UNDERLINE, "MyBoolean eq false)"))),
+			Sort.emptySort());
+
+		Assert.assertEquals(1, pageItems.getTotalCount());
+
+		List<JournalArticle> journalArticles =
+			(List<JournalArticle>)pageItems.getItems();
+
+		Assert.assertEquals(journalArticle, journalArticles.get(0));
+	}
+
+	@Test
+	public void testGetPageItemsFilterByIntegerStructureField()
+		throws Exception {
+
+		DDMStructureTestHelper ddmStructureTestHelper =
+			new DDMStructureTestHelper(
+				PortalUtil.getClassNameId(JournalArticle.class), _group);
+
+		DDMStructure ddmStructure = ddmStructureTestHelper.addStructure(
+			PortalUtil.getClassNameId(JournalArticle.class),
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			deserialize(
+				_ddmFormJSONDeserializer,
+				read("test-journal-all-fields-structure.json")),
+			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
+
+		DDMTemplate ddmTemplate = DDMTemplateTestUtil.addTemplate(
+			_group.getGroupId(), ddmStructure.getStructureId(),
+			PortalUtil.getClassNameId(JournalArticle.class),
+			TemplateConstants.LANG_TYPE_VM,
+			read("test-journal-all-fields-template.xsl"), LocaleUtil.US);
+
+		Map<Locale, String> stringMap1 = new HashMap<>();
+
+		stringMap1.put(LocaleUtil.getDefault(), RandomTestUtil.randomString());
+
+		JournalArticle journalArticle =
+			JournalArticleLocalServiceUtil.addArticle(
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
+				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
+				null, read("test-journal-all-fields-content-1.xml"),
+				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
+				ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
+
+		FilterParser filterParser = _getFilterParser();
+
+		PageItems<JournalArticle> pageItems = getPageItems(
+			PaginationRequest.of(10, 1), _group.getGroupId(), _acceptLanguage,
+			getThemeDisplay(_group, LocaleUtil.getDefault()),
+			new Filter(
+				filterParser.parse(
+					StringBundler.concat(
+						"(values/_", ddmStructure.getStructureId(),
+						StringPool.UNDERLINE, "MyInteger eq 2)"))),
+			Sort.emptySort());
+
+		Assert.assertEquals(1, pageItems.getTotalCount());
+
+		List<JournalArticle> journalArticles =
+			(List<JournalArticle>)pageItems.getItems();
+
+		Assert.assertEquals(journalArticle, journalArticles.get(0));
+	}
+
+	@Test
+	public void testGetPageItemsFilterByLambdaAnyOnKeywordsFieldWithEq()
+		throws Exception {
+
+		Map<Locale, String> stringMap1 = new HashMap<>();
+
+		stringMap1.put(LocaleUtil.getDefault(), RandomTestUtil.randomString());
 
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
@@ -834,11 +1029,19 @@ public class StructuredContentNestedCollectionResourceFilteringTest
 			stringMap1, null, LocaleUtil.getDefault(), null, true, true,
 			serviceContext);
 
+		User user = TestPropsValues.getUser();
+		String keyword1 = "keyword1";
+		String keyword2 = "keyword2";
+
+		addAssetTagNames(
+			user.getUserId(), journalArticle1,
+			new String[] {keyword1, keyword2});
+
 		Map<Locale, String> stringMap2 = new HashMap<>();
 
-		stringMap2.put(LocaleUtil.getDefault(), "description2");
+		stringMap2.put(LocaleUtil.getDefault(), RandomTestUtil.randomString());
 
-		JournalTestUtil.addArticle(
+		JournalArticle journalArticle2 = JournalTestUtil.addArticle(
 			_group.getGroupId(),
 			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			JournalArticleConstants.CLASSNAME_ID_DEFAULT,
@@ -846,12 +1049,20 @@ public class StructuredContentNestedCollectionResourceFilteringTest
 			stringMap2, null, LocaleUtil.getDefault(), null, true, true,
 			serviceContext);
 
+		String keyword3 = "keyword3";
+
+		addAssetTagNames(
+			user.getUserId(), journalArticle2,
+			new String[] {keyword2, keyword3});
+
 		FilterParser filterParser = _getFilterParser();
 
 		PageItems<JournalArticle> pageItems = getPageItems(
 			PaginationRequest.of(10, 1), _group.getGroupId(), _acceptLanguage,
 			getThemeDisplay(_group, LocaleUtil.getDefault()),
-			new Filter(filterParser.parse("(description eq 'description1')")),
+			new Filter(
+				filterParser.parse(
+					"(keywords/any(k:k eq '" + keyword1 + "'))")),
 			Sort.emptySort());
 
 		Assert.assertEquals(1, pageItems.getTotalCount());
@@ -859,7 +1070,70 @@ public class StructuredContentNestedCollectionResourceFilteringTest
 		List<JournalArticle> journalArticles =
 			(List<JournalArticle>)pageItems.getItems();
 
-		Assert.assertEquals(journalArticle1, journalArticles.get(0));
+		JournalArticle journalArticle = journalArticles.get(0);
+
+		Assert.assertEquals(journalArticle1, journalArticle);
+
+		List<String> tagNames = getJournalArticleAssetTags(journalArticle);
+
+		Assert.assertEquals(tagNames.toString(), 2, tagNames.size());
+		Assert.assertTrue(tagNames.toString(), tagNames.contains(keyword1));
+		Assert.assertTrue(tagNames.toString(), tagNames.contains(keyword2));
+		Assert.assertFalse(tagNames.toString(), tagNames.contains(keyword3));
+	}
+
+	@Test
+	public void testGetPageItemsFilterByNumberStructureField()
+		throws Exception {
+
+		DDMStructureTestHelper ddmStructureTestHelper =
+			new DDMStructureTestHelper(
+				PortalUtil.getClassNameId(JournalArticle.class), _group);
+
+		DDMStructure ddmStructure = ddmStructureTestHelper.addStructure(
+			PortalUtil.getClassNameId(JournalArticle.class),
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			deserialize(
+				_ddmFormJSONDeserializer,
+				read("test-journal-all-fields-structure.json")),
+			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
+
+		DDMTemplate ddmTemplate = DDMTemplateTestUtil.addTemplate(
+			_group.getGroupId(), ddmStructure.getStructureId(),
+			PortalUtil.getClassNameId(JournalArticle.class),
+			TemplateConstants.LANG_TYPE_VM,
+			read("test-journal-all-fields-template.xsl"), LocaleUtil.US);
+
+		Map<Locale, String> stringMap1 = new HashMap<>();
+
+		stringMap1.put(LocaleUtil.getDefault(), RandomTestUtil.randomString());
+
+		JournalArticle journalArticle =
+			JournalArticleLocalServiceUtil.addArticle(
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
+				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
+				null, read("test-journal-all-fields-content-1.xml"),
+				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
+				ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
+
+		FilterParser filterParser = _getFilterParser();
+
+		PageItems<JournalArticle> pageItems = getPageItems(
+			PaginationRequest.of(10, 1), _group.getGroupId(), _acceptLanguage,
+			getThemeDisplay(_group, LocaleUtil.getDefault()),
+			new Filter(
+				filterParser.parse(
+					StringBundler.concat(
+						"(values/_", ddmStructure.getStructureId(),
+						StringPool.UNDERLINE, "MyNumber eq -1.2)"))),
+			Sort.emptySort());
+
+		Assert.assertEquals(1, pageItems.getTotalCount());
+
+		List<JournalArticle> journalArticles =
+			(List<JournalArticle>)pageItems.getItems();
+
+		Assert.assertEquals(journalArticle, journalArticles.get(0));
 	}
 
 	@Test
@@ -968,7 +1242,25 @@ public class StructuredContentNestedCollectionResourceFilteringTest
 	}
 
 	@Test
-	public void testGetPageItemsFilterByStructureField() throws Exception {
+	public void testGetPageItemsFilterByRadioStructureField() throws Exception {
+		DDMStructureTestHelper ddmStructureTestHelper =
+			new DDMStructureTestHelper(
+				PortalUtil.getClassNameId(JournalArticle.class), _group);
+
+		DDMStructure ddmStructure = ddmStructureTestHelper.addStructure(
+			PortalUtil.getClassNameId(JournalArticle.class),
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			deserialize(
+				_ddmFormJSONDeserializer,
+				read("test-journal-all-fields-structure.json")),
+			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
+
+		DDMTemplate ddmTemplate = DDMTemplateTestUtil.addTemplate(
+			_group.getGroupId(), ddmStructure.getStructureId(),
+			PortalUtil.getClassNameId(JournalArticle.class),
+			TemplateConstants.LANG_TYPE_VM,
+			read("test-journal-all-fields-template.xsl"), LocaleUtil.US);
+
 		Map<Locale, String> stringMap1 = new HashMap<>();
 
 		stringMap1.put(LocaleUtil.getDefault(), RandomTestUtil.randomString());
@@ -977,8 +1269,8 @@ public class StructuredContentNestedCollectionResourceFilteringTest
 			JournalArticleLocalServiceUtil.addArticle(
 				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
 				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
-				null, _read("test-journal-content-text-field.xml"),
-				_ddmStructure.getStructureKey(), _ddmTemplate.getTemplateKey(),
+				null, read("test-journal-all-fields-content-1.xml"),
+				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
 				ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 
 		FilterParser filterParser = _getFilterParser();
@@ -989,9 +1281,63 @@ public class StructuredContentNestedCollectionResourceFilteringTest
 			new Filter(
 				filterParser.parse(
 					StringBundler.concat(
-						"(values/_", _ddmStructure.getStructureId(),
-						StringPool.UNDERLINE, "TextFieldName eq ",
-						"'textfield')"))),
+						"(values/_", ddmStructure.getStructureId(),
+						StringPool.UNDERLINE, "MyRadio eq 'value 1')"))),
+			Sort.emptySort());
+
+		Assert.assertEquals(1, pageItems.getTotalCount());
+
+		List<JournalArticle> journalArticles =
+			(List<JournalArticle>)pageItems.getItems();
+
+		Assert.assertEquals(journalArticle, journalArticles.get(0));
+	}
+
+	@Test
+	public void testGetPageItemsFilterByStringStructureField()
+		throws Exception {
+
+		DDMStructureTestHelper ddmStructureTestHelper =
+			new DDMStructureTestHelper(
+				PortalUtil.getClassNameId(JournalArticle.class), _group);
+
+		DDMStructure ddmStructure = ddmStructureTestHelper.addStructure(
+			PortalUtil.getClassNameId(JournalArticle.class),
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			deserialize(
+				_ddmFormJSONDeserializer,
+				read("test-journal-all-fields-structure.json")),
+			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
+
+		DDMTemplate ddmTemplate = DDMTemplateTestUtil.addTemplate(
+			_group.getGroupId(), ddmStructure.getStructureId(),
+			PortalUtil.getClassNameId(JournalArticle.class),
+			TemplateConstants.LANG_TYPE_VM,
+			read("test-journal-all-fields-template.xsl"), LocaleUtil.US);
+
+		Map<Locale, String> stringMap1 = new HashMap<>();
+
+		stringMap1.put(LocaleUtil.getDefault(), RandomTestUtil.randomString());
+
+		JournalArticle journalArticle =
+			JournalArticleLocalServiceUtil.addArticle(
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
+				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
+				null, read("test-journal-all-fields-content-1.xml"),
+				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
+				ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
+
+		FilterParser filterParser = _getFilterParser();
+
+		PageItems<JournalArticle> pageItems = getPageItems(
+			PaginationRequest.of(10, 1), _group.getGroupId(), _acceptLanguage,
+			getThemeDisplay(_group, LocaleUtil.getDefault()),
+			new Filter(
+				filterParser.parse(
+					StringBundler.concat(
+						"(values/_", ddmStructure.getStructureId(),
+						StringPool.UNDERLINE, "MyText eq ",
+						"'TextFieldValue_us')"))),
 			Sort.emptySort());
 
 		Assert.assertEquals(1, pageItems.getTotalCount());
@@ -1068,7 +1414,7 @@ public class StructuredContentNestedCollectionResourceFilteringTest
 
 		stringMap2.put(LocaleUtil.getDefault(), "title2");
 
-		JournalTestUtil.addArticle(
+		JournalArticle journalArticle2 = JournalTestUtil.addArticle(
 			_group.getGroupId(),
 			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			JournalArticleConstants.CLASSNAME_ID_DEFAULT,
@@ -1101,7 +1447,8 @@ public class StructuredContentNestedCollectionResourceFilteringTest
 		List<JournalArticle> journalArticles =
 			(List<JournalArticle>)pageItems.getItems();
 
-		Assert.assertEquals(journalArticle1, journalArticles.get(0));
+		Assert.assertTrue(journalArticles.contains(journalArticle1));
+		Assert.assertTrue(journalArticles.contains(journalArticle2));
 	}
 
 	@Test
@@ -1253,8 +1600,8 @@ public class StructuredContentNestedCollectionResourceFilteringTest
 		FilterParser filterParser = _getFilterParser();
 
 		PageItems<JournalArticle> pageItems = getPageItems(
-			PaginationRequest.of(10, 1), _group.getGroupId(), _acceptLanguage,
-			getThemeDisplay(_group, LocaleUtil.SPAIN),
+			PaginationRequest.of(10, 1), _group.getGroupId(),
+			() -> LocaleUtil.SPAIN, getThemeDisplay(_group, LocaleUtil.SPAIN),
 			new Filter(filterParser.parse("(title eq 'titulo1')")),
 			Sort.emptySort());
 
@@ -1496,6 +1843,65 @@ public class StructuredContentNestedCollectionResourceFilteringTest
 	}
 
 	@Test
+	public void testGetPageItemsFilterByTitleNotLowerOrEqual()
+		throws Exception {
+
+		Map<Locale, String> stringMap1 = new HashMap<>();
+
+		stringMap1.put(LocaleUtil.getDefault(), "title1");
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
+
+		JournalTestUtil.addArticle(
+			_group.getGroupId(),
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			JournalArticleConstants.CLASSNAME_ID_DEFAULT,
+			RandomTestUtil.randomString(), false, stringMap1, stringMap1,
+			stringMap1, null, LocaleUtil.getDefault(), null, true, true,
+			serviceContext);
+
+		Map<Locale, String> stringMap2 = new HashMap<>();
+
+		stringMap2.put(LocaleUtil.getDefault(), "title2");
+
+		JournalTestUtil.addArticle(
+			_group.getGroupId(),
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			JournalArticleConstants.CLASSNAME_ID_DEFAULT,
+			RandomTestUtil.randomString(), false, stringMap2, stringMap2,
+			stringMap2, null, LocaleUtil.getDefault(), null, true, true,
+			serviceContext);
+
+		Map<Locale, String> stringMap3 = new HashMap<>();
+
+		stringMap3.put(LocaleUtil.getDefault(), "title3");
+
+		JournalArticle journalArticle = JournalTestUtil.addArticle(
+			_group.getGroupId(),
+			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			JournalArticleConstants.CLASSNAME_ID_DEFAULT,
+			RandomTestUtil.randomString(), false, stringMap3, stringMap3,
+			stringMap3, null, LocaleUtil.getDefault(), null, true, true,
+			serviceContext);
+
+		FilterParser filterParser = _getFilterParser();
+
+		PageItems<JournalArticle> pageItems = getPageItems(
+			PaginationRequest.of(10, 1), _group.getGroupId(), _acceptLanguage,
+			getThemeDisplay(_group, LocaleUtil.getDefault()),
+			new Filter(filterParser.parse("not (title le 'title2')")),
+			Sort.emptySort());
+
+		Assert.assertEquals(1, pageItems.getTotalCount());
+
+		List<JournalArticle> journalArticles =
+			(List<JournalArticle>)pageItems.getItems();
+
+		Assert.assertTrue(journalArticles.contains(journalArticle));
+	}
+
+	@Test
 	public void testGetPageItemsFilterByTitleStartingWithLowerCase()
 		throws Exception {
 
@@ -1639,6 +2045,115 @@ public class StructuredContentNestedCollectionResourceFilteringTest
 	}
 
 	@Test
+	public void testGetPageItemsFilterByTrueCheckboxStructureField()
+		throws Exception {
+
+		DDMStructureTestHelper ddmStructureTestHelper =
+			new DDMStructureTestHelper(
+				PortalUtil.getClassNameId(JournalArticle.class), _group);
+
+		DDMStructure ddmStructure = ddmStructureTestHelper.addStructure(
+			PortalUtil.getClassNameId(JournalArticle.class),
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			deserialize(
+				_ddmFormJSONDeserializer,
+				read("test-journal-all-fields-structure.json")),
+			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
+
+		DDMTemplate ddmTemplate = DDMTemplateTestUtil.addTemplate(
+			_group.getGroupId(), ddmStructure.getStructureId(),
+			PortalUtil.getClassNameId(JournalArticle.class),
+			TemplateConstants.LANG_TYPE_VM,
+			read("test-journal-all-fields-template.xsl"), LocaleUtil.US);
+
+		Map<Locale, String> stringMap1 = new HashMap<>();
+
+		stringMap1.put(LocaleUtil.getDefault(), RandomTestUtil.randomString());
+
+		JournalArticle journalArticle =
+			JournalArticleLocalServiceUtil.addArticle(
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
+				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
+				null, read("test-journal-all-fields-content-1.xml"),
+				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
+				ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
+
+		FilterParser filterParser = _getFilterParser();
+
+		PageItems<JournalArticle> pageItems = getPageItems(
+			PaginationRequest.of(10, 1), _group.getGroupId(), _acceptLanguage,
+			getThemeDisplay(_group, LocaleUtil.getDefault()),
+			new Filter(
+				filterParser.parse(
+					StringBundler.concat(
+						"(values/_", ddmStructure.getStructureId(),
+						StringPool.UNDERLINE, "MyBoolean eq true)"))),
+			Sort.emptySort());
+
+		Assert.assertEquals(1, pageItems.getTotalCount());
+
+		List<JournalArticle> journalArticles =
+			(List<JournalArticle>)pageItems.getItems();
+
+		Assert.assertEquals(journalArticle, journalArticles.get(0));
+	}
+
+	@Test
+	public void testGetPageItemsFilterByTrueCheckboxStructureFieldInNoDefaultLocale()
+		throws Exception {
+
+		DDMStructureTestHelper ddmStructureTestHelper =
+			new DDMStructureTestHelper(
+				PortalUtil.getClassNameId(JournalArticle.class), _group);
+
+		DDMStructure ddmStructure = ddmStructureTestHelper.addStructure(
+			PortalUtil.getClassNameId(JournalArticle.class),
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			deserialize(
+				_ddmFormJSONDeserializer,
+				read("test-journal-all-fields-structure.json")),
+			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
+
+		DDMTemplate ddmTemplate = DDMTemplateTestUtil.addTemplate(
+			_group.getGroupId(), ddmStructure.getStructureId(),
+			PortalUtil.getClassNameId(JournalArticle.class),
+			TemplateConstants.LANG_TYPE_VM,
+			read("test-journal-all-fields-template.xsl"), LocaleUtil.US);
+
+		Map<Locale, String> stringMap1 = new HashMap<>();
+
+		stringMap1.put(LocaleUtil.getDefault(), RandomTestUtil.randomString());
+
+		JournalArticle journalArticle =
+			JournalArticleLocalServiceUtil.addArticle(
+				TestPropsValues.getUser().getUserId(), _group.getGroupId(),
+				JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, stringMap1,
+				null, read("test-journal-all-fields-content-1.xml"),
+				ddmStructure.getStructureKey(), ddmTemplate.getTemplateKey(),
+				ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
+
+		FilterParser filterParser = _getFilterParser();
+
+		PageItems<JournalArticle> pageItems = getPageItems(
+			PaginationRequest.of(10, 1), _group.getGroupId(),
+			() -> LocaleUtil.SPAIN,
+			getThemeDisplay(_group, LocaleUtil.getDefault()),
+			new Filter(
+				filterParser.parse(
+					StringBundler.concat(
+						"(values/_", ddmStructure.getStructureId(),
+						StringPool.UNDERLINE, "MyBoolean eq true)"))),
+			Sort.emptySort());
+
+		Assert.assertEquals(1, pageItems.getTotalCount());
+
+		List<JournalArticle> journalArticles =
+			(List<JournalArticle>)pageItems.getItems();
+
+		Assert.assertEquals(journalArticle, journalArticles.get(0));
+	}
+
+	@Test
 	public void testGetSearchFilterWithExistingProperty() throws Exception {
 		FilterParser filterParser = _getFilterParser();
 
@@ -1651,40 +2166,15 @@ public class StructuredContentNestedCollectionResourceFilteringTest
 		Assert.assertEquals("title value", termQuery.getValue());
 	}
 
-	protected DDMForm deserialize(String content) {
-		try {
-			return _ddmFormJSONDeserializer.deserialize(content);
-		}
-		catch (PortalException pe) {
-			throw new RuntimeException(pe);
-		}
-	}
-
-	private FilterParser _getFilterParser() throws Exception {
+	private FilterParser _getFilterParser() {
 		return _serviceTracker.getService();
 	}
 
-	private String _read(String fileName) throws Exception {
-		Class<?> clazz = getClass();
-
-		ClassLoader classLoader = clazz.getClassLoader();
-
-		InputStream inputStream = classLoader.getResourceAsStream(
-			"/com/liferay/structured/content/apio/internal/architect/reso" +
-				"urce/test/" + fileName);
-
-		return StringUtil.read(inputStream);
-	}
-
-	private static final AcceptLanguage _acceptLanguage =
-		() -> LocaleUtil.getDefault();
+	private static final AcceptLanguage _acceptLanguage = () -> LocaleUtil.US;
 	private static ServiceTracker<FilterParser, FilterParser> _serviceTracker;
 
 	@Inject
 	private DDMFormJSONDeserializer _ddmFormJSONDeserializer;
-
-	private DDMStructure _ddmStructure;
-	private DDMTemplate _ddmTemplate;
 
 	@DeleteAfterTestRun
 	private Group _group;

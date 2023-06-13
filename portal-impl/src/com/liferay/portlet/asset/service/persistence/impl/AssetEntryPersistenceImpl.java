@@ -22,8 +22,6 @@ import com.liferay.asset.kernel.service.persistence.AssetCategoryPersistence;
 import com.liferay.asset.kernel.service.persistence.AssetEntryPersistence;
 import com.liferay.asset.kernel.service.persistence.AssetTagPersistence;
 
-import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
@@ -46,6 +44,7 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import com.liferay.portlet.asset.model.impl.AssetEntryImpl;
@@ -2790,6 +2789,8 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 	public List<AssetEntry> findByLayoutUuid(String layoutUuid, int start,
 		int end, OrderByComparator<AssetEntry> orderByComparator,
 		boolean retrieveFromCache) {
+		layoutUuid = Objects.toString(layoutUuid, "");
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -2813,7 +2814,7 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 
 			if ((list != null) && !list.isEmpty()) {
 				for (AssetEntry assetEntry : list) {
-					if (!Objects.equals(layoutUuid, assetEntry.getLayoutUuid())) {
+					if (!layoutUuid.equals(assetEntry.getLayoutUuid())) {
 						list = null;
 
 						break;
@@ -2837,10 +2838,7 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 
 			boolean bindLayoutUuid = false;
 
-			if (layoutUuid == null) {
-				query.append(_FINDER_COLUMN_LAYOUTUUID_LAYOUTUUID_1);
-			}
-			else if (layoutUuid.equals("")) {
+			if (layoutUuid.isEmpty()) {
 				query.append(_FINDER_COLUMN_LAYOUTUUID_LAYOUTUUID_3);
 			}
 			else {
@@ -3024,6 +3022,8 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 	public AssetEntry[] findByLayoutUuid_PrevAndNext(long entryId,
 		String layoutUuid, OrderByComparator<AssetEntry> orderByComparator)
 		throws NoSuchEntryException {
+		layoutUuid = Objects.toString(layoutUuid, "");
+
 		AssetEntry assetEntry = findByPrimaryKey(entryId);
 
 		Session session = null;
@@ -3069,10 +3069,7 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 
 		boolean bindLayoutUuid = false;
 
-		if (layoutUuid == null) {
-			query.append(_FINDER_COLUMN_LAYOUTUUID_LAYOUTUUID_1);
-		}
-		else if (layoutUuid.equals("")) {
+		if (layoutUuid.isEmpty()) {
 			query.append(_FINDER_COLUMN_LAYOUTUUID_LAYOUTUUID_3);
 		}
 		else {
@@ -3192,6 +3189,8 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 	 */
 	@Override
 	public int countByLayoutUuid(String layoutUuid) {
+		layoutUuid = Objects.toString(layoutUuid, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_LAYOUTUUID;
 
 		Object[] finderArgs = new Object[] { layoutUuid };
@@ -3206,10 +3205,7 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 
 			boolean bindLayoutUuid = false;
 
-			if (layoutUuid == null) {
-				query.append(_FINDER_COLUMN_LAYOUTUUID_LAYOUTUUID_1);
-			}
-			else if (layoutUuid.equals("")) {
+			if (layoutUuid.isEmpty()) {
 				query.append(_FINDER_COLUMN_LAYOUTUUID_LAYOUTUUID_3);
 			}
 			else {
@@ -3250,7 +3246,6 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_LAYOUTUUID_LAYOUTUUID_1 = "assetEntry.layoutUuid IS NULL";
 	private static final String _FINDER_COLUMN_LAYOUTUUID_LAYOUTUUID_2 = "assetEntry.layoutUuid = ?";
 	private static final String _FINDER_COLUMN_LAYOUTUUID_LAYOUTUUID_3 = "(assetEntry.layoutUuid IS NULL OR assetEntry.layoutUuid = '')";
 	public static final FinderPath FINDER_PATH_FETCH_BY_G_CU = new FinderPath(AssetEntryModelImpl.ENTITY_CACHE_ENABLED,
@@ -3323,6 +3318,8 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 	@Override
 	public AssetEntry fetchByG_CU(long groupId, String classUuid,
 		boolean retrieveFromCache) {
+		classUuid = Objects.toString(classUuid, "");
+
 		Object[] finderArgs = new Object[] { groupId, classUuid };
 
 		Object result = null;
@@ -3350,10 +3347,7 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 
 			boolean bindClassUuid = false;
 
-			if (classUuid == null) {
-				query.append(_FINDER_COLUMN_G_CU_CLASSUUID_1);
-			}
-			else if (classUuid.equals("")) {
+			if (classUuid.isEmpty()) {
 				query.append(_FINDER_COLUMN_G_CU_CLASSUUID_3);
 			}
 			else {
@@ -3447,6 +3441,8 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 	 */
 	@Override
 	public int countByG_CU(long groupId, String classUuid) {
+		classUuid = Objects.toString(classUuid, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_G_CU;
 
 		Object[] finderArgs = new Object[] { groupId, classUuid };
@@ -3463,10 +3459,7 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 
 			boolean bindClassUuid = false;
 
-			if (classUuid == null) {
-				query.append(_FINDER_COLUMN_G_CU_CLASSUUID_1);
-			}
-			else if (classUuid.equals("")) {
+			if (classUuid.isEmpty()) {
 				query.append(_FINDER_COLUMN_G_CU_CLASSUUID_3);
 			}
 			else {
@@ -3510,7 +3503,6 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 	}
 
 	private static final String _FINDER_COLUMN_G_CU_GROUPID_2 = "assetEntry.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_CU_CLASSUUID_1 = "assetEntry.classUuid IS NULL";
 	private static final String _FINDER_COLUMN_G_CU_CLASSUUID_2 = "assetEntry.classUuid = ?";
 	private static final String _FINDER_COLUMN_G_CU_CLASSUUID_3 = "(assetEntry.classUuid IS NULL OR assetEntry.classUuid = '')";
 	public static final FinderPath FINDER_PATH_FETCH_BY_C_C = new FinderPath(AssetEntryModelImpl.ENTITY_CACHE_ENABLED,

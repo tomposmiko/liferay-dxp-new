@@ -18,24 +18,30 @@ import com.liferay.apio.architect.functional.Try;
 import com.liferay.apio.architect.representor.Representor;
 import com.liferay.apio.architect.resource.ItemResource;
 import com.liferay.apio.architect.routes.ItemRoutes;
-import com.liferay.blog.apio.architect.identifier.BlogPostingIdentifier;
-import com.liferay.comment.apio.architect.identifier.CommentIdentifier;
-import com.liferay.media.object.apio.architect.identifier.MediaObjectIdentifier;
+import com.liferay.blogs.model.BlogsEntry;
+import com.liferay.message.boards.model.MBDiscussion;
+import com.liferay.portal.apio.exception.ValidationException;
 import com.liferay.portal.apio.user.CurrentUser;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.workflow.WorkflowException;
 import com.liferay.portal.kernel.workflow.WorkflowTask;
 import com.liferay.portal.kernel.workflow.WorkflowTaskManager;
 import com.liferay.workflow.apio.architect.identifier.WorkflowLogIdentifier;
 import com.liferay.workflow.apio.architect.identifier.WorkflowTaskIdentifier;
 import com.liferay.workflow.apio.internal.architect.form.AssignToMeForm;
+import com.liferay.workflow.apio.internal.architect.form.AssignToUserForm;
+import com.liferay.workflow.apio.internal.architect.form.ChangeTransitionForm;
+import com.liferay.workflow.apio.internal.architect.form.UpdateDueDateForm;
 import com.liferay.workflow.apio.internal.architect.route.AssignToMePostRoute;
+import com.liferay.workflow.apio.internal.architect.route.AssignToUserPostRoute;
+import com.liferay.workflow.apio.internal.architect.route.ChangeTransitionPostRoute;
+import com.liferay.workflow.apio.internal.architect.route.UpdateDueDatePostRoute;
 
 import java.io.Serializable;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,6 +74,18 @@ public class WorkflowTaskItemResource
 			new AssignToMePostRoute(), this::_assignToMe, CurrentUser.class,
 			WorkflowTaskIdentifier.class, (credentials, id) -> true,
 			AssignToMeForm::buildForm
+		).addCustomRoute(
+			new AssignToUserPostRoute(), this::_assignToUser, Company.class,
+			CurrentUser.class, WorkflowTaskIdentifier.class,
+			(credentials, id) -> true, AssignToUserForm::buildForm
+		).addCustomRoute(
+			new ChangeTransitionPostRoute(), this::_changeTransition,
+			CurrentUser.class, WorkflowTaskIdentifier.class,
+			(credentials, id) -> true, ChangeTransitionForm::buildForm
+		).addCustomRoute(
+			new UpdateDueDatePostRoute(), this::_updateDueDate,
+			CurrentUser.class, WorkflowTaskIdentifier.class,
+			(credentials, id) -> true, UpdateDueDateForm::buildForm
 		).build();
 	}
 
@@ -86,13 +104,16 @@ public class WorkflowTaskItemResource
 		).addDate(
 			"dateCreated", WorkflowTask::getCreateDate
 		).addDate(
-			"expires", WorkflowTask::getDueDate
-		).addLinkedModel(
-			"blogPost", BlogPostingIdentifier.class, this::_getLinkedModelId
-		).addLinkedModel(
-			"comment", CommentIdentifier.class, this::_getLinkedModelId
-		).addLinkedModel(
-			"document", MediaObjectIdentifier.class, this::_getLinkedModelId
+			"dueDate", WorkflowTask::getDueDate
+		).addNested(
+			"object", WorkflowTask::getOptionalAttributes,
+			nestedBuilder -> nestedBuilder.types(
+				"Object"
+			).addApplicationRelativeURL(
+				"identifier", this::_getResourceURL
+			).addString(
+				"resourceType", this::_getResourceType
+			).build()
 		).addRelatedCollection(
 			"logs", WorkflowLogIdentifier.class
 		).addString(
@@ -107,31 +128,96 @@ public class WorkflowTaskItemResource
 	}
 
 	private WorkflowTask _assignToMe(
-		Long workflowTaskId, AssignToMeForm assignToMeForm,
-		CurrentUser currentUser) {
+			Long workflowTaskId, AssignToMeForm assignToMeForm,
+			CurrentUser currentUser)
+		throws WorkflowException {
 
-		return Try.fromFallible(
-			() -> _workflowTaskManager.getWorkflowTask(
-				currentUser.getCompanyId(), workflowTaskId)
-		).map(
-			workflowTask -> _workflowTaskManager.assignWorkflowTaskToUser(
-				currentUser.getCompanyId(), currentUser.getUserId(),
-				workflowTask.getWorkflowTaskId(), currentUser.getUserId(), "",
-				null, null)
-		).orElse(
-			null
+		return _workflowTaskManager.assignWorkflowTaskToUser(
+			currentUser.getCompanyId(), currentUser.getUserId(), workflowTaskId,
+			currentUser.getUserId(), "", null, null);
+	}
+
+	private WorkflowTask _assignToUser(
+			Long workflowTaskId, AssignToUserForm assignToMeForm,
+			Company company, CurrentUser currentUser)
+		throws WorkflowException {
+
+		long assigneeId = assignToMeForm.getAssigneeId();
+
+		return _workflowTaskManager.assignWorkflowTaskToUser(
+			company.getCompanyId(), currentUser.getUserId(), workflowTaskId,
+			assigneeId, "", null, null);
+	}
+
+	private WorkflowTask _changeTransition(
+			Long workflowTaskId, ChangeTransitionForm changeTransitionForm,
+			CurrentUser currentUser)
+		throws WorkflowException {
+
+		String transition = changeTransitionForm.getTransition();
+
+		Try.fromFallible(
+			() -> _getTaskTransitionsNames(
+				_workflowTaskManager.getWorkflowTask(
+					currentUser.getCompanyId(), workflowTaskId))
+		).filter(
+			transitionName -> transitionName.contains(transition)
+		).orElseThrow(
+			() -> new ValidationException("Invalid transition: " + transition)
 		);
+
+		return _workflowTaskManager.completeWorkflowTask(
+			currentUser.getCompanyId(), currentUser.getUserId(), workflowTaskId,
+			transition, "", null);
 	}
 
-	private Serializable _getEntryClassPK(WorkflowTask workflowTask) {
-		Map<String, Serializable> optionalAttributes =
-			workflowTask.getOptionalAttributes();
+	private String _getResourceType(
+		Map<String, Serializable> optionalAttributes) {
 
-		return optionalAttributes.get("entryClassPK");
+		Map<String, String> map = new HashMap<String, String>() {
+			{
+				put(BlogsEntry.class.getName(), "BlogPosting");
+				put(MBDiscussion.class.getName(), "Comment");
+			}
+		};
+
+		String type = map.get(optionalAttributes.get("entryClassName"));
+
+		if (type == null) {
+			return null;
+		}
+
+		return type;
 	}
 
-	private Long _getLinkedModelId(WorkflowTask workflowTask) {
-		return GetterUtil.getLong(_getEntryClassPK(workflowTask));
+	private String _getResourceURL(
+		Map<String, Serializable> optionalAttributes) {
+
+		Map<String, String> map = new HashMap<String, String>() {
+			{
+				put(BlogsEntry.class.getName(), "blog-posting");
+				put(MBDiscussion.class.getName(), "comment");
+			}
+		};
+
+		String entryClassName = map.get(
+			optionalAttributes.get("entryClassName"));
+
+		if (entryClassName == null) {
+			return null;
+		}
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("p/");
+		sb.append(entryClassName);
+		sb.append("/");
+
+		String entryClassPK = (String)optionalAttributes.get("entryClassPK");
+
+		sb.append(entryClassPK);
+
+		return sb.toString();
 	}
 
 	private List<String> _getTaskTransitionsNames(WorkflowTask workflowTask) {
@@ -157,6 +243,16 @@ public class WorkflowTaskItemResource
 
 		return _workflowTaskManager.getWorkflowTask(
 			company.getCompanyId(), workflowTaskId);
+	}
+
+	private WorkflowTask _updateDueDate(
+			Long workflowTaskId, UpdateDueDateForm updateDueDateForm,
+			CurrentUser currentUser)
+		throws WorkflowException {
+
+		return _workflowTaskManager.updateDueDate(
+			currentUser.getCompanyId(), currentUser.getUserId(), workflowTaskId,
+			updateDueDateForm.getComment(), updateDueDateForm.getDueDate());
 	}
 
 	@Reference

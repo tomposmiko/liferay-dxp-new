@@ -1,10 +1,9 @@
 dependencies {
 	compileOnly group: "com.liferay", name: "com.liferay.apio.architect.api", version: "1.8.0"
-	compileOnly group: "com.liferay", name: "com.liferay.blog.apio.api", version: "1.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.comment.apio.api", version: "1.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.media.object.apio.api", version: "1.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.blogs.api", version: "4.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.message.boards.api", version: "4.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.person.apio.api", version: "1.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.portal.apio.api", version: "1.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.portal.apio.api", version: "1.2.0"
 	compileOnly group: "com.liferay", name: "com.liferay.portal.workflow.kaleo.api", version: "3.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.portal.workflow.kaleo.definition.api", version: "3.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.role.apio.api", version: "1.0.0"

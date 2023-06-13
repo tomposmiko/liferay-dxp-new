@@ -1044,8 +1044,8 @@ public abstract class DLPreviewableProcessor implements DLProcessor {
 
 		String binPath = fileEntryElement.attributeValue(binPathName);
 
-		try (InputStream is =
-				portletDataContext.getZipEntryAsInputStream(binPath)) {
+		try (InputStream is = portletDataContext.getZipEntryAsInputStream(
+				binPath)) {
 
 			if (is == null) {
 				return;
@@ -1113,8 +1113,8 @@ public abstract class DLPreviewableProcessor implements DLProcessor {
 
 		String binPath = fileEntryElement.attributeValue(binPathName);
 
-		try (InputStream is =
-				portletDataContext.getZipEntryAsInputStream(binPath)) {
+		try (InputStream is = portletDataContext.getZipEntryAsInputStream(
+				binPath)) {
 
 			if (is == null) {
 				return;
@@ -1158,21 +1158,21 @@ public abstract class DLPreviewableProcessor implements DLProcessor {
 		}
 		else if ((index == THUMBNAIL_INDEX_CUSTOM_1) &&
 				 ((PrefsPropsUtil.getInteger(
-					 PropsKeys.
-						 DL_FILE_ENTRY_THUMBNAIL_CUSTOM_1_MAX_HEIGHT) > 0) ||
+					 PropsKeys.DL_FILE_ENTRY_THUMBNAIL_CUSTOM_1_MAX_HEIGHT) >
+						 0) ||
 				  (PrefsPropsUtil.getInteger(
-					  PropsKeys.
-						  DL_FILE_ENTRY_THUMBNAIL_CUSTOM_1_MAX_WIDTH) > 0))) {
+					  PropsKeys.DL_FILE_ENTRY_THUMBNAIL_CUSTOM_1_MAX_WIDTH) >
+						  0))) {
 
 			return true;
 		}
 		else if ((index == THUMBNAIL_INDEX_CUSTOM_2) &&
 				 ((PrefsPropsUtil.getInteger(
-					 PropsKeys.
-						 DL_FILE_ENTRY_THUMBNAIL_CUSTOM_2_MAX_HEIGHT) > 0) ||
+					 PropsKeys.DL_FILE_ENTRY_THUMBNAIL_CUSTOM_2_MAX_HEIGHT) >
+						 0) ||
 				  (PrefsPropsUtil.getInteger(
-					  PropsKeys.
-						  DL_FILE_ENTRY_THUMBNAIL_CUSTOM_2_MAX_WIDTH) > 0))) {
+					  PropsKeys.DL_FILE_ENTRY_THUMBNAIL_CUSTOM_2_MAX_WIDTH) >
+						  0))) {
 
 			return true;
 		}

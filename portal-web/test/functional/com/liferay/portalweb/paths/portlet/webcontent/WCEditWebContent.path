@@ -14,6 +14,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>WEB_CONTENT_ID</td>
+	<td>//input[contains(@id,'JournalPortlet_newArticleId')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>VERSION</td>
 	<td>//span[@class='workflow-version']/span[@class='workflow-value']</td>
 	<td></td>
@@ -93,17 +98,6 @@
 <tr>
 	<td>DISPLAY_PAGE_SELECTION</td>
 	<td>//span[contains(@id,'displayPageNameInput')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td></td>
-	<td></td>
-	<td></td>
-</tr>
-<!--PERMISSIONS-->
-<tr>
-	<td>PERMISSIONS_VIEWABLE_BY_SELECT</td>
-	<td>//select[contains(@id,'inputPermissionsViewRole')]</td>
 	<td></td>
 </tr>
 </tbody>

@@ -35,12 +35,11 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * Provides the information necessary to expose the <a
- * href="http://schema.org/WebSite">WebSite</a> resources through a web API. The
- * resources are mapped from the internal model {@code Website}.
+ * Provides the information necessary to expose <a
+ * href="http://schema.org/WebSite">WebSite </a> resources through a web API.
+ * The resources are mapped from the internal model {@code Website}.
  *
  * @author Javier Gamarra
- * @review
  */
 @Component(immediate = true, service = ReusableNestedCollectionRouter.class)
 public class WebUrlReusableNestedCollectionRouter
@@ -48,8 +47,8 @@ public class WebUrlReusableNestedCollectionRouter
 		<Website, Long, WebUrlIdentifier, ClassNameClassPK> {
 
 	@Override
-	public NestedCollectionRoutes
-		<Website, Long, ClassNameClassPK> collectionRoutes(
+	public NestedCollectionRoutes<Website, Long, ClassNameClassPK>
+		collectionRoutes(
 			NestedCollectionRoutes.Builder<Website, Long, ClassNameClassPK>
 				builder) {
 

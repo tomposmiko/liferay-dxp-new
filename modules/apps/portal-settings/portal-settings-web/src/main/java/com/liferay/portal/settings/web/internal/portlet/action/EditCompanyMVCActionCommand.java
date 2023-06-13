@@ -35,6 +35,7 @@ import com.liferay.portal.kernel.exception.PhoneNumberException;
 import com.liferay.portal.kernel.exception.PhoneNumberExtensionException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.WebsiteURLException;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Address;
 import com.liferay.portal.kernel.model.EmailAddress;
 import com.liferay.portal.kernel.model.Group;
@@ -47,8 +48,10 @@ import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.CompanyService;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PropertiesParamUtil;
@@ -58,16 +61,12 @@ import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.settings.constants.PortalSettingsPortletKeys;
 import com.liferay.portal.settings.web.internal.exception.RequiredLocaleException;
-import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.users.admin.kernel.util.UsersAdminUtil;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
-import javax.portlet.PortletPreferences;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -227,29 +226,22 @@ public class EditCompanyMVCActionCommand extends BaseFormMVCActionCommand {
 
 		long companyId = _portal.getCompanyId(actionRequest);
 
-		PortletPreferences portletPreferences = PrefsPropsUtil.getPreferences(
-			companyId);
+		String[] removedLanguageIds = ArrayUtil.filter(
+			LocaleUtil.toLanguageIds(
+				LanguageUtil.getCompanyAvailableLocales(companyId)),
+			languageId -> !StringUtil.contains(
+				newLanguageIds, languageId, StringPool.COMMA));
 
-		String oldLanguageIds = portletPreferences.getValue(
-			PropsKeys.LOCALES, StringPool.BLANK);
-
-		if (Objects.equals(oldLanguageIds, newLanguageIds)) {
+		if (ArrayUtil.isEmpty(removedLanguageIds)) {
 			return;
 		}
 
-		List<String> removedLanguageIds = new ArrayList<>();
+		DynamicQuery dynamicQuery = _groupLocalService.dynamicQuery();
 
-		for (String oldLanguageId : oldLanguageIds.split(StringPool.COMMA)) {
-			if (!StringUtil.contains(
-					newLanguageIds, oldLanguageId, StringPool.COMMA)) {
-
-				removedLanguageIds.add(oldLanguageId);
-			}
-		}
-
-		if (removedLanguageIds.isEmpty()) {
-			return;
-		}
+		dynamicQuery.add(RestrictionsFactoryUtil.eq("companyId", companyId));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.like(
+				"typeSettings", "%inheritLocales=false%"));
 
 		Disjunction disjunction = RestrictionsFactoryUtil.disjunction();
 
@@ -259,12 +251,7 @@ public class EditCompanyMVCActionCommand extends BaseFormMVCActionCommand {
 					"typeSettings", "%languageId=" + removedLanguageId + "%"));
 		}
 
-		DynamicQuery dynamicQuery = _groupLocalService.dynamicQuery();
-
 		dynamicQuery.add(disjunction);
-		dynamicQuery.add(
-			RestrictionsFactoryUtil.like(
-				"typeSettings", "%inheritLocales=false%"));
 
 		List<Group> groups = _groupLocalService.dynamicQuery(dynamicQuery);
 

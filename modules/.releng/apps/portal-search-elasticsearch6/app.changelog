@@ -25,3 +25,17 @@ app.artifacts-2.0.1=\
 app.change.log-2.0.1=LPS-74544 LPS-77301 LPS-77699 LPS-78447 LPS-79679 LPS-80917 LPS-81411 LPS-81792 LPS-82004 LPS-82007 LPS-82008 LPS-83389 LPS-83485 LPS-83574 LPS-83942 LPS-84119 LPS-84663 LPS-84665 LPS-84837 LPS-84965 LPS-85003 LPS-85065 LPS-85124 LPS-85260 LPS-85296 LPS-86408 LPS-86534 LPS-86710
 
 app.git.id-2.0.1=8a02307992736d24effcbe35ddf596bbfd2318b9
+
+#
+# Liferay App Version 2.0.2
+#
+
+app.artifacts-2.0.2=\
+	com.ctc.wstx-4.4.1.jar,\
+	com.liferay.portal.search.elasticsearch6.api-2.0.10.jar,\
+	com.liferay.portal.search.elasticsearch6.impl-2.0.35.jar,\
+	org.codehaus.stax2-3.1.4.jar
+
+app.change.log-2.0.2=LPS-86408 LPS-86710 
+
+app.git.id-2.0.2=1ad0206eec8462b94638d545f9f0df37163ccdfd

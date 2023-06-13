@@ -18,6 +18,8 @@ import com.liferay.announcements.kernel.model.AnnouncementsFlag;
 import com.liferay.announcements.kernel.service.AnnouncementsFlagService;
 import com.liferay.announcements.kernel.service.persistence.AnnouncementsFlagPersistence;
 
+import com.liferay.counter.kernel.service.persistence.CounterPersistence;
+
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -126,6 +128,24 @@ public abstract class AnnouncementsFlagServiceBaseImpl extends BaseServiceImpl
 		this.counterLocalService = counterLocalService;
 	}
 
+	/**
+	 * Returns the counter persistence.
+	 *
+	 * @return the counter persistence
+	 */
+	public CounterPersistence getCounterPersistence() {
+		return counterPersistence;
+	}
+
+	/**
+	 * Sets the counter persistence.
+	 *
+	 * @param counterPersistence the counter persistence
+	 */
+	public void setCounterPersistence(CounterPersistence counterPersistence) {
+		this.counterPersistence = counterPersistence;
+	}
+
 	public void afterPropertiesSet() {
 	}
 
@@ -182,4 +202,6 @@ public abstract class AnnouncementsFlagServiceBaseImpl extends BaseServiceImpl
 	protected AnnouncementsFlagPersistence announcementsFlagPersistence;
 	@BeanReference(type = com.liferay.counter.kernel.service.CounterLocalService.class)
 	protected com.liferay.counter.kernel.service.CounterLocalService counterLocalService;
+	@BeanReference(type = CounterPersistence.class)
+	protected CounterPersistence counterPersistence;
 }

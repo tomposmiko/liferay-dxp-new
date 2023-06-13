@@ -18,29 +18,106 @@ import com.liferay.apio.architect.language.AcceptLanguage;
 import com.liferay.apio.architect.pagination.PageItems;
 import com.liferay.apio.architect.pagination.Pagination;
 import com.liferay.apio.architect.resource.NestedCollectionResource;
+import com.liferay.dynamic.data.mapping.io.DDMFormJSONDeserializer;
+import com.liferay.dynamic.data.mapping.kernel.DDMFormFieldValue;
+import com.liferay.dynamic.data.mapping.model.DDMForm;
+import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalArticleWrapper;
+import com.liferay.journal.service.JournalArticleLocalServiceUtil;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.filter.Filter;
 import com.liferay.portal.odata.sort.Sort;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
+import com.liferay.structured.content.apio.architect.resource.StructuredContentField;
 
+import java.io.InputStream;
+
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 
 /**
  * @author Julio Camarero
  */
 public abstract class BaseStructuredContentNestedCollectionResourceTestCase {
+
+	protected void addAssetTagNames(
+			long userId, JournalArticle journalArticle, String[] assetTagNames)
+		throws PortalException {
+
+		JournalArticleLocalServiceUtil.updateAsset(
+			userId, journalArticle, null, assetTagNames, null, null);
+	}
+
+	protected StructuredContentField createStructuredContentField(
+			DDMFormFieldValue ddmFormFieldValue, DDMStructure ddmStructure)
+		throws Exception {
+
+		NestedCollectionResource nestedCollectionResource =
+			_getNestedCollectionResource();
+
+		Class<? extends NestedCollectionResource> clazz =
+			nestedCollectionResource.getClass();
+
+		Class<?>[] declaredClasses = clazz.getDeclaredClasses();
+
+		Class<StructuredContentField> innerClass =
+			(Class<StructuredContentField>)declaredClasses[0];
+
+		Constructor<StructuredContentField>[] constructors =
+			(Constructor<StructuredContentField>[])
+				innerClass.getDeclaredConstructors();
+
+		Constructor constructor = constructors[0];
+
+		constructor.setAccessible(true);
+
+		return (StructuredContentField)constructor.newInstance(
+			nestedCollectionResource, ddmFormFieldValue, ddmStructure);
+	}
+
+	protected DDMForm deserialize(
+		DDMFormJSONDeserializer ddmFormJSONDeserializer, String content) {
+
+		try {
+			return ddmFormJSONDeserializer.deserialize(content);
+		}
+		catch (PortalException pe) {
+			throw new RuntimeException(pe);
+		}
+	}
+
+	protected List<String> getJournalArticleAssetTags(
+			JournalArticle journalArticle)
+		throws Exception {
+
+		NestedCollectionResource nestedCollectionResource =
+			_getNestedCollectionResource();
+
+		Class<? extends NestedCollectionResource> clazz =
+			nestedCollectionResource.getClass();
+
+		Method method = clazz.getDeclaredMethod(
+			"_getJournalArticleAssetTags", JournalArticle.class);
+
+		method.setAccessible(true);
+
+		return (List<String>)method.invoke(
+			nestedCollectionResource, journalArticle);
+	}
 
 	protected JournalArticleWrapper getJournalArticleWrapper(
 			long journalArticleId, ThemeDisplay themeDisplay)
@@ -66,6 +143,25 @@ public abstract class BaseStructuredContentNestedCollectionResourceTestCase {
 		catch (InvocationTargetException ite) {
 			throw ite.getCause();
 		}
+	}
+
+	protected Locale getLocale(
+			AcceptLanguage acceptLanguage, long contentSpaceId)
+		throws Exception {
+
+		NestedCollectionResource nestedCollectionResource =
+			_getNestedCollectionResource();
+
+		Class<? extends NestedCollectionResource> clazz =
+			nestedCollectionResource.getClass();
+
+		Method method = clazz.getDeclaredMethod(
+			"_getLocale", AcceptLanguage.class, long.class);
+
+		method.setAccessible(true);
+
+		return (Locale)method.invoke(
+			nestedCollectionResource, acceptLanguage, contentSpaceId);
 	}
 
 	protected PageItems<JournalArticle> getPageItems(
@@ -110,6 +206,25 @@ public abstract class BaseStructuredContentNestedCollectionResourceTestCase {
 			nestedCollectionResource, filter, locale);
 	}
 
+	protected List<StructuredContentField> getStructuredContentFields(
+			JournalArticleWrapper journalArticleWrapper)
+		throws Exception {
+
+		NestedCollectionResource nestedCollectionResource =
+			_getNestedCollectionResource();
+
+		Class<? extends NestedCollectionResource> clazz =
+			nestedCollectionResource.getClass();
+
+		Method method = clazz.getDeclaredMethod(
+			"_getStructuredContentFields", JournalArticle.class);
+
+		method.setAccessible(true);
+
+		return (List<StructuredContentField>)method.invoke(
+			nestedCollectionResource, journalArticleWrapper);
+	}
+
 	protected ThemeDisplay getThemeDisplay(Group group, Locale locale)
 		throws Exception {
 
@@ -126,18 +241,30 @@ public abstract class BaseStructuredContentNestedCollectionResourceTestCase {
 		return themeDisplay;
 	}
 
+	protected String read(String fileName) throws Exception {
+		Class<?> clazz = getClass();
+
+		ClassLoader classLoader = clazz.getClassLoader();
+
+		InputStream inputStream = classLoader.getResourceAsStream(
+			"/com/liferay/structured/content/apio/internal/architect/resource" +
+				"/test/" + fileName);
+
+		return StringUtil.read(inputStream);
+	}
+
 	private NestedCollectionResource _getNestedCollectionResource()
 		throws Exception {
 
 		Registry registry = RegistryUtil.getRegistry();
 
-		Collection<NestedCollectionResource> services = registry.getServices(
+		Collection<NestedCollectionResource> collection = registry.getServices(
 			NestedCollectionResource.class,
 			"(component.name=com.liferay.structured.content.apio.internal." +
 				"architect.resource." +
 					"StructuredContentNestedCollectionResource)");
 
-		Iterator<NestedCollectionResource> iterator = services.iterator();
+		Iterator<NestedCollectionResource> iterator = collection.iterator();
 
 		return iterator.next();
 	}

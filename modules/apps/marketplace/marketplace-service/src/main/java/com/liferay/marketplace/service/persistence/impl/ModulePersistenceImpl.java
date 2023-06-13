@@ -22,8 +22,6 @@ import com.liferay.marketplace.model.impl.ModuleImpl;
 import com.liferay.marketplace.model.impl.ModuleModelImpl;
 import com.liferay.marketplace.service.persistence.ModulePersistence;
 
-import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -39,6 +37,7 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
@@ -175,6 +174,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	@Override
 	public List<Module> findByUuid(String uuid, int start, int end,
 		OrderByComparator<Module> orderByComparator, boolean retrieveFromCache) {
+		uuid = Objects.toString(uuid, "");
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -198,7 +199,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Module module : list) {
-					if (!Objects.equals(uuid, module.getUuid())) {
+					if (!uuid.equals(module.getUuid())) {
 						list = null;
 
 						break;
@@ -222,10 +223,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 			boolean bindUuid = false;
 
-			if (uuid == null) {
-				query.append(_FINDER_COLUMN_UUID_UUID_1);
-			}
-			else if (uuid.equals("")) {
+			if (uuid.isEmpty()) {
 				query.append(_FINDER_COLUMN_UUID_UUID_3);
 			}
 			else {
@@ -405,6 +403,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	public Module[] findByUuid_PrevAndNext(long moduleId, String uuid,
 		OrderByComparator<Module> orderByComparator)
 		throws NoSuchModuleException {
+		uuid = Objects.toString(uuid, "");
+
 		Module module = findByPrimaryKey(moduleId);
 
 		Session session = null;
@@ -450,10 +450,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 		boolean bindUuid = false;
 
-		if (uuid == null) {
-			query.append(_FINDER_COLUMN_UUID_UUID_1);
-		}
-		else if (uuid.equals("")) {
+		if (uuid.isEmpty()) {
 			query.append(_FINDER_COLUMN_UUID_UUID_3);
 		}
 		else {
@@ -573,6 +570,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 */
 	@Override
 	public int countByUuid(String uuid) {
+		uuid = Objects.toString(uuid, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_UUID;
 
 		Object[] finderArgs = new Object[] { uuid };
@@ -586,10 +585,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 			boolean bindUuid = false;
 
-			if (uuid == null) {
-				query.append(_FINDER_COLUMN_UUID_UUID_1);
-			}
-			else if (uuid.equals("")) {
+			if (uuid.isEmpty()) {
 				query.append(_FINDER_COLUMN_UUID_UUID_3);
 			}
 			else {
@@ -630,7 +626,6 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_UUID_UUID_1 = "module.uuid IS NULL";
 	private static final String _FINDER_COLUMN_UUID_UUID_2 = "module.uuid = ?";
 	private static final String _FINDER_COLUMN_UUID_UUID_3 = "(module.uuid IS NULL OR module.uuid = '')";
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_UUID_C = new FinderPath(ModuleModelImpl.ENTITY_CACHE_ENABLED,
@@ -725,6 +720,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	public List<Module> findByUuid_C(String uuid, long companyId, int start,
 		int end, OrderByComparator<Module> orderByComparator,
 		boolean retrieveFromCache) {
+		uuid = Objects.toString(uuid, "");
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -752,7 +749,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Module module : list) {
-					if (!Objects.equals(uuid, module.getUuid()) ||
+					if (!uuid.equals(module.getUuid()) ||
 							(companyId != module.getCompanyId())) {
 						list = null;
 
@@ -777,10 +774,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 			boolean bindUuid = false;
 
-			if (uuid == null) {
-				query.append(_FINDER_COLUMN_UUID_C_UUID_1);
-			}
-			else if (uuid.equals("")) {
+			if (uuid.isEmpty()) {
 				query.append(_FINDER_COLUMN_UUID_C_UUID_3);
 			}
 			else {
@@ -977,6 +971,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	public Module[] findByUuid_C_PrevAndNext(long moduleId, String uuid,
 		long companyId, OrderByComparator<Module> orderByComparator)
 		throws NoSuchModuleException {
+		uuid = Objects.toString(uuid, "");
+
 		Module module = findByPrimaryKey(moduleId);
 
 		Session session = null;
@@ -1022,10 +1018,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 		boolean bindUuid = false;
 
-		if (uuid == null) {
-			query.append(_FINDER_COLUMN_UUID_C_UUID_1);
-		}
-		else if (uuid.equals("")) {
+		if (uuid.isEmpty()) {
 			query.append(_FINDER_COLUMN_UUID_C_UUID_3);
 		}
 		else {
@@ -1151,6 +1144,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 */
 	@Override
 	public int countByUuid_C(String uuid, long companyId) {
+		uuid = Objects.toString(uuid, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_UUID_C;
 
 		Object[] finderArgs = new Object[] { uuid, companyId };
@@ -1164,10 +1159,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 			boolean bindUuid = false;
 
-			if (uuid == null) {
-				query.append(_FINDER_COLUMN_UUID_C_UUID_1);
-			}
-			else if (uuid.equals("")) {
+			if (uuid.isEmpty()) {
 				query.append(_FINDER_COLUMN_UUID_C_UUID_3);
 			}
 			else {
@@ -1212,7 +1204,6 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_UUID_C_UUID_1 = "module.uuid IS NULL AND ";
 	private static final String _FINDER_COLUMN_UUID_C_UUID_2 = "module.uuid = ? AND ";
 	private static final String _FINDER_COLUMN_UUID_C_UUID_3 = "(module.uuid IS NULL OR module.uuid = '') AND ";
 	private static final String _FINDER_COLUMN_UUID_C_COMPANYID_2 = "module.companyId = ?";
@@ -1804,6 +1795,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	public List<Module> findByBundleSymbolicName(String bundleSymbolicName,
 		int start, int end, OrderByComparator<Module> orderByComparator,
 		boolean retrieveFromCache) {
+		bundleSymbolicName = Objects.toString(bundleSymbolicName, "");
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -1831,7 +1824,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Module module : list) {
-					if (!Objects.equals(bundleSymbolicName,
+					if (!bundleSymbolicName.equals(
 								module.getBundleSymbolicName())) {
 						list = null;
 
@@ -1856,10 +1849,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 			boolean bindBundleSymbolicName = false;
 
-			if (bundleSymbolicName == null) {
-				query.append(_FINDER_COLUMN_BUNDLESYMBOLICNAME_BUNDLESYMBOLICNAME_1);
-			}
-			else if (bundleSymbolicName.equals("")) {
+			if (bundleSymbolicName.isEmpty()) {
 				query.append(_FINDER_COLUMN_BUNDLESYMBOLICNAME_BUNDLESYMBOLICNAME_3);
 			}
 			else {
@@ -2043,6 +2033,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	public Module[] findByBundleSymbolicName_PrevAndNext(long moduleId,
 		String bundleSymbolicName, OrderByComparator<Module> orderByComparator)
 		throws NoSuchModuleException {
+		bundleSymbolicName = Objects.toString(bundleSymbolicName, "");
+
 		Module module = findByPrimaryKey(moduleId);
 
 		Session session = null;
@@ -2088,10 +2080,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 		boolean bindBundleSymbolicName = false;
 
-		if (bundleSymbolicName == null) {
-			query.append(_FINDER_COLUMN_BUNDLESYMBOLICNAME_BUNDLESYMBOLICNAME_1);
-		}
-		else if (bundleSymbolicName.equals("")) {
+		if (bundleSymbolicName.isEmpty()) {
 			query.append(_FINDER_COLUMN_BUNDLESYMBOLICNAME_BUNDLESYMBOLICNAME_3);
 		}
 		else {
@@ -2211,6 +2200,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 */
 	@Override
 	public int countByBundleSymbolicName(String bundleSymbolicName) {
+		bundleSymbolicName = Objects.toString(bundleSymbolicName, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_BUNDLESYMBOLICNAME;
 
 		Object[] finderArgs = new Object[] { bundleSymbolicName };
@@ -2224,10 +2215,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 			boolean bindBundleSymbolicName = false;
 
-			if (bundleSymbolicName == null) {
-				query.append(_FINDER_COLUMN_BUNDLESYMBOLICNAME_BUNDLESYMBOLICNAME_1);
-			}
-			else if (bundleSymbolicName.equals("")) {
+			if (bundleSymbolicName.isEmpty()) {
 				query.append(_FINDER_COLUMN_BUNDLESYMBOLICNAME_BUNDLESYMBOLICNAME_3);
 			}
 			else {
@@ -2268,8 +2256,6 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_BUNDLESYMBOLICNAME_BUNDLESYMBOLICNAME_1 =
-		"module.bundleSymbolicName IS NULL";
 	private static final String _FINDER_COLUMN_BUNDLESYMBOLICNAME_BUNDLESYMBOLICNAME_2 =
 		"module.bundleSymbolicName = ?";
 	private static final String _FINDER_COLUMN_BUNDLESYMBOLICNAME_BUNDLESYMBOLICNAME_3 =
@@ -2362,6 +2348,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	public List<Module> findByContextName(String contextName, int start,
 		int end, OrderByComparator<Module> orderByComparator,
 		boolean retrieveFromCache) {
+		contextName = Objects.toString(contextName, "");
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -2385,7 +2373,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Module module : list) {
-					if (!Objects.equals(contextName, module.getContextName())) {
+					if (!contextName.equals(module.getContextName())) {
 						list = null;
 
 						break;
@@ -2409,10 +2397,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 			boolean bindContextName = false;
 
-			if (contextName == null) {
-				query.append(_FINDER_COLUMN_CONTEXTNAME_CONTEXTNAME_1);
-			}
-			else if (contextName.equals("")) {
+			if (contextName.isEmpty()) {
 				query.append(_FINDER_COLUMN_CONTEXTNAME_CONTEXTNAME_3);
 			}
 			else {
@@ -2594,6 +2579,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	public Module[] findByContextName_PrevAndNext(long moduleId,
 		String contextName, OrderByComparator<Module> orderByComparator)
 		throws NoSuchModuleException {
+		contextName = Objects.toString(contextName, "");
+
 		Module module = findByPrimaryKey(moduleId);
 
 		Session session = null;
@@ -2639,10 +2626,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 		boolean bindContextName = false;
 
-		if (contextName == null) {
-			query.append(_FINDER_COLUMN_CONTEXTNAME_CONTEXTNAME_1);
-		}
-		else if (contextName.equals("")) {
+		if (contextName.isEmpty()) {
 			query.append(_FINDER_COLUMN_CONTEXTNAME_CONTEXTNAME_3);
 		}
 		else {
@@ -2762,6 +2746,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 */
 	@Override
 	public int countByContextName(String contextName) {
+		contextName = Objects.toString(contextName, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_CONTEXTNAME;
 
 		Object[] finderArgs = new Object[] { contextName };
@@ -2775,10 +2761,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 			boolean bindContextName = false;
 
-			if (contextName == null) {
-				query.append(_FINDER_COLUMN_CONTEXTNAME_CONTEXTNAME_1);
-			}
-			else if (contextName.equals("")) {
+			if (contextName.isEmpty()) {
 				query.append(_FINDER_COLUMN_CONTEXTNAME_CONTEXTNAME_3);
 			}
 			else {
@@ -2819,7 +2802,6 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_CONTEXTNAME_CONTEXTNAME_1 = "module.contextName IS NULL";
 	private static final String _FINDER_COLUMN_CONTEXTNAME_CONTEXTNAME_2 = "module.contextName = ?";
 	private static final String _FINDER_COLUMN_CONTEXTNAME_CONTEXTNAME_3 = "(module.contextName IS NULL OR module.contextName = '')";
 	public static final FinderPath FINDER_PATH_FETCH_BY_A_CN = new FinderPath(ModuleModelImpl.ENTITY_CACHE_ENABLED,
@@ -2892,6 +2874,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	@Override
 	public Module fetchByA_CN(long appId, String contextName,
 		boolean retrieveFromCache) {
+		contextName = Objects.toString(contextName, "");
+
 		Object[] finderArgs = new Object[] { appId, contextName };
 
 		Object result = null;
@@ -2919,10 +2903,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 			boolean bindContextName = false;
 
-			if (contextName == null) {
-				query.append(_FINDER_COLUMN_A_CN_CONTEXTNAME_1);
-			}
-			else if (contextName.equals("")) {
+			if (contextName.isEmpty()) {
 				query.append(_FINDER_COLUMN_A_CN_CONTEXTNAME_3);
 			}
 			else {
@@ -3015,6 +2996,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	 */
 	@Override
 	public int countByA_CN(long appId, String contextName) {
+		contextName = Objects.toString(contextName, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_A_CN;
 
 		Object[] finderArgs = new Object[] { appId, contextName };
@@ -3030,10 +3013,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 			boolean bindContextName = false;
 
-			if (contextName == null) {
-				query.append(_FINDER_COLUMN_A_CN_CONTEXTNAME_1);
-			}
-			else if (contextName.equals("")) {
+			if (contextName.isEmpty()) {
 				query.append(_FINDER_COLUMN_A_CN_CONTEXTNAME_3);
 			}
 			else {
@@ -3077,7 +3057,6 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	}
 
 	private static final String _FINDER_COLUMN_A_CN_APPID_2 = "module.appId = ? AND ";
-	private static final String _FINDER_COLUMN_A_CN_CONTEXTNAME_1 = "module.contextName IS NULL";
 	private static final String _FINDER_COLUMN_A_CN_CONTEXTNAME_2 = "module.contextName = ?";
 	private static final String _FINDER_COLUMN_A_CN_CONTEXTNAME_3 = "(module.contextName IS NULL OR module.contextName = '')";
 	public static final FinderPath FINDER_PATH_FETCH_BY_A_BSN_BV = new FinderPath(ModuleModelImpl.ENTITY_CACHE_ENABLED,
@@ -3164,6 +3143,9 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	@Override
 	public Module fetchByA_BSN_BV(long appId, String bundleSymbolicName,
 		String bundleVersion, boolean retrieveFromCache) {
+		bundleSymbolicName = Objects.toString(bundleSymbolicName, "");
+		bundleVersion = Objects.toString(bundleVersion, "");
+
 		Object[] finderArgs = new Object[] {
 				appId, bundleSymbolicName, bundleVersion
 			};
@@ -3195,10 +3177,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 			boolean bindBundleSymbolicName = false;
 
-			if (bundleSymbolicName == null) {
-				query.append(_FINDER_COLUMN_A_BSN_BV_BUNDLESYMBOLICNAME_1);
-			}
-			else if (bundleSymbolicName.equals("")) {
+			if (bundleSymbolicName.isEmpty()) {
 				query.append(_FINDER_COLUMN_A_BSN_BV_BUNDLESYMBOLICNAME_3);
 			}
 			else {
@@ -3209,10 +3188,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 			boolean bindBundleVersion = false;
 
-			if (bundleVersion == null) {
-				query.append(_FINDER_COLUMN_A_BSN_BV_BUNDLEVERSION_1);
-			}
-			else if (bundleVersion.equals("")) {
+			if (bundleVersion.isEmpty()) {
 				query.append(_FINDER_COLUMN_A_BSN_BV_BUNDLEVERSION_3);
 			}
 			else {
@@ -3313,6 +3289,9 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	@Override
 	public int countByA_BSN_BV(long appId, String bundleSymbolicName,
 		String bundleVersion) {
+		bundleSymbolicName = Objects.toString(bundleSymbolicName, "");
+		bundleVersion = Objects.toString(bundleVersion, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_A_BSN_BV;
 
 		Object[] finderArgs = new Object[] {
@@ -3330,10 +3309,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 			boolean bindBundleSymbolicName = false;
 
-			if (bundleSymbolicName == null) {
-				query.append(_FINDER_COLUMN_A_BSN_BV_BUNDLESYMBOLICNAME_1);
-			}
-			else if (bundleSymbolicName.equals("")) {
+			if (bundleSymbolicName.isEmpty()) {
 				query.append(_FINDER_COLUMN_A_BSN_BV_BUNDLESYMBOLICNAME_3);
 			}
 			else {
@@ -3344,10 +3320,7 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 
 			boolean bindBundleVersion = false;
 
-			if (bundleVersion == null) {
-				query.append(_FINDER_COLUMN_A_BSN_BV_BUNDLEVERSION_1);
-			}
-			else if (bundleVersion.equals("")) {
+			if (bundleVersion.isEmpty()) {
 				query.append(_FINDER_COLUMN_A_BSN_BV_BUNDLEVERSION_3);
 			}
 			else {
@@ -3395,10 +3368,8 @@ public class ModulePersistenceImpl extends BasePersistenceImpl<Module>
 	}
 
 	private static final String _FINDER_COLUMN_A_BSN_BV_APPID_2 = "module.appId = ? AND ";
-	private static final String _FINDER_COLUMN_A_BSN_BV_BUNDLESYMBOLICNAME_1 = "module.bundleSymbolicName IS NULL AND ";
 	private static final String _FINDER_COLUMN_A_BSN_BV_BUNDLESYMBOLICNAME_2 = "module.bundleSymbolicName = ? AND ";
 	private static final String _FINDER_COLUMN_A_BSN_BV_BUNDLESYMBOLICNAME_3 = "(module.bundleSymbolicName IS NULL OR module.bundleSymbolicName = '') AND ";
-	private static final String _FINDER_COLUMN_A_BSN_BV_BUNDLEVERSION_1 = "module.bundleVersion IS NULL";
 	private static final String _FINDER_COLUMN_A_BSN_BV_BUNDLEVERSION_2 = "module.bundleVersion = ?";
 	private static final String _FINDER_COLUMN_A_BSN_BV_BUNDLEVERSION_3 = "(module.bundleVersion IS NULL OR module.bundleVersion = '')";
 

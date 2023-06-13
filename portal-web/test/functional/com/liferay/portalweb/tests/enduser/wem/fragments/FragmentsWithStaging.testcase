@@ -1,0 +1,92 @@
+@component-name = "portal-wcm"
+definition {
+	property portal.release = "true";
+	property portal.upstream = "true";
+	property testray.main.component.name = "Fragments";
+
+	setUp {
+		TestCase.setUpPortalInstance();
+
+		User.firstLoginPG();
+
+		JSONGroup.addGroup(groupName = "Test Site Name");
+
+		JSONLayout.addPublicLayout(
+			groupName = "Test Site Name",
+			layoutName = "Staging Test Page"
+		);
+
+		Staging.openStagingAdmin(siteURLKey = "test-site-name");
+
+		Staging.activateStagingCP(siteName = "Test Site Name");
+	}
+
+	tearDown {
+		var testPortalInstance = PropsUtil.get("test.portal.instance");
+
+		if ("${testPortalInstance}" == "true") {
+			PortalInstances.tearDownCP();
+		}
+		else {
+			JSONGroup.deleteGroupByName(groupName = "Test Site Name");
+		}
+	}
+
+	@description = "Fragments are published automatically on any publishing process."
+	@priority = "5"
+	test AssertFragmentsAlwaysPublished {
+		JSONFragment.addFragmentCollection(
+			groupKey = "Test Site Name-staging",
+			name = "Collection Name",
+			site = "false"
+		);
+
+		JSONFragment.addFragment(
+			collectionName = "Collection Name",
+			groupKey = "Test Site Name-staging",
+			name = "Fragment Name",
+			site = "false"
+		);
+
+		JSONFragment.assertFragmentCollectionNotInGroup(
+			collectionName = "Collection Name",
+			groupName = "Test Site Name"
+		);
+
+		Staging.openStagingAdmin(siteURLKey = "test-site-name-staging");
+
+		Staging.publishCustomPublication();
+
+		JSONFragment.assertFragmentCollectionInGroup(
+			collectionName = "Collection Name",
+			groupName = "Test Site Name"
+		);
+
+		JSONFragment.assertFragmentInGroup(
+			collectionName = "Collection Name",
+			fragmentName = "Fragment Name",
+			groupName = "Test Site Name"
+		);
+	}
+
+	@description = "Page Fragments administration is only be accessible in staging view."
+	@priority = "5"
+	test AssertFragmentsAreOnlyEditableInStagingView {
+		ProductMenuHelper.expandPanel(panel = "Site Administration");
+
+		ProductMenuHelper.expandCategory(category = "Build");
+
+		AssertVisible(locator1 = "ProductMenu#PORTLET", key_portlet = "Page Fragments");
+
+		ProductMenu.gotoLiveSite(site = "Site Name");
+
+		ProductMenuHelper.expandPanel(panel = "Site Administration");
+
+		ProductMenuHelper.expandCategory(category = "Build");
+
+		AssertElementNotPresent(
+			locator1 = "ProductMenu#PORTLET",
+			key_portlet = "Page Fragments"
+		);
+	}
+}

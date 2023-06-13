@@ -14,12 +14,12 @@
 
 package com.liferay.bean.portlet.cdi.extension.internal;
 
-import com.liferay.bean.portlet.cdi.extension.internal.scope.ScopedBeanHolder;
+import com.liferay.bean.portlet.cdi.extension.internal.scope.ScopedBeanManager;
+import com.liferay.bean.portlet.cdi.extension.internal.scope.ScopedBeanManagerThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.Validator;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -180,8 +180,7 @@ public class BeanPortletInvokerPortlet
 					String markup = (String)beanMethod.invoke();
 
 					if (markup != null) {
-						RenderResponse renderResponse = (RenderResponse)
-							args[1];
+						RenderResponse renderResponse = (RenderResponse)args[1];
 
 						PrintWriter writer = renderResponse.getWriter();
 
@@ -268,15 +267,11 @@ public class BeanPortletInvokerPortlet
 			return;
 		}
 
-		ScopedBeanHolder scopedBeanHolder = new ScopedBeanHolder(
-			portletRequest, portletResponse, _portletConfig);
-
-		try (Closeable closeable = scopedBeanHolder.install()) {
-			_invokeBeanMethods(beanMethods, portletRequest, portletResponse);
-		}
-		catch (IOException ioe) {
-			throw new PortletException(ioe);
-		}
+		ScopedBeanManagerThreadLocal.invokeWithScopedBeanManager(
+			() -> _invokeBeanMethods(
+				beanMethods, portletRequest, portletResponse),
+			() -> new ScopedBeanManager(
+				portletRequest, portletResponse, _portletConfig));
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

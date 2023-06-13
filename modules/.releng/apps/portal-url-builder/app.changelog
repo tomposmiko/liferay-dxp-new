@@ -21,3 +21,15 @@ app.artifacts-1.0.1=\
 app.change.log-1.0.1=LPS-74544 LPS-84093 LPS-86408
 
 app.git.id-1.0.1=5370dfca41a51abddb2c6f7dd5a8bb03b333be5f
+
+#
+# Liferay App Version 1.0.2
+#
+
+app.artifacts-1.0.2=\
+	com.liferay.portal.url.builder.api-1.0.3.jar,\
+	com.liferay.portal.url.builder.impl-1.0.5.jar
+
+app.change.log-1.0.2=LPS-86408
+
+app.git.id-1.0.2=1ad0206eec8462b94638d545f9f0df37163ccdfd

@@ -40,6 +40,9 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
+ * Enables the Sign In portlet to render a prompt for users to enter their
+ * OpenID Connect IDs.
+ *
  * @author Michael C. Han
  */
 @Component(
@@ -72,9 +75,6 @@ public class OpenIdConnectLoginRequestMVCRenderCommand
 			return "/login.jsp";
 		}
 
-		HttpServletResponse httpServletResponse =
-			_portal.getHttpServletResponse(renderResponse);
-
 		Collection<String> openIdConnectProviderNames =
 			_openIdConnectProviderRegistry.getOpenIdConnectProviderNames();
 
@@ -84,6 +84,9 @@ public class OpenIdConnectLoginRequestMVCRenderCommand
 
 		RequestDispatcher requestDispatcher =
 			_servletContext.getRequestDispatcher(_JSP_PATH);
+
+		HttpServletResponse httpServletResponse =
+			_portal.getHttpServletResponse(renderResponse);
 
 		try {
 			requestDispatcher.include(httpServletRequest, httpServletResponse);

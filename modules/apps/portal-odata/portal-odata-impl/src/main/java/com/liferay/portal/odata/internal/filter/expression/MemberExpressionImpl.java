@@ -14,6 +14,7 @@
 
 package com.liferay.portal.odata.internal.filter.expression;
 
+import com.liferay.portal.odata.filter.expression.Expression;
 import com.liferay.portal.odata.filter.expression.ExpressionVisitException;
 import com.liferay.portal.odata.filter.expression.ExpressionVisitor;
 import com.liferay.portal.odata.filter.expression.MemberExpression;
@@ -26,13 +27,21 @@ import java.util.List;
  */
 public class MemberExpressionImpl implements MemberExpression {
 
-	public MemberExpressionImpl(List<String> resourcePath) {
+	public MemberExpressionImpl(Expression expression) {
+		this(Collections.emptyList(), expression);
+	}
+
+	public MemberExpressionImpl(
+		List<String> resourcePath, Expression expression) {
+
 		if (resourcePath == null) {
 			_resourcePath = Collections.emptyList();
 		}
 		else {
 			_resourcePath = Collections.unmodifiableList(resourcePath);
 		}
+
+		_expression = expression;
 	}
 
 	@Override
@@ -43,15 +52,21 @@ public class MemberExpressionImpl implements MemberExpression {
 	}
 
 	@Override
+	public Expression getExpression() {
+		return _expression;
+	}
+
+	@Override
 	public List<String> getResourcePath() {
 		return _resourcePath;
 	}
 
 	@Override
 	public String toString() {
-		return _resourcePath.toString();
+		return _expression.toString();
 	}
 
-	private final List<String > _resourcePath;
+	private final Expression _expression;
+	private final List<String> _resourcePath;
 
 }

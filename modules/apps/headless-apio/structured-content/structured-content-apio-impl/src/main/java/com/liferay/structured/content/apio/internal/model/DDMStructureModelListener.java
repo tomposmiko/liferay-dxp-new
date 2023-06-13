@@ -15,12 +15,12 @@
 package com.liferay.structured.content.apio.internal.model;
 
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
+import com.liferay.dynamic.data.mapping.model.DDMFormFieldType;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.storage.FieldConstants;
 import com.liferay.dynamic.data.mapping.util.DDMIndexer;
 import com.liferay.journal.model.JournalArticle;
-import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Property;
@@ -33,18 +33,29 @@ import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.ModelListener;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
+import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
-import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.odata.entity.BooleanEntityField;
+import com.liferay.portal.odata.entity.DateEntityField;
+import com.liferay.portal.odata.entity.DoubleEntityField;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
+import com.liferay.portal.odata.entity.IntegerEntityField;
 import com.liferay.portal.odata.entity.StringEntityField;
 import com.liferay.structured.content.apio.internal.architect.filter.StructuredContentEntityModel;
 import com.liferay.structured.content.apio.internal.architect.resource.StructuredContentNestedCollectionResource;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -140,31 +151,12 @@ public class DDMStructureModelListener extends BaseModelListener<DDMStructure> {
 	}
 
 	protected String encodeName(
-		long ddmStructureId, String fieldName, Locale locale,
-		String indexType) {
+		long ddmStructureId, String fieldName, Locale locale, String type) {
 
-		StringBundler sb = new StringBundler(10);
-
-		sb.append(DDMIndexer.DDM_FIELD_PREFIX);
-
-		if (Validator.isNotNull(indexType)) {
-			sb.append(indexType);
-			sb.append(DDMIndexer.DDM_FIELD_SEPARATOR);
-		}
-
-		sb.append(ddmStructureId);
-		sb.append(DDMIndexer.DDM_FIELD_SEPARATOR);
-		sb.append(fieldName);
-
-		if (locale != null) {
-			sb.append(StringPool.UNDERLINE);
-			sb.append(LocaleUtil.toLanguageId(locale));
-		}
-
-		sb.append(StringPool.UNDERLINE);
-		sb.append("String");
-
-		return Field.getSortableFieldName(sb.toString());
+		return Field.getSortableFieldName(
+			StringBundler.concat(
+				_ddmIndexer.encodeName(ddmStructureId, fieldName, locale),
+				StringPool.UNDERLINE, type));
 	}
 
 	private Optional<EntityField> _createEntityField(
@@ -178,18 +170,94 @@ public class DDMStructureModelListener extends BaseModelListener<DDMStructure> {
 			return Optional.empty();
 		}
 
-		if (Objects.equals(ddmFormField.getDataType(), FieldConstants.STRING)) {
+		if (Objects.equals(ddmFormField.getType(), DDMFormFieldType.CHECKBOX)) {
 			return Optional.of(
-				new StringEntityField(
-					StructuredContentNestedCollectionResource.encodeKey(
-						ddmStructure, ddmFormField.getName()),
+				new BooleanEntityField(
+					StructuredContentNestedCollectionResource.
+						encodeFilterAndSortIdentifier(
+							ddmStructure, ddmFormField.getName()),
 					locale -> encodeName(
 						ddmStructure.getStructureId(), ddmFormField.getName(),
-						locale, indexType))
-			);
+						locale, "String")));
+		}
+		else if (Objects.equals(
+					ddmFormField.getDataType(), FieldConstants.DATE)) {
+
+			return Optional.of(
+				new DateEntityField(
+					StructuredContentNestedCollectionResource.
+						encodeFilterAndSortIdentifier(
+							ddmStructure, ddmFormField.getName()),
+					locale -> encodeName(
+						ddmStructure.getStructureId(), ddmFormField.getName(),
+						locale, "String"),
+					locale -> encodeName(
+						ddmStructure.getStructureId(), ddmFormField.getName(),
+						locale, "String"),
+					this::_getDDMDateFieldValue));
+		}
+		else if (Objects.equals(
+					ddmFormField.getDataType(), FieldConstants.DOUBLE) ||
+				 Objects.equals(
+					 ddmFormField.getDataType(), FieldConstants.NUMBER)) {
+
+			return Optional.of(
+				new DoubleEntityField(
+					StructuredContentNestedCollectionResource.
+						encodeFilterAndSortIdentifier(
+							ddmStructure, ddmFormField.getName()),
+					locale -> encodeName(
+						ddmStructure.getStructureId(), ddmFormField.getName(),
+						locale, "Number")));
+		}
+		else if (Objects.equals(
+					ddmFormField.getDataType(), FieldConstants.LONG) ||
+				 Objects.equals(
+					 ddmFormField.getDataType(), FieldConstants.INTEGER)) {
+
+			return Optional.of(
+				new IntegerEntityField(
+					StructuredContentNestedCollectionResource.
+						encodeFilterAndSortIdentifier(
+							ddmStructure, ddmFormField.getName()),
+					locale -> encodeName(
+						ddmStructure.getStructureId(), ddmFormField.getName(),
+						locale, "Number")));
+		}
+		else if (Objects.equals(
+					ddmFormField.getDataType(), DDMFormFieldType.RADIO) ||
+				 (Objects.equals(
+					 ddmFormField.getType(), DDMFormFieldType.TEXT) &&
+				  Objects.equals(ddmFormField.getIndexType(), "keyword"))) {
+
+			return Optional.of(
+				new StringEntityField(
+					StructuredContentNestedCollectionResource.
+						encodeFilterAndSortIdentifier(
+							ddmStructure, ddmFormField.getName()),
+					locale -> encodeName(
+						ddmStructure.getStructureId(), ddmFormField.getName(),
+						locale, "String")));
 		}
 
 		return Optional.empty();
+	}
+
+	private String _getDDMDateFieldValue(Object fieldValue) {
+		DateFormat indexDateFormat = DateFormatFactoryUtil.getSimpleDateFormat(
+			PropsUtil.get(PropsKeys.INDEX_DATE_FORMAT_PATTERN));
+
+		try {
+			Date date = indexDateFormat.parse(String.valueOf(fieldValue));
+
+			DateFormat searchDateFormat =
+				DateFormatFactoryUtil.getSimpleDateFormat("yyyy-MM-dd");
+
+			return searchDateFormat.format(date);
+		}
+		catch (ParseException pe) {
+			throw new RuntimeException(pe);
+		}
 	}
 
 	private Map<Long, List<EntityField>> _getEntityFieldsMap()
@@ -291,6 +359,9 @@ public class DDMStructureModelListener extends BaseModelListener<DDMStructure> {
 
 	@Reference
 	private ClassNameLocalService _classNameLocalService;
+
+	@Reference
+	private DDMIndexer _ddmIndexer;
 
 	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;

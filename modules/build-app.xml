@@ -31,17 +31,6 @@
 
 	<target depends="dist-module-artifacts,update-app-marketplace-version,write-app-change-log,zip-app-sources" name="build-app">
 		<delete file="${dist.dir}/ticket.list.tmp" />
-
-		<condition property="git.finalize">
-			<and>
-				<isset property="app.ticket.list" />
-				<not>
-					<istrue value="${override.git.finalize}" />
-				</not>
-			</and>
-		</condition>
-
-		<antcall target="git-finalize" />
 	</target>
 
 	<target depends="get-app-names" name="build-app-all">
@@ -54,6 +43,8 @@
 				</antcall>
 			</sequential>
 		</for>
+
+		<antcall target="git-finalize" />
 	</target>
 
 	<target depends="dist-module-artifacts,get-app-change-log" name="build-app-from-changelog">
@@ -511,52 +502,24 @@
 	</target>
 
 	<target depends="get-app-names-core" name="get-app-names" unless="app.names">
-		<pathconvert pathsep="${line.separator}" property="app.names.unfiltered">
-			<flattenmapper />
-			<path>
-				<dirset
-					dir="${modules.dir}"
-					includes="private/apps/*"
-				>
-					<present targetdir="${modules.dir}/.releng/private">
-						<mapper
-							from="*"
-							to="*${file.separator}app.properties"
-							type="glob"
-						/>
-					</present>
-				</dirset>
-				<dirset
-					dir="${modules.dir}"
-					includes="apps/*"
-				>
-					<present targetdir="${modules.dir}/.releng">
-						<mapper
-							from="*"
-							to="*${file.separator}app.properties"
-							type="glob"
-						/>
-					</present>
-				</dirset>
-			</path>
+		<pathconvert pathsep="," property="app.names">
+			<fileset
+				dir="${modules.dir}"
+			>
+				<contains casesensitive="false" ignorewhitespace="true" text="Liferay-Releng-Bundle: true" />
+				<containsregexp casesensitive="false" expression="Liferay-Releng-Suite:\s*[\w-]+$" multiline="true" />
+				<include name="apps/**/app.bnd" />
+				<include name="private/apps/**/app.bnd" />
+				<present targetdir="${modules.dir}/.releng">
+					<mapper
+						from="*app.bnd"
+						to="*app.properties"
+						type="glob"
+					/>
+				</present>
+			</fileset>
+			<regexpmapper from=".+${file.separator}(.+)${file.separator}app\.bnd" to="\1" />
 		</pathconvert>
-
-		<property name="app.names.unfiltered.formatted" value="${app.names.unfiltered}${line.separator}" />
-
-		<loadfile
-			property="app.names"
-		>
-			<filterchain>
-				<sortfilter />
-
-				<uniqfilter />
-
-				<tokenfilter delimoutput=",">
-					<stringtokenizer delims="${line.separator}" />
-				</tokenfilter>
-			</filterchain>
-			<propertyresource name="app.names.unfiltered.formatted" />
-		</loadfile>
 	</target>
 
 	<target if="${core.apps}" name="get-app-names-core" unless="app.names">
@@ -659,33 +622,30 @@
 		</pathconvert>
 	</target>
 
-	<target if="${git.finalize}" name="git-finalize">
+	<target name="git-finalize" unless="${override.git.finalize}">
 		<exec dir="${modules.dir}" executable="git" failonerror="true">
 			<arg value="reset" />
 		</exec>
 
 		<exec dir="${modules.dir}" executable="git" failonerror="true">
 			<arg value="add" />
-			<arg value="${releng.app.dir}/app.changelog" />
-			<arg value="${releng.app.dir}/app.properties" />
-			<arg value="-f" />
+			<arg value=".releng/**/app.changelog" />
+			<arg value=".releng/**/app.properties" />
 		</exec>
+
+		<loadfile
+			property="app.names.spaced"
+		>
+			<filterchain>
+				<replacestring from="," to=", " />
+			</filterchain>
+			<propertyresource name="app.names" />
+		</loadfile>
 
 		<exec dir="${modules.dir}" executable="git" failonerror="true">
 			<arg value="commit" />
 			<arg value="-m" />
-			<arg value="${git.commit.app.ticket} ${Liferay-Releng-App-Title} ${app.version}" />
-		</exec>
-
-		<exec dir="${modules.dir}" executable="git" failonerror="false">
-			<arg value="tag" />
-			<arg value="-d" />
-			<arg value="marketplace-${app.name}-${app.version}" />
-		</exec>
-
-		<exec dir="${modules.dir}" executable="git" failonerror="true">
-			<arg value="tag" />
-			<arg value="marketplace-${app.name}-${app.version}" />
+			<arg value="${git.commit.app.ticket} Release Apps: ${app.names.spaced}" />
 		</exec>
 	</target>
 
@@ -1041,6 +1001,10 @@
 	</target>
 
 	<target depends="get-lpkg-artifacts-list" name="write-lpkg-marketplace-properties" unless="module.dirs.null">
+		<tstamp>
+			<format pattern="yyMMddHHmmssSSS" property="remote.app.id" />
+		</tstamp>
+
 		<echo file="${lpkg.dir}/liferay-marketplace.properties" message="bundles=${lpkg.artifacts.list}" />
 
 		<echo append="true" file="${lpkg.dir}/liferay-marketplace.properties" message="${line.separator}" />
@@ -1049,7 +1013,7 @@
 
 		<echo append="true" file="${lpkg.dir}/liferay-marketplace.properties" message="${line.separator}" />
 
-		<echo append="true" file="${lpkg.dir}/liferay-marketplace.properties" message="remote-app-id=${title}" />
+		<echo append="true" file="${lpkg.dir}/liferay-marketplace.properties" message="remote-app-id=${remote.app.id}" />
 
 		<echo append="true" file="${lpkg.dir}/liferay-marketplace.properties" message="${line.separator}" />
 

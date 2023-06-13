@@ -23,3 +23,16 @@ app.artifacts-1.0.1=\
 app.change.log-1.0.1=LPS-74544 LPS-78938 LPS-83505 LPS-84093 LPS-84119 LPS-85849 LPS-86714 
 
 app.git.id-1.0.1=9aae833f1e798f25e9186f76ab2efb63d98f7fa1
+
+#
+# Liferay App Version 1.0.2
+#
+
+app.artifacts-1.0.2=\
+	com.liferay.portal.background.task.api-3.0.2.jar,\
+	com.liferay.portal.background.task.service-4.0.15.jar,\
+	com.liferay.portal.background.task.web-3.0.0.jar
+
+app.change.log-1.0.2=LPS-79653 LPS-80332 LPS-85849 LPS-86714 
+
+app.git.id-1.0.2=1ad0206eec8462b94638d545f9f0df37163ccdfd

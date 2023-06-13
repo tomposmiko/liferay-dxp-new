@@ -1,0 +1,284 @@
+@component-name = "portal-wcm"
+definition {
+	property portal.release = "true";
+	property portal.upstream = "true";
+	property testray.main.component.name = "Display Pages";
+
+	setUp {
+		TestCase.setUpPortalInstance();
+
+		User.firstLoginPG();
+
+		JSONGroup.addGroup(groupName = "Test Site Name");
+
+		FragmentsAdmin.openFragmentsAdmin(siteURLKey = "test-site-name");
+
+		FragmentsAdmin.importCollectionFromDependenciesFolder(
+			collectionZipFile = "fragment-collection.zip"
+		);
+
+		DisplayPagesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
+
+		DisplayPagesAdmin.add(displayPageName = "Display Page Name");
+	}
+
+	tearDown {
+		var testPortalInstance = PropsUtil.get("test.portal.instance");
+
+		if ("${testPortalInstance}" == "true") {
+			PortalInstances.tearDownCP();
+		}
+		else {
+			JSONGroup.deleteGroupByName(groupName = "Test Site Name");
+		}
+	}
+
+	@description = "User can add a display page."
+	@priority = "3"
+	test AddBlankDisplayPage {
+		PortletEntry.publish();
+
+		LexiconEntry.viewEntryName(rowEntry = "Display Page Name");
+	}
+
+	@description = "User can add a display page with fragments."
+	@priority = "5"
+	test AddDisplayPage {
+		property portal.acceptance = "true";
+
+		PageEditor.addFragment(
+			collectionName = "Collection Name",
+			fragmentName = "Title"
+		);
+
+		AssertVisible(
+			locator1 = "Fragment#PAGE_EDITOR_FRAGMENT",
+			key_content = "Lorem ipsum dolor sit amet",
+			key_fragmentClass = "header",
+			key_position = "1"
+		);
+
+		PageEditor.viewAutoSaveMessage();
+
+		PortletEntry.publish();
+
+		LexiconEntry.gotoEntryMenuItem(
+			menuItem = "Edit",
+			rowEntry = "Display Page Name"
+		);
+
+		AssertVisible(
+			locator1 = "Fragment#PAGE_EDITOR_FRAGMENT",
+			key_content = "Lorem ipsum dolor sit amet",
+			key_fragmentClass = "header",
+			key_position = "1"
+		);
+	}
+
+	@priority = "4"
+	test AssertAssetTypeOnlySelectableOnce {
+		PageEditorMapping.selectAssetType(
+			assetType = "Web Content Article",
+			subType = "Basic Web Content"
+		);
+
+		PageEditorMapping.assertAssetTypeUnselectable();
+	}
+
+	@description = "In the display page editor, user can add, remove, and reorder fragments, and user can edit text in fragment editable fields."
+	@priority = "5"
+	test AssertDisplayPageEditorFunctionality {
+		PageEditor.addFragment(
+			collectionName = "Collection Name",
+			fragmentName = "Title"
+		);
+
+		PageEditor.addFragment(
+			collectionName = "Collection Name",
+			fragmentName = "Rich Text"
+		);
+
+		PageEditor.addFragment(
+			collectionName = "Collection Name",
+			fragmentName = "Button"
+		);
+
+		PageEditor.moveFragment(direction = "down", fragmentName = "Title");
+
+		PageEditor.addFragment(
+			collectionName = "Collection Name",
+			fragmentName = "Content"
+		);
+
+		PageEditor.editFragmentText(
+			fragmentName = "Rich Text",
+			id = "rich-text",
+			text = "Editing Finished"
+		);
+
+		PageEditor.removeFragment(fragmentName = "Button");
+
+		PageEditor.viewFragmentEditableText(
+			editableText = "Editing Finished",
+			fragmentName = "Rich Text",
+			id = "rich-text"
+		);
+
+		AssertVisible(
+			locator1 = "Fragment#PAGE_EDITOR_FRAGMENT",
+			key_content = "Editing Finished",
+			key_fragmentClass = "rich-text",
+			key_position = "1"
+		);
+
+		AssertVisible(
+			locator1 = "Fragment#PAGE_EDITOR_FRAGMENT",
+			key_content = "Lorem ipsum dolor sit amet",
+			key_fragmentClass = "header",
+			key_position = "2"
+		);
+
+		AssertVisible(
+			locator1 = "Fragment#PAGE_EDITOR_FRAGMENT",
+			key_content = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean tempus eleifend lacus nec porttitor. Vestibulum pharetra ullamcorper felis volutpat commodo. Nam id ipsum placerat, hendrerit orci eu, congue nisi. Proin.",
+			key_fragmentClass = "body",
+			key_position = "3"
+		);
+
+		Button.viewNotPresent(button = "Submit");
+	}
+
+	@description = "User can delete display pages."
+	@priority = "5"
+	test DeleteDisplayPage {
+		property portal.acceptance = "true";
+
+		DisplayPagesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
+
+		LexiconEntry.delete(rowEntry = "Display Page Name");
+
+		LexiconEntry.viewNoEntry(rowEntry = "Display Page Name");
+	}
+
+	@description = "User can edit a display page. This includes adding, removing, and reordering fragments and includes editing text in fragment editable fields."
+	@priority = "5"
+	test EditDisplayPage {
+		PageEditor.addFragment(
+			collectionName = "Collection Name",
+			fragmentName = "Title"
+		);
+
+		PageEditor.addFragment(
+			collectionName = "Collection Name",
+			fragmentName = "Rich Text"
+		);
+
+		PageEditor.addFragment(
+			collectionName = "Collection Name",
+			fragmentName = "Button"
+		);
+
+		PortletEntry.publish();
+
+		LexiconEntry.gotoEntryMenuItem(
+			menuItem = "Edit",
+			rowEntry = "Display Page Name"
+		);
+
+		PageEditor.moveFragment(direction = "down", fragmentName = "Title");
+
+		PageEditor.addFragment(
+			collectionName = "Collection Name",
+			fragmentName = "Content"
+		);
+
+		PageEditor.editFragmentText(
+			fragmentName = "Rich Text",
+			id = "rich-text",
+			text = "Editing Finished"
+		);
+
+		PageEditor.removeFragment(fragmentName = "Button");
+
+		PortletEntry.publish();
+
+		LexiconEntry.gotoEntryMenuItem(
+			menuItem = "Edit",
+			rowEntry = "Display Page Name"
+		);
+
+		PageEditor.viewFragmentEditableText(
+			editableText = "Editing Finished",
+			fragmentName = "Rich Text",
+			id = "rich-text"
+		);
+
+		AssertVisible(
+			locator1 = "Fragment#PAGE_EDITOR_FRAGMENT",
+			key_content = "Editing Finished",
+			key_fragmentClass = "rich-text",
+			key_position = "1"
+		);
+
+		AssertVisible(
+			locator1 = "Fragment#PAGE_EDITOR_FRAGMENT",
+			key_content = "Lorem ipsum dolor sit amet",
+			key_fragmentClass = "header",
+			key_position = "2"
+		);
+
+		AssertVisible(
+			locator1 = "Fragment#PAGE_EDITOR_FRAGMENT",
+			key_content = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean tempus eleifend lacus nec porttitor. Vestibulum pharetra ullamcorper felis volutpat commodo. Nam id ipsum placerat, hendrerit orci eu, congue nisi. Proin.",
+			key_fragmentClass = "body",
+			key_position = "3"
+		);
+
+		Button.viewNotPresent(button = "Submit");
+	}
+
+	@description = "User can rename display pages."
+	@priority = "4"
+	test RenameDisplayPage {
+		DisplayPagesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
+
+		PageTemplatesAdmin.rename(
+			pageTemplateName = "Display Page Name New",
+			rowEntry = "Display Page Name"
+		);
+
+		LexiconEntry.viewEntryName(rowEntry = "Display Page Name New");
+	}
+
+	@description = "User cannot delete a display page that is in use by an asset."
+	@priority = "4"
+	test ViewCannotDeleteActiveDisplayPage {
+		PageEditorMapping.selectAssetType(
+			assetType = "Web Content Article",
+			subType = "Basic Web Content"
+		);
+
+		Button.clickPublish();
+
+		WebContent.openWebContentAdmin(siteURLKey = "test-site-name");
+
+		WebContent.addArticleCP(
+			webContentContent = "Webcontent Content",
+			webContentTitle = "Webcontent Title"
+		);
+
+		WebContentNavigator.gotoEditCP(webContentTitle = "Webcontent Title");
+
+		WebContent.editDisplayPage(
+			pageName = "Display Page Name",
+			pageType = "Display Pages"
+		);
+
+		DisplayPagesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
+
+		LexiconEntry.delete(
+			failure = "Error:You cannot delete asset display pages that are used by one or more assets.",
+			rowEntry = "Display Page Name"
+		);
+	}
+}

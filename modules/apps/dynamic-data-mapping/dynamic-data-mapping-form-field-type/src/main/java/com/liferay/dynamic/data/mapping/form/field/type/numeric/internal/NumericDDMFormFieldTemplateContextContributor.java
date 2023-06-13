@@ -96,8 +96,9 @@ public class NumericDDMFormFieldTemplateContextContributor
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
 
 		DDMFormFieldEvaluationResult ddmFormFieldEvaluationResult =
-			(DDMFormFieldEvaluationResult)ddmFormFieldRenderingContext.
-				getProperty("ddmFormFieldEvaluationResult");
+			(DDMFormFieldEvaluationResult)
+				ddmFormFieldRenderingContext.getProperty(
+					"ddmFormFieldEvaluationResult");
 
 		if (ddmFormFieldEvaluationResult != null) {
 			String dataType = ddmFormFieldEvaluationResult.getProperty(

@@ -29,3 +29,19 @@ app.artifacts-1.0.1=\
 app.change.log-1.0.1=LPS-64821 LPS-74544 LPS-77699 LPS-82844 LPS-83206 LPS-83764 LPS-83801 LPS-84039 LPS-84093 LPS-84119 LPS-84216 LPS-84315 LPS-84416 LPS-85296 LPS-85722 LPS-86408 LPS-86714 
 
 app.git.id-1.0.1=d72499b62adcbfc39cf9404aea6825d80cede31e
+
+#
+# Liferay App Version 1.0.2
+#
+
+app.artifacts-1.0.2=\
+	com.liferay.portal.template.freemarker-4.0.15.jar,\
+	com.liferay.portal.template.soy.api-1.0.2.jar,\
+	com.liferay.portal.template.soy.context.contributor-2.0.0.jar,\
+	com.liferay.portal.template.soy.impl-1.0.12.jar,\
+	com.liferay.portal.template.velocity-3.0.14.jar,\
+	com.liferay.portal.template.xsl-3.0.3.jar
+
+app.change.log-1.0.2=LPS-80332 LPS-84093 LPS-84119 LPS-86408 LPS-86714 
+
+app.git.id-1.0.2=1ad0206eec8462b94638d545f9f0df37163ccdfd

@@ -19,7 +19,7 @@ import com.liferay.dynamic.data.lists.internal.upgrade.v1_0_0.UpgradeKernelPacka
 import com.liferay.dynamic.data.lists.internal.upgrade.v1_0_0.UpgradeLastPublishDate;
 import com.liferay.dynamic.data.lists.internal.upgrade.v1_0_0.UpgradeSchema;
 import com.liferay.dynamic.data.lists.internal.upgrade.v1_0_1.UpgradeRecordGroup;
-import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
 
 import org.osgi.service.component.annotations.Component;
@@ -56,14 +56,13 @@ public class DDLServiceUpgrade implements UpgradeStepRegistrator {
 			new com.liferay.dynamic.data.lists.internal.upgrade.v1_1_0.
 				UpgradeDDLRecordSet(),
 			new com.liferay.dynamic.data.lists.internal.upgrade.v1_1_0.
-				UpgradeDDLRecordSetVersion(
-					_counterLocalService, _userLocalService));
+				UpgradeDDLRecordSetVersion(_counterLocalService));
 	}
 
 	@Reference
 	private CounterLocalService _counterLocalService;
 
 	@Reference
-	private UserLocalService _userLocalService;
+	private DDMStructureLocalService _ddmStructureLocalService;
 
 }

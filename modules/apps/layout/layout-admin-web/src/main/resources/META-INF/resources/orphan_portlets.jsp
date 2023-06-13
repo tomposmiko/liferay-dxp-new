@@ -48,7 +48,7 @@ renderResponse.setTitle(LanguageUtil.get(request, "orphan-widgets"));
 			<aui:icon image="warning-full" markupView="lexicon" />
 		</span>
 
-		<strong class="lead"><liferay-ui:message key="warning" />:</strong>
+		<strong class="lead"><liferay-ui:message key="warning-colon" /></strong>
 
 		<c:choose>
 			<c:when test="<%= selLayout.isLayoutPrototypeLinkActive() %>">
@@ -59,7 +59,7 @@ renderResponse.setTitle(LanguageUtil.get(request, "orphan-widgets"));
 			</c:otherwise>
 		</c:choose>
 
-		<button aria-label="Close" class="close" data-dismiss="alert" type="button">
+		<button aria-label="<%= LanguageUtil.get(request, "close") %>" class="close" data-dismiss="alert" type="button">
 			<aui:icon image="times" markupView="lexicon" />
 		</button>
 	</div>

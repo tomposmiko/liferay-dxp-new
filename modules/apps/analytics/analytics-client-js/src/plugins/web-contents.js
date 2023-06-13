@@ -9,7 +9,17 @@ const applicationId = 'WebContent';
  * @return {object} The payload with webContent information
  */
 function getWebContentPayload(webContent) {
-	return {articleId: webContent.dataset.analyticsAssetId};
+	const {dataset} = webContent;
+
+	let payload = {
+		articleId: dataset.analyticsAssetId,
+	};
+
+	if (dataset.analyticsAssetTitle) {
+		payload = {...payload, title: dataset.analyticsAssetTitle};
+	}
+
+	return payload;
 }
 
 /**
@@ -70,14 +80,9 @@ function trackWebContentViewed(analytics) {
 			.filter(element => isTrackableWebContent(element))
 			.forEach(element => {
 				let payload = getWebContentPayload(element);
-				const title = element.dataset.analyticsAssetTitle;
 				const numberOfWords = getNumberOfWords(element);
 
 				payload = {numberOfWords, ...payload};
-
-				if (title) {
-					payload = {title, ...payload};
-				}
 
 				analytics.send('webContentViewed', applicationId, payload);
 			});

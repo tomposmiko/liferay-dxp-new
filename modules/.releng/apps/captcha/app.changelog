@@ -10,3 +10,16 @@ app.artifacts-1.0.0=\
 app.change.log-1.0.0=LPS-77699 LPS-85296
 
 app.git.id-1.0.0=140b11c51c1824150d677e356c02d2aa3c8ec841
+
+#
+# Liferay App Version 1.0.1
+#
+
+app.artifacts-1.0.1=\
+	com.liferay.captcha.api-2.0.9.jar,\
+	com.liferay.captcha.impl-1.0.3.jar,\
+	com.liferay.captcha.taglib-2.0.1.jar
+
+app.change.log-1.0.1=LPS-77699 LPS-85296 
+
+app.git.id-1.0.1=1ad0206eec8462b94638d545f9f0df37163ccdfd

@@ -50,6 +50,7 @@ import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -62,7 +63,10 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	configurationPid = "com.liferay.portal.store.file.system.configuration.FileSystemStoreConfiguration",
 	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
-	property = "store.type=com.liferay.portal.store.file.system.FileSystemStore",
+	property = {
+		"service.ranking:Integer=0",
+		"store.type=com.liferay.portal.store.file.system.FileSystemStore"
+	},
 	service = Store.class
 )
 public class FileSystemStore extends BaseStore {
@@ -464,6 +468,7 @@ public class FileSystemStore extends BaseStore {
 	}
 
 	@Activate
+	@Modified
 	protected void activate(Map<String, Object> properties) {
 		_fileSystemStoreConfiguration = ConfigurableUtil.createConfigurable(
 			FileSystemStoreConfiguration.class, properties);

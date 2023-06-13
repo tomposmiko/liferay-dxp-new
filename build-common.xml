@@ -816,6 +816,7 @@ information.
 						<arg value="-Dapp.server.parent.dir=${app.server.parent.dir}" />
 						<arg value="-Dforced.cache.enabled=@{forcedcacheenabled}" />
 						<arg value="-Dliferay.home=${liferay.home}" />
+						<arg if:set="env.JENKINS_HOME" value="-Dliferay.ssl.context.enabled=true" />
 						<arg value="tasks" />
 						<arg value="--all" />
 						<env key="GRADLE_OPTS" value="@{gradleopts}" />
@@ -855,6 +856,7 @@ information.
 								<arg value="-Dapp.server.parent.dir=${app.server.parent.dir}" />
 								<arg value="-Dforced.cache.enabled=@{forcedcacheenabled}" />
 								<arg value="-Dliferay.home=${liferay.home}" />
+								<arg if:set="env.JENKINS_HOME" value="-Dliferay.ssl.context.enabled=true" />
 								<arg line="@{task}" />
 								<env key="GRADLE_OPTS" value="@{gradleopts}" />
 								<redirector errorproperty="@{outputproperty}.error" outputproperty="@{outputproperty}" unless:blank="@{outputproperty}" />
@@ -1416,6 +1418,10 @@ artifact.url=${remote.repository.url}/com/liferay/portal/com.liferay.${processed
 							<isset property="env.JENKINS_HOME" />
 						</not>
 						<then>
+							<property location="${project.dir}/${build.binaries.cache.dir}" name="build.binaries.cache.dir.absolute.path" />
+
+							<echo>Updating ${build.binaries.cache.dir.absolute.path}.</echo>
+
 							<exec dir="${project.dir}/${build.binaries.cache.dir}" executable="git" failonerror="true">
 								<arg value="pull" />
 								<arg value="--rebase" />
@@ -1460,8 +1466,17 @@ artifact.url=${remote.repository.url}/com/liferay/portal/com.liferay.${processed
 			<gradle-execute forcedcacheenabled="true" outputproperty="sdk.zip.file" task="printDependencyPath">
 				<arg value="--build-file=${project.dir}/modules/util.gradle" />
 				<arg value="--quiet" />
+				<arg value="-Dorg.gradle.internal.launcher.welcomeMessageEnabled=false" />
 				<arg value="-PdependencyNotation=com.liferay.portal:com.liferay.portal.plugins.sdk:${build.sdk.version}" />
 			</gradle-execute>
+
+			<propertyregex
+				input="${sdk.zip.file}"
+				override="true"
+				property="sdk.zip.file"
+				regexp="(.*$)"
+				select="\1"
+			/>
 
 			<dirname file="${sdk.zip.file}" property="sdk.zip.dir" />
 
@@ -1766,7 +1781,10 @@ rerun your task.
 					<propertyref name="liferay.releng.product.display.name" />
 					<propertyref name="liferay.releng.public" />
 					<propertyref name="liferay.releng.supported" />
+					<propertyref name="org.gradle.console" />
 					<propertyref name="org.gradle.daemon" />
+					<propertyref name="org.gradle.internal.launcher.welcomeMessageEnabled" />
+					<propertyref name="org.gradle.warning.mode" />
 					<propertyref name="project.templates.test.builds" />
 					<propertyref name="release.versions.test.other.dir" />
 					<propertyref name="sass.compiler.class.name" />

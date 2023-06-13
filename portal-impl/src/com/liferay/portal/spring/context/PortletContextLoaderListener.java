@@ -19,7 +19,7 @@ import com.liferay.portal.kernel.bean.BeanLocator;
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.portlet.PortletClassLoaderUtil;
+import com.liferay.portal.kernel.servlet.ServletContextClassLoaderPool;
 import com.liferay.portal.kernel.util.MethodKey;
 
 import java.lang.reflect.Method;
@@ -41,9 +41,16 @@ public class PortletContextLoaderListener extends ContextLoaderListener {
 
 	@Override
 	public void contextDestroyed(ServletContextEvent servletContextEvent) {
-		ClassLoader classLoader = PortletClassLoaderUtil.getClassLoader();
-
 		ServletContext servletContext = servletContextEvent.getServletContext();
+
+		ClassLoader classLoader = ServletContextClassLoaderPool.getClassLoader(
+			servletContext.getServletContextName());
+
+		if (classLoader == null) {
+			throw new IllegalStateException(
+				"Unable to find the class loader for servlet context " +
+					servletContext.getServletContextName());
+		}
 
 		try {
 			Class<?> beanLocatorUtilClass = Class.forName(
@@ -80,7 +87,14 @@ public class PortletContextLoaderListener extends ContextLoaderListener {
 		servletContext.removeAttribute(
 			WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
 
-		ClassLoader classLoader = PortletClassLoaderUtil.getClassLoader();
+		ClassLoader classLoader = ServletContextClassLoaderPool.getClassLoader(
+			servletContext.getServletContextName());
+
+		if (classLoader == null) {
+			throw new IllegalStateException(
+				"Unable to find the class loader for servlet context " +
+					servletContext.getServletContextName());
+		}
 
 		super.contextInitialized(servletContextEvent);
 

@@ -1,0 +1,318 @@
+@component-name = "portal-wcm"
+definition {
+	property portal.release = "true";
+	property portal.upstream = "true";
+	property testray.main.component.name = "Site Administration";
+
+	setUp {
+		TestCase.setUpPortalInstance();
+
+		User.firstLoginPG();
+
+		JSONGroup.addGroup(groupName = "Test Site Name 1");
+
+		// Add two sites and activate staging on both.
+
+		Staging.openStagingAdmin(siteURLKey = "test-site-name-1");
+
+		Staging.activateStagingCP(siteName = "Test Site Name 1");
+
+		JSONGroup.addGroup(groupName = "Test Site Name 2");
+
+		Staging.openStagingAdmin(siteURLKey = "test-site-name-2");
+
+		Staging.activateStagingCP(siteName = "Test Site Name 2");
+
+		// Add fragments.
+
+		FragmentsAdmin.openFragmentsAdmin(siteURLKey = "test-site-name-1-staging");
+
+		FragmentsAdmin.importCollectionFromDependenciesFolder(
+			collectionZipFile = "fragment-collection.zip"
+		);
+
+		// Add a content page template.
+
+		PageTemplatesAdmin.openPageTemplatesAdmin(
+			siteURLKey = "test-site-name-1-staging"
+		);
+
+		PageTemplatesAdmin.addCollection(collectionName = "Page Template Collection");
+
+		Navigator.gotoNavNested(navNested = "Page Template Collection");
+
+		PageTemplatesAdmin.add(pageTemplateName = "Page Template Name");
+
+		PageEditor.addFragment(
+			collectionName = "Collection Name",
+			fragmentName = "Button"
+		);
+
+		Button.clickPublish();
+
+		// Add a content page from the page template.
+
+		SitePages.openPagesAdmin(siteURLKey = "test-site-name-1-staging");
+
+		ContentPages.addPage(
+			collectionName = "Page Template Collection",
+			pageName = "Test Template Content Page",
+			pageTemplateName = "Page Template Name"
+		);
+
+		// Add a regular content page.
+
+		SitePages.openPagesAdmin(siteURLKey = "test-site-name-1-staging");
+
+		ContentPages.addPage(pageName = "Test Regular Content Page");
+
+		PageEditor.addFragment(
+			collectionName = "Collection Name",
+			fragmentName = "Title"
+		);
+
+		// Add a navigation menu.
+
+		NavigationMenusAdmin.openNavigationMenusAdmin(
+			siteURLKey = "test-site-name-1-staging"
+		);
+
+		NavigationMenusAdmin.addMenu(menuName = "Test Navigation Menu Name");
+
+		NavigationMenusAdmin.addItem(
+			item = "Page",
+			pageNames = "Test Template Content Page,Test Regular Content Page"
+		);
+
+		NavigationMenusAdmin.addItem(
+			item = "URL",
+			url = "https://www.liferay.com/",
+			urlName = "Liferay"
+		);
+
+		Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name-1-staging");
+
+		NavigationMenusWidget.gotoNavigationMenuWidgetConfig();
+
+		NavigationMenusWidget.chooseMenu(menuName = "Test Navigation Menu Name");
+
+		Portlet.saveAndCloseConfig();
+
+		// Add a display page.
+
+		DisplayPagesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name-1-staging");
+
+		DisplayPagesAdmin.add(displayPageName = "Display Page Name");
+
+		PageEditor.addFragment(
+			collectionName = "Collection Name",
+			fragmentName = "Title"
+		);
+
+		PageEditor.addFragment(
+			collectionName = "Collection Name",
+			fragmentName = "Rich Text"
+		);
+
+		PageEditorMapping.selectAssetType(
+			assetType = "Web Content Article",
+			subType = "Basic Web Content"
+		);
+
+		PageEditorMapping.mapEditableTextToAsset(
+			fragmentName = "Title",
+			id = "title",
+			itemName = "Title"
+		);
+
+		PageEditorMapping.mapEditableTextToAsset(
+			fragmentName = "Rich Text",
+			id = "rich-text",
+			itemName = "content"
+		);
+
+		PortletEntry.publish();
+
+		// Add a web content article that uses the display page.
+
+		WebContent.openWebContentAdmin(siteURLKey = "test-site-name-1-staging");
+
+		WebContentNavigator.gotoAddCP();
+
+		WebContent.addCP(
+			webContentContent = "Webcontent Content",
+			webContentTitle = "Webcontent Title"
+		);
+
+		WebContent.editDisplayPage(
+			pageName = "Display Page Name",
+			pageType = "Display Pages"
+		);
+
+		Staging.openStagingAdmin(siteURLKey = "test-site-name-1-staging");
+
+		// Publish everything to live.
+
+		Staging.publishCustomPublication();
+	}
+
+	tearDown {
+		var testPortalInstance = PropsUtil.get("test.portal.instance");
+
+		if ("${testPortalInstance}" == "true") {
+			PortalInstances.tearDownCP();
+		}
+		else {
+			JSONGroup.deleteGroupByName(groupName = "Test Site Name 1");
+
+			JSONGroup.deleteGroupByName(groupName = "Test Site Name 2");
+		}
+	}
+
+	@description = "Export a live site into a different staging site. This test is focused on modern site building features. The high level steps of this test are outlined in LRQA-44517."
+	@priority = "5"
+	test ImportLiveSiteToStagingSite {
+		// Export the live site.
+
+		LAR.openExportAdmin(siteURLKey = "test-site-name-1");
+
+		LexiconEntry.gotoAdd();
+
+		LAR.exportSuccess();
+
+		LAR.downloadLar();
+
+		// Import to another staging site.
+
+		LAR.openImportAdmin(siteURLKey = "test-site-name-2-staging");
+
+		LexiconEntry.gotoAdd();
+
+		Site.importSiteFromTempFolder();
+
+		// Assert fragments.
+
+		FragmentsAdmin.openFragmentsAdmin(siteURLKey = "test-site-name-2-staging");
+
+		AssertVisible(locator1 = "Card#SPECIFIC_LARGE_TEXT", key_cardText = "Content");
+
+		AssertVisible(locator1 = "Card#SPECIFIC_LARGE_TEXT", key_cardText = "Image");
+
+		AssertVisible(locator1 = "Card#SPECIFIC_LARGE_TEXT", key_cardText = "Button");
+
+		AssertVisible(
+			locator1 = "Card#SPECIFIC_LARGE_TEXT",
+			key_cardText = "Multiple Editables"
+		);
+
+		AssertVisible(locator1 = "Card#SPECIFIC_LARGE_TEXT", key_cardText = "Rich Text");
+
+		AssertVisible(locator1 = "Card#SPECIFIC_LARGE_TEXT", key_cardText = "Title");
+
+		LexiconEntry.gotoEntryMenuItem(menuItem = "Edit", rowEntry = "Button");
+
+		SelectFrame(locator1 = "FragmentEditor#PREVIEW_IFRAME");
+
+		AssertElementPresent(locator1 = "Button#SUBMIT");
+
+		AssertElementPresent(locator1 = "Button#CANCEL");
+
+		AssertClickNoError(locator1 = "Button#SUBMIT", value1 = "Submit");
+
+		AssertConfirm(value1 = "Form submitted");
+
+		SelectFrameTop();
+
+		// Assert content page template.
+
+		PageTemplatesAdmin.openPageTemplatesAdmin(
+			siteURLKey = "test-site-name-2-staging"
+		);
+
+		LexiconEntry.gotoEntryMenuItem(
+			menuItem = "Edit",
+			rowEntry = "Page Template Name"
+		);
+
+		AssertVisible(
+			locator1 = "Fragment#PAGE_EDITOR_FRAGMENT",
+			key_content = "Submit",
+			key_fragmentClass = "footer",
+			key_position = "1"
+		);
+
+		for (var button : list "Submit,Cancel") {
+			Button.viewPresent(button = "${button}");
+		}
+
+		// Assert content pages and navigation menu widget.
+
+		Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name-2-staging");
+
+		Click(locator1 = "Home#PAGE", key_pageName = "Test Template Content Page");
+
+		AssertVisible(
+			locator1 = "Fragment#FRAGMENT",
+			key_content = "Submit",
+			key_fragmentClass = "footer",
+			key_position = "1"
+		);
+
+		for (var button : list "Submit,Cancel") {
+			Button.viewPresent(button = "${button}");
+		}
+
+		Click(locator1 = "Home#PAGE", key_pageName = "Test Regular Content Page");
+
+		AssertVisible(
+			locator1 = "Fragment#FRAGMENT",
+			key_content = "Lorem ipsum dolor sit amet",
+			key_fragmentClass = "header",
+			key_position = "1"
+		);
+
+		Click(locator1 = "Home#PAGE", key_pageName = "Liferay");
+
+		AssertLocation(value1 = "https://www.liferay.com/");
+
+		// Assert navigation menu.
+
+		NavigationMenusAdmin.openNavigationMenusAdmin(
+			siteURLKey = "test-site-name-2-staging"
+		);
+
+		AssertVisible(
+			locator1 = "ContentRow#ENTRY_CONTENT_ENTRY_NAME_LINK",
+			key_rowEntry = "Test Navigation Menu Name"
+		);
+
+		// Assert display page.
+
+		DisplayPagesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name-2-staging");
+
+		AssertVisible(
+			locator1 = "Card#SPECIFIC_LARGE_TEXT",
+			key_cardText = "Display Page Name"
+		);
+
+		// Assert web content article.
+
+		Navigator.openWithAppendToBaseURL(
+			urlAppend = "web/test-site-name-2-staging/-/webcontent-title"
+		);
+
+		AssertVisible(
+			locator1 = "Fragment#FRAGMENT",
+			key_content = "Webcontent Title",
+			key_fragmentClass = "header",
+			key_position = "1"
+		);
+
+		AssertVisible(
+			locator1 = "Fragment#FRAGMENT",
+			key_content = "Webcontent Content",
+			key_fragmentClass = "rich-text",
+			key_position = "2"
+		);
+	}
+}

@@ -289,8 +289,8 @@ public class DDMFormTemplateContextFactoryHelper {
 
 	protected boolean hasDataProviderSettings(DDMFormField ddmFormField) {
 		if (MapUtil.getLong(
-				ddmFormField.getProperties(),
-				"ddmDataProviderInstanceId") > 0) {
+				ddmFormField.getProperties(), "ddmDataProviderInstanceId") >
+					0) {
 
 			return true;
 		}

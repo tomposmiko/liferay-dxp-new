@@ -1,4 +1,4 @@
 Bundle-Name: Liferay Export Import Resources Importer
 Bundle-SymbolicName: com.liferay.exportimport.resources.importer
-Bundle-Version: 3.0.7
+Bundle-Version: 3.0.8
 -includeresource: content=../../staging/staging-lang/src/main/resources/content

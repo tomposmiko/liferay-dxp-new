@@ -34,8 +34,10 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.constants.SearchContextAttributes;
 import com.liferay.portal.search.elasticsearch6.configuration.ElasticsearchConfiguration;
+import com.liferay.portal.search.elasticsearch6.constants.ElasticsearchSearchContextAttributes;
 import com.liferay.portal.search.elasticsearch6.internal.index.IndexNameBuilder;
 import com.liferay.portal.search.engine.adapter.SearchEngineAdapter;
 import com.liferay.portal.search.engine.adapter.search.CountSearchRequest;
@@ -99,66 +101,14 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 
 			while (true) {
 				SearchSearchRequest searchSearchRequest =
-					new SearchSearchRequest();
-
-				QueryConfig queryConfig = searchContext.getQueryConfig();
-
-				searchSearchRequest.setAlternateUidFieldName(
-					queryConfig.getAlternateUidFieldName());
-
-				boolean basicFacetSelection = GetterUtil.getBoolean(
-					searchContext.getAttribute(
-						SearchContextAttributes.
-							ATTRIBUTE_KEY_BASIC_FACET_SELECTION));
-
-				searchSearchRequest.setBasicFacetSelection(basicFacetSelection);
-
-				String[] indexNames = getSelectedIndexNames(
-					queryConfig, searchContext);
-
-				searchSearchRequest.setIndexNames(indexNames);
-
-				searchSearchRequest.putAllFacets(searchContext.getFacets());
-
-				searchSearchRequest.setGroupBy(searchContext.getGroupBy());
-
-				searchSearchRequest.setHighlightEnabled(
-					queryConfig.isHighlightEnabled());
-				searchSearchRequest.setHighlightFieldNames(
-					queryConfig.getHighlightFieldNames());
-				searchSearchRequest.setHighlightFragmentSize(
-					queryConfig.getHighlightFragmentSize());
-				searchSearchRequest.setHighlightSnippetSize(
-					queryConfig.getHighlightSnippetSize());
-				searchSearchRequest.setLocale(queryConfig.getLocale());
-				searchSearchRequest.setHighlightRequireFieldMatch(
-					queryConfig.isHighlightRequireFieldMatch());
-
-				boolean luceneSyntax = GetterUtil.getBoolean(
-					searchContext.getAttribute(
-						SearchContextAttributes.ATTRIBUTE_KEY_LUCENE_SYNTAX));
-
-				searchSearchRequest.setLuceneSyntax(luceneSyntax);
-
-				searchSearchRequest.setQuery(query);
-				searchSearchRequest.setPostFilter(query.getPostFilter());
-
-				searchSearchRequest.setScoreEnabled(
-					queryConfig.isScoreEnabled());
-				searchSearchRequest.setSelectedFieldNames(
-					queryConfig.getSelectedFieldNames());
-
-				int size = end - start;
-
-				searchSearchRequest.setSize(size);
-
-				searchSearchRequest.setStart(start);
-
-				searchSearchRequest.setSorts(searchContext.getSorts());
-				searchSearchRequest.setStats(searchContext.getStats());
+					createSearchSearchRequest(searchContext, query, start, end);
 
 				SearchSearchResponse searchSearchResponse =
 					searchEngineAdapter.execute(searchSearchRequest);
+
+				searchContext.setAttribute(
+					"queryString",
+					searchSearchResponse.getSearchRequestString());
 
 				hits = searchSearchResponse.getHits();
 
@@ -229,6 +179,9 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 			CountSearchResponse countSearchResponse =
 				searchEngineAdapter.execute(countSearchRequest);
 
+			searchContext.setAttribute(
+				"queryString", countSearchResponse.getSearchRequestString());
+
 			return countSearchResponse.getCount();
 		}
 		catch (Exception e) {
@@ -270,6 +223,75 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 			ElasticsearchConfiguration.class, properties);
 
 		_logExceptionsOnly = _elasticsearchConfiguration.logExceptionsOnly();
+	}
+
+	protected SearchSearchRequest createSearchSearchRequest(
+		SearchContext searchContext, Query query, int start, int end) {
+
+		SearchSearchRequest searchSearchRequest = new SearchSearchRequest();
+
+		QueryConfig queryConfig = searchContext.getQueryConfig();
+
+		searchSearchRequest.setAlternateUidFieldName(
+			queryConfig.getAlternateUidFieldName());
+
+		boolean basicFacetSelection = GetterUtil.getBoolean(
+			searchContext.getAttribute(
+				SearchContextAttributes.ATTRIBUTE_KEY_BASIC_FACET_SELECTION));
+
+		searchSearchRequest.setBasicFacetSelection(basicFacetSelection);
+
+		String[] indexNames = getSelectedIndexNames(queryConfig, searchContext);
+
+		searchSearchRequest.setIndexNames(indexNames);
+
+		searchSearchRequest.putAllFacets(searchContext.getFacets());
+
+		searchSearchRequest.setGroupBy(searchContext.getGroupBy());
+
+		searchSearchRequest.setHighlightEnabled(
+			queryConfig.isHighlightEnabled());
+		searchSearchRequest.setHighlightFieldNames(
+			queryConfig.getHighlightFieldNames());
+		searchSearchRequest.setHighlightFragmentSize(
+			queryConfig.getHighlightFragmentSize());
+		searchSearchRequest.setHighlightSnippetSize(
+			queryConfig.getHighlightSnippetSize());
+		searchSearchRequest.setLocale(queryConfig.getLocale());
+		searchSearchRequest.setHighlightRequireFieldMatch(
+			queryConfig.isHighlightRequireFieldMatch());
+
+		boolean luceneSyntax = GetterUtil.getBoolean(
+			searchContext.getAttribute(
+				SearchContextAttributes.ATTRIBUTE_KEY_LUCENE_SYNTAX));
+
+		searchSearchRequest.setLuceneSyntax(luceneSyntax);
+
+		searchSearchRequest.setQuery(query);
+		searchSearchRequest.setPostFilter(query.getPostFilter());
+
+		String preference = (String)searchContext.getAttribute(
+			ElasticsearchSearchContextAttributes.
+				ATTRIBUTE_KEY_SEARCH_REQUEST_PREFERENCE);
+
+		if (!Validator.isBlank(preference)) {
+			searchSearchRequest.setPreference(preference);
+		}
+
+		searchSearchRequest.setScoreEnabled(queryConfig.isScoreEnabled());
+		searchSearchRequest.setSelectedFieldNames(
+			queryConfig.getSelectedFieldNames());
+
+		int size = end - start;
+
+		searchSearchRequest.setSize(size);
+
+		searchSearchRequest.setStart(start);
+
+		searchSearchRequest.setSorts(searchContext.getSorts());
+		searchSearchRequest.setStats(searchContext.getStats());
+
+		return searchSearchRequest;
 	}
 
 	protected String[] getSelectedIndexNames(

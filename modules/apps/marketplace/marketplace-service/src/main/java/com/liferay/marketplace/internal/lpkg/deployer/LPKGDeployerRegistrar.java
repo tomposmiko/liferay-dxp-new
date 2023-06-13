@@ -18,13 +18,13 @@ import com.liferay.marketplace.model.App;
 import com.liferay.marketplace.model.Module;
 import com.liferay.marketplace.service.AppLocalService;
 import com.liferay.marketplace.service.ModuleLocalService;
+import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.PropertiesUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -44,6 +44,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
+import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -194,16 +195,17 @@ public class LPKGDeployerRegistrar {
 	@Reference
 	private AppLocalService _appLocalService;
 
-	private final BundleListener _bundleListener = new BundleListener() {
+	private final BundleListener _bundleListener =
+		new SynchronousBundleListener() {
 
-		@Override
-		public void bundleChanged(BundleEvent bundleEvent) {
-			if (bundleEvent.getType() == BundleEvent.STARTED) {
-				_register(bundleEvent.getBundle());
+			@Override
+			public void bundleChanged(BundleEvent bundleEvent) {
+				if (bundleEvent.getType() == BundleEvent.STARTED) {
+					_register(bundleEvent.getBundle());
+				}
 			}
-		}
 
-	};
+		};
 
 	@Reference
 	private LPKGDeployer _lpkgDeployer;

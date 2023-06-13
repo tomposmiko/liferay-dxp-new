@@ -10,7 +10,7 @@ dependencies {
 	compileOnly group: "com.liferay", name: "com.liferay.dynamic.data.mapping.api", version: "4.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.exportimport.api", version: "3.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.friendly.url.api", version: "1.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.journal.api", version: "3.4.0"
+	compileOnly group: "com.liferay", name: "com.liferay.journal.api", version: "3.5.0"
 	compileOnly group: "com.liferay", name: "com.liferay.mobile.device.rules.api", version: "3.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.osgi.service.tracker.collections", version: "3.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.osgi.util", version: "4.0.0"

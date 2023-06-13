@@ -209,8 +209,8 @@ public class AdminPortlet extends BaseKBPortlet {
 			boolean prioritizeByNumericalPrefix = ParamUtil.getBoolean(
 				uploadPortletRequest, "prioritizeByNumericalPrefix");
 
-			try (InputStream inputStream =
-					uploadPortletRequest.getFileAsStream("file")) {
+			try (InputStream inputStream = uploadPortletRequest.getFileAsStream(
+					"file")) {
 
 				ServiceContext serviceContext =
 					ServiceContextFactory.getInstance(

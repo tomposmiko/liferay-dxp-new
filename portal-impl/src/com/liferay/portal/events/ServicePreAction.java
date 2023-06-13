@@ -510,9 +510,6 @@ public class ServicePreAction extends Action {
 
 		boolean hasUpdateLayoutPermission = false;
 
-		boolean customizedView = SessionParamUtil.getBoolean(
-			request, "customized_view", true);
-
 		if (layout != null) {
 			LayoutTypeAccessPolicy layoutTypeAccessPolicy =
 				LayoutTypeAccessPolicyTracker.getLayoutTypeAccessPolicy(layout);
@@ -572,6 +569,9 @@ public class ServicePreAction extends Action {
 			layoutTypePortlet = (LayoutTypePortlet)layout.getLayoutType();
 
 			boolean customizable = layoutTypePortlet.isCustomizable();
+
+			boolean customizedView = SessionParamUtil.getBoolean(
+				request, "customized_view", true);
 
 			if (!customizable || group.isLayoutPrototype() ||
 				group.isLayoutSetPrototype() || group.isStagingGroup()) {
@@ -729,8 +729,8 @@ public class ServicePreAction extends Action {
 
 		lifecycle = ParamUtil.getString(request, "p_t_lifecycle", lifecycle);
 
+		String async = ParamUtil.getString(request, "p_p_async");
 		String hub = ParamUtil.getString(request, "p_p_hub");
-
 		boolean isolated = ParamUtil.getBoolean(request, "p_p_isolated");
 
 		boolean widget = false;
@@ -763,6 +763,7 @@ public class ServicePreAction extends Action {
 		themeDisplay.setServerPort(PortalUtil.getForwardedPort(request));
 		themeDisplay.setWidget(widget);
 
+		themeDisplay.setAsync(async.equals("1"));
 		themeDisplay.setCompany(company);
 		themeDisplay.setCompanyLogo(companyLogo);
 		themeDisplay.setCompanyLogoHeight(companyLogoHeight);
@@ -1534,6 +1535,17 @@ public class ServicePreAction extends Action {
 			List<Layout> layouts, long doAsGroupId)
 		throws PortalException {
 
+		return getViewableLayoutComposite(
+			request, user, permissionChecker, layout, layouts, doAsGroupId,
+			false);
+	}
+
+	protected LayoutComposite getViewableLayoutComposite(
+			HttpServletRequest request, User user,
+			PermissionChecker permissionChecker, Layout layout,
+			List<Layout> layouts, long doAsGroupId, boolean ignoreHiddenLayouts)
+		throws PortalException {
+
 		if ((layouts == null) || layouts.isEmpty()) {
 			return new LayoutComposite(layout, layouts);
 		}
@@ -1549,7 +1561,7 @@ public class ServicePreAction extends Action {
 		List<Layout> accessibleLayouts = new ArrayList<>();
 
 		for (Layout curLayout : layouts) {
-			if (!curLayout.isHidden() &&
+			if ((ignoreHiddenLayouts || !curLayout.isHidden()) &&
 				hasAccessPermission(
 					permissionChecker, curLayout, doAsGroupId, false)) {
 
@@ -1593,7 +1605,8 @@ public class ServicePreAction extends Action {
 		List<Layout> layouts = defaultLayoutComposite.getLayouts();
 
 		return getViewableLayoutComposite(
-			request, user, permissionChecker, layout, layouts, doAsGroupId);
+			request, user, permissionChecker, layout, layouts, doAsGroupId,
+			true);
 	}
 
 	protected boolean hasAccessPermission(

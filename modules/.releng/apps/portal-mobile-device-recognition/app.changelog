@@ -8,3 +8,14 @@ app.artifacts-1.0.0=\
 app.change.log-1.0.0=LPS-80332 LPS-80517
 
 app.git.id-1.0.0=bf9943b93ff9473888db9fac9695168575fa3ab2
+
+#
+# Liferay App Version 1.0.1
+#
+
+app.artifacts-1.0.1=\
+	com.liferay.portal.mobile.device.recognition.impl-1.0.1.jar
+
+app.change.log-1.0.1=LPS-80332 LPS-80517
+
+app.git.id-1.0.1=1ad0206eec8462b94638d545f9f0df37163ccdfd

@@ -157,6 +157,7 @@ public class OAuth2ApplicationLocalServiceImpl
 		return oAuth2ApplicationPersistence.update(oAuth2Application);
 	}
 
+	@Override
 	public void afterPropertiesSet() {
 		super.afterPropertiesSet();
 
@@ -427,18 +428,16 @@ public class OAuth2ApplicationLocalServiceImpl
 		if (!Validator.isBlank(clientSecret)) {
 			for (GrantType grantType : allowedGrantTypesList) {
 				if (!grantType.isSupportsConfidentialClients()) {
-					throw new
-						OAuth2ApplicationClientGrantTypeException(
-							grantType.name());
+					throw new OAuth2ApplicationClientGrantTypeException(
+						grantType.name());
 				}
 			}
 		}
 		else {
 			for (GrantType grantType : allowedGrantTypesList) {
 				if (!grantType.isSupportsPublicClients()) {
-					throw new
-						OAuth2ApplicationClientGrantTypeException(
-							grantType.name());
+					throw new OAuth2ApplicationClientGrantTypeException(
+						grantType.name());
 				}
 			}
 		}

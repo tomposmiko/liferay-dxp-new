@@ -1448,9 +1448,9 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	 * Returns all the active or inactive groups associated with the company.
 	 *
 	 * @param  companyId the primary key of the company
-	 * @param  active whether to return only active groups, or only inactive
+	 * @param  active whether to return only active groups or only inactive
 	 *         groups
-	 * @return the active or inactive groups associated with the company
+	 * @return the active or inactive groups
 	 */
 	@Override
 	public List<Group> getActiveGroups(long companyId, boolean active) {
@@ -1458,19 +1458,28 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	}
 
 	/**
-	 * Returns the active or inactive groups associated with the company.
+	 * Returns the active or inactive groups associated with the company and,
+	 * optionally, the main site.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end -
+	 * start</code> instances. <code>start</code> and <code>end</code> are not
+	 * primary keys, they are indexes in the result set. Thus, <code>0</code>
+	 * refers to the first result in the set. Setting both <code>start</code>
+	 * and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
+	 * result set.
+	 * </p>
 	 *
 	 * @param  companyId the primary key of the company
-	 * @param  active whether to return only active groups, or only inactive
+	 * @param  site whether the group is associated with a main site
+	 * @param  active whether to return only active groups or only inactive
 	 *         groups
-	 * @param  site whether the group is to be associated with a main site
 	 * @param  start the lower bound of the range of groups to return
 	 * @param  end the upper bound of the range of groups to return (not
 	 *         inclusive)
 	 * @param  obc the comparator to order the groups (optionally
 	 *         <code>null</code>)
-	 * @return the active or inactive groups associated with the company
-	 * @review
+	 * @return the active or inactive groups
 	 */
 	@Override
 	public List<Group> getActiveGroups(
@@ -1484,16 +1493,24 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	/**
 	 * Returns the active or inactive groups associated with the company.
 	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end -
+	 * start</code> instances. <code>start</code> and <code>end</code> are not
+	 * primary keys, they are indexes in the result set. Thus, <code>0</code>
+	 * refers to the first result in the set. Setting both <code>start</code>
+	 * and <code>end</code> to {@link QueryUtil#ALL_POS} will return the full
+	 * result set.
+	 * </p>
+	 *
 	 * @param  companyId the primary key of the company
-	 * @param  active whether to return only active groups, or only inactive
+	 * @param  active whether to return only active groups or only inactive
 	 *         groups
 	 * @param  start the lower bound of the range of groups to return
 	 * @param  end the upper bound of the range of groups to return (not
 	 *         inclusive)
 	 * @param  obc the comparator to order the groups (optionally
 	 *         <code>null</code>)
-	 * @return the active or inactive groups associated with the company
-	 * @review
+	 * @return the active or inactive groups
 	 */
 	@Override
 	public List<Group> getActiveGroups(
@@ -1504,13 +1521,13 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	}
 
 	/**
-	 * Returns the number of active or inactive groups associated with the company.
+	 * Returns the number of active or inactive groups associated with the
+	 * company.
 	 *
 	 * @param  companyId the primary key of the company
-	 * @param  active whether to count only active groups, or only inactive
+	 * @param  active whether to count only active groups or only inactive
 	 *         groups
-	 * @return the number of active or inactive groups associated with the company
-	 * @review
+	 * @return the number of active or inactive groups
 	 */
 	@Override
 	public int getActiveGroupsCount(long companyId, boolean active) {
@@ -1518,14 +1535,14 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 	}
 
 	/**
-	 * Returns the number of active or inactive groups associated with the company.
+	 * Returns the number of active or inactive groups associated with the
+	 * company.
 	 *
 	 * @param  companyId the primary key of the company
-	 * @param  active whether to count only active groups, or only inactive
+	 * @param  active whether to count only active groups or only inactive
 	 *         groups
 	 * @param  site whether the group is to be associated with a main site
-	 * @return the number of active or inactive groups associated with the company
-	 * @review
+	 * @return the number of active or inactive groups
 	 */
 	@Override
 	public int getActiveGroupsCount(
@@ -1720,8 +1737,12 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 		int start, int end) {
 
 		if (Validator.isNull(name)) {
-			return groupPersistence.findByC_P_S(
-				companyId, parentGroupId, site, start, end);
+			return getGroups(companyId, parentGroupId, site, start, end);
+		}
+
+		if (parentGroupId == GroupConstants.ANY_PARENT_GROUP_ID) {
+			return groupPersistence.findByC_LikeN_S(
+				companyId, name, site, start, end);
 		}
 
 		return groupPersistence.findByC_P_LikeN_S(
@@ -1822,8 +1843,11 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 		long companyId, long parentGroupId, String name, boolean site) {
 
 		if (Validator.isNull(name)) {
-			return groupPersistence.countByC_P_S(
-				companyId, parentGroupId, site);
+			return getGroupsCount(companyId, parentGroupId, site);
+		}
+
+		if (parentGroupId == GroupConstants.ANY_PARENT_GROUP_ID) {
+			return groupPersistence.countByC_LikeN_S(companyId, name, site);
 		}
 
 		return groupPersistence.countByC_P_LikeN_S(
@@ -3891,9 +3915,6 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 
 		Group group = groupPersistence.findByPrimaryKey(groupId);
 
-		UnicodeProperties oldTypeSettingsProperties =
-			group.getTypeSettingsProperties();
-
 		UnicodeProperties typeSettingsProperties = new UnicodeProperties(true);
 
 		typeSettingsProperties.fastLoad(typeSettings);
@@ -3902,6 +3923,9 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 			PropsKeys.LOCALES);
 
 		if (Validator.isNotNull(newLanguageIds)) {
+			UnicodeProperties oldTypeSettingsProperties =
+				group.getTypeSettingsProperties();
+
 			String oldLanguageIds = oldTypeSettingsProperties.getProperty(
 				PropsKeys.LOCALES, StringPool.BLANK);
 
@@ -5154,9 +5178,10 @@ public class GroupLocalServiceImpl extends GroupLocalServiceBaseImpl {
 			}
 		}
 
-		Group parentGroup = groupPersistence.findByPrimaryKey(parentGroupId);
-
 		if (group.isStagingGroup()) {
+			Group parentGroup = groupPersistence.findByPrimaryKey(
+				parentGroupId);
+
 			Group staginGroup = parentGroup.getStagingGroup();
 
 			long stagingGroupId = staginGroup.getGroupId();

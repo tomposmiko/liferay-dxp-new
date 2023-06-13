@@ -5,15 +5,18 @@ let Analytics;
 let EVENT_ID = 0;
 
 const ANALYTICS_IDENTITY = {email: 'foo@bar.com'};
-const ANALYTICS_KEY = 'ANALYTICS_KEY';
-const ENDPOINT_URL = 'https://osbasahcerebropublisher-asahlfr.lfr.io';
+const ENDPOINT_URL = 'https://ac-server.io';
 const FLUSH_INTERVAL = 100;
+const INITIAL_CONFIG = {
+	dataSourceId: '1234',
+	endpointUrl: ENDPOINT_URL,
+};
 const MOCKED_REQUEST_DURATION = 5000;
 
 // Local Storage keys
-const STORAGE_KEY_EVENTS = 'lcs_client_batch';
-const STORAGE_KEY_USER_ID = 'lcs_client_user_id';
-const STORAGE_KEY_IDENTITY = 'lcs_client_identity';
+const STORAGE_KEY_EVENTS = 'ac_client_batch';
+const STORAGE_KEY_USER_ID = 'ac_client_user_id';
+const STORAGE_KEY_IDENTITY = 'ac_client_identity';
 
 const fetchMock = window.fetchMock;
 
@@ -44,9 +47,9 @@ describe('Analytics Client', () => {
 
 	beforeEach(
 		() => {
-			fetchMock.mock(/asahlfr/ig, () => Promise.resolve(200));
+			fetchMock.mock(/ac-server/ig, () => Promise.resolve(200));
 
-			Analytics = AnalyticsClient.create();
+			Analytics = AnalyticsClient.create(INITIAL_CONFIG);
 
 			localStorage.removeItem(STORAGE_KEY_EVENTS);
 			localStorage.removeItem(STORAGE_KEY_USER_ID);
@@ -77,12 +80,12 @@ describe('Analytics Client', () => {
 		});
 
 		it('should prevent overlapping requests', (done) => {
-			fetchMock.mock(/identity/ig, () => Promise.resolve(200));
+			fetchMock.mock(/identity$/, () => Promise.resolve(200));
 
 			let fetchCalled = 0;
 
 			fetchMock.mock(
-				/send-analytics-events$/,
+				/ac-server/ig,
 				function() {
 					fetchCalled += 1;
 
@@ -100,6 +103,7 @@ describe('Analytics Client', () => {
 			Analytics = AnalyticsClient.create(
 				{
 					flushInterval: FLUSH_INTERVAL,
+					...INITIAL_CONFIG,
 				}
 			);
 
@@ -126,18 +130,12 @@ describe('Analytics Client', () => {
 		});
 
 		it('should regenerate the stored identity if the identity changed' , () => {
-			fetchMock.mock(/identity/ig, () => Promise.resolve(200));
+			fetchMock.mock(/identity$/ig, () => Promise.resolve(200));
 
 			Analytics.reset();
 			Analytics.dispose();
 
-			Analytics = AnalyticsClient.create(
-				{
-					analyticsKey: ANALYTICS_KEY,
-					dataSourceId: '1234',
-					endpointUrl: ENDPOINT_URL,
-				}
-			);
+			Analytics = AnalyticsClient.create(INITIAL_CONFIG);
 
 			Analytics.setIdentity(ANALYTICS_IDENTITY);
 
@@ -159,23 +157,16 @@ describe('Analytics Client', () => {
 			Analytics.reset();
 			Analytics.dispose();
 
-			Analytics = AnalyticsClient.create(
-				{
-					analyticsKey: ANALYTICS_KEY,
-					dataSourceId: '1234',
-					endpointUrl: ENDPOINT_URL,
-				}
-			);
+			Analytics = AnalyticsClient.create(INITIAL_CONFIG);
 
 			let identityCalled = 0;
 
 			return Analytics.setIdentity(ANALYTICS_IDENTITY)
 				.then(() => {
 					fetchMock.restore();
-					fetchMock.mock(/asahlfr/ig, () => Promise.resolve(200));
 					fetchMock.mock(
-						/identity/ig,
-						function(url) {
+						/identity$/,
+						function() {
 							identityCalled += 1;
 							return '';
 						}
@@ -186,26 +177,21 @@ describe('Analytics Client', () => {
 		});
 
 		it('should not request the Identity Service when identity hasn\'t changed', () => {
-			fetchMock.mock(/identity/ig, () => Promise.resolve(200));
+			fetchMock.mock(/identity$/, () => Promise.resolve(200));
 
 			Analytics.reset();
 			Analytics.dispose();
 
-			Analytics = AnalyticsClient.create(
-				{
-					analyticsKey: ANALYTICS_KEY,
-				}
-			);
+			Analytics = AnalyticsClient.create(INITIAL_CONFIG);
 
 			let identityCalled = 0;
 
 			return Analytics.setIdentity(ANALYTICS_IDENTITY)
 				.then(() => {
 					fetchMock.restore();
-					fetchMock.mock(/asahlfr/ig, () => Promise.resolve(200));
 					fetchMock.mock(
-						/send-identity-context/,
-						function(url) {
+						/identity$/,
+						function() {
 							identityCalled += 1;
 							return '';
 						}
@@ -221,14 +207,15 @@ describe('Analytics Client', () => {
 
 			Analytics = AnalyticsClient.create(
 				{
-					flushInterval: FLUSH_INTERVAL * 10
+					flushInterval: FLUSH_INTERVAL * 10,
+					...INITIAL_CONFIG,
 				}
 			);
 
-			fetchMock.mock(/send-identity-context$/, () => Promise.resolve({}));
+			fetchMock.mock(/identity$/, () => Promise.resolve({}));
 
 			fetchMock.mock(
-				/send-analytics-events$/,
+				/ac-server/ig,
 				function() {
 					// Send events while flush is in progress
 					sendDummyEvents(Analytics, 7);

@@ -278,14 +278,14 @@ public class JSR362BeanProducer {
 	@PortletRequestScoped
 	@Produces
 	public PortletConfig getPortletConfig() {
-		ScopedBeanHolder scopedBeanHolder =
-			ScopedBeanHolder.getCurrentInstance();
+		ScopedBeanManager scopedBeanManager =
+			ScopedBeanManagerThreadLocal.getCurrentScopedBeanManager();
 
-		if (scopedBeanHolder == null) {
+		if (scopedBeanManager == null) {
 			return null;
 		}
 
-		return scopedBeanHolder.getPortletConfig();
+		return scopedBeanManager.getPortletConfig();
 	}
 
 	@Named("portletContext")
@@ -349,28 +349,28 @@ public class JSR362BeanProducer {
 	@PortletRequestScoped
 	@Produces
 	public PortletRequest getPortletRequest() {
-		ScopedBeanHolder scopedBeanHolder =
-			ScopedBeanHolder.getCurrentInstance();
+		ScopedBeanManager scopedBeanManager =
+			ScopedBeanManagerThreadLocal.getCurrentScopedBeanManager();
 
-		if (scopedBeanHolder == null) {
+		if (scopedBeanManager == null) {
 			return null;
 		}
 
-		return scopedBeanHolder.getPortletRequest();
+		return scopedBeanManager.getPortletRequest();
 	}
 
 	@Named("portletResponse")
 	@PortletRequestScoped
 	@Produces
 	public PortletResponse getPortletResponse() {
-		ScopedBeanHolder scopedBeanHolder =
-			ScopedBeanHolder.getCurrentInstance();
+		ScopedBeanManager scopedBeanManager =
+			ScopedBeanManagerThreadLocal.getCurrentScopedBeanManager();
 
-		if (scopedBeanHolder == null) {
+		if (scopedBeanManager == null) {
 			return null;
 		}
 
-		return scopedBeanHolder.getPortletResponse();
+		return scopedBeanManager.getPortletResponse();
 	}
 
 	@Named("portletSession")

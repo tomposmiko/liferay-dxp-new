@@ -16,8 +16,6 @@ package com.liferay.portal.workflow.kaleo.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -34,6 +32,7 @@ import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 import com.liferay.portal.workflow.kaleo.exception.NoSuchTaskFormException;
@@ -2219,6 +2218,8 @@ public class KaleoTaskFormPersistenceImpl extends BasePersistenceImpl<KaleoTaskF
 	@Override
 	public KaleoTaskForm fetchByFormUuid_KTI(long kaleoTaskId, String formUuid,
 		boolean retrieveFromCache) {
+		formUuid = Objects.toString(formUuid, "");
+
 		Object[] finderArgs = new Object[] { kaleoTaskId, formUuid };
 
 		Object result = null;
@@ -2246,10 +2247,7 @@ public class KaleoTaskFormPersistenceImpl extends BasePersistenceImpl<KaleoTaskF
 
 			boolean bindFormUuid = false;
 
-			if (formUuid == null) {
-				query.append(_FINDER_COLUMN_FORMUUID_KTI_FORMUUID_1);
-			}
-			else if (formUuid.equals("")) {
+			if (formUuid.isEmpty()) {
 				query.append(_FINDER_COLUMN_FORMUUID_KTI_FORMUUID_3);
 			}
 			else {
@@ -2343,6 +2341,8 @@ public class KaleoTaskFormPersistenceImpl extends BasePersistenceImpl<KaleoTaskF
 	 */
 	@Override
 	public int countByFormUuid_KTI(long kaleoTaskId, String formUuid) {
+		formUuid = Objects.toString(formUuid, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_FORMUUID_KTI;
 
 		Object[] finderArgs = new Object[] { kaleoTaskId, formUuid };
@@ -2358,10 +2358,7 @@ public class KaleoTaskFormPersistenceImpl extends BasePersistenceImpl<KaleoTaskF
 
 			boolean bindFormUuid = false;
 
-			if (formUuid == null) {
-				query.append(_FINDER_COLUMN_FORMUUID_KTI_FORMUUID_1);
-			}
-			else if (formUuid.equals("")) {
+			if (formUuid.isEmpty()) {
 				query.append(_FINDER_COLUMN_FORMUUID_KTI_FORMUUID_3);
 			}
 			else {
@@ -2405,7 +2402,6 @@ public class KaleoTaskFormPersistenceImpl extends BasePersistenceImpl<KaleoTaskF
 	}
 
 	private static final String _FINDER_COLUMN_FORMUUID_KTI_KALEOTASKID_2 = "kaleoTaskForm.kaleoTaskId = ? AND ";
-	private static final String _FINDER_COLUMN_FORMUUID_KTI_FORMUUID_1 = "kaleoTaskForm.formUuid IS NULL";
 	private static final String _FINDER_COLUMN_FORMUUID_KTI_FORMUUID_2 = "kaleoTaskForm.formUuid = ?";
 	private static final String _FINDER_COLUMN_FORMUUID_KTI_FORMUUID_3 = "(kaleoTaskForm.formUuid IS NULL OR kaleoTaskForm.formUuid = '')";
 

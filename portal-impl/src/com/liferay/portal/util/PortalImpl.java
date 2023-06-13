@@ -21,6 +21,7 @@ import com.liferay.expando.kernel.exception.ValueDataException;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.model.ExpandoColumnConstants;
 import com.liferay.exportimport.kernel.staging.StagingUtil;
+import com.liferay.layouts.admin.kernel.model.LayoutTypePortletConstants;
 import com.liferay.petra.encryptor.Encryptor;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
@@ -487,6 +488,7 @@ public class PortalImpl implements Portal {
 		_reservedParams.add("p_p_mode");
 		_reservedParams.add("p_p_resource_id");
 		_reservedParams.add("p_p_cacheability");
+		_reservedParams.add("p_p_async");
 		_reservedParams.add("p_p_hub");
 		_reservedParams.add("p_p_width");
 		_reservedParams.add("p_p_col_id");
@@ -968,7 +970,14 @@ public class PortalImpl implements Portal {
 
 			url = null;
 		}
-		else if (securityMode.equals("ip")) {
+		else {
+			if (!securityMode.equals("ip") && _log.isWarnEnabled()) {
+				_log.warn(
+					StringBundler.concat(
+						"Property \"", PropsKeys.REDIRECT_URL_SECURITY_MODE,
+						"\" has invalid value: ", securityMode));
+			}
+
 			String[] allowedIps = PropsValues.REDIRECT_URL_IPS_ALLOWED;
 
 			if (allowedIps.length == 0) {
@@ -3269,7 +3278,14 @@ public class PortalImpl implements Portal {
 		}
 
 		if (layout.isTypeURL()) {
-			return getLayoutActualURL(layout);
+			String url = layout.getTypeSettingsProperty(
+				LayoutTypePortletConstants.URL);
+
+			if (Validator.isNotNull(url) && !url.startsWith(StringPool.SLASH) &&
+				!url.startsWith(getPortalURL(layout, themeDisplay))) {
+
+				return getLayoutActualURL(layout);
+			}
 		}
 
 		String layoutFriendlyURL = getLayoutFriendlyURL(layout, themeDisplay);
@@ -3786,9 +3802,7 @@ public class PortalImpl implements Portal {
 		HttpServletRequest originalRequest = null;
 
 		while (currentRequest instanceof HttpServletRequestWrapper) {
-			if (currentRequest instanceof
-					PersistentHttpServletRequestWrapper) {
-
+			if (currentRequest instanceof PersistentHttpServletRequestWrapper) {
 				PersistentHttpServletRequestWrapper
 					persistentHttpServletRequestWrapper =
 						(PersistentHttpServletRequestWrapper)currentRequest;
@@ -4045,8 +4059,8 @@ public class PortalImpl implements Portal {
 		getPortalInetSocketAddressEventListeners() {
 
 		return _portalInetSocketAddressEventListeners.toArray(
-			new PortalInetSocketAddressEventListener[
-				_portalInetSocketAddressEventListeners.size()]);
+			new PortalInetSocketAddressEventListener
+				[_portalInetSocketAddressEventListeners.size()]);
 	}
 
 	@Override
@@ -4610,6 +4624,9 @@ public class PortalImpl implements Portal {
 
 		Locale locale = portletRequest.getLocale();
 
+		String portletTitle = _getPortletTitle(
+			PortletIdCodec.decodePortletName(portletId), portletConfig, locale);
+
 		if (portletConfig == null) {
 			Portlet portlet = PortletLocalServiceUtil.getPortletById(
 				getCompanyId(portletRequest), portletId);
@@ -4619,11 +4636,35 @@ public class PortalImpl implements Portal {
 			ServletContext servletContext =
 				(ServletContext)request.getAttribute(WebKeys.CTX);
 
-			return getPortletTitle(portlet, servletContext, locale);
+			portletTitle = getPortletTitle(portlet, servletContext, locale);
 		}
 
-		return _getPortletTitle(
-			PortletIdCodec.decodePortletName(portletId), portletConfig, locale);
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		Layout layout = themeDisplay.getLayout();
+
+		long portletScopeGroupId = _getScopeGroupId(
+			themeDisplay, layout, portletId);
+
+		if (portletScopeGroupId != layout.getGroupId()) {
+			Group portletScopeGroup = GroupLocalServiceUtil.fetchGroup(
+				portletScopeGroupId);
+
+			String portletScopeName = portletScopeGroup.getName(locale);
+
+			try {
+				portletScopeName = portletScopeGroup.getDescriptiveName(locale);
+			}
+			catch (PortalException pe) {
+				_log.error("Unable to get descriptive name", pe);
+			}
+
+			return getNewPortletTitle(
+				portletTitle, StringPool.BLANK, portletScopeName);
+		}
+
+		return portletTitle;
 	}
 
 	@Override
@@ -5585,9 +5626,7 @@ public class PortalImpl implements Portal {
 				break;
 			}
 
-			if (currentRequest instanceof
-					PersistentHttpServletRequestWrapper) {
-
+			if (currentRequest instanceof PersistentHttpServletRequestWrapper) {
 				PersistentHttpServletRequestWrapper
 					persistentHttpServletRequestWrapper =
 						(PersistentHttpServletRequestWrapper)currentRequest;
@@ -6840,21 +6879,23 @@ public class PortalImpl implements Portal {
 				_logWebServerServlet.warn(e, e);
 			}
 		}
-		else if ((e instanceof PortalException) && _log.isDebugEnabled()) {
-			if (e instanceof NoSuchLayoutException ||
-				e instanceof PrincipalException) {
+		else if (e instanceof PortalException) {
+			if (_log.isDebugEnabled()) {
+				if (e instanceof NoSuchLayoutException ||
+					e instanceof PrincipalException) {
 
-				String msg = e.getMessage();
+					String msg = e.getMessage();
 
-				if (Validator.isNotNull(msg)) {
-					_log.debug(msg);
+					if (Validator.isNotNull(msg)) {
+						_log.debug(msg);
+					}
+				}
+				else {
+					_log.debug(e, e);
 				}
 			}
-			else {
-				_log.debug(e, e);
-			}
 		}
-		else if ((e instanceof SystemException) && _log.isWarnEnabled()) {
+		else if (_log.isWarnEnabled()) {
 			_log.warn(e, e);
 		}
 
@@ -6930,7 +6971,10 @@ public class PortalImpl implements Portal {
 			}
 		}
 		else if (e != null) {
-			response.sendError(status, e.getMessage());
+			response.sendError(
+				status,
+				"A " + e.getClass() +
+					" error occurred while processing your request");
 		}
 		else {
 			String currentURL = (String)request.getAttribute(
@@ -9099,7 +9143,7 @@ public class PortalImpl implements Portal {
 	}
 
 	private class CommentsStrutsActionServiceTrackerCustomizer
-		implements ServiceTrackerCustomizer <StrutsAction, StrutsAction> {
+		implements ServiceTrackerCustomizer<StrutsAction, StrutsAction> {
 
 		@Override
 		public StrutsAction addingService(

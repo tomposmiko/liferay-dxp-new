@@ -14,6 +14,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>PAGE_EDITOR_FRAGMENT</td>
+	<td>//div[contains(@class,'fragment-entry-link-list')]/div[${key_position}]//*[contains(@class,'fragment-${key_fragmentClass}') and contains(.,'${key_content}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>FRAGMENT_BODY</td>
 	<td>//div[contains(@class,'fragment-entry-link-wrapper')][contains(.,'${key_fragmentName}')]</td>
 	<td></td>

@@ -16,8 +16,6 @@ package com.liferay.portal.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -34,6 +32,7 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.model.impl.CountryImpl;
 import com.liferay.portal.model.impl.CountryModelImpl;
 
@@ -146,6 +145,8 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 	 */
 	@Override
 	public Country fetchByName(String name, boolean retrieveFromCache) {
+		name = Objects.toString(name, "");
+
 		Object[] finderArgs = new Object[] { name };
 
 		Object result = null;
@@ -170,10 +171,7 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 
 			boolean bindName = false;
 
-			if (name == null) {
-				query.append(_FINDER_COLUMN_NAME_NAME_1);
-			}
-			else if (name.equals("")) {
+			if (name.isEmpty()) {
 				query.append(_FINDER_COLUMN_NAME_NAME_3);
 			}
 			else {
@@ -251,6 +249,8 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 	 */
 	@Override
 	public int countByName(String name) {
+		name = Objects.toString(name, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_NAME;
 
 		Object[] finderArgs = new Object[] { name };
@@ -265,10 +265,7 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 
 			boolean bindName = false;
 
-			if (name == null) {
-				query.append(_FINDER_COLUMN_NAME_NAME_1);
-			}
-			else if (name.equals("")) {
+			if (name.isEmpty()) {
 				query.append(_FINDER_COLUMN_NAME_NAME_3);
 			}
 			else {
@@ -309,7 +306,6 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_NAME_NAME_1 = "country.name IS NULL";
 	private static final String _FINDER_COLUMN_NAME_NAME_2 = "country.name = ?";
 	private static final String _FINDER_COLUMN_NAME_NAME_3 = "(country.name IS NULL OR country.name = '')";
 	public static final FinderPath FINDER_PATH_FETCH_BY_A2 = new FinderPath(CountryModelImpl.ENTITY_CACHE_ENABLED,
@@ -373,6 +369,8 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 	 */
 	@Override
 	public Country fetchByA2(String a2, boolean retrieveFromCache) {
+		a2 = Objects.toString(a2, "");
+
 		Object[] finderArgs = new Object[] { a2 };
 
 		Object result = null;
@@ -397,10 +395,7 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 
 			boolean bindA2 = false;
 
-			if (a2 == null) {
-				query.append(_FINDER_COLUMN_A2_A2_1);
-			}
-			else if (a2.equals("")) {
+			if (a2.isEmpty()) {
 				query.append(_FINDER_COLUMN_A2_A2_3);
 			}
 			else {
@@ -477,6 +472,8 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 	 */
 	@Override
 	public int countByA2(String a2) {
+		a2 = Objects.toString(a2, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_A2;
 
 		Object[] finderArgs = new Object[] { a2 };
@@ -491,10 +488,7 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 
 			boolean bindA2 = false;
 
-			if (a2 == null) {
-				query.append(_FINDER_COLUMN_A2_A2_1);
-			}
-			else if (a2.equals("")) {
+			if (a2.isEmpty()) {
 				query.append(_FINDER_COLUMN_A2_A2_3);
 			}
 			else {
@@ -535,7 +529,6 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_A2_A2_1 = "country.a2 IS NULL";
 	private static final String _FINDER_COLUMN_A2_A2_2 = "country.a2 = ?";
 	private static final String _FINDER_COLUMN_A2_A2_3 = "(country.a2 IS NULL OR country.a2 = '')";
 	public static final FinderPath FINDER_PATH_FETCH_BY_A3 = new FinderPath(CountryModelImpl.ENTITY_CACHE_ENABLED,
@@ -599,6 +592,8 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 	 */
 	@Override
 	public Country fetchByA3(String a3, boolean retrieveFromCache) {
+		a3 = Objects.toString(a3, "");
+
 		Object[] finderArgs = new Object[] { a3 };
 
 		Object result = null;
@@ -623,10 +618,7 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 
 			boolean bindA3 = false;
 
-			if (a3 == null) {
-				query.append(_FINDER_COLUMN_A3_A3_1);
-			}
-			else if (a3.equals("")) {
+			if (a3.isEmpty()) {
 				query.append(_FINDER_COLUMN_A3_A3_3);
 			}
 			else {
@@ -703,6 +695,8 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 	 */
 	@Override
 	public int countByA3(String a3) {
+		a3 = Objects.toString(a3, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_A3;
 
 		Object[] finderArgs = new Object[] { a3 };
@@ -717,10 +711,7 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 
 			boolean bindA3 = false;
 
-			if (a3 == null) {
-				query.append(_FINDER_COLUMN_A3_A3_1);
-			}
-			else if (a3.equals("")) {
+			if (a3.isEmpty()) {
 				query.append(_FINDER_COLUMN_A3_A3_3);
 			}
 			else {
@@ -761,7 +752,6 @@ public class CountryPersistenceImpl extends BasePersistenceImpl<Country>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_A3_A3_1 = "country.a3 IS NULL";
 	private static final String _FINDER_COLUMN_A3_A3_2 = "country.a3 = ?";
 	private static final String _FINDER_COLUMN_A3_A3_3 = "(country.a3 IS NULL OR country.a3 = '')";
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_ACTIVE = new FinderPath(CountryModelImpl.ENTITY_CACHE_ENABLED,

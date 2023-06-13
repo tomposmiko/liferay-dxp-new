@@ -1143,15 +1143,15 @@ public class StagingImpl implements Staging {
 				((exportImportConfiguration.getType() ==
 					ExportImportConfigurationConstants.
 						TYPE_PUBLISH_LAYOUT_LOCAL) ||
-				(exportImportConfiguration.getType() ==
-					ExportImportConfigurationConstants.
-						TYPE_PUBLISH_LAYOUT_REMOTE) ||
-				(exportImportConfiguration.getType() ==
-					ExportImportConfigurationConstants.
-						TYPE_PUBLISH_PORTLET_LOCAL) ||
-				(exportImportConfiguration.getType() !=
-					ExportImportConfigurationConstants.
-						TYPE_PUBLISH_PORTLET_REMOTE))) {
+				 (exportImportConfiguration.getType() ==
+					 ExportImportConfigurationConstants.
+						 TYPE_PUBLISH_LAYOUT_REMOTE) ||
+				 (exportImportConfiguration.getType() ==
+					 ExportImportConfigurationConstants.
+						 TYPE_PUBLISH_PORTLET_LOCAL) ||
+				 (exportImportConfiguration.getType() !=
+					 ExportImportConfigurationConstants.
+						 TYPE_PUBLISH_PORTLET_REMOTE))) {
 
 				errorMessage = LanguageUtil.get(
 					locale,
@@ -1348,15 +1348,15 @@ public class StagingImpl implements Staging {
 				((exportImportConfiguration.getType() ==
 					ExportImportConfigurationConstants.
 						TYPE_PUBLISH_LAYOUT_LOCAL) ||
-				(exportImportConfiguration.getType() ==
-					ExportImportConfigurationConstants.
-						TYPE_PUBLISH_LAYOUT_REMOTE) ||
-				(exportImportConfiguration.getType() ==
-					ExportImportConfigurationConstants.
-						TYPE_PUBLISH_PORTLET_LOCAL) ||
-				(exportImportConfiguration.getType() !=
-					ExportImportConfigurationConstants.
-						TYPE_PUBLISH_PORTLET_REMOTE))) {
+				 (exportImportConfiguration.getType() ==
+					 ExportImportConfigurationConstants.
+						 TYPE_PUBLISH_LAYOUT_REMOTE) ||
+				 (exportImportConfiguration.getType() ==
+					 ExportImportConfigurationConstants.
+						 TYPE_PUBLISH_PORTLET_LOCAL) ||
+				 (exportImportConfiguration.getType() !=
+					 ExportImportConfigurationConstants.
+						 TYPE_PUBLISH_PORTLET_REMOTE))) {
 
 				errorMessage = LanguageUtil.get(
 					locale,
@@ -1983,8 +1983,8 @@ public class StagingImpl implements Staging {
 	@Deprecated
 	@Override
 	public Map<String, String[]> getStagingParameters() {
-		return
-			_exportImportConfigurationParameterMapFactory.buildParameterMap();
+		return _exportImportConfigurationParameterMapFactory.
+			buildParameterMap();
 	}
 
 	/**
@@ -2803,8 +2803,8 @@ public class StagingImpl implements Staging {
 
 				if (!Validator.isBlank(name)) {
 					Map<String, String[]> parameterMap =
-						(Map<String, String[]>)publishLayoutRemoteSettingsMap.
-							get("parameterMap");
+						(Map<String, String[]>)
+							publishLayoutRemoteSettingsMap.get("parameterMap");
 
 					parameterMap.put("name", new String[] {name});
 				}

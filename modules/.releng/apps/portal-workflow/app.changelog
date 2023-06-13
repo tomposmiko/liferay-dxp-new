@@ -45,3 +45,27 @@ app.artifacts-1.0.1=\
 app.change.log-1.0.1=LPS-74544 LPS-75655 LPS-77699 LPS-78938 LPS-82324 LPS-83160 LPS-83241 LPS-83249 LPS-83250 LPS-83326 LPS-83494 LPS-83646 LPS-83662 LPS-83697 LPS-83705 LPS-84093 LPS-84119 LPS-84282 LPS-84389 LPS-84399 LPS-84421 LPS-84444 LPS-84448 LPS-84449 LPS-84502 LPS-84583 LPS-85097 LPS-85263 LPS-85296 LPS-85410 LPS-85776 LPS-85849 LPS-86408 LPS-86413 
 
 app.git.id-1.0.1=92d11094f0af0ef6571765d74880b66bf2086097
+
+#
+# Liferay App Version 1.0.2
+#
+
+app.artifacts-1.0.2=\
+	com.liferay.portal.workflow.api-1.2.3.jar,\
+	com.liferay.portal.workflow.kaleo.api-3.2.0.jar,\
+	com.liferay.portal.workflow.kaleo.definition.api-3.0.6.jar,\
+	com.liferay.portal.workflow.kaleo.definition.impl-3.0.8.jar,\
+	com.liferay.portal.workflow.kaleo.runtime.api-3.0.5.jar,\
+	com.liferay.portal.workflow.kaleo.runtime.form.impl-1.0.1.jar,\
+	com.liferay.portal.workflow.kaleo.runtime.impl-3.0.10.jar,\
+	com.liferay.portal.workflow.kaleo.runtime.integration.impl-2.0.6.jar,\
+	com.liferay.portal.workflow.kaleo.runtime.scripting.impl-2.0.2.jar,\
+	com.liferay.portal.workflow.kaleo.service-3.0.20.jar,\
+	com.liferay.portal.workflow.lang-3.0.6.jar,\
+	com.liferay.portal.workflow.task.web-2.0.7.jar,\
+	com.liferay.portal.workflow.uad-3.0.1.jar,\
+	com.liferay.portal.workflow.web-1.0.23.jar
+
+app.change.log-1.0.2=LPS-77699 LPS-80332 LPS-84119 LPS-84399 LPS-84583 LPS-85296 LPS-85849 LPS-86408 LPS-86413 
+
+app.git.id-1.0.2=1ad0206eec8462b94638d545f9f0df37163ccdfd

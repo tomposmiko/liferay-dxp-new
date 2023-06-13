@@ -1,37 +1,16 @@
-<definition default="paste">
-	<command name="ckEditorPaste">
-		<execute function="WaitForSPARefresh" />
+@default = "paste"
+definition {
+	function paste {
+		WaitForSPARefresh();
 
-		<execute argument1="//a[contains(@class,'cke_button__unlink') and contains(@class,'cke_button_disabled')]" selenium="waitForVisible" />
+		selenium.waitForVisible();
 
-		<execute argument1="1000" selenium="pause" />
+		selenium.mouseOver();
 
-		<execute selenium="selectFrame" />
+		selenium.paste();
 
-		<execute argument1="//html/body" selenium="waitForVisible" />
+		selenium.assertJavaScriptErrors();
 
-		<execute argument1="//html/body" selenium="mouseOver" />
-
-		<execute argument1="//html/body" selenium="paste" />
-
-		<execute argument1="relative=parent" selenium="selectFrame" />
-
-		<execute selenium="assertJavaScriptErrors" />
-
-		<execute selenium="assertLiferayErrors" />
-	</command>
-
-	<command name="paste">
-		<execute function="WaitForSPARefresh" />
-
-		<execute selenium="waitForVisible" />
-
-		<execute selenium="mouseOver" />
-
-		<execute selenium="paste" />
-
-		<execute selenium="assertJavaScriptErrors" />
-
-		<execute selenium="assertLiferayErrors" />
-	</command>
-</definition>
+		selenium.assertLiferayErrors();
+	}
+}

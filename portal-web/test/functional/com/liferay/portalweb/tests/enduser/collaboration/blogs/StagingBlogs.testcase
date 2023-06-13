@@ -1,154 +1,438 @@
-<definition component-name="portal-collaboration">
-	<property name="portal.release" value="true" />
-	<property name="portal.upstream" value="true" />
-	<property name="testray.main.component.name" value="Blogs" />
+@component-name = "portal-collaboration"
+definition {
+	property portal.release = "true";
+	property portal.upstream = "true";
+	property testray.main.component.name = "Blogs";
 
-	<set-up>
-		<execute macro="TestCase#setUpPortalInstance" />
+	setUp {
+		TestCase.setUpPortalInstance();
 
-		<execute macro="User#firstLoginPG" />
+		User.firstLoginPG();
 
-		<execute macro="ProductMenu#gotoPortlet">
-			<var name="category" value="Sites" />
-			<var name="panel" value="Control Panel" />
-			<var name="portlet" value="Sites" />
-		</execute>
+		ProductMenu.gotoPortlet(
+			category = "Sites",
+			panel = "Control Panel",
+			portlet = "Sites"
+		);
 
-		<execute macro="Site#addBlankCP">
-			<var name="siteName" value="Site Name" />
-		</execute>
+		Site.addBlankCP(siteName = "Site Name");
 
-		<execute macro="ProductMenu#gotoPortlet">
-			<var name="category" value="Build" />
-			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Pages" />
-		</execute>
+		ProductMenu.gotoPortlet(
+			category = "Build",
+			panel = "Site Administration",
+			portlet = "Pages"
+		);
 
-		<execute macro="SitePages#addPublicPage">
-			<var name="pageName" value="Staging Blogs Page" />
-		</execute>
+		SitePages.addPublicPage(pageName = "Staging Blogs Page");
 
-		<execute macro="ProductMenu#gotoPortlet">
-			<var name="category" value="Publishing" />
-			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Staging" />
-		</execute>
+		ProductMenu.gotoPortlet(
+			category = "Publishing",
+			panel = "Site Administration",
+			portlet = "Staging"
+		);
 
-		<execute macro="Staging#activateStagingCP">
-			<var name="siteName" value="Site Name" />
-		</execute>
-	</set-up>
+		Staging.activateStagingCP(siteName = "Site Name");
+	}
 
-	<tear-down>
-		<var method="PropsUtil#get('test.portal.instance')" name="testPortalInstance" />
+	tearDown {
+		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		<if>
-			<equals arg1="${testPortalInstance}" arg2="true" />
-			<then>
-				<execute macro="PortalInstances#tearDownCP" />
-			</then>
-			<else>
-				<execute macro="BlogsEntry#tearDownCP" />
-			</else>
-		</if>
-	</tear-down>
+		if ("${testPortalInstance}" == "true") {
+			PortalInstances.tearDownCP();
+		}
+		else {
+			BlogsEntry.tearDownCP();
+		}
+	}
 
-	<command name="PublishDraftViaSAP" priority="5">
-		<description message="This test covers LPS-79000. It ensures that users can only publish an Approved blog entry. Draft entries should not have the Publish option." />
+	@description = "This test covers LPS-79000. It ensures that users can only publish an Approved blog entry. Draft entries should not have the Publish option."
+	@priority = "5"
+	test PublishDraftViaSAP {
+		ProductMenu.gotoPortlet(
+			category = "Content",
+			panel = "Site Administration",
+			portlet = "Blogs"
+		);
 
-		<execute macro="ProductMenu#gotoPortlet">
-			<var name="category" value="Content" />
-			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Blogs" />
-		</execute>
+		Blogs.addDraft(
+			entryContent = "Blogs Entry Content",
+			entrySubtitle = "Blogs Entry Subtitle",
+			entryTitle = "Blogs Entry Title"
+		);
 
-		<execute macro="Blogs#addDraft">
-			<var name="entryContent" value="Blogs Entry Content" />
-			<var name="entrySubtitle" value="Blogs Entry Subtitle" />
-			<var name="entryTitle" value="Blogs Entry Title" />
-		</execute>
+		Navigator.gotoStagedSitePage(
+			pageName = "Staging Blogs Page",
+			siteName = "Site Name"
+		);
 
-		<execute macro="Navigator#gotoStagedSitePage">
-			<var name="pageName" value="Staging Blogs Page" />
-			<var name="siteName" value="Site Name" />
-		</execute>
+		ProductMenu.gotoPortlet(
+			category = "Content",
+			panel = "Site Administration",
+			portlet = "Blogs"
+		);
 
-		<execute macro="ProductMenu#gotoPortlet">
-			<var name="category" value="Content" />
-			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Blogs" />
-		</execute>
+		Blogs.assertNoPublishOption(entryTitle = "Blogs Entry Title");
+	}
 
-		<execute macro="Blogs#assertNoPublishOption">
-			<var name="entryTitle" value="Blogs Entry Title" />
-		</execute>
-	</command>
+	@description = "This test covers LPS-77658. It publishes a blog entry to live via Single Asset Publishing."
+	@priority = "4"
+	test PublishEntryViaSAP {
+		Navigator.gotoStagedSitePage(
+			pageName = "Staging Blogs Page",
+			siteName = "Site Name"
+		);
 
-	<command name="PublishEntryViaSAP" priority="4">
-		<description message="This test covers LPS-77658. It publishes a blog entry to live via Single Asset Publishing." />
+		Portlet.addPG(portletName = "Blogs");
 
-		<execute macro="Navigator#gotoStagedSitePage">
-			<var name="pageName" value="Staging Blogs Page" />
-			<var name="siteName" value="Site Name" />
-		</execute>
+		Staging.gotoPublishToLive();
 
-		<execute macro="Portlet#addPG">
-			<var name="portletName" value="Blogs" />
-		</execute>
+		Staging.publishToLive();
 
-		<execute macro="Staging#gotoPublishToLive" />
+		ProductMenu.gotoLiveSite();
 
-		<execute macro="Staging#publishToLive" />
+		BlogsEntry.viewNoPG(entryTitle = "Blogs Entry Title");
 
-		<execute macro="ProductMenu#gotoLiveSite" />
+		Navigator.gotoStagedSitePage(
+			pageName = "Staging Blogs Page",
+			siteName = "Site Name"
+		);
 
-		<execute macro="BlogsEntry#viewNoPG">
-			<var name="entryTitle" value="Blogs Entry Title" />
-		</execute>
+		ProductMenu.gotoPortlet(
+			category = "Content",
+			panel = "Site Administration",
+			portlet = "Blogs"
+		);
 
-		<execute macro="Navigator#gotoStagedSitePage">
-			<var name="pageName" value="Staging Blogs Page" />
-			<var name="siteName" value="Site Name" />
-		</execute>
+		Blogs.addEntry(
+			entryContent = "Blogs Entry Content",
+			entryTitle = "Blogs Entry Title"
+		);
 
-		<execute macro="ProductMenu#gotoPortlet">
-			<var name="category" value="Content" />
-			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Blogs" />
-		</execute>
+		LexiconEntry.changeDisplayStyle(displayStyle = "Cards");
 
-		<execute macro="Blogs#addEntry">
-			<var name="entryContent" value="Blogs Entry Content" />
-			<var name="entryTitle" value="Blogs Entry Title" />
-		</execute>
+		Staging.publishViaSAP(
+			assetTitle = "Blogs Entry Title",
+			confirmMessage = "Are you sure you want to publish to live?"
+		);
 
-		<execute macro="Blogs#publishEntryViaSAP">
-			<var name="entryTitle" value="Blogs Entry Title" />
-		</execute>
+		ProductMenu.gotoLiveSite();
 
-		<execute macro="ProductMenu#gotoLiveSite" />
+		BlogsNavigator.gotoEntryPG(
+			entryContent = "Blogs Entry Content",
+			entryTitle = "Blogs Entry Title"
+		);
 
-		<execute macro="BlogsNavigator#gotoEntryPG">
-			<var name="entryContent" value="Blogs Entry Content" />
-			<var name="entryTitle" value="Blogs Entry Title" />
-		</execute>
+		BlogsEntry.viewEntry(
+			entryContent = "Blogs Entry Content",
+			entryTitle = "Blogs Entry Title"
+		);
 
-		<execute macro="BlogsEntry#viewEntry">
-			<var name="entryContent" value="Blogs Entry Content" />
-			<var name="entryTitle" value="Blogs Entry Title" />
-		</execute>
+		Notifications.viewBadgeCount(
+			activePanel = "Notifications",
+			notificationCount = "3"
+		);
 
-		<execute macro="Notifications#viewBadgeCount">
-			<var name="activePanel" value="Notifications" />
-			<var name="notificationCount" value="3" />
-		</execute>
+		Notifications.gotoNotifications();
 
-		<execute macro="Notifications#gotoNotifications" />
+		Notifications.viewSuccessfulPublication(
+			contentBody = "Publication Process Finished Successfully",
+			portletName = "Blogs Portlet",
+			publicationType = "Local"
+		);
+	}
 
-		<execute macro="Notifications#viewSuccessfulPublication">
-			<var name="contentBody" value="Publication Process Finished Successfully" />
-			<var name="portletName" value="Blogs Portlet" />
-			<var name="publicationType" value="Local" />
-		</execute>
-	</command>
-</definition>
+	@description = "This is a use case for LPS-78833."
+	@priority = "5"
+	test PublishEntryWithDeletedSmallImage {
+		Navigator.gotoStagedSitePage(
+			pageName = "Staging Blogs Page",
+			siteName = "Site Name"
+		);
+
+		ProductMenu.gotoPortlet(
+			category = "Content",
+			panel = "Site Administration",
+			portlet = "Blogs"
+		);
+
+		BlogsNavigator.gotoAddEntry();
+
+		BlogsEntry.addEntryContent(
+			entryContent = "Blogs Entry Content",
+			entryTitle = "Blogs Entry Title"
+		);
+
+		Panel.expandPanel(panel = "Configuration");
+
+		BlogsEntry.addSmallImage(
+			navTab = "Documents and Media",
+			uploadFileName = "Document_3.jpg"
+		);
+
+		PortletEntry.publish();
+
+		Navigator.gotoStagedSitePage(
+			pageName = "Site Page Name",
+			siteName = "Site Name"
+		);
+
+		Navigator.gotoStagedView();
+
+		Staging.gotoPublishToLive();
+
+		Staging.publishToLive();
+
+		ProductMenu.gotoLiveSite();
+
+		ProductMenu.gotoPortlet(
+			category = "Content",
+			panel = "Site Administration",
+			portlet = "Blogs"
+		);
+
+		LexiconEntry.changeDisplayStyle(displayStyle = "cards");
+
+		AssertElementPresent(
+			locator1 = "Blogs#ICON_VIEW_ENTRY_TITLE",
+			key_entryTitle = "Blogs Entry Title"
+		);
+
+		Navigator.gotoStagedSitePage(
+			pageName = "Site Page Name",
+			siteName = "Site Name"
+		);
+
+		ProductMenu.gotoPortlet(
+			category = "Content",
+			panel = "Site Administration",
+			portlet = "Blogs"
+		);
+
+		BlogsNavigator.gotoEditCP(entryTitle = "Blogs Entry Title");
+
+		Panel.expandPanel(panel = "Configuration");
+
+		BlogsEntry.removeSmallImage(uploadFileName = "Document_3.jpg");
+
+		PortletEntry.publish();
+
+		Navigator.gotoStagedSitePage(
+			pageName = "Site Page Name",
+			siteName = "Site Name"
+		);
+
+		Staging.gotoPublishToLive();
+
+		Staging.publishToLive();
+
+		Navigator.gotoStagedSitePage(
+			pageName = "Site Page Name",
+			siteName = "Site Name"
+		);
+
+		ProductMenu.gotoPortlet(
+			category = "Content",
+			panel = "Site Administration",
+			portlet = "Blogs"
+		);
+
+		BlogsNavigator.gotoEditCP(entryTitle = "Blogs Entry Title");
+
+		AssertElementNotPresent(
+			locator1 = "BlogsEntry#SMALL_IMAGE",
+			key_smallImage = "Document_3.jpg"
+		);
+
+		AssertTextEquals(
+			locator1 = "Button#SELECT_FILE_SMALL_IMAGE",
+			value1 = "Select File"
+		);
+
+		ProductMenu.gotoLiveSite();
+
+		ProductMenu.gotoPortlet(
+			category = "Content",
+			panel = "Site Administration",
+			portlet = "Blogs"
+		);
+
+		LexiconEntry.changeDisplayStyle(displayStyle = "cards");
+
+		AssertElementPresent(
+			locator1 = "Blogs#ICON_VIEW_ENTRY_TITLE",
+			key_entryTitle = "Blogs Entry Title"
+		);
+
+		Navigator.gotoNavItem(navItem = "Images");
+
+		AssertElementNotPresent(
+			locator1 = "Card#SPECIFIC_LARGE_TEXT",
+			value1 = "${rowEntry}",
+			key_cardText = "Document_3.jpg"
+		);
+
+		AssertElementNotPresent(
+			locator1 = "Card#SPECIFIC_LARGE_TEXT",
+			value1 = "${rowEntry}",
+			key_cardText = "Document_3 (1).jpg"
+		);
+	}
+
+	@description = "This is a use case for LPS-80543."
+	@priority = "5"
+	test ViewBlogsAsAGuestAndSiteMember {
+		JSONUser.addUser(
+			userEmailAddress = "userea@liferay.com",
+			userFirstName = "userfn",
+			userLastName = "userln",
+			userScreenName = "usersn"
+		);
+
+		ProductMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations"
+		);
+
+		User.editPasswordCP(
+			userEmailAddress = "userea@liferay.com",
+			userScreenName = "usersn"
+		);
+
+		ProductMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations"
+		);
+
+		User.editUserSiteCP(
+			siteName = "Site Name",
+			userEmailAddress = "userea@liferay.com",
+			userScreenName = "usersn"
+		);
+
+		Navigator.gotoStagedSitePage(
+			pageName = "Staging Blogs Page",
+			siteName = "Site Name"
+		);
+
+		Portlet.addPG(portletName = "Blogs");
+
+		Blogs.addEntryWithUploadedCoverImage(
+			coverImageName = "Document_1",
+			entryContent = "Blogs Entry Content 1",
+			entryTitle = "Blogs Entry Title 1",
+			navTab = "Upload Image",
+			uploadFileName = "Document_1.jpg"
+		);
+
+		Button.clickPublish();
+
+		Pause(locator1 = "3000");
+
+		BlogsNavigator.gotoAddEntry();
+
+		BlogsEntry.addTitle(entryTitle = "Blogs Entry Title 2");
+
+		BlogsEntry.addContentWithInlineImage(
+			entryContent = "Blogs Entry Content 2",
+			navTab = "Upload Image",
+			uploadFileName = "Document_2.jpg"
+		);
+
+		Pause(locator1 = "3000");
+
+		PortletEntry.publish();
+
+		BlogsNavigator.gotoAddEntry();
+
+		BlogsEntry.addEntryContent(
+			entryContent = "Blogs Entry Content 3",
+			entryTitle = "Blogs Entry Title 3"
+		);
+
+		BlogsEntry.addEntryExternalURL(entryExternalURL = "www.liferay.com");
+
+		PortletEntry.publish();
+
+		Staging.gotoPublishToLive();
+
+		Staging.publishToLive();
+
+		User.logoutPG();
+
+		User.loginUserPG(password = "test", userEmailAddress = "userea@liferay.com");
+
+		Navigator.gotoSitePage(pageName = "Staging Blogs Page", siteName = "Site Name");
+
+		BlogsNavigator.gotoEntryPG(
+			entryContent = "Blogs Entry Content 1",
+			entryTitle = "Blogs Entry Title 1"
+		);
+
+		BlogsEntry.viewEntry(
+			entryContent = "Blogs Entry Content 1",
+			entryTitle = "Blogs Entry Title 1",
+			uploadFileName = "Document_1.jpg"
+		);
+
+		BlogsNavigator.gotoEntryPG(
+			entryContent = "Blogs Entry Content 2",
+			entryTitle = "Blogs Entry Title 2"
+		);
+
+		BlogsEntry.viewEntry(
+			entryContent = "Blogs Entry Content 2",
+			entryInlineImage = "Document_2.jpg",
+			entryTitle = "Blogs Entry Title 2"
+		);
+
+		BlogsNavigator.gotoEntryPG(
+			entryContent = "Blogs Entry Content",
+			entryTitle = "Blogs Entry Title 3"
+		);
+
+		BlogsEntry.viewEntry(
+			entryContent = "Blogs Entry Content 3",
+			entryExternalURL = "https://www.liferay.com",
+			entryTitle = "Blogs Entry Title 3"
+		);
+
+		User.logoutPG();
+
+		Navigator.gotoSitePage(pageName = "Staging Blogs Page", siteName = "Site Name");
+
+		BlogsNavigator.gotoEntryPG(
+			entryContent = "Blogs Entry Content 1",
+			entryTitle = "Blogs Entry Title 1"
+		);
+
+		BlogsEntry.viewEntry(
+			entryContent = "Blogs Entry Content 1",
+			entryTitle = "Blogs Entry Title 1",
+			uploadFileName = "Document_1.jpg"
+		);
+
+		BlogsNavigator.gotoEntryPG(
+			entryContent = "Blogs Entry Content 2",
+			entryTitle = "Blogs Entry Title 2"
+		);
+
+		BlogsEntry.viewEntry(
+			entryContent = "Blogs Entry Content 2",
+			entryInlineImage = "Document_2.jpg",
+			entryTitle = "Blogs Entry Title 2"
+		);
+
+		BlogsNavigator.gotoEntryPG(
+			entryContent = "Blogs Entry Content 3",
+			entryTitle = "Blogs Entry Title 3"
+		);
+
+		BlogsEntry.viewEntry(
+			entryContent = "Blogs Entry Content 3",
+			entryExternalURL = "https://www.liferay.com",
+			entryTitle = "Blogs Entry Title 3"
+		);
+	}
+}

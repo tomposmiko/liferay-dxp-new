@@ -48,6 +48,10 @@
 		<priority value="ERROR" />
 	</category>
 
+	<category name="com.liferay.bean.portlet">
+		<priority value="INFO" />
+	</category>
+
 	<category name="com.liferay.jdbc">
 		<priority value="ERROR" />
 	</category>
@@ -666,6 +670,10 @@
 
 	<category name="com.liferay.portal.spring.context.PortalApplicationContext">
 		<priority value="ERROR" />
+	</category>
+
+	<category name="com.liferay.portal.spring.context.PortalContextLoaderListener">
+		<priority value="INFO" />
 	</category>
 
 	<category name="com.liferay.portal.spring.context.PortletApplicationContext">

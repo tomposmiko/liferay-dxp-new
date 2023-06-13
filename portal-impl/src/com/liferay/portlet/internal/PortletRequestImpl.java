@@ -983,6 +983,7 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 			allRenderParameters, publicRenderParameterNames, portletNamespace);
 	}
 
+	@Override
 	public void invalidateSession() {
 		_invalidSession = true;
 	}
@@ -1337,8 +1338,8 @@ public abstract class PortletRequestImpl implements LiferayPortletRequest {
 
 				if (pos >= 0) {
 					int privateRenderParameterNamespaceLength =
-						PortletQName.
-							PRIVATE_RENDER_PARAMETER_NAMESPACE.length();
+						PortletQName.PRIVATE_RENDER_PARAMETER_NAMESPACE.
+							length();
 
 					String privateRenderParameterName = name.substring(0, pos);
 

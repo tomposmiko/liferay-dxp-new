@@ -23,3 +23,17 @@ app.artifacts-1.0.1=\
 app.change.log-1.0.1=LPS-72545 LPS-74544 LPS-83241 LPS-83705 LPS-84090 LPS-84119 LPS-85096 LPS-85296 LPS-86408 LPS-86413
 
 app.git.id-1.0.1=eccd735f2949218cd158b25712a26924d6867da8
+
+#
+# Liferay App Version 1.0.2
+#
+
+app.artifacts-1.0.2=\
+	com.liferay.expando.api-1.0.2.jar,\
+	com.liferay.expando.exportimport-1.0.4.jar,\
+	com.liferay.expando.taglib-2.0.3.jar,\
+	com.liferay.expando.web-2.0.7.jar
+
+app.change.log-1.0.2=LPS-85296 LPS-86408 LPS-86413 
+
+app.git.id-1.0.2=1ad0206eec8462b94638d545f9f0df37163ccdfd

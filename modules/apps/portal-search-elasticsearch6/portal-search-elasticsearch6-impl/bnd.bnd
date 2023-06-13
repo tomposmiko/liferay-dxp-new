@@ -1,6 +1,6 @@
 Bundle-Name: Liferay Portal Search Elasticsearch 6 Implementation
 Bundle-SymbolicName: com.liferay.portal.search.elasticsearch6.impl
-Bundle-Version: 2.0.25
+Bundle-Version: 2.0.36
 Import-Package:\
 	!com.barchart.udt.*,\
 	\
@@ -95,6 +95,8 @@ Import-Package:\
 	\
 	!org.junit.*,\
 	\
+	!org.locationtech.jts.geom.*,\
+	\
 	!org.noggit.*,\
 	\
 	!org.owasp.html.*,\
@@ -107,3 +109,4 @@ Import-Package:\
 	\
 	*
 -dsannotations-options: inherit
+-fixupmessages: Classes found in the wrong directory: ...;is:=ignore

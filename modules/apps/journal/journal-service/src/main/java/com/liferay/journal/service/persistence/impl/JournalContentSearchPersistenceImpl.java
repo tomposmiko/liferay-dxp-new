@@ -22,8 +22,6 @@ import com.liferay.journal.model.impl.JournalContentSearchImpl;
 import com.liferay.journal.model.impl.JournalContentSearchModelImpl;
 import com.liferay.journal.service.persistence.JournalContentSearchPersistence;
 
-import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -38,6 +36,7 @@ import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
@@ -181,6 +180,8 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 		int start, int end,
 		OrderByComparator<JournalContentSearch> orderByComparator,
 		boolean retrieveFromCache) {
+		portletId = Objects.toString(portletId, "");
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -204,8 +205,7 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 
 			if ((list != null) && !list.isEmpty()) {
 				for (JournalContentSearch journalContentSearch : list) {
-					if (!Objects.equals(portletId,
-								journalContentSearch.getPortletId())) {
+					if (!portletId.equals(journalContentSearch.getPortletId())) {
 						list = null;
 
 						break;
@@ -229,10 +229,7 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 
 			boolean bindPortletId = false;
 
-			if (portletId == null) {
-				query.append(_FINDER_COLUMN_PORTLETID_PORTLETID_1);
-			}
-			else if (portletId.equals("")) {
+			if (portletId.isEmpty()) {
 				query.append(_FINDER_COLUMN_PORTLETID_PORTLETID_3);
 			}
 			else {
@@ -417,6 +414,8 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 		long contentSearchId, String portletId,
 		OrderByComparator<JournalContentSearch> orderByComparator)
 		throws NoSuchContentSearchException {
+		portletId = Objects.toString(portletId, "");
+
 		JournalContentSearch journalContentSearch = findByPrimaryKey(contentSearchId);
 
 		Session session = null;
@@ -463,10 +462,7 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 
 		boolean bindPortletId = false;
 
-		if (portletId == null) {
-			query.append(_FINDER_COLUMN_PORTLETID_PORTLETID_1);
-		}
-		else if (portletId.equals("")) {
+		if (portletId.isEmpty()) {
 			query.append(_FINDER_COLUMN_PORTLETID_PORTLETID_3);
 		}
 		else {
@@ -586,6 +582,8 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 	 */
 	@Override
 	public int countByPortletId(String portletId) {
+		portletId = Objects.toString(portletId, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_PORTLETID;
 
 		Object[] finderArgs = new Object[] { portletId };
@@ -599,10 +597,7 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 
 			boolean bindPortletId = false;
 
-			if (portletId == null) {
-				query.append(_FINDER_COLUMN_PORTLETID_PORTLETID_1);
-			}
-			else if (portletId.equals("")) {
+			if (portletId.isEmpty()) {
 				query.append(_FINDER_COLUMN_PORTLETID_PORTLETID_3);
 			}
 			else {
@@ -643,7 +638,6 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_PORTLETID_PORTLETID_1 = "journalContentSearch.portletId IS NULL";
 	private static final String _FINDER_COLUMN_PORTLETID_PORTLETID_2 = "journalContentSearch.portletId = ?";
 	private static final String _FINDER_COLUMN_PORTLETID_PORTLETID_3 = "(journalContentSearch.portletId IS NULL OR journalContentSearch.portletId = '')";
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_ARTICLEID =
@@ -738,6 +732,8 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 		int start, int end,
 		OrderByComparator<JournalContentSearch> orderByComparator,
 		boolean retrieveFromCache) {
+		articleId = Objects.toString(articleId, "");
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -761,8 +757,7 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 
 			if ((list != null) && !list.isEmpty()) {
 				for (JournalContentSearch journalContentSearch : list) {
-					if (!Objects.equals(articleId,
-								journalContentSearch.getArticleId())) {
+					if (!articleId.equals(journalContentSearch.getArticleId())) {
 						list = null;
 
 						break;
@@ -786,10 +781,7 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 
 			boolean bindArticleId = false;
 
-			if (articleId == null) {
-				query.append(_FINDER_COLUMN_ARTICLEID_ARTICLEID_1);
-			}
-			else if (articleId.equals("")) {
+			if (articleId.isEmpty()) {
 				query.append(_FINDER_COLUMN_ARTICLEID_ARTICLEID_3);
 			}
 			else {
@@ -974,6 +966,8 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 		long contentSearchId, String articleId,
 		OrderByComparator<JournalContentSearch> orderByComparator)
 		throws NoSuchContentSearchException {
+		articleId = Objects.toString(articleId, "");
+
 		JournalContentSearch journalContentSearch = findByPrimaryKey(contentSearchId);
 
 		Session session = null;
@@ -1020,10 +1014,7 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 
 		boolean bindArticleId = false;
 
-		if (articleId == null) {
-			query.append(_FINDER_COLUMN_ARTICLEID_ARTICLEID_1);
-		}
-		else if (articleId.equals("")) {
+		if (articleId.isEmpty()) {
 			query.append(_FINDER_COLUMN_ARTICLEID_ARTICLEID_3);
 		}
 		else {
@@ -1143,6 +1134,8 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 	 */
 	@Override
 	public int countByArticleId(String articleId) {
+		articleId = Objects.toString(articleId, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_ARTICLEID;
 
 		Object[] finderArgs = new Object[] { articleId };
@@ -1156,10 +1149,7 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 
 			boolean bindArticleId = false;
 
-			if (articleId == null) {
-				query.append(_FINDER_COLUMN_ARTICLEID_ARTICLEID_1);
-			}
-			else if (articleId.equals("")) {
+			if (articleId.isEmpty()) {
 				query.append(_FINDER_COLUMN_ARTICLEID_ARTICLEID_3);
 			}
 			else {
@@ -1200,7 +1190,6 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_ARTICLEID_ARTICLEID_1 = "journalContentSearch.articleId IS NULL";
 	private static final String _FINDER_COLUMN_ARTICLEID_ARTICLEID_2 = "journalContentSearch.articleId = ?";
 	private static final String _FINDER_COLUMN_ARTICLEID_ARTICLEID_3 = "(journalContentSearch.articleId IS NULL OR journalContentSearch.articleId = '')";
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_G_P = new FinderPath(JournalContentSearchModelImpl.ENTITY_CACHE_ENABLED,
@@ -1851,6 +1840,8 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 		int start, int end,
 		OrderByComparator<JournalContentSearch> orderByComparator,
 		boolean retrieveFromCache) {
+		articleId = Objects.toString(articleId, "");
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -1879,7 +1870,7 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 			if ((list != null) && !list.isEmpty()) {
 				for (JournalContentSearch journalContentSearch : list) {
 					if ((groupId != journalContentSearch.getGroupId()) ||
-							!Objects.equals(articleId,
+							!articleId.equals(
 								journalContentSearch.getArticleId())) {
 						list = null;
 
@@ -1906,10 +1897,7 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 
 			boolean bindArticleId = false;
 
-			if (articleId == null) {
-				query.append(_FINDER_COLUMN_G_A_ARTICLEID_1);
-			}
-			else if (articleId.equals("")) {
+			if (articleId.isEmpty()) {
 				query.append(_FINDER_COLUMN_G_A_ARTICLEID_3);
 			}
 			else {
@@ -2108,6 +2096,8 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 		long groupId, String articleId,
 		OrderByComparator<JournalContentSearch> orderByComparator)
 		throws NoSuchContentSearchException {
+		articleId = Objects.toString(articleId, "");
+
 		JournalContentSearch journalContentSearch = findByPrimaryKey(contentSearchId);
 
 		Session session = null;
@@ -2157,10 +2147,7 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 
 		boolean bindArticleId = false;
 
-		if (articleId == null) {
-			query.append(_FINDER_COLUMN_G_A_ARTICLEID_1);
-		}
-		else if (articleId.equals("")) {
+		if (articleId.isEmpty()) {
 			query.append(_FINDER_COLUMN_G_A_ARTICLEID_3);
 		}
 		else {
@@ -2284,6 +2271,8 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 	 */
 	@Override
 	public int countByG_A(long groupId, String articleId) {
+		articleId = Objects.toString(articleId, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_G_A;
 
 		Object[] finderArgs = new Object[] { groupId, articleId };
@@ -2299,10 +2288,7 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 
 			boolean bindArticleId = false;
 
-			if (articleId == null) {
-				query.append(_FINDER_COLUMN_G_A_ARTICLEID_1);
-			}
-			else if (articleId.equals("")) {
+			if (articleId.isEmpty()) {
 				query.append(_FINDER_COLUMN_G_A_ARTICLEID_3);
 			}
 			else {
@@ -2346,7 +2332,6 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 	}
 
 	private static final String _FINDER_COLUMN_G_A_GROUPID_2 = "journalContentSearch.groupId = ? AND ";
-	private static final String _FINDER_COLUMN_G_A_ARTICLEID_1 = "journalContentSearch.articleId IS NULL";
 	private static final String _FINDER_COLUMN_G_A_ARTICLEID_2 = "journalContentSearch.articleId = ?";
 	private static final String _FINDER_COLUMN_G_A_ARTICLEID_3 = "(journalContentSearch.articleId IS NULL OR journalContentSearch.articleId = '')";
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_G_P_L = new FinderPath(JournalContentSearchModelImpl.ENTITY_CACHE_ENABLED,
@@ -3051,6 +3036,8 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 		boolean privateLayout, String articleId, int start, int end,
 		OrderByComparator<JournalContentSearch> orderByComparator,
 		boolean retrieveFromCache) {
+		articleId = Objects.toString(articleId, "");
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -3080,7 +3067,7 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 				for (JournalContentSearch journalContentSearch : list) {
 					if ((groupId != journalContentSearch.getGroupId()) ||
 							(privateLayout != journalContentSearch.isPrivateLayout()) ||
-							!Objects.equals(articleId,
+							!articleId.equals(
 								journalContentSearch.getArticleId())) {
 						list = null;
 
@@ -3109,10 +3096,7 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 
 			boolean bindArticleId = false;
 
-			if (articleId == null) {
-				query.append(_FINDER_COLUMN_G_P_A_ARTICLEID_1);
-			}
-			else if (articleId.equals("")) {
+			if (articleId.isEmpty()) {
 				query.append(_FINDER_COLUMN_G_P_A_ARTICLEID_3);
 			}
 			else {
@@ -3328,6 +3312,8 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 		String articleId,
 		OrderByComparator<JournalContentSearch> orderByComparator)
 		throws NoSuchContentSearchException {
+		articleId = Objects.toString(articleId, "");
+
 		JournalContentSearch journalContentSearch = findByPrimaryKey(contentSearchId);
 
 		Session session = null;
@@ -3379,10 +3365,7 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 
 		boolean bindArticleId = false;
 
-		if (articleId == null) {
-			query.append(_FINDER_COLUMN_G_P_A_ARTICLEID_1);
-		}
-		else if (articleId.equals("")) {
+		if (articleId.isEmpty()) {
 			query.append(_FINDER_COLUMN_G_P_A_ARTICLEID_3);
 		}
 		else {
@@ -3513,6 +3496,8 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 	@Override
 	public int countByG_P_A(long groupId, boolean privateLayout,
 		String articleId) {
+		articleId = Objects.toString(articleId, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_G_P_A;
 
 		Object[] finderArgs = new Object[] { groupId, privateLayout, articleId };
@@ -3530,10 +3515,7 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 
 			boolean bindArticleId = false;
 
-			if (articleId == null) {
-				query.append(_FINDER_COLUMN_G_P_A_ARTICLEID_1);
-			}
-			else if (articleId.equals("")) {
+			if (articleId.isEmpty()) {
 				query.append(_FINDER_COLUMN_G_P_A_ARTICLEID_3);
 			}
 			else {
@@ -3580,7 +3562,6 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 
 	private static final String _FINDER_COLUMN_G_P_A_GROUPID_2 = "journalContentSearch.groupId = ? AND ";
 	private static final String _FINDER_COLUMN_G_P_A_PRIVATELAYOUT_2 = "journalContentSearch.privateLayout = ? AND ";
-	private static final String _FINDER_COLUMN_G_P_A_ARTICLEID_1 = "journalContentSearch.articleId IS NULL";
 	private static final String _FINDER_COLUMN_G_P_A_ARTICLEID_2 = "journalContentSearch.articleId = ?";
 	private static final String _FINDER_COLUMN_G_P_A_ARTICLEID_3 = "(journalContentSearch.articleId IS NULL OR journalContentSearch.articleId = '')";
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_G_P_L_P = new FinderPath(JournalContentSearchModelImpl.ENTITY_CACHE_ENABLED,
@@ -3700,6 +3681,8 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 		boolean privateLayout, long layoutId, String portletId, int start,
 		int end, OrderByComparator<JournalContentSearch> orderByComparator,
 		boolean retrieveFromCache) {
+		portletId = Objects.toString(portletId, "");
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -3732,7 +3715,7 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 					if ((groupId != journalContentSearch.getGroupId()) ||
 							(privateLayout != journalContentSearch.isPrivateLayout()) ||
 							(layoutId != journalContentSearch.getLayoutId()) ||
-							!Objects.equals(portletId,
+							!portletId.equals(
 								journalContentSearch.getPortletId())) {
 						list = null;
 
@@ -3763,10 +3746,7 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 
 			boolean bindPortletId = false;
 
-			if (portletId == null) {
-				query.append(_FINDER_COLUMN_G_P_L_P_PORTLETID_1);
-			}
-			else if (portletId.equals("")) {
+			if (portletId.isEmpty()) {
 				query.append(_FINDER_COLUMN_G_P_L_P_PORTLETID_3);
 			}
 			else {
@@ -3995,6 +3975,8 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 		long layoutId, String portletId,
 		OrderByComparator<JournalContentSearch> orderByComparator)
 		throws NoSuchContentSearchException {
+		portletId = Objects.toString(portletId, "");
+
 		JournalContentSearch journalContentSearch = findByPrimaryKey(contentSearchId);
 
 		Session session = null;
@@ -4050,10 +4032,7 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 
 		boolean bindPortletId = false;
 
-		if (portletId == null) {
-			query.append(_FINDER_COLUMN_G_P_L_P_PORTLETID_1);
-		}
-		else if (portletId.equals("")) {
+		if (portletId.isEmpty()) {
 			query.append(_FINDER_COLUMN_G_P_L_P_PORTLETID_3);
 		}
 		else {
@@ -4188,6 +4167,8 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 	@Override
 	public int countByG_P_L_P(long groupId, boolean privateLayout,
 		long layoutId, String portletId) {
+		portletId = Objects.toString(portletId, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_G_P_L_P;
 
 		Object[] finderArgs = new Object[] {
@@ -4209,10 +4190,7 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 
 			boolean bindPortletId = false;
 
-			if (portletId == null) {
-				query.append(_FINDER_COLUMN_G_P_L_P_PORTLETID_1);
-			}
-			else if (portletId.equals("")) {
+			if (portletId.isEmpty()) {
 				query.append(_FINDER_COLUMN_G_P_L_P_PORTLETID_3);
 			}
 			else {
@@ -4262,7 +4240,6 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 	private static final String _FINDER_COLUMN_G_P_L_P_GROUPID_2 = "journalContentSearch.groupId = ? AND ";
 	private static final String _FINDER_COLUMN_G_P_L_P_PRIVATELAYOUT_2 = "journalContentSearch.privateLayout = ? AND ";
 	private static final String _FINDER_COLUMN_G_P_L_P_LAYOUTID_2 = "journalContentSearch.layoutId = ? AND ";
-	private static final String _FINDER_COLUMN_G_P_L_P_PORTLETID_1 = "journalContentSearch.portletId IS NULL";
 	private static final String _FINDER_COLUMN_G_P_L_P_PORTLETID_2 = "journalContentSearch.portletId = ?";
 	private static final String _FINDER_COLUMN_G_P_L_P_PORTLETID_3 = "(journalContentSearch.portletId IS NULL OR journalContentSearch.portletId = '')";
 	public static final FinderPath FINDER_PATH_FETCH_BY_G_P_L_P_A = new FinderPath(JournalContentSearchModelImpl.ENTITY_CACHE_ENABLED,
@@ -4370,6 +4347,9 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 	public JournalContentSearch fetchByG_P_L_P_A(long groupId,
 		boolean privateLayout, long layoutId, String portletId,
 		String articleId, boolean retrieveFromCache) {
+		portletId = Objects.toString(portletId, "");
+		articleId = Objects.toString(articleId, "");
+
 		Object[] finderArgs = new Object[] {
 				groupId, privateLayout, layoutId, portletId, articleId
 			};
@@ -4408,10 +4388,7 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 
 			boolean bindPortletId = false;
 
-			if (portletId == null) {
-				query.append(_FINDER_COLUMN_G_P_L_P_A_PORTLETID_1);
-			}
-			else if (portletId.equals("")) {
+			if (portletId.isEmpty()) {
 				query.append(_FINDER_COLUMN_G_P_L_P_A_PORTLETID_3);
 			}
 			else {
@@ -4422,10 +4399,7 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 
 			boolean bindArticleId = false;
 
-			if (articleId == null) {
-				query.append(_FINDER_COLUMN_G_P_L_P_A_ARTICLEID_1);
-			}
-			else if (articleId.equals("")) {
+			if (articleId.isEmpty()) {
 				query.append(_FINDER_COLUMN_G_P_L_P_A_ARTICLEID_3);
 			}
 			else {
@@ -4525,6 +4499,9 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 	@Override
 	public int countByG_P_L_P_A(long groupId, boolean privateLayout,
 		long layoutId, String portletId, String articleId) {
+		portletId = Objects.toString(portletId, "");
+		articleId = Objects.toString(articleId, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_G_P_L_P_A;
 
 		Object[] finderArgs = new Object[] {
@@ -4546,10 +4523,7 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 
 			boolean bindPortletId = false;
 
-			if (portletId == null) {
-				query.append(_FINDER_COLUMN_G_P_L_P_A_PORTLETID_1);
-			}
-			else if (portletId.equals("")) {
+			if (portletId.isEmpty()) {
 				query.append(_FINDER_COLUMN_G_P_L_P_A_PORTLETID_3);
 			}
 			else {
@@ -4560,10 +4534,7 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 
 			boolean bindArticleId = false;
 
-			if (articleId == null) {
-				query.append(_FINDER_COLUMN_G_P_L_P_A_ARTICLEID_1);
-			}
-			else if (articleId.equals("")) {
+			if (articleId.isEmpty()) {
 				query.append(_FINDER_COLUMN_G_P_L_P_A_ARTICLEID_3);
 			}
 			else {
@@ -4617,10 +4588,8 @@ public class JournalContentSearchPersistenceImpl extends BasePersistenceImpl<Jou
 	private static final String _FINDER_COLUMN_G_P_L_P_A_GROUPID_2 = "journalContentSearch.groupId = ? AND ";
 	private static final String _FINDER_COLUMN_G_P_L_P_A_PRIVATELAYOUT_2 = "journalContentSearch.privateLayout = ? AND ";
 	private static final String _FINDER_COLUMN_G_P_L_P_A_LAYOUTID_2 = "journalContentSearch.layoutId = ? AND ";
-	private static final String _FINDER_COLUMN_G_P_L_P_A_PORTLETID_1 = "journalContentSearch.portletId IS NULL AND ";
 	private static final String _FINDER_COLUMN_G_P_L_P_A_PORTLETID_2 = "journalContentSearch.portletId = ? AND ";
 	private static final String _FINDER_COLUMN_G_P_L_P_A_PORTLETID_3 = "(journalContentSearch.portletId IS NULL OR journalContentSearch.portletId = '') AND ";
-	private static final String _FINDER_COLUMN_G_P_L_P_A_ARTICLEID_1 = "journalContentSearch.articleId IS NULL";
 	private static final String _FINDER_COLUMN_G_P_L_P_A_ARTICLEID_2 = "journalContentSearch.articleId = ?";
 	private static final String _FINDER_COLUMN_G_P_L_P_A_ARTICLEID_3 = "(journalContentSearch.articleId IS NULL OR journalContentSearch.articleId = '')";
 

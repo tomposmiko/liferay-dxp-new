@@ -159,9 +159,8 @@ public class VerifyUUIDTest extends BaseVerifyProcessTestCase {
 	)
 	@Test
 	public void testVerifyParallelUnknownModelWithUnknownPKColumnName() {
-		VerifiableUUIDModel[] verifiableUUIDModels =
-			new VerifiableUUIDModel[
-				PropsValues.VERIFY_PROCESS_CONCURRENCY_THRESHOLD];
+		VerifiableUUIDModel[] verifiableUUIDModels = new VerifiableUUIDModel
+			[PropsValues.VERIFY_PROCESS_CONCURRENCY_THRESHOLD];
 
 		for (int i = 0; i < PropsValues.VERIFY_PROCESS_CONCURRENCY_THRESHOLD;
 			 i++) {
@@ -307,8 +306,8 @@ public class VerifyUUIDTest extends BaseVerifyProcessTestCase {
 					message.startsWith(logMessage));
 			}
 			else {
-				Assert.fail(
-					"Unknown ExpectedType" + expectedLog.expectedType());
+				throw new IllegalStateException(
+					"Unknown ExpectedType" + expectedLog.expectedType(), e);
 			}
 		}
 	}

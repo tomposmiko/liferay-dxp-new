@@ -3402,7 +3402,7 @@ public class JournalArticleLocalServiceImpl
 		throws PortalException {
 
 		return getFirstArticle(
-			groupId, articleId, status, new ArticleVersionComparator(false));
+			groupId, articleId, status, new ArticleVersionComparator(true));
 	}
 
 	/**
@@ -3522,6 +3522,7 @@ public class JournalArticleLocalServiceImpl
 	 * @deprecated As of Judson (7.1.x), with no direct replacement
 	 */
 	@Deprecated
+	@Override
 	public com.liferay.portal.kernel.service.SubscriptionLocalService
 		getSubscriptionLocalService() {
 
@@ -5189,6 +5190,7 @@ public class JournalArticleLocalServiceImpl
 	 * @deprecated As of Judson (7.1.x), with no direct replacement
 	 */
 	@Deprecated
+	@Override
 	public void setSubscriptionLocalService(
 		com.liferay.portal.kernel.service.SubscriptionLocalService
 			subscriptionLocalService) {

@@ -22,8 +22,6 @@ import com.liferay.mail.reader.model.impl.FolderImpl;
 import com.liferay.mail.reader.model.impl.FolderModelImpl;
 import com.liferay.mail.reader.service.persistence.FolderPersistence;
 
-import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -40,6 +38,7 @@ import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
@@ -663,6 +662,8 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 	@Override
 	public Folder fetchByA_F(long accountId, String fullName,
 		boolean retrieveFromCache) {
+		fullName = Objects.toString(fullName, "");
+
 		Object[] finderArgs = new Object[] { accountId, fullName };
 
 		Object result = null;
@@ -690,10 +691,7 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 
 			boolean bindFullName = false;
 
-			if (fullName == null) {
-				query.append(_FINDER_COLUMN_A_F_FULLNAME_1);
-			}
-			else if (fullName.equals("")) {
+			if (fullName.isEmpty()) {
 				query.append(_FINDER_COLUMN_A_F_FULLNAME_3);
 			}
 			else {
@@ -786,6 +784,8 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 	 */
 	@Override
 	public int countByA_F(long accountId, String fullName) {
+		fullName = Objects.toString(fullName, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_A_F;
 
 		Object[] finderArgs = new Object[] { accountId, fullName };
@@ -801,10 +801,7 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 
 			boolean bindFullName = false;
 
-			if (fullName == null) {
-				query.append(_FINDER_COLUMN_A_F_FULLNAME_1);
-			}
-			else if (fullName.equals("")) {
+			if (fullName.isEmpty()) {
 				query.append(_FINDER_COLUMN_A_F_FULLNAME_3);
 			}
 			else {
@@ -848,7 +845,6 @@ public class FolderPersistenceImpl extends BasePersistenceImpl<Folder>
 	}
 
 	private static final String _FINDER_COLUMN_A_F_ACCOUNTID_2 = "folder.accountId = ? AND ";
-	private static final String _FINDER_COLUMN_A_F_FULLNAME_1 = "folder.fullName IS NULL";
 	private static final String _FINDER_COLUMN_A_F_FULLNAME_2 = "folder.fullName = ?";
 	private static final String _FINDER_COLUMN_A_F_FULLNAME_3 = "(folder.fullName IS NULL OR folder.fullName = '')";
 

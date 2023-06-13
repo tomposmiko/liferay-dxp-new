@@ -16,8 +16,6 @@ package com.liferay.sync.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -35,6 +33,7 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
@@ -179,6 +178,8 @@ public class SyncDevicePersistenceImpl extends BasePersistenceImpl<SyncDevice>
 	public List<SyncDevice> findByUuid(String uuid, int start, int end,
 		OrderByComparator<SyncDevice> orderByComparator,
 		boolean retrieveFromCache) {
+		uuid = Objects.toString(uuid, "");
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -202,7 +203,7 @@ public class SyncDevicePersistenceImpl extends BasePersistenceImpl<SyncDevice>
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SyncDevice syncDevice : list) {
-					if (!Objects.equals(uuid, syncDevice.getUuid())) {
+					if (!uuid.equals(syncDevice.getUuid())) {
 						list = null;
 
 						break;
@@ -226,10 +227,7 @@ public class SyncDevicePersistenceImpl extends BasePersistenceImpl<SyncDevice>
 
 			boolean bindUuid = false;
 
-			if (uuid == null) {
-				query.append(_FINDER_COLUMN_UUID_UUID_1);
-			}
-			else if (uuid.equals("")) {
+			if (uuid.isEmpty()) {
 				query.append(_FINDER_COLUMN_UUID_UUID_3);
 			}
 			else {
@@ -410,6 +408,8 @@ public class SyncDevicePersistenceImpl extends BasePersistenceImpl<SyncDevice>
 	public SyncDevice[] findByUuid_PrevAndNext(long syncDeviceId, String uuid,
 		OrderByComparator<SyncDevice> orderByComparator)
 		throws NoSuchDeviceException {
+		uuid = Objects.toString(uuid, "");
+
 		SyncDevice syncDevice = findByPrimaryKey(syncDeviceId);
 
 		Session session = null;
@@ -455,10 +455,7 @@ public class SyncDevicePersistenceImpl extends BasePersistenceImpl<SyncDevice>
 
 		boolean bindUuid = false;
 
-		if (uuid == null) {
-			query.append(_FINDER_COLUMN_UUID_UUID_1);
-		}
-		else if (uuid.equals("")) {
+		if (uuid.isEmpty()) {
 			query.append(_FINDER_COLUMN_UUID_UUID_3);
 		}
 		else {
@@ -578,6 +575,8 @@ public class SyncDevicePersistenceImpl extends BasePersistenceImpl<SyncDevice>
 	 */
 	@Override
 	public int countByUuid(String uuid) {
+		uuid = Objects.toString(uuid, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_UUID;
 
 		Object[] finderArgs = new Object[] { uuid };
@@ -591,10 +590,7 @@ public class SyncDevicePersistenceImpl extends BasePersistenceImpl<SyncDevice>
 
 			boolean bindUuid = false;
 
-			if (uuid == null) {
-				query.append(_FINDER_COLUMN_UUID_UUID_1);
-			}
-			else if (uuid.equals("")) {
+			if (uuid.isEmpty()) {
 				query.append(_FINDER_COLUMN_UUID_UUID_3);
 			}
 			else {
@@ -635,7 +631,6 @@ public class SyncDevicePersistenceImpl extends BasePersistenceImpl<SyncDevice>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_UUID_UUID_1 = "syncDevice.uuid IS NULL";
 	private static final String _FINDER_COLUMN_UUID_UUID_2 = "syncDevice.uuid = ?";
 	private static final String _FINDER_COLUMN_UUID_UUID_3 = "(syncDevice.uuid IS NULL OR syncDevice.uuid = '')";
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_UUID_C = new FinderPath(SyncDeviceModelImpl.ENTITY_CACHE_ENABLED,
@@ -730,6 +725,8 @@ public class SyncDevicePersistenceImpl extends BasePersistenceImpl<SyncDevice>
 	public List<SyncDevice> findByUuid_C(String uuid, long companyId,
 		int start, int end, OrderByComparator<SyncDevice> orderByComparator,
 		boolean retrieveFromCache) {
+		uuid = Objects.toString(uuid, "");
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -757,7 +754,7 @@ public class SyncDevicePersistenceImpl extends BasePersistenceImpl<SyncDevice>
 
 			if ((list != null) && !list.isEmpty()) {
 				for (SyncDevice syncDevice : list) {
-					if (!Objects.equals(uuid, syncDevice.getUuid()) ||
+					if (!uuid.equals(syncDevice.getUuid()) ||
 							(companyId != syncDevice.getCompanyId())) {
 						list = null;
 
@@ -782,10 +779,7 @@ public class SyncDevicePersistenceImpl extends BasePersistenceImpl<SyncDevice>
 
 			boolean bindUuid = false;
 
-			if (uuid == null) {
-				query.append(_FINDER_COLUMN_UUID_C_UUID_1);
-			}
-			else if (uuid.equals("")) {
+			if (uuid.isEmpty()) {
 				query.append(_FINDER_COLUMN_UUID_C_UUID_3);
 			}
 			else {
@@ -985,6 +979,8 @@ public class SyncDevicePersistenceImpl extends BasePersistenceImpl<SyncDevice>
 		String uuid, long companyId,
 		OrderByComparator<SyncDevice> orderByComparator)
 		throws NoSuchDeviceException {
+		uuid = Objects.toString(uuid, "");
+
 		SyncDevice syncDevice = findByPrimaryKey(syncDeviceId);
 
 		Session session = null;
@@ -1030,10 +1026,7 @@ public class SyncDevicePersistenceImpl extends BasePersistenceImpl<SyncDevice>
 
 		boolean bindUuid = false;
 
-		if (uuid == null) {
-			query.append(_FINDER_COLUMN_UUID_C_UUID_1);
-		}
-		else if (uuid.equals("")) {
+		if (uuid.isEmpty()) {
 			query.append(_FINDER_COLUMN_UUID_C_UUID_3);
 		}
 		else {
@@ -1159,6 +1152,8 @@ public class SyncDevicePersistenceImpl extends BasePersistenceImpl<SyncDevice>
 	 */
 	@Override
 	public int countByUuid_C(String uuid, long companyId) {
+		uuid = Objects.toString(uuid, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_UUID_C;
 
 		Object[] finderArgs = new Object[] { uuid, companyId };
@@ -1172,10 +1167,7 @@ public class SyncDevicePersistenceImpl extends BasePersistenceImpl<SyncDevice>
 
 			boolean bindUuid = false;
 
-			if (uuid == null) {
-				query.append(_FINDER_COLUMN_UUID_C_UUID_1);
-			}
-			else if (uuid.equals("")) {
+			if (uuid.isEmpty()) {
 				query.append(_FINDER_COLUMN_UUID_C_UUID_3);
 			}
 			else {
@@ -1220,7 +1212,6 @@ public class SyncDevicePersistenceImpl extends BasePersistenceImpl<SyncDevice>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_UUID_C_UUID_1 = "syncDevice.uuid IS NULL AND ";
 	private static final String _FINDER_COLUMN_UUID_C_UUID_2 = "syncDevice.uuid = ? AND ";
 	private static final String _FINDER_COLUMN_UUID_C_UUID_3 = "(syncDevice.uuid IS NULL OR syncDevice.uuid = '') AND ";
 	private static final String _FINDER_COLUMN_UUID_C_COMPANYID_2 = "syncDevice.companyId = ?";
@@ -1810,6 +1801,8 @@ public class SyncDevicePersistenceImpl extends BasePersistenceImpl<SyncDevice>
 	public List<SyncDevice> findByC_U(long companyId, String userName,
 		int start, int end, OrderByComparator<SyncDevice> orderByComparator,
 		boolean retrieveFromCache) {
+		userName = Objects.toString(userName, "");
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -1858,10 +1851,7 @@ public class SyncDevicePersistenceImpl extends BasePersistenceImpl<SyncDevice>
 
 			boolean bindUserName = false;
 
-			if (userName == null) {
-				query.append(_FINDER_COLUMN_C_U_USERNAME_1);
-			}
-			else if (userName.equals("")) {
+			if (userName.isEmpty()) {
 				query.append(_FINDER_COLUMN_C_U_USERNAME_3);
 			}
 			else {
@@ -2059,6 +2049,8 @@ public class SyncDevicePersistenceImpl extends BasePersistenceImpl<SyncDevice>
 		long companyId, String userName,
 		OrderByComparator<SyncDevice> orderByComparator)
 		throws NoSuchDeviceException {
+		userName = Objects.toString(userName, "");
+
 		SyncDevice syncDevice = findByPrimaryKey(syncDeviceId);
 
 		Session session = null;
@@ -2106,10 +2098,7 @@ public class SyncDevicePersistenceImpl extends BasePersistenceImpl<SyncDevice>
 
 		boolean bindUserName = false;
 
-		if (userName == null) {
-			query.append(_FINDER_COLUMN_C_U_USERNAME_1);
-		}
-		else if (userName.equals("")) {
+		if (userName.isEmpty()) {
 			query.append(_FINDER_COLUMN_C_U_USERNAME_3);
 		}
 		else {
@@ -2233,6 +2222,8 @@ public class SyncDevicePersistenceImpl extends BasePersistenceImpl<SyncDevice>
 	 */
 	@Override
 	public int countByC_U(long companyId, String userName) {
+		userName = Objects.toString(userName, "");
+
 		FinderPath finderPath = FINDER_PATH_WITH_PAGINATION_COUNT_BY_C_U;
 
 		Object[] finderArgs = new Object[] { companyId, userName };
@@ -2248,10 +2239,7 @@ public class SyncDevicePersistenceImpl extends BasePersistenceImpl<SyncDevice>
 
 			boolean bindUserName = false;
 
-			if (userName == null) {
-				query.append(_FINDER_COLUMN_C_U_USERNAME_1);
-			}
-			else if (userName.equals("")) {
+			if (userName.isEmpty()) {
 				query.append(_FINDER_COLUMN_C_U_USERNAME_3);
 			}
 			else {
@@ -2295,7 +2283,6 @@ public class SyncDevicePersistenceImpl extends BasePersistenceImpl<SyncDevice>
 	}
 
 	private static final String _FINDER_COLUMN_C_U_COMPANYID_2 = "syncDevice.companyId = ? AND ";
-	private static final String _FINDER_COLUMN_C_U_USERNAME_1 = "syncDevice.userName IS NULL";
 	private static final String _FINDER_COLUMN_C_U_USERNAME_2 = "lower(syncDevice.userName) LIKE ?";
 	private static final String _FINDER_COLUMN_C_U_USERNAME_3 = "(syncDevice.userName IS NULL OR syncDevice.userName LIKE '')";
 

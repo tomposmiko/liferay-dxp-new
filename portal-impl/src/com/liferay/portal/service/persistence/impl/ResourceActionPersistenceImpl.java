@@ -16,8 +16,6 @@ package com.liferay.portal.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -33,6 +31,7 @@ import com.liferay.portal.kernel.service.persistence.ResourceActionPersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.model.impl.ResourceActionImpl;
 import com.liferay.portal.model.impl.ResourceActionModelImpl;
 
@@ -172,6 +171,8 @@ public class ResourceActionPersistenceImpl extends BasePersistenceImpl<ResourceA
 	public List<ResourceAction> findByName(String name, int start, int end,
 		OrderByComparator<ResourceAction> orderByComparator,
 		boolean retrieveFromCache) {
+		name = Objects.toString(name, "");
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -195,7 +196,7 @@ public class ResourceActionPersistenceImpl extends BasePersistenceImpl<ResourceA
 
 			if ((list != null) && !list.isEmpty()) {
 				for (ResourceAction resourceAction : list) {
-					if (!Objects.equals(name, resourceAction.getName())) {
+					if (!name.equals(resourceAction.getName())) {
 						list = null;
 
 						break;
@@ -219,10 +220,7 @@ public class ResourceActionPersistenceImpl extends BasePersistenceImpl<ResourceA
 
 			boolean bindName = false;
 
-			if (name == null) {
-				query.append(_FINDER_COLUMN_NAME_NAME_1);
-			}
-			else if (name.equals("")) {
+			if (name.isEmpty()) {
 				query.append(_FINDER_COLUMN_NAME_NAME_3);
 			}
 			else {
@@ -404,6 +402,8 @@ public class ResourceActionPersistenceImpl extends BasePersistenceImpl<ResourceA
 	public ResourceAction[] findByName_PrevAndNext(long resourceActionId,
 		String name, OrderByComparator<ResourceAction> orderByComparator)
 		throws NoSuchResourceActionException {
+		name = Objects.toString(name, "");
+
 		ResourceAction resourceAction = findByPrimaryKey(resourceActionId);
 
 		Session session = null;
@@ -449,10 +449,7 @@ public class ResourceActionPersistenceImpl extends BasePersistenceImpl<ResourceA
 
 		boolean bindName = false;
 
-		if (name == null) {
-			query.append(_FINDER_COLUMN_NAME_NAME_1);
-		}
-		else if (name.equals("")) {
+		if (name.isEmpty()) {
 			query.append(_FINDER_COLUMN_NAME_NAME_3);
 		}
 		else {
@@ -572,6 +569,8 @@ public class ResourceActionPersistenceImpl extends BasePersistenceImpl<ResourceA
 	 */
 	@Override
 	public int countByName(String name) {
+		name = Objects.toString(name, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_NAME;
 
 		Object[] finderArgs = new Object[] { name };
@@ -586,10 +585,7 @@ public class ResourceActionPersistenceImpl extends BasePersistenceImpl<ResourceA
 
 			boolean bindName = false;
 
-			if (name == null) {
-				query.append(_FINDER_COLUMN_NAME_NAME_1);
-			}
-			else if (name.equals("")) {
+			if (name.isEmpty()) {
 				query.append(_FINDER_COLUMN_NAME_NAME_3);
 			}
 			else {
@@ -630,7 +626,6 @@ public class ResourceActionPersistenceImpl extends BasePersistenceImpl<ResourceA
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_NAME_NAME_1 = "resourceAction.name IS NULL";
 	private static final String _FINDER_COLUMN_NAME_NAME_2 = "resourceAction.name = ?";
 	private static final String _FINDER_COLUMN_NAME_NAME_3 = "(resourceAction.name IS NULL OR resourceAction.name = '')";
 	public static final FinderPath FINDER_PATH_FETCH_BY_N_A = new FinderPath(ResourceActionModelImpl.ENTITY_CACHE_ENABLED,
@@ -703,6 +698,9 @@ public class ResourceActionPersistenceImpl extends BasePersistenceImpl<ResourceA
 	@Override
 	public ResourceAction fetchByN_A(String name, String actionId,
 		boolean retrieveFromCache) {
+		name = Objects.toString(name, "");
+		actionId = Objects.toString(actionId, "");
+
 		Object[] finderArgs = new Object[] { name, actionId };
 
 		Object result = null;
@@ -728,10 +726,7 @@ public class ResourceActionPersistenceImpl extends BasePersistenceImpl<ResourceA
 
 			boolean bindName = false;
 
-			if (name == null) {
-				query.append(_FINDER_COLUMN_N_A_NAME_1);
-			}
-			else if (name.equals("")) {
+			if (name.isEmpty()) {
 				query.append(_FINDER_COLUMN_N_A_NAME_3);
 			}
 			else {
@@ -742,10 +737,7 @@ public class ResourceActionPersistenceImpl extends BasePersistenceImpl<ResourceA
 
 			boolean bindActionId = false;
 
-			if (actionId == null) {
-				query.append(_FINDER_COLUMN_N_A_ACTIONID_1);
-			}
-			else if (actionId.equals("")) {
+			if (actionId.isEmpty()) {
 				query.append(_FINDER_COLUMN_N_A_ACTIONID_3);
 			}
 			else {
@@ -830,6 +822,9 @@ public class ResourceActionPersistenceImpl extends BasePersistenceImpl<ResourceA
 	 */
 	@Override
 	public int countByN_A(String name, String actionId) {
+		name = Objects.toString(name, "");
+		actionId = Objects.toString(actionId, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_N_A;
 
 		Object[] finderArgs = new Object[] { name, actionId };
@@ -844,10 +839,7 @@ public class ResourceActionPersistenceImpl extends BasePersistenceImpl<ResourceA
 
 			boolean bindName = false;
 
-			if (name == null) {
-				query.append(_FINDER_COLUMN_N_A_NAME_1);
-			}
-			else if (name.equals("")) {
+			if (name.isEmpty()) {
 				query.append(_FINDER_COLUMN_N_A_NAME_3);
 			}
 			else {
@@ -858,10 +850,7 @@ public class ResourceActionPersistenceImpl extends BasePersistenceImpl<ResourceA
 
 			boolean bindActionId = false;
 
-			if (actionId == null) {
-				query.append(_FINDER_COLUMN_N_A_ACTIONID_1);
-			}
-			else if (actionId.equals("")) {
+			if (actionId.isEmpty()) {
 				query.append(_FINDER_COLUMN_N_A_ACTIONID_3);
 			}
 			else {
@@ -906,10 +895,8 @@ public class ResourceActionPersistenceImpl extends BasePersistenceImpl<ResourceA
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_N_A_NAME_1 = "resourceAction.name IS NULL AND ";
 	private static final String _FINDER_COLUMN_N_A_NAME_2 = "resourceAction.name = ? AND ";
 	private static final String _FINDER_COLUMN_N_A_NAME_3 = "(resourceAction.name IS NULL OR resourceAction.name = '') AND ";
-	private static final String _FINDER_COLUMN_N_A_ACTIONID_1 = "resourceAction.actionId IS NULL";
 	private static final String _FINDER_COLUMN_N_A_ACTIONID_2 = "resourceAction.actionId = ?";
 	private static final String _FINDER_COLUMN_N_A_ACTIONID_3 = "(resourceAction.actionId IS NULL OR resourceAction.actionId = '')";
 

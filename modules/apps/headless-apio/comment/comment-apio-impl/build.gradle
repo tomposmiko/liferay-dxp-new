@@ -7,7 +7,6 @@ dependencies {
 	compileOnly group: "com.liferay", name: "com.liferay.media.object.apio.api", version: "1.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.person.apio.api", version: "1.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.petra.string", version: "2.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.portal.apio.api", version: "1.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.structured.content.apio.api", version: "1.0.0"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "3.0.0"
 	compileOnly group: "javax.ws.rs", name: "javax.ws.rs-api", version: "2.1"

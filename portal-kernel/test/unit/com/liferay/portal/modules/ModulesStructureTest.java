@@ -33,6 +33,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.nio.file.DirectoryStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -438,15 +439,13 @@ public class ModulesStructureTest {
 
 							Path path = dirPath.resolve(entry.getKey());
 
-							if (Files.exists(path)) {
-								Assert.fail(
-									StringBundler.concat(
-										"Please rename ", String.valueOf(path),
-										" to ",
-										String.valueOf(
-											path.resolveSibling(
-												entry.getValue()))));
-							}
+							Assert.assertFalse(
+								StringBundler.concat(
+									"Please rename ", String.valueOf(path),
+									" to ",
+									String.valueOf(
+										path.resolveSibling(entry.getValue()))),
+								Files.exists(path));
 						}
 					}
 
@@ -648,11 +647,54 @@ public class ModulesStructureTest {
 			Path dirPath, String buildGradleTemplate)
 		throws IOException {
 
-		if (Files.notExists(dirPath.resolve("build-ext.gradle"))) {
-			buildGradleTemplate = StringUtil.removeSubstring(
-				buildGradleTemplate,
-				StringPool.NEW_LINE + StringPool.NEW_LINE +
-					"apply from: \"build-ext.gradle\"");
+		List<String> sortedBuildExtGradleFileNames = new ArrayList<>();
+
+		if (Files.exists(dirPath.resolve("build-ext.gradle"))) {
+			sortedBuildExtGradleFileNames.add("build-ext.gradle");
+		}
+
+		Set<String> buildExtGradleFileNames = new TreeSet<>(
+			String.CASE_INSENSITIVE_ORDER);
+
+		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(
+				dirPath)) {
+
+			for (Path path : directoryStream) {
+				if (Files.isDirectory(path)) {
+					continue;
+				}
+
+				String fileName = String.valueOf(path.getFileName());
+
+				if (!fileName.endsWith(".gradle")) {
+					continue;
+				}
+
+				if (!fileName.startsWith("build-ext-")) {
+					continue;
+				}
+
+				buildExtGradleFileNames.add(fileName);
+			}
+		}
+
+		sortedBuildExtGradleFileNames.addAll(buildExtGradleFileNames);
+
+		if (!sortedBuildExtGradleFileNames.isEmpty()) {
+			StringBundler sb = new StringBundler(
+				4 * sortedBuildExtGradleFileNames.size() + 2);
+
+			sb.append(buildGradleTemplate);
+			sb.append(StringPool.NEW_LINE);
+
+			for (String fileName : sortedBuildExtGradleFileNames) {
+				sb.append(StringPool.NEW_LINE);
+				sb.append("apply from: \"");
+				sb.append(fileName);
+				sb.append("\"");
+			}
+
+			buildGradleTemplate = sb.toString();
 		}
 
 		final Set<String> pluginNames = new TreeSet<>();
@@ -803,8 +845,17 @@ public class ModulesStructureTest {
 			GradleDependency gradleDependency, Path dirPath)
 		throws IOException {
 
-		if (!_masterBranch || dirPath.equals(_modulesDirPath) ||
+		if (dirPath.equals(_modulesDirPath) ||
 			gradleDependency.isProjectDependency()) {
+
+			return false;
+		}
+
+		Path lfrbuildRelengSkipUpdateFileVersionsPath = dirPath.resolve(
+			".lfrbuild-releng-skip-update-file-versions");
+
+		if (!Files.exists(lfrbuildRelengSkipUpdateFileVersionsPath) &&
+			!_masterBranch) {
 
 			return false;
 		}
@@ -1024,48 +1075,46 @@ public class ModulesStructureTest {
 			else {
 				Matcher matcher = gradlePropertiesPattern.matcher(key);
 
-				if (!_gitRepoGradlePropertiesKeys.contains(key) &&
-					!key.endsWith(".version") && !matcher.matches()) {
+				StringBundler sb = new StringBundler(
+					(_gitRepoGradlePropertiesKeys.size() + 5) * 3 + 8);
 
-					StringBundler sb = new StringBundler(
-						(_gitRepoGradlePropertiesKeys.size() + 5) * 3 + 8);
+				sb.append("Incorrect key \"");
+				sb.append(key);
+				sb.append("\" in ");
+				sb.append(gradlePropertiesPath);
+				sb.append(". Allowed keys are: ");
 
-					sb.append("Incorrect key \"");
-					sb.append(key);
-					sb.append("\" in ");
-					sb.append(gradlePropertiesPath);
-					sb.append(". Allowed keys are: ");
+				List<String> allowedKeys = new ArrayList<>(
+					_gitRepoGradlePropertiesKeys);
 
-					List<String> allowedKeys = new ArrayList<>(
-						_gitRepoGradlePropertiesKeys);
+				allowedKeys.add(_GIT_REPO_GRADLE_PROJECT_GROUP_KEY);
+				allowedKeys.add(_GIT_REPO_GRADLE_PROJECT_PATH_PREFIX_KEY);
 
-					allowedKeys.add(_GIT_REPO_GRADLE_PROJECT_GROUP_KEY);
-					allowedKeys.add(_GIT_REPO_GRADLE_PROJECT_PATH_PREFIX_KEY);
-
-					if (privateRepo) {
-						allowedKeys.add(
-							_GIT_REPO_GRADLE_REPOSITORY_PRIVATE_PASSWORD);
-						allowedKeys.add(
-							_GIT_REPO_GRADLE_REPOSITORY_PRIVATE_URL);
-						allowedKeys.add(
-							_GIT_REPO_GRADLE_REPOSITORY_PRIVATE_USERNAME);
-					}
-
-					Collections.sort(allowedKeys);
-
-					for (String allowedKey : allowedKeys) {
-						sb.append(CharPool.QUOTE);
-						sb.append(allowedKey);
-						sb.append("\", ");
-					}
-
-					sb.append(", keys ending with \".version\", and keys ");
-					sb.append("matching the pattern \"");
-					sb.append(gradlePropertiesPattern.pattern());
-					sb.append("\".");
-
-					Assert.fail(sb.toString());
+				if (privateRepo) {
+					allowedKeys.add(
+						_GIT_REPO_GRADLE_REPOSITORY_PRIVATE_PASSWORD);
+					allowedKeys.add(_GIT_REPO_GRADLE_REPOSITORY_PRIVATE_URL);
+					allowedKeys.add(
+						_GIT_REPO_GRADLE_REPOSITORY_PRIVATE_USERNAME);
 				}
+
+				Collections.sort(allowedKeys);
+
+				for (String allowedKey : allowedKeys) {
+					sb.append(CharPool.QUOTE);
+					sb.append(allowedKey);
+					sb.append("\", ");
+				}
+
+				sb.append(", keys ending with \".version\", and keys ");
+				sb.append("matching the pattern \"");
+				sb.append(gradlePropertiesPattern.pattern());
+				sb.append("\".");
+
+				Assert.assertFalse(
+					sb.toString(),
+					!_gitRepoGradlePropertiesKeys.contains(key) &&
+					!key.endsWith(".version") && !matcher.matches());
 			}
 
 			previousKey = key;
@@ -1240,37 +1289,36 @@ public class ModulesStructureTest {
 			"testIntegrationRuntime", hasSrcTestIntegrationDir);
 
 		for (GradleDependency gradleDependency : gradleDependencies) {
-			if (_shouldBecomeProjectDependency(gradleDependency, dirPath)) {
-				StringBundler sb = new StringBundler(9);
+			StringBundler sb = new StringBundler(9);
 
-				sb.append("Artifact dependency {");
-				sb.append(gradleDependency);
-				sb.append("} in ");
-				sb.append(path);
-				sb.append(" not permitted on ");
-				sb.append(_branchName);
-				sb.append(" branch. Use ");
+			sb.append("Artifact dependency {");
+			sb.append(gradleDependency);
+			sb.append("} in ");
+			sb.append(path);
+			sb.append(" not permitted on ");
+			sb.append(_branchName);
+			sb.append(" branch. Use ");
 
-				String moduleGroup = gradleDependency.getModuleGroup();
+			String moduleGroup = gradleDependency.getModuleGroup();
 
-				if (moduleGroup.equals("com.liferay.portal")) {
-					sb.append("version \"default\"");
-				}
-				else {
-					sb.append("a project dependency");
-				}
-
-				sb.append(" instead.");
-
-				Assert.fail(sb.toString());
+			if (moduleGroup.equals("com.liferay.portal")) {
+				sb.append("version \"default\"");
 			}
+			else {
+				sb.append("a project dependency");
+			}
+
+			sb.append(" instead.");
+
+			Assert.assertFalse(
+				sb.toString(),
+				_shouldBecomeProjectDependency(gradleDependency, dirPath));
 
 			Boolean allowed = allowedConfigurationsMap.get(
 				gradleDependency.getConfiguration());
 
 			if ((allowed != null) && !allowed.booleanValue()) {
-				StringBundler sb = new StringBundler(
-					allowedConfigurationsMap.size() * 4 + 4);
+				sb = new StringBundler(allowedConfigurationsMap.size() * 4 + 4);
 
 				sb.append("Incorrect configuration of dependency {");
 				sb.append(gradleDependency);
@@ -1298,7 +1346,7 @@ public class ModulesStructureTest {
 					sb.append(CharPool.QUOTE);
 				}
 
-				Assert.fail(sb.toString());
+				Assert.assertFalse(sb.toString(), !allowed);
 			}
 
 			GradleDependency activeGradleDependency =
@@ -1408,8 +1456,9 @@ public class ModulesStructureTest {
 
 	private static final String[] _GIT_IGNORE_LINE_PREFIXES = {"/wedeploy/"};
 
-	private static final String[] _GIT_IGNORE_OPTIONAL_LINES =
-		{"gradle-ext.properties"};
+	private static final String[] _GIT_IGNORE_OPTIONAL_LINES = {
+		"gradle-ext.properties"
+	};
 
 	private static final String _GIT_REPO_FILE_NAME = ".gitrepo";
 
@@ -1417,8 +1466,9 @@ public class ModulesStructureTest {
 		"project.group";
 
 	private static final String[]
-		_GIT_REPO_GRADLE_PROJECT_GROUP_RESERVED_PREFIXES =
-			{"com.liferay.plugins", "com.liferay.portal"};
+		_GIT_REPO_GRADLE_PROJECT_GROUP_RESERVED_PREFIXES = {
+			"com.liferay.plugins", "com.liferay.portal"
+		};
 
 	private static final String _GIT_REPO_GRADLE_PROJECT_PATH_PREFIX_KEY =
 		"project.path.prefix";
@@ -1451,7 +1501,7 @@ public class ModulesStructureTest {
 	private static final Set<String> _gitRepoGradlePropertiesKeys =
 		SetUtil.fromList(
 			Arrays.asList(
-				"jira.project.keys", "org.gradle.parallel",
+				"jira.project.keys", "org.gradle.daemon", "org.gradle.parallel",
 				"pom.scm.connection", "pom.scm.developerConnection",
 				"pom.scm.url"));
 	private static final List<String> _gradleConfigurations = Arrays.asList(

@@ -457,11 +457,9 @@ public class UpgradeClient {
 				}
 			}
 
-			File dir = _appServer.getDir();
-
 			System.out.println(
-				"Please enter your application server directory (" + dir +
-					"): ");
+				"Please enter your application server directory (" +
+					_appServer.getDir() + "): ");
 
 			response = _consoleReader.readLine();
 
@@ -501,7 +499,10 @@ public class UpgradeClient {
 				_appServer.setPortalDirName(response);
 			}
 
+			File dir = _appServer.getDir();
+
 			_appServerProperties.setProperty("dir", dir.getCanonicalPath());
+
 			_appServerProperties.setProperty(
 				"extra.lib.dirs", _appServer.getExtraLibDirNames());
 			_appServerProperties.setProperty(

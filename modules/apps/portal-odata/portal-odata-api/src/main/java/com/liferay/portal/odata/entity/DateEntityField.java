@@ -41,10 +41,30 @@ public class DateEntityField extends EntityField {
 		String name, Function<Locale, String> sortableFieldNameFunction,
 		Function<Locale, String> filterableFieldNameFunction) {
 
+		this(
+			name, sortableFieldNameFunction, filterableFieldNameFunction,
+			String::valueOf);
+	}
+
+	/**
+	 * Creates a new {@code EntityField} with a {@code Function} to convert the
+	 * entity field's name to a filterable/sortable field name for a locale.
+	 *
+	 * @param  name the entity field's name
+	 * @param  sortableFieldNameFunction the sortable field name {@code
+	 *         Function}
+	 * @param  filterableFieldNameFunction the filterable field name {@code
+	 *         Function}
+	 * @review
+	 */
+	public DateEntityField(
+		String name, Function<Locale, String> sortableFieldNameFunction,
+		Function<Locale, String> filterableFieldNameFunction,
+		Function<Object, String> filterableFieldValueFunction) {
+
 		super(
 			name, Type.DATE, sortableFieldNameFunction,
-			filterableFieldNameFunction,
-			fieldValue -> String.valueOf(fieldValue));
+			filterableFieldNameFunction, filterableFieldValueFunction);
 	}
 
 }

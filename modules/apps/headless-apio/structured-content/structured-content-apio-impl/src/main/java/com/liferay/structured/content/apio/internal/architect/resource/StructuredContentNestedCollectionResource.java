@@ -38,6 +38,7 @@ import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.dynamic.data.mapping.kernel.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.kernel.DDMFormValues;
 import com.liferay.dynamic.data.mapping.kernel.Value;
+import com.liferay.dynamic.data.mapping.model.DDMFormFieldType;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.service.DDMStructureService;
@@ -80,7 +81,10 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.odata.entity.ComplexEntityField;
+import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.Filter;
@@ -88,7 +92,9 @@ import com.liferay.portal.odata.filter.InvalidFilterException;
 import com.liferay.portal.odata.sort.Sort;
 import com.liferay.portal.odata.sort.SortField;
 import com.liferay.structure.apio.architect.identifier.ContentStructureIdentifier;
+import com.liferay.structure.apio.architect.util.StructureFieldConverter;
 import com.liferay.structured.content.apio.architect.identifier.StructuredContentIdentifier;
+import com.liferay.structured.content.apio.architect.resource.StructuredContentField;
 import com.liferay.structured.content.apio.architect.util.StructuredContentUtil;
 import com.liferay.structured.content.apio.internal.architect.filter.StructuredContentEntityModel;
 import com.liferay.structured.content.apio.internal.architect.form.StructuredContentCreatorForm;
@@ -98,9 +104,12 @@ import com.liferay.structured.content.apio.internal.model.RenderedJournalArticle
 import com.liferay.structured.content.apio.internal.util.JournalArticleContentHelper;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -123,7 +132,11 @@ public class StructuredContentNestedCollectionResource
 		<JournalArticleWrapper, Long, StructuredContentIdentifier, Long,
 		 ContentSpaceIdentifier> {
 
-	public static String encodeKey(DDMStructure ddmStructure, String name) {
+	public static final String VALUES_NAME = "values";
+
+	public static String encodeFilterAndSortIdentifier(
+		DDMStructure ddmStructure, String name) {
+
 		return StringBundler.concat(
 			StringPool.UNDERLINE, ddmStructure.getStructureId(),
 			StringPool.UNDERLINE, name);
@@ -207,26 +220,25 @@ public class StructuredContentNestedCollectionResource
 				"renderedContent", RenderedJournalArticle::getRenderedContent
 			).build()
 		).addNestedList(
-			"values", this::_getStructuredContentFields,
+			VALUES_NAME, this::_getStructuredContentFields,
 			fieldValuesBuilder -> fieldValuesBuilder.types(
 				"ContentFieldValue"
 			).addLinkedModel(
 				"document", MediaObjectIdentifier.class,
-				ddmFormFieldWrapper -> Try.fromFallible(
-					ddmFormFieldWrapper::getDDMFormFieldValue
+				structuredContentField -> Try.fromFallible(
+					() -> structuredContentField.getLocalizedValue(
+						LocaleUtil.getDefault())
 				).map(
-					DDMFormFieldValue::getValue
-				).map(
-					value -> value.getString(LocaleUtil.getDefault())
-				).map(
-					string -> StructuredContentUtil.getFileEntryId(
-						string, _dlAppService)
+					value -> StructuredContentUtil.getFileEntryId(
+						value, _dlAppService)
 				).orElse(
 					null
 				)
 			).addLinkedModel(
 				"structuredContent", StructuredContentIdentifier.class,
 				this::_getStructuredContentId
+			).addLocalizedStringByLocale(
+				"label", StructuredContentField::getLocalizedLabel
 			).addLocalizedStringByLocale(
 				"value", StructuredContentField::getLocalizedValue
 			).addNested(
@@ -241,13 +253,14 @@ public class StructuredContentNestedCollectionResource
 			).addRelativeURL(
 				"link", this::_getLink
 			).addString(
-				"dataType", StructuredContentField::getDDMFormFieldDataType
-			).addLocalizedStringByLocale(
-				"label", StructuredContentField::getLocalizedLabel
+				"dataType", StructuredContentField::getDataType
+			).addString(
+				"filterAndSortIdentifier",
+				StructuredContentField::getFilterAndSortIdentifier
+			).addString(
+				"inputControl", StructuredContentField::getInputControl
 			).addString(
 				"name", StructuredContentField::getName
-			).addString(
-				"key", StructuredContentField::getKey
 			).build()
 		).addRelatedCollection(
 			"category", CategoryIdentifier.class
@@ -297,7 +310,7 @@ public class StructuredContentNestedCollectionResource
 		DDMStructure ddmStructure = _ddmStructureService.getStructure(
 			ddmStructureId);
 
-		Locale locale = themeDisplay.getLocale();
+		Locale locale = _getLocale(acceptLanguage, contentSpaceId);
 
 		String content =
 			_journalArticleContentHelper.createJournalArticleContent(
@@ -306,7 +319,7 @@ public class StructuredContentNestedCollectionResource
 
 		String ddmStructureKey = ddmStructure.getStructureKey();
 		String ddmTemplateKey = _getDDMTemplateKey(ddmStructure);
-		Date displayDate = new Date();
+		Calendar calendar = Calendar.getInstance();
 
 		ServiceContext serviceContext =
 			structuredContentCreatorForm.getServiceContext(contentSpaceId);
@@ -318,24 +331,23 @@ public class StructuredContentNestedCollectionResource
 			ddmStructureKey, ddmTemplateKey, null,
 			_getDefaultValue(
 				structuredContentCreatorForm.getPublishedDateMonthOptional(),
-				displayDate.getMonth()),
+				calendar.get(Calendar.MONTH)),
 			_getDefaultValue(
 				structuredContentCreatorForm.getPublishedDateDayOptional(),
-				displayDate.getDate()),
+				calendar.get(Calendar.DATE)),
 			_getDefaultValue(
 				structuredContentCreatorForm.getPublishedDateYearOptional(),
-				displayDate.getYear()),
+				calendar.get(Calendar.YEAR)),
 			_getDefaultValue(
 				structuredContentCreatorForm.getPublishedDateHourOptional(),
-				displayDate.getHours()),
+				calendar.get(Calendar.HOUR)),
 			_getDefaultValue(
 				structuredContentCreatorForm.getPublishedDateMinuteOptional(),
-				displayDate.getMinutes()),
+				calendar.get(Calendar.MINUTE)),
 			0, 0, 0, 0, 0, true, 0, 0, 0, 0, 0, true, true, null,
 			serviceContext);
 
-		return new JournalArticleWrapper(
-			journalArticle, acceptLanguage.getPreferredLocale(), themeDisplay);
+		return new JournalArticleWrapper(journalArticle, locale, themeDisplay);
 	}
 
 	private ClassNameClassPK _createClassNameClassPK(
@@ -404,26 +416,6 @@ public class StructuredContentNestedCollectionResource
 		return optional.orElse(defaultValue);
 	}
 
-	private List<StructuredContentField> _getFormFieldValues(
-		List<StructuredContentField> ddmFormFieldValues) {
-
-		Stream<StructuredContentField> ddmFormFieldValueStream =
-			ddmFormFieldValues.stream();
-
-		List<StructuredContentField> nestedDDMFormFieldValues =
-			ddmFormFieldValueStream.flatMap(
-				ddmFormFieldValue -> _getFormFieldValues(
-					ddmFormFieldValue.getNestedFields()
-				).stream()
-			).collect(
-				Collectors.toList()
-			);
-
-		nestedDDMFormFieldValues.addAll(ddmFormFieldValues);
-
-		return nestedDDMFormFieldValues;
-	}
-
 	private Query _getFullQuery(
 			Filter filter, Locale locale, SearchContext searchContext)
 		throws SearchException {
@@ -449,11 +441,8 @@ public class StructuredContentNestedCollectionResource
 		StructuredContentField structuredContentField) {
 
 		return Try.fromFallible(
-			structuredContentField::getDDMFormFieldValue
-		).map(
-			DDMFormFieldValue::getValue
-		).map(
-			value -> value.getString(LocaleUtil.getDefault())
+			() -> structuredContentField.getLocalizedValue(
+				LocaleUtil.getDefault())
 		).filter(
 			StructuredContentUtil::isJSONObject
 		).filter(
@@ -518,11 +507,8 @@ public class StructuredContentNestedCollectionResource
 
 	private String _getLink(StructuredContentField structuredContentField) {
 		return Try.fromFallible(
-			structuredContentField::getDDMFormFieldValue
-		).map(
-			DDMFormFieldValue::getValue
-		).map(
-			value -> value.getString(LocaleUtil.getDefault())
+			() -> structuredContentField.getLocalizedValue(
+				LocaleUtil.getDefault())
 		).filter(
 			StructuredContentUtil::isJSONObject
 		).filter(
@@ -536,19 +522,30 @@ public class StructuredContentNestedCollectionResource
 		);
 	}
 
+	private Locale _getLocale(
+			AcceptLanguage acceptLanguage, long contentSpaceId)
+		throws PortalException {
+
+		return Optional.ofNullable(
+			acceptLanguage.getPreferredLocale()
+		).orElse(
+			_portal.getSiteDefaultLocale(contentSpaceId)
+		);
+	}
+
 	private PageItems<JournalArticleWrapper> _getPageItems(
 			Pagination pagination, long contentSpaceId,
 			AcceptLanguage acceptLanguage, ThemeDisplay themeDisplay,
 			Filter filter, Sort sort)
 		throws PortalException {
 
+		Locale locale = _getLocale(acceptLanguage, contentSpaceId);
+
 		SearchContext searchContext = _createSearchContext(
-			themeDisplay.getCompanyId(), contentSpaceId,
-			acceptLanguage.getPreferredLocale(), sort,
+			themeDisplay.getCompanyId(), contentSpaceId, locale, sort,
 			pagination.getStartPosition(), pagination.getEndPosition());
 
-		Query fullQuery = _getFullQuery(
-			filter, themeDisplay.getLocale(), searchContext);
+		Query fullQuery = _getFullQuery(filter, locale, searchContext);
 
 		PermissionChecker permissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
@@ -578,8 +575,7 @@ public class StructuredContentNestedCollectionResource
 			List::stream
 		).map(
 			journalArticle -> new JournalArticleWrapper(
-				journalArticle, acceptLanguage.getPreferredLocale(),
-				themeDisplay)
+				journalArticle, locale, themeDisplay)
 		).collect(
 			Collectors.toList()
 		);
@@ -659,7 +655,7 @@ public class StructuredContentNestedCollectionResource
 	}
 
 	private List<StructuredContentField> _getStructuredContentFields(
-		JournalArticleWrapper journalArticleWrapper) {
+		JournalArticle journalArticle) {
 
 		return Try.fromFallible(
 			() ->
@@ -667,8 +663,7 @@ public class StructuredContentNestedCollectionResource
 					JournalArticle.class)
 		).map(
 			assetRendererFactory -> assetRendererFactory.getAssetRenderer(
-				journalArticleWrapper,
-				AssetRendererFactory.TYPE_LATEST_APPROVED)
+				journalArticle, AssetRendererFactory.TYPE_LATEST_APPROVED)
 		).map(
 			AssetRenderer::getDDMFormValuesReader
 		).map(
@@ -676,34 +671,41 @@ public class StructuredContentNestedCollectionResource
 		).map(
 			DDMFormValues::getDDMFormFieldValues
 		).map(
-			ddmFormFieldValueList -> {
-				Stream<DDMFormFieldValue> stream =
-					ddmFormFieldValueList.stream();
-
-				return stream.map(
-					ddmFormFieldValue -> new StructuredContentField(
-						ddmFormFieldValue,
-						journalArticleWrapper.getDDMStructure())
-				).collect(
-					Collectors.toList()
-				);
-			}
+			ddmFormFieldValueList -> _toStructuredContentFields(
+				ddmFormFieldValueList, journalArticle.getDDMStructure())
 		).map(
-			this::_getFormFieldValues
+			this::_getStructuredContentFields
 		).orElse(
 			null
 		);
+	}
+
+	private List<StructuredContentField> _getStructuredContentFields(
+		List<StructuredContentField> structuredContentFields) {
+
+		Stream<StructuredContentField> stream =
+			structuredContentFields.stream();
+
+		List<StructuredContentField> nestedStructureContentFields =
+			stream.flatMap(
+				structuredContentField -> _getStructuredContentFields(
+					structuredContentField.getNestedStructuredContentFields()
+				).stream()
+			).collect(
+				Collectors.toList()
+			);
+
+		nestedStructureContentFields.addAll(structuredContentFields);
+
+		return nestedStructureContentFields;
 	}
 
 	private Long _getStructuredContentId(
 		StructuredContentField structuredContentField) {
 
 		return Try.fromFallible(
-			structuredContentField::getDDMFormFieldValue
-		).map(
-			ddmFormFieldValue -> ddmFormFieldValue.getValue()
-		).map(
-			value -> value.getString(LocaleUtil.getDefault())
+			() -> structuredContentField.getLocalizedValue(
+				LocaleUtil.getDefault())
 		).filter(
 			StructuredContentUtil::isJSONObject
 		).map(
@@ -714,6 +716,22 @@ public class StructuredContentNestedCollectionResource
 			JournalArticle::getResourcePrimKey
 		).orElse(
 			null
+		);
+	}
+
+	private List<StructuredContentField> _toStructuredContentFields(
+		List<DDMFormFieldValue> ddmFormFieldValues, DDMStructure ddmStructure) {
+
+		Stream<DDMFormFieldValue> stream = ddmFormFieldValues.stream();
+
+		return stream.filter(
+			ddmFormFieldValue -> !Objects.equals(
+				DDMFormFieldType.SEPARATOR, ddmFormFieldValue.getType())
+		).map(
+			ddmFormFieldValue -> new StructuredContentFieldImpl(
+				ddmFormFieldValue, ddmStructure)
+		).collect(
+			Collectors.toList()
 		);
 	}
 
@@ -732,7 +750,7 @@ public class StructuredContentNestedCollectionResource
 
 		DDMStructure ddmStructure = journalArticle.getDDMStructure();
 
-		Locale locale = acceptLanguage.getPreferredLocale();
+		Locale locale = _getLocale(acceptLanguage, journalArticle.getGroupId());
 
 		String content =
 			_journalArticleContentHelper.createJournalArticleContent(
@@ -825,22 +843,31 @@ public class StructuredContentNestedCollectionResource
 	private LayoutLocalService _layoutLocalService;
 
 	@Reference
+	private Portal _portal;
+
+	@Reference
 	private SearchResultPermissionFilterFactory
 		_searchResultPermissionFilterFactory;
 
-	private static class StructuredContentField {
+	@Reference
+	private StructureFieldConverter _structureFieldConverter;
 
-		public StructuredContentField(
+	private class StructuredContentFieldImpl implements StructuredContentField {
+
+		public StructuredContentFieldImpl(
 			DDMFormFieldValue ddmFormFieldValue, DDMStructure ddmStructure) {
 
 			_ddmFormFieldValue = ddmFormFieldValue;
 			_ddmStructure = ddmStructure;
 		}
 
-		public String getDDMFormFieldDataType() {
+		@Override
+		public String getDataType() {
 			try {
-				return _ddmStructure.getFieldDataType(
+				String dataType = _ddmStructure.getFieldDataType(
 					_ddmFormFieldValue.getName());
+
+				return _structureFieldConverter.getFieldDataType(dataType);
 			}
 			catch (PortalException pe) {
 				if (_log.isWarnEnabled()) {
@@ -854,14 +881,50 @@ public class StructuredContentNestedCollectionResource
 			}
 		}
 
-		public DDMFormFieldValue getDDMFormFieldValue() {
-			return _ddmFormFieldValue;
+		@Override
+		public String getFilterAndSortIdentifier() {
+			Map<String, EntityField> entityFieldsMap =
+				_entityModel.getEntityFieldsMap();
+
+			ComplexEntityField complexEntityField =
+				(ComplexEntityField)entityFieldsMap.get(VALUES_NAME);
+
+			Map<String, EntityField> complexEntityFieldEntityFieldsMap =
+				complexEntityField.getEntityFieldsMap();
+
+			EntityField entityField = complexEntityFieldEntityFieldsMap.get(
+				encodeFilterAndSortIdentifier(
+					_ddmStructure, _ddmFormFieldValue.getName()));
+
+			if (entityField != null) {
+				return entityField.getName();
+			}
+
+			return null;
 		}
 
-		public String getKey() {
-			return encodeKey(_ddmStructure, _ddmFormFieldValue.getName());
+		@Override
+		public String getInputControl() {
+			return Try.fromFallible(
+				() -> _ddmStructure.getFieldType(_ddmFormFieldValue.getName())
+			).map(
+				fieldType ->
+					_structureFieldConverter.getFieldInputControl(fieldType)
+			).recover(
+				pe -> {
+					if (_log.isWarnEnabled()) {
+						_log.warn(
+							"Unable to get input control for field name " +
+								_ddmFormFieldValue.getName(),
+							pe);
+					}
+
+					return null;
+				}
+			);
 		}
 
+		@Override
 		public String getLocalizedLabel(Locale locale) {
 			try {
 				return _ddmStructure.getFieldLabel(
@@ -881,6 +944,7 @@ public class StructuredContentNestedCollectionResource
 			}
 		}
 
+		@Override
 		public String getLocalizedValue(Locale locale) {
 			Value value = _ddmFormFieldValue.getValue();
 
@@ -893,22 +957,16 @@ public class StructuredContentNestedCollectionResource
 			return null;
 		}
 
+		@Override
 		public String getName() {
 			return _ddmFormFieldValue.getName();
 		}
 
-		public List<StructuredContentField> getNestedFields() {
-			List<DDMFormFieldValue> ddmFormFieldValues =
-				_ddmFormFieldValue.getNestedDDMFormFieldValues();
-
-			Stream<DDMFormFieldValue> stream = ddmFormFieldValues.stream();
-
-			return stream.map(
-				ddmFormFieldValue ->
-					new StructuredContentField(ddmFormFieldValue, _ddmStructure)
-			).collect(
-				Collectors.toList()
-			);
+		@Override
+		public List<StructuredContentField> getNestedStructuredContentFields() {
+			return _toStructuredContentFields(
+				_ddmFormFieldValue.getNestedDDMFormFieldValues(),
+				_ddmStructure);
 		}
 
 		private final DDMFormFieldValue _ddmFormFieldValue;

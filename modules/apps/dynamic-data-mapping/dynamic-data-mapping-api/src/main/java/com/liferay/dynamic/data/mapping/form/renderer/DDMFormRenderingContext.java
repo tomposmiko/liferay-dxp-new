@@ -73,6 +73,10 @@ public class DDMFormRenderingContext {
 		return _readOnly;
 	}
 
+	public boolean isSharedURL() {
+		return MapUtil.getBoolean(_properties, "sharedURL");
+	}
+
 	public boolean isShowRequiredFieldsWarning() {
 		return _showRequiredFieldsWarning;
 	}
@@ -117,6 +121,10 @@ public class DDMFormRenderingContext {
 
 	public void setReadOnly(boolean readOnly) {
 		_readOnly = readOnly;
+	}
+
+	public void setSharedURL(boolean sharedURL) {
+		_properties.put("sharedURL", sharedURL);
 	}
 
 	public void setShowRequiredFieldsWarning(

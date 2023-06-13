@@ -14,6 +14,8 @@
 
 package com.liferay.journal.web.internal.display.context;
 
+import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
@@ -47,6 +49,7 @@ import com.liferay.journal.util.comparator.FolderArticleArticleIdComparator;
 import com.liferay.journal.util.comparator.FolderArticleDisplayDateComparator;
 import com.liferay.journal.util.comparator.FolderArticleModifiedDateComparator;
 import com.liferay.journal.util.comparator.FolderArticleTitleComparator;
+import com.liferay.journal.web.asset.JournalArticleAssetRenderer;
 import com.liferay.journal.web.configuration.JournalWebConfiguration;
 import com.liferay.journal.web.internal.portlet.action.ActionUtil;
 import com.liferay.journal.web.internal.search.EntriesChecker;
@@ -897,6 +900,19 @@ public class JournalDisplayContext {
 		return orderColumns;
 	}
 
+	public String getOriginalAuthor(JournalArticle article) {
+		long classPK = JournalArticleAssetRenderer.getClassPK(article);
+
+		AssetEntry assetEntry = AssetEntryLocalServiceUtil.fetchEntry(
+			JournalArticle.class.getName(), classPK);
+
+		if (assetEntry != null) {
+			return assetEntry.getUserName();
+		}
+
+		return article.getUserName();
+	}
+
 	public long getParentFolderId() {
 		if (_parentFolderId != null) {
 			return _parentFolderId;
@@ -1460,8 +1476,8 @@ public class JournalDisplayContext {
 
 		if (JournalFolderPermission.contains(
 				themeDisplay.getPermissionChecker(),
-				themeDisplay.getScopeGroupId(),
-				getFolderId(), ActionKeys.ADD_FOLDER) ||
+				themeDisplay.getScopeGroupId(), getFolderId(),
+				ActionKeys.ADD_FOLDER) ||
 			JournalFolderPermission.contains(
 				themeDisplay.getPermissionChecker(),
 				themeDisplay.getScopeGroupId(), getFolderId(),

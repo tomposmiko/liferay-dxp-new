@@ -28,6 +28,7 @@ import com.liferay.journal.model.JournalFolderConstants;
 import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.apio.test.util.AuthConfigurationTestUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -59,6 +60,7 @@ import java.util.Map;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 
 /**
  * @author Ruben Pulido
@@ -105,10 +107,16 @@ public class StructuredContentApioTestBundleActivator
 	public void start(BundleContext bundleContext) {
 		_autoCloseables = new ArrayList<>();
 
-		_ddmFormJSONDeserializer = bundleContext.getService(
-			bundleContext.getServiceReference(DDMFormJSONDeserializer.class));
+		_bundleContext = bundleContext;
+
+		_serviceReference = bundleContext.getServiceReference(
+			DDMFormJSONDeserializer.class);
+
+		_ddmFormJSONDeserializer = bundleContext.getService(_serviceReference);
 
 		try {
+			AuthConfigurationTestUtil.deployOAuthConfiguration(_bundleContext);
+
 			_prepareTest();
 		}
 		catch (Exception e) {
@@ -121,6 +129,8 @@ public class StructuredContentApioTestBundleActivator
 	@Override
 	public void stop(BundleContext bundleContext) {
 		_cleanUp();
+
+		_bundleContext.ungetService(_serviceReference);
 	}
 
 	protected DDMForm deserialize(String content) {
@@ -340,6 +350,8 @@ public class StructuredContentApioTestBundleActivator
 		StructuredContentApioTestBundleActivator.class);
 
 	private List<AutoCloseable> _autoCloseables;
+	private BundleContext _bundleContext;
 	private DDMFormJSONDeserializer _ddmFormJSONDeserializer;
+	private ServiceReference<DDMFormJSONDeserializer> _serviceReference;
 
 }

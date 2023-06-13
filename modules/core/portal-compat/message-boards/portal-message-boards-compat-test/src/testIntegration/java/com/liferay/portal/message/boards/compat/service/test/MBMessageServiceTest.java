@@ -157,7 +157,7 @@ public class MBMessageServiceTest {
 					JDBCExceptionReporter.class.getName(), Level.ERROR);
 			CaptureAppender captureAppender5 =
 				Log4JLoggerTestUtil.configureLog4JLogger(
-					SynchronousDestination.class.getName(), Level.ERROR);) {
+					SynchronousDestination.class.getName(), Level.ERROR)) {
 
 			for (DoAsUserThread doAsUserThread : doAsUserThreads) {
 				doAsUserThread.start();
@@ -257,8 +257,8 @@ public class MBMessageServiceTest {
 		PermissionChecker permissionChecker =
 			PermissionCheckerFactoryUtil.create(user);
 
-		try (ContextUserReplace contextUserReplace =
-				new ContextUserReplace(user, permissionChecker)) {
+		try (ContextUserReplace contextUserReplace = new ContextUserReplace(
+				user, permissionChecker)) {
 
 			MBMessageServiceUtil.addMessage(
 				_group.getGroupId(), _category.getCategoryId(),
@@ -282,8 +282,8 @@ public class MBMessageServiceTest {
 		PermissionChecker permissionChecker =
 			PermissionCheckerFactoryUtil.create(user);
 
-		try (ContextUserReplace contextUserReplace =
-				new ContextUserReplace(user, permissionChecker)) {
+		try (ContextUserReplace contextUserReplace = new ContextUserReplace(
+				user, permissionChecker)) {
 
 			MBMessageServiceUtil.addMessage(
 				_group.getGroupId(),

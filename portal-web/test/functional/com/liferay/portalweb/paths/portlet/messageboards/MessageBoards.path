@@ -231,6 +231,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>THREAD_LIST_THREAD_UNREAD</td>
+	<td>//*[@data-qa-id='rowItemContent']/h4/a/strong[contains(.,'${key_threadSubject}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>THREAD_LIST_VIEWS</td>
 	<td>//li[contains(.,'${key_threadSubject}')]/div/span[2]</td>
 	<td></td>
@@ -264,17 +269,6 @@
 </tr>
 <tr>
 	<td>THREAD_TABLE_STARTED_BY</td>
-	<td>//div[contains(@id,'mbThreadsSearchContainer')]//tr[contains(.,'${key_threadSubject}')]/td[3]//a</td>
-	<td></td>
-</tr>
-<tr>
-	<td></td>
-	<td></td>
-	<td></td>
-</tr>
-<!--THREAD_TABLE_ADMIN-->
-<tr>
-	<td>THREAD_TABLE_ADMIN_FLAG</td>
 	<td>//div[contains(@id,'mbThreadsSearchContainer')]//tr[contains(.,'${key_threadSubject}')]/td[3]//a</td>
 	<td></td>
 </tr>

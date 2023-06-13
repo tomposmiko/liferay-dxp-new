@@ -21,3 +21,15 @@ app.artifacts-1.0.1=\
 app.change.log-1.0.1=LPS-78938 
 
 app.git.id-1.0.1=edc143efc326edc375db43d44c1f51c6a9e6f09d
+
+#
+# Liferay App Version 1.0.2
+#
+
+app.artifacts-1.0.2=\
+	com.liferay.external.reference.api-1.0.1.jar,\
+	com.liferay.external.reference.service-1.0.2.jar
+
+app.change.log-1.0.2=LPS-78938 LPS-81336
+
+app.git.id-1.0.2=1ad0206eec8462b94638d545f9f0df37163ccdfd

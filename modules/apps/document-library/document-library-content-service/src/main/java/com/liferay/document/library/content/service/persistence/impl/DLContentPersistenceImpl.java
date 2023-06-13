@@ -22,8 +22,6 @@ import com.liferay.document.library.content.model.impl.DLContentImpl;
 import com.liferay.document.library.content.model.impl.DLContentModelImpl;
 import com.liferay.document.library.content.service.persistence.DLContentPersistence;
 
-import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -39,6 +37,7 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 
@@ -740,6 +739,8 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 		String path, int start, int end,
 		OrderByComparator<DLContent> orderByComparator,
 		boolean retrieveFromCache) {
+		path = Objects.toString(path, "");
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -769,7 +770,7 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 				for (DLContent dlContent : list) {
 					if ((companyId != dlContent.getCompanyId()) ||
 							(repositoryId != dlContent.getRepositoryId()) ||
-							!Objects.equals(path, dlContent.getPath())) {
+							!path.equals(dlContent.getPath())) {
 						list = null;
 
 						break;
@@ -797,10 +798,7 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 
 			boolean bindPath = false;
 
-			if (path == null) {
-				query.append(_FINDER_COLUMN_C_R_P_PATH_1);
-			}
-			else if (path.equals("")) {
+			if (path.isEmpty()) {
 				query.append(_FINDER_COLUMN_C_R_P_PATH_3);
 			}
 			else {
@@ -1011,6 +1009,8 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 		long repositoryId, String path,
 		OrderByComparator<DLContent> orderByComparator)
 		throws NoSuchContentException {
+		path = Objects.toString(path, "");
+
 		DLContent dlContent = findByPrimaryKey(contentId);
 
 		Session session = null;
@@ -1060,10 +1060,7 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 
 		boolean bindPath = false;
 
-		if (path == null) {
-			query.append(_FINDER_COLUMN_C_R_P_PATH_1);
-		}
-		else if (path.equals("")) {
+		if (path.isEmpty()) {
 			query.append(_FINDER_COLUMN_C_R_P_PATH_3);
 		}
 		else {
@@ -1191,6 +1188,8 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 */
 	@Override
 	public int countByC_R_P(long companyId, long repositoryId, String path) {
+		path = Objects.toString(path, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_C_R_P;
 
 		Object[] finderArgs = new Object[] { companyId, repositoryId, path };
@@ -1208,10 +1207,7 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 
 			boolean bindPath = false;
 
-			if (path == null) {
-				query.append(_FINDER_COLUMN_C_R_P_PATH_1);
-			}
-			else if (path.equals("")) {
+			if (path.isEmpty()) {
 				query.append(_FINDER_COLUMN_C_R_P_PATH_3);
 			}
 			else {
@@ -1258,7 +1254,6 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 
 	private static final String _FINDER_COLUMN_C_R_P_COMPANYID_2 = "dlContent.companyId = ? AND ";
 	private static final String _FINDER_COLUMN_C_R_P_REPOSITORYID_2 = "dlContent.repositoryId = ? AND ";
-	private static final String _FINDER_COLUMN_C_R_P_PATH_1 = "dlContent.path IS NULL";
 	private static final String _FINDER_COLUMN_C_R_P_PATH_2 = "dlContent.path = ?";
 	private static final String _FINDER_COLUMN_C_R_P_PATH_3 = "(dlContent.path IS NULL OR dlContent.path = '')";
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_C_R_LIKEP =
@@ -1360,6 +1355,8 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 		String path, int start, int end,
 		OrderByComparator<DLContent> orderByComparator,
 		boolean retrieveFromCache) {
+		path = Objects.toString(path, "");
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -1410,10 +1407,7 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 
 			boolean bindPath = false;
 
-			if (path == null) {
-				query.append(_FINDER_COLUMN_C_R_LIKEP_PATH_1);
-			}
-			else if (path.equals("")) {
+			if (path.isEmpty()) {
 				query.append(_FINDER_COLUMN_C_R_LIKEP_PATH_3);
 			}
 			else {
@@ -1624,6 +1618,8 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 		long companyId, long repositoryId, String path,
 		OrderByComparator<DLContent> orderByComparator)
 		throws NoSuchContentException {
+		path = Objects.toString(path, "");
+
 		DLContent dlContent = findByPrimaryKey(contentId);
 
 		Session session = null;
@@ -1673,10 +1669,7 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 
 		boolean bindPath = false;
 
-		if (path == null) {
-			query.append(_FINDER_COLUMN_C_R_LIKEP_PATH_1);
-		}
-		else if (path.equals("")) {
+		if (path.isEmpty()) {
 			query.append(_FINDER_COLUMN_C_R_LIKEP_PATH_3);
 		}
 		else {
@@ -1804,6 +1797,8 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	 */
 	@Override
 	public int countByC_R_LikeP(long companyId, long repositoryId, String path) {
+		path = Objects.toString(path, "");
+
 		FinderPath finderPath = FINDER_PATH_WITH_PAGINATION_COUNT_BY_C_R_LIKEP;
 
 		Object[] finderArgs = new Object[] { companyId, repositoryId, path };
@@ -1821,10 +1816,7 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 
 			boolean bindPath = false;
 
-			if (path == null) {
-				query.append(_FINDER_COLUMN_C_R_LIKEP_PATH_1);
-			}
-			else if (path.equals("")) {
+			if (path.isEmpty()) {
 				query.append(_FINDER_COLUMN_C_R_LIKEP_PATH_3);
 			}
 			else {
@@ -1871,7 +1863,6 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 
 	private static final String _FINDER_COLUMN_C_R_LIKEP_COMPANYID_2 = "dlContent.companyId = ? AND ";
 	private static final String _FINDER_COLUMN_C_R_LIKEP_REPOSITORYID_2 = "dlContent.repositoryId = ? AND ";
-	private static final String _FINDER_COLUMN_C_R_LIKEP_PATH_1 = "dlContent.path IS NULL";
 	private static final String _FINDER_COLUMN_C_R_LIKEP_PATH_2 = "dlContent.path LIKE ?";
 	private static final String _FINDER_COLUMN_C_R_LIKEP_PATH_3 = "(dlContent.path IS NULL OR dlContent.path LIKE '')";
 	public static final FinderPath FINDER_PATH_FETCH_BY_C_R_P_V = new FinderPath(DLContentModelImpl.ENTITY_CACHE_ENABLED,
@@ -1966,6 +1957,9 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	@Override
 	public DLContent fetchByC_R_P_V(long companyId, long repositoryId,
 		String path, String version, boolean retrieveFromCache) {
+		path = Objects.toString(path, "");
+		version = Objects.toString(version, "");
+
 		Object[] finderArgs = new Object[] {
 				companyId, repositoryId, path, version
 			};
@@ -1999,10 +1993,7 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 
 			boolean bindPath = false;
 
-			if (path == null) {
-				query.append(_FINDER_COLUMN_C_R_P_V_PATH_1);
-			}
-			else if (path.equals("")) {
+			if (path.isEmpty()) {
 				query.append(_FINDER_COLUMN_C_R_P_V_PATH_3);
 			}
 			else {
@@ -2013,10 +2004,7 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 
 			boolean bindVersion = false;
 
-			if (version == null) {
-				query.append(_FINDER_COLUMN_C_R_P_V_VERSION_1);
-			}
-			else if (version.equals("")) {
+			if (version.isEmpty()) {
 				query.append(_FINDER_COLUMN_C_R_P_V_VERSION_3);
 			}
 			else {
@@ -2111,6 +2099,9 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 	@Override
 	public int countByC_R_P_V(long companyId, long repositoryId, String path,
 		String version) {
+		path = Objects.toString(path, "");
+		version = Objects.toString(version, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_C_R_P_V;
 
 		Object[] finderArgs = new Object[] {
@@ -2130,10 +2121,7 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 
 			boolean bindPath = false;
 
-			if (path == null) {
-				query.append(_FINDER_COLUMN_C_R_P_V_PATH_1);
-			}
-			else if (path.equals("")) {
+			if (path.isEmpty()) {
 				query.append(_FINDER_COLUMN_C_R_P_V_PATH_3);
 			}
 			else {
@@ -2144,10 +2132,7 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 
 			boolean bindVersion = false;
 
-			if (version == null) {
-				query.append(_FINDER_COLUMN_C_R_P_V_VERSION_1);
-			}
-			else if (version.equals("")) {
+			if (version.isEmpty()) {
 				query.append(_FINDER_COLUMN_C_R_P_V_VERSION_3);
 			}
 			else {
@@ -2198,10 +2183,8 @@ public class DLContentPersistenceImpl extends BasePersistenceImpl<DLContent>
 
 	private static final String _FINDER_COLUMN_C_R_P_V_COMPANYID_2 = "dlContent.companyId = ? AND ";
 	private static final String _FINDER_COLUMN_C_R_P_V_REPOSITORYID_2 = "dlContent.repositoryId = ? AND ";
-	private static final String _FINDER_COLUMN_C_R_P_V_PATH_1 = "dlContent.path IS NULL AND ";
 	private static final String _FINDER_COLUMN_C_R_P_V_PATH_2 = "dlContent.path = ? AND ";
 	private static final String _FINDER_COLUMN_C_R_P_V_PATH_3 = "(dlContent.path IS NULL OR dlContent.path = '') AND ";
-	private static final String _FINDER_COLUMN_C_R_P_V_VERSION_1 = "dlContent.version IS NULL";
 	private static final String _FINDER_COLUMN_C_R_P_V_VERSION_2 = "dlContent.version = ?";
 	private static final String _FINDER_COLUMN_C_R_P_V_VERSION_3 = "(dlContent.version IS NULL OR dlContent.version = '')";
 

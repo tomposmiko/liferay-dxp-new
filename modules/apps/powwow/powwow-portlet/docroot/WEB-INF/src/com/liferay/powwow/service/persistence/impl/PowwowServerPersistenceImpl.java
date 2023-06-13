@@ -16,8 +16,6 @@ package com.liferay.powwow.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
@@ -36,6 +34,7 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 
 import com.liferay.powwow.exception.NoSuchServerException;
 import com.liferay.powwow.model.PowwowServer;
@@ -185,6 +184,8 @@ public class PowwowServerPersistenceImpl extends BasePersistenceImpl<PowwowServe
 	public List<PowwowServer> findByPT_A(String providerType, boolean active,
 		int start, int end, OrderByComparator<PowwowServer> orderByComparator,
 		boolean retrieveFromCache) {
+		providerType = Objects.toString(providerType, "");
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -212,8 +213,7 @@ public class PowwowServerPersistenceImpl extends BasePersistenceImpl<PowwowServe
 
 			if ((list != null) && !list.isEmpty()) {
 				for (PowwowServer powwowServer : list) {
-					if (!Objects.equals(providerType,
-								powwowServer.getProviderType()) ||
+					if (!providerType.equals(powwowServer.getProviderType()) ||
 							(active != powwowServer.isActive())) {
 						list = null;
 
@@ -238,10 +238,7 @@ public class PowwowServerPersistenceImpl extends BasePersistenceImpl<PowwowServe
 
 			boolean bindProviderType = false;
 
-			if (providerType == null) {
-				query.append(_FINDER_COLUMN_PT_A_PROVIDERTYPE_1);
-			}
-			else if (providerType.equals("")) {
+			if (providerType.isEmpty()) {
 				query.append(_FINDER_COLUMN_PT_A_PROVIDERTYPE_3);
 			}
 			else {
@@ -441,6 +438,8 @@ public class PowwowServerPersistenceImpl extends BasePersistenceImpl<PowwowServe
 		String providerType, boolean active,
 		OrderByComparator<PowwowServer> orderByComparator)
 		throws NoSuchServerException {
+		providerType = Objects.toString(providerType, "");
+
 		PowwowServer powwowServer = findByPrimaryKey(powwowServerId);
 
 		Session session = null;
@@ -486,10 +485,7 @@ public class PowwowServerPersistenceImpl extends BasePersistenceImpl<PowwowServe
 
 		boolean bindProviderType = false;
 
-		if (providerType == null) {
-			query.append(_FINDER_COLUMN_PT_A_PROVIDERTYPE_1);
-		}
-		else if (providerType.equals("")) {
+		if (providerType.isEmpty()) {
 			query.append(_FINDER_COLUMN_PT_A_PROVIDERTYPE_3);
 		}
 		else {
@@ -615,6 +611,8 @@ public class PowwowServerPersistenceImpl extends BasePersistenceImpl<PowwowServe
 	 */
 	@Override
 	public int countByPT_A(String providerType, boolean active) {
+		providerType = Objects.toString(providerType, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_PT_A;
 
 		Object[] finderArgs = new Object[] { providerType, active };
@@ -629,10 +627,7 @@ public class PowwowServerPersistenceImpl extends BasePersistenceImpl<PowwowServe
 
 			boolean bindProviderType = false;
 
-			if (providerType == null) {
-				query.append(_FINDER_COLUMN_PT_A_PROVIDERTYPE_1);
-			}
-			else if (providerType.equals("")) {
+			if (providerType.isEmpty()) {
 				query.append(_FINDER_COLUMN_PT_A_PROVIDERTYPE_3);
 			}
 			else {
@@ -677,7 +672,6 @@ public class PowwowServerPersistenceImpl extends BasePersistenceImpl<PowwowServe
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_PT_A_PROVIDERTYPE_1 = "powwowServer.providerType IS NULL AND ";
 	private static final String _FINDER_COLUMN_PT_A_PROVIDERTYPE_2 = "powwowServer.providerType = ? AND ";
 	private static final String _FINDER_COLUMN_PT_A_PROVIDERTYPE_3 = "(powwowServer.providerType IS NULL OR powwowServer.providerType = '') AND ";
 	private static final String _FINDER_COLUMN_PT_A_ACTIVE_2 = "powwowServer.active = ?";

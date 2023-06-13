@@ -274,14 +274,16 @@ public class EmbeddedElasticsearchConnection
 		stopWatch.start();
 
 		if (_log.isWarnEnabled()) {
-			StringBundler sb = new StringBundler(6);
+			StringBundler sb = new StringBundler(8);
 
 			sb.append("Liferay is configured to use embedded Elasticsearch ");
 			sb.append("as its search engine. Do NOT use embedded ");
 			sb.append("Elasticsearch in production. Embedded Elasticsearch ");
 			sb.append("is useful for development and demonstration purposes. ");
-			sb.append("Remote Elasticsearch connections can be configured in ");
-			sb.append("the Control Panel.");
+			sb.append("Refer to the documentation for details on the ");
+			sb.append("limitations of embedded Elasticsearch. Remote ");
+			sb.append("Elasticsearch connections can be configured in the ");
+			sb.append("Control Panel.");
 
 			_log.warn(sb.toString());
 		}

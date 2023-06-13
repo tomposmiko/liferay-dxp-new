@@ -16,19 +16,20 @@ package com.liferay.portal.cache.test.util;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.cache.MVCCPortalCache;
 import com.liferay.portal.cache.TransactionalPortalCache;
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.cache.PortalCacheHelperUtil;
 import com.liferay.portal.kernel.cache.transactional.TransactionalPortalCacheHelper;
+import com.liferay.portal.kernel.model.MVCCModel;
+import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.util.PropsTestUtil;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionAttribute;
 import com.liferay.portal.kernel.transaction.TransactionLifecycleListener;
 import com.liferay.portal.kernel.transaction.TransactionStatus;
-import com.liferay.portal.kernel.util.Props;
-import com.liferay.portal.kernel.util.PropsUtil;
-import com.liferay.portal.kernel.util.ProxyFactory;
 import com.liferay.registry.BasicRegistryImpl;
 import com.liferay.registry.RegistryUtil;
 
@@ -394,22 +395,22 @@ public class TransactionalPortalCacheTest {
 		// MVCC portal cache without ttl
 
 		_testTransactionalPortalCache(
-			new TransactionalPortalCache<>(_portalCache, true), false);
+			new TransactionalPortalCache<>(_portalCache, true), false, true);
 
 		// Non MVCC portal cache without ttl
 
 		_testTransactionalPortalCache(
-			new TransactionalPortalCache<>(_portalCache, false), false);
+			new TransactionalPortalCache<>(_portalCache, false), false, false);
 
 		// MVCC portal cache with ttl
 
 		_testTransactionalPortalCache(
-			new TransactionalPortalCache<>(_portalCache, true), true);
+			new TransactionalPortalCache<>(_portalCache, true), true, true);
 
 		// Non MVCC portal cache with ttl
 
 		_testTransactionalPortalCache(
-			new TransactionalPortalCache<>(_portalCache, false), true);
+			new TransactionalPortalCache<>(_portalCache, false), true, false);
 	}
 
 	@Test
@@ -526,11 +527,49 @@ public class TransactionalPortalCacheTest {
 			TransactionalPortalCacheHelper.class, "_transactionalCacheEnabled",
 			null);
 
-		PropsUtil.setProps(ProxyFactory.newDummyInstance(Props.class));
+		PropsTestUtil.setProps(Collections.emptyMap());
 
 		Assert.assertFalse(
 			"TransactionalPortalCacheHelper should be disabled",
 			TransactionalPortalCacheHelper.isEnabled());
+	}
+
+	@Test
+	public void testTransactionalPortalCacheWithRealMVCCPortalCache() {
+		_setEnableTransactionalCache(true);
+
+		TransactionalPortalCache<String, MVCCModel> transactionalPortalCache =
+			new TransactionalPortalCache<>(
+				new MVCCPortalCache<>(
+					new TestPortalCache<>("Test MVCC Portal Cache")),
+				true);
+
+		// Put real value and commit
+
+		TransactionalPortalCacheHelper.begin();
+
+		MockMVCCModel mockMVCCModel = new MockMVCCModel(0);
+
+		transactionalPortalCache.put(_KEY_1, mockMVCCModel);
+
+		TransactionalPortalCacheHelper.commit(false);
+
+		Assert.assertSame(mockMVCCModel, transactionalPortalCache.get(_KEY_1));
+
+		// Remove, put NullModel and commit
+
+		TransactionalPortalCacheHelper.begin();
+
+		transactionalPortalCache.remove(_KEY_1);
+
+		MVCCModel nullMVCCModel = ReflectionTestUtil.getFieldValue(
+			BasePersistenceImpl.class, "nullModel");
+
+		transactionalPortalCache.put(_KEY_1, nullMVCCModel);
+
+		TransactionalPortalCacheHelper.commit(false);
+
+		Assert.assertSame(nullMVCCModel, transactionalPortalCache.get(_KEY_1));
 	}
 
 	@Test
@@ -823,7 +862,7 @@ public class TransactionalPortalCacheTest {
 
 	private void _testTransactionalPortalCache(
 		TransactionalPortalCache<String, String> transactionalPortalCache,
-		boolean ttl) {
+		boolean ttl, boolean mvcc) {
 
 		// Rollback
 
@@ -999,23 +1038,48 @@ public class TransactionalPortalCacheTest {
 
 		TransactionalPortalCacheHelper.commit(false);
 
-		if (ttl) {
-			_testCacheListener.assertUpdated(_KEY_1, _VALUE_1, 10);
+		if (mvcc) {
+			_testCacheListener.assertRemoved(_KEY_1, _VALUE_2);
+
+			if (ttl) {
+				_testCacheListener.assertPut(_KEY_1, _VALUE_1, 10);
+			}
+			else {
+				_testCacheListener.assertPut(_KEY_1, _VALUE_1);
+			}
+
+			_testCacheListener.assertActionsCount(2);
+
+			_testCacheReplicator.assertRemoved(_KEY_1, _VALUE_2);
+
+			if (ttl) {
+				_testCacheReplicator.assertPut(_KEY_1, _VALUE_1, 10);
+			}
+			else {
+				_testCacheReplicator.assertPut(_KEY_1, _VALUE_1);
+			}
+
+			_testCacheReplicator.assertActionsCount(2);
 		}
 		else {
-			_testCacheListener.assertUpdated(_KEY_1, _VALUE_1);
-		}
+			if (ttl) {
+				_testCacheListener.assertUpdated(_KEY_1, _VALUE_1, 10);
+			}
+			else {
+				_testCacheListener.assertUpdated(_KEY_1, _VALUE_1);
+			}
 
-		_testCacheListener.assertActionsCount(1);
+			_testCacheListener.assertActionsCount(1);
 
-		if (ttl) {
-			_testCacheReplicator.assertUpdated(_KEY_1, _VALUE_1, 10);
-		}
-		else {
-			_testCacheReplicator.assertUpdated(_KEY_1, _VALUE_1);
-		}
+			if (ttl) {
+				_testCacheReplicator.assertUpdated(_KEY_1, _VALUE_1, 10);
+			}
+			else {
+				_testCacheReplicator.assertUpdated(_KEY_1, _VALUE_1);
+			}
 
-		_testCacheReplicator.assertActionsCount(1);
+			_testCacheReplicator.assertActionsCount(1);
+		}
 
 		Assert.assertEquals(_VALUE_1, transactionalPortalCache.get(_KEY_1));
 		Assert.assertEquals(_VALUE_1, _portalCache.get(_KEY_1));
@@ -1027,20 +1091,72 @@ public class TransactionalPortalCacheTest {
 
 		TransactionalPortalCacheHelper.begin();
 
+		PortalCacheHelperUtil.removeWithoutReplicator(
+			transactionalPortalCache, _KEY_1);
+
+		if (ttl) {
+			PortalCacheHelperUtil.putWithoutReplicator(
+				transactionalPortalCache, _KEY_1, _VALUE_2, 10);
+		}
+		else {
+			PortalCacheHelperUtil.putWithoutReplicator(
+				transactionalPortalCache, _KEY_1, _VALUE_2);
+		}
+
+		Assert.assertEquals(_VALUE_2, transactionalPortalCache.get(_KEY_1));
+		Assert.assertEquals(_VALUE_1, _portalCache.get(_KEY_1));
+
+		TransactionalPortalCacheHelper.commit(false);
+
+		if (mvcc) {
+			_testCacheListener.assertRemoved(_KEY_1, _VALUE_1);
+
+			if (ttl) {
+				_testCacheListener.assertPut(_KEY_1, _VALUE_2, 10);
+			}
+			else {
+				_testCacheListener.assertPut(_KEY_1, _VALUE_2);
+			}
+
+			_testCacheListener.assertActionsCount(2);
+			_testCacheReplicator.assertActionsCount(0);
+		}
+		else {
+			if (ttl) {
+				_testCacheListener.assertUpdated(_KEY_1, _VALUE_2, 10);
+			}
+			else {
+				_testCacheListener.assertUpdated(_KEY_1, _VALUE_2);
+			}
+
+			_testCacheListener.assertActionsCount(1);
+			_testCacheReplicator.assertActionsCount(0);
+		}
+
+		Assert.assertEquals(_VALUE_2, transactionalPortalCache.get(_KEY_1));
+		Assert.assertEquals(_VALUE_2, _portalCache.get(_KEY_1));
+
+		_testCacheListener.reset();
+		_testCacheReplicator.reset();
+
+		// Commit 6
+
+		TransactionalPortalCacheHelper.begin();
+
 		transactionalPortalCache.removeAll();
 
 		if (ttl) {
-			transactionalPortalCache.put(_KEY_1, _VALUE_2, 10);
+			transactionalPortalCache.put(_KEY_1, _VALUE_1, 10);
 		}
 		else {
-			transactionalPortalCache.put(_KEY_1, _VALUE_2);
+			transactionalPortalCache.put(_KEY_1, _VALUE_1);
 		}
 
 		PortalCacheHelperUtil.removeAllWithoutReplicator(
 			transactionalPortalCache);
 
 		Assert.assertNull(transactionalPortalCache.get(_KEY_1));
-		Assert.assertEquals(_VALUE_1, _portalCache.get(_KEY_1));
+		Assert.assertEquals(_VALUE_2, _portalCache.get(_KEY_1));
 
 		TransactionalPortalCacheHelper.commit(false);
 

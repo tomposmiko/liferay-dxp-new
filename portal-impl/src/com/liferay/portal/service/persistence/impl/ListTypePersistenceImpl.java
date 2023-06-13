@@ -16,8 +16,6 @@ package com.liferay.portal.service.persistence.impl;
 
 import aQute.bnd.annotation.ProviderType;
 
-import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
@@ -34,6 +32,7 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.impl.ListTypeImpl;
 import com.liferay.portal.model.impl.ListTypeModelImpl;
@@ -170,6 +169,8 @@ public class ListTypePersistenceImpl extends BasePersistenceImpl<ListType>
 	@Override
 	public List<ListType> findByType(String type, int start, int end,
 		OrderByComparator<ListType> orderByComparator, boolean retrieveFromCache) {
+		type = Objects.toString(type, "");
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -193,7 +194,7 @@ public class ListTypePersistenceImpl extends BasePersistenceImpl<ListType>
 
 			if ((list != null) && !list.isEmpty()) {
 				for (ListType listType : list) {
-					if (!Objects.equals(type, listType.getType())) {
+					if (!type.equals(listType.getType())) {
 						list = null;
 
 						break;
@@ -217,10 +218,7 @@ public class ListTypePersistenceImpl extends BasePersistenceImpl<ListType>
 
 			boolean bindType = false;
 
-			if (type == null) {
-				query.append(_FINDER_COLUMN_TYPE_TYPE_1);
-			}
-			else if (type.equals("")) {
+			if (type.isEmpty()) {
 				query.append(_FINDER_COLUMN_TYPE_TYPE_3);
 			}
 			else {
@@ -401,6 +399,8 @@ public class ListTypePersistenceImpl extends BasePersistenceImpl<ListType>
 	public ListType[] findByType_PrevAndNext(long listTypeId, String type,
 		OrderByComparator<ListType> orderByComparator)
 		throws NoSuchListTypeException {
+		type = Objects.toString(type, "");
+
 		ListType listType = findByPrimaryKey(listTypeId);
 
 		Session session = null;
@@ -446,10 +446,7 @@ public class ListTypePersistenceImpl extends BasePersistenceImpl<ListType>
 
 		boolean bindType = false;
 
-		if (type == null) {
-			query.append(_FINDER_COLUMN_TYPE_TYPE_1);
-		}
-		else if (type.equals("")) {
+		if (type.isEmpty()) {
 			query.append(_FINDER_COLUMN_TYPE_TYPE_3);
 		}
 		else {
@@ -569,6 +566,8 @@ public class ListTypePersistenceImpl extends BasePersistenceImpl<ListType>
 	 */
 	@Override
 	public int countByType(String type) {
+		type = Objects.toString(type, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_TYPE;
 
 		Object[] finderArgs = new Object[] { type };
@@ -583,10 +582,7 @@ public class ListTypePersistenceImpl extends BasePersistenceImpl<ListType>
 
 			boolean bindType = false;
 
-			if (type == null) {
-				query.append(_FINDER_COLUMN_TYPE_TYPE_1);
-			}
-			else if (type.equals("")) {
+			if (type.isEmpty()) {
 				query.append(_FINDER_COLUMN_TYPE_TYPE_3);
 			}
 			else {
@@ -627,7 +623,6 @@ public class ListTypePersistenceImpl extends BasePersistenceImpl<ListType>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_TYPE_TYPE_1 = "listType.type IS NULL";
 	private static final String _FINDER_COLUMN_TYPE_TYPE_2 = "listType.type = ?";
 	private static final String _FINDER_COLUMN_TYPE_TYPE_3 = "(listType.type IS NULL OR listType.type = '')";
 	public static final FinderPath FINDER_PATH_FETCH_BY_N_T = new FinderPath(ListTypeModelImpl.ENTITY_CACHE_ENABLED,
@@ -700,6 +695,9 @@ public class ListTypePersistenceImpl extends BasePersistenceImpl<ListType>
 	@Override
 	public ListType fetchByN_T(String name, String type,
 		boolean retrieveFromCache) {
+		name = Objects.toString(name, "");
+		type = Objects.toString(type, "");
+
 		Object[] finderArgs = new Object[] { name, type };
 
 		Object result = null;
@@ -725,10 +723,7 @@ public class ListTypePersistenceImpl extends BasePersistenceImpl<ListType>
 
 			boolean bindName = false;
 
-			if (name == null) {
-				query.append(_FINDER_COLUMN_N_T_NAME_1);
-			}
-			else if (name.equals("")) {
+			if (name.isEmpty()) {
 				query.append(_FINDER_COLUMN_N_T_NAME_3);
 			}
 			else {
@@ -739,10 +734,7 @@ public class ListTypePersistenceImpl extends BasePersistenceImpl<ListType>
 
 			boolean bindType = false;
 
-			if (type == null) {
-				query.append(_FINDER_COLUMN_N_T_TYPE_1);
-			}
-			else if (type.equals("")) {
+			if (type.isEmpty()) {
 				query.append(_FINDER_COLUMN_N_T_TYPE_3);
 			}
 			else {
@@ -838,6 +830,9 @@ public class ListTypePersistenceImpl extends BasePersistenceImpl<ListType>
 	 */
 	@Override
 	public int countByN_T(String name, String type) {
+		name = Objects.toString(name, "");
+		type = Objects.toString(type, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_N_T;
 
 		Object[] finderArgs = new Object[] { name, type };
@@ -852,10 +847,7 @@ public class ListTypePersistenceImpl extends BasePersistenceImpl<ListType>
 
 			boolean bindName = false;
 
-			if (name == null) {
-				query.append(_FINDER_COLUMN_N_T_NAME_1);
-			}
-			else if (name.equals("")) {
+			if (name.isEmpty()) {
 				query.append(_FINDER_COLUMN_N_T_NAME_3);
 			}
 			else {
@@ -866,10 +858,7 @@ public class ListTypePersistenceImpl extends BasePersistenceImpl<ListType>
 
 			boolean bindType = false;
 
-			if (type == null) {
-				query.append(_FINDER_COLUMN_N_T_TYPE_1);
-			}
-			else if (type.equals("")) {
+			if (type.isEmpty()) {
 				query.append(_FINDER_COLUMN_N_T_TYPE_3);
 			}
 			else {
@@ -914,10 +903,8 @@ public class ListTypePersistenceImpl extends BasePersistenceImpl<ListType>
 		return count.intValue();
 	}
 
-	private static final String _FINDER_COLUMN_N_T_NAME_1 = "listType.name IS NULL AND ";
 	private static final String _FINDER_COLUMN_N_T_NAME_2 = "listType.name = ? AND ";
 	private static final String _FINDER_COLUMN_N_T_NAME_3 = "(listType.name IS NULL OR listType.name = '') AND ";
-	private static final String _FINDER_COLUMN_N_T_TYPE_1 = "listType.type IS NULL";
 	private static final String _FINDER_COLUMN_N_T_TYPE_2 = "listType.type = ?";
 	private static final String _FINDER_COLUMN_N_T_TYPE_3 = "(listType.type IS NULL OR listType.type = '')";
 

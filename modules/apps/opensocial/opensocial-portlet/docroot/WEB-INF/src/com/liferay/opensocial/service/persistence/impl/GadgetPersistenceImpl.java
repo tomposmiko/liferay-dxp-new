@@ -22,8 +22,6 @@ import com.liferay.opensocial.model.impl.GadgetImpl;
 import com.liferay.opensocial.model.impl.GadgetModelImpl;
 import com.liferay.opensocial.service.persistence.GadgetPersistence;
 
-import com.liferay.petra.string.StringBundler;
-
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
@@ -44,6 +42,7 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
@@ -180,6 +179,8 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 	@Override
 	public List<Gadget> findByUuid(String uuid, int start, int end,
 		OrderByComparator<Gadget> orderByComparator, boolean retrieveFromCache) {
+		uuid = Objects.toString(uuid, "");
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -203,7 +204,7 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Gadget gadget : list) {
-					if (!Objects.equals(uuid, gadget.getUuid())) {
+					if (!uuid.equals(gadget.getUuid())) {
 						list = null;
 
 						break;
@@ -227,10 +228,7 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 
 			boolean bindUuid = false;
 
-			if (uuid == null) {
-				query.append(_FINDER_COLUMN_UUID_UUID_1);
-			}
-			else if (uuid.equals("")) {
+			if (uuid.isEmpty()) {
 				query.append(_FINDER_COLUMN_UUID_UUID_3);
 			}
 			else {
@@ -410,6 +408,8 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 	public Gadget[] findByUuid_PrevAndNext(long gadgetId, String uuid,
 		OrderByComparator<Gadget> orderByComparator)
 		throws NoSuchGadgetException {
+		uuid = Objects.toString(uuid, "");
+
 		Gadget gadget = findByPrimaryKey(gadgetId);
 
 		Session session = null;
@@ -455,10 +455,7 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 
 		boolean bindUuid = false;
 
-		if (uuid == null) {
-			query.append(_FINDER_COLUMN_UUID_UUID_1);
-		}
-		else if (uuid.equals("")) {
+		if (uuid.isEmpty()) {
 			query.append(_FINDER_COLUMN_UUID_UUID_3);
 		}
 		else {
@@ -605,6 +602,8 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 			return findByUuid(uuid, start, end, orderByComparator);
 		}
 
+		uuid = Objects.toString(uuid, "");
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
@@ -624,10 +623,7 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 
 		boolean bindUuid = false;
 
-		if (uuid == null) {
-			query.append(_FINDER_COLUMN_UUID_UUID_1_SQL);
-		}
-		else if (uuid.equals("")) {
+		if (uuid.isEmpty()) {
 			query.append(_FINDER_COLUMN_UUID_UUID_3_SQL);
 		}
 		else {
@@ -709,6 +705,8 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 			return findByUuid_PrevAndNext(gadgetId, uuid, orderByComparator);
 		}
 
+		uuid = Objects.toString(uuid, "");
+
 		Gadget gadget = findByPrimaryKey(gadgetId);
 
 		Session session = null;
@@ -759,10 +757,7 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 
 		boolean bindUuid = false;
 
-		if (uuid == null) {
-			query.append(_FINDER_COLUMN_UUID_UUID_1_SQL);
-		}
-		else if (uuid.equals("")) {
+		if (uuid.isEmpty()) {
 			query.append(_FINDER_COLUMN_UUID_UUID_3_SQL);
 		}
 		else {
@@ -911,6 +906,8 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 	 */
 	@Override
 	public int countByUuid(String uuid) {
+		uuid = Objects.toString(uuid, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_UUID;
 
 		Object[] finderArgs = new Object[] { uuid };
@@ -925,10 +922,7 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 
 			boolean bindUuid = false;
 
-			if (uuid == null) {
-				query.append(_FINDER_COLUMN_UUID_UUID_1);
-			}
-			else if (uuid.equals("")) {
+			if (uuid.isEmpty()) {
 				query.append(_FINDER_COLUMN_UUID_UUID_3);
 			}
 			else {
@@ -981,16 +975,15 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 			return countByUuid(uuid);
 		}
 
+		uuid = Objects.toString(uuid, "");
+
 		StringBundler query = new StringBundler(2);
 
 		query.append(_FILTER_SQL_COUNT_GADGET_WHERE);
 
 		boolean bindUuid = false;
 
-		if (uuid == null) {
-			query.append(_FINDER_COLUMN_UUID_UUID_1_SQL);
-		}
-		else if (uuid.equals("")) {
+		if (uuid.isEmpty()) {
 			query.append(_FINDER_COLUMN_UUID_UUID_3_SQL);
 		}
 		else {
@@ -1030,10 +1023,8 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 		}
 	}
 
-	private static final String _FINDER_COLUMN_UUID_UUID_1 = "gadget.uuid IS NULL";
 	private static final String _FINDER_COLUMN_UUID_UUID_2 = "gadget.uuid = ?";
 	private static final String _FINDER_COLUMN_UUID_UUID_3 = "(gadget.uuid IS NULL OR gadget.uuid = '')";
-	private static final String _FINDER_COLUMN_UUID_UUID_1_SQL = "gadget.uuid_ IS NULL";
 	private static final String _FINDER_COLUMN_UUID_UUID_2_SQL = "gadget.uuid_ = ?";
 	private static final String _FINDER_COLUMN_UUID_UUID_3_SQL = "(gadget.uuid_ IS NULL OR gadget.uuid_ = '')";
 	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_UUID_C = new FinderPath(GadgetModelImpl.ENTITY_CACHE_ENABLED,
@@ -1129,6 +1120,8 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 	public List<Gadget> findByUuid_C(String uuid, long companyId, int start,
 		int end, OrderByComparator<Gadget> orderByComparator,
 		boolean retrieveFromCache) {
+		uuid = Objects.toString(uuid, "");
+
 		boolean pagination = true;
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
@@ -1156,7 +1149,7 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Gadget gadget : list) {
-					if (!Objects.equals(uuid, gadget.getUuid()) ||
+					if (!uuid.equals(gadget.getUuid()) ||
 							(companyId != gadget.getCompanyId())) {
 						list = null;
 
@@ -1181,10 +1174,7 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 
 			boolean bindUuid = false;
 
-			if (uuid == null) {
-				query.append(_FINDER_COLUMN_UUID_C_UUID_1);
-			}
-			else if (uuid.equals("")) {
+			if (uuid.isEmpty()) {
 				query.append(_FINDER_COLUMN_UUID_C_UUID_3);
 			}
 			else {
@@ -1381,6 +1371,8 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 	public Gadget[] findByUuid_C_PrevAndNext(long gadgetId, String uuid,
 		long companyId, OrderByComparator<Gadget> orderByComparator)
 		throws NoSuchGadgetException {
+		uuid = Objects.toString(uuid, "");
+
 		Gadget gadget = findByPrimaryKey(gadgetId);
 
 		Session session = null;
@@ -1426,10 +1418,7 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 
 		boolean bindUuid = false;
 
-		if (uuid == null) {
-			query.append(_FINDER_COLUMN_UUID_C_UUID_1);
-		}
-		else if (uuid.equals("")) {
+		if (uuid.isEmpty()) {
 			query.append(_FINDER_COLUMN_UUID_C_UUID_3);
 		}
 		else {
@@ -1585,6 +1574,8 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 			return findByUuid_C(uuid, companyId, start, end, orderByComparator);
 		}
 
+		uuid = Objects.toString(uuid, "");
+
 		StringBundler query = null;
 
 		if (orderByComparator != null) {
@@ -1604,10 +1595,7 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 
 		boolean bindUuid = false;
 
-		if (uuid == null) {
-			query.append(_FINDER_COLUMN_UUID_C_UUID_1_SQL);
-		}
-		else if (uuid.equals("")) {
+		if (uuid.isEmpty()) {
 			query.append(_FINDER_COLUMN_UUID_C_UUID_3_SQL);
 		}
 		else {
@@ -1695,6 +1683,8 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 				orderByComparator);
 		}
 
+		uuid = Objects.toString(uuid, "");
+
 		Gadget gadget = findByPrimaryKey(gadgetId);
 
 		Session session = null;
@@ -1745,10 +1735,7 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 
 		boolean bindUuid = false;
 
-		if (uuid == null) {
-			query.append(_FINDER_COLUMN_UUID_C_UUID_1_SQL);
-		}
-		else if (uuid.equals("")) {
+		if (uuid.isEmpty()) {
 			query.append(_FINDER_COLUMN_UUID_C_UUID_3_SQL);
 		}
 		else {
@@ -1903,6 +1890,8 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 	 */
 	@Override
 	public int countByUuid_C(String uuid, long companyId) {
+		uuid = Objects.toString(uuid, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_UUID_C;
 
 		Object[] finderArgs = new Object[] { uuid, companyId };
@@ -1917,10 +1906,7 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 
 			boolean bindUuid = false;
 
-			if (uuid == null) {
-				query.append(_FINDER_COLUMN_UUID_C_UUID_1);
-			}
-			else if (uuid.equals("")) {
+			if (uuid.isEmpty()) {
 				query.append(_FINDER_COLUMN_UUID_C_UUID_3);
 			}
 			else {
@@ -1978,16 +1964,15 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 			return countByUuid_C(uuid, companyId);
 		}
 
+		uuid = Objects.toString(uuid, "");
+
 		StringBundler query = new StringBundler(3);
 
 		query.append(_FILTER_SQL_COUNT_GADGET_WHERE);
 
 		boolean bindUuid = false;
 
-		if (uuid == null) {
-			query.append(_FINDER_COLUMN_UUID_C_UUID_1_SQL);
-		}
-		else if (uuid.equals("")) {
+		if (uuid.isEmpty()) {
 			query.append(_FINDER_COLUMN_UUID_C_UUID_3_SQL);
 		}
 		else {
@@ -2031,10 +2016,8 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 		}
 	}
 
-	private static final String _FINDER_COLUMN_UUID_C_UUID_1 = "gadget.uuid IS NULL AND ";
 	private static final String _FINDER_COLUMN_UUID_C_UUID_2 = "gadget.uuid = ? AND ";
 	private static final String _FINDER_COLUMN_UUID_C_UUID_3 = "(gadget.uuid IS NULL OR gadget.uuid = '') AND ";
-	private static final String _FINDER_COLUMN_UUID_C_UUID_1_SQL = "gadget.uuid_ IS NULL AND ";
 	private static final String _FINDER_COLUMN_UUID_C_UUID_2_SQL = "gadget.uuid_ = ? AND ";
 	private static final String _FINDER_COLUMN_UUID_C_UUID_3_SQL = "(gadget.uuid_ IS NULL OR gadget.uuid_ = '') AND ";
 	private static final String _FINDER_COLUMN_UUID_C_COMPANYID_2 = "gadget.companyId = ?";
@@ -2965,6 +2948,8 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 	@Override
 	public Gadget fetchByC_U(long companyId, String url,
 		boolean retrieveFromCache) {
+		url = Objects.toString(url, "");
+
 		Object[] finderArgs = new Object[] { companyId, url };
 
 		Object result = null;
@@ -2992,10 +2977,7 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 
 			boolean bindUrl = false;
 
-			if (url == null) {
-				query.append(_FINDER_COLUMN_C_U_URL_1);
-			}
-			else if (url.equals("")) {
+			if (url.isEmpty()) {
 				query.append(_FINDER_COLUMN_C_U_URL_3);
 			}
 			else {
@@ -3078,6 +3060,8 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 	 */
 	@Override
 	public int countByC_U(long companyId, String url) {
+		url = Objects.toString(url, "");
+
 		FinderPath finderPath = FINDER_PATH_COUNT_BY_C_U;
 
 		Object[] finderArgs = new Object[] { companyId, url };
@@ -3094,10 +3078,7 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 
 			boolean bindUrl = false;
 
-			if (url == null) {
-				query.append(_FINDER_COLUMN_C_U_URL_1);
-			}
-			else if (url.equals("")) {
+			if (url.isEmpty()) {
 				query.append(_FINDER_COLUMN_C_U_URL_3);
 			}
 			else {
@@ -3141,7 +3122,6 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 	}
 
 	private static final String _FINDER_COLUMN_C_U_COMPANYID_2 = "gadget.companyId = ? AND ";
-	private static final String _FINDER_COLUMN_C_U_URL_1 = "gadget.url IS NULL";
 	private static final String _FINDER_COLUMN_C_U_URL_2 = "gadget.url = ?";
 	private static final String _FINDER_COLUMN_C_U_URL_3 = "(gadget.url IS NULL OR gadget.url = '')";
 

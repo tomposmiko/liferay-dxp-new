@@ -38,7 +38,6 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.layoutconfiguration.util.PortletRenderer;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -242,7 +241,7 @@ public class TemplateProcessor implements ColumnProcessor {
 			if (value instanceof String) {
 				Object storedValue = modifiableSettings.getValue(key, null);
 
-				if (!value.equals(storedValue)) {
+				if (storedValue == null) {
 					modifiableSettings.setValue(key, (String)value);
 
 					modified = true;
@@ -251,7 +250,7 @@ public class TemplateProcessor implements ColumnProcessor {
 			else if (value instanceof String[]) {
 				Object[] storedValues = modifiableSettings.getValues(key, null);
 
-				if (!Arrays.equals((String[])value, storedValues)) {
+				if (storedValues == null) {
 					modifiableSettings.setValues(key, (String[])value);
 
 					modified = true;

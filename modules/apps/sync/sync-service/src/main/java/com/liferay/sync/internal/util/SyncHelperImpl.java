@@ -377,7 +377,7 @@ public class SyncHelperImpl implements SyncHelper {
 				Channels.newChannel(checksumsInputStream);
 			OutputStream deltaOutputStream = new FileOutputStream(deltaFile);
 			WritableByteChannel deltaOutputStreamWritableByteChannel =
-				Channels.newChannel(deltaOutputStream);) {
+				Channels.newChannel(deltaOutputStream)) {
 
 			ByteChannelReader checksumsByteChannelReader =
 				new ByteChannelReader(checksumsReadableByteChannel);
@@ -471,8 +471,8 @@ public class SyncHelperImpl implements SyncHelper {
 			WritableByteChannel patchedWritableByteChannel =
 				Channels.newChannel(patchedFileOutputStream);
 			FileInputStream deltaInputStream = new FileInputStream(deltaFile);
-			ReadableByteChannel deltaReadableByteChannel =
-				Channels.newChannel(deltaInputStream)) {
+			ReadableByteChannel deltaReadableByteChannel = Channels.newChannel(
+				deltaInputStream)) {
 
 			ByteChannelReader deltaByteChannelReader = new ByteChannelReader(
 				deltaReadableByteChannel);

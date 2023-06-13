@@ -31,6 +31,7 @@ import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.person.apio.architect.identifier.PersonIdentifier;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.structure.apio.architect.model.FormLayoutPage;
+import com.liferay.structure.apio.architect.util.StructureFieldConverter;
 import com.liferay.structure.apio.architect.util.StructureRepresentorBuilderHelper;
 import com.liferay.structure.apio.internal.model.FormLayoutPageImpl;
 
@@ -47,6 +48,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * Provides the information necessary to expose structure resources through a
@@ -107,16 +109,16 @@ public class StructureRepresentorBuilderHelperImpl
 				DDMFormField::getDDMFormFieldOptions),
 			this::_buildFieldOptions
 		).addString(
-			"additionalType", DDMFormField::getType
-		).addString(
 			"dataSourceType",
 			getDDMFormFieldPropertyFunction(
 				String.class::cast, "dataSourceType")
 		).addString(
-			"dataType", DDMFormField::getDataType
+			"dataType", this::_getDDMFormFieldDataType
 		).addString(
 			"displayStyle",
 			getDDMFormFieldPropertyFunction(String.class::cast, "displayStyle")
+		).addString(
+			"inputControl", this::_getDDMFormFieldInputControl
 		).addString(
 			"name", DDMFormField::getName
 		).addString(
@@ -152,8 +154,8 @@ public class StructureRepresentorBuilderHelperImpl
 
 	@Override
 	public NestedRepresentor.FirstStep<FormLayoutPage>
-		buildFormLayoutPageFirstStep(NestedRepresentor.Builder<FormLayoutPage>
-		builder) {
+		buildFormLayoutPageFirstStep(
+			NestedRepresentor.Builder<FormLayoutPage> builder) {
 
 		return builder.types(
 			"FormLayoutPage"
@@ -337,5 +339,18 @@ public class StructureRepresentorBuilderHelperImpl
 			"value", Map.Entry::getKey
 		).build();
 	}
+
+	private String _getDDMFormFieldDataType(DDMFormField ddmFormField) {
+		return _structureFieldConverter.getFieldDataType(
+			ddmFormField.getDataType(), ddmFormField.getType());
+	}
+
+	private String _getDDMFormFieldInputControl(DDMFormField ddmFormField) {
+		return _structureFieldConverter.getFieldInputControl(
+			ddmFormField.getType());
+	}
+
+	@Reference
+	private StructureFieldConverter _structureFieldConverter;
 
 }

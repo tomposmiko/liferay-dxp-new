@@ -18,6 +18,7 @@ import com.liferay.petra.executor.PortalExecutorManager;
 import com.liferay.petra.lang.ClassLoaderPool;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.bean.BeanLocatorImpl;
 import com.liferay.portal.dao.orm.hibernate.FieldInterceptionHelperUtil;
@@ -42,6 +43,7 @@ import com.liferay.portal.kernel.scheduler.SchedulerEngineHelper;
 import com.liferay.portal.kernel.servlet.DirectServletRegistryUtil;
 import com.liferay.portal.kernel.servlet.PortletSessionListenerManager;
 import com.liferay.portal.kernel.servlet.SerializableSessionAttributeListener;
+import com.liferay.portal.kernel.servlet.ServletContextClassLoaderPool;
 import com.liferay.portal.kernel.servlet.ServletContextPool;
 import com.liferay.portal.kernel.template.TemplateResourceLoaderUtil;
 import com.liferay.portal.kernel.util.ClearThreadLocalUtil;
@@ -74,8 +76,11 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.lang.reflect.Field;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.FutureTask;
 
@@ -173,6 +178,9 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 		ModuleFrameworkUtilAdapter.unregisterContext(_arrayApplicationContext);
 
 		_arrayApplicationContext.close();
+
+		ClassLoaderPool.unregister(_portalServletContextName);
+		ServletContextClassLoaderPool.unregister(_portalServletContextName);
 	}
 
 	@Override
@@ -213,6 +221,10 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 
 		InitUtil.init();
 
+		// Log JVM arguments after Log4j is initialized
+
+		_logJVMArguments();
+
 		_portalServletContextName = servletContext.getServletContextName();
 
 		if (_portalServletContextName == null) {
@@ -250,6 +262,8 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 		ClassLoader portalClassLoader = PortalClassLoaderUtil.getClassLoader();
 
 		ClassLoaderPool.register(_portalServletContextName, portalClassLoader);
+		ServletContextClassLoaderPool.register(
+			_portalServletContextName, portalClassLoader);
 
 		ServiceDependencyManager serviceDependencyManager =
 			new ServiceDependencyManager();
@@ -273,19 +287,23 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 			SchedulerEngineHelper.class,
 			SingleDestinationMessageSenderFactory.class);
 
-		FutureTask<Void> springInitTask = new FutureTask<>(
-			() -> {
-				super.contextInitialized(servletContextEvent);
+		FutureTask<Void> springInitTask = null;
 
-				return null;
-			});
+		if (PropsValues.MODULE_FRAMEWORK_CONCURRENT_STARTUP_ENABLED) {
+			springInitTask = new FutureTask<>(
+				() -> {
+					super.contextInitialized(servletContextEvent);
 
-		Thread springInitThread = new Thread(
-			springInitTask, "Portal Spring Init Thread");
+					return null;
+				});
 
-		springInitThread.setDaemon(true);
+			Thread springInitThread = new Thread(
+				springInitTask, "Portal Spring Init Thread");
 
-		springInitThread.start();
+			springInitThread.setDaemon(true);
+
+			springInitThread.start();
+		}
 
 		try {
 			ModuleFrameworkUtilAdapter.registerContext(
@@ -299,11 +317,16 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 			throw new RuntimeException(e);
 		}
 
-		try {
-			springInitTask.get();
+		if (springInitTask == null) {
+			super.contextInitialized(servletContextEvent);
 		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
+		else {
+			try {
+				springInitTask.get();
+			}
+			catch (Exception e) {
+				throw new RuntimeException(e);
+			}
 		}
 
 		InitUtil.registerSpringInitialized();
@@ -403,6 +426,31 @@ public class PortalContextLoaderListener extends ContextLoaderListener {
 
 		servletContext.addListener(PortalSessionListener.class);
 		servletContext.addListener(PortletSessionListenerManager.class);
+	}
+
+	private void _logJVMArguments() {
+		if (!_log.isInfoEnabled()) {
+			return;
+		}
+
+		RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
+
+		List<String> inputArguments = runtimeMXBean.getInputArguments();
+
+		StringBundler sb = new StringBundler(inputArguments.size() * 2);
+
+		sb.append("JVM arguments: ");
+
+		for (String inputArgument : inputArguments) {
+			sb.append(inputArgument);
+			sb.append(StringPool.SPACE);
+		}
+
+		if (!inputArguments.isEmpty()) {
+			sb.setIndex(sb.index() - 1);
+		}
+
+		_log.info(sb.toString());
 	}
 
 	private static final Field _FILTERED_PROPERTY_DESCRIPTORS_CACHE_FIELD;

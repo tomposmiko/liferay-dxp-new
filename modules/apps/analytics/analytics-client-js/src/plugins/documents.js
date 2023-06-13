@@ -10,10 +10,17 @@ const applicationId = 'Document';
  */
 function getDocumentPayload(documentElement) {
 	const {dataset} = documentElement;
-	return {
+
+	let payload = {
 		fileEntryId: dataset.analyticsAssetId,
 		fileEntryVersion: dataset.analyticsAssetVersion,
 	};
+
+	if (dataset.analyticsAssetTitle) {
+		payload = {...payload, title: dataset.analyticsAssetTitle};
+	}
+
+	return payload;
 }
 
 /**
@@ -66,12 +73,7 @@ function trackDocumentPreviewed(analytics) {
 			)
 			.filter(element => isTrackableDocument(element))
 			.forEach(element => {
-				let payload = getDocumentPayload(element);
-				const title = element.dataset.analyticsAssetTitle;
-
-				if (title) {
-					payload = {title, ...payload};
-				}
+				const payload = getDocumentPayload(element);
 
 				analytics.send('documentPreviewed', applicationId, payload);
 			});

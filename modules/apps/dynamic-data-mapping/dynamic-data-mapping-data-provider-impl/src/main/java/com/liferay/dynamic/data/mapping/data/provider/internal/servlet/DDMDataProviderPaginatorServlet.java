@@ -115,8 +115,8 @@ public class DDMDataProviderPaginatorServlet extends HttpServlet {
 		int end = ParamUtil.getInteger(request, "end");
 
 		if (Validator.isNull(dataProviderInstanceUUID) ||
-			Validator.isNull(outputParameterName) || (start < 0) ||
-			(end < 0) || (end < start) || (start == end)) {
+			Validator.isNull(outputParameterName) || (start < 0) || (end < 0) ||
+			(end < start) || (start == end)) {
 
 			return null;
 		}

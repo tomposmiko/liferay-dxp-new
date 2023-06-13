@@ -1,0 +1,148 @@
+@component-name = "portal-wcm"
+definition {
+	property portal.release = "true";
+	property portal.upstream = "true";
+	property testray.main.component.name = "Fragments";
+
+	setUp {
+		TestCase.setUpPortalInstance();
+
+		User.firstLoginPG();
+
+		JSONGroup.addGroup(groupName = "Test Site Name");
+
+		JSONFragment.addFragmentCollection(
+			groupName = "Test Site Name",
+			name = "Collection Name"
+		);
+
+		JSONFragment.addFragment(
+			collectionName = "Collection Name",
+			groupName = "Test Site Name",
+			name = "Fragment Name"
+		);
+
+		FragmentsAdmin.openFragmentsAdmin(siteURLKey = "test-site-name");
+	}
+
+	tearDown {
+		var testPortalInstance = PropsUtil.get("test.portal.instance");
+
+		if ("${testPortalInstance}" == "true") {
+			PortalInstances.tearDownCP();
+		}
+		else {
+			JSONGroup.deleteGroupByName(groupName = "Test Site Name");
+		}
+	}
+
+	@priority = "5"
+	test DeleteFragment {
+		property portal.acceptance = "true";
+
+		Navigator.gotoNavNested(navNested = "Collection Name");
+
+		LexiconEntry.delete(rowEntry = "Fragment Name");
+
+		FragmentsAdmin.openFragmentsAdmin(siteURLKey = "test-site-name");
+
+		Navigator.gotoNavNested(navNested = "Collection Name");
+
+		LexiconEntry.viewNoEntry(rowEntry = "Fragment Name");
+	}
+
+	@priority = "5"
+	test DeleteFragmentCollection {
+		property portal.acceptance = "true";
+
+		Collection.deleteCollection(collectionName = "Collection Name");
+
+		FragmentsAdmin.openFragmentsAdmin(siteURLKey = "test-site-name");
+
+		Collection.viewNotPresent(collectionName = "Collection Name");
+	}
+
+	@priority = "4"
+	test RenameFragment {
+		Navigator.gotoNavNested(navNested = "Collection Name");
+
+		LexiconEntry.gotoEntryMenuItem(menuItem = "Rename", rowEntry = "Fragment Name");
+
+		PortletEntry.inputName(name = "Rename Fragment");
+
+		Modal.save();
+
+		FragmentsAdmin.openFragmentsAdmin(siteURLKey = "test-site-name");
+
+		Navigator.gotoNavNested(navNested = "Collection Name");
+
+		LexiconEntry.viewEntryName(rowEntry = "Rename Fragment");
+	}
+
+	@priority = "5"
+	test ViewCannotDeleteFragmentInUse {
+		Navigator.gotoNavNested(navNested = "Collection Name");
+
+		PageTemplatesAdmin.openPageTemplatesAdmin(siteURLKey = "test-site-name");
+
+		NavItem.gotoPageTemplates();
+
+		PageTemplatesAdmin.addCollection(collectionName = "Page Template Collection");
+
+		PageTemplatesAdmin.add(pageTemplateName = "Page Template Name");
+
+		PageEditor.addFragment(
+			collectionName = "Collection Name",
+			fragmentName = "Fragment Name"
+		);
+
+		PageEditor.viewAutoSaveMessage();
+
+		FragmentsAdmin.openFragmentsAdmin(siteURLKey = "test-site-name");
+
+		Navigator.gotoNavNested(navNested = "Collection Name");
+
+		LexiconEntry.delete(
+			failure = "Error:The fragment entry cannot be deleted because it is required by one or more page templates.",
+			rowEntry = "Fragment Name"
+		);
+	}
+
+	@priority = "4"
+	test ViewOnlyDraftFragmentsCanBeSaved {
+		Navigator.gotoNavNested(navNested = "Collection Name");
+
+		FragmentsAdmin.addFragment(fragmentName = "Fragment Name 2");
+
+		SiteAdmin.viewPortletTitle(portletTitle = "Fragment Name 2 (Draft)");
+
+		PortletEntry.saveAsDraft();
+
+		FragmentsAdmin.openFragmentsAdmin(siteURLKey = "test-site-name");
+
+		Navigator.gotoNavNested(navNested = "Collection Name");
+
+		PortletEntry.viewWorkflowStatus(
+			rowEntry = "Fragment Name 2",
+			workflowStatus = "Draft"
+		);
+
+		LexiconEntry.gotoEntryMenuItem(menuItem = "Edit", rowEntry = "Fragment Name 2");
+
+		var htmlSnippet = '''
+<html>${line.separator}
+<div>${line.separator}
+<span class="test">This is a test.</span>${line.separator}
+</div>${line.separator}
+</html>''';
+
+		Type.typeAceEditorNoError(
+			locator1 = "FragmentEditor#HTML_EDITOR",
+			value1 = "${htmlSnippet}"
+		);
+
+		PortletEntry.publish();
+
+		AssertElementNotPresent(locator1 = "Button#SAVE_AS_DRAFT");
+	}
+}

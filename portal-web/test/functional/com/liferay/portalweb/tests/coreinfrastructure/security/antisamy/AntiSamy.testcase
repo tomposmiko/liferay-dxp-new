@@ -1,69 +1,59 @@
-<definition component-name="portal-security">
-	<property name="portal.release" value="true" />
-	<property name="portal.upstream" value="true" />
-	<property name="testray.main.component.name" value="AntiSamy" />
+@component-name = "portal-security"
+definition {
+	property portal.release = "true";
+	property portal.upstream = "true";
+	property testray.main.component.name = "AntiSamy";
 
-	<set-up>
-		<execute macro="TestCase#setUpPortalInstance" />
+	setUp {
+		TestCase.setUpPortalInstance();
 
-		<execute macro="User#firstLoginPG" />
-	</set-up>
+		User.firstLoginPG();
+	}
 
-	<tear-down>
-		<var method="PropsUtil#get('test.portal.instance')" name="testPortalInstance" />
+	tearDown {
+		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		<if>
-			<equals arg1="${testPortalInstance}" arg2="true" />
-			<then>
-				<execute macro="PortalInstances#tearDownCP" />
-			</then>
-			<else>
-				<execute macro="WikiPage#tearDownCP" />
+		if ("${testPortalInstance}" == "true") {
+			PortalInstances.tearDownCP();
+		}
+		else {
+			WikiPage.tearDownCP();
 
-				<execute macro="Page#tearDownCP" />
-			</else>
-		</if>
-	</tear-down>
+			Page.tearDownCP();
+		}
+	}
 
-	<command name="AddWikiFrontPageContentJavascript" priority="4">
-		<execute macro="ProductMenu#gotoPortlet">
-			<var name="category" value="Build" />
-			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Pages" />
-		</execute>
+	@priority = "4"
+	test AddWikiFrontPageContentJavascript {
+		ProductMenu.gotoPortlet(
+			category = "Build",
+			panel = "Site Administration",
+			portlet = "Pages"
+		);
 
-		<execute macro="SitePages#addPublicPage">
-			<var name="pageName" value="AntiSamy Test Page" />
-		</execute>
+		SitePages.addPublicPage(pageName = "AntiSamy Test Page");
 
-		<execute macro="Navigator#gotoPage">
-			<var name="pageName" value="AntiSamy Test Page" />
-		</execute>
+		Navigator.gotoPage(pageName = "AntiSamy Test Page");
 
-		<execute macro="Portlet#addPG">
-			<var name="portletName" value="Wiki" />
-		</execute>
+		Portlet.addPG(portletName = "Wiki");
 
-		<var name="wikiPageContent">
-			<![CDATA[
+		var wikiPageContent = '''
 				<p id='demo'>PASS</p>
 
 				<script type='text/javascript'>
 					document.getElementById('demo').innerHTML = 'FAIL';
 				</script>
-			]]>
-		</var>
+			''';
+		var wikiPageText = "PASS";
 
-		<var name="wikiPageText" value="PASS" />
+		WikiPage.addFrontPagePG(
+			htmlSource = "true",
+			wikiPageContent = "${wikiPageContent}"
+		);
 
-		<execute macro="WikiPage#addFrontPagePG">
-			<var name="htmlSource" value="true" />
-			<var name="wikiPageContent" value="${wikiPageContent}" />
-		</execute>
-
-		<execute macro="WikiPage#viewPG">
-			<var name="wikiPageContent" value="${wikiPageText}" />
-			<var name="wikiPageTitle" value="FrontPage" />
-		</execute>
-	</command>
-</definition>
+		WikiPage.viewPG(
+			wikiPageContent = "${wikiPageText}",
+			wikiPageTitle = "FrontPage"
+		);
+	}
+}

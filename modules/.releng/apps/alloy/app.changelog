@@ -19,3 +19,14 @@ app.artifacts-1.0.1=\
 app.change.log-1.0.1=LPS-84039 LPS-84090 LPS-85796 LPS-86355 LPS-86408
 
 app.git.id-1.0.1=42951d71812eedf6d27a042e26a4e8d148df94a8
+
+#
+# Liferay App Version 1.0.2
+#
+
+app.artifacts-1.0.2=\
+	com.liferay.alloy.mvc-3.0.7.jar
+
+app.change.log-1.0.2=LPS-86355 LPS-86408 
+
+app.git.id-1.0.2=1ad0206eec8462b94638d545f9f0df37163ccdfd

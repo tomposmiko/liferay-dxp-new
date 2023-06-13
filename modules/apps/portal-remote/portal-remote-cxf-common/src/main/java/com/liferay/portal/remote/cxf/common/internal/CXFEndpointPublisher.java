@@ -161,7 +161,8 @@ public class CXFEndpointPublisher {
 			_servletContextHelperServiceRegistration =
 				_bundleContext.registerService(
 					ServletContextHelper.class,
-					new ServletContextHelper(_bundleContext.getBundle()) {},
+					new ServletContextHelper(_bundleContext.getBundle()) {
+					},
 					properties);
 
 			CXFNonSpringServlet cxfNonSpringServlet = new CXFNonSpringServlet();
@@ -203,8 +204,9 @@ public class CXFEndpointPublisher {
 				String[] authVerifierPropertiesArray = null;
 
 				if (authVerifierPropertiesObject instanceof String) {
-					authVerifierPropertiesArray =
-						new String[] {(String)authVerifierPropertiesObject};
+					authVerifierPropertiesArray = new String[] {
+						(String)authVerifierPropertiesObject
+					};
 				}
 				else {
 					authVerifierPropertiesArray =
