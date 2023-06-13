@@ -28,7 +28,9 @@ const SUGGESTION_KEY = 'suggestion';
 
 const VerticalNavigationBar = ({
 	items,
+	moveKBObjectURL,
 	parentContainerId,
+	portletNamespace,
 	productMenuOpen: initialProductMenuOpen,
 }) => {
 	const parentContainer = document.getElementById(parentContainerId);
@@ -166,6 +168,8 @@ const VerticalNavigationBar = ({
 							<div className="sidebar-body">
 								<PanelComponent
 									items={item.navigationItems}
+									moveKBObjectURL={moveKBObjectURL}
+									portletNamespace={portletNamespace}
 									selectedItemId={item.selectedItemId}
 								/>
 							</div>
@@ -187,7 +191,9 @@ const itemShape = {
 
 VerticalNavigationBar.propTypes = {
 	items: PropTypes.arrayOf(PropTypes.shape(itemShape)),
+	moveKBObjectURL: PropTypes.string,
 	parentContainerId: PropTypes.string.isRequired,
+	portletNamespace: PropTypes.string.isRequired,
 	productMenuOpen: PropTypes.bool,
 };
 

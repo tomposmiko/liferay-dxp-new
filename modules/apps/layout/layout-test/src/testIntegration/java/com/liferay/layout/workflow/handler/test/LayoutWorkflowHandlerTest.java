@@ -15,7 +15,7 @@
 package com.liferay.layout.workflow.handler.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
+import com.liferay.fragment.contributor.FragmentCollectionContributorRegistry;
 import com.liferay.fragment.entry.processor.constants.FragmentEntryProcessorConstants;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
@@ -390,15 +390,12 @@ public class LayoutWorkflowHandlerTest {
 		throws Exception {
 
 		FragmentEntry fragmentEntry =
-			_fragmentCollectionContributorTracker.getFragmentEntry(
+			_fragmentCollectionContributorRegistry.getFragmentEntry(
 				"BASIC_COMPONENT-heading");
 
 		Assert.assertNotNull(fragmentEntry);
 
 		ContentLayoutTestUtil.addFragmentEntryLinkToLayout(
-			layout, fragmentEntry.getFragmentEntryId(), segmentsExperienceId,
-			fragmentEntry.getCss(), fragmentEntry.getHtml(),
-			fragmentEntry.getJs(), fragmentEntry.getConfiguration(),
 			JSONUtil.put(
 				FragmentEntryProcessorConstants.
 					KEY_EDITABLE_FRAGMENT_ENTRY_PROCESSOR,
@@ -408,8 +405,10 @@ public class LayoutWorkflowHandlerTest {
 					KEY_FREEMARKER_FRAGMENT_ENTRY_PROCESSOR,
 				JSONUtil.put("headingLevel", "h1")
 			).toString(),
-			fragmentEntry.getFragmentEntryKey(), fragmentEntry.getType(), null,
-			0);
+			fragmentEntry.getCss(), fragmentEntry.getConfiguration(),
+			fragmentEntry.getFragmentEntryId(), fragmentEntry.getHtml(),
+			fragmentEntry.getJs(), layout, fragmentEntry.getFragmentEntryKey(),
+			fragmentEntry.getType(), null, 0, segmentsExperienceId);
 	}
 
 	private void _approveUserWorkflowTasks() throws PortalException {
@@ -506,8 +505,8 @@ public class LayoutWorkflowHandlerTest {
 	private CompanyLocalService _companyLocalService;
 
 	@Inject
-	private FragmentCollectionContributorTracker
-		_fragmentCollectionContributorTracker;
+	private FragmentCollectionContributorRegistry
+		_fragmentCollectionContributorRegistry;
 
 	@Inject
 	private FragmentEntryConfigurationParser _fragmentEntryConfigurationParser;

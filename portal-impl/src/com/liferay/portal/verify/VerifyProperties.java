@@ -326,6 +326,10 @@ public class VerifyProperties {
 			"module.framework.concurrent.startup.enabled"
 		},
 		{
+			"module.framework.configuration.bundle.symbolic.names",
+			"module.framework.configuration.bundle.symbolic.names"
+		},
+		{
 			"module.framework.runtime.start.level",
 			"module.framework.runtime.start.level"
 		},
@@ -333,6 +337,7 @@ public class VerifyProperties {
 			"module.framework.services.ignored.interfaces",
 			"module.framework.services.ignored.interfaces"
 		},
+		{"module.framework.static.jars", "module.framework.static.jars"},
 		{
 			"module.framework.system.packages.extra",
 			"module.framework.system.packages.extra"

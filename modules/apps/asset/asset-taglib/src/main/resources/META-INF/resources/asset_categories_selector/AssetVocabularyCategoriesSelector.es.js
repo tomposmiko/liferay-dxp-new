@@ -271,6 +271,11 @@ function AssetVocabulariesCategoriesSelector({
 
 					<ClayInput.GroupItem shrink>
 						<ClayButton
+							aria-haspopup="dialog"
+							aria-label={sub(
+								Liferay.Language.get('select-x'),
+								label
+							)}
 							displayType="secondary"
 							onClick={handleSelectButtonClick}
 							ref={selectButtonRef}

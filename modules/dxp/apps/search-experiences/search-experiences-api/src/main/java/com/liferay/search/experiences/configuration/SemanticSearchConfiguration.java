@@ -39,9 +39,9 @@ public interface SemanticSearchConfiguration {
 	public boolean sentenceTransformerEnabled();
 
 	@Meta.AD(
-		deflt = "huggingFace", name = "sentence-transform-provider",
-		optionLabels = {"Hugging Face", "txtai"},
-		optionValues = {"huggingFace", "txtai"}, required = false
+		deflt = "huggingFaceInferenceAPI", name = "sentence-transform-provider",
+		optionLabels = {"Hugging Face Inference API", "txtai"},
+		optionValues = {"huggingFaceInferenceAPI", "txtai"}, required = false
 	)
 	public String sentenceTransformProvider();
 
@@ -78,12 +78,6 @@ public interface SemanticSearchConfiguration {
 		name = "model-timeout", required = false
 	)
 	public int modelTimeout();
-
-	@Meta.AD(
-		deflt = "false", description = "sentence-transformer-enable-gpu-help",
-		name = "enable-gpu", required = false
-	)
-	public boolean enableGPU();
 
 	@Meta.AD(
 		deflt = "768",

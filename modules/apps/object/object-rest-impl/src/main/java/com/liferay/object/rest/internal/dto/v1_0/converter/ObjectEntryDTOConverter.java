@@ -507,6 +507,8 @@ public class ObjectEntryDTOConverter
 					}
 				}
 
+				map.put(objectFieldName, objectEntryId);
+
 				if (GetterUtil.getBoolean(
 						PropsUtil.get("feature.flag.LPS-161364")) &&
 					(map.get(objectRelationship.getName()) == null)) {

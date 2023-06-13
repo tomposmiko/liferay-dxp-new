@@ -20,17 +20,20 @@ import com.liferay.object.constants.ObjectValidationRuleConstants;
 import com.liferay.object.exception.ObjectValidationRuleEngineException;
 import com.liferay.object.exception.ObjectValidationRuleNameException;
 import com.liferay.object.exception.ObjectValidationRuleScriptException;
-import com.liferay.object.model.ObjectEntry;
+import com.liferay.object.internal.action.util.ObjectEntryVariablesUtil;
+import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectValidationRule;
 import com.liferay.object.scripting.exception.ObjectScriptingException;
 import com.liferay.object.scripting.validator.ObjectScriptingValidator;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.base.ObjectValidationRuleLocalServiceBaseImpl;
 import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
+import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
 import com.liferay.object.validation.rule.ObjectValidationRuleEngine;
 import com.liferay.object.validation.rule.ObjectValidationRuleEngineRegistry;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
@@ -42,12 +45,11 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.vulcan.extension.EntityExtensionThreadLocal;
+import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -185,39 +187,31 @@ public class ObjectValidationRuleLocalServiceImpl
 
 	@Override
 	@Transactional(readOnly = true)
-	public void validate(BaseModel<?> baseModel, long objectDefinitionId)
+	public void validate(
+			BaseModel<?> baseModel, long objectDefinitionId,
+			JSONObject payloadJSONObject, long userId)
 		throws PortalException {
 
 		if (baseModel == null) {
 			return;
 		}
 
-		Map<String, Object> values = new HashMap<>();
-
-		if (baseModel instanceof ObjectEntry) {
-			values = HashMapBuilder.<String, Object>putAll(
-				baseModel.getModelAttributes()
-			).putAll(
-				_objectEntryLocalService.getValues((ObjectEntry)baseModel)
-			).build();
-		}
-		else {
-			values = HashMapBuilder.<String, Object>putAll(
-				baseModel.getModelAttributes()
-			).putAll(
-				_objectEntryLocalService.
-					getExtensionDynamicObjectDefinitionTableValues(
-						_objectDefinitionPersistence.fetchByPrimaryKey(
-							objectDefinitionId),
-						GetterUtil.getLong(baseModel.getPrimaryKeyObj()))
-			).putAll(
-				EntityExtensionThreadLocal.getExtendedProperties()
-			).build();
-		}
-
 		List<ObjectValidationRule> objectValidationRules =
 			objectValidationRuleLocalService.getObjectValidationRules(
 				objectDefinitionId, true);
+
+		if (ListUtil.isEmpty(objectValidationRules)) {
+			return;
+		}
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionPersistence.fetchByPrimaryKey(objectDefinitionId);
+
+		Map<String, Object> variables =
+			ObjectEntryVariablesUtil.getValidationRuleVariables(
+				baseModel, _dtoConverterRegistry, objectDefinition,
+				_objectEntryLocalService, payloadJSONObject,
+				_systemObjectDefinitionMetadataRegistry);
 
 		for (ObjectValidationRule objectValidationRule :
 				objectValidationRules) {
@@ -228,7 +222,7 @@ public class ObjectValidationRuleLocalServiceImpl
 						objectValidationRule.getEngine());
 
 			Map<String, Object> results = objectValidationRuleEngine.execute(
-				values, objectValidationRule.getScript());
+				variables, objectValidationRule.getScript());
 
 			if (GetterUtil.getBoolean(results.get("invalidScript"))) {
 				throw new ObjectValidationRuleScriptException(
@@ -316,6 +310,9 @@ public class ObjectValidationRuleLocalServiceImpl
 	private DDMExpressionFactory _ddmExpressionFactory;
 
 	@Reference
+	private DTOConverterRegistry _dtoConverterRegistry;
+
+	@Reference
 	private ObjectDefinitionPersistence _objectDefinitionPersistence;
 
 	@Reference
@@ -327,6 +324,10 @@ public class ObjectValidationRuleLocalServiceImpl
 	@Reference
 	private ObjectValidationRuleEngineRegistry
 		_objectValidationRuleEngineRegistry;
+
+	@Reference
+	private SystemObjectDefinitionMetadataRegistry
+		_systemObjectDefinitionMetadataRegistry;
 
 	@Reference
 	private UserLocalService _userLocalService;

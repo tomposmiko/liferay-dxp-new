@@ -136,24 +136,46 @@ public class SolrIndexingFixture implements IndexingFixture {
 	}
 
 	protected static SolrQueryTranslator createSolrQueryTranslator() {
-		return new SolrQueryTranslator() {
-			{
-				setBooleanQueryTranslator(new BooleanQueryTranslatorImpl());
-				setDisMaxQueryTranslator(new DisMaxQueryTranslatorImpl());
-				setFuzzyQueryTranslator(new FuzzyQueryTranslatorImpl());
-				setMatchAllQueryTranslator(new MatchAllQueryTranslatorImpl());
-				setMatchQueryTranslator(new MatchQueryTranslatorImpl());
-				setMoreLikeThisQueryTranslator(
-					new MoreLikeThisQueryTranslatorImpl());
-				setMultiMatchQueryTranslator(
-					new MultiMatchQueryTranslatorImpl());
-				setNestedQueryTranslator(new NestedQueryTranslatorImpl());
-				setStringQueryTranslator(new StringQueryTranslatorImpl());
-				setTermQueryTranslator(new TermQueryTranslatorImpl());
-				setTermRangeQueryTranslator(new TermRangeQueryTranslatorImpl());
-				setWildcardQueryTranslator(new WildcardQueryTranslatorImpl());
-			}
-		};
+		SolrQueryTranslator solrQueryTranslator = new SolrQueryTranslator();
+
+		ReflectionTestUtil.setFieldValue(
+			solrQueryTranslator, "_booleanQueryTranslator",
+			new BooleanQueryTranslatorImpl());
+		ReflectionTestUtil.setFieldValue(
+			solrQueryTranslator, "_disMaxQueryTranslator",
+			new DisMaxQueryTranslatorImpl());
+		ReflectionTestUtil.setFieldValue(
+			solrQueryTranslator, "_fuzzyQueryTranslator",
+			new FuzzyQueryTranslatorImpl());
+		ReflectionTestUtil.setFieldValue(
+			solrQueryTranslator, "_matchAllQueryTranslator",
+			new MatchAllQueryTranslatorImpl());
+		ReflectionTestUtil.setFieldValue(
+			solrQueryTranslator, "_matchQueryTranslator",
+			new MatchQueryTranslatorImpl());
+		ReflectionTestUtil.setFieldValue(
+			solrQueryTranslator, "_moreLikeThisQueryTranslator",
+			new MoreLikeThisQueryTranslatorImpl());
+		ReflectionTestUtil.setFieldValue(
+			solrQueryTranslator, "_multiMatchQueryTranslator",
+			new MultiMatchQueryTranslatorImpl());
+		ReflectionTestUtil.setFieldValue(
+			solrQueryTranslator, "_nestedQueryTranslator",
+			new NestedQueryTranslatorImpl());
+		ReflectionTestUtil.setFieldValue(
+			solrQueryTranslator, "_stringQueryTranslator",
+			new StringQueryTranslatorImpl());
+		ReflectionTestUtil.setFieldValue(
+			solrQueryTranslator, "_termQueryTranslator",
+			new TermQueryTranslatorImpl());
+		ReflectionTestUtil.setFieldValue(
+			solrQueryTranslator, "_termRangeQueryTranslator",
+			new TermRangeQueryTranslatorImpl());
+		ReflectionTestUtil.setFieldValue(
+			solrQueryTranslator, "_wildcardQueryTranslator",
+			new WildcardQueryTranslatorImpl());
+
+		return solrQueryTranslator;
 	}
 
 	protected static SolrSearchEngineAdapterFixture
@@ -194,49 +216,53 @@ public class SolrIndexingFixture implements IndexingFixture {
 	}
 
 	protected FacetProcessor<SolrQuery> createFacetProcessor() {
-		return new DefaultFacetProcessor() {
-			{
-				setJSONFactory(_jsonFactory);
-			}
-		};
+		DefaultFacetProcessor defaultFacetProcessor =
+			new DefaultFacetProcessor();
+
+		ReflectionTestUtil.setFieldValue(
+			defaultFacetProcessor, "_jsonFactory", _jsonFactory);
+
+		return defaultFacetProcessor;
 	}
 
 	protected IndexSearcher createIndexSearcher(
-		final SearchEngineAdapter searchEngineAdapter,
+		SearchEngineAdapter searchEngineAdapter,
 		SolrClientManager solrClientManager) {
 
 		SolrIndexSearcher solrIndexSearcher = new SolrIndexSearcher() {
 			{
-				setFacetProcessor(_facetProcessor);
-				setProps(createProps());
-				setSearchRequestBuilderFactory(
-					new SearchRequestBuilderFactoryImpl());
-				setSearchResponseBuilderFactory(
-					new SearchResponseBuilderFactoryImpl());
-				setSearchEngineAdapter(searchEngineAdapter);
-
 				activate(_properties);
 			}
 		};
 
 		ReflectionTestUtil.setFieldValue(
+			solrIndexSearcher, "_props", createProps());
+		ReflectionTestUtil.setFieldValue(
 			solrIndexSearcher, "_querySuggester",
 			createSolrQuerySuggester(solrClientManager));
+		ReflectionTestUtil.setFieldValue(
+			solrIndexSearcher, "_searchEngineAdapter", searchEngineAdapter);
+		ReflectionTestUtil.setFieldValue(
+			solrIndexSearcher, "_searchRequestBuilderFactory",
+			new SearchRequestBuilderFactoryImpl());
+		ReflectionTestUtil.setFieldValue(
+			solrIndexSearcher, "_searchResponseBuilderFactory",
+			new SearchResponseBuilderFactoryImpl());
 
 		return solrIndexSearcher;
 	}
 
 	protected IndexWriter createIndexWriter(
-		final SearchEngineAdapter searchEngineAdapter) {
+		SearchEngineAdapter searchEngineAdapter) {
 
 		SolrIndexWriter solrIndexWriter = new SolrIndexWriter() {
 			{
-				setSearchEngineAdapter(searchEngineAdapter);
-
 				activate(_properties);
 			}
 		};
 
+		ReflectionTestUtil.setFieldValue(
+			solrIndexWriter, "_searchEngineAdapter", searchEngineAdapter);
 		ReflectionTestUtil.setFieldValue(
 			solrIndexWriter, "_spellCheckIndexWriter",
 			createSolrSpellCheckIndexWriter(searchEngineAdapter));
@@ -296,31 +322,41 @@ public class SolrIndexingFixture implements IndexingFixture {
 	protected SolrQuerySuggester createSolrQuerySuggester(
 		SolrClientManager solrClientManager) {
 
-		return new SolrQuerySuggester() {
+		SolrQuerySuggester solrQuerySuggester = new SolrQuerySuggester() {
 			{
 				setLocalization(_localization);
 
-				setNGramQueryBuilder(createNGramQueryBuilder());
-				setSolrClientManager(solrClientManager);
-
 				activate(_properties);
 			}
 		};
+
+		ReflectionTestUtil.setFieldValue(
+			solrQuerySuggester, "_nGramQueryBuilder",
+			createNGramQueryBuilder());
+		ReflectionTestUtil.setFieldValue(
+			solrQuerySuggester, "_solrClientManager", solrClientManager);
+
+		return solrQuerySuggester;
 	}
 
 	protected SolrSpellCheckIndexWriter createSolrSpellCheckIndexWriter(
-		final SearchEngineAdapter searchEngineAdapter) {
+		SearchEngineAdapter searchEngineAdapter) {
 
-		return new SolrSpellCheckIndexWriter() {
-			{
-				digester = createDigester();
-				nGramHolderBuilder = new NGramHolderBuilderImpl();
+		SolrSpellCheckIndexWriter solrSpellCheckIndexWriter =
+			new SolrSpellCheckIndexWriter() {
+				{
+					digester = createDigester();
+					nGramHolderBuilder = new NGramHolderBuilderImpl();
 
-				setSearchEngineAdapter(searchEngineAdapter);
+					activate(_properties);
+				}
+			};
 
-				activate(_properties);
-			}
-		};
+		ReflectionTestUtil.setFieldValue(
+			solrSpellCheckIndexWriter, "_searchEngineAdapter",
+			searchEngineAdapter);
+
+		return solrSpellCheckIndexWriter;
 	}
 
 	private static final long _COMPANY_ID = RandomTestUtil.randomLong();

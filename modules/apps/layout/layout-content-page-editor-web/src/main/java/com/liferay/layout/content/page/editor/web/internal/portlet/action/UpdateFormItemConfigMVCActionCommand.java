@@ -15,10 +15,10 @@
 package com.liferay.layout.content.page.editor.web.internal.portlet.action;
 
 import com.liferay.fragment.contributor.FragmentCollectionContributor;
-import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
+import com.liferay.fragment.contributor.FragmentCollectionContributorRegistry;
 import com.liferay.fragment.entry.processor.constants.FragmentEntryProcessorConstants;
 import com.liferay.fragment.listener.FragmentEntryLinkListener;
-import com.liferay.fragment.listener.FragmentEntryLinkListenerTracker;
+import com.liferay.fragment.listener.FragmentEntryLinkListenerRegistry;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.service.FragmentEntryLinkService;
@@ -34,7 +34,7 @@ import com.liferay.info.field.type.TextInfoFieldType;
 import com.liferay.info.form.InfoForm;
 import com.liferay.info.item.InfoItemServiceRegistry;
 import com.liferay.info.item.provider.InfoItemFormProvider;
-import com.liferay.info.search.InfoSearchClassMapperTracker;
+import com.liferay.info.search.InfoSearchClassMapperRegistry;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
 import com.liferay.layout.content.page.editor.web.internal.util.FragmentEntryLinkManager;
 import com.liferay.layout.content.page.editor.web.internal.util.layout.structure.LayoutStructureUtil;
@@ -167,7 +167,7 @@ public class UpdateFormItemConfigMVCActionCommand extends BaseMVCActionCommand {
 		throws Exception {
 
 		FragmentCollectionContributor fragmentCollectionContributor =
-			_fragmentCollectionContributorTracker.
+			_fragmentCollectionContributorRegistry.
 				getFragmentCollectionContributor("INPUTS");
 
 		if (fragmentCollectionContributor == null) {
@@ -200,7 +200,7 @@ public class UpdateFormItemConfigMVCActionCommand extends BaseMVCActionCommand {
 			InfoFieldType infoFieldType = infoField.getInfoFieldType();
 
 			FragmentEntry fragmentEntry =
-				_fragmentCollectionContributorTracker.getFragmentEntry(
+				_fragmentCollectionContributorRegistry.getFragmentEntry(
 					_getFragmentEntryKey(infoFieldType));
 
 			if ((fragmentEntry == null) ||
@@ -222,7 +222,7 @@ public class UpdateFormItemConfigMVCActionCommand extends BaseMVCActionCommand {
 		}
 
 		FragmentEntry fragmentEntry =
-			_fragmentCollectionContributorTracker.getFragmentEntry(
+			_fragmentCollectionContributorRegistry.getFragmentEntry(
 				"INPUTS-submit-button");
 
 		if ((fragmentEntry == null) ||
@@ -304,7 +304,7 @@ public class UpdateFormItemConfigMVCActionCommand extends BaseMVCActionCommand {
 			long groupId)
 		throws Exception {
 
-		String itemClassName = _infoSearchClassMapperTracker.getClassName(
+		String itemClassName = _infoSearchClassMapperRegistry.getClassName(
 			_portal.getClassName(
 				formStyledLayoutStructureItem.getClassNameId()));
 
@@ -494,7 +494,7 @@ public class UpdateFormItemConfigMVCActionCommand extends BaseMVCActionCommand {
 					addedFragmentEntryLinks) {
 
 				for (FragmentEntryLinkListener fragmentEntryLinkListener :
-						_fragmentEntryLinkListenerTracker.
+						_fragmentEntryLinkListenerRegistry.
 							getFragmentEntryLinkListeners()) {
 
 					fragmentEntryLinkListener.onAddFragmentEntryLink(
@@ -549,11 +549,12 @@ public class UpdateFormItemConfigMVCActionCommand extends BaseMVCActionCommand {
 		UpdateFormItemConfigMVCActionCommand.class);
 
 	@Reference
-	private FragmentCollectionContributorTracker
-		_fragmentCollectionContributorTracker;
+	private FragmentCollectionContributorRegistry
+		_fragmentCollectionContributorRegistry;
 
 	@Reference
-	private FragmentEntryLinkListenerTracker _fragmentEntryLinkListenerTracker;
+	private FragmentEntryLinkListenerRegistry
+		_fragmentEntryLinkListenerRegistry;
 
 	@Reference
 	private FragmentEntryLinkManager _fragmentEntryLinkManager;
@@ -565,7 +566,7 @@ public class UpdateFormItemConfigMVCActionCommand extends BaseMVCActionCommand {
 	private InfoItemServiceRegistry _infoItemServiceRegistry;
 
 	@Reference
-	private InfoSearchClassMapperTracker _infoSearchClassMapperTracker;
+	private InfoSearchClassMapperRegistry _infoSearchClassMapperRegistry;
 
 	@Reference
 	private JSONFactory _jsonFactory;

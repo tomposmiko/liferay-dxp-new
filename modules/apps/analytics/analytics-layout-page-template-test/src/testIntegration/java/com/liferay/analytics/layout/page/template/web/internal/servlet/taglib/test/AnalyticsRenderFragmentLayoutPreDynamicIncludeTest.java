@@ -19,6 +19,8 @@ import com.liferay.analytics.layout.page.template.web.internal.layout.display.pa
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.blogs.model.BlogsEntry;
 import com.liferay.blogs.service.BlogsEntryLocalService;
+import com.liferay.document.library.kernel.model.DLFolderConstants;
+import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.info.item.InfoItemReference;
 import com.liferay.journal.constants.JournalFolderConstants;
 import com.liferay.journal.model.JournalArticle;
@@ -29,7 +31,9 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.ClassName;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.servlet.taglib.DynamicInclude;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -37,6 +41,8 @@ import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
@@ -98,6 +104,46 @@ public class AnalyticsRenderFragmentLayoutPreDynamicIncludeTest {
 				"<div data-analytics-asset-id=\"", blogsEntry.getEntryId(),
 				"\" data-analytics-asset-title=\"", blogsEntry.getTitle(),
 				"\" data-analytics-asset-type=\"blog\">"),
+			mockHttpServletResponse.getContentAsString());
+	}
+
+	@Test
+	public void testIncludeWithFileEntry() throws Exception {
+		MockHttpServletRequest mockHttpServletRequest =
+			new MockHttpServletRequest();
+
+		FileEntry fileEntry = _dlAppLocalService.addFileEntry(
+			null, TestPropsValues.getUserId(), _group.getGroupId(),
+			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, "image.jpg",
+			ContentTypes.IMAGE_JPEG,
+			FileUtil.getBytes(
+				AnalyticsRenderFragmentLayoutPreDynamicIncludeTest.class,
+				"dependencies/image.jpg"),
+			null, null, new ServiceContext());
+
+		mockHttpServletRequest.setAttribute(
+			LayoutDisplayPageWebKeys.LAYOUT_DISPLAY_PAGE_OBJECT_PROVIDER,
+			_fileEntryLayoutDisplayPageProvider.
+				getLayoutDisplayPageObjectProvider(
+					new InfoItemReference(
+						FileEntry.class.getName(),
+						fileEntry.getFileEntryId())));
+
+		MockHttpServletResponse mockHttpServletResponse =
+			new MockHttpServletResponse();
+
+		_dynamicInclude.include(
+			mockHttpServletRequest, mockHttpServletResponse,
+			RandomTestUtil.randomString());
+
+		Assert.assertEquals(
+			StringBundler.concat(
+				"<div data-analytics-asset-action=\"preview",
+				"\" data-analytics-asset-id=\"", fileEntry.getFileEntryId(),
+				"\" data-analytics-asset-title=\"", fileEntry.getTitle(),
+				"\" data-analytics-asset-type=\"file",
+				"\" data-analytics-asset-version=\"", fileEntry.getVersion(),
+				"\">"),
 			mockHttpServletResponse.getContentAsString());
 	}
 
@@ -186,10 +232,16 @@ public class AnalyticsRenderFragmentLayoutPreDynamicIncludeTest {
 	@Inject
 	private ClassNameLocalService _classNameLocalService;
 
+	@Inject
+	private DLAppLocalService _dlAppLocalService;
+
 	@Inject(
 		filter = "component.name=com.liferay.analytics.layout.page.template.web.internal.servlet.taglib.AnalyticsRenderFragmentLayoutPreDynamicInclude"
 	)
 	private DynamicInclude _dynamicInclude;
+
+	@Inject(filter = "component.name=*.FileEntryLayoutDisplayPageProvider")
+	private LayoutDisplayPageProvider _fileEntryLayoutDisplayPageProvider;
 
 	@DeleteAfterTestRun
 	private Group _group;

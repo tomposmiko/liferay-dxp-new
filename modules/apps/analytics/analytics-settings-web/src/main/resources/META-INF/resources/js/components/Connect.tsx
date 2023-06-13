@@ -18,14 +18,14 @@ import ClayForm, {ClayInput} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
 import {useModal} from '@clayui/modal';
 import classNames from 'classnames';
-import React, {useContext, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
-import {AppContext, Events} from '../App';
+import {Events, useData, useDispatch} from '../App';
 import {ESteps} from '../pages/wizard/WizardPage';
 import {fetchConnection} from '../utils/api';
 import BasePage from './BasePage';
-import DisconnectModal from './DisconnectModal';
-import LoadingInline from './LoadingInline';
+import Loading from './Loading';
+import DisconnectModal from './connect/DisconnectModal';
 
 interface IConnectProps {
 	onChangeStep?: (step: ESteps) => void;
@@ -33,10 +33,9 @@ interface IConnectProps {
 }
 
 const Connect: React.FC<IConnectProps> = ({onChangeStep, title}) => {
-	const [
-		{connected, liferayAnalyticsURL, token: initialToken},
-		dispatch,
-	] = useContext(AppContext);
+	const {connected, liferayAnalyticsURL, token: initialToken} = useData();
+	const dispatch = useDispatch();
+
 	const [token, setToken] = useState(initialToken);
 	const {observer, onOpenChange, open} = useModal();
 	const [submitting, setSubmitting] = useState(false);
@@ -47,33 +46,29 @@ const Connect: React.FC<IConnectProps> = ({onChangeStep, title}) => {
 		const request = async () => {
 			setSubmitting(true);
 
-			const result = await fetchConnection(token);
+			const {ok} = await fetchConnection(token);
 
 			setSubmitting(false);
 
-			if (result?.ok) {
+			if (ok) {
 				dispatch({
 					payload: {
 						connected: true,
 						token,
 					},
-					type: Events.Connected,
+					type: Events.Connect,
 				});
 
 				onChangeStep && onChangeStep(ESteps.Property);
-			}
-			else {
-				Liferay.Util.openToast({
-					message: Liferay.Language.get(
-						'an-unexpected-system-error-occurred'
-					),
-					type: 'danger',
-				});
 			}
 		};
 
 		request();
 	};
+
+	useEffect(() => {
+		setToken(initialToken);
+	}, [initialToken]);
 
 	return (
 		<BasePage
@@ -104,6 +99,7 @@ const Connect: React.FC<IConnectProps> = ({onChangeStep, title}) => {
 						disabled={connected}
 						id="inputToken"
 						onChange={({target: {value}}) => setToken(value)}
+						placeholder={Liferay.Language.get('paste-token-here')}
 						type="text"
 						value={token}
 					/>
@@ -148,7 +144,7 @@ const Connect: React.FC<IConnectProps> = ({onChangeStep, title}) => {
 							disabled={!token || submitting}
 							type="submit"
 						>
-							{submitting && <LoadingInline />}
+							{submitting && <Loading inline />}
 
 							{Liferay.Language.get('connect')}
 						</ClayButton>

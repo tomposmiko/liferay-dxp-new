@@ -119,8 +119,6 @@ export type TestrayCaseResult = {
 	build?: TestrayBuild;
 	case?: TestrayCase;
 	closedDate: string;
-	commentMBMessage: string;
-	commentMBMessageId: string;
 	component?: TestrayComponent;
 	dateCreated: string;
 	dateModified: string;
@@ -129,6 +127,8 @@ export type TestrayCaseResult = {
 	id: number;
 	issue: string;
 	key: string;
+	mbMessageId: number;
+	mbThreadId: number;
 	r_buildToCaseResult_c_build?: TestrayBuild;
 	r_caseToCaseResult_c_case?: TestrayCase;
 	r_caseToCaseResult_c_caseId?: number;
@@ -139,6 +139,15 @@ export type TestrayCaseResult = {
 	startDate: string;
 	user?: UserAccount;
 	warnings: number;
+};
+
+export type TestrayCaseResultIssue = {
+	caseResult?: TestrayCaseResult;
+	id: number;
+	issue?: TestrayIssue;
+	name: string;
+	r_caseResultToCaseResultsIssues_c_caseResult?: TestrayCaseResult;
+	r_issueToCaseResultsIssues_c_issue?: TestrayIssue;
 };
 
 export type TestrayCaseType = {
@@ -157,6 +166,13 @@ export type TestrayFactorOption = {
 	id: number;
 	name: string;
 	r_factorCategoryToOptions_c_factorCategory: TestrayFactorCategory;
+};
+
+export type TestrayIssue = {
+	dateCreated: number;
+	dateModified: number;
+	id: number;
+	name: string;
 };
 
 export type TestrayProductVersion = {
@@ -333,4 +349,21 @@ export type TestrayFactor = {
 	r_factorOptionToFactors_c_factorOption?: TestrayFactorOption;
 	r_runToFactors_c_run?: TestrayRun;
 	run: TestrayRun;
+};
+
+export type TestrayAttachment = {
+	name: string;
+	url: string;
+	value: string;
+};
+
+export type MessageBoardMessage = {
+	articleBody: string;
+	creator: {
+		image: string;
+		name: string;
+	};
+	dateCreated: string;
+	headline: string;
+	id: string;
 };

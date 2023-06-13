@@ -1717,10 +1717,6 @@ public interface PropsKeys {
 	public static final String MODULE_FRAMEWORK_CONFIGS_DIR =
 		"module.framework.configs.dir";
 
-	public static final String
-		MODULE_FRAMEWORK_CONFIGURATION_BUNDLE_SYMBOLIC_NAMES =
-			"module.framework.configuration.bundle.symbolic.names";
-
 	public static final String MODULE_FRAMEWORK_EXPORT_PASSWORD_ATTRIBUTES =
 		"module.framework.export.password.attributes";
 
@@ -1764,9 +1760,6 @@ public interface PropsKeys {
 
 	public static final String MODULE_FRAMEWORK_STATE_DIR =
 		"module.framework.state.dir";
-
-	public static final String MODULE_FRAMEWORK_STATIC_JARS =
-		"module.framework.static.jars";
 
 	public static final String MODULE_FRAMEWORK_STOP_WAIT_TIMEOUT =
 		"module.framework.stop.wait.timeout";
@@ -1827,6 +1820,9 @@ public interface PropsKeys {
 
 	public static final String NOTIFICATIONS_MAX_EVENTS =
 		"notifications.max.events";
+
+	public static final String OBJECT_ENTRY_SCRIPT_VARIABLES_VERSION =
+		"object.entry.script.variables.version";
 
 	public static final String OBJECT_NESTED_FIELDS_MAX_QUERY_DEPTH =
 		"object.nested.fields.max.query.depth";

@@ -12,6 +12,7 @@
  * details.
  */
 
+import {sub} from 'frontend-js-web';
 import React, {
 	Dispatch,
 	ReactNode,
@@ -39,6 +40,13 @@ const HOME_KEYCODE = 36;
 type ITargetPosition = 'bottom' | 'middle' | 'top';
 type IItemType = 'root' | 'page' | 'row' | 'column' | 'field';
 
+const INITIAL_STATE = {
+	setState: () => {},
+	setText: () => {},
+	state: null,
+	text: null,
+};
+
 interface IState {
 	currentTarget: {
 		itemPath: number[];
@@ -60,15 +68,19 @@ interface IState {
 		  };
 }
 
-const KeyboardDNDContext = React.createContext<
-	[IState | null, Dispatch<SetStateAction<IState | null>>]
->([null, () => {}]);
+const KeyboardDNDContext = React.createContext<{
+	setState: Dispatch<SetStateAction<IState | null>>;
+	setText: Dispatch<SetStateAction<string | null>>;
+	state: IState | null;
+	text: string | null;
+}>(INITIAL_STATE);
 
 export function KeyboardDNDContextProvider({children}: {children: ReactNode}) {
 	const dispatch = useForm();
 	const formState = useFormState();
 	const formStateRef = useRef(formState);
 	const [state, setState] = useState<IState | null>(null);
+	const [text, setText] = useState<string | null>(null);
 
 	const isDragging = useMemo(() => Boolean(state as any), [state]);
 	const stateRef = useRef(state);
@@ -160,12 +172,24 @@ export function KeyboardDNDContextProvider({children}: {children: ReactNode}) {
 				event.keyCode === ARROW_DOWN_KEYCODE ||
 				event.keyCode === ARROW_UP_KEYCODE
 			) {
-				setState(
-					getNextValidTarget(
-						formStateRef.current,
-						stateRef.current!,
-						event.keyCode === ARROW_DOWN_KEYCODE ? 'down' : 'up'
-					)
+				const nextState = getNextValidTarget(
+					formStateRef.current,
+					stateRef.current!,
+					event.keyCode === ARROW_DOWN_KEYCODE ? 'down' : 'up'
+				);
+
+				setState(nextState);
+
+				const {path, position} = getTextData(
+					nextState,
+					formStateRef.current
+				);
+
+				setText(
+					sub(Liferay.Language.get('targeting-x-of-x'), [
+						position,
+						path,
+					])
 				);
 			}
 			else if (event.keyCode === ESCAPE_KEYCODE) {
@@ -173,40 +197,77 @@ export function KeyboardDNDContextProvider({children}: {children: ReactNode}) {
 			}
 			else if (event.keyCode === ENTER_KEYCODE) {
 				handleDrop(stateRef.current!);
+
+				const {path, position} = getTextData(
+					stateRef.current!,
+					formStateRef.current
+				);
+
+				setText(
+					sub(Liferay.Language.get('field-placed-on-x-of-x'), [
+						position,
+						path,
+					])
+				);
+
+				setTimeout(() => setText(null), 1000);
+
 				setState(null);
 			}
 			else if (event.keyCode === HOME_KEYCODE) {
-				setState(
-					getNextValidTarget(
-						formStateRef.current,
-						{
-							...stateRef.current!,
-							currentTarget: {
-								itemPath: [0],
-								itemType: 'page',
-								position: 'top',
-							},
+				const nextState = getNextValidTarget(
+					formStateRef.current,
+					{
+						...stateRef.current!,
+						currentTarget: {
+							itemPath: [0],
+							itemType: 'page',
+							position: 'top',
 						},
-						'down'
-					)
+					},
+					'down'
+				);
+
+				setState(nextState);
+
+				const {path, position} = getTextData(
+					nextState,
+					formStateRef.current
+				);
+
+				setText(
+					sub(Liferay.Language.get('targeting-x-of-x'), [
+						position,
+						path,
+					])
 				);
 			}
 			else if (event.keyCode === END_KEYCODE) {
-				setState(
-					getNextValidTarget(
-						formStateRef.current,
-						{
-							...stateRef.current!,
-							currentTarget: {
-								itemPath: [
-									formStateRef.current.pages.length - 1,
-								],
-								itemType: 'page',
-								position: 'bottom',
-							},
+				const nextState = getNextValidTarget(
+					formStateRef.current,
+					{
+						...stateRef.current!,
+						currentTarget: {
+							itemPath: [formStateRef.current.pages.length - 1],
+							itemType: 'page',
+							position: 'bottom',
 						},
-						'up'
-					)
+					},
+					'up'
+				);
+
+				setState(nextState);
+
+				const {path, position} = getTextData(
+					nextState,
+					formStateRef.current
+				);
+
+				setText(
+					sub(Liferay.Language.get('targeting-x-of-x'), [
+						position,
+						path,
+					])
 				);
 			}
 		};
@@ -219,7 +280,7 @@ export function KeyboardDNDContextProvider({children}: {children: ReactNode}) {
 	}, [dispatch, isDragging]);
 
 	return (
-		<KeyboardDNDContext.Provider value={[state, setState]}>
+		<KeyboardDNDContext.Provider value={{setState, setText, state, text}}>
 			{children}
 		</KeyboardDNDContext.Provider>
 	);
@@ -227,10 +288,10 @@ export function KeyboardDNDContextProvider({children}: {children: ReactNode}) {
 
 export function useSetSourceItem() {
 	const formState = useFormState();
-	const [, setState] = useContext(KeyboardDNDContext);
+	const {setState, setText} = useContext(KeyboardDNDContext);
 
 	return useCallback(
-		(nextSourceItem: IState['sourceItem'] | null) =>
+		(nextSourceItem: IState['sourceItem'] | null) => {
 			setState((state) => {
 				if (nextSourceItem && !state) {
 					return getNextValidTarget(
@@ -252,9 +313,20 @@ export function useSetSourceItem() {
 				}
 
 				return state;
-			}),
-		[formState, setState]
+			});
+
+			setText(
+				Liferay.Language.get(
+					'use-up-and-down-arrows-to-move-the-field-and-press-enter-to-place-it-in-desired-position'
+				)
+			);
+		},
+		[formState, setState, setText]
 	);
+}
+
+export function useText() {
+	return useContext(KeyboardDNDContext).text;
 }
 
 export function useIsOverTarget(
@@ -262,7 +334,7 @@ export function useIsOverTarget(
 	position: ITargetPosition
 ): boolean {
 	const formState = useFormState();
-	const [state] = useContext(KeyboardDNDContext);
+	const {state} = useContext(KeyboardDNDContext);
 
 	if (!state) {
 		return false;
@@ -551,4 +623,53 @@ function getNextValidTarget(
 		currentTarget: findNextValidTarget(initialTarget),
 		sourceItem,
 	};
+}
+
+function getTextData(
+	state: IState,
+	formState: ReturnType<typeof useFormState>
+) {
+	const {itemPath, position} = state.currentTarget;
+	const {paginationMode} = formState;
+
+	const pathItems: Array<string> = [];
+
+	itemPath.forEach((itemIndex, i) => {
+		const item = getItem(formState, itemPath.slice(0, i + 1));
+		const itemType = getItemType(item);
+		const itemTypeLabel = getItemTypeLabel(itemType);
+
+		if (
+			itemType === 'page' &&
+			paginationMode === 'single-page' &&
+			itemPath.length > 1
+		) {
+			return;
+		}
+
+		pathItems.push(item.label || `${itemTypeLabel} ${itemIndex + 1}`);
+	});
+
+	return {
+		path: pathItems.join(','),
+		position,
+	};
+}
+
+function getItemTypeLabel(itemType: string) {
+	switch (itemType) {
+		case 'root':
+			return Liferay.Language.get('root');
+		case 'page':
+			return Liferay.Language.get('page');
+		case 'row':
+			return Liferay.Language.get('row');
+		case 'column':
+			return Liferay.Language.get('column');
+		case 'field': {
+			return Liferay.Language.get('field');
+		}
+		default:
+			return itemType;
+	}
 }

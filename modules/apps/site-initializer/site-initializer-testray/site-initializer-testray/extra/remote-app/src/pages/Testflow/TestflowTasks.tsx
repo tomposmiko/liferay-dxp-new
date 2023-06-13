@@ -19,6 +19,7 @@ import {KeyedMutator} from 'swr';
 import Avatar from '../../components/Avatar';
 import AssignToMe from '../../components/Avatar/AssigneToMe';
 import Code from '../../components/Code';
+import FloatingBox from '../../components/FloatingBox/index';
 import Container from '../../components/Layout/Container';
 import ListView from '../../components/ListView';
 import Loading from '../../components/Loading';
@@ -26,12 +27,14 @@ import TaskbarProgress from '../../components/ProgressBar/TaskbarProgress';
 import StatusBadge from '../../components/StatusBadge';
 import {StatusBadgeType} from '../../components/StatusBadge/StatusBadge';
 import QATable from '../../components/Table/QATable';
+import {ListViewTypes} from '../../context/ListViewContext';
 import useCaseResultGroupBy from '../../data/useCaseResultGroupBy';
 import {useFetch} from '../../hooks/useFetch';
 import useHeader from '../../hooks/useHeader';
 import useMutate from '../../hooks/useMutate';
 import i18n from '../../i18n';
 import {filters} from '../../schema/filter';
+import {Liferay} from '../../services/liferay';
 import {
 	APIResponse,
 	PickList,
@@ -89,6 +92,34 @@ const TestFlowTasks = () => {
 		return <Loading />;
 	}
 
+	const getFloatingBoxAlerts = (subtasks: TestraySubTask[]) => {
+		const alerts = [];
+
+		if (subtasks.length === 1) {
+			alerts.push({
+				text: i18n.translate(
+					'please-select-at-least-two-subtasks-to-merge'
+				),
+			});
+		}
+
+		const subtasksWithDifferentAssignedUsers = subtasks
+			.filter(
+				({user}) =>
+					user &&
+					user.id.toString() !== Liferay.ThemeDisplay.getUserId()
+			)
+			.map(({name}) => ({
+				header: name,
+				text: i18n.sub(
+					'subtask-x-must-be-assigned-to-you-to-be-user-id-a-merge',
+					name
+				),
+			}));
+
+		return [...alerts, ...subtasksWithDifferentAssignedUsers];
+	};
+
 	return (
 		<>
 			<Container collapsable title={i18n.translate('task-details')}>
@@ -101,8 +132,7 @@ const TestFlowTasks = () => {
 									value: (
 										<StatusBadge
 											type={
-												testrayTask.dueStatus
-													.key as StatusBadgeType
+												testrayTask.dueStatus.key.toLowerCase() as StatusBadgeType
 											}
 										>
 											{testrayTask.dueStatus.name}
@@ -240,7 +270,9 @@ const TestFlowTasks = () => {
 								key: 'dueStatus',
 								render: (dueStatus: PickList) => (
 									<StatusBadge
-										type={dueStatus?.key as StatusBadgeType}
+										type={
+											dueStatus?.key.toLowerCase() as StatusBadgeType
+										}
 									>
 										{dueStatus?.name}
 									</StatusBadge>
@@ -317,7 +349,36 @@ const TestFlowTasks = () => {
 					variables={{
 						filter: searchUtil.eq('taskId', testrayTask.id),
 					}}
-				/>
+				>
+					{({items}, {dispatch, listViewContext: {selectedRows}}) => {
+						const alerts = getFloatingBoxAlerts(
+							selectedRows.map((rowId) =>
+								items.find(({id}) => rowId === id)
+							)
+						);
+
+						return (
+							<FloatingBox
+								alerts={alerts}
+								clearList={() =>
+									dispatch({
+										payload: [],
+										type: ListViewTypes.SET_CHECKED_ROW,
+									})
+								}
+								isVisible={!!selectedRows.length}
+								primaryButtonProps={{
+									disabled: !!alerts.length,
+									title: i18n.translate('merge-subtasks'),
+								}}
+								selectedCount={selectedRows.length}
+								tooltipText={i18n.translate(
+									'merge-selected-subtasks-into-the-highest-scoring-subtask'
+								)}
+							/>
+						);
+					}}
+				</ListView>
 			</Container>
 
 			<SubtaskCompleteModal

@@ -65,7 +65,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  * @author Igor Beslic
  */
-@Component(immediate = true, service = UpgradeStepRegistrator.class)
+@Component(service = UpgradeStepRegistrator.class)
 public class CommerceProductServiceUpgradeStepRegistrator
 	implements UpgradeStepRegistrator {
 
@@ -237,7 +237,7 @@ public class CommerceProductServiceUpgradeStepRegistrator
 			new MVCCVersionUpgradeProcess() {
 
 				@Override
-				protected String[] getModuleTableNames() {
+				protected String[] getTableNames() {
 					return new String[] {
 						"CPAttachmentFileEntry", "CPDSpecificationOptionValue",
 						"CPDefinition", "CPDefinitionLink",

@@ -28,6 +28,11 @@ public class ModuleFrameworkPropsValues {
 			SystemProperties.get(
 				"module.framework.concurrent.startup.enabled"));
 
+	public static final String[]
+		MODULE_FRAMEWORK_CONFIGURATION_BUNDLE_SYMBOLIC_NAMES =
+			SystemProperties.getArray(
+				"module.framework.configuration.bundle.symbolic.names");
+
 	public static final int MODULE_FRAMEWORK_DYNAMIC_INSTALL_START_LEVEL =
 		GetterUtil.getInteger(
 			SystemProperties.get(
@@ -43,6 +48,9 @@ public class ModuleFrameworkPropsValues {
 	public static final String[] MODULE_FRAMEWORK_SERVICES_IGNORED_INTERFACES =
 		SystemProperties.getArray(
 			"module.framework.services.ignored.interfaces");
+
+	public static final String[] MODULE_FRAMEWORK_STATIC_JARS =
+		SystemProperties.getArray("module.framework.static.jars");
 
 	public static final String[] MODULE_FRAMEWORK_SYSTEM_PACKAGES_EXTRA =
 		SystemProperties.getArray("module.framework.system.packages.extra");

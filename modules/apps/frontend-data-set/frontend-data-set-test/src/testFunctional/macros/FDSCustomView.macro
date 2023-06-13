@@ -1,9 +1,27 @@
 definition {
 
-	macro assertCustomView {
-		AssertTextEquals(
+	macro assertColumnNotPresent {
+		AssertElementNotPresent(
+			key_field = "${key_field}",
+			locator1 = "FrontendDataSet#TABLE_ITEM_COLUMN");
+	}
+
+	macro assertColumnPresent {
+		AssertElementPresent(
+			key_field = "${key_field}",
+			locator1 = "FrontendDataSet#TABLE_ITEM_COLUMN");
+	}
+
+	macro assertCustomViewName {
+		AssertElementPresent(
 			locator1 = "FrontendDataSet#SELECT_CUSTOM_VIEW",
 			value1 = "${key_nameCustomView}");
+	}
+
+	macro assertFilterSummaryLabel {
+		AssertElementPresent(
+			locator1 = "FrontendDataSet#FILTER_SUMMARY_LABEL",
+			value1 = "${key_filter}");
 	}
 
 	macro changeCustomView {
@@ -43,6 +61,24 @@ definition {
 			locator1 = "Button#GENERAL_BUTTON_MODAL_FOOTER");
 	}
 
+	macro deleteView {
+		Click(locator1 = "FrontendDataSet#SELECT_OPTION_HEADER");
+
+		Click(
+			key_itemName = "Delete View",
+			locator1 = "FrontendDataSet#SELECT_OPTION_CUSTOM_VIEW");
+
+		AssertTextEquals(
+			locator1 = "Modal#BODY",
+			value1 = "Are you sure you want to delete this? It will be deleted immediately.");
+
+		Click(
+			key_text = "Delete",
+			locator1 = "Modal#MODAL_FOOTER_BUTTON");
+
+		Alert.viewSuccessMessage();
+	}
+
 	macro getValueByPosition {
 		var key_columnIndex = "${columnIndex}";
 		var key_valueIndex = "${valueIndex}";
@@ -52,10 +88,10 @@ definition {
 	}
 
 	macro saveCustomView {
-		Click(locator1 = "FrontendDataSet#SELECT_CUSTOM_VIEW");
+		Click(locator1 = "FrontendDataSet#SELECT_OPTION_HEADER");
 
 		Click(
-			key_optionName = "Save View",
+			key_itemName = "Save View",
 			locator1 = "FrontendDataSet#SELECT_OPTION_CUSTOM_VIEW");
 	}
 
@@ -89,30 +125,6 @@ definition {
 		Click(
 			locator1 = "FrontendDataSet#SELECT_OPTION_CUSTOM_VIEW",
 			value1 = "${key_itemName}");
-	}
-
-	macro verifyCustomView {
-		VerifyElementPresent(
-			locator1 = "FrontendDataSet#SELECT_CUSTOM_VIEW",
-			value1 = "${key_nameCustomView}");
-	}
-
-	macro verifyFilterSummaryLabel {
-		VerifyElementPresent(
-			locator1 = "FrontendDataSet#FILTER_SUMMARY_LABEL",
-			value1 = "${key_filter}");
-	}
-
-	macro viewColumn {
-		VerifyElementPresent(
-			key_field = "${key_field}",
-			locator1 = "FrontendDataSet#TABLE_ITEM_COLUMN");
-	}
-
-	macro viewNoColumn {
-		AssertElementNotPresent(
-			key_field = "${key_field}",
-			locator1 = "FrontendDataSet#TABLE_ITEM_COLUMN");
 	}
 
 }

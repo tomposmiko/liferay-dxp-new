@@ -33,10 +33,10 @@ import com.liferay.info.item.InfoItemServiceRegistry;
 import com.liferay.info.item.provider.InfoItemDetailsProvider;
 import com.liferay.info.item.provider.InfoItemFieldValuesProvider;
 import com.liferay.info.item.provider.InfoItemObjectProvider;
-import com.liferay.info.search.InfoSearchClassMapperTracker;
+import com.liferay.info.search.InfoSearchClassMapperRegistry;
 import com.liferay.layout.display.page.LayoutDisplayPageObjectProvider;
 import com.liferay.layout.display.page.LayoutDisplayPageProvider;
-import com.liferay.layout.display.page.LayoutDisplayPageProviderTracker;
+import com.liferay.layout.display.page.LayoutDisplayPageProviderRegistry;
 import com.liferay.layout.display.page.constants.LayoutDisplayPageWebKeys;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryService;
@@ -243,10 +243,11 @@ public abstract class BaseAssetDisplayPageFriendlyURLResolver
 	protected InfoItemServiceRegistry infoItemServiceRegistry;
 
 	@Reference
-	protected InfoSearchClassMapperTracker infoSearchClassMapperTracker;
+	protected InfoSearchClassMapperRegistry infoSearchClassMapperRegistry;
 
 	@Reference
-	protected LayoutDisplayPageProviderTracker layoutDisplayPageProviderTracker;
+	protected LayoutDisplayPageProviderRegistry
+		layoutDisplayPageProviderRegistry;
 
 	@Reference
 	protected LayoutLocalService layoutLocalService;
@@ -263,7 +264,7 @@ public abstract class BaseAssetDisplayPageFriendlyURLResolver
 	private AssetEntry _getAssetEntry(
 		LayoutDisplayPageObjectProvider<?> layoutDisplayPageObjectProvider) {
 
-		String className = infoSearchClassMapperTracker.getSearchClassName(
+		String className = infoSearchClassMapperRegistry.getSearchClassName(
 			layoutDisplayPageObjectProvider.getClassName());
 
 		AssetRendererFactory<?> assetRendererFactory =
@@ -402,7 +403,7 @@ public abstract class BaseAssetDisplayPageFriendlyURLResolver
 		String urlSeparator = _getURLSeparator(friendlyURL);
 
 		LayoutDisplayPageProvider<?> layoutDisplayPageProvider =
-			layoutDisplayPageProviderTracker.
+			layoutDisplayPageProviderRegistry.
 				getLayoutDisplayPageProviderByURLSeparator(urlSeparator);
 
 		if (layoutDisplayPageProvider == null) {

@@ -17,7 +17,6 @@ import {useEffect, useState} from 'react';
 import i18n from '../../../I18n';
 import {Badge, Button} from '../../../components';
 import {useAppPropertiesContext} from '../../../contexts/AppPropertiesContext';
-import {Liferay} from '../../../services/liferay';
 import {
 	addTeamMembersInvitation,
 	associateUserAccountWithAccountAndAccountRole,
@@ -186,44 +185,40 @@ const InviteTeamMembersPage = ({
 
 		if (filledEmails.length) {
 			setIsLoadingUserInvitation(true);
-			const newMembersData = await Promise.all(
-				filledEmails.map(async ({email, role}) => {
-					const invitedUser = await addTeamMemberInvitation({
-						context: {
-							displaySuccess: false,
-							type: 'liferay-rest',
-						},
-						variables: {
-							TeamMembersInvitation: {
-								accountEntryId: project.id,
-								email,
-								r_accountEntryToDXPCloudEnvironment_accountEntryId:
-									project?.id,
-								role: role.key,
-							},
-							scopeKey: Liferay.ThemeDisplay.getScopeGroupId(),
-						},
-					});
+			const newMembersData = await addTeamMemberInvitation({
+				context: {
+					displaySuccess: false,
+					type: 'liferay-rest',
+				},
+				variables: {
+					TeamMembersInvitation: filledEmails.map(
+						({email, role}) => ({
+							email,
+							r_accountEntryToDXPCloudEnvironment_accountEntryId:
+								project?.id,
+							role: role.key,
+						})
+					),
+				},
+			});
 
-					await associateUserAccount({
-						variables: {
-							accountKey: project.accountKey,
-							accountRoleId: role.id,
-							emailAddress: email,
-						},
-					});
+			filledEmails.map(async ({email, role}) => {
+				await associateUserAccount({
+					variables: {
+						accountKey: project.accountKey,
+						accountRoleId: role.id,
+						emailAddress: email,
+					},
+				});
 
-					await associateContactRoleNameByEmailByProject(
-						project.accountKey,
-						provisioningServerAPI,
-						sessionId,
-						encodeURI(email),
-						role.raysourceName
-					);
-
-					return invitedUser;
-				})
-			);
+				await associateContactRoleNameByEmailByProject(
+					project.accountKey,
+					provisioningServerAPI,
+					sessionId,
+					encodeURI(email),
+					role.raysourceName
+				);
+			});
 
 			setIsLoadingUserInvitation(false);
 

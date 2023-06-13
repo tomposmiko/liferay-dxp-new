@@ -14,7 +14,6 @@
 
 package com.liferay.portal.service.persistence.impl;
 
-import com.liferay.petra.sql.dsl.Column;
 import com.liferay.petra.sql.dsl.DSLFunctionFactoryUtil;
 import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
 import com.liferay.petra.sql.dsl.expression.Expression;
@@ -969,9 +968,9 @@ public class RoleFinderImpl extends RoleFinderBaseImpl implements RoleFinder {
 	}
 
 	private Predicate _getKeywordsPredicate(
-		Column<?, String> column, String[] keywords) {
+		Expression<String> expression, String[] keywords) {
 
-		Expression<String> expression = DSLFunctionFactoryUtil.lower(column);
+		expression = DSLFunctionFactoryUtil.lower(expression);
 
 		Predicate keywordsPredicate = null;
 
@@ -1023,7 +1022,9 @@ public class RoleFinderImpl extends RoleFinderBaseImpl implements RoleFinder {
 						RoleTable.INSTANCE.title, keywordsArray)
 				).or(
 					_getKeywordsPredicate(
-						RoleTable.INSTANCE.description, keywordsArray)
+						DSLFunctionFactoryUtil.castClobText(
+							RoleTable.INSTANCE.description),
+						keywordsArray)
 				));
 
 			teamsSubqueryPredicate = teamsSubqueryPredicate.and(

@@ -12,38 +12,122 @@
  * details.
  */
 
-import {fetch} from 'frontend-js-web';
+import request from './request';
 
-export function fetchConnection(token: string) {
-	return fetch('/o/analytics-settings-rest/v1.0/data-sources', {
+export function createProperty(name: string) {
+	return request('/channels', {
 		body: JSON.stringify({
-			token,
+			name,
 		}),
-		headers: {'Content-Type': 'application/json'},
 		method: 'POST',
 	});
 }
 
 export function deleteConnection() {
-	return fetch('/o/analytics-settings-rest/v1.0/data-sources', {
-		method: 'DELETE',
+	return request('/data-sources', {method: 'DELETE'});
+}
+
+export function fetchAccountGroups(queryString?: string) {
+	return request(`/contacts/account-groups?${queryString}`, {
+		method: 'GET',
+	});
+}
+
+export function fetchChannels(queryString?: string) {
+	return request(`/commerce-channels?${queryString}`, {
+		method: 'GET',
+	});
+}
+
+export function fetchConnection(token: string) {
+	return request('/data-sources', {
+		body: JSON.stringify({
+			token,
+		}),
+		method: 'POST',
+	});
+}
+
+export function fetchContactsOrganization(queryString?: string) {
+	return request(`/contacts/organizations?${queryString}`, {
+		method: 'GET',
+	});
+}
+
+export function fetchContactsUsersGroup(queryString?: string) {
+	return request(`/contacts/user-groups?${queryString}`, {
+		method: 'GET',
+	});
+}
+
+export function fetchAttributesConfiguration() {
+	return request('/contacts/configuration', {
+		method: 'GET',
 	});
 }
 
 export function fetchProperties() {
-	return fetch('/o/analytics-settings-rest/v1.0/channels', {
-		method: 'GET',
-	})
-		.then((response) => response.json())
-		.then((data) => data);
+	return request('/channels?sort=createDate:desc', {method: 'GET'});
 }
 
-export function createProperty(name: string) {
-	return fetch('/o/analytics-settings-rest/v1.0/channels', {
+export function fetchSites(queryString?: string) {
+	return request(`/sites?${queryString}`, {
+		method: 'GET',
+	});
+}
+
+export function updateProperty({
+	channelId,
+	commerceChannelIds,
+	commerceSyncEnabled,
+	dataSourceId,
+	siteIds,
+}: {
+	channelId: string;
+	commerceChannelIds?: number[];
+	commerceSyncEnabled?: boolean;
+	dataSourceId?: string;
+	siteIds?: number[];
+}) {
+	return request('/channels', {
 		body: JSON.stringify({
-			name,
+			channelId,
+			commerceSyncEnabled,
+			...(dataSourceId && {
+				dataSources: [
+					{
+						commerceChannelIds,
+						dataSourceId,
+						siteIds,
+					},
+				],
+			}),
 		}),
-		headers: {'Content-Type': 'application/json'},
-		method: 'POST',
+		method: 'PATCH',
+	});
+}
+
+export function updateAttributesConfiguration({
+	syncAllAccounts,
+	syncAllContacts,
+	syncedAccountGroupIds,
+	syncedOrganizationIds,
+	syncedUserGroupIds,
+}: {
+	syncAllAccounts: boolean;
+	syncAllContacts: boolean;
+	syncedAccountGroupIds?: string[];
+	syncedOrganizationIds?: string[];
+	syncedUserGroupIds?: string[];
+}) {
+	return request('/contacts/configuration', {
+		body: JSON.stringify({
+			syncAllAccounts,
+			syncAllContacts,
+			syncedAccountGroupIds,
+			syncedOrganizationIds,
+			syncedUserGroupIds,
+		}),
+		method: 'PUT',
 	});
 }

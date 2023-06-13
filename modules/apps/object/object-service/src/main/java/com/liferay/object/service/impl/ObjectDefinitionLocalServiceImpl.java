@@ -23,6 +23,7 @@ import com.liferay.layout.service.LayoutClassedModelUsageLocalService;
 import com.liferay.list.type.service.ListTypeEntryLocalService;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
+import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.deployer.ObjectDefinitionDeployer;
 import com.liferay.object.exception.NoSuchObjectFieldException;
 import com.liferay.object.exception.ObjectDefinitionAccountEntryRestrictedException;
@@ -357,16 +358,16 @@ public class ObjectDefinitionLocalServiceImpl
 			objectDefinition.getObjectDefinitionId());
 
 		for (ObjectRelationship objectRelationship :
-				_objectRelationshipPersistence.findByObjectDefinitionId1(
-					objectDefinition.getObjectDefinitionId())) {
+				_objectRelationshipPersistence.findByODI1_R(
+					objectDefinition.getObjectDefinitionId(), false)) {
 
 			_objectRelationshipLocalService.deleteObjectRelationship(
 				objectRelationship);
 		}
 
 		for (ObjectRelationship objectRelationship :
-				_objectRelationshipPersistence.findByObjectDefinitionId2(
-					objectDefinition.getObjectDefinitionId())) {
+				_objectRelationshipPersistence.findByODI2_R(
+					objectDefinition.getObjectDefinitionId(), false)) {
 
 			_objectRelationshipLocalService.deleteObjectRelationship(
 				objectRelationship);
@@ -558,6 +559,16 @@ public class ObjectDefinitionLocalServiceImpl
 		_createTable(objectDefinition.getDBTableName(), objectDefinition);
 		_createTable(
 			objectDefinition.getExtensionDBTableName(), objectDefinition);
+
+		for (ObjectRelationship objectRelationship :
+				_objectRelationshipLocalService.getObjectRelationships(
+					objectDefinition.getObjectDefinitionId(),
+					ObjectRelationshipConstants.TYPE_MANY_TO_MANY)) {
+
+			_objectRelationshipLocalService.
+				createManyToManyObjectRelationshipTable(
+					userId, objectRelationship);
+		}
 
 		deployObjectDefinition(objectDefinition);
 
@@ -1181,6 +1192,10 @@ public class ObjectDefinitionLocalServiceImpl
 		objectDefinition.setTitleObjectFieldId(titleObjectFieldId);
 		objectDefinition.setAccountEntryRestricted(accountEntryRestricted);
 		objectDefinition.setActive(active);
+		objectDefinition.setClassName(
+			_getClassName(
+				objectDefinition.getObjectDefinitionId(),
+				objectDefinition.getClassName(), objectDefinition.isSystem()));
 		objectDefinition.setEnableCategorization(enableCategorization);
 		objectDefinition.setEnableComments(enableComments);
 		objectDefinition.setEnableObjectEntryHistory(enableObjectEntryHistory);

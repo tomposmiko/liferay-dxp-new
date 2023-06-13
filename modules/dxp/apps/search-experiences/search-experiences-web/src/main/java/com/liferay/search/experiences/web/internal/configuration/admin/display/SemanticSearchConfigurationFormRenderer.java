@@ -85,8 +85,6 @@ public class SemanticSearchConfigurationFormRenderer
 			ParamUtil.getInteger(
 				httpServletRequest, "embeddingVectorDimensions")
 		).put(
-			"enableGPU", ParamUtil.getBoolean(httpServletRequest, "enableGPU")
-		).put(
 			"huggingFaceAccessToken",
 			ParamUtil.getString(httpServletRequest, "huggingFaceAccessToken")
 		).put(
@@ -113,6 +111,12 @@ public class SemanticSearchConfigurationFormRenderer
 		).put(
 			"txtaiHostAddress",
 			ParamUtil.getString(httpServletRequest, "txtaiHostAddress")
+		).put(
+			"txtaiPassword",
+			ParamUtil.getString(httpServletRequest, "txtaiPassword")
+		).put(
+			"txtaiUsername",
+			ParamUtil.getString(httpServletRequest, "txtaiUsername")
 		).build();
 	}
 
@@ -160,8 +164,6 @@ public class SemanticSearchConfigurationFormRenderer
 		semanticSearchCompanyConfigurationDisplayContext.
 			setEmbeddingVectorDimensions(
 				_semanticSearchConfiguration.embeddingVectorDimensions());
-		semanticSearchCompanyConfigurationDisplayContext.setEnableGPU(
-			_semanticSearchConfiguration.enableGPU());
 		semanticSearchCompanyConfigurationDisplayContext.
 			setHuggingFaceAccessToken(
 				_semanticSearchConfiguration.huggingFaceAccessToken());
@@ -184,6 +186,10 @@ public class SemanticSearchConfigurationFormRenderer
 				_semanticSearchConfiguration.textTruncationStrategy());
 		semanticSearchCompanyConfigurationDisplayContext.setTxtaiHostAddress(
 			_semanticSearchConfiguration.txtaiHostAddress());
+		semanticSearchCompanyConfigurationDisplayContext.setTxtaiPassword(
+			_semanticSearchConfiguration.txtaiPassword());
+		semanticSearchCompanyConfigurationDisplayContext.setTxtaiUserName(
+			_semanticSearchConfiguration.txtaiUsername());
 
 		httpServletRequest.setAttribute(
 			SemanticSearchCompanyConfigurationDisplayContext.class.getName(),
@@ -226,7 +232,7 @@ public class SemanticSearchConfigurationFormRenderer
 					httpServletRequest,
 					"model.resource.com.liferay.message.boards.model.MBMessage")
 			).put(
-				"model.resource.com.liferay.wiki.model.WikiPage",
+				"com.liferay.wiki.model.WikiPage",
 				_language.get(
 					httpServletRequest,
 					"model.resource.com.liferay.wiki.model.WikiPage")
@@ -268,7 +274,8 @@ public class SemanticSearchConfigurationFormRenderer
 		HttpServletRequest httpServletRequest) {
 
 		return LinkedHashMapBuilder.put(
-			"huggingFace", _language.get(httpServletRequest, "hugging-face")
+			"huggingFaceInferenceAPI",
+			_language.get(httpServletRequest, "hugging-face-inference-api")
 		).put(
 			"txtai", _language.get(httpServletRequest, "txtai")
 		).build();

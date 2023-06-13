@@ -317,7 +317,7 @@
 </tr>
 <tr>
 	<td>OPTION_SELECT</td>
-	<td>//div[contains (@class, 'select-field-trigger')]/a</td>
+	<td>//div[contains (@class, 'select-field-trigger')]//a</td>
 	<td></td>
 </tr>
 <tr>
@@ -1086,6 +1086,11 @@
 <tr>
 	<td>PRODUCT_STATUS_BASED_ON_PRODUCT_NAME_WITH_ROW</td>
 	<td>xpath=((//a[text()='${key_productName}'])[${key_row}]/../../..//strong[contains(.,'${key_status}')])</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PRODUCT_ENTRY_CHECKBOX</td>
+	<td>//a[text()='${key_productName}']/../../..//input[@type='checkbox']</td>
 	<td></td>
 </tr>
 

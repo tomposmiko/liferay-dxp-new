@@ -68,13 +68,11 @@ public class ScopeSearchFacetDisplayContextTest {
 		ScopeSearchFacetDisplayContext scopeSearchFacetDisplayContext =
 			createDisplayContext(parameterValue);
 
-		List<ScopeSearchFacetTermDisplayContext>
-			scopeSearchFacetTermDisplayContexts =
-				scopeSearchFacetDisplayContext.getTermDisplayContexts();
+		List<BucketDisplayContext> bucketDisplayContexts =
+			scopeSearchFacetDisplayContext.getBucketDisplayContexts();
 
 		Assert.assertEquals(
-			scopeSearchFacetTermDisplayContexts.toString(), 0,
-			scopeSearchFacetTermDisplayContexts.size());
+			bucketDisplayContexts.toString(), 0, bucketDisplayContexts.size());
 
 		Assert.assertEquals(
 			parameterValue, scopeSearchFacetDisplayContext.getParameterValue());
@@ -94,24 +92,21 @@ public class ScopeSearchFacetDisplayContextTest {
 		ScopeSearchFacetDisplayContext scopeSearchFacetDisplayContext =
 			createDisplayContext(parameterValue);
 
-		List<ScopeSearchFacetTermDisplayContext>
-			scopeSearchFacetTermDisplayContexts =
-				scopeSearchFacetDisplayContext.getTermDisplayContexts();
+		List<BucketDisplayContext> bucketDisplayContexts =
+			scopeSearchFacetDisplayContext.getBucketDisplayContexts();
 
 		Assert.assertEquals(
-			scopeSearchFacetTermDisplayContexts.toString(), 1,
-			scopeSearchFacetTermDisplayContexts.size());
+			bucketDisplayContexts.toString(), 1, bucketDisplayContexts.size());
 
-		ScopeSearchFacetTermDisplayContext scopeSearchFacetTermDisplayContext =
-			scopeSearchFacetTermDisplayContexts.get(0);
+		BucketDisplayContext bucketDisplayContext = bucketDisplayContexts.get(
+			0);
 
-		Assert.assertEquals(0, scopeSearchFacetTermDisplayContext.getCount());
+		Assert.assertEquals(name, bucketDisplayContext.getBucketText());
 		Assert.assertEquals(
-			name, scopeSearchFacetTermDisplayContext.getDescriptiveName());
-		Assert.assertEquals(
-			groupId, scopeSearchFacetTermDisplayContext.getGroupId());
-		Assert.assertTrue(scopeSearchFacetTermDisplayContext.isSelected());
-		Assert.assertTrue(scopeSearchFacetTermDisplayContext.isShowCount());
+			String.valueOf(groupId), bucketDisplayContext.getFilterValue());
+		Assert.assertEquals(0, bucketDisplayContext.getFrequency());
+		Assert.assertTrue(bucketDisplayContext.isFrequencyVisible());
+		Assert.assertTrue(bucketDisplayContext.isSelected());
 
 		Assert.assertEquals(
 			parameterValue, scopeSearchFacetDisplayContext.getParameterValue());
@@ -135,25 +130,21 @@ public class ScopeSearchFacetDisplayContextTest {
 		ScopeSearchFacetDisplayContext scopeSearchFacetDisplayContext =
 			createDisplayContext(parameterValue);
 
-		List<ScopeSearchFacetTermDisplayContext>
-			scopeSearchFacetTermDisplayContexts =
-				scopeSearchFacetDisplayContext.getTermDisplayContexts();
+		List<BucketDisplayContext> bucketDisplayContexts =
+			scopeSearchFacetDisplayContext.getBucketDisplayContexts();
 
 		Assert.assertEquals(
-			scopeSearchFacetTermDisplayContexts.toString(), 1,
-			scopeSearchFacetTermDisplayContexts.size());
+			bucketDisplayContexts.toString(), 1, bucketDisplayContexts.size());
 
-		ScopeSearchFacetTermDisplayContext scopeSearchFacetTermDisplayContext =
-			scopeSearchFacetTermDisplayContexts.get(0);
+		BucketDisplayContext bucketDisplayContext = bucketDisplayContexts.get(
+			0);
 
+		Assert.assertEquals(name, bucketDisplayContext.getBucketText());
 		Assert.assertEquals(
-			count, scopeSearchFacetTermDisplayContext.getCount());
-		Assert.assertEquals(
-			name, scopeSearchFacetTermDisplayContext.getDescriptiveName());
-		Assert.assertEquals(
-			groupId, scopeSearchFacetTermDisplayContext.getGroupId());
-		Assert.assertFalse(scopeSearchFacetTermDisplayContext.isSelected());
-		Assert.assertTrue(scopeSearchFacetTermDisplayContext.isShowCount());
+			String.valueOf(groupId), bucketDisplayContext.getFilterValue());
+		Assert.assertEquals(count, bucketDisplayContext.getFrequency());
+		Assert.assertTrue(bucketDisplayContext.isFrequencyVisible());
+		Assert.assertFalse(bucketDisplayContext.isSelected());
 
 		Assert.assertEquals(
 			parameterValue, scopeSearchFacetDisplayContext.getParameterValue());
@@ -177,25 +168,21 @@ public class ScopeSearchFacetDisplayContextTest {
 		ScopeSearchFacetDisplayContext scopeSearchFacetDisplayContext =
 			createDisplayContext(parameterValue);
 
-		List<ScopeSearchFacetTermDisplayContext>
-			scopeSearchFacetTermDisplayContexts =
-				scopeSearchFacetDisplayContext.getTermDisplayContexts();
+		List<BucketDisplayContext> bucketDisplayContexts =
+			scopeSearchFacetDisplayContext.getBucketDisplayContexts();
 
 		Assert.assertEquals(
-			scopeSearchFacetTermDisplayContexts.toString(), 1,
-			scopeSearchFacetTermDisplayContexts.size());
+			bucketDisplayContexts.toString(), 1, bucketDisplayContexts.size());
 
-		ScopeSearchFacetTermDisplayContext scopeSearchFacetTermDisplayContext =
-			scopeSearchFacetTermDisplayContexts.get(0);
+		BucketDisplayContext bucketDisplayContext = bucketDisplayContexts.get(
+			0);
 
+		Assert.assertEquals(name, bucketDisplayContext.getBucketText());
 		Assert.assertEquals(
-			count, scopeSearchFacetTermDisplayContext.getCount());
-		Assert.assertEquals(
-			name, scopeSearchFacetTermDisplayContext.getDescriptiveName());
-		Assert.assertEquals(
-			groupId, scopeSearchFacetTermDisplayContext.getGroupId());
-		Assert.assertTrue(scopeSearchFacetTermDisplayContext.isSelected());
-		Assert.assertTrue(scopeSearchFacetTermDisplayContext.isShowCount());
+			String.valueOf(groupId), bucketDisplayContext.getFilterValue());
+		Assert.assertEquals(count, bucketDisplayContext.getFrequency());
+		Assert.assertTrue(bucketDisplayContext.isFrequencyVisible());
+		Assert.assertTrue(bucketDisplayContext.isSelected());
 
 		Assert.assertEquals(
 			parameterValue, scopeSearchFacetDisplayContext.getParameterValue());

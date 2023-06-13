@@ -15,13 +15,9 @@
 package com.liferay.knowledge.base.internal.search;
 
 import com.liferay.document.library.kernel.model.DLFileEntry;
-import com.liferay.knowledge.base.constants.KBFolderConstants;
 import com.liferay.knowledge.base.model.KBArticle;
-import com.liferay.knowledge.base.model.KBFolder;
 import com.liferay.knowledge.base.service.KBArticleLocalService;
-import com.liferay.knowledge.base.service.KBFolderLocalService;
 import com.liferay.knowledge.base.util.KnowledgeBaseUtil;
-import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Property;
@@ -47,21 +43,24 @@ import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HtmlParser;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.search.spi.model.index.contributor.ModelDocumentContributor;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 /**
  * @author Peter Shin
@@ -121,6 +120,19 @@ public class KBArticleIndexer extends BaseIndexer<KBArticle> {
 		return hits;
 	}
 
+	@Reference(
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY,
+		service = ModelDocumentContributor.class,
+		target = "(indexer.class.name=com.liferay.knowledge.base.model.KBArticle)"
+	)
+	protected void addModelDocumentContributor(
+		ModelDocumentContributor<KBArticle> modelDocumentContributor) {
+
+		_modelDocumentContributors.add(modelDocumentContributor);
+	}
+
 	@Override
 	protected void doDelete(KBArticle kbArticle) throws Exception {
 		deleteDocument(
@@ -131,19 +143,9 @@ public class KBArticleIndexer extends BaseIndexer<KBArticle> {
 	protected Document doGetDocument(KBArticle kbArticle) throws Exception {
 		Document document = getBaseModelDocument(CLASS_NAME, kbArticle);
 
-		document.addText(
-			Field.CONTENT, _htmlParser.extractText(kbArticle.getContent()));
-		document.addText(Field.DESCRIPTION, kbArticle.getDescription());
-		document.addKeyword(Field.FOLDER_ID, kbArticle.getKbFolderId());
-		document.addText(Field.TITLE, kbArticle.getTitle());
-		document.addKeyword(
-			Field.TREE_PATH,
-			StringUtil.split(kbArticle.buildTreePath(), CharPool.SLASH));
-		document.addKeyword("folderNames", _getKBFolderNames(kbArticle));
-		document.addKeyword(
-			"parentMessageId", kbArticle.getParentResourcePrimKey());
-		document.addKeyword("titleKeyword", kbArticle.getTitle(), true);
-		document.addKeywordSortable("urlTitle", kbArticle.getUrlTitle());
+		_modelDocumentContributors.forEach(
+			modelDocumentContributor -> modelDocumentContributor.contribute(
+				document, kbArticle));
 
 		return document;
 	}
@@ -210,30 +212,17 @@ public class KBArticleIndexer extends BaseIndexer<KBArticle> {
 		_reindexKBArticles(companyId);
 	}
 
+	protected void removeModelDocumentContributor(
+		ModelDocumentContributor<KBArticle> modelDocumentContributor) {
+
+		_modelDocumentContributors.remove(modelDocumentContributor);
+	}
+
 	@Reference
 	protected IndexWriterHelper indexWriterHelper;
 
 	@Reference
 	protected KBArticleLocalService kbArticleLocalService;
-
-	@Reference
-	protected KBFolderLocalService kbFolderLocalService;
-
-	private String[] _getKBFolderNames(KBArticle kbArticle) throws Exception {
-		long kbFolderId = kbArticle.getKbFolderId();
-
-		Collection<String> kbFolderNames = new ArrayList<>();
-
-		while (kbFolderId != KBFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
-			KBFolder kbFolder = kbFolderLocalService.getKBFolder(kbFolderId);
-
-			kbFolderNames.add(kbFolder.getName());
-
-			kbFolderId = kbFolder.getParentKBFolderId();
-		}
-
-		return kbFolderNames.toArray(new String[0]);
-	}
 
 	private void _reindexAttachments(KBArticle kbArticle) throws Exception {
 		Indexer<DLFileEntry> indexer = IndexerRegistryUtil.nullSafeGetIndexer(
@@ -296,13 +285,13 @@ public class KBArticleIndexer extends BaseIndexer<KBArticle> {
 	private static final Log _log = LogFactoryUtil.getLog(
 		KBArticleIndexer.class);
 
-	@Reference
-	private HtmlParser _htmlParser;
-
 	@Reference(
 		target = "(model.class.name=com.liferay.knowledge.base.model.KBArticle)"
 	)
 	private ModelResourcePermission<KBArticle>
 		_kbArticleModelResourcePermission;
+
+	private final List<ModelDocumentContributor<KBArticle>>
+		_modelDocumentContributors = new CopyOnWriteArrayList<>();
 
 }
