@@ -647,7 +647,7 @@
 			</library>
 			<library>
 				<file-name>lib/development/postgresql.jar</file-name>
-				<version>42.2.5</version>
+				<version>42.3.3</version>
 				<project-name>PostgreSQL JDBC Driver</project-name>
 				<project-url>http://jdbc.postgresql.org</project-url>
 				<licenses>
@@ -1165,30 +1165,6 @@
 					<license>
 						<license-name>Apache License 2.0</license-name>
 						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/bcmail.jar</file-name>
-				<version>1.61.LIFERAY-PATCHED-1</version>
-				<project-name>Bouncy Castle</project-name>
-				<project-url>http://www.bouncycastle.org</project-url>
-				<licenses>
-					<license>
-						<license-name>MIT License</license-name>
-						<license-url>http://opensource.org/licenses/MIT</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/bcprov.jar</file-name>
-				<version>1.61.LIFERAY-PATCHED-1</version>
-				<project-name>Bouncy Castle</project-name>
-				<project-url>http://www.bouncycastle.org</project-url>
-				<licenses>
-					<license>
-						<license-name>MIT License</license-name>
-						<license-url>http://opensource.org/licenses/MIT</license-url>
 					</license>
 				</licenses>
 			</library>
@@ -1726,7 +1702,7 @@
 			</library>
 			<library>
 				<file-name>lib/portal/hikaricp.jar</file-name>
-				<version>2.6.3</version>
+				<version>4.0.3</version>
 				<project-name>HikariCP</project-name>
 				<project-url>https://github.com/brettwooldridge/HikariCP</project-url>
 				<licenses>
@@ -1750,7 +1726,7 @@
 			</library>
 			<library>
 				<file-name>lib/portal/httpclient.jar</file-name>
-				<version>4.5.5</version>
+				<version>4.5.13</version>
 				<project-name>HttpComponents</project-name>
 				<project-url>http://hc.apache.org</project-url>
 				<licenses>
@@ -1762,7 +1738,7 @@
 			</library>
 			<library>
 				<file-name>lib/portal/httpcore.jar</file-name>
-				<version>4.4.9</version>
+				<version>4.4.14</version>
 				<project-name>HttpComponents</project-name>
 				<project-url>http://hc.apache.org</project-url>
 				<licenses>
@@ -1774,7 +1750,7 @@
 			</library>
 			<library>
 				<file-name>lib/portal/httpmime.jar</file-name>
-				<version>4.5.5</version>
+				<version>4.5.13</version>
 				<project-name>HttpComponents</project-name>
 				<project-url>http://hc.apache.org</project-url>
 				<licenses>

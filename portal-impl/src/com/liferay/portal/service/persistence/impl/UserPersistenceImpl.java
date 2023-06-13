@@ -8589,14 +8589,14 @@ public class UserPersistenceImpl
 
 		UserModelImpl userModelImpl = (UserModelImpl)user;
 
-		if (Validator.isNull(user.getExternalReferenceCode())) {
-			user.setExternalReferenceCode(String.valueOf(user.getPrimaryKey()));
-		}
-
 		if (Validator.isNull(user.getUuid())) {
 			String uuid = PortalUUIDUtil.generate();
 
 			user.setUuid(uuid);
+		}
+
+		if (Validator.isNull(user.getExternalReferenceCode())) {
+			user.setExternalReferenceCode(user.getUuid());
 		}
 
 		ServiceContext serviceContext =
@@ -8713,7 +8713,7 @@ public class UserPersistenceImpl
 	 */
 	@Override
 	public User fetchByPrimaryKey(Serializable primaryKey) {
-		if (CTPersistenceHelperUtil.isProductionMode(User.class)) {
+		if (CTPersistenceHelperUtil.isProductionMode(User.class, primaryKey)) {
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 
