@@ -61,6 +61,12 @@ public interface FieldResource {
 			return new FieldResourceImpl(this);
 		}
 
+		public Builder contextPath(String contextPath) {
+			_contextPath = contextPath;
+
+			return this;
+		}
+
 		public Builder endpoint(String host, int port, String scheme) {
 			_host = host;
 			_port = port;
@@ -106,6 +112,7 @@ public interface FieldResource {
 		private Builder() {
 		}
 
+		private String _contextPath = "";
 		private Map<String, String> _headers = new LinkedHashMap<>();
 		private String _host = "localhost";
 		private Locale _locale;
@@ -196,7 +203,7 @@ public interface FieldResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port +
+					_builder._port + _builder._contextPath +
 						"/o/batch-planner/v1.0/plans/{internalClassName}/fields");
 
 			httpInvoker.path("internalClassName", internalClassName);

@@ -326,6 +326,13 @@ public class ObjectFieldLocalServiceWrapper
 	}
 
 	@Override
+	public java.util.List<com.liferay.object.model.ObjectField>
+		getCustomObjectFields(long objectFieldId) {
+
+		return _objectFieldLocalService.getCustomObjectFields(objectFieldId);
+	}
+
+	@Override
 	public com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery
 		getExportActionableDynamicQuery(
 			com.liferay.exportimport.kernel.lar.PortletDataContext
@@ -501,6 +508,14 @@ public class ObjectFieldLocalServiceWrapper
 		com.liferay.object.model.ObjectField objectField) {
 
 		return _objectFieldLocalService.updateObjectField(objectField);
+	}
+
+	@Override
+	public com.liferay.object.model.ObjectField updateRequired(
+			long objectFieldId, boolean required)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _objectFieldLocalService.updateRequired(objectFieldId, required);
 	}
 
 	@Override

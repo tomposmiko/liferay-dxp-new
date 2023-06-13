@@ -21,8 +21,14 @@ const headlessAPI = 'o/headless-commerce-admin-catalog/v1.0';
  * @returns {Promise<ProductQuote[]>)} Array of Product Quote
  */
 export async function getProductQuotes() {
+	const catalog = await axios.get(
+		`${headlessAPI}/catalogs?filter=name eq 'Raylife'`
+	);
+
+	const catalogId = catalog?.data?.items[0]?.id;
+
 	const {data} = await axios.get(
-		`${headlessAPI}/products?nestedFields=skus,catalog&page=1&pageSize=50`
+		`${headlessAPI}/products?filter=catalogId eq ${catalogId}&nestedFields=skus,catalog&page=1&pageSize=50`
 	);
 
 	return LiferayAdapt.adaptToProductQuote(data.items);

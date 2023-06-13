@@ -96,11 +96,8 @@ function getInputCommonConfiguration(configurationValues, formFields) {
 			name: SHOW_HELP_TEXT_CONFIGURATION_KEY,
 			type: 'checkbox',
 			typeOptions: {displayType: 'toggle'},
-		}
-	);
-
-	if (configurationValues[SHOW_HELP_TEXT_CONFIGURATION_KEY] !== false) {
-		fields.push({
+		},
+		{
 			defaultValue: '',
 			label: Liferay.Language.get('help-text'),
 			localizable: true,
@@ -112,8 +109,8 @@ function getInputCommonConfiguration(configurationValues, formFields) {
 					'guide-your-users-to-fill-in-the-field-by-adding-help-text-here'
 				),
 			},
-		});
-	}
+		}
+	);
 
 	return fields;
 }
@@ -197,9 +194,9 @@ export function FormInputGeneralPanel({item}) {
 
 						if (
 							fragmentEntryType === FRAGMENT_ENTRY_TYPES.input &&
-							editableValues[FREEMARKER_FRAGMENT_ENTRY_PROCESSOR][
-								FIELD_ID_CONFIGURATION_KEY
-							]
+							editableValues[
+								FREEMARKER_FRAGMENT_ENTRY_PROCESSOR
+							]?.[FIELD_ID_CONFIGURATION_KEY]
 						) {
 							selectedFields.push(
 								editableValues[
@@ -382,8 +379,8 @@ function FormInputMappingOptions({configurationValues, form, onValueSelect}) {
 					className={classNames(
 						'page-editor__mapping-panel__type-label',
 						{
-							'mb-0': subtype,
-							'mb-3': !subtype,
+							'mb-1': subtype,
+							'mb-4': !subtype,
 						}
 					)}
 				>
@@ -396,7 +393,7 @@ function FormInputMappingOptions({configurationValues, form, onValueSelect}) {
 			)}
 
 			{subtype && (
-				<p className="mb-3 page-editor__mapping-panel__type-label">
+				<p className="mb-4 page-editor__mapping-panel__type-label">
 					<span className="mr-1">
 						{Liferay.Language.get('subtype')}:
 					</span>

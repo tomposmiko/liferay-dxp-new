@@ -317,6 +317,10 @@ definition {
 			Refresh();
 		}
 
+		task ("Close the onboarding modal") {
+			ACUtils.closeModal();
+		}
+
 		task ("View only one information banner shown") {
 			ACUtils.viewAlertInfo(infoMessage = "Workspace timezone has changed to UTC+08:00 China Time");
 

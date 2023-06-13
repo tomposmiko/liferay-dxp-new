@@ -23,7 +23,7 @@ import {
 	closeSidePanel,
 	openToast,
 } from '@liferay/object-js-components-web';
-import {fetch} from 'frontend-js-web';
+import {fetch, sub} from 'frontend-js-web';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {createTextMaskInputElement} from 'text-mask-core';
 
@@ -67,6 +67,8 @@ export default function EditObjectField({
 	readOnly,
 }: IProps) {
 	const onSubmit = async ({id, ...objectField}: ObjectField) => {
+		delete objectField.system;
+
 		const response = await fetch(
 			`/o/object-admin/v1.0/object-fields/${id}`,
 			{
@@ -111,7 +113,12 @@ export default function EditObjectField({
 		onSubmit,
 	});
 
-	const disabled = !!(readOnly || isApproved || values.relationshipType);
+	const disabled = !!(
+		readOnly ||
+		isApproved ||
+		values.relationshipType ||
+		values.system
+	);
 
 	const [locale, setSelectedLocale] = useState(
 		defaultLocale as {
@@ -376,7 +383,7 @@ function MaxLengthProperties({
 				{settings.showCounter && (
 					<Input
 						error={errors.maxLength}
-						feedbackMessage={Liferay.Util.sub(
+						feedbackMessage={sub(
 							Liferay.Language.get(
 								'set-the-maximum-number-of-characters-accepted-this-value-cant-be-less-than-x-or-greater-than-x'
 							),
@@ -418,7 +425,7 @@ function AttachmentProperties({
 				{settings.showFilesInDocumentsAndMedia && (
 					<Input
 						error={errors.storageDLFolderPath}
-						feedbackMessage={Liferay.Util.sub(
+						feedbackMessage={sub(
 							Liferay.Language.get(
 								'input-the-path-of-the-chosen-folder-in-documents-and-media-an-example-of-a-valid-path-is-x'
 							),

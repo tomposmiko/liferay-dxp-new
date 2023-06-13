@@ -13,12 +13,11 @@ import {useQuery} from '@apollo/client';
 import ClayModal from '@clayui/modal';
 import React, {useState} from 'react';
 import i18n from '../../../../common/I18n';
-import {Button, Table} from '../../../../common/components';
+import {Button, StatusTag, Table} from '../../../../common/components';
 import {getAccountSubscriptionsTerms} from '../../../../common/services/liferay/graphql/queries';
-import StatusTag from '../../components/StatusTag';
+import getDateCustomFormat from '../../../../common/utils/getDateCustomFormat';
+import getKebabCase from '../../../../common/utils/getKebabCase';
 import {STATUS_TAG_TYPES} from '../../utils/constants';
-import getDateCustomFormat from '../../utils/getDateCustomFormat';
-import getKebabCase from '../../utils/getKebabCase';
 
 const dateFormat = {
 	day: '2-digit',

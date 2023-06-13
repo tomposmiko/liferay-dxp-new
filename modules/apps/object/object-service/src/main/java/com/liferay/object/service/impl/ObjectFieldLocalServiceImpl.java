@@ -41,9 +41,6 @@ import com.liferay.object.service.persistence.ObjectFieldPersistence;
 import com.liferay.object.service.persistence.ObjectFieldSettingPersistence;
 import com.liferay.object.service.persistence.ObjectLayoutColumnPersistence;
 import com.liferay.object.service.persistence.ObjectRelationshipPersistence;
-import com.liferay.object.service.persistence.ObjectViewColumnPersistence;
-import com.liferay.object.service.persistence.ObjectViewPersistence;
-import com.liferay.object.service.persistence.ObjectViewSortColumnPersistence;
 import com.liferay.petra.sql.dsl.Table;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
@@ -244,6 +241,11 @@ public class ObjectFieldLocalServiceImpl
 	}
 
 	@Override
+	public List<ObjectField> getCustomObjectFields(long objectFieldId) {
+		return _objectFieldPersistence.findByODI_S(objectFieldId, false);
+	}
+
+	@Override
 	public ObjectField getObjectField(long objectFieldId)
 		throws PortalException {
 
@@ -400,6 +402,19 @@ public class ObjectFieldLocalServiceImpl
 		return objectField;
 	}
 
+	@Indexable(type = IndexableType.REINDEX)
+	@Override
+	public ObjectField updateRequired(long objectFieldId, boolean required)
+		throws PortalException {
+
+		ObjectField objectField = objectFieldPersistence.findByPrimaryKey(
+			objectFieldId);
+
+		objectField.setRequired(required);
+
+		return objectFieldPersistence.update(objectField);
+	}
+
 	private ObjectField _addObjectField(
 			long userId, long listTypeDefinitionId, long objectDefinitionId,
 			String businessType, String dbColumnName, String dbTableName,
@@ -535,6 +550,16 @@ public class ObjectFieldLocalServiceImpl
 		}
 
 		objectField = objectFieldPersistence.remove(objectField);
+
+		if (objectDefinition.getAccountEntryRestrictedObjectFieldId() ==
+				objectField.getObjectFieldId()) {
+
+			objectDefinition.setAccountEntryRestrictedObjectFieldId(0);
+			objectDefinition.setAccountEntryRestricted(false);
+
+			objectDefinition = _objectDefinitionPersistence.update(
+				objectDefinition);
+		}
 
 		String objectFieldSettingFileSource = StringPool.BLANK;
 
@@ -741,16 +766,7 @@ public class ObjectFieldLocalServiceImpl
 	private ObjectRelationshipPersistence _objectRelationshipPersistence;
 
 	@Reference
-	private ObjectViewColumnPersistence _objectViewColumnPersistence;
-
-	@Reference
 	private ObjectViewLocalService _objectViewLocalService;
-
-	@Reference
-	private ObjectViewPersistence _objectViewPersistence;
-
-	@Reference
-	private ObjectViewSortColumnPersistence _objectViewSortColumnPersistence;
 
 	private final Set<String> _reservedNames = SetUtil.fromArray(
 		"actions", "companyid", "createdate", "creator", "datecreated",

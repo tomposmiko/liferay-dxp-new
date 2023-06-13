@@ -842,6 +842,11 @@
 
 		<!-- Module Source Checks -->
 
+		<check name="JavaModuleClassGetResourceCallCheck">
+			<category name="Bug Prevention" />
+			<description name="Checks that dependencies files are located in the correct directory." />
+			<property name="enabled" value="false" />
+		</check>
 		<check name="JavaModuleComponentCheck">
 			<category name="Bug Prevention" />
 			<description name="Checks for use of `@Component` in `-api` or `-spi` modules." />
@@ -1318,6 +1323,10 @@
 		<check name="PropertiesStylingCheck">
 			<category name="Styling" />
 			<description name="Applies rules to enforce consistency in code style." />
+		</check>
+		<check name="PropertiesTestFileCheck">
+			<category name="Styling" />
+			<description name="Performs several checks in `test.properties`." />
 		</check>
 		<check name="PropertiesWhitespaceCheck">
 			<category name="Styling" />

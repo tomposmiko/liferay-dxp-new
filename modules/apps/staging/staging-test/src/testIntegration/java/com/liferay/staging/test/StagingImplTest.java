@@ -35,6 +35,8 @@ import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.layout.test.util.LayoutTestUtil;
+import com.liferay.petra.function.UnsafeSupplier;
+import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Group;
@@ -134,9 +136,11 @@ public class StagingImplTest {
 			TestPropsValues.getUserId(), _remoteStagingGroup.getGroupId(),
 			_remoteLiveGroup.getGroupId(), false, parameters);
 
-		Layout remoteLiveGroupLayout = StagingUtil.getRemoteLayout(
-			TestPropsValues.getUserId(), remoteStagingGroupLayout.getGroupId(),
-			remoteStagingGroupLayout.getPlid());
+		Layout remoteLiveGroupLayout = _executeWithRemoteCredentials(
+			() -> StagingUtil.getRemoteLayout(
+				TestPropsValues.getUserId(),
+				remoteStagingGroupLayout.getGroupId(),
+				remoteStagingGroupLayout.getPlid()));
 
 		Assert.assertNotNull(remoteLiveGroupLayout);
 
@@ -156,10 +160,11 @@ public class StagingImplTest {
 			_remoteStagingGroup);
 
 		Assert.assertFalse(
-			StagingUtil.hasRemoteLayout(
-				TestPropsValues.getUserId(),
-				remoteStagingGroupLayout.getGroupId(),
-				remoteStagingGroupLayout.getPlid()));
+			_executeWithRemoteCredentials(
+				() -> StagingUtil.hasRemoteLayout(
+					TestPropsValues.getUserId(),
+					remoteStagingGroupLayout.getGroupId(),
+					remoteStagingGroupLayout.getPlid())));
 
 		Map<String, String[]> parameters =
 			ExportImportConfigurationParameterMapFactoryUtil.
@@ -170,10 +175,11 @@ public class StagingImplTest {
 			_remoteLiveGroup.getGroupId(), false, parameters);
 
 		Assert.assertTrue(
-			StagingUtil.hasRemoteLayout(
-				TestPropsValues.getUserId(),
-				remoteStagingGroupLayout.getGroupId(),
-				remoteStagingGroupLayout.getPlid()));
+			_executeWithRemoteCredentials(
+				() -> StagingUtil.hasRemoteLayout(
+					TestPropsValues.getUserId(),
+					remoteStagingGroupLayout.getGroupId(),
+					remoteStagingGroupLayout.getPlid())));
 	}
 
 	@Test
@@ -518,58 +524,64 @@ public class StagingImplTest {
 	}
 
 	protected void enableRemoteStaging(boolean branching) throws Exception {
-		PropsValuesTestUtil.setPortalProperty(
-			"TUNNELING_SERVLET_SHARED_SECRET",
-			"F0E1D2C3B4A5968778695A4B3C2D1E0F");
-		PropsValuesTestUtil.setPortalProperty(
-			"TUNNELING_SERVLET_SHARED_SECRET_HEX", true);
+		try (SafeCloseable safeCloseable1 =
+				PropsValuesTestUtil.swapWithSafeCloseable(
+					"TUNNELING_SERVLET_SHARED_SECRET",
+					"F0E1D2C3B4A5968778695A4B3C2D1E0F");
+			SafeCloseable safeCloseable2 =
+				PropsValuesTestUtil.swapWithSafeCloseable(
+					"TUNNELING_SERVLET_SHARED_SECRET_HEX", true)) {
 
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(
-				_remoteStagingGroup.getGroupId());
+			ServiceContext serviceContext =
+				ServiceContextTestUtil.getServiceContext(
+					_remoteStagingGroup.getGroupId());
 
-		Map<String, Serializable> attributes = serviceContext.getAttributes();
+			Map<String, Serializable> attributes =
+				serviceContext.getAttributes();
 
-		attributes.putAll(
-			ExportImportConfigurationParameterMapFactoryUtil.
-				buildParameterMap());
+			attributes.putAll(
+				ExportImportConfigurationParameterMapFactoryUtil.
+					buildParameterMap());
 
-		if (branching) {
-			serviceContext.setSignedIn(true);
+			if (branching) {
+				serviceContext.setSignedIn(true);
+			}
+
+			UserTestUtil.setUser(TestPropsValues.getUser());
+
+			StagingLocalServiceUtil.enableRemoteStaging(
+				TestPropsValues.getUserId(), _remoteStagingGroup, branching,
+				branching, "localhost", PortalUtil.getPortalServerPort(false),
+				PortalUtil.getPathContext(), false,
+				_remoteLiveGroup.getGroupId(), serviceContext);
+
+			GroupUtil.clearCache();
+
+			if (!branching) {
+				return;
+			}
+
+			UnicodeProperties typeSettingsUnicodeProperties =
+				_remoteStagingGroup.getTypeSettingsProperties();
+
+			Assert.assertTrue(
+				GetterUtil.getBoolean(
+					typeSettingsUnicodeProperties.getProperty(
+						"branchingPrivate")));
+			Assert.assertTrue(
+				GetterUtil.getBoolean(
+					typeSettingsUnicodeProperties.getProperty(
+						"branchingPublic")));
+
+			Assert.assertNotNull(
+				LayoutSetBranchLocalServiceUtil.fetchLayoutSetBranch(
+					_remoteStagingGroup.getGroupId(), false,
+					LayoutSetBranchConstants.MASTER_BRANCH_NAME));
+			Assert.assertNotNull(
+				LayoutSetBranchLocalServiceUtil.fetchLayoutSetBranch(
+					_remoteStagingGroup.getGroupId(), true,
+					LayoutSetBranchConstants.MASTER_BRANCH_NAME));
 		}
-
-		UserTestUtil.setUser(TestPropsValues.getUser());
-
-		StagingLocalServiceUtil.enableRemoteStaging(
-			TestPropsValues.getUserId(), _remoteStagingGroup, branching,
-			branching, "localhost", PortalUtil.getPortalServerPort(false),
-			PortalUtil.getPathContext(), false, _remoteLiveGroup.getGroupId(),
-			serviceContext);
-
-		GroupUtil.clearCache();
-
-		if (!branching) {
-			return;
-		}
-
-		UnicodeProperties typeSettingsUnicodeProperties =
-			_remoteStagingGroup.getTypeSettingsProperties();
-
-		Assert.assertTrue(
-			GetterUtil.getBoolean(
-				typeSettingsUnicodeProperties.getProperty("branchingPrivate")));
-		Assert.assertTrue(
-			GetterUtil.getBoolean(
-				typeSettingsUnicodeProperties.getProperty("branchingPublic")));
-
-		Assert.assertNotNull(
-			LayoutSetBranchLocalServiceUtil.fetchLayoutSetBranch(
-				_remoteStagingGroup.getGroupId(), false,
-				LayoutSetBranchConstants.MASTER_BRANCH_NAME));
-		Assert.assertNotNull(
-			LayoutSetBranchLocalServiceUtil.fetchLayoutSetBranch(
-				_remoteStagingGroup.getGroupId(), true,
-				LayoutSetBranchConstants.MASTER_BRANCH_NAME));
 	}
 
 	protected AssetCategory updateAssetCategory(
@@ -587,6 +599,22 @@ public class StagingImplTest {
 			category.getParentCategoryId(), titleMap,
 			category.getDescriptionMap(), category.getVocabularyId(), null,
 			ServiceContextTestUtil.getServiceContext());
+	}
+
+	private <T> T _executeWithRemoteCredentials(
+			UnsafeSupplier<T, Exception> unsafeSupplier)
+		throws Exception {
+
+		try (SafeCloseable safeCloseable1 =
+				PropsValuesTestUtil.swapWithSafeCloseable(
+					"TUNNELING_SERVLET_SHARED_SECRET",
+					"F0E1D2C3B4A5968778695A4B3C2D1E0F");
+			SafeCloseable safeCloseable2 =
+				PropsValuesTestUtil.swapWithSafeCloseable(
+					"TUNNELING_SERVLET_SHARED_SECRET_HEX", true)) {
+
+			return unsafeSupplier.get();
+		}
 	}
 
 	private static final Locale[] _locales = {

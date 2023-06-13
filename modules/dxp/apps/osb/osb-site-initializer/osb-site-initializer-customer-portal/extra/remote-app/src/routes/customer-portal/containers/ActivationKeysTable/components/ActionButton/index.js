@@ -13,7 +13,7 @@ import {useCallback} from 'react';
 import {useNavigate} from 'react-router-dom';
 import i18n from '../../../../../../common/I18n';
 import {Button, ButtonDropDown} from '../../../../../../common/components';
-import {useApplicationProvider} from '../../../../../../common/context/AppPropertiesProvider';
+import {useAppPropertiesContext} from '../../../../../../common/contexts/AppPropertiesContext';
 import {ALERT_DOWNLOAD_TYPE} from '../../../../utils/constants';
 import {getActivationKeyDownload} from '../../utils/getActivationKeyDownload';
 import {getActivationKeysActionsItems} from '../../utils/getActivationKeysActionsItems';
@@ -28,7 +28,7 @@ const ActionButton = ({
 	sessionId,
 	setStatus,
 }) => {
-	const {licenseKeyDownloadURL} = useApplicationProvider();
+	const {provisioningServerAPI} = useAppPropertiesContext();
 	const navigate = useNavigate();
 
 	const handleAlertStatus = useCallback(
@@ -57,7 +57,7 @@ const ActionButton = ({
 		const activationKeysDownloadItems = getActivationKeysDownloadItems(
 			isAbleToDownloadAggregateKeys,
 			filterCheckedActivationKeys,
-			licenseKeyDownloadURL,
+			provisioningServerAPI,
 			sessionId,
 			handleMultipleAlertStatus,
 			handleAlertStatus,
@@ -82,7 +82,7 @@ const ActionButton = ({
 				className="btn btn-primary"
 				onClick={async () =>
 					getActivationKeyDownload(
-						licenseKeyDownloadURL,
+						provisioningServerAPI,
 						sessionId,
 						handleAlertStatus,
 						activationKeysByStatusPaginatedChecked[0],
@@ -100,7 +100,7 @@ const ActionButton = ({
 
 	const activationKeysActionsItems = getActivationKeysActionsItems(
 		project?.accountKey,
-		licenseKeyDownloadURL,
+		provisioningServerAPI,
 		sessionId,
 		handleAlertStatus,
 		handleRedirectPage,

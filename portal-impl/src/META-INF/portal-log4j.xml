@@ -21,6 +21,14 @@
 
 			<DirectWriteRolloverStrategy />
 		</Appender>
+
+		<Appender filePattern="@liferay.home@/logs/companies/@company.id@/liferay-@company.id@.%d{yyyy-MM-dd}.log" ignoreExceptions="false" name="COMPANY_LOG_ROUTING_TEXT_FILE" type="CompanyLogRouting">
+			<Layout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p [%t][%c{1}:%L] %m%n" type="PatternLayout" />
+
+			<TimeBasedTriggeringPolicy />
+
+			<DirectWriteRolloverStrategy />
+		</Appender>
 	</Appenders>
 
 	<Loggers>
@@ -91,7 +99,7 @@
 		<Logger level="WARN" name="com.liferay.portal.kernel.dao.orm.QueryUtil" />
 		<Logger level="INFO" name="com.liferay.portal.kernel.deploy" />
 		<Logger level="ERROR" name="com.liferay.portal.kernel.lar" />
-		<Logger level="INFO" name="com.liferay.portal.kernel.messaging.config.BaseMessagingConfigurator" />
+		<Logger level="INFO" name="com.liferay.portal.kernel.messaging.config.DefaultMessagingConfigurator" />
 		<Logger level="WARN" name="com.liferay.portal.kernel.messaging.proxy.ProxyMessageListener" />
 		<Logger level="ERROR" name="com.liferay.portal.kernel.model.Image" />
 		<Logger level="ERROR" name="com.liferay.portal.kernel.portlet.InvokerPortlet" />
@@ -281,6 +289,7 @@
 		<Logger level="WARN" name="portal-web.docroot.errors.404.jsp" />
 
 		<Root level="INFO">
+			<AppenderRef ref="COMPANY_LOG_ROUTING_TEXT_FILE" />
 			<AppenderRef ref="CONSOLE" />
 			<AppenderRef ref="TEXT_FILE" />
 			<AppenderRef ref="XML_FILE" />

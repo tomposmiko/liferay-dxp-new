@@ -15,10 +15,12 @@
 package com.liferay.layout.admin.web.internal.portlet.action;
 
 import com.liferay.client.extension.constants.ClientExtensionEntryConstants;
+import com.liferay.client.extension.model.ClientExtensionEntryRel;
 import com.liferay.client.extension.service.ClientExtensionEntryRelLocalService;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
@@ -129,15 +131,67 @@ public class EditLayoutSetMVCActionCommand extends BaseMVCActionCommand {
 			themeDisplay.getPermissionChecker(), layoutSet.getGroupId(),
 			ActionKeys.MANAGE_LAYOUTS);
 
-		String faviconCETExternalReferenceCode = ParamUtil.getString(
-			actionRequest, "faviconCETExternalReferenceCode");
+		String themeFaviconCETExternalReferenceCode = ParamUtil.getString(
+			actionRequest, "themeFaviconCETExternalReferenceCode");
 
-		if (Validator.isNotNull(faviconCETExternalReferenceCode)) {
-			_clientExtensionEntryRelLocalService.addClientExtensionEntryRel(
-				themeDisplay.getUserId(),
-				_portal.getClassNameId(LayoutSet.class),
-				layoutSet.getLayoutSetId(), faviconCETExternalReferenceCode,
+		if (Validator.isNotNull(themeFaviconCETExternalReferenceCode)) {
+			ClientExtensionEntryRel clientExtensionEntryRel =
+				_clientExtensionEntryRelLocalService.
+					fetchClientExtensionEntryRelByExternalReferenceCode(
+						layoutSet.getCompanyId(),
+						themeFaviconCETExternalReferenceCode);
+
+			if (clientExtensionEntryRel == null) {
+				_clientExtensionEntryRelLocalService.
+					deleteClientExtensionEntryRels(
+						_portal.getClassNameId(LayoutSet.class),
+						layoutSet.getLayoutSetId(),
+						ClientExtensionEntryConstants.TYPE_THEME_FAVICON);
+
+				_clientExtensionEntryRelLocalService.addClientExtensionEntryRel(
+					themeDisplay.getUserId(),
+					_portal.getClassNameId(LayoutSet.class),
+					layoutSet.getLayoutSetId(),
+					themeFaviconCETExternalReferenceCode,
+					ClientExtensionEntryConstants.TYPE_THEME_FAVICON);
+			}
+		}
+		else {
+			_clientExtensionEntryRelLocalService.deleteClientExtensionEntryRels(
+				themeDisplay.getCompanyId(), layoutSet.getLayoutSetId(),
 				ClientExtensionEntryConstants.TYPE_THEME_FAVICON);
+		}
+
+		_clientExtensionEntryRelLocalService.deleteClientExtensionEntryRels(
+			themeDisplay.getCompanyId(), layoutSet.getLayoutSetId(),
+			ClientExtensionEntryConstants.TYPE_GLOBAL_CSS);
+
+		String[] globalCSSCETExternalReferenceCodes = ParamUtil.getStringValues(
+			actionRequest, "globalCSSCETExternalReferenceCodes");
+
+		for (String globalCSSCETExternalReferenceCode :
+				globalCSSCETExternalReferenceCodes) {
+
+			_clientExtensionEntryRelLocalService.addClientExtensionEntryRel(
+				themeDisplay.getUserId(), _portal.getClassNameId(Layout.class),
+				layoutSet.getLayoutSetId(), globalCSSCETExternalReferenceCode,
+				ClientExtensionEntryConstants.TYPE_GLOBAL_CSS);
+		}
+
+		_clientExtensionEntryRelLocalService.deleteClientExtensionEntryRels(
+			themeDisplay.getCompanyId(), layoutSet.getLayoutSetId(),
+			ClientExtensionEntryConstants.TYPE_GLOBAL_JS);
+
+		String[] globalJSCETExternalReferenceCodes = ParamUtil.getStringValues(
+			actionRequest, "globalJSCETExternalReferenceCodes");
+
+		for (String globalJSCETExternalReferenceCode :
+				globalJSCETExternalReferenceCodes) {
+
+			_clientExtensionEntryRelLocalService.addClientExtensionEntryRel(
+				themeDisplay.getUserId(), _portal.getClassNameId(Layout.class),
+				layoutSet.getLayoutSetId(), globalJSCETExternalReferenceCode,
+				ClientExtensionEntryConstants.TYPE_GLOBAL_JS);
 		}
 
 		String themeCSSCETExternalReferenceCode = ParamUtil.getString(

@@ -14,26 +14,43 @@
 
 package com.liferay.client.extension.type;
 
+import com.liferay.client.extension.type.annotation.CETProperty;
+import com.liferay.client.extension.type.annotation.CETType;
+
 import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * @author Brian Wing Shun Chan
  */
+@CETType(description = "This is a description.", name = "customElement")
 @ProviderType
 public interface CETCustomElement extends CET {
 
+	@CETProperty(defaultValue = "", name = "cssURLs", type = "list")
 	public String getCSSURLs();
 
+	@CETProperty(
+		defaultValue = "", name = "friendlyURLMapping", type = "string"
+	)
 	public String getFriendlyURLMapping();
 
+	@CETProperty(defaultValue = "", name = "htmlElementName", type = "string")
 	public String getHTMLElementName();
 
+	@CETProperty(
+		defaultValue = "", name = "portletCategoryName", type = "string"
+	)
 	public String getPortletCategoryName();
 
+	@CETProperty(defaultValue = "", name = "urls", type = "list")
 	public String getURLs();
 
+	@CETProperty(
+		defaultValue = "false", name = "instanceable", type = "boolean"
+	)
 	public boolean isInstanceable();
 
+	@CETProperty(defaultValue = "false", name = "useESM", type = "boolean")
 	public boolean isUseESM();
 
 }

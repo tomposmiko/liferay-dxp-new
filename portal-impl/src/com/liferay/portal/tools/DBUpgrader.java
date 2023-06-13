@@ -75,6 +75,16 @@ public class DBUpgrader {
 			return;
 		}
 
+		if (StartupHelperUtil.isUpgrading()) {
+			try (Connection connection = DataAccess.getConnection()) {
+				if (PortalUpgradeProcess.supportsRetry(connection)) {
+					System.out.println("Retrying upgrade");
+
+					return;
+				}
+			}
+		}
+
 		throw new IllegalStateException(
 			StringBundler.concat(
 				"The database contains changes from a previous upgrade ",
@@ -380,6 +390,8 @@ public class DBUpgrader {
 			buildNumber = _getBuildNumberForMissedUpgradeProcesses(buildNumber);
 
 			StartupHelperUtil.upgradeProcess(buildNumber);
+
+			_updateReleaseState(ReleaseConstants.STATE_GOOD);
 		}
 		catch (Exception exception) {
 			_updateReleaseState(ReleaseConstants.STATE_UPGRADE_FAILURE);

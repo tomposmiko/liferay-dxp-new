@@ -955,10 +955,10 @@
     "@clayui/icon" "^3.56.0"
     classnames "^2.2.6"
 
-"@clayui/css@3.59.0":
-  version "3.59.0"
-  resolved "https://registry.yarnpkg.com/@clayui/css/-/css-3.59.0.tgz#affc9571b90955cd1b1632fd21069ee111185819"
-  integrity sha512-dVDz8+tV4MThDUWJSRaAv5ztQdkFGI9McEqTakUCLYCSQIhTEuwHQD9g6h9Pvxwuf1JgD+nW+mzsQyJmGjiFXA==
+"@clayui/css@3.61.0":
+  version "3.61.0"
+  resolved "https://registry.yarnpkg.com/@clayui/css/-/css-3.61.0.tgz#39625a7161bcf18f75d3e5178f4b0141315473e8"
+  integrity sha512-m3dtgou8872qohqNgRY2zo6BxNyLirrvsEzOVXZ/cmri+zAQwafUPbeC3szFZBuk2tpL9UuTMlJlTPTMdOx7LQ==
 
 "@clayui/drop-down@3.58.0":
   version "3.58.0"

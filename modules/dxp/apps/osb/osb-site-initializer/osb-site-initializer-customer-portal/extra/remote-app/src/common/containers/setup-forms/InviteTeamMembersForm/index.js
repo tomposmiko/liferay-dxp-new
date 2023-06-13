@@ -16,7 +16,7 @@ import {FieldArray, Formik} from 'formik';
 import {useEffect, useState} from 'react';
 import i18n from '../../../I18n';
 import {Badge, Button} from '../../../components';
-import {useApplicationProvider} from '../../../context/AppPropertiesProvider';
+import {useAppPropertiesContext} from '../../../contexts/AppPropertiesContext';
 import {Liferay} from '../../../services/liferay';
 import {
 	addTeamMembersInvitation,
@@ -45,7 +45,10 @@ const InviteTeamMembersPage = ({
 	touched,
 	values,
 }) => {
-	const {licenseKeyDownloadURL, supportLink} = useApplicationProvider();
+	const {
+		articleAccountSupportURL,
+		provisioningServerAPI,
+	} = useAppPropertiesContext();
 
 	const [addTeamMemberInvitation, {error: addTeamMemberError}] = useMutation(
 		addTeamMembersInvitation
@@ -186,7 +189,7 @@ const InviteTeamMembersPage = ({
 
 					await associateContactRoleNameByEmailByProject(
 						project.accountKey,
-						licenseKeyDownloadURL,
+						provisioningServerAPI,
 						sessionId,
 						encodeURI(email),
 						role.raysourceName
@@ -400,7 +403,7 @@ const InviteTeamMembersPage = ({
 
 										<a
 											className="font-weight-bold text-neutral-9"
-											href={supportLink}
+											href={articleAccountSupportURL}
 											rel="noreferrer"
 											target="_blank"
 										>

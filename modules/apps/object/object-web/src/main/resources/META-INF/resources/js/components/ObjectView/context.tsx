@@ -350,6 +350,8 @@ const viewReducer = (state: TState, action: TAction) => {
 				objectViewSortColumns,
 			} = objectView;
 
+			const {ffUseMetadataAsSystemFields} = state;
+
 			const objectFieldsWithCheck = objectFields.map(
 				(field: TObjectField) => {
 					return {
@@ -362,9 +364,11 @@ const viewReducer = (state: TState, action: TAction) => {
 
 			const newObjectFields: TObjectField[] = [];
 
-			METADATA.map((field) => {
-				newObjectFields.push(field);
-			});
+			if (!ffUseMetadataAsSystemFields) {
+				METADATA.map((field) => {
+					newObjectFields.push(field);
+				});
+			}
 
 			objectFieldsWithCheck.map((field: TObjectField) => {
 				newObjectFields.push(field);
@@ -765,6 +769,7 @@ const viewReducer = (state: TState, action: TAction) => {
 
 interface IViewContextProviderProps extends React.HTMLAttributes<HTMLElement> {
 	value: {
+		ffUseMetadataAsSystemFields: boolean;
 		isViewOnly: boolean;
 		objectViewId: string;
 		workflowStatusJSONArray: TWorkflowStatus[];

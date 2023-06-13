@@ -24,6 +24,9 @@
 		<field name="userName" type="String" />
 		<field name="createDate" type="Date" />
 		<field name="modifiedDate" type="Date" />
+		<field name="authRequestParametersJSON" type="String">
+			<hint name="max-length">3999</hint>
+		</field>
 		<field name="authServerWellKnownURI" type="String">
 			<hint name="max-length">256</hint>
 		</field>
@@ -33,8 +36,8 @@
 		<field name="infoJSON" type="String">
 			<hint-collection name="CLOB" />
 		</field>
-		<field name="parametersJSON" type="String">
-			<hint-collection name="CLOB" />
+		<field name="tokenRequestParametersJSON" type="String">
+			<hint name="max-length">3999</hint>
 		</field>
 	</model>
 </model-hints>

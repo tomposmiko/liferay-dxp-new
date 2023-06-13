@@ -12,7 +12,7 @@
 import {useEffect} from 'react';
 import {useOutletContext} from 'react-router-dom';
 import i18n from '../../../../../common/I18n';
-import {useApplicationProvider} from '../../../../../common/context/AppPropertiesProvider';
+import {useAppPropertiesContext} from '../../../../../common/contexts/AppPropertiesContext';
 import ManageProductUser from '../../../components/ManageProductUsers';
 import TeamMembersTable from '../../../containers/TeamMembersTable';
 import {useCustomerPortal} from '../../../context';
@@ -20,7 +20,7 @@ import {useCustomerPortal} from '../../../context';
 const TeamMembers = () => {
 	const {setHasQuickLinksPanel, setHasSideMenu} = useOutletContext();
 	const [{project, sessionId, subscriptionGroups}] = useCustomerPortal();
-	const {licenseKeyDownloadURL} = useApplicationProvider();
+	const {provisioningServerAPI} = useAppPropertiesContext();
 
 	useEffect(() => {
 		setHasQuickLinksPanel(false);
@@ -45,8 +45,8 @@ const TeamMembers = () => {
 
 			<div className="mt-4">
 				<TeamMembersTable
-					licenseKeyDownloadURL={licenseKeyDownloadURL}
 					project={project}
+					provisioningServerAPI={provisioningServerAPI}
 					sessionId={sessionId}
 				/>
 			</div>

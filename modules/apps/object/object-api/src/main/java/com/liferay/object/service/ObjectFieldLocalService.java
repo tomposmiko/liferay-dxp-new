@@ -257,6 +257,9 @@ public interface ObjectFieldLocalService
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<ObjectField> getCustomObjectFields(long objectFieldId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
 		PortletDataContext portletDataContext);
 
@@ -366,5 +369,9 @@ public interface ObjectFieldLocalService
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	public ObjectField updateObjectField(ObjectField objectField);
+
+	@Indexable(type = IndexableType.REINDEX)
+	public ObjectField updateRequired(long objectFieldId, boolean required)
+		throws PortalException;
 
 }

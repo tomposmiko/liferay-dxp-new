@@ -411,13 +411,13 @@ public class ObjectDefinitionLocalServiceTest {
 						return Arrays.asList(
 							createObjectField(
 								"Boolean", "Boolean", "Action Required",
-								"actionRequired", true),
+								"actionRequired", true, false),
 							createObjectField(
 								"LongInteger", "Long", "Delivery Type",
-								"deliveryType", false),
+								"deliveryType", false, false),
 							createObjectField(
-								"Text", "type_", "String", "Type", "type",
-								true));
+								"Text", "type_", "String", "Type", "type", true,
+								false));
 					}
 
 					@Override
@@ -503,13 +503,13 @@ public class ObjectDefinitionLocalServiceTest {
 						return Arrays.asList(
 							createObjectField(
 								"Boolean", "Boolean", "Archived", "archived",
-								true),
+								true, false),
 							createObjectField(
 								"LongInteger", "Long", "Delivery Type",
-								"deliveryType", true),
+								"deliveryType", true, false),
 							createObjectField(
 								"Text", "type_", "String", "Type", "type",
-								false));
+								false, false));
 					}
 
 					@Override
@@ -948,10 +948,9 @@ public class ObjectDefinitionLocalServiceTest {
 		try {
 			objectDefinition =
 				_objectDefinitionLocalService.updateCustomObjectDefinition(
-					objectDefinition.getObjectDefinitionId(),
+					objectDefinition.getObjectDefinitionId(), 0,
 					RandomTestUtil.randomLong(), RandomTestUtil.randomLong(),
-					RandomTestUtil.randomLong(), false,
-					objectDefinition.isActive(),
+					false, objectDefinition.isActive(),
 					LocalizedMapUtil.getLocalizedMap("Able"), "Able", null,
 					null, false, LocalizedMapUtil.getLocalizedMap("Ables"),
 					objectDefinition.getScope());
@@ -971,10 +970,9 @@ public class ObjectDefinitionLocalServiceTest {
 
 		objectDefinition =
 			_objectDefinitionLocalService.updateCustomObjectDefinition(
-				objectDefinition.getObjectDefinitionId(),
-				RandomTestUtil.randomLong(), objectField.getObjectFieldId(),
-				objectField.getObjectFieldId(), false,
-				objectDefinition.isActive(),
+				objectDefinition.getObjectDefinitionId(), 0,
+				objectField.getObjectFieldId(), objectField.getObjectFieldId(),
+				false, objectDefinition.isActive(),
 				LocalizedMapUtil.getLocalizedMap("Able"), "Able", null, null,
 				false, LocalizedMapUtil.getLocalizedMap("Ables"),
 				objectDefinition.getScope());

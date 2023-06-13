@@ -792,6 +792,26 @@ definition {
 		PageEditor.waitForAutoSave();
 	}
 
+	macro addFragmentToFormContainer {
+		if (!(isSet(position))) {
+			var position = "1";
+		}
+
+		PageEditor.gotoTab(tabName = "Fragments and Widgets");
+
+		PageEditor.expandFragmentCollection(collectionName = "${collectionName}");
+
+		DragAndDrop.javaScriptDragAndDropToObject(
+			key_collectionName = "${collectionName}",
+			key_fragmentName = "${fragmentName}",
+			key_position = "${position}",
+			key_targetFragmentName = "Form Container",
+			locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_TAB_FRAGMENT",
+			locator2 = "PageEditor#FORM_CONTAINER_CONTAINER");
+
+		PageEditor.waitForAutoSave();
+	}
+
 	macro addVideoFragmentURL {
 		Type(
 			key_text = "URL",
@@ -1054,32 +1074,6 @@ definition {
 			value1 = "${offSetX},${offSetY}");
 	}
 
-	macro clickPublish {
-		Button.click(button = "Publish");
-
-		if (IsElementPresent(locator1 = "Modal#BODY")) {
-			AssertTextEquals(
-				locator1 = "Modal#BODY",
-				value1 = "Some of the fields have invalid values. If you continue publishing, the latest valid values will display.");
-
-			if ("${publishing}" == "Cancel") {
-				Click(
-					key_text = "Cancel",
-					locator1 = "Modal#MODAL_FOOTER_BUTTON");
-			}
-			else {
-				Click(
-					key_text = "Continue",
-					locator1 = "Modal#MODAL_FOOTER_BUTTON");
-
-				Alert.viewSuccessMessage();
-			}
-		}
-		else {
-			Alert.viewSuccessMessage();
-		}
-	}
-
 	macro closeSidebar {
 		var key_tabName = "${tabName}";
 
@@ -1266,6 +1260,19 @@ definition {
 				key_fieldLabel = "Number of Tabs",
 				locator1 = "FormFields#NUMBER_FIELD",
 				value1 = "${numberOfTabs}");
+		}
+
+		if (isSet(opacity)) {
+			Type(
+				key_fieldLabel = "Opacity",
+				locator1 = "FormFields#NUMBER_FIELD",
+				value1 = "${opacity}");
+
+			Click(
+				key_sidebarButton = "Browser",
+				locator1 = "PageEditor#FRAGMENT_SIDEBAR_TITLE");
+
+			PageEditor.waitForAutoSave();
 		}
 
 		if (isSet(paddingBottom)) {
@@ -2415,6 +2422,108 @@ definition {
 		PageEditor.waitForAutoSave();
 	}
 
+	macro editInput {
+		PageEditor.gotoConfiguration(fragmentName = "${fragmentName}");
+
+		if (isSet(field)) {
+			Select(
+				key_fieldLabel = "Field",
+				locator1 = "Select#GENERIC_SELECT_FIELD",
+				value1 = "${field}");
+
+			PageEditor.waitForAutoSave();
+
+			AssertTextEquals(
+				key_text = "Label",
+				locator1 = "TextInput#ANY",
+				value1 = "${field}");
+		}
+
+		if ("${markAsRequired}" == "true") {
+			Check.checkNotVisible(
+				checkboxName = "Mark as Required",
+				locator1 = "Checkbox#ANY_CHECKBOX");
+
+			PageEditor.waitForAutoSave();
+		}
+		else if ("${markAsRequired}" == "false") {
+			Uncheck.uncheckNotVisible(
+				checkboxName = "Mark as Required",
+				locator1 = "Checkbox#ANY_CHECKBOX");
+
+			PageEditor.waitForAutoSave();
+		}
+
+		if ("${hideLabel}" == "true") {
+			Uncheck.uncheckToggleSwitch(
+				key_toggleSwitchLabel = "Show Label",
+				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
+
+			PageEditor.waitForAutoSave();
+		}
+		else if ("${hideLabel}" == "false") {
+			Check.checkToggleSwitch(
+				key_toggleSwitchLabel = "Show Label",
+				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
+
+			PageEditor.waitForAutoSave();
+		}
+
+		if (isSet(label)) {
+			Type(
+				key_text = "Label",
+				locator1 = "TextInput#ANY",
+				value1 = "${label}");
+
+			Click(
+				key_sidebarButton = "Browser",
+				locator1 = "PageEditor#FRAGMENT_SIDEBAR_TITLE");
+
+			PageEditor.waitForAutoSave();
+		}
+
+		if ("${hideHelpText}" == "true") {
+			Uncheck.uncheckToggleSwitch(
+				key_toggleSwitchLabel = "Show Help Text",
+				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
+
+			PageEditor.waitForAutoSave();
+		}
+		else if ("${hideHelpText}" == "false") {
+			Check.checkToggleSwitch(
+				key_toggleSwitchLabel = "Show Help Text",
+				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
+
+			PageEditor.waitForAutoSave();
+		}
+
+		if (isSet(helpText)) {
+			Type(
+				key_label = "Help Text",
+				locator1 = "TextArea#ANY_LABELED",
+				value1 = "${helpText}");
+
+			Click(
+				key_sidebarButton = "Browser",
+				locator1 = "PageEditor#FRAGMENT_SIDEBAR_TITLE");
+
+			PageEditor.waitForAutoSave();
+		}
+
+		if (isSet(placeholder)) {
+			Type(
+				key_text = "Placeholder",
+				locator1 = "TextInput#ANY",
+				value1 = "${placeholder}");
+
+			Click(
+				key_sidebarButton = "Browser",
+				locator1 = "PageEditor#FRAGMENT_SIDEBAR_TITLE");
+
+			PageEditor.waitForAutoSave();
+		}
+	}
+
 	macro editLayoutContainer {
 		if (isSet(position)) {
 			var index = "${position}";
@@ -3139,13 +3248,19 @@ definition {
 			var index = "1";
 		}
 
-		var class = selenium.getAttribute("xpath=(//div[@aria-label='${fragmentName}'])[${index}]@class");
+		var javascript = '''
+function getWebElement(locator) {
+  return document.evaluate(locator, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+}
 
-		var class = StringUtil.extractFirst("${class}", " page-editor__topper");
+return	Array.from(getWebElement("(//div[@aria-label='${fragmentName}'])[${index}]").classList).filter(className => className.includes('lfr-layout-structure-item'))[0];
+		''';
 
-		var class = StringUtil.extractLast("${class}", "lfr-layout-structure-item-topper-");
+		var className = selenium.getEval("${javascript}");
 
-		var commonStylesClass = StringUtil.add("lfr-layout-structure-item-", "${class}", "");
+		var className = StringUtil.extractLast("${className}", "lfr-layout-structure-item-topper-");
+
+		var commonStylesClass = StringUtil.add("lfr-layout-structure-item-", "${className}", "");
 
 		return "${commonStylesClass}";
 	}
@@ -3162,6 +3277,24 @@ definition {
 		var fileSize = StringUtil.extractDigits("${fileSize}");
 
 		return "${fileSize}";
+	}
+
+	macro getTopperStylesClass {
+		if (!(isSet(index))) {
+			var index = "1";
+		}
+
+		var javascript = '''
+function getWebElement(locator) {
+  return document.evaluate(locator, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+}
+
+return	Array.from(getWebElement("(//div[@aria-label='${fragmentName}'])[${index}]").classList).filter(className => className.includes('lfr-layout-structure-item'))[0];
+		''';
+
+		var topperStylesClass = selenium.getEval("${javascript}");
+
+		return "${topperStylesClass}";
 	}
 
 	macro getWidthOfSelectedImageResolution {
@@ -3402,6 +3535,12 @@ definition {
 			key_nodeName = "${fragmentName}",
 			locator1 = "Treeview#PAGE_STRUCTURE_TREE_NODE_HIDE_INDEX");
 
+		if ((IsElementPresent(locator1 = "Modal#BODY")) && (IsTextEqual(locator1 = "Modal#BODY", value1 = "This fragment contains a required form field or a submit element. Are you sure you want to hide it?"))) {
+			Click(
+				key_text = "Hide",
+				locator1 = "Modal#MODAL_FOOTER_BUTTON");
+		}
+
 		PageEditor.waitForAutoSave();
 	}
 
@@ -3479,6 +3618,24 @@ definition {
 		PageEditor.openExperienceMenu();
 
 		Click(locator1 = "PageEditor#EXPERIENCE_PRIORITIZE_BUTTON");
+	}
+
+	macro publish {
+		Button.click(button = "Publish");
+
+		if ((IsElementPresent(locator1 = "Modal#BODY")) && (IsTextEqual(locator1 = "Modal#HEADER", value1 = "Style Errors Detected"))) {
+			Modal.publish(
+				action = "${action}",
+				warningMessage = "Some of the fields have invalid values. If you continue publishing, the latest valid values will display.");
+		}
+		else if ((IsElementPresent(locator1 = "Modal#BODY")) && (IsTextEqual(locator1 = "Modal#HEADER", value1 = "Required Form Components"))) {
+			Modal.publish(
+				action = "${action}",
+				warningMessage = "This page contains one or several forms with missing or hidden form components. Are you sure you want to publish it?");
+		}
+		else {
+			Alert.viewSuccessMessage();
+		}
 	}
 
 	macro removeFragment {
@@ -4168,7 +4325,7 @@ definition {
 
 		var actualStyleValue = Css.getStyleValue(
 			className = "${commonStylesClass}",
-			id = "layout-common-styles",
+			cssSelector = "#layout-common-styles",
 			styleName = "${styleName}");
 
 		if (contains("${actualStyleValue}", "${styleValue}")) {
@@ -4512,6 +4669,24 @@ definition {
 				key_fragmentName = "${fragmentName}",
 				key_type = "${type}",
 				locator1 = "Fragment#FRAGMENT_CONFIGURATION_TYPE");
+		}
+	}
+
+	macro viewFragmentTopperStyle {
+		var topperStylesClass = PageEditor.getTopperStylesClass(
+			fragmentName = "${fragmentName}",
+			index = "${index}");
+
+		var actualStyleValue = Css.getStyleValue(
+			className = "${topperStylesClass}",
+			cssSelector = "#layout-common-styles",
+			styleName = "${styleName}");
+
+		if (contains("${topperStylesClass}", "${styleValue}")) {
+			echo("PASSED");
+		}
+		else {
+			TestUtils.fail(message = "FAILED: expected '${styleValue}', actual was '${actualStyleValue}'");
 		}
 	}
 

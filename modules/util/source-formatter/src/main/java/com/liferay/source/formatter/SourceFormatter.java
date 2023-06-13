@@ -38,6 +38,7 @@ import com.liferay.source.formatter.check.configuration.SuppressionsLoader;
 import com.liferay.source.formatter.check.util.SourceUtil;
 import com.liferay.source.formatter.processor.BNDRunSourceProcessor;
 import com.liferay.source.formatter.processor.BNDSourceProcessor;
+import com.liferay.source.formatter.processor.CETSourceProcessor;
 import com.liferay.source.formatter.processor.CQLSourceProcessor;
 import com.liferay.source.formatter.processor.CSSSourceProcessor;
 import com.liferay.source.formatter.processor.CodeownersSourceProcessor;
@@ -353,6 +354,8 @@ public class SourceFormatter {
 		_sourceProcessors.add(new XMLSourceProcessor());
 		_sourceProcessors.add(new YMLSourceProcessor());
 
+		_sourceProcessors.add(new CETSourceProcessor());
+
 		ExecutorService executorService = Executors.newFixedThreadPool(
 			_sourceProcessors.size());
 
@@ -555,6 +558,22 @@ public class SourceFormatter {
 				dependentFileNames = _addDependentFileName(
 					dependentFileNames, recentChangesFileName, "bnd.bnd");
 			}
+			else if (recentChangesFileName.endsWith(".java") &&
+					 recentChangesFileName.contains(
+						 "/modules/apps/client-extension/client-extension-" +
+							 "type-api/src/main/java/com/liferay/client" +
+								 "/extension/type/CET")) {
+
+				dependentFileNames.addAll(
+					SourceFormatterUtil.filterFileNames(
+						_allFileNames, new String[0],
+						new String[] {
+							"**/modules/apps/client-extension/client-" +
+								"extension-type-api/src/main/java/com/liferay" +
+									"/client/extension/type/CET*.java"
+						},
+						_sourceFormatterExcludes, false));
+			}
 			else if (recentChangesFileName.endsWith("ServiceImpl.java")) {
 				dependentFileNames = _addDependentFileName(
 					dependentFileNames, recentChangesFileName, "service.xml");
@@ -595,6 +614,13 @@ public class SourceFormatter {
 					_sourceFormatterArgs.getBaseDirName() +
 						"/portal-impl/src/com/liferay/portlet/social/util" +
 							"/SocialConfigurationImpl.java");
+			}
+			else if (_isFrontendPackageChanges(recentChangesFileName)) {
+				dependentFileNames.addAll(
+					SourceFormatterUtil.filterFileNames(
+						_allFileNames, new String[0],
+						new String[] {"**/package.json"},
+						_sourceFormatterExcludes, false));
 			}
 		}
 
@@ -1090,6 +1116,25 @@ public class SourceFormatter {
 		if (_sourceFormatterArgs.isShowDebugInformation()) {
 			DebugUtil.addCheckNames(CheckType.SOURCE_CHECK, _getCheckNames());
 		}
+	}
+
+	private boolean _isFrontendPackageChanges(String recentChangesFileName) {
+		if (recentChangesFileName.endsWith(
+				"/modules/apps/frontend-js/frontend-js-metal-web" +
+					"/package.json") ||
+			recentChangesFileName.endsWith(
+				"/modules/apps/frontend-js/frontend-js-react-web" +
+					"/package.json") ||
+			recentChangesFileName.endsWith(
+				"/modules/apps/frontend-js/frontend-js-spa-web/package.json") ||
+			recentChangesFileName.endsWith(
+				"/modules/apps/frontend-taglib/frontend-taglib-clay" +
+					"/package.json")) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private boolean _isSubrepository() throws Exception {

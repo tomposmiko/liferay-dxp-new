@@ -60,12 +60,17 @@ definition {
 
 		Portlet.addPG(portletName = "Documents and Media");
 
+		DMDocument.enableActionsMenuOnPortlet();
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
 		DMNavigator.gotoAddRepositoryPG();
 
 		DMRepository.edit(dmRepositoryName = "Sharepoint Repository Name");
 
 		DMRepository.addSharepoint(
 			dmRepositoryLibraryName = "Documents",
+			dmRepositoryLibraryPath = "Shared Documents",
 			dmRepositoryName = "Sharepoint",
 			dmRepositorySiteURL = "http://${sharepointVmHostName}",
 			dmServerVersion = "2013");
@@ -116,6 +121,8 @@ definition {
 	@priority = "4"
 	@refactorneeded
 	test ViewDocumentAsGuest {
+		property test.name.skip.portal.instance = "PGSharepoint2013#ViewDocumentAsGuest";
+
 		Navigator.gotoPage(pageName = "Documents and Media Page");
 
 		DMNavigator.gotoRepository(dmRepositoryName = "Sharepoint Repository Name");

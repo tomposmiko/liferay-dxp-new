@@ -6,7 +6,7 @@
 		<libraries>
 			<library>
 				<file-name>com.liferay.adaptive.media.image.impl.jar!metadata-extractor.jar</file-name>
-				<version>2.13.0</version>
+				<version>2.18.0</version>
 				<project-name>metadata-extractor</project-name>
 				<project-url>https://drewnoakes.com/code/exif/</project-url>
 				<licenses>
@@ -18,13 +18,13 @@
 			</library>
 			<library>
 				<file-name>com.liferay.adaptive.media.image.impl.jar!xmpcore.jar</file-name>
-				<version>6.0.6</version>
-				<project-name>XMP Library for Java</project-name>
-				<project-url>https://zerowing.corp.adobe.com/display/granite</project-url>
+				<version>6.1.11</version>
+				<project-name>Adobe XMPCore</project-name>
+				<project-url>https://www.adobe.com/devnet/xmp/library/eula-xmp-library-java.html</project-url>
 				<licenses>
 					<license>
-						<license-name>The BSD License</license-name>
-						<license-url>http://www.adobe.com/devnet/xmp/library/eula-xmp-library-java.html</license-url>
+						<license-name>The BSD 3-Clause License (BSD3)</license-name>
+						<license-url>https://opensource.org/licenses/BSD-3-Clause</license-url>
 					</license>
 				</licenses>
 			</library>
@@ -494,7 +494,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.commerce.payment.method.paypal.jar!json.jar</file-name>
-				<version>20180813</version>
+				<version>20220320</version>
 				<project-name>JSON in Java</project-name>
 				<project-url>https://github.com/douglascrockford/JSON-java</project-url>
 				<licenses>
@@ -2021,7 +2021,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.frontend.js.loader.modules.extender.jar!json.jar</file-name>
-				<version>20180813</version>
+				<version>20220320</version>
 				<project-name>JSON in Java</project-name>
 				<project-url>https://github.com/douglascrockford/JSON-java</project-url>
 				<licenses>
@@ -2081,7 +2081,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.imageio.plugins.jar!common-image.jar</file-name>
-				<version>3.3.2</version>
+				<version>3.8.2</version>
 				<project-name>TwelveMonkeys :: Common :: Image</project-name>
 				<licenses>
 					<license>
@@ -2092,7 +2092,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.imageio.plugins.jar!common-io.jar</file-name>
-				<version>3.3.2</version>
+				<version>3.8.2</version>
 				<project-name>TwelveMonkeys :: Common :: IO</project-name>
 				<licenses>
 					<license>
@@ -2103,7 +2103,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.imageio.plugins.jar!common-lang.jar</file-name>
-				<version>3.3.2</version>
+				<version>3.8.2</version>
 				<project-name>TwelveMonkeys :: Common :: Language support</project-name>
 				<licenses>
 					<license>
@@ -2114,7 +2114,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.imageio.plugins.jar!imageio-bmp.jar</file-name>
-				<version>3.4.3</version>
+				<version>3.8.2</version>
 				<project-name>TwelveMonkeys :: ImageIO :: BMP plugin</project-name>
 				<licenses>
 					<license>
@@ -2125,7 +2125,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.imageio.plugins.jar!imageio-core.jar</file-name>
-				<version>3.5</version>
+				<version>3.8.2</version>
 				<project-name>TwelveMonkeys :: ImageIO :: Core</project-name>
 				<licenses>
 					<license>
@@ -2136,7 +2136,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.imageio.plugins.jar!imageio-hdr.jar</file-name>
-				<version>3.5</version>
+				<version>3.8.2</version>
 				<project-name>TwelveMonkeys :: ImageIO :: HDR plugin</project-name>
 				<licenses>
 					<license>
@@ -2147,7 +2147,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.imageio.plugins.jar!imageio-icns.jar</file-name>
-				<version>3.5</version>
+				<version>3.8.2</version>
 				<project-name>TwelveMonkeys :: ImageIO :: ICNS plugin</project-name>
 				<licenses>
 					<license>
@@ -2158,7 +2158,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.imageio.plugins.jar!imageio-iff.jar</file-name>
-				<version>3.5</version>
+				<version>3.8.2</version>
 				<project-name>TwelveMonkeys :: ImageIO :: IFF plugin</project-name>
 				<licenses>
 					<license>
@@ -2169,7 +2169,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.imageio.plugins.jar!imageio-jpeg.jar</file-name>
-				<version>3.5</version>
+				<version>3.8.2</version>
 				<project-name>TwelveMonkeys :: ImageIO :: JPEG plugin</project-name>
 				<licenses>
 					<license>
@@ -2180,7 +2180,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.imageio.plugins.jar!imageio-metadata.jar</file-name>
-				<version>3.5</version>
+				<version>3.8.2</version>
 				<project-name>TwelveMonkeys :: ImageIO :: Metadata</project-name>
 				<licenses>
 					<license>
@@ -2191,7 +2191,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.imageio.plugins.jar!imageio-pcx.jar</file-name>
-				<version>3.5</version>
+				<version>3.8.2</version>
 				<project-name>TwelveMonkeys :: ImageIO :: PCX plugin</project-name>
 				<licenses>
 					<license>
@@ -2202,7 +2202,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.imageio.plugins.jar!imageio-pict.jar</file-name>
-				<version>3.5</version>
+				<version>3.8.2</version>
 				<project-name>TwelveMonkeys :: ImageIO :: PICT plugin</project-name>
 				<licenses>
 					<license>
@@ -2213,7 +2213,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.imageio.plugins.jar!imageio-pnm.jar</file-name>
-				<version>3.5</version>
+				<version>3.8.2</version>
 				<project-name>TwelveMonkeys :: ImageIO :: PNM plugin</project-name>
 				<licenses>
 					<license>
@@ -2224,7 +2224,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.imageio.plugins.jar!imageio-psd.jar</file-name>
-				<version>3.5</version>
+				<version>3.8.2</version>
 				<project-name>TwelveMonkeys :: ImageIO :: PSD plugin</project-name>
 				<licenses>
 					<license>
@@ -2235,7 +2235,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.imageio.plugins.jar!imageio-sgi.jar</file-name>
-				<version>3.5</version>
+				<version>3.8.2</version>
 				<project-name>TwelveMonkeys :: ImageIO :: SGI plugin</project-name>
 				<licenses>
 					<license>
@@ -2246,7 +2246,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.imageio.plugins.jar!imageio-tga.jar</file-name>
-				<version>3.5</version>
+				<version>3.8.2</version>
 				<project-name>TwelveMonkeys :: ImageIO :: TGA plugin</project-name>
 				<licenses>
 					<license>
@@ -2257,7 +2257,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.imageio.plugins.jar!imageio-thumbsdb.jar</file-name>
-				<version>3.5</version>
+				<version>3.8.2</version>
 				<project-name>TwelveMonkeys :: ImageIO :: Thumbs.db plugin</project-name>
 				<licenses>
 					<license>
@@ -2268,7 +2268,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.imageio.plugins.jar!imageio-tiff.jar</file-name>
-				<version>3.5</version>
+				<version>3.8.2</version>
 				<project-name>TwelveMonkeys :: ImageIO :: TIFF plugin</project-name>
 				<licenses>
 					<license>
@@ -2645,30 +2645,6 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>com.liferay.petra.doulos.jar!commons-lang3.jar</file-name>
-				<version>3.4</version>
-				<project-name>Apache Commons Lang</project-name>
-				<project-url>http://commons.apache.org/proper/commons-lang/</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License, Version 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>com.liferay.petra.doulos.jar!concurrentlinkedhashmap-lru.jar</file-name>
-				<version>1.4.2</version>
-				<project-name>ConcurrentLinkedHashMap</project-name>
-				<project-url>http://code.google.com/p/concurrentlinkedhashmap</project-url>
-				<licenses>
-					<license>
-						<license-name>The Apache Software License, Version 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
 				<file-name>com.liferay.petra.json.web.service.client.jar!commons-codec.jar</file-name>
 				<version>1.7</version>
 				<project-name>Commons Codec</project-name>
@@ -2881,7 +2857,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.portal.json.validator.jar!json.jar</file-name>
-				<version>20180813</version>
+				<version>20220320</version>
 				<project-name>JSON in Java</project-name>
 				<project-url>https://github.com/douglascrockford/JSON-java</project-url>
 				<licenses>
@@ -5008,7 +4984,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.portal.tika.jar!metadata-extractor.jar</file-name>
-				<version>2.13.0</version>
+				<version>2.18.0</version>
 				<project-name>metadata-extractor</project-name>
 				<project-url>https://drewnoakes.com/code/exif/</project-url>
 				<licenses>
@@ -5162,13 +5138,13 @@
 			</library>
 			<library>
 				<file-name>com.liferay.portal.tika.jar!xmpcore.jar</file-name>
-				<version>6.0.6</version>
-				<project-name>XMP Library for Java</project-name>
-				<project-url>https://zerowing.corp.adobe.com/display/granite</project-url>
+				<version>6.1.11</version>
+				<project-name>Adobe XMPCore</project-name>
+				<project-url>https://www.adobe.com/devnet/xmp/library/eula-xmp-library-java.html</project-url>
 				<licenses>
 					<license>
-						<license-name>The BSD License</license-name>
-						<license-url>http://www.adobe.com/devnet/xmp/library/eula-xmp-library-java.html</license-url>
+						<license-name>The BSD 3-Clause License (BSD3)</license-name>
+						<license-url>https://opensource.org/licenses/BSD-3-Clause</license-url>
 					</license>
 				</licenses>
 			</library>
@@ -5513,7 +5489,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.portal.workflow.kaleo.service.jar!json.jar</file-name>
-				<version>20180813</version>
+				<version>20220320</version>
 				<project-name>JSON in Java</project-name>
 				<project-url>https://github.com/douglascrockford/JSON-java</project-url>
 				<licenses>
@@ -5525,7 +5501,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.portal.workflow.kaleo.service.jar!org.jabsorb.jar</file-name>
-				<version>1.3.2.LIFERAY-PATCHED-1</version>
+				<version>1.3.2.LIFERAY-PATCHED-2</version>
 				<project-name>org.jabsorb</project-name>
 				<licenses>
 					<license>
@@ -5927,7 +5903,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.shared.dependencies.netty.jar!netty-buffer.jar</file-name>
-				<version>4.1.72.Final</version>
+				<version>4.1.77.Final</version>
 				<project-name>Netty/Buffer</project-name>
 				<project-url>https://netty.io/</project-url>
 				<licenses>
@@ -5939,7 +5915,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.shared.dependencies.netty.jar!netty-codec-http.jar</file-name>
-				<version>4.1.72.Final</version>
+				<version>4.1.77.Final</version>
 				<project-name>Netty/Codec/HTTP</project-name>
 				<project-url>https://netty.io/</project-url>
 				<licenses>
@@ -5951,7 +5927,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.shared.dependencies.netty.jar!netty-codec-http2.jar</file-name>
-				<version>4.1.72.Final</version>
+				<version>4.1.77.Final</version>
 				<project-name>Netty/Codec/HTTP2</project-name>
 				<project-url>https://netty.io/</project-url>
 				<licenses>
@@ -5963,7 +5939,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.shared.dependencies.netty.jar!netty-codec.jar</file-name>
-				<version>4.1.72.Final</version>
+				<version>4.1.77.Final</version>
 				<project-name>Netty/Codec</project-name>
 				<project-url>https://netty.io/</project-url>
 				<licenses>
@@ -5975,7 +5951,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.shared.dependencies.netty.jar!netty-common.jar</file-name>
-				<version>4.1.72.Final</version>
+				<version>4.1.77.Final</version>
 				<project-name>Netty/Common</project-name>
 				<project-url>https://netty.io/</project-url>
 				<licenses>
@@ -5987,7 +5963,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.shared.dependencies.netty.jar!netty-handler-proxy.jar</file-name>
-				<version>4.1.72.Final</version>
+				<version>4.1.77.Final</version>
 				<project-name>Netty/Handler/Proxy</project-name>
 				<project-url>https://netty.io/</project-url>
 				<licenses>
@@ -5999,7 +5975,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.shared.dependencies.netty.jar!netty-handler.jar</file-name>
-				<version>4.1.72.Final</version>
+				<version>4.1.77.Final</version>
 				<project-name>Netty/Handler</project-name>
 				<project-url>https://netty.io/</project-url>
 				<licenses>
@@ -6011,7 +5987,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.shared.dependencies.netty.jar!netty-resolver-dns.jar</file-name>
-				<version>4.1.72.Final</version>
+				<version>4.1.77.Final</version>
 				<project-name>Netty/Resolver/DNS</project-name>
 				<project-url>https://netty.io/</project-url>
 				<licenses>
@@ -6023,7 +5999,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.shared.dependencies.netty.jar!netty-resolver.jar</file-name>
-				<version>4.1.72.Final</version>
+				<version>4.1.77.Final</version>
 				<project-name>Netty/Resolver</project-name>
 				<project-url>https://netty.io/</project-url>
 				<licenses>
@@ -6035,7 +6011,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.shared.dependencies.netty.jar!netty-transport.jar</file-name>
-				<version>4.1.72.Final</version>
+				<version>4.1.77.Final</version>
 				<project-name>Netty/Transport</project-name>
 				<project-url>https://netty.io/</project-url>
 				<licenses>
@@ -7560,7 +7536,7 @@
 			</library>
 			<library>
 				<file-name>lib/portal/jabsorb.jar</file-name>
-				<version>1.3.2.LIFERAY-PATCHED-1</version>
+				<version>1.3.2.LIFERAY-PATCHED-2</version>
 				<project-name>jabsorb</project-name>
 				<project-url>http://jabsorb.org</project-url>
 				<licenses>
@@ -7597,7 +7573,7 @@
 			</library>
 			<library>
 				<file-name>lib/portal/jaxb-runtime.jar</file-name>
-				<version>2.3.1</version>
+				<version>2.3.1.LIFERAY-PATCHED-1</version>
 				<project-name>Java Architecture for XML Binding</project-name>
 				<project-url>https://javaee.github.io/jaxb-v2/</project-url>
 				<licenses>
@@ -7684,7 +7660,7 @@
 			</library>
 			<library>
 				<file-name>lib/portal/json-java.jar</file-name>
-				<version>20180813</version>
+				<version>20220320</version>
 				<project-name>JSON in Java</project-name>
 				<project-url>https://github.com/douglascrockford/JSON-java</project-url>
 				<licenses>

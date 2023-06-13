@@ -3221,6 +3221,13 @@ components:
                     items:
                         $ref: "#/components/schemas/CollectionViewport"
                     type: array
+                cssClasses:
+                    # @review
+                    description:
+                        A list of CSS Classes that are applied to the element.
+                    items:
+                        type: string
+                    type: array
                 displayAllItems:
                     # @review
                     description:
@@ -3433,6 +3440,13 @@ components:
             description:
                 Represent a definition of a Page form.
             properties:
+                cssClasses:
+                    # @review
+                    description:
+                        A list of CSS Classes that are applied to the element.
+                    items:
+                        type: string
+                    type: array
                 formConfig:
                     # @review
                     description:
@@ -3470,6 +3484,13 @@ components:
             description:
                 Represents a definition of a Page Fragment Instance.
             properties:
+                cssClasses:
+                    # @review
+                    description:
+                        A list of CSS Classes that are applied to the element.
+                    items:
+                        type: string
+                    type: array
                 fragment:
                     allOf:
                         - $ref: "#/components/schemas/Fragment"
@@ -3526,6 +3547,13 @@ components:
             description:
                 Represents a definition of a Page row.
             properties:
+                cssClasses:
+                    # @review
+                    description:
+                        A list of CSS Classes that are applied to the element.
+                    items:
+                        type: string
+                    type: array
                 fragmentStyle:
                     allOf:
                         - $ref: "#/components/schemas/FragmentStyle"
@@ -3640,6 +3668,13 @@ components:
                                 - $ref: "#/components/schemas/FragmentInlineValue"
                                 - $ref: "#/components/schemas/FragmentMappedValue"
                     type: object
+                cssClasses:
+                    # @review
+                    description:
+                        A list of CSS Classes that are applied to the element.
+                    items:
+                        type: string
+                    type: array
                 fragmentLink:
                     allOf:
                         - $ref: "#/components/schemas/FragmentLink"
@@ -3915,6 +3950,13 @@ components:
             description:
                 Represents a definition of a Page Widget instance.
             properties:
+                cssClasses:
+                    # @review
+                    description:
+                        A list of CSS Classes that are applied to the element.
+                    items:
+                        type: string
+                    type: array
                 fragmentStyle:
                     allOf:
                         - $ref: "#/components/schemas/FragmentStyle"
@@ -4659,6 +4701,11 @@ components:
                     description:
                         The folder's description.
                     type: string
+                externalReferenceCode:
+                    # @review
+                    description:
+                        The structured content folder's external reference code.
+                    type: string
                 id:
                     description:
                         The folder's ID.
@@ -5042,7 +5089,7 @@ components:
 info:
     description:
         "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID
-        'com.liferay.headless.delivery.client', and version '4.0.27'."
+        'com.liferay.headless.delivery.client', and version '4.0.28'."
     license:
         name: "Apache 2.0"
         url: "http://www.apache.org/licenses/LICENSE-2.0.html"
@@ -11971,6 +12018,83 @@ paths:
                   schema:
                       format: int64
                       type: integer
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/StructuredContentFolder"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/StructuredContentFolder"
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/StructuredContentFolder"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/StructuredContentFolder"
+            tags: ["StructuredContentFolder"]
+    "/sites/{siteId}/structured-content-folders/by-external-reference-code/{externalReferenceCode}":
+        delete:
+            operationId: deleteSiteStructuredContentFolderByExternalReferenceCode
+            parameters:
+                - in: path
+                  name: siteId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+                - in: path
+                  name: externalReferenceCode
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                204:
+                    content:
+                        application/json: {}
+                        application/xml: {}
+            tags: ["StructuredContentFolder"]
+        get:
+            operationId: getSiteStructuredContentFolderByExternalReferenceCode
+            parameters:
+                - in: path
+                  name: siteId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+                - in: path
+                  name: externalReferenceCode
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/StructuredContentFolder"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/StructuredContentFolder"
+            tags: ["StructuredContentFolder"]
+        put:
+            operationId: putSiteStructuredContentFolderByExternalReferenceCode
+            parameters:
+                - in: path
+                  name: siteId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+                - in: path
+                  name: externalReferenceCode
+                  required: true
+                  schema:
+                      type: string
             requestBody:
                 content:
                     application/json:

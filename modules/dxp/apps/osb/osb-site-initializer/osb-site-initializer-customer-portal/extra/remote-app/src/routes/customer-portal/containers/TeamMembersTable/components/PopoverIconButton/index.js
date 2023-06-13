@@ -13,9 +13,9 @@ import ClayButton from '@clayui/button';
 import ClayIcon from '@clayui/icon';
 import ClayPopover from '@clayui/popover';
 import i18n from '../../../../../../common/I18n';
-import {useApplicationProvider} from '../../../../../../common/context/AppPropertiesProvider';
+import {useAppPropertiesContext} from '../../../../../../common/contexts/AppPropertiesContext';
 const PopoverIconButton = ({alignPosition = 'bottom'}) => {
-	const {customerPortalRoles} = useApplicationProvider();
+	const {articleAccountSupportURL} = useAppPropertiesContext();
 
 	return (
 		<ClayPopover
@@ -37,7 +37,7 @@ const PopoverIconButton = ({alignPosition = 'bottom'}) => {
 				)}
 
 				<a
-					href={customerPortalRoles}
+					href={articleAccountSupportURL}
 					rel="noopener noreferrer"
 					target="_blank"
 				>

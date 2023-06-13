@@ -61,8 +61,9 @@ public class OAuthClientEntryLocalServiceImpl
 
 	@Override
 	public OAuthClientEntry addOAuthClientEntry(
-			long userId, String authServerWellKnownURI, String infoJSON,
-			String parametersJSON)
+			long userId, String authRequestParametersJSON,
+			String authServerWellKnownURI, String infoJSON,
+			String tokenRequestParametersJSON)
 		throws PortalException {
 
 		User user = _userLocalService.getUser(userId);
@@ -79,11 +80,18 @@ public class OAuthClientEntryLocalServiceImpl
 		_validateClientId(
 			0, user.getCompanyId(), authServerWellKnownURI, clientId);
 
-		if (Validator.isNull(parametersJSON)) {
-			parametersJSON = "{}";
+		if (Validator.isNull(authRequestParametersJSON)) {
+			authRequestParametersJSON = "{}";
 		}
 		else {
-			_validateParametersJSON(parametersJSON);
+			_validateParametersJSON(authRequestParametersJSON);
+		}
+
+		if (Validator.isNull(tokenRequestParametersJSON)) {
+			tokenRequestParametersJSON = "{}";
+		}
+		else {
+			_validateParametersJSON(tokenRequestParametersJSON);
 		}
 
 		OAuthClientEntry oAuthClientEntry = oAuthClientEntryPersistence.create(
@@ -92,10 +100,13 @@ public class OAuthClientEntryLocalServiceImpl
 		oAuthClientEntry.setCompanyId(user.getCompanyId());
 		oAuthClientEntry.setUserId(user.getUserId());
 		oAuthClientEntry.setUserName(user.getFullName());
+		oAuthClientEntry.setAuthRequestParametersJSON(
+			authRequestParametersJSON);
 		oAuthClientEntry.setAuthServerWellKnownURI(authServerWellKnownURI);
 		oAuthClientEntry.setClientId(clientId);
 		oAuthClientEntry.setInfoJSON(infoJSON);
-		oAuthClientEntry.setParametersJSON(parametersJSON);
+		oAuthClientEntry.setTokenRequestParametersJSON(
+			tokenRequestParametersJSON);
 
 		oAuthClientEntry = oAuthClientEntryPersistence.update(oAuthClientEntry);
 
@@ -194,8 +205,9 @@ public class OAuthClientEntryLocalServiceImpl
 
 	@Override
 	public OAuthClientEntry updateOAuthClientEntry(
-			long oAuthClientEntryId, String authServerWellKnownURI,
-			String infoJSON, String parametersJSON)
+			long oAuthClientEntryId, String authRequestParametersJSON,
+			String authServerWellKnownURI, String infoJSON,
+			String tokenRequestParametersJSON)
 		throws PortalException {
 
 		OAuthClientEntry oAuthClientEntry =
@@ -215,17 +227,27 @@ public class OAuthClientEntryLocalServiceImpl
 			oAuthClientEntryId, oAuthClientEntry.getCompanyId(),
 			authServerWellKnownURI, clientId);
 
-		if (Validator.isNull(parametersJSON)) {
-			parametersJSON = "{}";
+		if (Validator.isNull(authRequestParametersJSON)) {
+			authRequestParametersJSON = "{}";
 		}
 		else {
-			_validateParametersJSON(parametersJSON);
+			_validateParametersJSON(authRequestParametersJSON);
 		}
 
+		if (Validator.isNull(tokenRequestParametersJSON)) {
+			tokenRequestParametersJSON = "{}";
+		}
+		else {
+			_validateParametersJSON(tokenRequestParametersJSON);
+		}
+
+		oAuthClientEntry.setAuthRequestParametersJSON(
+			authRequestParametersJSON);
 		oAuthClientEntry.setAuthServerWellKnownURI(authServerWellKnownURI);
 		oAuthClientEntry.setClientId(clientId);
 		oAuthClientEntry.setInfoJSON(infoJSON);
-		oAuthClientEntry.setParametersJSON(parametersJSON);
+		oAuthClientEntry.setTokenRequestParametersJSON(
+			tokenRequestParametersJSON);
 
 		return oAuthClientEntryPersistence.update(oAuthClientEntry);
 	}

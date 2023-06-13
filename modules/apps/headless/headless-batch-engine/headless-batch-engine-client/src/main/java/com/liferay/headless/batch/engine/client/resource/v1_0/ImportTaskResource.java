@@ -172,6 +172,12 @@ public interface ImportTaskResource {
 			return new ImportTaskResourceImpl(this);
 		}
 
+		public Builder contextPath(String contextPath) {
+			_contextPath = contextPath;
+
+			return this;
+		}
+
 		public Builder endpoint(String host, int port, String scheme) {
 			_host = host;
 			_port = port;
@@ -217,6 +223,7 @@ public interface ImportTaskResource {
 		private Builder() {
 		}
 
+		private String _contextPath = "";
 		private Map<String, String> _headers = new LinkedHashMap<>();
 		private String _host = "localhost";
 		private Locale _locale;
@@ -303,7 +310,7 @@ public interface ImportTaskResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port +
+					_builder._port + _builder._contextPath +
 						"/o/headless-batch-engine/v1.0/import-task/by-external-reference-code/{externalReferenceCode}");
 
 			httpInvoker.path("externalReferenceCode", externalReferenceCode);
@@ -376,7 +383,7 @@ public interface ImportTaskResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port +
+					_builder._port + _builder._contextPath +
 						"/o/headless-batch-engine/v1.0/import-task/by-external-reference-code/{externalReferenceCode}/content");
 
 			httpInvoker.path("externalReferenceCode", externalReferenceCode);
@@ -449,7 +456,7 @@ public interface ImportTaskResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port +
+					_builder._port + _builder._contextPath +
 						"/o/headless-batch-engine/v1.0/import-task/by-external-reference-code/{externalReferenceCode}/failed-items/report");
 
 			httpInvoker.path("externalReferenceCode", externalReferenceCode);
@@ -561,7 +568,7 @@ public interface ImportTaskResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port +
+					_builder._port + _builder._contextPath +
 						"/o/headless-batch-engine/v1.0/import-task/{className}");
 
 			httpInvoker.path("className", className);
@@ -682,7 +689,7 @@ public interface ImportTaskResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port +
+					_builder._port + _builder._contextPath +
 						"/o/headless-batch-engine/v1.0/import-task/{className}");
 
 			httpInvoker.path("className", className);
@@ -805,7 +812,7 @@ public interface ImportTaskResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port +
+					_builder._port + _builder._contextPath +
 						"/o/headless-batch-engine/v1.0/import-task/{className}");
 
 			httpInvoker.path("className", className);
@@ -936,7 +943,7 @@ public interface ImportTaskResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port +
+					_builder._port + _builder._contextPath +
 						"/o/headless-batch-engine/v1.0/import-task/{className}");
 
 			httpInvoker.path("className", className);
@@ -1054,7 +1061,7 @@ public interface ImportTaskResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port +
+					_builder._port + _builder._contextPath +
 						"/o/headless-batch-engine/v1.0/import-task/{className}");
 
 			httpInvoker.path("className", className);
@@ -1180,7 +1187,7 @@ public interface ImportTaskResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port +
+					_builder._port + _builder._contextPath +
 						"/o/headless-batch-engine/v1.0/import-task/{className}");
 
 			httpInvoker.path("className", className);
@@ -1259,7 +1266,7 @@ public interface ImportTaskResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port +
+					_builder._port + _builder._contextPath +
 						"/o/headless-batch-engine/v1.0/import-task/{importTaskId}");
 
 			httpInvoker.path("importTaskId", importTaskId);
@@ -1327,7 +1334,7 @@ public interface ImportTaskResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port +
+					_builder._port + _builder._contextPath +
 						"/o/headless-batch-engine/v1.0/import-task/{importTaskId}/content");
 
 			httpInvoker.path("importTaskId", importTaskId);
@@ -1397,7 +1404,7 @@ public interface ImportTaskResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port +
+					_builder._port + _builder._contextPath +
 						"/o/headless-batch-engine/v1.0/import-task/{importTaskId}/failed-items/report");
 
 			httpInvoker.path("importTaskId", importTaskId);

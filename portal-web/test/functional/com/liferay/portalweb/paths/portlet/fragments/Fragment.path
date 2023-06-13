@@ -138,6 +138,24 @@
 	<td></td>
 </tr>
 
+<!--FORM COMPONENTS-->
+
+<tr>
+	<td>INPUT_LABEL</td>
+	<td>xpath=(//div[contains(@id,'fragment-')]//div[contains(@class,'form')]//label[contains(@for,'${type}')][normalize-space()='${fieldLabel}'])[${index}]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>INPUT_LABEL_INVISIBLE</td>
+	<td>xpath=(//div[contains(@id,'fragment-')]//div[contains(@class,'form')]//label[contains(@for,'${type}')])[${index}]//span[contains(@class,'sr-only')][normalize-space(text())='${fieldLabel}'] | (//div[contains(@id,'fragment-')]//div[contains(@class,'form')]//label[contains(@for,'${type}')][contains(@class,'sr-only')][normalize-space(text())='${fieldLabel}'])[${index}]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>INPUT_HELP_TEXT</td>
+	<td>xpath=(//div[contains(@id,'fragment-')]//div[contains(@class,'form')]//p[contains(@id,'${type}-help-text')])[${index}]</td>
+	<td></td>
+</tr>
+
 <!--FRAGMENT_COMMENT-->
 
 <tr>

@@ -14,6 +14,9 @@
 
 package com.liferay.object.service.impl;
 
+import com.liferay.asset.kernel.service.AssetCategoryLocalService;
+import com.liferay.asset.kernel.service.AssetTagLocalService;
+import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.layout.model.LayoutClassedModelUsage;
 import com.liferay.layout.service.LayoutClassedModelUsageLocalService;
@@ -21,6 +24,7 @@ import com.liferay.list.type.service.ListTypeEntryLocalService;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.deployer.ObjectDefinitionDeployer;
 import com.liferay.object.exception.NoSuchObjectFieldException;
+import com.liferay.object.exception.ObjectDefinitionAccountEntryRestrictedObjectFieldIdException;
 import com.liferay.object.exception.ObjectDefinitionActiveException;
 import com.liferay.object.exception.ObjectDefinitionLabelException;
 import com.liferay.object.exception.ObjectDefinitionNameException;
@@ -81,6 +85,7 @@ import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.service.ResourceLocalService;
@@ -486,8 +491,8 @@ public class ObjectDefinitionLocalServiceImpl
 			throw new ObjectDefinitionStatusException();
 		}
 
-		int count = _objectFieldPersistence.countByObjectDefinitionId(
-			objectDefinition.getObjectDefinitionId());
+		int count = _objectFieldPersistence.countByODI_S(
+			objectDefinition.getObjectDefinitionId(), false);
 
 		if (count == 0) {
 			throw new RequiredObjectFieldException();
@@ -516,13 +521,15 @@ public class ObjectDefinitionLocalServiceImpl
 
 		_addingObjectDefinitionDeployer(
 			new ObjectDefinitionDeployerImpl(
-				_bundleContext, _dynamicQueryBatchIndexingActionableFactory,
+				_assetCategoryLocalService, _assetTagLocalService,
+				_assetVocabularyLocalService, _bundleContext,
+				_dynamicQueryBatchIndexingActionableFactory, _groupLocalService,
 				_listTypeEntryLocalService, _modelSearchRegistrarHelper, this,
 				_objectEntryLocalService, _objectFieldLocalService,
-				_objectRelationshipLocalService, _objectScopeProviderRegistry,
-				_objectViewLocalService, _persistedModelLocalServiceRegistry,
-				_resourceActions, _userLocalService,
-				_workflowStatusModelPreFilterContributor));
+				_objectLayoutLocalService, _objectRelationshipLocalService,
+				_objectScopeProviderRegistry, _objectViewLocalService,
+				_persistedModelLocalServiceRegistry, _resourceActions,
+				_userLocalService, _workflowStatusModelPreFilterContributor));
 
 		_objectDefinitionDeployerServiceTracker = new ServiceTracker<>(
 			_bundleContext, ObjectDefinitionDeployer.class,
@@ -803,7 +810,7 @@ public class ObjectDefinitionLocalServiceImpl
 
 		if (objectFields != null) {
 			for (ObjectField objectField : objectFields) {
-				if (system) {
+				if (system || objectField.isSystem()) {
 					_objectFieldLocalService.addSystemObjectField(
 						userId, objectDefinition.getObjectDefinitionId(),
 						objectField.getBusinessType(),
@@ -1004,11 +1011,26 @@ public class ObjectDefinitionLocalServiceImpl
 
 		boolean originalActive = objectDefinition.isActive();
 
+		_validateAccountEntryRestrictedObjectFieldId(
+			accountEntryRestrictedObjectFieldId, accountEntryRestricted);
 		_validateObjectFieldId(objectDefinition, descriptionObjectFieldId);
 		_validateObjectFieldId(objectDefinition, titleObjectFieldId);
 		_validateActive(objectDefinition, active);
 		_validateLabel(labelMap);
 		_validatePluralLabel(pluralLabelMap);
+
+		if (objectDefinition.getAccountEntryRestrictedObjectFieldId() != 0) {
+			_objectFieldLocalService.updateRequired(
+				objectDefinition.getAccountEntryRestrictedObjectFieldId(),
+				false);
+		}
+
+		if (accountEntryRestricted &&
+			(accountEntryRestrictedObjectFieldId > 0)) {
+
+			_objectFieldLocalService.updateRequired(
+				accountEntryRestrictedObjectFieldId, true);
+		}
 
 		objectDefinition.setAccountEntryRestrictedObjectFieldId(
 			accountEntryRestrictedObjectFieldId);
@@ -1109,6 +1131,18 @@ public class ObjectDefinitionLocalServiceImpl
 			});
 
 		actionableDynamicQuery.performActions();
+	}
+
+	private void _validateAccountEntryRestrictedObjectFieldId(
+			long accountEntryRestrictedObjectFieldId,
+			boolean accountEntryRestricted)
+		throws ObjectDefinitionAccountEntryRestrictedObjectFieldIdException {
+
+		if (accountEntryRestricted &&
+			(accountEntryRestrictedObjectFieldId == 0)) {
+
+			throw new ObjectDefinitionAccountEntryRestrictedObjectFieldIdException();
+		}
 	}
 
 	private void _validateActive(
@@ -1277,6 +1311,15 @@ public class ObjectDefinitionLocalServiceImpl
 			ObjectDefinitionLocalServiceUtil.class, "undeployObjectDefinition",
 			ObjectDefinition.class);
 
+	@Reference
+	private AssetCategoryLocalService _assetCategoryLocalService;
+
+	@Reference
+	private AssetTagLocalService _assetTagLocalService;
+
+	@Reference
+	private AssetVocabularyLocalService _assetVocabularyLocalService;
+
 	private BundleContext _bundleContext;
 
 	@Reference
@@ -1285,6 +1328,9 @@ public class ObjectDefinitionLocalServiceImpl
 	@Reference
 	private DynamicQueryBatchIndexingActionableFactory
 		_dynamicQueryBatchIndexingActionableFactory;
+
+	@Reference
+	private GroupLocalService _groupLocalService;
 
 	@Reference
 	private LayoutClassedModelUsageLocalService

@@ -18,8 +18,10 @@ import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.dto.v1_0.Status;
+import com.liferay.object.rest.dto.v1_0.util.CreatorUtil;
+import com.liferay.object.rest.manager.v1_0.BaseObjectEntryManager;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
-import com.liferay.object.storage.salesforce.internal.client.SalesforceClient;
+import com.liferay.object.storage.salesforce.internal.http.SalesforceHttp;
 import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -28,8 +30,10 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
+import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.aggregation.Aggregation;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
@@ -42,6 +46,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -54,7 +59,8 @@ import org.osgi.service.component.annotations.Reference;
 	property = "object.entry.manager.storage.type=" + ObjectDefinitionConstants.STORAGE_TYPE_SALESFORCE,
 	service = ObjectEntryManager.class
 )
-public class SalesforceObjectEntryManagerImpl implements ObjectEntryManager {
+public class SalesforceObjectEntryManagerImpl
+	extends BaseObjectEntryManager implements ObjectEntryManager {
 
 	@Override
 	public ObjectEntry addObjectEntry(
@@ -115,20 +121,39 @@ public class SalesforceObjectEntryManagerImpl implements ObjectEntryManager {
 			Filter filter, Pagination pagination, String search, Sort[] sorts)
 		throws Exception {
 
-		JSONObject responseJSONObject = _salesforceClient.query(
-			"SELECT FIELDS(ALL) FROM " +
-				_getSalesforceObjectName(objectDefinition.getName()) +
-					_getSalesforcePagination(pagination));
+		JSONObject responseJSONObject1 = _salesforceHttp.get(
+			companyId, getGroupId(objectDefinition, scopeKey),
+			HttpComponentsUtil.addParameter(
+				"query", "q",
+				StringBundler.concat(
+					"SELECT FIELDS(ALL) FROM ",
+					_getSalesforceObjectName(objectDefinition.getName()),
+					_getSalesforcePagination(pagination))));
 
-		if ((responseJSONObject == null) ||
-			(responseJSONObject.length() == 0)) {
+		if ((responseJSONObject1 == null) ||
+			(responseJSONObject1.length() == 0)) {
 
 			return Page.of(Collections.emptyList());
 		}
 
+		JSONObject responseJSONObject2 = _salesforceHttp.get(
+			companyId, getGroupId(objectDefinition, scopeKey),
+			HttpComponentsUtil.addParameter(
+				"query", "q",
+				"SELECT COUNT(Id) FROM " +
+					_getSalesforceObjectName(objectDefinition.getName())));
+
+		JSONArray jsonArray = responseJSONObject2.getJSONArray("records");
+
 		return Page.of(
-			_toObjectEntries(responseJSONObject.getJSONArray("records")),
-			pagination, responseJSONObject.getInt("totalSize"));
+			_toObjectEntries(
+				companyId, responseJSONObject1.getJSONArray("records")),
+			pagination,
+			jsonArray.getJSONObject(
+				0
+			).getInt(
+				"expr0"
+			));
 	}
 
 	@Override
@@ -169,7 +194,14 @@ public class SalesforceObjectEntryManagerImpl implements ObjectEntryManager {
 			ObjectDefinition objectDefinition, String scopeKey)
 		throws Exception {
 
-		return null;
+		return _toObjectEntry(
+			companyId, _getDateFormat(),
+			_salesforceHttp.get(
+				companyId, getGroupId(objectDefinition, scopeKey),
+				StringBundler.concat(
+					"sobjects/",
+					_getSalesforceObjectName(objectDefinition.getName()), "/",
+					externalReferenceCode)));
 	}
 
 	@Override
@@ -192,6 +224,10 @@ public class SalesforceObjectEntryManagerImpl implements ObjectEntryManager {
 		return null;
 	}
 
+	private DateFormat _getDateFormat() {
+		return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+	}
+
 	private String _getSalesforceObjectName(String objectDefinitionName) {
 		return StringUtil.removeFirst(objectDefinitionName, "C_") + "__c";
 	}
@@ -202,27 +238,32 @@ public class SalesforceObjectEntryManagerImpl implements ObjectEntryManager {
 			pagination.getStartPosition());
 	}
 
-	private List<ObjectEntry> _toObjectEntries(JSONArray jsonArray)
+	private List<ObjectEntry> _toObjectEntries(
+			long companyId, JSONArray jsonArray)
 		throws Exception {
 
-		DateFormat dateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-
 		return JSONUtil.toList(
-			jsonArray, jsonObject -> _toObjectEntry(dateFormat, jsonObject));
+			jsonArray,
+			jsonObject -> _toObjectEntry(
+				companyId, _getDateFormat(), jsonObject));
 	}
 
 	private ObjectEntry _toObjectEntry(
-			DateFormat dateFormat, JSONObject jsonObject)
+			long companyId, DateFormat dateFormat, JSONObject jsonObject)
 		throws Exception {
 
 		ObjectEntry objectEntry = new ObjectEntry() {
 			{
 				actions = Collections.emptyMap();
+				creator = CreatorUtil.toCreator(
+					_portal, Optional.empty(),
+					_userLocalService.fetchUserByExternalReferenceCode(
+						companyId, jsonObject.getString("OwnerId")));
 				dateCreated = dateFormat.parse(
 					jsonObject.getString("CreatedDate"));
 				dateModified = dateFormat.parse(
 					jsonObject.getString("LastModifiedDate"));
+				externalReferenceCode = jsonObject.getString("Id");
 				status = new Status() {
 					{
 						code = 0;
@@ -238,12 +279,7 @@ public class SalesforceObjectEntryManagerImpl implements ObjectEntryManager {
 		while (iterator.hasNext()) {
 			String key = iterator.next();
 
-			if (key.equals("Id")) {
-				objectEntry.setExternalReferenceCode(jsonObject.getString(key));
-			}
-			else if (StringUtil.contains(key, "__c", StringPool.BLANK) &&
-					 Validator.isNotNull(jsonObject.get(key))) {
-
+			if (StringUtil.contains(key, "__c", StringPool.BLANK)) {
 				String customFieldName = StringUtil.removeLast(key, "__c");
 
 				customFieldName = StringUtil.removeSubstring(
@@ -254,7 +290,9 @@ public class SalesforceObjectEntryManagerImpl implements ObjectEntryManager {
 
 				Map<String, Object> properties = objectEntry.getProperties();
 
-				properties.put(customFieldName, jsonObject.get(key));
+				properties.put(
+					customFieldName,
+					jsonObject.isNull(key) ? null : jsonObject.get(key));
 			}
 		}
 
@@ -262,6 +300,12 @@ public class SalesforceObjectEntryManagerImpl implements ObjectEntryManager {
 	}
 
 	@Reference
-	private SalesforceClient _salesforceClient;
+	private Portal _portal;
+
+	@Reference
+	private SalesforceHttp _salesforceHttp;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }

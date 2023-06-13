@@ -45,6 +45,7 @@ import com.liferay.asset.publisher.web.internal.helper.AssetPublisherWebHelper;
 import com.liferay.asset.publisher.web.internal.util.AssetPublisherCustomizer;
 import com.liferay.asset.util.AssetHelper;
 import com.liferay.asset.util.AssetPublisherAddItemHolder;
+import com.liferay.asset.util.LinkedAssetEntryIdsUtil;
 import com.liferay.document.library.kernel.document.conversion.DocumentConversionUtil;
 import com.liferay.info.collection.provider.CollectionQuery;
 import com.liferay.info.collection.provider.InfoCollectionProvider;
@@ -1886,25 +1887,32 @@ public class AssetPublisherDisplayContext {
 	public void setLayoutAssetEntry(AssetEntry assetEntry)
 		throws PortalException {
 
-		if (_httpServletRequest.getAttribute(WebKeys.LAYOUT_ASSET_ENTRY) !=
-				null) {
-
-			return;
-		}
-
 		String defaultAssetPublisherPortletId =
 			_assetPublisherWebHelper.getDefaultAssetPublisherId(
 				_themeDisplay.getLayout());
 
-		if (isDefaultAssetPublisher() ||
-			Validator.isNull(defaultAssetPublisherPortletId) ||
-			!PortletPermissionUtil.contains(
+		if (!isDefaultAssetPublisher() &&
+			Validator.isNotNull(defaultAssetPublisherPortletId) &&
+			PortletPermissionUtil.contains(
 				_themeDisplay.getPermissionChecker(), _themeDisplay.getLayout(),
 				defaultAssetPublisherPortletId, ActionKeys.VIEW)) {
+
+			return;
+		}
+
+		if (_httpServletRequest.getAttribute(WebKeys.LAYOUT_ASSET_ENTRY) ==
+				null) {
 
 			_httpServletRequest.setAttribute(
 				WebKeys.LAYOUT_ASSET_ENTRY, assetEntry);
 		}
+
+		if (assetEntry == null) {
+			return;
+		}
+
+		LinkedAssetEntryIdsUtil.addLinkedAssetEntryId(
+			_httpServletRequest, assetEntry.getEntryId());
 	}
 
 	public void setPageKeywords() {

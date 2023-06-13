@@ -14,7 +14,6 @@
 
 package com.liferay.fragment.entry.processor.freemarker;
 
-import com.liferay.fragment.constants.FragmentConstants;
 import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
 import com.liferay.fragment.entry.processor.freemarker.internal.configuration.FreeMarkerFragmentEntryProcessorConfiguration;
 import com.liferay.fragment.entry.processor.freemarker.internal.templateparser.InputTemplateNode;
@@ -23,11 +22,15 @@ import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.processor.FragmentEntryProcessor;
 import com.liferay.fragment.processor.FragmentEntryProcessorContext;
+import com.liferay.fragment.renderer.FragmentRenderer;
+import com.liferay.fragment.renderer.FragmentRendererTracker;
 import com.liferay.fragment.service.FragmentEntryLocalService;
 import com.liferay.fragment.util.configuration.FragmentConfigurationField;
 import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
+import com.liferay.info.exception.InfoFormValidationException;
 import com.liferay.info.field.InfoField;
 import com.liferay.info.field.type.InfoFieldType;
+import com.liferay.info.field.type.NumberInfoFieldType;
 import com.liferay.info.field.type.SelectInfoFieldType;
 import com.liferay.info.form.InfoForm;
 import com.liferay.petra.io.DummyWriter;
@@ -43,6 +46,7 @@ import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.servlet.DummyHttpServletResponse;
+import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.template.StringTemplateResource;
 import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.template.TemplateConstants;
@@ -60,6 +64,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -153,6 +158,13 @@ public class FreeMarkerFragmentEntryProcessor
 			).put(
 				"fragmentEntryLinkNamespace", fragmentEntryLink.getNamespace()
 			).put(
+				"input",
+				_toInputTemplateNode(
+					fragmentEntryLink,
+					fragmentEntryProcessorContext.getHttpServletRequest(),
+					fragmentEntryProcessorContext.getInfoFormOptional(),
+					fragmentEntryProcessorContext.getLocale())
+			).put(
 				"layoutMode",
 				_getLayoutMode(
 					fragmentEntryProcessorContext.getHttpServletRequest())
@@ -162,15 +174,6 @@ public class FreeMarkerFragmentEntryProcessor
 					fragmentEntryLink.getConfiguration(),
 					fragmentEntryProcessorContext.getSegmentsEntryIds())
 			).build());
-
-		if (_isInputFragmentEntryType(fragmentEntryLink)) {
-			template.put(
-				"input",
-				_toInputTemplateNode(
-					fragmentEntryLink,
-					fragmentEntryProcessorContext.getInfoFormOptional(),
-					fragmentEntryProcessorContext.getLocale()));
-		}
 
 		template.prepareTaglib(
 			fragmentEntryProcessorContext.getHttpServletRequest(),
@@ -243,6 +246,7 @@ public class FreeMarkerFragmentEntryProcessor
 					).put(
 						"input",
 						new InputTemplateNode(
+							StringPool.BLANK, StringPool.BLANK,
 							StringPool.BLANK, StringPool.BLANK, "name", false,
 							false, false, "type", "value")
 					).put(
@@ -264,6 +268,44 @@ public class FreeMarkerFragmentEntryProcessor
 			throw new FragmentEntryContentException(
 				_getMessage(templateException), templateException);
 		}
+	}
+
+	private String _getFragmentEntryName(
+		FragmentEntryLink fragmentEntryLink, Locale locale) {
+
+		FragmentEntry fragmentEntry =
+			_fragmentEntryLocalService.fetchFragmentEntry(
+				fragmentEntryLink.getFragmentEntryId());
+
+		if (fragmentEntry != null) {
+			return fragmentEntry.getName();
+		}
+
+		String rendererKey = fragmentEntryLink.getRendererKey();
+
+		if (Validator.isNull(rendererKey)) {
+			return StringPool.BLANK;
+		}
+
+		Map<String, FragmentEntry> fragmentEntries =
+			_fragmentCollectionContributorTracker.getFragmentEntries(locale);
+
+		FragmentEntry contributedFragmentEntry = fragmentEntries.get(
+			rendererKey);
+
+		if (contributedFragmentEntry != null) {
+			return contributedFragmentEntry.getName();
+		}
+
+		FragmentRenderer fragmentRenderer =
+			_fragmentRendererTracker.getFragmentRenderer(
+				fragmentEntryLink.getRendererKey());
+
+		if (fragmentRenderer != null) {
+			return fragmentRenderer.getLabel(locale);
+		}
+
+		return StringPool.BLANK;
 	}
 
 	private String _getLayoutMode(HttpServletRequest httpServletRequest) {
@@ -298,34 +340,14 @@ public class FreeMarkerFragmentEntryProcessor
 		return false;
 	}
 
-	private boolean _isInputFragmentEntryType(
-		FragmentEntryLink fragmentEntryLink) {
-
-		FragmentEntry fragmentEntry = null;
-
-		if (Validator.isNotNull(fragmentEntryLink.getRendererKey())) {
-			fragmentEntry =
-				_fragmentCollectionContributorTracker.getFragmentEntry(
-					fragmentEntryLink.getRendererKey());
-		}
-
-		if (fragmentEntry == null) {
-			fragmentEntry = _fragmentEntryLocalService.fetchFragmentEntry(
-				fragmentEntryLink.getFragmentEntryId());
-		}
-
-		if ((fragmentEntry != null) &&
-			(fragmentEntry.getType() == FragmentConstants.TYPE_INPUT)) {
-
-			return true;
-		}
-
-		return false;
-	}
-
 	private InputTemplateNode _toInputTemplateNode(
 		FragmentEntryLink fragmentEntryLink,
+		HttpServletRequest httpServletRequest,
 		Optional<InfoForm> infoFormOptional, Locale locale) {
+
+		String dataType = StringPool.BLANK;
+
+		String errorMessage = StringPool.BLANK;
 
 		InfoField infoField = null;
 
@@ -342,18 +364,31 @@ public class FreeMarkerFragmentEntryProcessor
 			infoField = infoForm.getInfoField(fieldName);
 		}
 
+		if ((infoField != null) &&
+			SessionErrors.contains(
+				httpServletRequest, infoField.getUniqueId())) {
+
+			InfoFormValidationException infoFormValidationException =
+				(InfoFormValidationException)SessionErrors.get(
+					httpServletRequest, infoField.getUniqueId());
+
+			errorMessage = infoFormValidationException.getLocalizedMessage(
+				locale);
+		}
+
 		String inputHelpText = GetterUtil.getString(
 			_fragmentEntryConfigurationParser.getFieldValue(
 				fragmentEntryLink.getEditableValues(),
 				new FragmentConfigurationField(
 					"inputHelpText", "string", "", true, "text"),
 				locale));
-
 		String inputLabel = GetterUtil.getString(
 			_fragmentEntryConfigurationParser.getFieldValue(
 				fragmentEntryLink.getEditableValues(),
 				new FragmentConfigurationField(
-					"inputLabel", "string", StringPool.BLANK, true, "text"),
+					"inputLabel", "string",
+					_getFragmentEntryName(fragmentEntryLink, locale), true,
+					"text"),
 				locale));
 
 		String name = "name";
@@ -364,14 +399,14 @@ public class FreeMarkerFragmentEntryProcessor
 
 		boolean required = false;
 
-		boolean inputRequired = GetterUtil.getBoolean(
-			_fragmentEntryConfigurationParser.getFieldValue(
-				fragmentEntryLink.getEditableValues(),
-				new FragmentConfigurationField(
-					"inputRequired", "boolean", "false", false, "checkbox"),
-				locale));
+		if (((infoField != null) && infoField.isRequired()) ||
+			GetterUtil.getBoolean(
+				_fragmentEntryConfigurationParser.getFieldValue(
+					fragmentEntryLink.getEditableValues(),
+					new FragmentConfigurationField(
+						"inputRequired", "boolean", "false", false, "checkbox"),
+					locale))) {
 
-		if (((infoField != null) && infoField.isRequired()) || inputRequired) {
 			required = true;
 		}
 
@@ -395,11 +430,24 @@ public class FreeMarkerFragmentEntryProcessor
 			InfoFieldType infoFieldType = infoField.getInfoFieldType();
 
 			type = infoFieldType.getName();
+
+			if (infoFieldType instanceof NumberInfoFieldType) {
+				dataType = "integer";
+
+				Optional<Boolean> decimalOptional =
+					infoField.getAttributeOptional(NumberInfoFieldType.DECIMAL);
+
+				boolean decimal = decimalOptional.orElse(false);
+
+				if (decimal) {
+					dataType = "decimal";
+				}
+			}
 		}
 
 		InputTemplateNode inputTemplateNode = new InputTemplateNode(
-			inputHelpText, inputLabel, name, required, inputShowHelpText,
-			inputShowLabel, type, "value");
+			dataType, errorMessage, inputHelpText, inputLabel, name, required,
+			inputShowHelpText, inputShowLabel, type, "value");
 
 		if ((infoField != null) &&
 			(infoField.getInfoFieldType() == SelectInfoFieldType.INSTANCE)) {
@@ -434,6 +482,9 @@ public class FreeMarkerFragmentEntryProcessor
 
 	@Reference
 	private FragmentEntryLocalService _fragmentEntryLocalService;
+
+	@Reference
+	private FragmentRendererTracker _fragmentRendererTracker;
 
 	@Reference
 	private Portal _portal;

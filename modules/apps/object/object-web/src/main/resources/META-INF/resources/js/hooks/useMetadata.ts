@@ -18,7 +18,10 @@ import {useMemo} from 'react';
 import {METADATA} from '../components/ObjectView/context';
 import {defaultLanguageId} from '../utils/locale';
 
-export default function useMetadata(elementList: SidebarCategory[]) {
+export default function useMetadata(
+	elementList: SidebarCategory[],
+	ffUseMetadataAsSystemFields: boolean
+) {
 	return useMemo(() => {
 		if (!elementList || elementList.length === 0) {
 			return [] as SidebarCategory[];
@@ -27,14 +30,16 @@ export default function useMetadata(elementList: SidebarCategory[]) {
 		const [first, ...others] = elementList;
 		const items = [...first.items];
 
-		METADATA.forEach(({label, name}) => {
-			items.push({
-				content: name,
-				label: label[defaultLanguageId],
-				tooltip: '',
+		if (!ffUseMetadataAsSystemFields) {
+			METADATA.forEach(({label, name}) => {
+				items.push({
+					content: name,
+					label: label[defaultLanguageId],
+					tooltip: '',
+				});
 			});
-		});
+		}
 
 		return [{...first, items}, ...others];
-	}, [elementList]);
+	}, [ffUseMetadataAsSystemFields, elementList]);
 }

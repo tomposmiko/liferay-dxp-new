@@ -60,6 +60,7 @@ interface ObjectField {
 	relationshipType?: unknown;
 	required: boolean;
 	state: boolean;
+	system?: boolean;
 }
 
 interface ObjectFieldSetting {
@@ -82,6 +83,7 @@ interface ObjectValidation {
 	engine: string;
 	engineLabel: string;
 	errorLabel: LocalizedValue<string>;
+	ffUseMetadataAsSystemFields?: boolean;
 	id: number;
 	name: LocalizedValue<string>;
 	script: string;

@@ -17,9 +17,6 @@ package com.liferay.object.web.internal.info.item.provider;
 import com.liferay.info.exception.NoSuchFormVariationException;
 import com.liferay.info.field.InfoField;
 import com.liferay.info.field.InfoFieldSet;
-import com.liferay.info.field.type.ImageInfoFieldType;
-import com.liferay.info.field.type.InfoFieldType;
-import com.liferay.info.field.type.TextInfoFieldType;
 import com.liferay.info.form.InfoForm;
 import com.liferay.info.item.field.reader.InfoItemFieldReaderFieldSetProvider;
 import com.liferay.info.item.provider.InfoItemFormProvider;
@@ -33,13 +30,12 @@ import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.web.internal.info.item.ObjectEntryInfoItemFields;
+import com.liferay.object.web.internal.util.ObjectFieldDBTypeUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.template.info.item.provider.TemplateInfoItemFieldSetProvider;
-
-import java.util.Objects;
 
 /**
  * @author Jorge Ferrer
@@ -141,14 +137,6 @@ public class ObjectEntryInfoItemFormProvider
 		).build();
 	}
 
-	private InfoFieldType _getInfoFieldType(ObjectField objectField) {
-		if (Objects.equals(objectField.getDBType(), "Blob")) {
-			return ImageInfoFieldType.INSTANCE;
-		}
-
-		return TextInfoFieldType.INSTANCE;
-	}
-
 	private InfoForm _getInfoForm(long objectDefinitionId)
 		throws NoSuchFormVariationException {
 
@@ -185,22 +173,14 @@ public class ObjectEntryInfoItemFormProvider
 			long objectDefinitionId)
 		throws NoSuchFormVariationException {
 
-		ObjectDefinition objectDefinition = null;
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.fetchObjectDefinition(
+				objectDefinitionId);
 
-		try {
-			objectDefinition =
-				_objectDefinitionLocalService.getObjectDefinition(
-					objectDefinitionId);
-		}
-		catch (NoSuchObjectDefinitionException
-					noSuchObjectDefinitionException) {
-
+		if (objectDefinition == null) {
 			throw new NoSuchFormVariationException(
 				String.valueOf(objectDefinitionId),
-				noSuchObjectDefinitionException);
-		}
-		catch (PortalException portalException) {
-			throw new RuntimeException("Unexpected exception", portalException);
+				new NoSuchObjectDefinitionException());
 		}
 
 		return InfoFieldSet.builder(
@@ -213,41 +193,39 @@ public class ObjectEntryInfoItemFormProvider
 					if (Validator.isNotNull(
 							objectField.getRelationshipType())) {
 
-						try {
-							ObjectRelationship objectRelationship =
-								_objectRelationshipLocalService.
-									fetchObjectRelationshipByObjectFieldId2(
-										objectField.getObjectFieldId());
+						ObjectRelationship objectRelationship =
+							_objectRelationshipLocalService.
+								fetchObjectRelationshipByObjectFieldId2(
+									objectField.getObjectFieldId());
 
-							ObjectDefinition relatedObjectDefinition =
-								_objectDefinitionLocalService.
-									getObjectDefinition(
-										objectRelationship.
-											getObjectDefinitionId1());
+						ObjectDefinition relatedObjectDefinition =
+							_objectDefinitionLocalService.fetchObjectDefinition(
+								objectRelationship.getObjectDefinitionId1());
 
-							if (!relatedObjectDefinition.isActive()) {
-								continue;
-							}
-						}
-						catch (PortalException portalException) {
-							throw new RuntimeException(
-								"Unexpected exception", portalException);
+						if ((relatedObjectDefinition == null) ||
+							!relatedObjectDefinition.isActive()) {
+
+							continue;
 						}
 					}
 
 					unsafeConsumer.accept(
 						InfoField.builder(
 						).infoFieldType(
-							_getInfoFieldType(objectField)
+							ObjectFieldDBTypeUtil.getInfoFieldType(objectField)
 						).namespace(
 							ObjectField.class.getSimpleName()
 						).name(
 							objectField.getName()
+						).editable(
+							true
 						).labelInfoLocalizedValue(
 							InfoLocalizedValue.<String>builder(
 							).values(
 								objectField.getLabelMap()
 							).build()
+						).required(
+							objectField.isRequired()
 						).build());
 				}
 			}

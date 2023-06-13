@@ -17,9 +17,9 @@ package com.liferay.object.rest.internal.manager.v1_0;
 import com.liferay.account.constants.AccountConstants;
 import com.liferay.account.model.AccountEntry;
 import com.liferay.account.service.AccountEntryLocalService;
-import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.object.constants.ObjectConstants;
 import com.liferay.object.constants.ObjectDefinitionConstants;
+import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.exception.NoSuchObjectEntryException;
 import com.liferay.object.model.ObjectDefinition;
@@ -30,9 +30,8 @@ import com.liferay.object.rest.internal.dto.v1_0.converter.ObjectEntryDTOConvert
 import com.liferay.object.rest.internal.odata.entity.v1_0.ObjectEntryEntityModel;
 import com.liferay.object.rest.internal.petra.sql.dsl.expression.PredicateUtil;
 import com.liferay.object.rest.internal.resource.v1_0.ObjectEntryResourceImpl;
+import com.liferay.object.rest.manager.v1_0.BaseObjectEntryManager;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
-import com.liferay.object.scope.ObjectScopeProvider;
-import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectEntryService;
@@ -50,7 +49,6 @@ import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.filter.TermFilter;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateUtil;
@@ -78,7 +76,6 @@ import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.util.ActionUtil;
-import com.liferay.portal.vulcan.util.GroupUtil;
 import com.liferay.portal.vulcan.util.SearchUtil;
 import com.liferay.portal.vulcan.util.TransformUtil;
 
@@ -109,7 +106,8 @@ import org.osgi.service.component.annotations.Reference;
 	property = "object.entry.manager.storage.type=" + ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
 	service = ObjectEntryManager.class
 )
-public class DefaultObjectEntryManagerImpl implements ObjectEntryManager {
+public class DefaultObjectEntryManagerImpl
+	extends BaseObjectEntryManager implements ObjectEntryManager {
 
 	@Override
 	public ObjectEntry addObjectEntry(
@@ -121,7 +119,7 @@ public class DefaultObjectEntryManagerImpl implements ObjectEntryManager {
 		return _toObjectEntry(
 			dtoConverterContext, objectDefinition,
 			_objectEntryService.addObjectEntry(
-				_getGroupId(objectDefinition, scopeKey),
+				getGroupId(objectDefinition, scopeKey),
 				objectDefinition.getObjectDefinitionId(),
 				_toObjectValues(
 					objectDefinition.getObjectDefinitionId(),
@@ -162,14 +160,15 @@ public class DefaultObjectEntryManagerImpl implements ObjectEntryManager {
 			ObjectEntry objectEntry, String scopeKey)
 		throws Exception {
 
-		ServiceContext serviceContext = new ServiceContext();
+		ServiceContext serviceContext = _createServiceContext(
+			objectEntry.getProperties(), dtoConverterContext.getUserId());
 
 		serviceContext.setCompanyId(companyId);
 
 		return _toObjectEntry(
 			dtoConverterContext, objectDefinition,
 			_objectEntryService.addOrUpdateObjectEntry(
-				externalReferenceCode, _getGroupId(objectDefinition, scopeKey),
+				externalReferenceCode, getGroupId(objectDefinition, scopeKey),
 				objectDefinition.getObjectDefinitionId(),
 				_toObjectValues(
 					objectDefinition.getObjectDefinitionId(),
@@ -199,7 +198,7 @@ public class DefaultObjectEntryManagerImpl implements ObjectEntryManager {
 		com.liferay.object.model.ObjectEntry objectEntry =
 			_objectEntryService.getObjectEntry(
 				externalReferenceCode, companyId,
-				_getGroupId(objectDefinition, scopeKey));
+				getGroupId(objectDefinition, scopeKey));
 
 		_checkObjectEntryObjectDefinitionId(objectDefinition, objectEntry);
 
@@ -216,6 +215,12 @@ public class DefaultObjectEntryManagerImpl implements ObjectEntryManager {
 			_objectEntryService.fetchObjectEntry(objectEntryId);
 
 		if (objectEntry != null) {
+			if (objectDefinition == null) {
+				objectDefinition =
+					_objectDefinitionLocalService.getObjectDefinition(
+						objectEntry.getObjectDefinitionId());
+			}
+
 			return _toObjectEntry(
 				dtoConverterContext, objectDefinition, objectEntry);
 		}
@@ -231,7 +236,7 @@ public class DefaultObjectEntryManagerImpl implements ObjectEntryManager {
 			Pagination pagination, String search, Sort[] sorts)
 		throws Exception {
 
-		long groupId = _getGroupId(objectDefinition, scopeKey);
+		long groupId = getGroupId(objectDefinition, scopeKey);
 
 		return SearchUtil.search(
 			HashMapBuilder.put(
@@ -307,7 +312,7 @@ public class DefaultObjectEntryManagerImpl implements ObjectEntryManager {
 			Sort[] sorts)
 		throws Exception {
 
-		long groupId = _getGroupId(objectDefinition, scopeKey);
+		long groupId = getGroupId(objectDefinition, scopeKey);
 
 		long[] accountEntryIds = null;
 
@@ -448,7 +453,7 @@ public class DefaultObjectEntryManagerImpl implements ObjectEntryManager {
 		com.liferay.object.model.ObjectEntry objectEntry =
 			_objectEntryService.getObjectEntry(
 				externalReferenceCode, companyId,
-				_getGroupId(objectDefinition, scopeKey));
+				getGroupId(objectDefinition, scopeKey));
 
 		_checkObjectEntryObjectDefinitionId(objectDefinition, objectEntry);
 
@@ -585,28 +590,6 @@ public class DefaultObjectEntryManagerImpl implements ObjectEntryManager {
 		return serviceContext;
 	}
 
-	private long _getGroupId(
-		ObjectDefinition objectDefinition, String scopeKey) {
-
-		ObjectScopeProvider objectScopeProvider =
-			_objectScopeProviderRegistry.getObjectScopeProvider(
-				objectDefinition.getScope());
-
-		if (objectScopeProvider.isGroupAware()) {
-			if (Objects.equals("site", objectDefinition.getScope())) {
-				return GroupUtil.getGroupId(
-					objectDefinition.getCompanyId(), scopeKey,
-					_groupLocalService);
-			}
-
-			return GroupUtil.getDepotGroupId(
-				scopeKey, objectDefinition.getCompanyId(),
-				_depotEntryLocalService, _groupLocalService);
-		}
-
-		return 0;
-	}
-
 	private String _getObjectEntriesPermissionName(long objectDefinitionId) {
 		return ObjectConstants.RESOURCE_NAME + "#" + objectDefinitionId;
 	}
@@ -702,14 +685,11 @@ public class DefaultObjectEntryManagerImpl implements ObjectEntryManager {
 
 		return TransformUtil.transform(
 			objectEntries,
-			objectEntry -> {
-				ObjectDefinition objectDefinition =
-					_objectDefinitionLocalService.getObjectDefinition(
-						objectEntry.getObjectDefinitionId());
-
-				return _toObjectEntry(
-					dtoConverterContext, objectDefinition, objectEntry);
-			});
+			objectEntry -> _toObjectEntry(
+				dtoConverterContext,
+				_objectDefinitionLocalService.getObjectDefinition(
+					objectEntry.getObjectDefinitionId()),
+				objectEntry));
 	}
 
 	private ObjectEntry _toObjectEntry(
@@ -793,7 +773,10 @@ public class DefaultObjectEntryManagerImpl implements ObjectEntryManager {
 				continue;
 			}
 
-			if (Objects.equals(objectField.getDBType(), "Date")) {
+			if (Objects.equals(
+					objectField.getDBType(),
+					ObjectFieldConstants.DB_TYPE_DATE)) {
+
 				values.put(name, _toDate(locale, String.valueOf(object)));
 			}
 
@@ -819,9 +802,6 @@ public class DefaultObjectEntryManagerImpl implements ObjectEntryManager {
 	@Reference
 	private Aggregations _aggregations;
 
-	@Reference
-	private DepotEntryLocalService _depotEntryLocalService;
-
 	@Reference(
 		target = "(result.class.name=com.liferay.portal.kernel.search.filter.Filter)"
 	)
@@ -830,9 +810,6 @@ public class DefaultObjectEntryManagerImpl implements ObjectEntryManager {
 
 	@Reference
 	private FilterParserProvider _filterParserProvider;
-
-	@Reference
-	private GroupLocalService _groupLocalService;
 
 	@Reference
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
@@ -854,9 +831,6 @@ public class DefaultObjectEntryManagerImpl implements ObjectEntryManager {
 
 	@Reference
 	private ObjectRelationshipService _objectRelationshipService;
-
-	@Reference
-	private ObjectScopeProviderRegistry _objectScopeProviderRegistry;
 
 	@Reference
 	private Queries _queries;

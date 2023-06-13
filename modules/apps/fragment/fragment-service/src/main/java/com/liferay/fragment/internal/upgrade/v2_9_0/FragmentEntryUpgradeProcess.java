@@ -26,6 +26,10 @@ public class FragmentEntryUpgradeProcess extends UpgradeProcess {
 		if (!hasColumn("FragmentEntry", "typeOptions")) {
 			alterTableAddColumn("FragmentEntry", "typeOptions", "TEXT");
 		}
+
+		if (!hasColumn("FragmentEntryVersion", "typeOptions")) {
+			alterTableAddColumn("FragmentEntryVersion", "typeOptions", "TEXT");
+		}
 	}
 
 }

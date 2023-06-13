@@ -121,6 +121,12 @@ public interface ObjectFieldResource {
 			return new ObjectFieldResourceImpl(this);
 		}
 
+		public Builder contextPath(String contextPath) {
+			_contextPath = contextPath;
+
+			return this;
+		}
+
 		public Builder endpoint(String host, int port, String scheme) {
 			_host = host;
 			_port = port;
@@ -166,6 +172,7 @@ public interface ObjectFieldResource {
 		private Builder() {
 		}
 
+		private String _contextPath = "";
 		private Map<String, String> _headers = new LinkedHashMap<>();
 		private String _host = "localhost";
 		private Locale _locale;
@@ -264,7 +271,7 @@ public interface ObjectFieldResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port +
+					_builder._port + _builder._contextPath +
 						"/o/object-admin/v1.0/object-definitions/{objectDefinitionId}/object-fields");
 
 			httpInvoker.path("objectDefinitionId", objectDefinitionId);
@@ -350,7 +357,7 @@ public interface ObjectFieldResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port +
+					_builder._port + _builder._contextPath +
 						"/o/object-admin/v1.0/object-definitions/{objectDefinitionId}/object-fields");
 
 			httpInvoker.path("objectDefinitionId", objectDefinitionId);
@@ -430,7 +437,7 @@ public interface ObjectFieldResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port +
+					_builder._port + _builder._contextPath +
 						"/o/object-admin/v1.0/object-definitions/{objectDefinitionId}/object-fields/batch");
 
 			httpInvoker.path("objectDefinitionId", objectDefinitionId);
@@ -509,7 +516,7 @@ public interface ObjectFieldResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port +
+					_builder._port + _builder._contextPath +
 						"/o/object-admin/v1.0/object-fields/{objectFieldId}");
 
 			httpInvoker.path("objectFieldId", objectFieldId);
@@ -586,7 +593,7 @@ public interface ObjectFieldResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port +
+					_builder._port + _builder._contextPath +
 						"/o/object-admin/v1.0/object-fields/batch");
 
 			httpInvoker.userNameAndPassword(
@@ -663,7 +670,7 @@ public interface ObjectFieldResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port +
+					_builder._port + _builder._contextPath +
 						"/o/object-admin/v1.0/object-fields/{objectFieldId}");
 
 			httpInvoker.path("objectFieldId", objectFieldId);
@@ -747,7 +754,7 @@ public interface ObjectFieldResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port +
+					_builder._port + _builder._contextPath +
 						"/o/object-admin/v1.0/object-fields/{objectFieldId}");
 
 			httpInvoker.path("objectFieldId", objectFieldId);
@@ -831,7 +838,7 @@ public interface ObjectFieldResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port +
+					_builder._port + _builder._contextPath +
 						"/o/object-admin/v1.0/object-fields/{objectFieldId}");
 
 			httpInvoker.path("objectFieldId", objectFieldId);
@@ -908,7 +915,7 @@ public interface ObjectFieldResource {
 
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port +
+					_builder._port + _builder._contextPath +
 						"/o/object-admin/v1.0/object-fields/batch");
 
 			httpInvoker.userNameAndPassword(

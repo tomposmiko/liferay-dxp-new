@@ -255,6 +255,29 @@ definition {
 		Alert.viewSuccessMessage();
 	}
 
+	macro editAndCheckOrderAndShipmentERC {
+		Click(locator1 = "Icon#EDIT_PENCIL");
+
+		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_IFRAME");
+
+		Type(
+			key_fieldLabel = "External Reference Code",
+			locator1 = "TextInput#GENERIC_TEXT_INPUT",
+			value1 = "${keyReferenceCode}");
+
+		Button.clickSubmitButton();
+
+		if (isSet(checkReferenceCode)) {
+			AssertElementPresent(
+				key_erc = "${keyReferenceCode}",
+				locator1 = "CommerceOrders#ORDER_AND_SHIPMENT_ERC_VALUE");
+		}
+
+		if (isSet(uniqueERC)) {
+			Alert.viewErrorMessage(errorMessage = "Please enter a unique external reference code.");
+		}
+	}
+
 	macro editCartPortletOrderQuantity {
 		Type(
 			locator1 = "CommerceAccelerators#CART_PORTLET_ORDER_QUANTITY",
@@ -432,12 +455,118 @@ definition {
 			urlAppend = "group/control_panel/manage?p_p_id=com_liferay_commerce_order_web_internal_portlet_CommerceOrderTypePortlet");
 	}
 
+	macro openTermsAndConditionsAdmin {
+		Navigator.openWithAppendToBaseURL(
+			baseURL = "${baseURL}",
+			urlAppend = "group/guest/~/control_panel/manage?p_p_id=com_liferay_commerce_term_web_internal_portlet_CommerceTermEntryPortlet");
+	}
+
 	macro selectOrderFromAccountSelector {
 		Click.clickNoMouseOver(locator1 = "CommerceAccelerators#ACCOUNT_SELECTOR_DROPDOWN");
 
 		Click(
 			key_entryName = "${orderId}",
 			locator1 = "CommerceEntry#SEARCH_ORDER_ID_RESULT");
+	}
+
+	macro setAccountOrderDefaults {
+		CommerceNavigator.gotoMiniumAccountOrderDefaults(accountName = "${accountName}");
+
+		if (isSet(paymentMethod)) {
+			Button.click(button = "Set Default Commerce Payment Method");
+
+			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+
+			Click.clickAtNotVisible(
+				key_radioOption = "${paymentMethod}",
+				locator1 = "CommerceEntry#RADIO_BUTTON");
+
+			IFrame.selectTopFrame();
+
+			Button.clickSave();
+
+			AssertTextEquals(
+				key_defaultOption = "Payment Method",
+				locator1 = "CommerceEntry#ACCOUNT_ORDER_DEFAULTS_ENTRY",
+				value1 = "${paymentMethod}");
+		}
+
+		if (isSet(paymentTerm)) {
+			Button.click(button = "Set Default Payment Commerce Terms Entry");
+
+			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+
+			Click.clickAtNotVisible(
+				key_radioOption = "${paymentTerm}",
+				locator1 = "CommerceEntry#RADIO_BUTTON");
+
+			IFrame.selectTopFrame();
+
+			Button.clickSave();
+
+			AssertTextEquals(
+				key_defaultOption = "Payment",
+				locator1 = "CommerceEntry#ACCOUNT_ORDER_DEFAULTS_ENTRY",
+				value1 = "${paymentTerm}");
+		}
+
+		if (isSet(deliveryTerm)) {
+			Button.click(button = "Set Default Delivery Commerce Terms Entry");
+
+			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+
+			Click.clickAtNotVisible(
+				key_radioOption = "${deliveryTerm}",
+				locator1 = "CommerceEntry#RADIO_BUTTON");
+
+			IFrame.selectTopFrame();
+
+			Button.clickSave();
+
+			AssertTextEquals(
+				key_defaultOption = "Delivery",
+				locator1 = "CommerceEntry#ACCOUNT_ORDER_DEFAULTS_ENTRY",
+				value1 = "${deliveryTerm}");
+		}
+
+		if (isSet(shippingOption) && isSet(channelName)) {
+			Click(
+				key_entryName = "${channelName}",
+				key_table = "Default Account Commerce Channels Shipping Options",
+				locator1 = "CommerceEntry#TABLE_ENTRY_EDIT_BUTTON");
+
+			SelectFrame.selectFrameNoLoading(locator1 = "IFrame#MODAL_BODY");
+
+			if ("${shippingOption}" == "Use Priority Settings") {
+				var shippingMethod = "Use Priority Settings";
+				var shippingOption = "Use Priority Settings";
+
+				Click.clickAtNotVisible(
+					key_radioOption = "Use Priority Settings",
+					locator1 = "CommerceEntry#RADIO_BUTTON");
+			}
+			else {
+				Click.clickAtNotVisible(
+					key_radioOption = "${shippingMethod} / ${shippingOption}",
+					locator1 = "CommerceEntry#RADIO_BUTTON");
+			}
+
+			Button.clickSave();
+
+			IFrame.selectTopFrame();
+
+			AssertElementPresent(
+				key_columnNumber = "1",
+				key_productName = "${channelName}",
+				key_value = "${shippingMethod}",
+				locator1 = "CommerceEntry#TABLE_SEARCH_BY_NAME_AND_COLUMN_CONTENT");
+
+			AssertElementPresent(
+				key_columnNumber = "2",
+				key_productName = "${channelName}",
+				key_value = "${shippingOption}",
+				locator1 = "CommerceEntry#TABLE_SEARCH_BY_NAME_AND_COLUMN_CONTENT");
+		}
 	}
 
 	macro viewOrdersDetails {

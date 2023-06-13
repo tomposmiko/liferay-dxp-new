@@ -67,6 +67,7 @@ import com.liferay.object.service.ObjectLayoutLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.web.internal.constants.ObjectWebKeys;
 import com.liferay.object.web.internal.display.context.helper.ObjectRequestHelper;
+import com.liferay.object.web.internal.util.ObjectDefinitionPermissionUtil;
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -89,6 +90,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -441,10 +443,8 @@ public class ObjectEntryDisplayContext {
 				return false;
 			}
 
-			ObjectDefinition objectDefinition = getObjectDefinition();
-
-			return !_objectEntryService.hasModelResourcePermission(
-				objectDefinition.getObjectDefinitionId(), objectEntry.getId(),
+			return !ObjectDefinitionPermissionUtil.hasModelResourcePermission(
+				getObjectDefinition(), objectEntry, _objectEntryService,
 				ActionKeys.UPDATE);
 		}
 		catch (PortalException portalException) {
@@ -589,28 +589,54 @@ public class ObjectEntryDisplayContext {
 			ObjectEntry objectEntry = getObjectEntry();
 
 			if (objectEntry != null) {
-				readOnly = !_objectEntryService.hasModelResourcePermission(
-					objectDefinition.getObjectDefinitionId(),
-					objectEntry.getId(), ActionKeys.UPDATE);
+				readOnly =
+					!ObjectDefinitionPermissionUtil.hasModelResourcePermission(
+						objectDefinition, objectEntry, _objectEntryService,
+						ActionKeys.UPDATE);
 			}
 		}
 
-		List<ObjectField> objectFields =
-			_objectFieldLocalService.getObjectFields(
-				objectDefinition.getObjectDefinitionId());
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-154872"))) {
+			if (objectLayoutTab == null) {
+				for (ObjectField objectField :
+						_objectFieldLocalService.getCustomObjectFields(
+							objectDefinition.getObjectDefinitionId())) {
 
-		if (objectLayoutTab == null) {
-			for (ObjectField objectField : objectFields) {
-				if (!_isActive(objectField)) {
-					continue;
+					if (!_isActive(objectField)) {
+						continue;
+					}
+
+					ddmForm.addDDMFormField(
+						_getDDMFormField(objectField, readOnly));
 				}
-
-				ddmForm.addDDMFormField(
-					_getDDMFormField(objectField, readOnly));
+			}
+			else {
+				_addDDMFormFields(
+					ddmForm,
+					_objectFieldLocalService.getObjectFields(
+						objectDefinition.getObjectDefinitionId()),
+					objectLayoutTab, readOnly);
 			}
 		}
 		else {
-			_addDDMFormFields(ddmForm, objectFields, objectLayoutTab, readOnly);
+			List<ObjectField> objectFields =
+				_objectFieldLocalService.getObjectFields(
+					objectDefinition.getObjectDefinitionId());
+
+			if (objectLayoutTab == null) {
+				for (ObjectField objectField : objectFields) {
+					if (!_isActive(objectField)) {
+						continue;
+					}
+
+					ddmForm.addDDMFormField(
+						_getDDMFormField(objectField, readOnly));
+				}
+			}
+			else {
+				_addDDMFormFields(
+					ddmForm, objectFields, objectLayoutTab, readOnly);
+			}
 		}
 
 		ddmForm.setDefaultLocale(_objectRequestHelper.getLocale());
