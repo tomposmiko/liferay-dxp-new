@@ -541,9 +541,19 @@ public class CPInstanceLocalServiceImpl extends CPInstanceLocalServiceBaseImpl {
 		}
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #checkCPInstances(long)}
+	 */
+	@Deprecated
 	@Override
 	public void checkCPInstances() throws PortalException {
 		checkCPInstancesByDisplayDate(0);
+		checkCPInstancesByExpirationDate();
+	}
+
+	@Override
+	public void checkCPInstances(long cpDefinitionId) throws PortalException {
+		checkCPInstancesByDisplayDate(cpDefinitionId);
 		checkCPInstancesByExpirationDate();
 	}
 
@@ -574,17 +584,18 @@ public class CPInstanceLocalServiceImpl extends CPInstanceLocalServiceBaseImpl {
 			serviceContext.setWorkflowAction(WorkflowConstants.ACTION_PUBLISH);
 
 			CPDefinition cpDefinition =
-				cpDefinitionLocalService.getCPDefinition(cpDefinitionId);
+				cpDefinitionLocalService.getCPDefinition(
+					cpInstance.getCPDefinitionId());
 
 			if (cpDefinition.isIgnoreSKUCombinations()) {
 				_expireApprovedSiblingCPInstances(
-					cpDefinitionId, cpInstance.getCPInstanceId(),
-					serviceContext);
+					cpInstance.getCPDefinitionId(),
+					cpInstance.getCPInstanceId(), serviceContext);
 			}
 			else {
 				_expireApprovedSiblingMatchingCPInstances(
-					cpDefinitionId, cpInstance.getCPInstanceId(),
-					serviceContext);
+					cpInstance.getCPDefinitionId(),
+					cpInstance.getCPInstanceId(), serviceContext);
 			}
 
 			cpInstanceLocalService.updateStatus(

@@ -14,6 +14,7 @@
 
 import ClayLayout from '@clayui/layout';
 import ClayLoadingIndicator from '@clayui/loading-indicator';
+import classNames from 'classnames';
 import React, {useContext, useEffect, useMemo, useState} from 'react';
 
 import {COLUMN_SIZE_MODULE_PER_ROW_SIZES} from '../../config/constants/columnSizes';
@@ -29,6 +30,8 @@ import selectLanguageId from '../../selectors/selectLanguageId';
 import selectSegmentsExperienceId from '../../selectors/selectSegmentsExperienceId';
 import CollectionService from '../../services/CollectionService';
 import updateItemConfig from '../../thunks/updateItemConfig';
+import getLayoutDataItemClassName from '../../utils/getLayoutDataItemClassName';
+import getLayoutDataItemUniqueClassName from '../../utils/getLayoutDataItemUniqueClassName';
 import {getResponsiveConfig} from '../../utils/getResponsiveConfig';
 import isNullOrUndefined from '../../utils/isNullOrUndefined';
 import UnsafeHTML from '../UnsafeHTML';
@@ -131,7 +134,18 @@ const Grid = ({
 	return (
 		<>
 			{Array.from({length: numberOfRows}).map((_, i) => (
-				<ClayLayout.Row key={`row-${i}`}>
+				<ClayLayout.Row
+					className={
+						config.featureFlagLps119551 &&
+						classNames(
+							`align-items-${collectionConfig.verticalAlignment}`,
+							{
+								'no-gutters': !collectionConfig.gutters,
+							}
+						)
+					}
+					key={`row-${i}`}
+				>
 					{Array.from({length: collectionConfig.numberOfColumns}).map(
 						(_, j) => {
 							const key = `col-${i}-${j}`;
@@ -378,7 +392,18 @@ const Collection = React.memo(
 			collectionConfig.listStyle !== '' && collection.fakeCollection;
 
 		return (
-			<div className="page-editor__collection" ref={ref} style={style}>
+			<div
+				className={classNames('page-editor__collection', {
+					[getLayoutDataItemClassName(
+						item.type
+					)]: config.featureFlagLps132571,
+					[getLayoutDataItemUniqueClassName(
+						item.itemId
+					)]: config.featureFlagLps132571,
+				})}
+				ref={ref}
+				style={style}
+			>
 				{loading ? (
 					<ClayLoadingIndicator />
 				) : !collectionIsMapped(collectionConfig) ? (
@@ -395,7 +420,11 @@ const Collection = React.memo(
 						<Grid
 							child={child}
 							collection={collection}
-							collectionConfig={collectionConfig}
+							collectionConfig={
+								config.featureFlagLps119551
+									? responsiveConfig
+									: collectionConfig
+							}
 							collectionId={item.itemId}
 							collectionLength={collection.items.length}
 							customCollectionSelectorURL={

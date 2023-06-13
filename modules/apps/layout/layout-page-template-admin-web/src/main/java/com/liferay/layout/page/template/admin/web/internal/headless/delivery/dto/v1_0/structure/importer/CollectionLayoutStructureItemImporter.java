@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -70,99 +71,109 @@ public class CollectionLayoutStructureItemImporter
 		Map<String, Object> definitionMap = getDefinitionMap(
 			pageElement.getDefinition());
 
-		if (definitionMap != null) {
-			Map<String, Object> collectionConfig =
-				(Map<String, Object>)definitionMap.get("collectionConfig");
+		if (definitionMap == null) {
+			return collectionStyledLayoutStructureItem;
+		}
 
-			if (collectionConfig != null) {
-				collectionStyledLayoutStructureItem.setCollectionJSONObject(
-					_getCollectionConfigAsJSONObject(collectionConfig));
+		Map<String, Object> collectionConfig =
+			(Map<String, Object>)definitionMap.get("collectionConfig");
+
+		if (collectionConfig != null) {
+			collectionStyledLayoutStructureItem.setCollectionJSONObject(
+				_getCollectionConfigAsJSONObject(collectionConfig));
+		}
+
+		if (definitionMap.containsKey("collectionViewports")) {
+			List<Map<String, Object>> collectionViewports =
+				(List<Map<String, Object>>)definitionMap.get(
+					"collectionViewports");
+
+			for (Map<String, Object> collectionViewport : collectionViewports) {
+				_processCollectionViewportDefinition(
+					collectionStyledLayoutStructureItem,
+					(Map<String, Object>)collectionViewport.get(
+						"collectionViewportDefinition"),
+					(String)collectionViewport.get("id"));
 			}
+		}
 
-			collectionStyledLayoutStructureItem.setDisplayAllItems(
-				(Boolean)definitionMap.get("displayAllItems"));
+		collectionStyledLayoutStructureItem.setDisplayAllItems(
+			(Boolean)definitionMap.get("displayAllItems"));
 
-			Boolean displayAllPages = (Boolean)definitionMap.get(
-				"displayAllPages");
+		Boolean displayAllPages = (Boolean)definitionMap.get("displayAllPages");
 
-			Boolean showAllItems = (Boolean)definitionMap.get("showAllItems");
+		Boolean showAllItems = (Boolean)definitionMap.get("showAllItems");
 
-			if (displayAllPages == null) {
-				displayAllPages = showAllItems;
-			}
+		if (displayAllPages == null) {
+			displayAllPages = showAllItems;
+		}
 
-			collectionStyledLayoutStructureItem.setDisplayAllPages(
-				displayAllPages);
+		collectionStyledLayoutStructureItem.setDisplayAllPages(displayAllPages);
 
-			collectionStyledLayoutStructureItem.setListItemStyle(
-				(String)definitionMap.get("listItemStyle"));
-			collectionStyledLayoutStructureItem.setListStyle(
-				(String)definitionMap.get("listStyle"));
-			collectionStyledLayoutStructureItem.setNumberOfColumns(
-				(Integer)definitionMap.get("numberOfColumns"));
+		collectionStyledLayoutStructureItem.setListItemStyle(
+			(String)definitionMap.get("listItemStyle"));
+		collectionStyledLayoutStructureItem.setListStyle(
+			(String)definitionMap.get("listStyle"));
+		collectionStyledLayoutStructureItem.setNumberOfColumns(
+			(Integer)definitionMap.get("numberOfColumns"));
 
-			Integer numberOfItems = (Integer)definitionMap.get("numberOfItems");
+		Integer numberOfItems = (Integer)definitionMap.get("numberOfItems");
 
-			collectionStyledLayoutStructureItem.setNumberOfItems(numberOfItems);
+		collectionStyledLayoutStructureItem.setNumberOfItems(numberOfItems);
 
-			Integer numberOfItemsPerPage = (Integer)definitionMap.get(
-				"numberOfItemsPerPage");
+		Integer numberOfItemsPerPage = (Integer)definitionMap.get(
+			"numberOfItemsPerPage");
 
-			if (numberOfItemsPerPage != null) {
-				collectionStyledLayoutStructureItem.setNumberOfItemsPerPage(
-					numberOfItemsPerPage);
-			}
+		if (numberOfItemsPerPage != null) {
+			collectionStyledLayoutStructureItem.setNumberOfItemsPerPage(
+				numberOfItemsPerPage);
+		}
 
-			Integer numberOfPages = (Integer)definitionMap.get("numberOfPages");
+		Integer numberOfPages = (Integer)definitionMap.get("numberOfPages");
 
-			if (numberOfPages == null) {
-				if ((numberOfItemsPerPage != null) &&
-					(numberOfItemsPerPage > 0)) {
-
-					collectionStyledLayoutStructureItem.setNumberOfPages(
-						(int)Math.ceil(
-							numberOfItems / (double)numberOfItemsPerPage));
-				}
-			}
-			else {
+		if (numberOfPages == null) {
+			if ((numberOfItemsPerPage != null) && (numberOfItemsPerPage > 0)) {
 				collectionStyledLayoutStructureItem.setNumberOfPages(
-					numberOfPages);
+					(int)Math.ceil(
+						numberOfItems / (double)numberOfItemsPerPage));
 			}
+		}
+		else {
+			collectionStyledLayoutStructureItem.setNumberOfPages(numberOfPages);
+		}
 
-			collectionStyledLayoutStructureItem.setPaginationType(
-				_toPaginationType((String)definitionMap.get("paginationType")));
+		collectionStyledLayoutStructureItem.setPaginationType(
+			_toPaginationType((String)definitionMap.get("paginationType")));
 
-			collectionStyledLayoutStructureItem.setShowAllItems(showAllItems);
+		collectionStyledLayoutStructureItem.setShowAllItems(showAllItems);
 
-			collectionStyledLayoutStructureItem.setTemplateKey(
-				(String)definitionMap.get("templateKey"));
+		collectionStyledLayoutStructureItem.setTemplateKey(
+			(String)definitionMap.get("templateKey"));
 
-			Map<String, Object> fragmentStyleMap =
-				(Map<String, Object>)definitionMap.get("fragmentStyle");
+		Map<String, Object> fragmentStyleMap =
+			(Map<String, Object>)definitionMap.get("fragmentStyle");
 
-			if (fragmentStyleMap != null) {
+		if (fragmentStyleMap != null) {
+			JSONObject jsonObject = JSONUtil.put(
+				"styles",
+				toStylesJSONObject(
+					layoutStructureItemImporterContext, fragmentStyleMap));
+
+			collectionStyledLayoutStructureItem.updateItemConfig(jsonObject);
+		}
+
+		if (definitionMap.containsKey("fragmentViewports")) {
+			List<Map<String, Object>> fragmentViewports =
+				(List<Map<String, Object>>)definitionMap.get(
+					"fragmentViewports");
+
+			for (Map<String, Object> fragmentViewport : fragmentViewports) {
 				JSONObject jsonObject = JSONUtil.put(
-					"styles",
-					toStylesJSONObject(
-						layoutStructureItemImporterContext, fragmentStyleMap));
+					(String)fragmentViewport.get("id"),
+					toFragmentViewportStylesJSONObject(fragmentViewport));
 
 				collectionStyledLayoutStructureItem.updateItemConfig(
 					jsonObject);
-			}
-
-			if (definitionMap.containsKey("fragmentViewports")) {
-				List<Map<String, Object>> fragmentViewports =
-					(List<Map<String, Object>>)definitionMap.get(
-						"fragmentViewports");
-
-				for (Map<String, Object> fragmentViewport : fragmentViewports) {
-					JSONObject jsonObject = JSONUtil.put(
-						(String)fragmentViewport.get("id"),
-						toFragmentViewportStylesJSONObject(fragmentViewport));
-
-					collectionStyledLayoutStructureItem.updateItemConfig(
-						jsonObject);
-				}
 			}
 		}
 
@@ -285,6 +296,28 @@ public class CollectionLayoutStructureItemImporter
 		}
 
 		return null;
+	}
+
+	private void _processCollectionViewportDefinition(
+		CollectionStyledLayoutStructureItem collectionStyledLayoutStructureItem,
+		Map<String, Object> collectionViewportDefinitionMap,
+		String collectionViewportId) {
+
+		collectionStyledLayoutStructureItem.setViewportConfiguration(
+			collectionViewportId,
+			JSONUtil.put(
+				"numberOfColumns",
+				() -> {
+					if (collectionViewportDefinitionMap.containsKey(
+							"numberOfColumns")) {
+
+						return GetterUtil.getInteger(
+							collectionViewportDefinitionMap.get(
+								"numberOfColumns"));
+					}
+
+					return null;
+				}));
 	}
 
 	private Long _toClassPK(String classPKString) {

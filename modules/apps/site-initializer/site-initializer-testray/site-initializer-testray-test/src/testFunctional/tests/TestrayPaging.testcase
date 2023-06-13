@@ -1,6 +1,7 @@
 @component-name = "portal-solutions"
 definition {
 
+	property osgi.modules.includes = "site-initializer-testray";
 	property portal.release = "false";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Testray 2";
@@ -29,6 +30,8 @@ definition {
 	@priority = "5"
 	test CanChangeComponentPageByClickingOnNumber {
 		ApplicationsMenu.gotoSite(site = "Testray 2");
+
+		Testray.createProjectTestray(key_name = "Liferay Portal 7.");
 
 		Testray.goToProjectPage(projectName = "Liferay Portal 7.0");
 
@@ -71,6 +74,8 @@ definition {
 	@priority = "3"
 	test CanChangePageOnNextAndPrevioustButton {
 		ApplicationsMenu.gotoSite(site = "Testray 2");
+
+		Testray.createProjectTestray(key_name = "Liferay Portal 7.");
 
 		Testray.goToProjectPage(projectName = "Liferay Portal 7.0");
 

@@ -744,6 +744,10 @@ definition {
 				queryContains = "Contains");
 		}
 
+		task ("Prioritize the variation") {
+			AssetListsAdmin.prioritizeVariation(variationTitle = "Segment With Test User");
+		}
+
 		task ("Select the created Dynamic Collection to be used in the asset publisher portlet") {
 			Navigator.gotoSitePage(
 				pageName = "Test Page Name",
@@ -1426,8 +1430,6 @@ definition {
 		task ("Prioritize the variation") {
 			AssetListsAdmin.prioritizeVariation(variationTitle = "Second Segment");
 
-			Refresh();
-
 			AssetListsAdmin.prioritizeVariation(variationTitle = "Second Segment");
 		}
 
@@ -1783,8 +1785,6 @@ definition {
 
 		task ("Prioritize the variation") {
 			AssetListsAdmin.prioritizeVariation(variationTitle = "Second Segment");
-
-			Refresh();
 
 			AssetListsAdmin.prioritizeVariation(variationTitle = "Second Segment");
 		}
@@ -2160,8 +2160,6 @@ definition {
 
 			AssetListsAdmin.prioritizeVariation(variationTitle = "Second Segment");
 
-			Refresh();
-
 			AssetListsAdmin.prioritizeVariation(variationTitle = "Second Segment");
 		}
 
@@ -2450,8 +2448,6 @@ definition {
 				entryList = "WC_Title_3");
 
 			AssetListsAdmin.prioritizeVariation(variationTitle = "Second Segment");
-
-			Refresh();
 
 			AssetListsAdmin.prioritizeVariation(variationTitle = "Second Segment");
 		}
@@ -2768,6 +2764,12 @@ definition {
 			AssetListsAdmin.selectAsset(
 				assetType = "Basic Web Content",
 				entryList = "WC_Title_3,WC_Title_4");
+		}
+
+		task ("Deprioritize the Anyone variationto botton") {
+			AssetListsAdmin.deprioritizeVariation(variationTitle = "Anyone");
+
+			AssetListsAdmin.deprioritizeVariation(variationTitle = "Anyone");
 		}
 
 		task ("Select the created manual Collection to be used in the asset publisher portlet") {
@@ -3319,6 +3321,10 @@ definition {
 				assetType = "Basic Web Content",
 				itemSubtype = "Basic Web Content",
 				itemType = "Web Content Article");
+		}
+
+		task ("Deprioritize the Anyone variation") {
+			AssetListsAdmin.deprioritizeVariation(variationTitle = "Anyone");
 		}
 
 		task ("Select the created manual Collection to be used in the asset publisher portlet") {

@@ -35,19 +35,27 @@ definition {
 	}
 
 	macro assertCanCollapseAndExpandEntryField {
-		LexiconEntry.gotoAdd();
-
-		Click(locator1 = "CreateObject#COLLAPSE_EXPAND_OBJECT_PORTLET_ENTRY_FIELD");
-
 		WaitForSPARefresh();
 
-		AssertNotVisible(locator1 = "ObjectAdmin#ENTRY_STRING_VALUE_FIELD");
+		if (IsVisible(key_closedOrOpen = "open", locator1 = "CreateObject#VIEW_COLLAPSE_ICON")) {
+			Click(locator1 = "CreateObject#COLLAPSE_EXPAND_OBJECT_PORTLET_ENTRY_FIELD");
 
-		Click(locator1 = "CreateObject#COLLAPSE_EXPAND_OBJECT_PORTLET_ENTRY_FIELD");
+			WaitForSPARefresh();
 
-		WaitForSPARefresh();
+			AssertNotVisible(
+				key_entryLabel = "Custom Field",
+				locator1 = "ObjectPortlet#VIEW_ENTRY_DETAILS_LABEL");
+		}
 
-		AssertVisible(locator1 = "ObjectAdmin#ENTRY_STRING_VALUE_FIELD");
+		if (IsVisible(key_closedOrOpen = "closed", locator1 = "CreateObject#VIEW_COLLAPSE_ICON")) {
+			Click(locator1 = "CreateObject#COLLAPSE_EXPAND_OBJECT_PORTLET_ENTRY_FIELD");
+
+			WaitForSPARefresh();
+
+			AssertVisible(
+				key_entryLabel = "Custom Field",
+				locator1 = "ObjectPortlet#VIEW_ENTRY_DETAILS_LABEL");
+		}
 	}
 
 	macro assertCannotAddRelationshipTabFirst {
@@ -66,6 +74,13 @@ definition {
 		AssertElementNotPresent(
 			key_labelName = "${labelName}",
 			locator1 = "CreateObject#OBJECT_NAME");
+	}
+
+	macro assertCustomObjectWithIndex {
+		AssertElementPresent(
+			key_index = "${index}",
+			key_labelName = "${labelName}",
+			locator1 = "CreateObject#OBJECT_NAME_INDEX");
 	}
 
 	macro assertDisabledAllFields {

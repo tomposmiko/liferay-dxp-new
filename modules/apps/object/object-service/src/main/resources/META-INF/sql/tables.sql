@@ -203,8 +203,9 @@ create table ObjectValidationRule (
 	modifiedDate DATE null,
 	objectDefinitionId LONG,
 	active_ BOOLEAN,
-	errorLabel STRING null,
 	engine VARCHAR(75) null,
+	errorLabel STRING null,
+	name STRING null,
 	script VARCHAR(75) null
 );
 

@@ -1,5 +1,6 @@
 {
 	"dependencies": {
+		"text-mask-core": "^5.1.2"
 	},
 	"name": "@liferay/object-web",
 	"private": true,
@@ -8,5 +9,5 @@
 		"checkFormat": "liferay-npm-scripts check",
 		"format": "liferay-npm-scripts fix"
 	},
-	"version": "1.0.58"
+	"version": "1.0.59"
 }

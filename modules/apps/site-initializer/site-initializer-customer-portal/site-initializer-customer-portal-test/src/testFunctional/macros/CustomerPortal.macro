@@ -148,8 +148,6 @@ definition {
 			value1 = "${userPassword}");
 
 		Click(locator1 = "CustomerPortalSite#OKTA_SUBMIT");
-
-		OpenIDConnect.acceptConditions();
 	}
 
 	macro replaceCertificateAndPrivateKey {

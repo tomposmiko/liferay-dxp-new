@@ -45,7 +45,7 @@ const DeveloperKeysInputs = ({
 		licenseKeyDownloadURL,
 	} = useApplicationProvider();
 	const [dxpVersions, setDxpVersions] = useState([]);
-	const [selectedVersion, setSelectedVersion] = useState(dxpVersion);
+	const [selectedVersion, setSelectedVersion] = useState(dxpVersion || '');
 	const [
 		developerKeysDownloadStatus,
 		setDeveloperKeysDownloadStatus,
@@ -77,11 +77,12 @@ const DeveloperKeysInputs = ({
 	}, [dxpVersion, listType]);
 
 	const developerKeyDownload = async () => {
+		const [selectedVersionSplitted] = selectedVersion.split(' ');
 		const license = await getDevelopmentLicenseKey(
 			accountKey,
 			licenseKeyDownloadURL,
 			sessionId,
-			encodeURI(selectedVersion),
+			encodeURI(selectedVersionSplitted),
 			productName
 		);
 
@@ -98,7 +99,7 @@ const DeveloperKeysInputs = ({
 
 			return downloadFromBlob(
 				licenseBlob,
-				`activation-key-${productName.toLowerCase()}development-${selectedVersion}-${projectFileName}${extensionFile}`
+				`activation-key-${productName.toLowerCase()}development-${selectedVersionSplitted}-${projectFileName}${extensionFile}`
 			);
 		}
 
@@ -119,24 +120,21 @@ const DeveloperKeysInputs = ({
 							symbol="caret-bottom"
 						/>
 
-						{selectedVersion && (
-							<ClaySelect
-								className="bg-neutral-1 border-0 font-weight-bold mr-2 pr-6"
-								onChange={({target}) => {
-									setSelectedVersion(target.value);
-								}}
-								value={selectedVersion}
-							>
-								{selectedVersion &&
-									dxpVersions.map((version) => (
-										<ClaySelect.Option
-											className="font-weight-bold options"
-											key={version.key}
-											label={version.name}
-										/>
-									))}
-							</ClaySelect>
-						)}
+						<ClaySelect
+							className="bg-neutral-1 border-0 font-weight-bold mr-2 pr-6"
+							onChange={({target}) => {
+								setSelectedVersion(target.value);
+							}}
+							value={selectedVersion}
+						>
+							{dxpVersions.map((version) => (
+								<ClaySelect.Option
+									className="font-weight-bold options"
+									key={version.key}
+									label={version.name}
+								/>
+							))}
+						</ClaySelect>
 					</div>
 				</label>
 

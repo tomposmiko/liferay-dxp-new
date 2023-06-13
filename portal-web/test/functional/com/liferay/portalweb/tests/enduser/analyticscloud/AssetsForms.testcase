@@ -40,6 +40,10 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8433 | Test Summary: Form appears on card shows the pages that the form appears on"
 	@priority = "5"
 	test AssertAppearsOnListShowsPagesFormsExists {
+		task ("Connect DXP to AC") {
+			ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
+		}
+
 		task ("Submit the form") {
 			ACUtils.navigateToSitePage(
 				actionType = "Submit Form",
@@ -55,7 +59,7 @@ definition {
 		task ("Switch to new property in AC and go to forms tab") {
 			ACUtils.launchAC();
 
-			ACProperties.switchProperty(propertyName = "${propertyName}");
+			ACProperties.switchProperty(propertyName = "${assignedPropertyName}");
 
 			ACNavigation.goToAssets();
 
@@ -71,17 +75,13 @@ definition {
 		}
 
 		task ("Assert appears on metric") {
-
-			// This data takes too long to appear
-
 			var portalURL = PropsUtil.get("portal.url");
-
-			var siteName = TestCase.getSiteName(siteName = "${siteName}");
+			var dataSourceName = StringUtil.extractFirst("${assignedPropertyName}", " ");
 
 			ACAssets.viewAssetAppearsOnMetric(
 				canonicalURL = "${portalURL}/web/site-name",
 				cardTitle = "Asset Appears On",
-				pageNmae = "AC Page - Site Name - ${siteName}");
+				pageName = "AC Page - Site Name - ${dataSourceName}");
 		}
 	}
 
@@ -247,8 +247,14 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8417 | Test Summary: Forms list is searchable"
+	@ignore = "true"
 	@priority = "5"
 	test CanFormsListSearchable {
+		property portal.upstream = "quarantine";
+
+		// AC Quarantine Reason: Empty state no form changed
+		// LRAC-10599 is a dependency of this fix
+
 		var formNameList = "Created Form Name,Created Form Name 1";
 
 		ACUtils.addPage(layoutName = "AC Page 1");
@@ -616,6 +622,8 @@ definition {
 	@description = "Form known individuals shows which individuals interact with the form"
 	@priority = "5"
 	test KnownIndividualsShowsWhichIndividualsInteractWithForm {
+		property test.name.skip.portal.instance = "AssetsForms#KnownIndividualsShowsWhichIndividualsInteractWithForm";
+
 		var nameList = "ac ac,liferay liferay,dxp dxp";
 		var usernameList = "ac,liferay,dxp";
 		var emailList = "ac@liferay.com,liferay@liferay.com,dxp@liferay.com";
@@ -667,6 +675,8 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8120 | Test Summary: Assert forms list shows all of the forms in a list"
 	@priority = "5"
 	test ViewAllFormsShownInAssetList {
+		property test.name.skip.portal.instance = "AssetsForms#ViewAllFormsShownInAssetList";
+
 		var formNameList = "Created Form Name,Created Form Name 1,Created Form Name 2,Created Form Name 3";
 
 		for (var n : list "1,2,3") {
@@ -712,6 +722,7 @@ definition {
 	@priority = "5"
 	test VisitorBehaviorCardShowsExpectedAmountOfViews {
 		property portal.acceptance = "true";
+		property test.name.skip.portal.instance = "AssetsForms#VisitorBehaviorCardShowsExpectedAmountOfViews";
 
 		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
 

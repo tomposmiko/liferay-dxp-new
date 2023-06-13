@@ -92,7 +92,7 @@ definition {
 
 			Button.clickDone();
 
-			Button.clickCancel();
+			ImportExport.openImportExportAdmin();
 
 			ImportExport.assertExecutionEntry(
 				entityType = "Account",
@@ -641,12 +641,12 @@ definition {
 
 		task ("When the user tries to import a file without mapping all the required fields") {
 			Button.click(button = "Next");
-
-			Button.click(button = "Start Import");
 		}
 
-		task ("Then the import should fail and the missing field should be highlighted red") {
-			AssertElementNotPresent(locator1 = "Message#SUCCESS_DISMISSIBLE");
+		task ("Then the user should not be able to import the file and the missing field should be highlighted red") {
+			AssertElementNotPresent(
+				key_text = "Start Import",
+				locator1 = "Button#ANY");
 
 			AssertElementPresent(
 				key_destinationField = "currencyCode",
@@ -766,7 +766,7 @@ definition {
 		}
 
 		task ("Then the export template should be created successfully") {
-			Button.clickCancel();
+			ImportExport.openImportExportAdmin();
 
 			Navigator.gotoNavTab(navTab = "Templates");
 
@@ -803,7 +803,7 @@ definition {
 		}
 
 		task ("Then the import template should be created successfully") {
-			Button.clickCancel();
+			ImportExport.openImportExportAdmin();
 
 			Navigator.gotoNavTab(navTab = "Templates");
 
@@ -916,7 +916,7 @@ definition {
 		task ("When the imports are finished") {
 			Button.clickDone();
 
-			Button.clickCancel();
+			ImportExport.openImportExportAdmin();
 
 			ImportExport.assertExecutionEntry(
 				entityType = "Account",
@@ -1114,7 +1114,7 @@ definition {
 
 	@description = "Verify users are shown a preview for the first row being imported in a CSV file."
 	@priority = "3"
-	test ViewCSVImportPreview {
+	test ViewCSVFirstRowPreview {
 		property portal.acceptance = "true";
 
 		task ("Given the user is importing a CSV file") {
@@ -1138,9 +1138,47 @@ definition {
 		}
 	}
 
+	@description = "Verify users can view a preview of the CSV file being imported."
+	@priority = "3"
+	test ViewCSVImportPreview {
+		property portal.acceptance = "true";
+
+		task ("Given the user has configured an import for a CSV file") {
+			ImportExport.openImportExportAdmin();
+
+			ImportExport.gotoImport();
+
+			ImportExport.configureImport(
+				entityType = "Account",
+				fieldMappings = "name:Account Name,type:Account Type,description:Account Description,externalReferenceCode:External Reference Code",
+				fileName = "csv_account_import.csv",
+				headlessEndpoint = "/headless-admin-user");
+		}
+
+		task ("When the user clicks Next") {
+			Button.clickNext();
+		}
+
+		task ("Then a preview should be shown of the csv file content.") {
+			ImportExport.assertPreviewLabels(previewLabels = "description,externalReferenceCode,name,type");
+
+			ImportExport.assertPreviewEntry(
+				entryName = "Test Business Account",
+				previewFields = "business,Test Business Account Description,101");
+
+			ImportExport.assertPreviewEntry(
+				entryName = "Test Guest Account",
+				previewFields = "guest,Test Guest Account Description,102");
+
+			ImportExport.assertPreviewEntry(
+				entryName = "Test Person Account",
+				previewFields = "person,Test Person Account Description,103");
+		}
+	}
+
 	@description = "Verify users are shown a preview for the first row being imported in a JSON file."
 	@priority = "3"
-	test ViewJSONImportPreview {
+	test ViewJSONFirstRowPreview {
 		property portal.acceptance = "true";
 
 		task ("Given the user is importing a JSON file") {
@@ -1164,9 +1202,43 @@ definition {
 		}
 	}
 
+	@description = "Verify users can view a preview of the JSON file being imported."
+	@priority = "3"
+	test ViewJSONImportPreview {
+		property portal.acceptance = "true";
+
+		task ("Given the user has configured an import for a JSON file") {
+			ImportExport.openImportExportAdmin();
+
+			ImportExport.gotoImport();
+
+			ImportExport.configureImport(
+				entityType = "Channel",
+				fieldMappings = "currencyCode:currencyCode,name:name,type:type",
+				fileName = "json_channel_import.json",
+				headlessEndpoint = "/headless-commerce-admin-channel");
+		}
+
+		task ("When the user clicks Next") {
+			Button.clickNext();
+		}
+
+		task ("Then a preview should be shown of the JSON file content.") {
+			ImportExport.assertPreviewLabels(previewLabels = "currencyCode,name,type");
+
+			ImportExport.assertPreviewEntry(
+				entryName = "Test Channel 1",
+				previewFields = "USD,site");
+
+			ImportExport.assertPreviewEntry(
+				entryName = "Test Channel 2",
+				previewFields = "CAD,site");
+		}
+	}
+
 	@description = "Verify users are shown a preview for the first row being imported in a JSONL file."
 	@priority = "3"
-	test ViewJSONLImportPreview {
+	test ViewJSONLFirstRowPreview {
 		property portal.acceptance = "true";
 
 		task ("Given the user is importing a JSONL file") {
@@ -1187,6 +1259,40 @@ definition {
 
 		task ("Then a preview of the first row being imported should be shown.") {
 			ImportExport.assertImportPreviews(importPreviews = "name:Test Business Account,type:business,description:Test Business Account Description,externalReferenceCode:101");
+		}
+	}
+
+	@description = "Verify users can view a preview of the JSONL file being imported."
+	@priority = "3"
+	test ViewJSONLImportPreview {
+		property portal.acceptance = "true";
+
+		task ("Given the user has configured an import for a JSONL file") {
+			ImportExport.openImportExportAdmin();
+
+			ImportExport.gotoImport();
+
+			ImportExport.configureImport(
+				entityType = "Channel",
+				fieldMappings = "currencyCode:currencyCode,name:name,type:type",
+				fileName = "jsonl_channel_import.jsonl",
+				headlessEndpoint = "/headless-commerce-admin-channel");
+		}
+
+		task ("When the user clicks Next") {
+			Button.clickNext();
+		}
+
+		task ("Then a preview should be shown of the JSONL file content.") {
+			ImportExport.assertPreviewLabels(previewLabels = "currencyCode,name,type");
+
+			ImportExport.assertPreviewEntry(
+				entryName = "Test Channel 1",
+				previewFields = "USD,site");
+
+			ImportExport.assertPreviewEntry(
+				entryName = "Test Channel 2",
+				previewFields = "CAD,site");
 		}
 	}
 

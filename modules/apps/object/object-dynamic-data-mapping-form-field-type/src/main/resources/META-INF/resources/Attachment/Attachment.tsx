@@ -24,7 +24,7 @@ import {
 	FieldChangeEventHandler,
 	ReactFieldBase as FieldBase,
 } from 'dynamic-data-mapping-form-field-type';
-import {fetch} from 'frontend-js-web';
+import {fetch, openSelectionModal} from 'frontend-js-web';
 import React, {ChangeEventHandler, useEffect, useRef, useState} from 'react';
 
 import './Attachment.scss';
@@ -77,10 +77,11 @@ function File({attachment, loading, onDelete}: IFileProps) {
 
 export default function Attachment({
 	acceptedFileExtensions,
+	fileSource,
 	maximumFileSize,
 	objectEntryId, // "0" means that there is no previews
 	onChange,
-	uploadURL,
+	url,
 	value,
 
 	...otherProps
@@ -118,11 +119,19 @@ export default function Attachment({
 			delete: {href, method},
 		},
 	}: Attachment) => {
-		if (objectEntryId === '0') {
+		if (fileSource === 'userComputer' && objectEntryId === '0') {
 			await fetch(href, {method});
 		}
 
 		onChange({target: {value: null}});
+	};
+
+	const handleSelectedItem = (selectedItem: any) => {
+		if (selectedItem) {
+			const selectedItemValue = JSON.parse(selectedItem.value);
+
+			onChange({target: {value: selectedItemValue.fileEntryId}});
+		}
 	};
 
 	const handleUpload: ChangeEventHandler<HTMLInputElement> = async ({
@@ -154,7 +163,7 @@ export default function Attachment({
 						[`${portletNamespace}file`]: files[0],
 					}),
 					method: 'POST',
-					url: uploadURL,
+					url,
 				})) as {file: File; success: boolean};
 
 				onChange({target: {value: file.fileEntryId}});
@@ -179,10 +188,21 @@ export default function Attachment({
 					displayType="secondary"
 					onClick={() => {
 						setError({});
-						const filePicker = inputRef.current;
-						if (filePicker) {
-							filePicker.value = '';
-							filePicker.click();
+
+						if (fileSource === 'documentsAndMedia') {
+							openSelectionModal({
+								onSelect: handleSelectedItem,
+								selectEventName: `${portletNamespace}selectAttachmentEntry`,
+								title: Liferay.Language.get('select-file'),
+								url,
+							});
+						}
+						else if (fileSource === 'userComputer') {
+							const filePicker = inputRef.current;
+							if (filePicker) {
+								filePicker.value = '';
+								filePicker.click();
+							}
 						}
 					}}
 				>
@@ -242,9 +262,10 @@ interface IFileProps {
 }
 interface IProps {
 	acceptedFileExtensions: string;
+	fileSource: string;
 	maximumFileSize: string; // TODO: Fix endpoint to fetch as a number
 	objectEntryId: string; // TODO: Fix endpoint to fetch as a number
 	onChange: FieldChangeEventHandler;
-	uploadURL: string;
+	url: string;
 	value: string; // TODO: Fix endpoint to fetch as a number
 }

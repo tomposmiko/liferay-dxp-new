@@ -50,6 +50,7 @@ import com.liferay.commerce.service.CommerceOrderItemLocalService;
 import com.liferay.commerce.service.CommerceOrderLocalService;
 import com.liferay.commerce.service.CommerceShippingMethodLocalService;
 import com.liferay.commerce.util.CommerceShippingEngineRegistry;
+import com.liferay.commerce.util.comparator.CommerceShippingMethodPriorityComparator;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
@@ -193,7 +194,7 @@ public class CommerceOrderGenerator {
 
 		// Commerce shipping options
 
-		String commerceShippingOptionName =
+		String commerceShippingOptionKey =
 			commerceOrder.getShippingOptionName();
 
 		List<CommerceShippingOption> commerceShippingOptions =
@@ -204,7 +205,7 @@ public class CommerceOrderGenerator {
 			CommerceShippingOption commerceShippingOption =
 				commerceShippingOptions.get(0);
 
-			commerceShippingOptionName = commerceShippingOption.getName();
+			commerceShippingOptionKey = commerceShippingOption.getKey();
 		}
 
 		// Update commerce order
@@ -214,7 +215,7 @@ public class CommerceOrderGenerator {
 			commerceAddress.getCommerceAddressId(),
 			commerceAddress.getCommerceAddressId(),
 			commerceOrder.getCommercePaymentMethodKey(),
-			commerceShippingMethodId, commerceShippingOptionName,
+			commerceShippingMethodId, commerceShippingOptionKey,
 			commerceOrder.getPurchaseOrderNumber(), commerceOrder.getSubtotal(),
 			commerceOrder.getShippingAmount(), commerceOrder.getTotal(),
 			commerceOrder.getAdvanceStatus(), commerceContext);
@@ -419,7 +420,9 @@ public class CommerceOrderGenerator {
 		List<CommerceShippingMethod> commerceShippingMethods =
 			_commerceShippingMethodLocalService.getCommerceShippingMethods(
 				_commerceChannelLocalService.
-					getCommerceChannelGroupIdBySiteGroupId(groupId));
+					getCommerceChannelGroupIdBySiteGroupId(groupId),
+				QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+				new CommerceShippingMethodPriorityComparator());
 
 		if (commerceShippingMethods.isEmpty()) {
 			return 0;

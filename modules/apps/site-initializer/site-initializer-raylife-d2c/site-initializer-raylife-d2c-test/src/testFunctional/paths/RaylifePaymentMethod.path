@@ -70,6 +70,11 @@
 	<td>//p[contains(@class, 'text-center') and contains(., '${discount}')]</td>
 	<td></td>
 </tr>
+<tr>
+	<td>FIELD_EMAIL_PAYPAL</td>
+	<td>//input[contains(@id, 'email')]</td>
+	<td></td>
+</tr>
 </tbody>
 </table>
 </body>

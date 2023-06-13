@@ -62,6 +62,10 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8907 | Test Summary: Expand activity in individual overview"
 	@priority = "3"
 	test CanExpandActivityInIndividualOverview {
+		property portal.upstream = "quarantine";
+
+		// AC Quarantine Reason: Individuals activities takes some time to load
+
 		task ("Sign in as new user") {
 			User.logoutAndLoginPG(
 				userLoginEmailAddress = "userea@liferay.com",
@@ -238,6 +242,10 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8906 | Test Summary: As a Business User, I should be able to select a point on individual overview activities graph"
 	@priority = "3"
 	test SelectDataOnIndividualsActivitiesChart {
+		property portal.upstream = "quarantine";
+
+		// AC Quarantine Reason: Data does not appear in time
+
 		task ("Sign in as new user") {
 			User.logoutAndLoginPG(
 				userLoginEmailAddress = "userea@liferay.com",

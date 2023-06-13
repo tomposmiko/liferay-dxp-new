@@ -21,13 +21,15 @@
 						"textAlign": "none",
 						"width": "w-auto"
 					},
+					"htmlProperties": {
+						"htmlTag": "Div"
+					},
 					"indexed": true,
 					"layout": {
 						"align": "Stretch",
 						"borderWidth": 0,
 						"contentDisplay": "FlexRow",
 						"flexWrap": "WrapReverse",
-						"htmlTag": "Div",
 						"justify": "Start",
 						"marginBottom": 0,
 						"marginLeft": 0,

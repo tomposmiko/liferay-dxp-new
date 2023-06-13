@@ -159,6 +159,7 @@ function SpacingSelectorButton({
 }) {
 	const [active, setActive] = useState(false);
 	const itemListRef = useRef();
+	const label = `${capitalize(type)} ${capitalize(position)}`;
 	const [labelElement, setLabelElement] = useState(null);
 	const tooltipId = useId();
 	const triggerId = useId();
@@ -181,6 +182,7 @@ function SpacingSelectorButton({
 					aria-describedby={tooltipId}
 					aria-expanded={active}
 					aria-haspopup={true}
+					aria-label={label}
 					className={`${BUTTON_CLASSNAME} b-0 flex-grow-1 mb-0 text-center`}
 					data-position={position}
 					data-type={type}
@@ -193,9 +195,16 @@ function SpacingSelectorButton({
 					<Tooltip
 						hoverElement={triggerElement}
 						id={tooltipId}
-						label={`${capitalize(type)} ${capitalize(position)}: ${
-							value || defaultValue
-						}`}
+						label={
+							<>
+								{label} -{' '}
+								<SpacingOptionValue
+									position={position}
+									type={type}
+									value={value || defaultValue}
+								/>
+							</>
+						}
 						positionElement={labelElement}
 					/>
 
@@ -205,11 +214,13 @@ function SpacingSelectorButton({
 		>
 			<div ref={itemListRef}>
 				<ClayDropDown.ItemList aria-labelledby={triggerId}>
-					<ClayDropDown.Group
-						header={`${capitalize(type)} ${capitalize(position)}`}
-					>
+					<ClayDropDown.Group header={label}>
 						{options.map((option) => (
 							<ClayDropDown.Item
+								aria-label={Liferay.Util.sub(
+									Liferay.Language.get('set-x-to-x'),
+									[label, option.label]
+								)}
 								className="d-flex"
 								key={option.value}
 								onClick={() => {
@@ -224,9 +235,9 @@ function SpacingSelectorButton({
 
 								<strong className="flex-shrink-0 pl-2">
 									<SpacingOptionValue
-										option={option}
 										position={position}
 										type={type}
+										value={option.value}
 									/>
 								</strong>
 							</ClayDropDown.Item>
@@ -238,14 +249,14 @@ function SpacingSelectorButton({
 	);
 }
 
-function SpacingOptionValue({option, position, type}) {
+function SpacingOptionValue({position, type, value: optionValue}) {
 	const globalContext = useGlobalContext();
-	const [value, setValue] = useState(option.value);
+	const [value, setValue] = useState(optionValue);
 
 	useEffect(() => {
 		const element = globalContext.document.createElement('div');
 		element.style.display = 'none';
-		element.classList.add(`${type[0]}${position[0]}-${option.value}`);
+		element.classList.add(`${type[0]}${position[0]}-${optionValue}`);
 		globalContext.document.body.appendChild(element);
 
 		setValue(
@@ -255,7 +266,7 @@ function SpacingOptionValue({option, position, type}) {
 		);
 
 		globalContext.document.body.removeChild(element);
-	}, [globalContext, option, position, type]);
+	}, [globalContext, optionValue, position, type]);
 
 	return value;
 }

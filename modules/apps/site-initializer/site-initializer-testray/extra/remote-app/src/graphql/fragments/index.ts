@@ -28,3 +28,4 @@ export * from './testraySubTask';
 export * from './testraySuite';
 export * from './testrayTask';
 export * from './testrayTeam';
+export * from './testrayWarning';

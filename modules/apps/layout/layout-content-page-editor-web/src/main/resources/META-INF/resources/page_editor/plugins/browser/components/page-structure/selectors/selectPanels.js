@@ -25,7 +25,6 @@ import selectCanUpdateEditables from '../../../../../app/selectors/selectCanUpda
 import selectCanUpdateItemConfiguration from '../../../../../app/selectors/selectCanUpdateItemConfiguration';
 import {CollectionAppliedFiltersGeneralPanel} from '../components/item-configuration-panels/CollectionAppliedFiltersGeneralPanel';
 import {CollectionFilterGeneralPanel} from '../components/item-configuration-panels/CollectionFilterGeneralPanel';
-import {CollectionGeneralPanel} from '../components/item-configuration-panels/CollectionGeneralPanel';
 import ContainerAdvancedPanel from '../components/item-configuration-panels/ContainerAdvancedPanel';
 import ContainerGeneralPanel from '../components/item-configuration-panels/ContainerGeneralPanel';
 import {ContainerStylesPanel} from '../components/item-configuration-panels/ContainerStylesPanel';
@@ -38,6 +37,7 @@ import {MappingPanel} from '../components/item-configuration-panels/MappingPanel
 import {RowAdvancedPanel} from '../components/item-configuration-panels/RowAdvancedPanel';
 import {RowGeneralPanel} from '../components/item-configuration-panels/RowGeneralPanel';
 import {RowStylesPanel} from '../components/item-configuration-panels/RowStylesPanel';
+import {CollectionGeneralPanel} from '../components/item-configuration-panels/collection-general-panel/CollectionGeneralPanel';
 
 export const PANEL_IDS = {
 	collectionAppliedFiltersGeneral: 'collectionAppliedFiltersGeneral',
@@ -193,6 +193,7 @@ export function selectPanels(activeItemId, activeItemType, state) {
 	else if (activeItem.type === LAYOUT_DATA_ITEM_TYPES.collection) {
 		panelsIds = {
 			[PANEL_IDS.collectionGeneral]:
+				config.featureFlagLps119551 ||
 				state.selectedViewportSize === VIEWPORT_SIZES.desktop,
 		};
 	}
