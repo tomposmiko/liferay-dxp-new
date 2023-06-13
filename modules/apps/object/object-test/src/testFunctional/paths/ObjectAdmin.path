@@ -101,6 +101,11 @@
 		<td></td>
 	</tr>
 	<tr>
+		<td>ENTRY_BOOLEAN_CHECKBOX_BY_NAME</td>
+		<td>//input[contains(@class,'custom-control-input') and contains(@name,'${key_checkboxName}')]</td>
+		<td></td>
+	</tr>
+	<tr>
 		<td>ENTRY_DOUBLE_VALUE_FIELD</td>
 		<td>xpath=(//input[contains(@name,'_com_liferay_object_web_internal_object_definitions_portlet_ObjectDefinitionsPortlet_')])[7]</td>
 		<td></td>
@@ -447,7 +452,7 @@
 	</tr>
 	<tr>
 		<td>VIEW_ACTIONS_TAB</td>
-		<td>//div[contains(@class,'dnd-tr') and contains (.,'${key_actionName}') and contains (.,'${key_actionActive}')]</td>
+		<td>//div[contains(@class, 'dnd-td') and contains(., '${key_actionActive}')]</td>
 		<td></td>
 	</tr>
 	<tr>
@@ -511,6 +516,11 @@
 		<td></td>
 	</tr>
 	<tr>
+		<td>PLACEHOLDER_DELETE_OBJECT</td>
+		<td>//input[contains(@placeholder,'Confirm Object Definition Name')]</td>
+		<td></td>
+	</tr>
+	<tr>
 		<td>PLACEHOLDER_DELETE_RELATIONSHIP</td>
 		<td>//input[contains(@placeholder,'Confirm Relationship Name')]</td>
 		<td></td>
@@ -533,6 +543,21 @@
 	<tr>
 		<td>VIEW_STATE_NAME</td>
 		<td>//h3[(@class='lfr-objects__card-title') and text()='Select the State Flow']//..//..//div[contains(@class,'lfr-objects__card-title--with-padding') and contains(.,'${key_stateName}')]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>SELECT_CHOOSE_OPTION</td>
+		<td>//option[contains(text(),'${chooseOption}')]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>CHOOSE_AN_OBJECT</td>
+		<td>//select[@class="form-control"]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>CHOOSE_OBJECT_LABEL</td>
+		<td>//*[contains(@label,'Unrelated Objects')]//..//option[contains(.,'${key_objectLabel}')]</td>
 		<td></td>
 	</tr>
 </tbody>

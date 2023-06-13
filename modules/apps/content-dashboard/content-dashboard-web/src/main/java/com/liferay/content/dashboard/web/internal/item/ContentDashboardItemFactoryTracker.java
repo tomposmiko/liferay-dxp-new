@@ -18,11 +18,11 @@ import com.liferay.asset.kernel.model.AssetVocabularyConstants;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
 import com.liferay.content.dashboard.web.internal.constants.ContentDashboardConstants;
 import com.liferay.content.dashboard.web.internal.util.AssetVocabularyUtil;
+import com.liferay.info.search.InfoSearchClassMapperTracker;
 import com.liferay.osgi.service.tracker.collections.map.ServiceReferenceMapperFactory;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.petra.reflect.GenericUtil;
-import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
@@ -30,8 +30,6 @@ import com.liferay.portal.kernel.service.CompanyLocalService;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -46,18 +44,6 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
  */
 @Component(service = ContentDashboardItemFactoryTracker.class)
 public class ContentDashboardItemFactoryTracker {
-
-	public Collection<Long> getClassNameIds() {
-		Collection<String> classNames = getClassNames();
-
-		Stream<String> stream = classNames.stream();
-
-		return stream.map(
-			_classNameLocalService::getClassNameId
-		).collect(
-			Collectors.toSet()
-		);
-	}
 
 	public Collection<String> getClassNames() {
 		return Collections.unmodifiableCollection(_serviceTrackerMap.keySet());
@@ -101,7 +87,7 @@ public class ContentDashboardItemFactoryTracker {
 	private CompanyLocalService _companyLocalService;
 
 	@Reference
-	private Language _language;
+	private InfoSearchClassMapperTracker _infoSearchClassMapperTracker;
 
 	private volatile ServiceTrackerMap<String, ContentDashboardItemFactory<?>>
 		_serviceTrackerMap;
@@ -124,7 +110,9 @@ public class ContentDashboardItemFactoryTracker {
 				_bundleContext.getService(serviceReference);
 
 			long classNameId = _classNameLocalService.getClassNameId(
-				GenericUtil.getGenericClassName(contentDashboardItemFactory));
+				_infoSearchClassMapperTracker.getSearchClassName(
+					GenericUtil.getGenericClassName(
+						contentDashboardItemFactory)));
 
 			for (ContentDashboardConstants.DefaultInternalAssetVocabularyName
 					defaultInternalAssetVocabularyName :

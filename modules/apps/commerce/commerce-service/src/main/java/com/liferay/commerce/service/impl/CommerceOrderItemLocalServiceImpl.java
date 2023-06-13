@@ -948,8 +948,20 @@ public class CommerceOrderItemLocalServiceImpl
 
 		validateParentCommerceOrderId(commerceOrderItem);
 
+		boolean discountChanged = _isDiscountChanged(
+			discountAmount, commerceOrderItem);
+		boolean priceChanged = _isPriceChanged(
+			finalPrice, promoPrice, unitPrice, commerceOrderItem);
+
 		commerceOrderItem.setDiscountAmount(
 			(BigDecimal)GetterUtil.get(discountAmount, BigDecimal.ZERO));
+
+		if (!commerceOrderItem.isDiscountManuallyAdjusted() &&
+			discountChanged) {
+
+			commerceOrderItem.setDiscountManuallyAdjusted(true);
+		}
+
 		commerceOrderItem.setDiscountPercentageLevel1(
 			(BigDecimal)GetterUtil.get(
 				discountPercentageLevel1, BigDecimal.ZERO));
@@ -965,6 +977,11 @@ public class CommerceOrderItemLocalServiceImpl
 		commerceOrderItem.setFinalPrice(
 			(BigDecimal)GetterUtil.get(finalPrice, BigDecimal.ZERO));
 		commerceOrderItem.setManuallyAdjusted(true);
+
+		if (!commerceOrderItem.isPriceManuallyAdjusted() && priceChanged) {
+			commerceOrderItem.setPriceManuallyAdjusted(true);
+		}
+
 		commerceOrderItem.setPromoPrice(
 			(BigDecimal)GetterUtil.get(promoPrice, BigDecimal.ZERO));
 		commerceOrderItem.setUnitPrice(
@@ -994,8 +1011,22 @@ public class CommerceOrderItemLocalServiceImpl
 		CommerceOrderItem commerceOrderItem =
 			commerceOrderItemPersistence.findByPrimaryKey(commerceOrderItemId);
 
+		boolean discountChanged = _isDiscountChanged(
+			discountAmount, discountAmountWithTaxAmount, commerceOrderItem);
+		boolean priceChanged = _isPriceChanged(
+			finalPrice, finalPriceWithTaxAmount, promoPrice,
+			promoPriceWithTaxAmount, unitPrice, unitPriceWithTaxAmount,
+			commerceOrderItem);
+
 		commerceOrderItem.setDiscountAmount(
 			(BigDecimal)GetterUtil.get(discountAmount, BigDecimal.ZERO));
+
+		if (!commerceOrderItem.isDiscountManuallyAdjusted() &&
+			discountChanged) {
+
+			commerceOrderItem.setDiscountManuallyAdjusted(true);
+		}
+
 		commerceOrderItem.setDiscountPercentageLevel1(
 			(BigDecimal)GetterUtil.get(
 				discountPercentageLevel1, BigDecimal.ZERO));
@@ -1011,41 +1042,36 @@ public class CommerceOrderItemLocalServiceImpl
 		commerceOrderItem.setDiscountPercentageLevel1WithTaxAmount(
 			(BigDecimal)GetterUtil.get(
 				discountPercentageLevel1WithTaxAmount, BigDecimal.ZERO));
-
 		commerceOrderItem.setDiscountPercentageLevel2WithTaxAmount(
 			(BigDecimal)GetterUtil.get(
 				discountPercentageLevel2WithTaxAmount, BigDecimal.ZERO));
-
 		commerceOrderItem.setDiscountPercentageLevel3WithTaxAmount(
 			(BigDecimal)GetterUtil.get(
 				discountPercentageLevel3WithTaxAmount, BigDecimal.ZERO));
-
 		commerceOrderItem.setDiscountPercentageLevel4WithTaxAmount(
 			(BigDecimal)GetterUtil.get(
 				discountPercentageLevel4WithTaxAmount, BigDecimal.ZERO));
-
 		commerceOrderItem.setDiscountWithTaxAmount(
 			(BigDecimal)GetterUtil.get(
 				discountAmountWithTaxAmount, BigDecimal.ZERO));
-
 		commerceOrderItem.setFinalPrice(
 			(BigDecimal)GetterUtil.get(finalPrice, BigDecimal.ZERO));
-
 		commerceOrderItem.setFinalPriceWithTaxAmount(
 			(BigDecimal)GetterUtil.get(
 				finalPriceWithTaxAmount, BigDecimal.ZERO));
-
 		commerceOrderItem.setManuallyAdjusted(true);
+
+		if (!commerceOrderItem.isPriceManuallyAdjusted() && priceChanged) {
+			commerceOrderItem.setPriceManuallyAdjusted(true);
+		}
+
 		commerceOrderItem.setPromoPrice(
 			(BigDecimal)GetterUtil.get(promoPrice, BigDecimal.ZERO));
-
 		commerceOrderItem.setPromoPriceWithTaxAmount(
 			(BigDecimal)GetterUtil.get(
 				promoPriceWithTaxAmount, BigDecimal.ZERO));
-
 		commerceOrderItem.setUnitPrice(
 			(BigDecimal)GetterUtil.get(unitPrice, BigDecimal.ZERO));
-
 		commerceOrderItem.setUnitPriceWithTaxAmount(
 			(BigDecimal)GetterUtil.get(
 				unitPriceWithTaxAmount, BigDecimal.ZERO));
@@ -1065,6 +1091,12 @@ public class CommerceOrderItemLocalServiceImpl
 		CommerceOrderItem commerceOrderItem =
 			commerceOrderItemPersistence.findByPrimaryKey(commerceOrderItemId);
 
+		if (!commerceOrderItem.isPriceManuallyAdjusted() &&
+			_isPriceChanged(unitPrice, commerceOrderItem)) {
+
+			commerceOrderItem.setPriceManuallyAdjusted(true);
+		}
+
 		commerceOrderItem.setUnitPrice(unitPrice);
 
 		return commerceOrderItemPersistence.update(commerceOrderItem);
@@ -1078,6 +1110,12 @@ public class CommerceOrderItemLocalServiceImpl
 
 		CommerceOrderItem commerceOrderItem =
 			commerceOrderItemPersistence.findByPrimaryKey(commerceOrderItemId);
+
+		if (!commerceOrderItem.isPriceManuallyAdjusted() &&
+			_isPriceChanged(unitPrice, commerceOrderItem)) {
+
+			commerceOrderItem.setPriceManuallyAdjusted(true);
+		}
 
 		_updateBookedQuantity(
 			userId, commerceOrderItem, commerceOrderItem.getBookedQuantityId(),
@@ -1098,6 +1136,12 @@ public class CommerceOrderItemLocalServiceImpl
 
 		CommerceOrderItem commerceOrderItem =
 			commerceOrderItemPersistence.findByPrimaryKey(commerceOrderItemId);
+
+		if (!commerceOrderItem.isPriceManuallyAdjusted() &&
+			_isPriceChanged(unitPrice, commerceOrderItem)) {
+
+			commerceOrderItem.setPriceManuallyAdjusted(true);
+		}
 
 		_updateBookedQuantity(
 			userId, commerceOrderItem, commerceOrderItem.getBookedQuantityId(),
@@ -1570,6 +1614,216 @@ public class CommerceOrderItemLocalServiceImpl
 					(commerceOptionValue.getCPInstanceId() == 0));
 
 		return commerceOptionValuesFiltered.collect(Collectors.toList());
+	}
+
+	private boolean _isDiscountChanged(
+		BigDecimal discountAmount, BigDecimal discountAmountWithTaxAmount,
+		CommerceOrderItem commerceOrderItem) {
+
+		if (discountAmount == null) {
+			discountAmount = BigDecimal.ZERO;
+		}
+
+		if (discountAmountWithTaxAmount == null) {
+			discountAmountWithTaxAmount = BigDecimal.ZERO;
+		}
+
+		int discountAmountCompareTo = 0;
+
+		if (commerceOrderItem.getDiscountAmount() != null) {
+			discountAmountCompareTo = discountAmount.compareTo(
+				commerceOrderItem.getDiscountAmount());
+		}
+
+		int discountAmountWithTaxAmountCompareTo = 0;
+
+		if (commerceOrderItem.getDiscountWithTaxAmount() != null) {
+			discountAmountWithTaxAmountCompareTo =
+				discountAmountWithTaxAmount.compareTo(
+					commerceOrderItem.getDiscountWithTaxAmount());
+		}
+
+		if ((discountAmountCompareTo != 0) ||
+			(discountAmountWithTaxAmountCompareTo != 0)) {
+
+			return true;
+		}
+
+		return false;
+	}
+
+	private boolean _isDiscountChanged(
+		BigDecimal discountAmount, CommerceOrderItem commerceOrderItem) {
+
+		if (discountAmount == null) {
+			discountAmount = BigDecimal.ZERO;
+		}
+
+		int discountAmountCompareTo = 0;
+
+		if (commerceOrderItem.getDiscountAmount() != null) {
+			discountAmountCompareTo = discountAmount.compareTo(
+				commerceOrderItem.getDiscountAmount());
+		}
+
+		if (discountAmountCompareTo != 0) {
+			return true;
+		}
+
+		return false;
+	}
+
+	private boolean _isPriceChanged(
+		BigDecimal finalPrice, BigDecimal finalPriceWithTaxAmount,
+		BigDecimal promoPrice, BigDecimal promoPriceWithTaxAmount,
+		BigDecimal unitPrice, BigDecimal unitPriceWithTaxAmount,
+		CommerceOrderItem commerceOrderItem) {
+
+		if (finalPrice == null) {
+			finalPrice = BigDecimal.ZERO;
+		}
+
+		if (promoPrice == null) {
+			promoPrice = BigDecimal.ZERO;
+		}
+
+		if (unitPrice == null) {
+			unitPrice = BigDecimal.ZERO;
+		}
+
+		if (promoPriceWithTaxAmount == null) {
+			promoPriceWithTaxAmount = BigDecimal.ZERO;
+		}
+
+		if (finalPriceWithTaxAmount == null) {
+			finalPriceWithTaxAmount = BigDecimal.ZERO;
+		}
+
+		if (unitPriceWithTaxAmount == null) {
+			unitPriceWithTaxAmount = BigDecimal.ZERO;
+		}
+
+		int finalPriceCompareTo = 0;
+
+		if (commerceOrderItem.getFinalPrice() != null) {
+			finalPriceCompareTo = finalPrice.compareTo(
+				commerceOrderItem.getFinalPrice());
+		}
+
+		int promoPriceCompareTo = 0;
+
+		if (commerceOrderItem.getPromoPrice() != null) {
+			promoPriceCompareTo = promoPrice.compareTo(
+				commerceOrderItem.getPromoPrice());
+		}
+
+		int unitPriceCompareTo = 0;
+
+		if (commerceOrderItem.getUnitPrice() != null) {
+			unitPriceCompareTo = unitPrice.compareTo(
+				commerceOrderItem.getUnitPrice());
+		}
+
+		int finalPriceWithTaxAmountCompareTo = 0;
+
+		if (commerceOrderItem.getFinalPriceWithTaxAmount() != null) {
+			finalPriceWithTaxAmountCompareTo =
+				finalPriceWithTaxAmount.compareTo(
+					commerceOrderItem.getFinalPriceWithTaxAmount());
+		}
+
+		int promoPriceWithTaxAmountCompareTo = 0;
+
+		if (commerceOrderItem.getPromoPriceWithTaxAmount() != null) {
+			promoPriceWithTaxAmountCompareTo =
+				promoPriceWithTaxAmount.compareTo(
+					commerceOrderItem.getPromoPriceWithTaxAmount());
+		}
+
+		int unitPriceWithTaxAmountCompareTo = 0;
+
+		if (commerceOrderItem.getUnitPriceWithTaxAmount() != null) {
+			unitPriceWithTaxAmountCompareTo = unitPriceWithTaxAmount.compareTo(
+				commerceOrderItem.getUnitPriceWithTaxAmount());
+		}
+
+		if ((finalPriceCompareTo != 0) || (promoPriceCompareTo != 0) ||
+			(unitPriceCompareTo != 0) ||
+			(finalPriceWithTaxAmountCompareTo != 0) ||
+			(promoPriceWithTaxAmountCompareTo != 0) ||
+			(unitPriceWithTaxAmountCompareTo != 0)) {
+
+			return true;
+		}
+
+		return false;
+	}
+
+	private boolean _isPriceChanged(
+		BigDecimal finalPrice, BigDecimal promoPrice, BigDecimal unitPrice,
+		CommerceOrderItem commerceOrderItem) {
+
+		if (finalPrice == null) {
+			finalPrice = BigDecimal.ZERO;
+		}
+
+		if (promoPrice == null) {
+			promoPrice = BigDecimal.ZERO;
+		}
+
+		if (unitPrice == null) {
+			unitPrice = BigDecimal.ZERO;
+		}
+
+		int finalPriceCompareTo = 0;
+
+		if (commerceOrderItem.getFinalPrice() != null) {
+			finalPriceCompareTo = finalPrice.compareTo(
+				commerceOrderItem.getFinalPrice());
+		}
+
+		int promoPriceCompareTo = 0;
+
+		if (commerceOrderItem.getPromoPrice() != null) {
+			promoPriceCompareTo = promoPrice.compareTo(
+				commerceOrderItem.getPromoPrice());
+		}
+
+		int unitPriceCompareTo = 0;
+
+		if (commerceOrderItem.getUnitPrice() != null) {
+			unitPriceCompareTo = unitPrice.compareTo(
+				commerceOrderItem.getUnitPrice());
+		}
+
+		if ((finalPriceCompareTo != 0) || (promoPriceCompareTo != 0) ||
+			(unitPriceCompareTo != 0)) {
+
+			return true;
+		}
+
+		return false;
+	}
+
+	private boolean _isPriceChanged(
+		BigDecimal unitPrice, CommerceOrderItem commerceOrderItem) {
+
+		if (unitPrice == null) {
+			unitPrice = BigDecimal.ZERO;
+		}
+
+		int unitPriceCompareTo = 0;
+
+		if (commerceOrderItem.getUnitPrice() != null) {
+			unitPriceCompareTo = unitPrice.compareTo(
+				commerceOrderItem.getUnitPrice());
+		}
+
+		if (unitPriceCompareTo != 0) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private boolean _isStaticPriceType(Object value) {

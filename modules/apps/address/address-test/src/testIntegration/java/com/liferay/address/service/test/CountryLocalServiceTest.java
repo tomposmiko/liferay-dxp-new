@@ -155,16 +155,14 @@ public class CountryLocalServiceTest {
 
 	@Test
 	public void testSearchCountries() throws Exception {
+		Country country1 = _addCountry(
+			"a1", "a11", true, RandomTestUtil.randomString() + "_a11");
+
 		String keywords = RandomTestUtil.randomString();
 
-		Country country1 = _addCountry(
-			"a1", "a11", true, RandomTestUtil.randomString());
-
-		Country country2 = _addCountry("a2", "a22", true, keywords);
-		Country country3 = _addCountry(
-			"a3", "a33", true, keywords + RandomTestUtil.randomString());
-		Country country4 = _addCountry(
-			"a4", "a44", false, keywords + RandomTestUtil.randomString());
+		Country country2 = _addCountry("a2", "a22", true, keywords + "_a22");
+		Country country3 = _addCountry("a3", "a33", true, keywords + "_a33");
+		Country country4 = _addCountry("a4", "a44", false, keywords + "_a44");
 
 		_testSearchCountries(keywords, true, country2, country3);
 		_testSearchCountries(keywords, false, country4);

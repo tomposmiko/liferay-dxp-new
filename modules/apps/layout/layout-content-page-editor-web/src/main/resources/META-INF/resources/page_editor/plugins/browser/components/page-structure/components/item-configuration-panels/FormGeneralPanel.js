@@ -26,11 +26,11 @@ import selectLanguageId from '../../../../../../app/selectors/selectLanguageId';
 import updateFormItemConfig from '../../../../../../app/thunks/updateFormItemConfig';
 import {formIsMapped} from '../../../../../../app/utils/formIsMapped';
 import {getEditableLocalizedValue} from '../../../../../../app/utils/getEditableLocalizedValue';
-import {useId} from '../../../../../../app/utils/useId';
 import Collapse from '../../../../../../common/components/Collapse';
 import CurrentLanguageFlag from '../../../../../../common/components/CurrentLanguageFlag';
 import {LayoutSelector} from '../../../../../../common/components/LayoutSelector';
 import useControlledState from '../../../../../../core/hooks/useControlledState';
+import {useId} from '../../../../../../core/hooks/useId';
 import {CommonStyles} from './CommonStyles';
 import ContainerDisplayOptions from './ContainerDisplayOptions';
 import FormMappingOptions from './FormMappingOptions';
@@ -291,11 +291,14 @@ function SuccessMessageOptions({item, onValueSelect}) {
 						</ClayInput.GroupItem>
 					</ClayInput.Group>
 
-					<div className="mt-1 small text-secondary" id={helpTextId}>
+					<p
+						className="m-0 mt-1 small text-secondary"
+						id={helpTextId}
+					>
 						{Liferay.Language.get(
 							'urls-must-have-a-valid-protocol'
 						)}
-					</div>
+					</p>
 				</ClayForm.Group>
 			)}
 		</>

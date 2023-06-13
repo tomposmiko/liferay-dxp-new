@@ -304,10 +304,6 @@ public class PropsValues {
 			PropsUtil.get(
 				PropsKeys.BUFFERED_INCREMENT_STANDBY_TIME_UPPER_LIMIT));
 
-	public static final boolean CACHE_CLEAR_ON_PLUGIN_UNDEPLOY =
-		GetterUtil.getBoolean(
-			PropsUtil.get(PropsKeys.CACHE_CLEAR_ON_PLUGIN_UNDEPLOY));
-
 	public static final int CACHE_CONTENT_THRESHOLD_SIZE =
 		GetterUtil.getInteger(
 			PropsUtil.get(PropsKeys.CACHE_CONTENT_THRESHOLD_SIZE));
@@ -906,6 +902,10 @@ public class PropsValues {
 	public static final boolean HIBERNATE_GENERATE_STATISTICS =
 		GetterUtil.getBoolean(
 			PropsUtil.get(PropsKeys.HIBERNATE_GENERATE_STATISTICS));
+
+	public static final boolean HIBERNATE_HBM_JAXB_CACHE =
+		GetterUtil.getBoolean(
+			PropsUtil.get(PropsKeys.HIBERNATE_HBM_JAXB_CACHE));
 
 	public static final int HIBERNATE_JDBC_BATCH_SIZE = GetterUtil.getInteger(
 		PropsUtil.get(PropsKeys.HIBERNATE_JDBC_BATCH_SIZE));

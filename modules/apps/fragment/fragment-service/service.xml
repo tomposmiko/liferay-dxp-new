@@ -172,6 +172,9 @@
 		<finder name="FragmentCollectionId" return-type="Collection">
 			<finder-column name="fragmentCollectionId" />
 		</finder>
+		<finder name="Type" return-type="Collection">
+			<finder-column name="type" />
+		</finder>
 		<finder name="G_FCI" return-type="Collection">
 			<finder-column name="groupId" />
 			<finder-column name="fragmentCollectionId" />
@@ -238,6 +241,7 @@
 		<column name="html" type="String" />
 		<column name="js" type="String" />
 		<column name="configuration" type="String" />
+		<column name="deleted" type="boolean" />
 		<column name="editableValues" type="String" />
 		<column name="namespace" type="String" />
 		<column name="position" type="int" />
@@ -260,7 +264,7 @@
 			<finder-column name="groupId" />
 		</finder>
 		<finder name="FragmentEntryId" return-type="Collection">
-			<finder-column name="fragmentEntryId" />
+			<finder-column arrayable-operator="true" name="fragmentEntryId" />
 		</finder>
 		<finder name="RendererKey" return-type="Collection">
 			<finder-column name="rendererKey" />
@@ -297,6 +301,11 @@
 			<finder-column name="groupId" />
 			<finder-column name="classNameId" />
 			<finder-column name="classPK" />
+		</finder>
+		<finder name="G_P_D" return-type="Collection">
+			<finder-column name="groupId" />
+			<finder-column name="plid" />
+			<finder-column name="deleted" />
 		</finder>
 		<finder name="G_F_C_C" return-type="Collection">
 			<finder-column name="groupId" />

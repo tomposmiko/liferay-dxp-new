@@ -51,10 +51,24 @@ public class DXPCloudClientTestrayImporter {
 		for (Element testCaseResultElement : _getTestCaseResultElements()) {
 			Element testCaseElement = rootElement.addElement("testcase");
 
+			Matcher matcher = _pattern.matcher(
+				testCaseResultElement.attributeValue("name"));
+
+			if (matcher.find()) {
+				System.out.println("Importing " + matcher.group("testName"));
+			}
+
 			testCaseElement.add(
 				_getTestCaseAttachmentsElement(testCaseResultElement));
 			testCaseElement.add(
 				_getTestCasePropertiesElement(testCaseResultElement));
+
+			Element testCaseFailureElement = _getTestCaseFailureElement(
+				testCaseResultElement);
+
+			if (testCaseFailureElement != null) {
+				testCaseElement.add(testCaseFailureElement);
+			}
 		}
 
 		TestrayBuild testrayBuild = _getTestrayBuild();
@@ -107,9 +121,12 @@ public class DXPCloudClientTestrayImporter {
 				JenkinsResultsParserUtil.tarGzip(
 					testrayResultsDir, resultsTarGzFile);
 
-				TestrayS3Bucket testrayS3Bucket = TestrayS3Bucket.getInstance();
+				if (_testrayS3Bucket == null) {
+					throw new RuntimeException(
+						"ERROR: Testray 2 requires GCP to be configured");
+				}
 
-				testrayS3Bucket.createTestrayS3Object(
+				_testrayS3Bucket.createTestrayS3Object(
 					"inbox/" + resultsTarGzFile.getName(), resultsTarGzFile);
 			}
 			catch (Exception exception) {
@@ -154,67 +171,75 @@ public class DXPCloudClientTestrayImporter {
 		return varValue;
 	}
 
-	private static Element _getOutputLogAttachmentElement() {
-		File xmlFile = new File(
-			_projectDir,
-			"test-results/TEST-com.liferay.poshi.runner.PoshiRunner.xml");
-
-		if (!xmlFile.exists()) {
+	private static Element _getPoshiLogAttachmentElement(File testDir) {
+		if (_testrayS3Bucket == null) {
 			return null;
 		}
 
-		File gzipFile = new File(_projectDir, "test-results/system-out.txt.gz");
+		Element systemOutAttachmentElement = _getSystemOutAttachmentElement();
+
+		if (systemOutAttachmentElement == null) {
+			return null;
+		}
+
+		File systemOutGzipFile = new File(
+			_projectDir, "test-results/system-out.txt.gz");
+
+		if (!systemOutGzipFile.exists()) {
+			return null;
+		}
+
+		File poshiLogGzipFile = new File(testDir, "poshi-log.txt.gz");
 
 		String key = JenkinsResultsParserUtil.combine(
-			_getRelativeURLPath(), "/", gzipFile.getName());
+			_getRelativeURLPath(), "/",
+			JenkinsResultsParserUtil.getPathRelativeTo(
+				poshiLogGzipFile, _projectDir));
 
-		TestrayS3Bucket testrayS3Bucket = TestrayS3Bucket.getInstance();
+		try {
+			String systemOut = JenkinsResultsParserUtil.read(systemOutGzipFile);
 
-		if (!gzipFile.exists()) {
-			try {
-				String content = JenkinsResultsParserUtil.read(xmlFile);
-
-				if (JenkinsResultsParserUtil.isNullOrEmpty(content)) {
-					return null;
-				}
-
-				String openTag = "<system-out><![CDATA[";
-
-				int x = content.indexOf(openTag);
-
-				int y = content.indexOf("]]></system-out>", x);
-
-				if ((x == -1) || (y == -1)) {
-					return null;
-				}
-
-				String systemOut = content.substring(x + openTag.length(), y);
-
-				systemOut = systemOut.trim();
-
-				if (JenkinsResultsParserUtil.isNullOrEmpty(systemOut)) {
-					return null;
-				}
-
-				File file = new File(
-					_projectDir, "test-results/system-out.txt");
-
-				JenkinsResultsParserUtil.write(file, systemOut);
-
-				JenkinsResultsParserUtil.gzip(file, gzipFile);
-
-				testrayS3Bucket.createTestrayS3Object(key, gzipFile);
+			if (JenkinsResultsParserUtil.isNullOrEmpty(systemOut)) {
+				return null;
 			}
-			catch (Exception exception) {
-				throw new RuntimeException(exception);
+
+			String testName = testDir.getName();
+
+			testName = testName.replaceAll("_", "#");
+
+			String open = "###\n### " + testName + "\n###";
+
+			int x = systemOut.indexOf(open);
+
+			if (x == -1) {
+				return null;
 			}
+
+			int y = systemOut.indexOf("###", x + open.length());
+
+			if (y == -1) {
+				y = systemOut.length();
+			}
+
+			File poshiLogFile = new File(testDir, "poshi-log.txt");
+
+			JenkinsResultsParserUtil.write(
+				poshiLogFile, systemOut.substring(x, y));
+
+			JenkinsResultsParserUtil.gzip(poshiLogFile, poshiLogGzipFile);
+
+			_testrayS3Bucket.createTestrayS3Object(key, poshiLogGzipFile);
+		}
+		catch (IOException ioException) {
+			return null;
 		}
 
 		Element attachmentElement = Dom4JUtil.getNewElement("attachment");
 
-		attachmentElement.addAttribute("name", "Output Log");
+		attachmentElement.addAttribute("name", "Poshi Log");
 		attachmentElement.addAttribute(
-			"url", testrayS3Bucket.getTestrayS3BaseURL() + key + "?authuser=0");
+			"url",
+			_testrayS3Bucket.getTestrayS3BaseURL() + key + "?authuser=0");
 		attachmentElement.addAttribute("value", key + "?authuser=0");
 
 		return attachmentElement;
@@ -256,12 +281,150 @@ public class DXPCloudClientTestrayImporter {
 		return _relativeURLPath;
 	}
 
+	private static Element _getSystemErrAttachmentElement() {
+		if (_testrayS3Bucket == null) {
+			return null;
+		}
+
+		File xmlFile = new File(
+			_projectDir,
+			"test-results/TEST-com.liferay.poshi.runner.PoshiRunner.xml");
+
+		if (!xmlFile.exists()) {
+			return null;
+		}
+
+		File gzipFile = new File(_projectDir, "test-results/system-err.txt.gz");
+
+		String key = JenkinsResultsParserUtil.combine(
+			_getRelativeURLPath(), "/", gzipFile.getName());
+
+		if (!gzipFile.exists()) {
+			try {
+				String content = JenkinsResultsParserUtil.read(xmlFile);
+
+				if (JenkinsResultsParserUtil.isNullOrEmpty(content)) {
+					return null;
+				}
+
+				String openTag = "<system-err><![CDATA[";
+
+				int x = content.indexOf(openTag);
+
+				int y = content.indexOf("]]></system-err>", x);
+
+				if ((x == -1) || (y == -1)) {
+					return null;
+				}
+
+				String systemOut = content.substring(x + openTag.length(), y);
+
+				systemOut = systemOut.trim();
+
+				if (JenkinsResultsParserUtil.isNullOrEmpty(systemOut)) {
+					return null;
+				}
+
+				File file = new File(
+					_projectDir, "test-results/system-err.txt");
+
+				JenkinsResultsParserUtil.write(file, systemOut);
+
+				JenkinsResultsParserUtil.gzip(file, gzipFile);
+
+				_testrayS3Bucket.createTestrayS3Object(key, gzipFile);
+			}
+			catch (Exception exception) {
+				throw new RuntimeException(exception);
+			}
+		}
+
+		Element attachmentElement = Dom4JUtil.getNewElement("attachment");
+
+		attachmentElement.addAttribute("name", "System Err");
+		attachmentElement.addAttribute(
+			"url",
+			_testrayS3Bucket.getTestrayS3BaseURL() + key + "?authuser=0");
+		attachmentElement.addAttribute("value", key + "?authuser=0");
+
+		return attachmentElement;
+	}
+
+	private static Element _getSystemOutAttachmentElement() {
+		if (_testrayS3Bucket == null) {
+			return null;
+		}
+
+		File xmlFile = new File(
+			_projectDir,
+			"test-results/TEST-com.liferay.poshi.runner.PoshiRunner.xml");
+
+		if (!xmlFile.exists()) {
+			return null;
+		}
+
+		File gzipFile = new File(_projectDir, "test-results/system-out.txt.gz");
+
+		String key = JenkinsResultsParserUtil.combine(
+			_getRelativeURLPath(), "/", gzipFile.getName());
+
+		if (!gzipFile.exists()) {
+			try {
+				String content = JenkinsResultsParserUtil.read(xmlFile);
+
+				if (JenkinsResultsParserUtil.isNullOrEmpty(content)) {
+					return null;
+				}
+
+				String openTag = "<system-out><![CDATA[";
+
+				int x = content.indexOf(openTag);
+
+				int y = content.indexOf("]]></system-out>", x);
+
+				if ((x == -1) || (y == -1)) {
+					return null;
+				}
+
+				String systemOut = content.substring(x + openTag.length(), y);
+
+				systemOut = systemOut.trim();
+
+				if (JenkinsResultsParserUtil.isNullOrEmpty(systemOut)) {
+					return null;
+				}
+
+				File file = new File(
+					_projectDir, "test-results/system-out.txt");
+
+				JenkinsResultsParserUtil.write(file, systemOut);
+
+				JenkinsResultsParserUtil.gzip(file, gzipFile);
+
+				_testrayS3Bucket.createTestrayS3Object(key, gzipFile);
+			}
+			catch (Exception exception) {
+				throw new RuntimeException(exception);
+			}
+		}
+
+		Element attachmentElement = Dom4JUtil.getNewElement("attachment");
+
+		attachmentElement.addAttribute("name", "System Out");
+		attachmentElement.addAttribute(
+			"url",
+			_testrayS3Bucket.getTestrayS3BaseURL() + key + "?authuser=0");
+		attachmentElement.addAttribute("value", key + "?authuser=0");
+
+		return attachmentElement;
+	}
+
 	private static Element _getTestCaseAttachmentsElement(
 		Element testCaseResultElement) {
 
 		Element attachmentsElement = Dom4JUtil.getNewElement("attachments");
 
-		if (!TestrayS3Bucket.googleCredentialsAvailable()) {
+		if (_testrayS3Bucket == null) {
 			return attachmentsElement;
 		}
 
@@ -289,8 +452,6 @@ public class DXPCloudClientTestrayImporter {
 
 		_removeUnreferencedImages(new File(testDir, "index.html"));
 
-		TestrayS3Bucket testrayS3Bucket = TestrayS3Bucket.getInstance();
-
 		for (File file : JenkinsResultsParserUtil.findFiles(testDir, ".*")) {
 			String fileName = file.getName();
 
@@ -312,7 +473,7 @@ public class DXPCloudClientTestrayImporter {
 				JenkinsResultsParserUtil.getPathRelativeTo(
 					file, testDir.getParentFile()));
 
-			testrayS3Bucket.createTestrayS3Object(key, file);
+			_testrayS3Bucket.createTestrayS3Object(key, file);
 
 			String attachmentName;
 
@@ -338,13 +499,48 @@ public class DXPCloudClientTestrayImporter {
 			attachmentElement.addAttribute("value", key + "?authuser=0");
 		}
 
-		Element outputLogAttachmentElement = _getOutputLogAttachmentElement();
+		Element poshiLogAttachmentElement = _getPoshiLogAttachmentElement(
+			testDir);
 
-		if (outputLogAttachmentElement != null) {
-			attachmentsElement.add(outputLogAttachmentElement);
+		if (poshiLogAttachmentElement != null) {
+			attachmentsElement.add(poshiLogAttachmentElement);
+		}
+
+		Element systemErrAttachmentElement = _getSystemErrAttachmentElement();
+
+		if (systemErrAttachmentElement != null) {
+			attachmentsElement.add(systemErrAttachmentElement);
+		}
+
+		Element systemOutAttachmentElement = _getSystemOutAttachmentElement();
+
+		if (systemOutAttachmentElement != null) {
+			attachmentsElement.add(systemOutAttachmentElement);
 		}
 
 		return attachmentsElement;
+	}
+
+	private static Element _getTestCaseFailureElement(
+		Element testCaseResultElement) {
+
+		Element failureElement = testCaseResultElement.element("failure");
+
+		if (failureElement == null) {
+			return null;
+		}
+
+		String failureMessage = failureElement.attributeValue("message");
+
+		if (JenkinsResultsParserUtil.isNullOrEmpty(failureMessage)) {
+			return null;
+		}
+
+		Element testCaseFailureElement = Dom4JUtil.getNewElement("failure");
+
+		testCaseFailureElement.addAttribute("message", failureMessage);
+
+		return testCaseFailureElement;
 	}
 
 	private static Element _getTestCasePropertiesElement(
@@ -433,7 +629,8 @@ public class DXPCloudClientTestrayImporter {
 			testrayProject.createTestrayProductVersion(_testrayProductVersion);
 
 		_testrayBuild = testrayRoutine.createTestrayBuild(
-			testrayProductVersion, _getTestrayBuildName());
+			testrayProductVersion, _getTestrayBuildName(),
+			new Date(_START_TIME), null, _testrayBuildSHA);
 
 		return _testrayBuild;
 	}
@@ -525,6 +722,12 @@ public class DXPCloudClientTestrayImporter {
 			_testrayBuildName = testrayBuildName;
 		}
 
+		String testrayBuildSHA = _getEnvVarValue("testrayBuildSHA");
+
+		if (!JenkinsResultsParserUtil.isNullOrEmpty(testrayBuildSHA)) {
+			_testrayBuildSHA = testrayBuildSHA;
+		}
+
 		String testrayCasePriority = _getEnvVarValue("testrayCasePriority");
 
 		if ((testrayCasePriority != null) &&
@@ -561,6 +764,18 @@ public class DXPCloudClientTestrayImporter {
 
 		if (!JenkinsResultsParserUtil.isNullOrEmpty(testrayRoutineName)) {
 			_testrayRoutineName = testrayRoutineName;
+		}
+
+		String testrayS3BucketName = _getEnvVarValue("testrayS3BucketName");
+
+		if (JenkinsResultsParserUtil.isNullOrEmpty(testrayS3BucketName)) {
+			testrayS3BucketName = TestrayS3Bucket.DEFAULT_BUCKET_NAME;
+		}
+
+		if (TestrayS3Bucket.hasGoogleApplicationCredentials(
+				testrayS3BucketName)) {
+
+			_testrayS3Bucket = TestrayS3Bucket.getInstance(testrayS3BucketName);
 		}
 
 		String testrayServerURL = _getEnvVarValue("testrayServerURL");
@@ -628,12 +843,14 @@ public class DXPCloudClientTestrayImporter {
 	private static TestrayBuild _testrayBuild;
 	private static String _testrayBuildName =
 		"DXP Cloud Client Build - $(start.time)";
+	private static String _testrayBuildSHA;
 	private static Integer _testrayCasePriority = 1;
 	private static String _testrayComponentName = "DXP Cloud Client Component";
 	private static String _testrayProductVersion = "1.x";
 	private static String _testrayProjectName = "DXP Cloud Client";
 	private static String _testrayReleaseName = "production";
 	private static String _testrayRoutineName = "DXP Cloud Client Routine";
+	private static TestrayS3Bucket _testrayS3Bucket;
 	private static String _testrayServerURL = "https://testray.liferay.com";
 	private static String _testrayTeamName = "DXP Cloud Client Team";
 	private static String _testrayUserName;

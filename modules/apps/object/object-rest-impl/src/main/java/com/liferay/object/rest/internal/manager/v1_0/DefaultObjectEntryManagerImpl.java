@@ -52,6 +52,8 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.sanitizer.Sanitizer;
+import com.liferay.portal.kernel.sanitizer.SanitizerUtil;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Sort;
@@ -62,6 +64,7 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.GroupThreadLocal;
@@ -126,14 +129,14 @@ public class DefaultObjectEntryManagerImpl
 			String scopeKey)
 		throws Exception {
 
+		long groupId = getGroupId(objectDefinition, scopeKey);
+
 		return _toObjectEntry(
 			dtoConverterContext, objectDefinition,
 			_objectEntryService.addObjectEntry(
-				getGroupId(objectDefinition, scopeKey),
-				objectDefinition.getObjectDefinitionId(),
+				groupId, objectDefinition.getObjectDefinitionId(),
 				_toObjectValues(
-					objectDefinition.getObjectDefinitionId(),
-					objectEntry.getProperties(),
+					groupId, objectDefinition, 0L, objectEntry.getProperties(),
 					dtoConverterContext.getLocale()),
 				_createServiceContext(
 					objectEntry.getProperties(),
@@ -175,14 +178,15 @@ public class DefaultObjectEntryManagerImpl
 
 		serviceContext.setCompanyId(companyId);
 
+		long groupId = getGroupId(objectDefinition, scopeKey);
+
 		return _toObjectEntry(
 			dtoConverterContext, objectDefinition,
 			_objectEntryService.addOrUpdateObjectEntry(
-				externalReferenceCode, getGroupId(objectDefinition, scopeKey),
+				externalReferenceCode, groupId,
 				objectDefinition.getObjectDefinitionId(),
 				_toObjectValues(
-					objectDefinition.getObjectDefinitionId(),
-					objectEntry.getProperties(),
+					groupId, objectDefinition, 0L, objectEntry.getProperties(),
 					dtoConverterContext.getLocale()),
 				serviceContext));
 	}
@@ -391,6 +395,14 @@ public class DefaultObjectEntryManagerImpl
 						objectDefinition.getObjectDefinitionId()),
 					groupId, dtoConverterContext.getUriInfo())
 			).put(
+				"createBatch",
+				ActionUtil.addAction(
+					"ADD_OBJECT_ENTRY", ObjectEntryResourceImpl.class, 0L,
+					"postObjectEntryBatch", null, objectDefinition.getUserId(),
+					_getObjectEntriesPermissionName(
+						objectDefinition.getObjectDefinitionId()),
+					groupId, dtoConverterContext.getUriInfo())
+			).put(
 				"get",
 				ActionUtil.addAction(
 					ActionKeys.VIEW, ObjectEntryResourceImpl.class, 0L,
@@ -566,7 +578,8 @@ public class DefaultObjectEntryManagerImpl
 			_objectEntryService.updateObjectEntry(
 				objectEntryId,
 				_toObjectValues(
-					serviceBuilderObjectEntry.getObjectDefinitionId(),
+					serviceBuilderObjectEntry.getGroupId(), objectDefinition,
+					serviceBuilderObjectEntry.getObjectEntryId(),
 					objectEntry.getProperties(),
 					dtoConverterContext.getLocale()),
 				_createServiceContext(
@@ -590,6 +603,9 @@ public class DefaultObjectEntryManagerImpl
 		Map<String, Object> properties, long userId) {
 
 		ServiceContext serviceContext = new ServiceContext();
+
+		serviceContext.setAddGroupPermissions(true);
+		serviceContext.setAddGuestPermissions(true);
 
 		if (properties.get("categoryIds") != null) {
 			serviceContext.setAssetCategoryIds(
@@ -695,10 +711,14 @@ public class DefaultObjectEntryManagerImpl
 					objectDefinition.getObjectDefinitionId(), deletionType,
 					false)) {
 
+			ObjectDefinition objectDefinition2 =
+				_objectDefinitionLocalService.getObjectDefinition(
+					objectRelationship.getObjectDefinitionId2());
+
 			ObjectRelatedModelsProvider objectRelatedModelsProvider =
 				_objectRelatedModelsProviderRegistry.
 					getObjectRelatedModelsProvider(
-						objectDefinition.getClassName(),
+						objectDefinition2.getClassName(),
 						objectRelationship.getType());
 
 			int count = objectRelatedModelsProvider.getRelatedModelsCount(
@@ -820,60 +840,63 @@ public class DefaultObjectEntryManagerImpl
 			com.liferay.object.model.ObjectEntry objectEntry)
 		throws Exception {
 
-		DefaultDTOConverterContext defaultDTOConverterContext =
-			new DefaultDTOConverterContext(
-				dtoConverterContext.isAcceptAllLanguages(),
-				HashMapBuilder.put(
-					"delete",
-					() -> {
-						if (_hasRelatedObjectEntries(
-								ObjectRelationshipConstants.
-									DELETION_TYPE_PREVENT,
-								objectDefinition, objectEntry)) {
+		HashMap<String, Map<String, String>> actions = new HashMap<>();
 
-							return null;
-						}
+		if (GetterUtil.getBoolean(
+				dtoConverterContext.getAttribute("addActions"), true)) {
 
-						return ActionUtil.addAction(
-							ActionKeys.DELETE, ObjectEntryResourceImpl.class,
-							objectEntry.getObjectEntryId(), "deleteObjectEntry",
-							null, objectEntry.getUserId(),
-							_getObjectEntryPermissionName(
-								objectEntry.getObjectDefinitionId()),
-							objectEntry.getGroupId(),
-							dtoConverterContext.getUriInfo());
+			actions = HashMapBuilder.<String, Map<String, String>>put(
+				"delete",
+				() -> {
+					if (_hasRelatedObjectEntries(
+							ObjectRelationshipConstants.DELETION_TYPE_PREVENT,
+							objectDefinition, objectEntry)) {
+
+						return null;
 					}
-				).put(
-					"get",
-					ActionUtil.addAction(
-						ActionKeys.VIEW, ObjectEntryResourceImpl.class,
-						objectEntry.getObjectEntryId(), "getObjectEntry", null,
-						objectEntry.getUserId(),
-						_getObjectEntryPermissionName(
-							objectEntry.getObjectDefinitionId()),
-						objectEntry.getGroupId(),
-						dtoConverterContext.getUriInfo())
-				).put(
-					"permissions",
-					ActionUtil.addAction(
-						ActionKeys.PERMISSIONS, ObjectEntryResourceImpl.class,
-						objectEntry.getObjectEntryId(), "patchObjectEntry",
+
+					return ActionUtil.addAction(
+						ActionKeys.DELETE, ObjectEntryResourceImpl.class,
+						objectEntry.getObjectEntryId(), "deleteObjectEntry",
 						null, objectEntry.getUserId(),
 						_getObjectEntryPermissionName(
 							objectEntry.getObjectDefinitionId()),
 						objectEntry.getGroupId(),
-						dtoConverterContext.getUriInfo())
-				).put(
-					"update",
-					ActionUtil.addAction(
-						ActionKeys.UPDATE, ObjectEntryResourceImpl.class,
-						objectEntry.getObjectEntryId(), "putObjectEntry", null,
-						objectEntry.getUserId(),
-						_getObjectEntryPermissionName(
-							objectEntry.getObjectDefinitionId()),
-						objectEntry.getGroupId(),
-						dtoConverterContext.getUriInfo())
-				).build(),
+						dtoConverterContext.getUriInfo());
+				}
+			).put(
+				"get",
+				ActionUtil.addAction(
+					ActionKeys.VIEW, ObjectEntryResourceImpl.class,
+					objectEntry.getObjectEntryId(), "getObjectEntry", null,
+					objectEntry.getUserId(),
+					_getObjectEntryPermissionName(
+						objectEntry.getObjectDefinitionId()),
+					objectEntry.getGroupId(), dtoConverterContext.getUriInfo())
+			).put(
+				"permissions",
+				ActionUtil.addAction(
+					ActionKeys.PERMISSIONS, ObjectEntryResourceImpl.class,
+					objectEntry.getObjectEntryId(), "patchObjectEntry", null,
+					objectEntry.getUserId(),
+					_getObjectEntryPermissionName(
+						objectEntry.getObjectDefinitionId()),
+					objectEntry.getGroupId(), dtoConverterContext.getUriInfo())
+			).put(
+				"update",
+				ActionUtil.addAction(
+					ActionKeys.UPDATE, ObjectEntryResourceImpl.class,
+					objectEntry.getObjectEntryId(), "putObjectEntry", null,
+					objectEntry.getUserId(),
+					_getObjectEntryPermissionName(
+						objectEntry.getObjectDefinitionId()),
+					objectEntry.getGroupId(), dtoConverterContext.getUriInfo())
+			).build();
+		}
+
+		DefaultDTOConverterContext defaultDTOConverterContext =
+			new DefaultDTOConverterContext(
+				dtoConverterContext.isAcceptAllLanguages(), actions,
 				dtoConverterContext.getDTOConverterRegistry(),
 				dtoConverterContext.getHttpServletRequest(),
 				objectEntry.getObjectEntryId(), dtoConverterContext.getLocale(),
@@ -888,11 +911,13 @@ public class DefaultObjectEntryManagerImpl
 	}
 
 	private Map<String, Serializable> _toObjectValues(
-		long objectDefinitionId, Map<String, Object> properties,
-		Locale locale) {
+			long groupId, ObjectDefinition objectDefinition, long objectEntryId,
+			Map<String, Object> properties, Locale locale)
+		throws Exception {
 
 		List<ObjectField> objectFields =
-			_objectFieldLocalService.getObjectFields(objectDefinitionId);
+			_objectFieldLocalService.getObjectFields(
+				objectDefinition.getObjectDefinitionId());
 
 		Map<String, Serializable> values = new HashMap<>();
 
@@ -902,6 +927,22 @@ public class DefaultObjectEntryManagerImpl
 			Object object = properties.get(name);
 
 			if ((object == null) && !objectField.isRequired()) {
+				continue;
+			}
+
+			if (Objects.equals(
+					ObjectFieldConstants.BUSINESS_TYPE_RICH_TEXT,
+					objectField.getBusinessType())) {
+
+				values.put(
+					name,
+					SanitizerUtil.sanitize(
+						objectField.getCompanyId(), groupId,
+						objectField.getUserId(),
+						objectDefinition.getClassName(), objectEntryId,
+						ContentTypes.TEXT_HTML, Sanitizer.MODE_ALL,
+						String.valueOf(object), null));
+
 				continue;
 			}
 

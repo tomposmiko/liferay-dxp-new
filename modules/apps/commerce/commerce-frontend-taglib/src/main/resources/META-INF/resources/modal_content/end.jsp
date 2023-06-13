@@ -21,7 +21,7 @@
 	<c:if test="<%= Validator.isNotNull(submitButtonLabel) || showCancelButton || showSubmitButton %>">
 		<div class="modal-iframe-footer">
 			<c:if test="<%= showCancelButton %>">
-				<div class="btn btn-secondary ml-3 modal-closer"><%= LanguageUtil.get(request, "cancel") %></div>
+				<div class="btn btn-secondary ml-3 modal-closer"><liferay-ui:message key="cancel" /></div>
 			</c:if>
 
 			<c:if test="<%= showSubmitButton || Validator.isNotNull(submitButtonLabel) %>">
@@ -45,6 +45,10 @@
 			};
 		}
 
+		<c:if test="<%= redirect != null %>">
+			eventDetail.redirectURL = '<%= redirect %>';
+		</c:if>
+
 		window.top.Liferay.fire(events.CLOSE_MODAL, eventDetail);
 	}
 
@@ -56,11 +60,14 @@
 		}
 	});
 
-	<c:if test='<%= SessionMessages.contains(renderRequest, "requestProcessed") %>'>
-		closeModal(true);
-	</c:if>
-
-	window.top.Liferay.fire(events.IS_LOADING_MODAL, {isLoading: false});
+	<c:choose>
+		<c:when test='<%= SessionMessages.contains(renderRequest, "requestProcessed") %>'>
+			closeModal(true);
+		</c:when>
+		<c:otherwise>
+			window.top.Liferay.fire(events.IS_LOADING_MODAL, {isLoading: false});
+		</c:otherwise>
+	</c:choose>
 
 	document.querySelectorAll('.modal-closer').forEach((trigger) => {
 		trigger.addEventListener('click', (e) => {

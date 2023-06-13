@@ -23,6 +23,7 @@ import React, {useEffect, useMemo, useState} from 'react';
 import {getResetLabelByViewport} from '../../../app/utils/getResetLabelByViewport';
 import {LengthField} from '../../../common/components/LengthField';
 import useControlledState from '../../../core/hooks/useControlledState';
+import {useId} from '../../../core/hooks/useId';
 import {ConfigurationFieldPropTypes} from '../../../prop-types/index';
 import {useActiveItemId} from '../../contexts/ControlsContext';
 import {useGlobalContext} from '../../contexts/GlobalContext';
@@ -30,7 +31,6 @@ import getLayoutDataItemUniqueClassName from '../../utils/getLayoutDataItemUniqu
 import getPreviousResponsiveStyle from '../../utils/getPreviousResponsiveStyle';
 import isNullOrUndefined from '../../utils/isNullOrUndefined';
 import isValidStyleValue from '../../utils/isValidStyleValue';
-import {useId} from '../../utils/useId';
 
 export function AdvancedSelectField({
 	canDetachTokenValues,
@@ -130,6 +130,7 @@ export function AdvancedSelectField({
 				<LengthField
 					field={field}
 					onValueSelect={onValueSelect}
+					showLabel={!field.icon}
 					value={nextValue}
 				/>
 			) : (
@@ -227,9 +228,9 @@ export function AdvancedSelectField({
 			) : null}
 
 			{field.description ? (
-				<div className="mt-1 small text-secondary" id={helpTextId}>
+				<p className="m-0 mt-1 small text-secondary" id={helpTextId}>
 					{field.description}
-				</div>
+				</p>
 			) : null}
 
 			{error ? (
@@ -326,7 +327,7 @@ const SingleSelectWithIcon = ({
 				id={inputId}
 				onChange={onChange}
 				options={options}
-				value={value}
+				value={value || ''}
 			/>
 
 			<div
@@ -390,7 +391,7 @@ AdvancedSelectField.propTypes = {
 					label: PropTypes.string.isRequired,
 					value: PropTypes.string.isRequired,
 				})
-			).isRequired,
+			),
 		}),
 	}),
 	onValueSelect: PropTypes.func.isRequired,

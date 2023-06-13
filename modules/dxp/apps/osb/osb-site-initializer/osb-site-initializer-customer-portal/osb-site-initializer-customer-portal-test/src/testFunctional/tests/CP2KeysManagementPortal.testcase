@@ -26,6 +26,12 @@ definition {
 			CustomerPortal.addCustomerPortalSite(siteName = "${testSiteName}");
 		}
 
+		task ("Add test user access to all Accounts") {
+			CustomerPortal.assignUserToOrganization();
+
+			CustomerPortal.addUserToOneOrMoreAccounts(accountsList = "${testAccount}");
+		}
+
 		task ("Login on OKTA") {
 			CustomerPortal.loginOktaToUpdateCP();
 		}

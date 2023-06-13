@@ -120,6 +120,12 @@ public class ObjectDefinitionResourceTest
 	@Ignore
 	@Override
 	@Test
+	public void testGraphQLGetObjectDefinitionByExternalReferenceCodeNotFound() {
+	}
+
+	@Ignore
+	@Override
+	@Test
 	public void testGraphQLGetObjectDefinitionNotFound() {
 	}
 
@@ -228,10 +234,14 @@ public class ObjectDefinitionResourceTest
 			new ObjectField[] {
 				new ObjectField() {
 					{
-						setBusinessType(BusinessType.TEXT);
-						setDBType(ObjectField.DBType.create("String"));
-						setLabel(Collections.singletonMap("en_US", "Column"));
-						setName("column");
+						businessType = BusinessType.TEXT;
+						DBType = ObjectField.DBType.create("String");
+						indexed = false;
+						indexedAsKeyword = false;
+						label = Collections.singletonMap("en_US", "Column");
+						name = "column";
+						required = false;
+						system = false;
 					}
 				}
 			});
@@ -240,8 +250,6 @@ public class ObjectDefinitionResourceTest
 		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-135430"))) {
 			objectDefinition.setStorageType(StringPool.BLANK);
 		}
-
-		objectDefinition.setTitleObjectFieldId(Long.valueOf(0));
 
 		return objectDefinition;
 	}
@@ -255,6 +263,14 @@ public class ObjectDefinitionResourceTest
 
 	@Override
 	protected ObjectDefinition testGetObjectDefinition_addObjectDefinition()
+		throws Exception {
+
+		return _addObjectDefinition(randomObjectDefinition());
+	}
+
+	@Override
+	protected ObjectDefinition
+			testGetObjectDefinitionByExternalReferenceCode_addObjectDefinition()
 		throws Exception {
 
 		return _addObjectDefinition(randomObjectDefinition());
@@ -300,6 +316,14 @@ public class ObjectDefinitionResourceTest
 
 	@Override
 	protected ObjectDefinition testPutObjectDefinition_addObjectDefinition()
+		throws Exception {
+
+		return _addObjectDefinition(randomObjectDefinition());
+	}
+
+	@Override
+	protected ObjectDefinition
+			testPutObjectDefinitionByExternalReferenceCode_addObjectDefinition()
 		throws Exception {
 
 		return _addObjectDefinition(randomObjectDefinition());

@@ -62,11 +62,7 @@ public class ObjectEntryEntityModel implements EntityModel {
 			() -> new StringEntityField(
 				"externalReferenceCode", locale -> "externalReferenceCode")
 		).put(
-			"id",
-			new IdEntityField(
-				"id",
-				locale -> Field.getSortableFieldName(Field.ENTRY_CLASS_PK),
-				String::valueOf)
+			"id", new IdEntityField("id", locale -> "id", String::valueOf)
 		).put(
 			"objectDefinitionId",
 			new IntegerEntityField(
@@ -90,6 +86,12 @@ public class ObjectEntryEntityModel implements EntityModel {
 					objectField.getRelationshipType(), "oneToMany")) {
 
 				String objectFieldName = objectField.getName();
+
+				_entityFieldsMap.put(
+					objectFieldName,
+					new IdEntityField(
+						objectFieldName, locale -> objectFieldName,
+						String::valueOf));
 
 				String relationshipIdName = objectFieldName.substring(
 					objectFieldName.lastIndexOf(StringPool.UNDERLINE) + 1);

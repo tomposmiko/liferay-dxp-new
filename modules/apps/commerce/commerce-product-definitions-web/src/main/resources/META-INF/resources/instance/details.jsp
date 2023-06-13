@@ -123,7 +123,7 @@ boolean discontinued = BeanParamUtil.getBoolean(cpInstance, request, "discontinu
 			</div>
 
 			<div class="col-4">
-				<aui:input label="sale-price" name="promoPrice" suffix="<%= HtmlUtil.escape(commerceCurrencyCode) %>" type="text" value="<%= cpInstanceDisplayContext.getPromoPrice() %>">
+				<aui:input label="promotion-price" name="promoPrice" suffix="<%= HtmlUtil.escape(commerceCurrencyCode) %>" type="text" value="<%= cpInstanceDisplayContext.getPromoPrice() %>">
 					<aui:validator name="min"><%= CommercePriceConstants.PRICE_VALUE_MIN %></aui:validator>
 					<aui:validator name="max"><%= CommercePriceConstants.PRICE_VALUE_MAX %></aui:validator>
 					<aui:validator name="number" />
@@ -214,7 +214,7 @@ boolean discontinued = BeanParamUtil.getBoolean(cpInstance, request, "discontinu
 		%>
 
 		<div class="<%= replacementAutocompleteWrapperCssClasses %>" id="<portlet:namespace />replacementAutocompleteWrapper">
-			<label class="control-label" for="replacementCPInstanceId"><%= LanguageUtil.get(request, "replacement") %></label>
+			<label class="control-label" for="replacementCPInstanceId"><liferay-ui:message key="replacement" /></label>
 
 			<div id="autocomplete-root"></div>
 		</div>

@@ -28,6 +28,7 @@ import com.liferay.fragment.service.FragmentEntryService;
 import com.liferay.fragment.util.comparator.FragmentCollectionContributorNameComparator;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
 import com.liferay.layout.content.page.editor.web.internal.constants.ContentPageEditorConstants;
+import com.liferay.layout.util.PortalPreferencesUtil;
 import com.liferay.layout.util.structure.DropZoneLayoutStructureItem;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.Language;
@@ -51,6 +52,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -74,6 +76,9 @@ public class FragmentCollectionManager {
 		List<Map<String, Object>> allFragmentCollectionMapsList =
 			new ArrayList<>();
 
+		boolean hideInputFragments = ObjectUtil.hideInputFragments(
+			themeDisplay.getCompanyId());
+
 		PortalPreferences portalPreferences =
 			_portletPreferencesFactory.getPortalPreferences(httpServletRequest);
 
@@ -85,8 +90,9 @@ public class FragmentCollectionManager {
 		if (includeSystem) {
 			allFragmentCollectionMapsList =
 				_getSystemFragmentCollectionMapsList(
-					highlightedFragmentEntryKeys, httpServletRequest,
-					masterDropZoneLayoutStructureItem, themeDisplay);
+					hideInputFragments, highlightedFragmentEntryKeys,
+					httpServletRequest, masterDropZoneLayoutStructureItem,
+					themeDisplay);
 		}
 
 		List<FragmentCollection> fragmentCollections =
@@ -112,7 +118,8 @@ public class FragmentCollectionManager {
 
 			List<Map<String, Object>> fragmentEntryMapsList =
 				_getFragmentEntryMapsList(
-					fragmentEntries, highlightedFragmentEntryKeys,
+					hideInputFragments, fragmentEntries,
+					highlightedFragmentEntryKeys,
 					masterDropZoneLayoutStructureItem, themeDisplay);
 
 			fragmentEntryMapsList.addAll(
@@ -164,7 +171,7 @@ public class FragmentCollectionManager {
 					fragmentCollectionMaps, sortedFragmentCollectionKeys);
 		}
 
-		if (!SetUtil.isEmpty(highlightedFragmentEntryKeys)) {
+		if (SetUtil.isNotEmpty(highlightedFragmentEntryKeys)) {
 			Map<String, Map<String, Object>> highlightedFragmentMaps =
 				new TreeMap<>();
 
@@ -227,7 +234,7 @@ public class FragmentCollectionManager {
 	}
 
 	private Map<String, Map<String, Object>> _getDynamicFragmentCollectionMaps(
-		Set<String> highlightedFragmentEntryKeys,
+		boolean hideInputFragments, Set<String> highlightedFragmentEntryKeys,
 		HttpServletRequest httpServletRequest,
 		DropZoneLayoutStructureItem masterDropZoneLayoutStructureItem,
 		ThemeDisplay themeDisplay) {
@@ -242,6 +249,12 @@ public class FragmentCollectionManager {
 				!_isAllowedFragmentEntryKey(
 					fragmentRenderer.getKey(),
 					masterDropZoneLayoutStructureItem)) {
+
+				continue;
+			}
+
+			if ((fragmentRenderer.getType() == FragmentConstants.TYPE_INPUT) &&
+				hideInputFragments) {
 
 				continue;
 			}
@@ -287,6 +300,7 @@ public class FragmentCollectionManager {
 
 	private Map<String, Map<String, Object>>
 		_getFragmentCollectionContributorMaps(
+			boolean hideInputFragments,
 			Set<String> highlightedFragmentEntryKeys,
 			DropZoneLayoutStructureItem masterDropZoneLayoutStructureItem,
 			ThemeDisplay themeDisplay) {
@@ -321,7 +335,8 @@ public class FragmentCollectionManager {
 
 			List<Map<String, Object>> fragmentEntryMapsList =
 				_getFragmentEntryMapsList(
-					fragmentEntries, highlightedFragmentEntryKeys,
+					hideInputFragments, fragmentEntries,
+					highlightedFragmentEntryKeys,
 					masterDropZoneLayoutStructureItem, themeDisplay);
 
 			fragmentEntryMapsList.addAll(
@@ -405,7 +420,7 @@ public class FragmentCollectionManager {
 	}
 
 	private List<Map<String, Object>> _getFragmentEntryMapsList(
-		List<FragmentEntry> fragmentEntries,
+		boolean hideInputFragments, List<FragmentEntry> fragmentEntries,
 		Set<String> highlightedFragmentEntryKeys,
 		DropZoneLayoutStructureItem masterDropZoneLayoutStructureItem,
 		ThemeDisplay themeDisplay) {
@@ -415,7 +430,12 @@ public class FragmentCollectionManager {
 		for (FragmentEntry fragmentEntry : fragmentEntries) {
 			if (!_isAllowedFragmentEntryKey(
 					fragmentEntry.getFragmentEntryKey(),
-					masterDropZoneLayoutStructureItem)) {
+					masterDropZoneLayoutStructureItem) ||
+				((fragmentEntry.isTypeInput() ||
+				  Objects.equals(
+					  fragmentEntry.getFragmentEntryKey(),
+					  "INPUTS-submit-button")) &&
+				 hideInputFragments)) {
 
 				continue;
 			}
@@ -488,24 +508,27 @@ public class FragmentCollectionManager {
 	}
 
 	private List<Map<String, Object>> _getSystemFragmentCollectionMapsList(
-		Set<String> highlightedFragmentEntryKeys,
+		boolean hideInputFragments, Set<String> highlightedFragmentEntryKeys,
 		HttpServletRequest httpServletRequest,
 		DropZoneLayoutStructureItem masterDropZoneLayoutStructureItem,
 		ThemeDisplay themeDisplay) {
 
 		Map<String, Map<String, Object>> fragmentCollectionMaps =
 			_getFragmentCollectionContributorMaps(
-				highlightedFragmentEntryKeys, masterDropZoneLayoutStructureItem,
-				themeDisplay);
+				hideInputFragments, highlightedFragmentEntryKeys,
+				masterDropZoneLayoutStructureItem, themeDisplay);
 
 		fragmentCollectionMaps.putAll(
 			_getDynamicFragmentCollectionMaps(
-				highlightedFragmentEntryKeys, httpServletRequest,
-				masterDropZoneLayoutStructureItem, themeDisplay));
+				hideInputFragments, highlightedFragmentEntryKeys,
+				httpServletRequest, masterDropZoneLayoutStructureItem,
+				themeDisplay));
+
+		Map<String, List<Map<String, Object>>> layoutElementMapsListMap =
+			ObjectUtil.getLayoutElementMapsListMap(themeDisplay.getCompanyId());
 
 		for (Map.Entry<String, List<Map<String, Object>>> entry :
-				ContentPageEditorConstants.layoutElementMapsListMap.
-					entrySet()) {
+				layoutElementMapsListMap.entrySet()) {
 
 			List<Map<String, Object>> layoutElementMapsList =
 				new LinkedList<>();
@@ -612,9 +635,6 @@ public class FragmentCollectionManager {
 
 	@Reference
 	private FragmentCompositionService _fragmentCompositionService;
-
-	@Reference
-	private FragmentEntryLinkManager _fragmentEntryLinkManager;
 
 	@Reference
 	private FragmentEntryService _fragmentEntryService;

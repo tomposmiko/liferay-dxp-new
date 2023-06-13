@@ -27,7 +27,7 @@ import {
 } from '../../../app/contexts/StoreContext';
 import selectWidgetFragmentEntryLinks from '../../../app/selectors/selectWidgetFragmentEntryLinks';
 import loadWidgets from '../../../app/thunks/loadWidgets';
-import {useId} from '../../../app/utils/useId';
+import {useId} from '../../../core/hooks/useId';
 import {useSessionState} from '../../../core/hooks/useSessionState';
 import {COLLECTION_IDS} from './FragmentsSidebar';
 import TabCollection from './TabCollection';
@@ -54,10 +54,7 @@ export default function TabsPanel({
 
 	const [scrollPosition, setScrollPosition] = useSessionState(
 		`${config.portletNamespace}_fragments-sidebar_${activeTabId}_scroll-position`,
-		0,
-		{
-			persistEnabled: Liferay.FeatureFlags['LPS-153452'],
-		}
+		0
 	);
 
 	const scrollPositionRef = useRef(scrollPosition);
@@ -110,7 +107,7 @@ export default function TabsPanel({
 
 	return (
 		<>
-			<ClayTabs className="flex-shrink-0 mx-3 page-editor__sidebar__fragments-widgets-panel__tabs">
+			<ClayTabs className="flex-shrink-0 page-editor__sidebar__fragments-widgets-panel__tabs px-3">
 				{tabs.map((tab, index) => (
 					<ClayTabs.Item
 						active={tab.id === activeTabId}

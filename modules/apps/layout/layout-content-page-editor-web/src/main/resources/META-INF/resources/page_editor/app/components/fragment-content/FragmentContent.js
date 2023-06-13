@@ -17,6 +17,7 @@ import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React, {useCallback, useEffect, useState} from 'react';
 
+import {useId} from '../../../core/hooks/useId';
 import {TEXT_EDITABLE_TYPES} from '../../config/constants/textEditableTypes';
 import {
 	useGetContent,
@@ -40,7 +41,6 @@ import getLayoutDataItemUniqueClassName from '../../utils/getLayoutDataItemUniqu
 import {getResponsiveConfig} from '../../utils/getResponsiveConfig';
 import hasInnerCommonStyles from '../../utils/hasInnerCustomStyles';
 import useBackgroundImageValue from '../../utils/useBackgroundImageValue';
-import {useId} from '../../utils/useId';
 import UnsafeHTML from '../UnsafeHTML';
 import FragmentContentInteractionsFilter from './FragmentContentInteractionsFilter';
 import FragmentContentProcessor from './FragmentContentProcessor';
@@ -113,7 +113,7 @@ const FragmentContent = ({
 		languageId,
 		segmentsExperienceId
 	);
-	const [content, setContent] = useState(defaultContent);
+	const [content, setContent] = useState('');
 
 	/* eslint-disable-next-line react-hooks/exhaustive-deps */
 	const editableValues = fragmentEntryLink

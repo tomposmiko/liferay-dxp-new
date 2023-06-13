@@ -20,12 +20,12 @@ import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 
 import useControlledState from '../../../core/hooks/useControlledState';
+import {useId} from '../../../core/hooks/useId';
 import {useStyleBook} from '../../../plugins/page-design-options/hooks/useStyleBook';
 import {ConfigurationFieldPropTypes} from '../../../prop-types/index';
 import {useSelector} from '../../contexts/StoreContext';
 import selectCanDetachTokenValues from '../../selectors/selectCanDetachTokenValues';
 import isNullOrUndefined from '../../utils/isNullOrUndefined';
-import {useId} from '../../utils/useId';
 import {AdvancedSelectField} from './AdvancedSelectField';
 
 export function SelectField({
@@ -42,7 +42,7 @@ export function SelectField({
 		(state) => state.selectedViewportSize
 	);
 
-	const validValues = field.typeOptions?.validValues;
+	const validValues = field.typeOptions?.validValues || [];
 
 	const multiSelect = field.typeOptions?.multiSelect ?? false;
 
@@ -83,7 +83,7 @@ export function SelectField({
 							: []
 					}
 				/>
-			) : field.icon && Liferay.FeatureFlags['LPS-143206'] ? (
+			) : field.icon ? (
 				<AdvancedSelectField
 					canDetachTokenValues={canDetachTokenValues}
 					disabled={disabled}
@@ -202,9 +202,9 @@ const MultiSelect = ({
 			</ClayDropDown>
 
 			{field.description ? (
-				<div className="mt-1 small text-secondary" id={helpTextId}>
+				<p className="m-0 mt-1 small text-secondary" id={helpTextId}>
 					{field.description}
-				</div>
+				</p>
 			) : null}
 		</>
 	);
@@ -241,9 +241,9 @@ const SingleSelect = ({disabled, field, onValueSelect, options, value}) => {
 			/>
 
 			{field.description ? (
-				<div className="mt-1 small text-secondary" id={helpTextId}>
+				<p className="m-0 mt-1 small text-secondary" id={helpTextId}>
 					{field.description}
-				</div>
+				</p>
 			) : null}
 		</>
 	);
@@ -261,7 +261,7 @@ SelectField.propTypes = {
 					label: PropTypes.string.isRequired,
 					value: PropTypes.string.isRequired,
 				})
-			).isRequired,
+			),
 		}),
 	}),
 

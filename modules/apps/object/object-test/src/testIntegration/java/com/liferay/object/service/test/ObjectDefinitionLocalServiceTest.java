@@ -26,6 +26,7 @@ import com.liferay.object.exception.ObjectDefinitionScopeException;
 import com.liferay.object.exception.ObjectDefinitionStatusException;
 import com.liferay.object.exception.ObjectDefinitionVersionException;
 import com.liferay.object.exception.ObjectFieldRelationshipTypeException;
+import com.liferay.object.field.builder.ObjectFieldBuilder;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntryTable;
 import com.liferay.object.model.ObjectField;
@@ -36,14 +37,15 @@ import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.test.util.ObjectDefinitionTestUtil;
 import com.liferay.object.system.BaseSystemObjectDefinitionMetadata;
 import com.liferay.object.util.LocalizedMapUtil;
-import com.liferay.object.util.ObjectFieldBuilder;
 import com.liferay.object.util.ObjectFieldUtil;
 import com.liferay.petra.sql.dsl.Column;
 import com.liferay.petra.sql.dsl.Table;
 import com.liferay.portal.kernel.dao.db.DBInspector;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.messaging.MessageBus;
+import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.UserNotificationEvent;
 import com.liferay.portal.kernel.model.UserNotificationEventTable;
@@ -413,6 +415,13 @@ public class ObjectDefinitionLocalServiceTest {
 				new BaseSystemObjectDefinitionMetadata() {
 
 					@Override
+					public BaseModel<?> deleteBaseModel(BaseModel<?> baseModel)
+						throws PortalException {
+
+						return null;
+					}
+
+					@Override
 					public String getJaxRsApplicationName() {
 						return "";
 					}
@@ -512,6 +521,13 @@ public class ObjectDefinitionLocalServiceTest {
 			_objectDefinitionLocalService.addOrUpdateSystemObjectDefinition(
 				TestPropsValues.getCompanyId(),
 				new BaseSystemObjectDefinitionMetadata() {
+
+					@Override
+					public BaseModel<?> deleteBaseModel(BaseModel<?> baseModel)
+						throws PortalException {
+
+						return null;
+					}
 
 					@Override
 					public String getJaxRsApplicationName() {
@@ -1017,7 +1033,7 @@ public class ObjectDefinitionLocalServiceTest {
 		try {
 			objectDefinition =
 				_objectDefinitionLocalService.updateCustomObjectDefinition(
-					objectDefinition.getObjectDefinitionId(), 0,
+					null, objectDefinition.getObjectDefinitionId(), 0,
 					RandomTestUtil.randomLong(), RandomTestUtil.randomLong(),
 					false, objectDefinition.isActive(), true, false,
 					LocalizedMapUtil.getLocalizedMap("Able"), "Able", null,
@@ -1040,7 +1056,7 @@ public class ObjectDefinitionLocalServiceTest {
 
 		objectDefinition =
 			_objectDefinitionLocalService.updateCustomObjectDefinition(
-				objectDefinition.getObjectDefinitionId(), 0,
+				null, objectDefinition.getObjectDefinitionId(), 0,
 				objectField.getObjectFieldId(), objectField.getObjectFieldId(),
 				false, objectDefinition.isActive(), true, false,
 				LocalizedMapUtil.getLocalizedMap("Able"), "Able", null, null,
@@ -1054,14 +1070,18 @@ public class ObjectDefinitionLocalServiceTest {
 			objectField.getObjectFieldId(),
 			objectDefinition.getTitleObjectFieldId());
 
+		String externalReferenceCode = RandomTestUtil.randomString();
+
 		objectDefinition =
 			_objectDefinitionLocalService.updateCustomObjectDefinition(
-				objectDefinition.getObjectDefinitionId(), 0, 0, 0, false,
-				objectDefinition.isActive(), true, false,
+				externalReferenceCode, objectDefinition.getObjectDefinitionId(),
+				0, 0, 0, false, objectDefinition.isActive(), true, false,
 				LocalizedMapUtil.getLocalizedMap("Able"), "Able", null, null,
 				false, LocalizedMapUtil.getLocalizedMap("Ables"),
 				objectDefinition.getScope());
 
+		Assert.assertEquals(
+			externalReferenceCode, objectDefinition.getExternalReferenceCode());
 		Assert.assertEquals(0, objectDefinition.getDescriptionObjectFieldId());
 		Assert.assertEquals(0, objectDefinition.getTitleObjectFieldId());
 		Assert.assertFalse(objectDefinition.isActive());
@@ -1075,7 +1095,7 @@ public class ObjectDefinitionLocalServiceTest {
 
 		objectDefinition =
 			_objectDefinitionLocalService.updateCustomObjectDefinition(
-				objectDefinition.getObjectDefinitionId(), 0, 0, 0, false,
+				null, objectDefinition.getObjectDefinitionId(), 0, 0, 0, false,
 				objectDefinition.isActive(), true, false,
 				LocalizedMapUtil.getLocalizedMap("Baker"), "Baker", null, null,
 				false, LocalizedMapUtil.getLocalizedMap("Bakers"),
@@ -1096,8 +1116,8 @@ public class ObjectDefinitionLocalServiceTest {
 
 		objectDefinition =
 			_objectDefinitionLocalService.updateCustomObjectDefinition(
-				objectDefinition.getObjectDefinitionId(), 0, 0, 0, false, true,
-				true, false, LocalizedMapUtil.getLocalizedMap("Charlie"),
+				null, objectDefinition.getObjectDefinitionId(), 0, 0, 0, false,
+				true, true, false, LocalizedMapUtil.getLocalizedMap("Charlie"),
 				"Charlie", null, null, false,
 				LocalizedMapUtil.getLocalizedMap("Charlies"),
 				objectDefinition.getScope());
@@ -1324,7 +1344,8 @@ public class ObjectDefinitionLocalServiceTest {
 		}
 
 		_assertSystemObjectFields(
-			new ObjectFieldBuilder().businessType(
+			new ObjectFieldBuilder(
+			).businessType(
 				ObjectFieldConstants.BUSINESS_TYPE_DATE
 			).dbColumnName(
 				objectEntryTable.createDate.getName()
@@ -1343,7 +1364,8 @@ public class ObjectDefinitionLocalServiceTest {
 		Assert.assertTrue(iterator.hasNext());
 
 		_assertSystemObjectFields(
-			new ObjectFieldBuilder().businessType(
+			new ObjectFieldBuilder(
+			).businessType(
 				ObjectFieldConstants.BUSINESS_TYPE_TEXT
 			).dbColumnName(
 				objectEntryTable.userName.getName()
@@ -1363,7 +1385,8 @@ public class ObjectDefinitionLocalServiceTest {
 			Assert.assertTrue(iterator.hasNext());
 
 			_assertSystemObjectFields(
-				new ObjectFieldBuilder().businessType(
+				new ObjectFieldBuilder(
+				).businessType(
 					ObjectFieldConstants.BUSINESS_TYPE_TEXT
 				).dbColumnName(
 					objectEntryTable.externalReferenceCode.getName()
@@ -1384,7 +1407,8 @@ public class ObjectDefinitionLocalServiceTest {
 		Assert.assertTrue(iterator.hasNext());
 
 		_assertSystemObjectFields(
-			new ObjectFieldBuilder().businessType(
+			new ObjectFieldBuilder(
+			).businessType(
 				ObjectFieldConstants.BUSINESS_TYPE_LONG_INTEGER
 			).dbColumnName(
 				dbColumnName
@@ -1392,6 +1416,10 @@ public class ObjectDefinitionLocalServiceTest {
 				dbTableName
 			).dbType(
 				ObjectFieldConstants.DB_TYPE_LONG
+			).indexed(
+				Boolean.TRUE
+			).indexedAsKeyword(
+				Boolean.TRUE
 			).labelMap(
 				LocalizedMapUtil.getLocalizedMap(
 					LanguageUtil.get(LocaleUtil.getDefault(), "id"))
@@ -1403,7 +1431,8 @@ public class ObjectDefinitionLocalServiceTest {
 		Assert.assertTrue(iterator.hasNext());
 
 		_assertSystemObjectFields(
-			new ObjectFieldBuilder().businessType(
+			new ObjectFieldBuilder(
+			).businessType(
 				ObjectFieldConstants.BUSINESS_TYPE_DATE
 			).dbColumnName(
 				objectEntryTable.modifiedDate.getName()
@@ -1422,7 +1451,8 @@ public class ObjectDefinitionLocalServiceTest {
 		Assert.assertTrue(iterator.hasNext());
 
 		_assertSystemObjectFields(
-			new ObjectFieldBuilder().businessType(
+			new ObjectFieldBuilder(
+			).businessType(
 				ObjectFieldConstants.BUSINESS_TYPE_TEXT
 			).dbColumnName(
 				objectEntryTable.status.getName()
@@ -1473,7 +1503,7 @@ public class ObjectDefinitionLocalServiceTest {
 		try {
 			objectDefinition2 =
 				_objectDefinitionLocalService.updateCustomObjectDefinition(
-					objectDefinition2.getObjectDefinitionId(), 0,
+					null, objectDefinition2.getObjectDefinitionId(), 0,
 					objectRelationship.getObjectFieldId2(), 0, false,
 					objectDefinition2.isActive(), true, false,
 					LocalizedMapUtil.getLocalizedMap("Able"), "Able", null,

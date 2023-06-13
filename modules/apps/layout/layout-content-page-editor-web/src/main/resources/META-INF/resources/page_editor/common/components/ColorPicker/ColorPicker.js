@@ -28,16 +28,14 @@ import {
 	useStyleErrors,
 } from '../../../app/contexts/StyleErrorsContext';
 import {getResetLabelByViewport} from '../../../app/utils/getResetLabelByViewport';
-import {useId} from '../../../app/utils/useId';
+import {useId} from '../../../core/hooks/useId';
 import {ConfigurationFieldPropTypes} from '../../../prop-types/index';
 import {DropdownColorPicker} from './DropdownColorPicker';
 import {parseColorValue} from './parseColorValue';
 
 import './ColorPicker.scss';
 
-export const DEFAULT_TOKEN_LABEL = Liferay.FeatureFlags['LPS-143206']
-	? Liferay.Language.get('inherited')
-	: Liferay.Language.get('default');
+export const DEFAULT_TOKEN_LABEL = Liferay.Language.get('inherited');
 
 const debouncedOnValueSelect = debounce(
 	(onValueSelect, fieldName, value) => onValueSelect(fieldName, value),
@@ -307,7 +305,7 @@ export function ColorPicker({
 						{tokenLabel ? (
 							canDetachTokenValues && (
 								<ClayButtonWithIcon
-									className="border-0 mb-0 ml-2 page-editor__color-picker__action-button"
+									className="border-0 flex-shrink-0 mb-0 ml-2 page-editor__color-picker__action-button"
 									displayType="secondary"
 									onClick={() => {
 										setCustomColors([
@@ -351,7 +349,7 @@ export function ColorPicker({
 						)}
 
 						<ClayButtonWithIcon
-							className="border-0 ml-2 page-editor__color-picker__action-button"
+							className="border-0 flex-shrink-0 ml-2 page-editor__color-picker__action-button"
 							displayType="secondary"
 							onClick={() => {
 								if (
@@ -372,13 +370,8 @@ export function ColorPicker({
 								);
 							}}
 							small
-							symbol={
-								Liferay.FeatureFlags['LPS-143206']
-									? 'restore'
-									: 'times-circle'
-							}
+							symbol="restore"
 							title={
-								Liferay.FeatureFlags['LPS-143206'] &&
 								selectedViewportSize
 									? getResetLabelByViewport(
 											selectedViewportSize

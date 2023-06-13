@@ -124,13 +124,11 @@ export default function ContentsSidebar() {
 
 	return (
 		<>
-			{Liferay.FeatureFlags['LPS-153452'] && (
-				<SidebarPanelHeader>
-					{Liferay.Language.get('page-content')}
-				</SidebarPanelHeader>
-			)}
+			<SidebarPanelHeader>
+				{Liferay.Language.get('page-content')}
+			</SidebarPanelHeader>
 
-			<div className="d-flex flex-column page-editor__page-contents pt-3">
+			<div className="d-flex flex-column page-editor__page-contents">
 				{view}
 			</div>
 		</>

@@ -57,7 +57,7 @@
 </tr>
 <tr>
 	<td>ASTERISK_DATE_FIELD</td>
-	<td>//label[contains(.,'${key_fieldFieldLabel}')]//span[*[name()='svg'][contains(@class,'icon-asterisk')]]</td>
+	<td>//label[contains(.,'${key_fieldFieldLabel}')]//span[*[name()='svg'][contains(@class,'icon-asterisk')]] | //label[contains(.,'${key_fieldFieldLabel}')]//span[contains(.,'*')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -353,6 +353,11 @@
 <tr>
 	<td>TOOLTIP</td>
 	<td>//span[*[name()='svg'][contains(@class,'icon-question')]]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>UNDO</td>
+	<td>//*[*[name()='svg'][contains(@class,'lexicon-icon-undo')]]</td>
 	<td></td>
 </tr>
 <tr>

@@ -104,6 +104,10 @@ definition {
 	test BreakWorkflowSLA {
 		property test.name.skip.portal.instance = "CrossClusterReplicationES7#BreakWorkflowSLA";
 
+		WorkflowMetrics.setSLADefinitionsJobInterval(
+			definitionsJobInterval = "1",
+			slaJobInterval = "1");
+
 		CrossClusterReplication.setupCrossClusterReplication();
 
 		Navigator.openURL();
@@ -429,12 +433,13 @@ definition {
 		Workflow.assignToMeTaskByActions(
 			workflowAssetTitle = "Blogs Entry Title",
 			workflowAssetType = "Blogs Entry",
-			workflowTask = "Review");
+			workflowTask = "review");
 
 		Workflow.approveTaskByActions(
 			workflowAssetTitle = "Blogs Entry Title",
 			workflowAssetType = "Blogs Entry",
-			workflowTask = "Review");
+			workflowDefinitionTask = "approve",
+			workflowTask = "review");
 
 		Navigator.openURL();
 

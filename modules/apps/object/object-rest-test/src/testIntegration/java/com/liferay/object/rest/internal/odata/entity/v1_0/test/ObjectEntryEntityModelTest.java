@@ -18,13 +18,13 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
+import com.liferay.object.field.builder.ObjectFieldBuilder;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.rest.odata.entity.v1_0.ObjectEntryEntityModel;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.util.LocalizedMapUtil;
-import com.liferay.object.util.ObjectFieldBuilder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.search.Field;
@@ -78,7 +78,8 @@ public class ObjectEntryEntityModelTest {
 				Collections.emptyList());
 
 		List<ObjectField> customObjectFields = Arrays.asList(
-			new ObjectFieldBuilder().businessType(
+			new ObjectFieldBuilder(
+			).businessType(
 				ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT
 			).name(
 				RandomTestUtil.randomString()
@@ -90,7 +91,8 @@ public class ObjectEntryEntityModelTest {
 			_createObjectField(ObjectFieldConstants.DB_TYPE_DOUBLE),
 			_createObjectField(ObjectFieldConstants.DB_TYPE_INTEGER),
 			_createObjectField(ObjectFieldConstants.DB_TYPE_LONG),
-			new ObjectFieldBuilder().relationshipType(
+			new ObjectFieldBuilder(
+			).relationshipType(
 				ObjectRelationshipConstants.TYPE_ONE_TO_MANY
 			).name(
 				RandomTestUtil.randomString()
@@ -140,7 +142,8 @@ public class ObjectEntryEntityModelTest {
 	}
 
 	private ObjectField _createObjectField(String dbType) {
-		return new ObjectFieldBuilder().dbType(
+		return new ObjectFieldBuilder(
+		).dbType(
 			dbType
 		).name(
 			RandomTestUtil.randomString()
@@ -198,11 +201,7 @@ public class ObjectEntryEntityModelTest {
 				new StringEntityField(
 					"externalReferenceCode", locale -> "externalReferenceCode")
 			).put(
-				"id",
-				new IdEntityField(
-					"id",
-					locale -> Field.getSortableFieldName(Field.ENTRY_CLASS_PK),
-					String::valueOf)
+				"id", new IdEntityField("id", locale -> "id", String::valueOf)
 			).put(
 				"objectDefinitionId",
 				new IntegerEntityField(

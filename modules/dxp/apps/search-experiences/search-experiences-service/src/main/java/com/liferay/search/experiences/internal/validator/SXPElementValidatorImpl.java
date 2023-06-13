@@ -52,7 +52,7 @@ public class SXPElementValidatorImpl implements SXPElementValidator {
 			SXPElementValidatorImpl.class, _wrap(elementDefinitionJSON, type),
 			"dependencies/sxpelement.schema.json");
 
-		if (!ListUtil.isEmpty(problems)) {
+		if (ListUtil.isNotEmpty(problems)) {
 			throw new SXPElementElementDefinitionJSONException(problems);
 		}
 	}
@@ -69,7 +69,8 @@ public class SXPElementValidatorImpl implements SXPElementValidator {
 		if (MapUtil.isEmpty(titleMap)) {
 			throw new SXPElementTitleException(
 				ListUtil.fromArray(
-					new Problem.Builder().message(
+					new Problem.Builder(
+					).message(
 						"Title is empty"
 					).severity(
 						Severity.ERROR

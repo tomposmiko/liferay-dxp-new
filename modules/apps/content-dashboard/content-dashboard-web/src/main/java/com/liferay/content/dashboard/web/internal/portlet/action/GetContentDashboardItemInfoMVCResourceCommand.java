@@ -134,8 +134,6 @@ public class GetContentDashboardItemInfoMVCResourceCommand
 				).put(
 					"classPK", _getClassPK(contentDashboardItem)
 				).put(
-					"clipboard", _getClipboardJSONObject(contentDashboardItem)
-				).put(
 					"createDate",
 					_toString(contentDashboardItem.getCreateDate())
 				).put(
@@ -161,13 +159,8 @@ public class GetContentDashboardItemInfoMVCResourceCommand
 					_toString(contentDashboardItem.getModifiedDate())
 				).put(
 					"preview",
-					Optional.ofNullable(
-						contentDashboardItem.getPreview()
-					).map(
-						ContentDashboardItem.Preview::toJSONObject
-					).orElse(
-						null
-					)
+					_getPreviewJSONObject(
+						contentDashboardItem, httpServletRequest)
 				).put(
 					"specificFields",
 					_getSpecificFieldsJSONObject(contentDashboardItem, locale)
@@ -313,18 +306,6 @@ public class GetContentDashboardItemInfoMVCResourceCommand
 		return infoItemReference.getClassPK();
 	}
 
-	private JSONObject _getClipboardJSONObject(
-		ContentDashboardItem contentDashboardItem) {
-
-		return Optional.ofNullable(
-			contentDashboardItem.getClipboard()
-		).map(
-			ContentDashboardItem.Clipboard::toJSONObject
-		).orElse(
-			null
-		);
-	}
-
 	private String _getDownloadURL(
 		ContentDashboardItem contentDashboardItem,
 		HttpServletRequest httpServletRequest) {
@@ -396,6 +377,55 @@ public class GetContentDashboardItemInfoMVCResourceCommand
 		return jsonArray;
 	}
 
+	private String _getPreviewImageURL(
+		ContentDashboardItem contentDashboardItem,
+		HttpServletRequest httpServletRequest) {
+
+		List<ContentDashboardItemAction> contentDashboardItemActions =
+			contentDashboardItem.getContentDashboardItemActions(
+				httpServletRequest,
+				ContentDashboardItemAction.Type.PREVIEW_IMAGE);
+
+		if (ListUtil.isNotEmpty(contentDashboardItemActions)) {
+			ContentDashboardItemAction contentDashboardItemAction =
+				contentDashboardItemActions.get(0);
+
+			return contentDashboardItemAction.getURL();
+		}
+
+		return null;
+	}
+
+	private JSONObject _getPreviewJSONObject(
+		ContentDashboardItem contentDashboardItem,
+		HttpServletRequest httpServletRequest) {
+
+		return JSONUtil.put(
+			"imageURL",
+			_getPreviewImageURL(contentDashboardItem, httpServletRequest)
+		).put(
+			"url", _getPreviewURL(contentDashboardItem, httpServletRequest)
+		);
+	}
+
+	private String _getPreviewURL(
+		ContentDashboardItem contentDashboardItem,
+		HttpServletRequest httpServletRequest) {
+
+		List<ContentDashboardItemAction> contentDashboardItemActions =
+			contentDashboardItem.getContentDashboardItemActions(
+				httpServletRequest, ContentDashboardItemAction.Type.PREVIEW);
+
+		if (ListUtil.isNotEmpty(contentDashboardItemActions)) {
+			ContentDashboardItemAction contentDashboardItemAction =
+				contentDashboardItemActions.get(0);
+
+			return contentDashboardItemAction.getURL();
+		}
+
+		return null;
+	}
+
 	private JSONObject _getSpecificFieldsJSONObject(
 		ContentDashboardItem contentDashboardItem, Locale locale) {
 
@@ -441,7 +471,7 @@ public class GetContentDashboardItemInfoMVCResourceCommand
 			contentDashboardItem.getContentDashboardItemActions(
 				httpServletRequest, ContentDashboardItemAction.Type.SUBSCRIBE);
 
-		if (!ListUtil.isEmpty(contentDashboardItemActions)) {
+		if (ListUtil.isNotEmpty(contentDashboardItemActions)) {
 			ContentDashboardItemAction contentDashboardItemAction =
 				contentDashboardItemActions.get(0);
 
@@ -481,7 +511,7 @@ public class GetContentDashboardItemInfoMVCResourceCommand
 				httpServletRequest,
 				ContentDashboardItemAction.Type.UNSUBSCRIBE);
 
-		if (!ListUtil.isEmpty(contentDashboardItemActions)) {
+		if (ListUtil.isNotEmpty(contentDashboardItemActions)) {
 			ContentDashboardItemAction contentDashboardItemAction =
 				contentDashboardItemActions.get(0);
 

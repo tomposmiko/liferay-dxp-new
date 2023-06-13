@@ -19,10 +19,10 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import useControlledState from '../../../core/hooks/useControlledState';
+import {useId} from '../../../core/hooks/useId';
 import {ConfigurationFieldPropTypes} from '../../../prop-types/index';
 import {VIEWPORT_SIZES} from '../../config/constants/viewportSizes';
 import {useSelector} from '../../contexts/StoreContext';
-import {useId} from '../../utils/useId';
 
 export function CheckboxField({
 	className,
@@ -105,9 +105,9 @@ export function CheckboxField({
 			</div>
 
 			{field.description ? (
-				<div className="mt-1 small text-secondary" id={helpTextId}>
+				<p className="m-0 mt-1 small text-secondary" id={helpTextId}>
 					{field.description}
-				</div>
+				</p>
 			) : null}
 		</ClayForm.Group>
 	);

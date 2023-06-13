@@ -68,7 +68,6 @@ import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.web.internal.constants.ObjectWebKeys;
 import com.liferay.object.web.internal.display.context.helper.ObjectRequestHelper;
 import com.liferay.object.web.internal.util.ObjectDefinitionPermissionUtil;
-import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -82,6 +81,7 @@ import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
+import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
@@ -385,6 +385,8 @@ public class ObjectEntryDisplayContext {
 					"selectRelatedModalEntry",
 				infoItemItemSelectorCriterion)
 		).setParameter(
+			"groupId", _getGroupId()
+		).setParameter(
 			"objectDefinitionId",
 			() -> {
 				ObjectDefinition objectDefinition1 =
@@ -486,6 +488,9 @@ public class ObjectEntryDisplayContext {
 		ObjectEntry objectEntry = getObjectEntry();
 
 		if (objectEntry != null) {
+			ddmFormRenderingContext.addProperty(
+				"objectEntryId", objectEntry.getId());
+
 			DDMFormValues ddmFormValues = _getDDMFormValues(
 				ddmForm, objectEntry);
 

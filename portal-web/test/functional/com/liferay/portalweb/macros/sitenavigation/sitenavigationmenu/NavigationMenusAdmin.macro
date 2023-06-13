@@ -77,6 +77,14 @@ definition {
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
+		if (isSet(depotName)) {
+			ItemSelector.changeWorkspaces(
+				customImage = "false",
+				workspacesType = "Asset Library");
+
+			LexiconCard.clickCard(card = "${depotName}");
+		}
+
 		if ("${item}" == "Page") {
 			NavigationMenusAdmin._addItemPage(
 				pageNameList = "${pageNameList}",
@@ -279,6 +287,10 @@ definition {
 
 	macro editItem {
 		NavigationMenusAdmin.openItemSidebar(itemName = "${itemName}");
+
+		if (isSet(useCustomName)) {
+			NavigationMenusAdmin._editItemPage();
+		}
 
 		if ("${item}" == "Page") {
 			if (isSet(customName)) {

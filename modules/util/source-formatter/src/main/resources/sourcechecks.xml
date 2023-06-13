@@ -1013,7 +1013,8 @@
 		</check>
 		<check name="JSPLanguageUtilCheck">
 			<category name="Bug Prevention" />
-			<description name="Finds cases where Locale is passed to `LanguageUtil.get` instead of `HttpServletRequest`." />
+			<description name="Finds incorrect use of `LanguageUtil.get` in `.jsp` files." />
+			<property name="enabled" value="false" />
 		</check>
 		<check name="JSPLineBreakCheck">
 			<category name="Styling" />
@@ -1652,6 +1653,11 @@
 		<check name="XMLSourcechecksFileCheck">
 			<category name="Bug Prevention" />
 			<description name="Performs several checks on `sourcechecks.xml` file." />
+		</check>
+		<check name="XMLSpringExtenderServiceCheck">
+			<category name="Performance" />
+			<description name="Finds cases where Spring extender service is used as a dependency injection." />
+			<property name="enabled" value="false" />
 		</check>
 		<check name="XMLSpringFileCheck">
 			<category name="Styling" />

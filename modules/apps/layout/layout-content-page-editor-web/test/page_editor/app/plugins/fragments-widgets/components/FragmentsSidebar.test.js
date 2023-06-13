@@ -167,6 +167,7 @@ const renderComponent = (widgets = DEFAULT_WIDGETS) => {
 			<StoreAPIContextProvider
 				dispatch={() => Promise.resolve({})}
 				getState={() => ({
+					fragmentEntryLinks: [],
 					fragments: [
 						{
 							fragmentCollectionId: 'collection-1',
@@ -587,10 +588,6 @@ describe('FragmentsSidebar', () => {
 	});
 
 	describe('Button to switch the display style', () => {
-		Liferay.Util.sub.mockImplementation((langKey, args) =>
-			langKey.replace('x', args)
-		);
-
 		it('shows the card view when the display style is list', () => {
 			const {getByTitle} = renderComponent();
 
