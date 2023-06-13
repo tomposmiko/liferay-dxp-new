@@ -72,9 +72,9 @@ definition {
 		task ("Click on 'click here' and check if a new tab with connection documentation appears") {
 			ACUtils.clickGenericHyperlink(hyperlinkText = "Click here");
 
-			SelectWindow(locator1 = "title=Connecting Liferay DXP to Analytics Cloud — Liferay Learn");
+			SelectWindow(locator1 = "title=Connecting Liferay DXP to Analytics Cloud - Liferay Learn");
 
-			ACUtils.viewGenericText(textValueList = "Documentation,Connecting Liferay DXP to Analytics Cloud");
+			ACUtils.viewGenericText(textValueList = "Connecting Liferay DXP to Analytics Cloud");
 		}
 
 		task ("Switch to the AC tab") {
@@ -132,9 +132,9 @@ definition {
 		task ("Click on 'click here' and check if a new tab with connection documentation appears") {
 			ACUtils.clickGenericHyperlink(hyperlinkText = "Click here");
 
-			SelectWindow(locator1 = "title=Connecting Liferay DXP to Analytics Cloud — Liferay Learn");
+			SelectWindow(locator1 = "title=Connecting Liferay DXP to Analytics Cloud - Liferay Learn");
 
-			ACUtils.viewGenericText(textValueList = "Documentation,Connecting Liferay DXP to Analytics Cloud");
+			ACUtils.viewGenericText(textValueList = "Connecting Liferay DXP to Analytics Cloud");
 		}
 	}
 

@@ -94,10 +94,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	property = "ddm.form.field.type.name=" + DDMFormFieldTypeConstants.DOCUMENT_LIBRARY,
-	service = {
-		DDMFormFieldTemplateContextContributor.class,
-		DocumentLibraryDDMFormFieldTemplateContextContributor.class
-	}
+	service = DDMFormFieldTemplateContextContributor.class
 )
 public class DocumentLibraryDDMFormFieldTemplateContextContributor
 	implements DDMFormFieldTemplateContextContributor {
@@ -308,8 +305,10 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 
 			User user = _getDDMFormDefaultUser(companyId);
 
-			folder = _createDDMFormFolder(
-				user.getUserId(), repositoryId, httpServletRequest);
+			if (user != null) {
+				folder = _createDDMFormFolder(
+					user.getUserId(), repositoryId, httpServletRequest);
+			}
 		}
 
 		if (folder == null) {

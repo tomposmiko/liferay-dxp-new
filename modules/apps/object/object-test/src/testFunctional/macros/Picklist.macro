@@ -92,6 +92,7 @@ definition {
 
 	macro addPicklistViaAPI {
 		JSONObject.addPicklist(
+			externalReferenceCode = ${externalReferenceCode},
 			picklistName = ${picklistName},
 			userEmailAddress = ${userEmailAddress},
 			userPassword = ${userPassword});
@@ -120,8 +121,6 @@ definition {
 	}
 
 	macro assertDisabledPicklistName {
-		SelectFrame(locator1 = "Picklist#IFRAME_PICKLIST_MODAL");
-
 		AssertElementPresent(locator1 = "Picklist#DISABLED_PICKLIST_NAME");
 	}
 
@@ -316,6 +315,25 @@ definition {
 			locator1 = "Picklist#SELECT_PICKLIST_VIEW");
 
 		MenuItem.clickNoError(menuItem = "View");
+	}
+
+	macro importPicklist {
+		Click(locator1 = "ObjectAdmin#KEBAB_MENU");
+
+		Click(locator1 = "Picklist#IMPORT_PICKLIST");
+
+		var filePath = TestCase.getDependenciesDirPath(fileName = "${picklistFileName}.json");
+
+		UploadFile(
+			locator1 = "TextInput#FILE",
+			value1 = ${filePath});
+
+		Type(
+			key_fieldLabel = "Name",
+			locator1 = "TextInput#GENERIC_TEXT_INPUT",
+			value1 = ${picklistName});
+
+		Button.clickImport();
 	}
 
 	macro optionsPicklist {

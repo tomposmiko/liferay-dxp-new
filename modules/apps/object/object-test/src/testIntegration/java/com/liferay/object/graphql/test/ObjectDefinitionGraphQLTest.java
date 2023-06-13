@@ -93,7 +93,7 @@ public class ObjectDefinitionGraphQLTest {
 
 		_objectDefinition =
 			ObjectDefinitionLocalServiceUtil.addCustomObjectDefinition(
-				TestPropsValues.getUserId(), false,
+				TestPropsValues.getUserId(), false, false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				"A" + RandomTestUtil.randomString(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -105,18 +105,18 @@ public class ObjectDefinitionGraphQLTest {
 			null, TestPropsValues.getUserId(), 0,
 			_objectDefinition.getObjectDefinitionId(),
 			ObjectFieldConstants.BUSINESS_TYPE_TEXT,
-			ObjectFieldConstants.DB_TYPE_STRING, null, true, true, "",
+			ObjectFieldConstants.DB_TYPE_STRING, true, true, "",
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			_objectFieldName, false, false, Collections.emptyList());
+			false, _objectFieldName, false, false, Collections.emptyList());
 
 		ObjectFieldLocalServiceUtil.addCustomObjectField(
 			null, TestPropsValues.getUserId(),
 			listTypeDefinition.getListTypeDefinitionId(),
 			_objectDefinition.getObjectDefinitionId(),
 			ObjectFieldConstants.BUSINESS_TYPE_PICKLIST,
-			ObjectFieldConstants.DB_TYPE_STRING, null, false, true, "",
+			ObjectFieldConstants.DB_TYPE_STRING, false, true, "",
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			_listFieldName, true, false, Collections.emptyList());
+			false, _listFieldName, true, false, Collections.emptyList());
 
 		_objectDefinition =
 			ObjectDefinitionLocalServiceUtil.publishCustomObjectDefinition(

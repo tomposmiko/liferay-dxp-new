@@ -41,17 +41,19 @@ public abstract class BaseObjectExtensionProvider implements ExtensionProvider {
 
 	@Override
 	public boolean isApplicableExtension(long companyId, String className) {
-		ObjectDefinition objectDefinition = getObjectDefinition(
+		ObjectDefinition objectDefinition = fetchObjectDefinition(
 			companyId, className);
 
-		if ((objectDefinition != null) && objectDefinition.isSystem()) {
+		if ((objectDefinition != null) &&
+			objectDefinition.isUnmodifiableSystemObject()) {
+
 			return true;
 		}
 
 		return false;
 	}
 
-	protected ObjectDefinition getObjectDefinition(
+	protected ObjectDefinition fetchObjectDefinition(
 		long companyId, String className) {
 
 		String internalDTOClassName = dtoMapper.toInternalDTOClassName(

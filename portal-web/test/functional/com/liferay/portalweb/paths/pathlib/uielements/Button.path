@@ -116,6 +116,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ANY_WITH_ARIA_LABEL_INDEX</td>
+	<td>xpath=(//button[@aria-label='${ariaLabel}'])[${key_index}]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>ANY_WITH_COLOR</td>
 	<td>//*[contains(@class,'btn-${key_color}')][normalize-space(text())='${key_text}']</td>
 	<td></td>
@@ -476,8 +481,13 @@
 	<td></td>
 </tr>
 <tr>
+	<td>IMAGE_CLEAR</td>
+	<td>//label[normalize-space(text())='${key_fieldLabel}']/following-sibling::div//button[contains(@id,'openGraphClearImageButton')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>IMAGE_SELECTOR</td>
-	<td>//label[normalize-space(text())='${key_fieldLabel}']/following-sibling::div//*[*[name()='svg'][contains(@class,'lexicon-icon-plus')]]</td>
+	<td>//label[normalize-space(text())='${key_fieldLabel}']/following-sibling::div//button[contains(@id,'openGraphImageButton')]</td>
 	<td></td>
 </tr>
 <tr>

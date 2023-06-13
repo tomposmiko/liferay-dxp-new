@@ -22,6 +22,7 @@ import com.liferay.object.constants.ObjectConstants;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
+import com.liferay.object.entry.util.ObjectEntryThreadLocal;
 import com.liferay.object.exception.NoSuchObjectEntryException;
 import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
 import com.liferay.object.model.ObjectAction;
@@ -32,7 +33,6 @@ import com.liferay.object.related.models.ObjectRelatedModelsProvider;
 import com.liferay.object.related.models.ObjectRelatedModelsProviderRegistry;
 import com.liferay.object.rest.dto.v1_0.ListEntry;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
-import com.liferay.object.rest.internal.dto.v1_0.converter.ObjectEntryDTOConverter;
 import com.liferay.object.rest.internal.petra.sql.dsl.expression.OrderByExpressionUtil;
 import com.liferay.object.rest.internal.resource.v1_0.ObjectEntryRelatedObjectsResourceImpl;
 import com.liferay.object.rest.internal.resource.v1_0.ObjectEntryResourceImpl;
@@ -78,7 +78,6 @@ import com.liferay.portal.kernel.search.filter.TermFilter;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
-import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -98,6 +97,7 @@ import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.portal.vulcan.aggregation.Aggregation;
 import com.liferay.portal.vulcan.aggregation.Facet;
+import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
@@ -397,13 +397,8 @@ public class DefaultObjectEntryManagerImpl
 
 		long groupId = getGroupId(objectDefinition, scopeKey);
 
-		int start = QueryUtil.ALL_POS;
-		int end = QueryUtil.ALL_POS;
-
-		if (pagination != null) {
-			start = pagination.getStartPosition();
-			end = pagination.getEndPosition();
-		}
+		int start = _getStartPosition(pagination);
+		int end = _getEndPosition(pagination);
 
 		List<Facet> facets = new ArrayList<>();
 
@@ -420,7 +415,7 @@ public class DefaultObjectEntryManagerImpl
 
 				Map<Object, Long> aggregationCounts =
 					_objectEntryLocalService.getAggregationCounts(
-						objectDefinition.getObjectDefinitionId(),
+						groupId, objectDefinition.getObjectDefinitionId(),
 						entry1.getKey(), predicate, start, end);
 
 				for (Map.Entry<Object, Long> entry2 :
@@ -597,8 +592,13 @@ public class DefaultObjectEntryManagerImpl
 					serviceBuilderObjectEntry.getGroupId(),
 					objectRelationship.getObjectRelationshipId(),
 					serviceBuilderObjectEntry.getPrimaryKey(),
-					pagination.getStartPosition(),
-					pagination.getEndPosition())));
+					_getStartPosition(pagination),
+					_getEndPosition(pagination))),
+			pagination,
+			objectRelatedModelsProvider.getRelatedModelsCount(
+				serviceBuilderObjectEntry.getGroupId(),
+				objectRelationship.getObjectRelationshipId(),
+				serviceBuilderObjectEntry.getPrimaryKey()));
 	}
 
 	@Override
@@ -631,13 +631,18 @@ public class DefaultObjectEntryManagerImpl
 						serviceBuilderObjectEntry.getGroupId(),
 						objectRelationship.getObjectRelationshipId(),
 						serviceBuilderObjectEntry.getPrimaryKey(),
-						pagination.getStartPosition(),
-						pagination.getEndPosition()),
+						_getStartPosition(pagination),
+						_getEndPosition(pagination)),
 				baseModel -> _toDTO(
 					baseModel, serviceBuilderObjectEntry,
 					_systemObjectDefinitionMetadataRegistry.
 						getSystemObjectDefinitionMetadata(
-							relatedObjectDefinition.getName()))));
+							relatedObjectDefinition.getName()))),
+			pagination,
+			objectRelatedModelsProvider.getRelatedModelsCount(
+				serviceBuilderObjectEntry.getGroupId(),
+				objectRelationship.getObjectRelationshipId(),
+				serviceBuilderObjectEntry.getPrimaryKey()));
 	}
 
 	@Override
@@ -719,10 +724,10 @@ public class DefaultObjectEntryManagerImpl
 				_getRelatedObjectDefinition(
 					objectDefinition, objectRelationship);
 
-			if (relatedObjectDefinition.isSystem()) {
+			if (relatedObjectDefinition.isUnmodifiableSystemObject()) {
 				throw new UnsupportedOperationException(
-					"Unable to create nested object entries with system " +
-						"object definitions");
+					"Nested object entries require a custom object " +
+						"definition or a modifiable system object definition");
 			}
 
 			ObjectEntryManager objectEntryManager =
@@ -772,6 +777,14 @@ public class DefaultObjectEntryManagerImpl
 
 		serviceContext.setAddGroupPermissions(true);
 		serviceContext.setAddGuestPermissions(true);
+
+		if (Validator.isNotNull(objectEntry.getTaxonomyCategoryIds()) &&
+			FeatureFlagManagerUtil.isEnabled("LPS-176651")) {
+
+			serviceContext.setAssetCategoryIds(
+				ArrayUtil.toArray(objectEntry.getTaxonomyCategoryIds()));
+			serviceContext.setAssetTagNames(objectEntry.getKeywords());
+		}
 
 		Map<String, Object> properties = objectEntry.getProperties();
 
@@ -837,6 +850,14 @@ public class DefaultObjectEntryManagerImpl
 				}
 			),
 			dtoConverterContext.getUserId());
+	}
+
+	private int _getEndPosition(Pagination pagination) {
+		if (pagination != null) {
+			return pagination.getEndPosition();
+		}
+
+		return QueryUtil.ALL_POS;
 	}
 
 	private String _getObjectEntriesPermissionName(long objectDefinitionId) {
@@ -917,6 +938,14 @@ public class DefaultObjectEntryManagerImpl
 		return relatedObjectDefinition;
 	}
 
+	private int _getStartPosition(Pagination pagination) {
+		if (pagination != null) {
+			return pagination.getStartPosition();
+		}
+
+		return QueryUtil.ALL_POS;
+	}
+
 	private Page<ObjectEntry> _getSystemObjectRelatedObjectEntries(
 			DTOConverterContext dtoConverterContext,
 			ObjectDefinition objectDefinition, long objectEntryId,
@@ -954,19 +983,23 @@ public class DefaultObjectEntryManagerImpl
 				dtoConverterContext,
 				objectRelatedModelsProvider.getRelatedModels(
 					groupId, objectRelationship.getObjectRelationshipId(),
-					objectEntryId, pagination.getStartPosition(),
-					pagination.getEndPosition())));
+					objectEntryId, _getStartPosition(pagination),
+					_getEndPosition(pagination))),
+			pagination,
+			objectRelatedModelsProvider.getRelatedModelsCount(
+				groupId, objectRelationship.getObjectRelationshipId(),
+				objectEntryId));
 	}
 
 	private boolean _hasRelatedObjectEntries(
-			String deletionType, ObjectDefinition objectDefinition,
+			ObjectDefinition objectDefinition,
 			com.liferay.object.model.ObjectEntry serviceBuilderObjectEntry)
 		throws PortalException {
 
 		for (ObjectRelationship objectRelationship :
 				_objectRelationshipLocalService.getObjectRelationships(
-					objectDefinition.getObjectDefinitionId(), deletionType,
-					false)) {
+					objectDefinition.getObjectDefinitionId(),
+					ObjectRelationshipConstants.DELETION_TYPE_PREVENT, false)) {
 
 			ObjectDefinition objectDefinition2 =
 				_objectDefinitionLocalService.getObjectDefinition(
@@ -983,10 +1016,24 @@ public class DefaultObjectEntryManagerImpl
 						objectDefinition2.getCompanyId(),
 						objectRelationship.getType());
 
-			int count = objectRelatedModelsProvider.getRelatedModelsCount(
-				serviceBuilderObjectEntry.getGroupId(),
-				objectRelationship.getObjectRelationshipId(),
-				serviceBuilderObjectEntry.getPrimaryKey());
+			int count = 0;
+
+			try {
+				ObjectEntryThreadLocal.setSkipObjectEntryResourcePermission(
+					true);
+
+				count = objectRelatedModelsProvider.getRelatedModelsCount(
+					serviceBuilderObjectEntry.getGroupId(),
+					objectRelationship.getObjectRelationshipId(),
+					serviceBuilderObjectEntry.getPrimaryKey());
+			}
+			catch (Exception exception) {
+				_log.error(exception);
+			}
+			finally {
+				ObjectEntryThreadLocal.setSkipObjectEntryResourcePermission(
+					false);
+			}
 
 			if (count > 0) {
 				return true;
@@ -1126,7 +1173,6 @@ public class DefaultObjectEntryManagerImpl
 				"delete",
 				() -> {
 					if (_hasRelatedObjectEntries(
-							ObjectRelationshipConstants.DELETION_TYPE_PREVENT,
 							objectDefinition, serviceBuilderObjectEntry)) {
 
 						return null;
@@ -1246,15 +1292,15 @@ public class DefaultObjectEntryManagerImpl
 					_toDate(locale, String.valueOf(value)));
 			}
 			else if (objectField.getListTypeDefinitionId() != 0) {
-				if (value instanceof Map) {
-					Map<String, String> map = (HashMap<String, String>)value;
-
-					values.put(objectField.getName(), map.get("key"));
-				}
-				else if (value instanceof ListEntry) {
+				if (value instanceof ListEntry) {
 					ListEntry listEntry = (ListEntry)value;
 
 					values.put(objectField.getName(), listEntry.getKey());
+				}
+				else if (value instanceof Map) {
+					Map<String, String> map = (HashMap<String, String>)value;
+
+					values.put(objectField.getName(), map.get("key"));
 				}
 				else {
 					values.put(objectField.getName(), (Serializable)value);
@@ -1298,8 +1344,11 @@ public class DefaultObjectEntryManagerImpl
 	@Reference
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 
-	@Reference
-	private ObjectEntryDTOConverter _objectEntryDTOConverter;
+	@Reference(
+		target = "(component.name=com.liferay.object.rest.internal.dto.v1_0.converter.ObjectEntryDTOConverter)"
+	)
+	private DTOConverter<com.liferay.object.model.ObjectEntry, ObjectEntry>
+		_objectEntryDTOConverter;
 
 	@Reference
 	private ObjectEntryLocalService _objectEntryLocalService;
@@ -1336,9 +1385,6 @@ public class DefaultObjectEntryManagerImpl
 
 	@Reference
 	private Queries _queries;
-
-	@Reference
-	private RoleLocalService _roleLocalService;
 
 	@Reference
 	private SearchRequestBuilderFactory _searchRequestBuilderFactory;

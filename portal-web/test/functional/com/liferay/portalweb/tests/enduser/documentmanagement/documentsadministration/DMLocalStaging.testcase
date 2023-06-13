@@ -22,7 +22,7 @@ definition {
 		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "site-name-staging");
 	}
 
-	@description = "This ensures that the document using custom document type can be deleted and republished."
+	@description = "This ensures that the document using custom document type can be deleted and republished. Skip the instance for performance improvement."
 	@priority = 5
 	@refactordone
 	test CanDeleteDocumentWithCustomType {
@@ -1476,6 +1476,8 @@ definition {
 	@description = "This test covers LPS-154413. It checks that an image with a custom friendlyURL added to a dynamic collection displayed in an Asset Publisher can be rendered properly on a site after its friendlyURL is edited and republished."
 	@priority = 4
 	test CanViewImageInDynamicCollectionViaAPAfterFriendlyURLIsUpdated {
+		property test.name.skip.portal.instance = "DMLocalStaging#CanViewImageInDynamicCollectionViaAPAfterFriendlyURLIsUpdated";
+
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
 			depotName = "Test Depot Name");

@@ -64,6 +64,12 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 	}
 
 	@Test
+	public void testChainPutForOrgJSONObject() throws Exception {
+		test("ChainPutForOrgJSONObject.testjava",
+				"Chaining on 'jsonObject.put' is preferred", 27);
+	}
+
+	@Test
 	public void testCollapseImports() throws Exception {
 		test("CollapseImports.testjava");
 	}
@@ -124,7 +130,7 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 
 	@Test
 	public void testExceedMaxLineLength() throws Exception {
-		test("ExceedMaxLineLength.testjava", "> 80", 37);
+		test("ExceedMaxLineLength.testjava", "> 80", 36);
 	}
 
 	@Test
@@ -202,6 +208,12 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 	@Test
 	public void testIfClauseWhitespace() throws Exception {
 		test("IfClauseWhitespace.testjava");
+	}
+
+	@Test
+	public void testImmediateAttribute() throws Exception {
+		test("ImmediateAttribute.testjava",
+			 "Do not use 'immediate = true' in @Component");
 	}
 
 	@Test
@@ -719,6 +731,11 @@ public class JavaSourceProcessorTest extends BaseSourceProcessorTestCase {
 			"No need to use if-statement to wrap 'alterColumn*' and " +
 				"'alterTable*' calls",
 			26);
+	}
+
+	@Test
+	public void testUsePassedInVariable() throws Exception {
+		test("UsePassedInVariable.testjava");
 	}
 
 }

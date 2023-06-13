@@ -19,6 +19,10 @@ import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationEntry;
 import com.liferay.object.constants.ObjectWebKeys;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectLayoutTab;
+import com.liferay.object.model.ObjectRelationship;
+import com.liferay.object.service.ObjectDefinitionLocalServiceUtil;
+import com.liferay.object.service.ObjectRelationshipLocalServiceUtil;
+import com.liferay.portal.kernel.model.User;
 
 import java.io.IOException;
 
@@ -59,6 +63,33 @@ public class ObjectLayoutTabScreenNavigationCategory
 	@Override
 	public String getScreenNavigationKey() {
 		return _objectDefinition.getClassName();
+	}
+
+	@Override
+	public boolean isVisible(User user, ObjectLayoutTab objectLayoutTab) {
+		long objectRelationshipId = _objectLayoutTab.getObjectRelationshipId();
+
+		if (objectRelationshipId == 0) {
+			return true;
+		}
+
+		ObjectRelationship objectRelationship =
+			ObjectRelationshipLocalServiceUtil.fetchObjectRelationship(
+				objectRelationshipId);
+
+		if (objectRelationship == null) {
+			return false;
+		}
+
+		ObjectDefinition objectDefinition =
+			ObjectDefinitionLocalServiceUtil.fetchObjectDefinition(
+				objectRelationship.getObjectDefinitionId2());
+
+		if ((objectDefinition == null) || !objectDefinition.isActive()) {
+			return false;
+		}
+
+		return true;
 	}
 
 	@Override

@@ -96,23 +96,6 @@ public class KaleoDesignerWorkflowPortletTab extends BaseWorkflowPortletTab {
 		return "/designer/view_workflow_definitions.jsp";
 	}
 
-	@Reference(unbind = "-")
-	protected void setKaleoDefinitionVersionLocalService(
-		KaleoDefinitionVersionLocalService kaleoDefinitionVersionLocalService) {
-
-		_kaleoDefinitionVersionLocalService =
-			kaleoDefinitionVersionLocalService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setUserLocalService(UserLocalService userLocalService) {
-		_userLocalService = userLocalService;
-	}
-
-	@Reference(unbind = "-")
-	protected KaleoDefinitionVersionLocalService
-		kaleoDefinitionVersionLocalService;
-
 	private void _setKaleoDefinitionVersionRenderRequestAttribute(
 			RenderRequest renderRequest)
 		throws PortalException {
@@ -120,15 +103,13 @@ public class KaleoDesignerWorkflowPortletTab extends BaseWorkflowPortletTab {
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		_kaleoDesignerDisplayContext = new KaleoDesignerDisplayContext(
-			_actionExecutorManager, renderRequest,
-			_kaleoDefinitionVersionLocalService, _portletResourcePermission,
-			ResourceBundleLoaderUtil.getPortalResourceBundleLoader(),
-			_userLocalService);
-
 		renderRequest.setAttribute(
 			KaleoDesignerWebKeys.KALEO_DESIGNER_DISPLAY_CONTEXT,
-			_kaleoDesignerDisplayContext);
+			new KaleoDesignerDisplayContext(
+				_actionExecutorManager, renderRequest,
+				_kaleoDefinitionVersionLocalService, _portletResourcePermission,
+				ResourceBundleLoaderUtil.getPortalResourceBundleLoader(),
+				_userLocalService));
 
 		String name = ParamUtil.getString(renderRequest, "name");
 
@@ -171,9 +152,9 @@ public class KaleoDesignerWorkflowPortletTab extends BaseWorkflowPortletTab {
 	@Reference
 	private ActionExecutorManager _actionExecutorManager;
 
+	@Reference
 	private KaleoDefinitionVersionLocalService
 		_kaleoDefinitionVersionLocalService;
-	private KaleoDesignerDisplayContext _kaleoDesignerDisplayContext;
 
 	@Reference(
 		target = "(resource.name=" + WorkflowConstants.RESOURCE_NAME + ")"

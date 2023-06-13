@@ -64,6 +64,7 @@ definition {
 			actionName = ${actionName},
 			active = ${active},
 			click = "save",
+			errorMessage = ${errorMessage},
 			fieldName = ${fieldName},
 			inputExpression = ${inputExpression},
 			inputMethod = ${inputMethod},
@@ -109,11 +110,13 @@ definition {
 			fieldName = ${fieldName},
 			fieldType = ${fieldType},
 			fileSource = ${fileSource},
+			formulaScript = ${formulaScript},
 			indexed = ${indexed},
 			indexedAsKeyword = ${indexedAsKeyword},
 			indexedLanguageId = ${indexedLanguageId},
 			isRequired = ${isRequired},
 			objectName = ${objectName},
+			outputOption = ${outputOption},
 			picklistName = ${picklistName},
 			showFilesInDocumentsAndMedia = ${showFilesInDocumentsAndMedia},
 			userEmailAddress = ${userEmailAddress},
@@ -238,6 +241,16 @@ definition {
 			value1 = ${entryValue});
 
 		PortletEntry.save();
+	}
+
+	macro addObjectMultiPicklistFieldEntryViaUI {
+		LexiconEntry.gotoAdd();
+
+		Click(locator1 = "ObjectAdmin#ENTRY_CHOOSE_OPTIONS_MULTIPICKLIST");
+
+		for (var picklistOption : list ${picklistOptionList}) {
+			MenuItem.clickNoError(menuItem = ${picklistOption});
+		}
 	}
 
 	macro addObjectPicklistFieldEntryViaUI {
@@ -836,7 +849,8 @@ definition {
 			objectName = ${objectName},
 			token = ${token},
 			userEmailAddress = ${userEmailAddress},
-			userPassword = ${userPassword});
+			userPassword = ${userPassword},
+			virtualHost = ${virtualHost});
 	}
 
 	macro deleteRelationshipViaUI {
@@ -956,6 +970,8 @@ definition {
 	}
 
 	macro fillObjectAction {
+		var key_text = "Message";
+
 		if (isSet(actionLabel)) {
 			Type(
 				locator1 = "ObjectAdmin#ACTION_LABEL_FIELD",
@@ -1021,6 +1037,12 @@ definition {
 						locator1 = "ObjectAction#INPUT_NEW_VALUE",
 						value1 = ${inputExpressionValue});
 				}
+
+				if (IsElementPresent(locator1 = "TextInput#ANY")) {
+					Type(
+						locator1 = "TextInput#ANY",
+						value1 = ${errorMessage});
+				}
 			}
 
 			if (${thenAction} == "Update an Object Entry") {
@@ -1081,6 +1103,12 @@ definition {
 			Type(
 				locator1 = "ObjectAdmin#ACTION_SECRET_FIELD",
 				value1 = ${secretAction});
+		}
+
+		if (IsElementPresent(locator1 = "ObjectAction#ADD_ERROR_MESSAGE_VALIDATION")) {
+			Type(
+				locator1 = "ObjectAction#ADD_ERROR_MESSAGE_VALIDATION",
+				value1 = ${errorMessage});
 		}
 
 		if (isSet(click)) {
@@ -1339,6 +1367,10 @@ definition {
 			locator1 = "ObjectAdmin#OBJECT_KEBAB_MENU");
 
 		MenuItem.click(menuItem = ${kebabOption});
+	}
+
+	macro setAccountRestrictionViaAPI {
+		JSONObject.setAccountRestriction(objectName = ${objectName});
 	}
 
 	macro viewCategorizationInObjectEntry {

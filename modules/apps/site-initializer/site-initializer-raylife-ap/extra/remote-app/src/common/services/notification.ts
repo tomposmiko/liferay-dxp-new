@@ -12,15 +12,26 @@
  * details.
  */
 
+import {Parameters, parametersFormater} from '.';
 import {axios} from './liferay/api';
 
 const headlessAPI = 'o/headless-user-notification/v1.0';
 
-export function getUserNotification(pageSize: number, page: number) {
-	return axios.get(
-		`${headlessAPI}/my-user-notifications/?&pageSize=${pageSize}&page=${page}`
-	);
+export function getUserNotification(parameters: Parameters) {
+	const parametersList = Object.keys(parameters);
+
+	if (parametersList.length) {
+		return axios.get(
+			`${headlessAPI}/my-user-notifications/?${parametersFormater(
+				parametersList,
+				parameters
+			)}`
+		);
+	}
+
+	return axios.get(`${headlessAPI}/my-user-notifications`);
 }
+
 export function putUserNotificationRead(userNotificationId: number) {
 	return axios.put(
 		`${headlessAPI}/user-notifications/${userNotificationId}/read`

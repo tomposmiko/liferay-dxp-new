@@ -19,7 +19,9 @@ import com.liferay.list.type.service.ListTypeDefinitionLocalService;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectField;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectFieldSetting;
 import com.liferay.object.admin.rest.internal.dto.v1_0.util.ObjectFieldSettingUtil;
+import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.petra.function.transform.TransformUtil;
+import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
@@ -32,7 +34,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	property = "dto.class.name=com.liferay.object.model.ObjectField",
-	service = {DTOConverter.class, ObjectFieldDTOConverter.class}
+	service = DTOConverter.class
 )
 public class ObjectFieldDTOConverter
 	implements DTOConverter<com.liferay.object.model.ObjectField, ObjectField> {
@@ -58,7 +60,11 @@ public class ObjectFieldDTOConverter
 				businessType = ObjectField.BusinessType.create(
 					objectField.getBusinessType());
 				DBType = ObjectField.DBType.create(objectField.getDBType());
-				defaultValue = objectField.getDefaultValue();
+				defaultValue =
+					com.liferay.object.field.setting.util.
+						ObjectFieldSettingUtil.getDefaultValueAsString(
+							null, objectField.getObjectFieldId(),
+							_objectFieldSettingLocalService, null);
 				externalReferenceCode = objectField.getExternalReferenceCode();
 				id = objectField.getObjectFieldId();
 				indexed = objectField.getIndexed();
@@ -67,6 +73,11 @@ public class ObjectFieldDTOConverter
 				label = LocalizedMapUtil.getLanguageIdMap(
 					objectField.getLabelMap());
 				listTypeDefinitionId = objectField.getListTypeDefinitionId();
+
+				if (FeatureFlagManagerUtil.isEnabled("LPS-146755")) {
+					localized = objectField.getLocalized();
+				}
+
 				name = objectField.getName();
 				objectFieldSettings = TransformUtil.transformToArray(
 					objectField.getObjectFieldSettings(),
@@ -100,5 +111,8 @@ public class ObjectFieldDTOConverter
 
 	@Reference
 	private ListTypeDefinitionLocalService _listTypeDefinitionLocalService;
+
+	@Reference
+	private ObjectFieldSettingLocalService _objectFieldSettingLocalService;
 
 }

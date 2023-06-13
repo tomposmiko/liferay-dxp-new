@@ -46,6 +46,10 @@ export function ObjectDataContainer({
 		Liferay.Language.Locale
 	>(defaultLanguageId);
 
+	const isReadOnly = Liferay.FeatureFlags['LPS-167253']
+		? !values.modifiable && values.system
+		: values.system;
+
 	return (
 		<ClayPanel
 			displayTitle={Liferay.Language.get('object-definition-data')}
@@ -66,7 +70,7 @@ export function ObjectDataContainer({
 
 				<InputLocalized
 					disabled={
-						values.system || !hasUpdateObjectDefinitionPermission
+						isReadOnly || !hasUpdateObjectDefinitionPermission
 					}
 					error={errors.label}
 					label={Liferay.Language.get('label')}
@@ -79,7 +83,7 @@ export function ObjectDataContainer({
 
 				<InputLocalized
 					disabled={
-						values.system || !hasUpdateObjectDefinitionPermission
+						isReadOnly || !hasUpdateObjectDefinitionPermission
 					}
 					error={errors.pluralLabel}
 					label={Liferay.Language.get('plural-label')}
@@ -100,7 +104,7 @@ export function ObjectDataContainer({
 				<ClayToggle
 					disabled={
 						!isApproved ||
-						values.system ||
+						isReadOnly ||
 						!hasUpdateObjectDefinitionPermission
 					}
 					label={Liferay.Language.get('active')}

@@ -97,6 +97,35 @@ public class Sku implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected BigDecimal cost;
 
+	@Schema
+	@Valid
+	public CustomField[] getCustomFields() {
+		return customFields;
+	}
+
+	public void setCustomFields(CustomField[] customFields) {
+		this.customFields = customFields;
+	}
+
+	@JsonIgnore
+	public void setCustomFields(
+		UnsafeSupplier<CustomField[], Exception> customFieldsUnsafeSupplier) {
+
+		try {
+			customFields = customFieldsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected CustomField[] customFields;
+
 	@DecimalMin("0")
 	@Schema(example = "1.1")
 	public Double getDepth() {
@@ -726,6 +755,39 @@ public class Sku implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected SkuOption[] skuOptions;
 
+	@Schema
+	@Valid
+	public SkuSubscriptionConfiguration getSkuSubscriptionConfiguration() {
+		return skuSubscriptionConfiguration;
+	}
+
+	public void setSkuSubscriptionConfiguration(
+		SkuSubscriptionConfiguration skuSubscriptionConfiguration) {
+
+		this.skuSubscriptionConfiguration = skuSubscriptionConfiguration;
+	}
+
+	@JsonIgnore
+	public void setSkuSubscriptionConfiguration(
+		UnsafeSupplier<SkuSubscriptionConfiguration, Exception>
+			skuSubscriptionConfigurationUnsafeSupplier) {
+
+		try {
+			skuSubscriptionConfiguration =
+				skuSubscriptionConfigurationUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected SkuSubscriptionConfiguration skuSubscriptionConfiguration;
+
 	@Schema(example = "1234567890")
 	public String getUnspsc() {
 		return unspsc;
@@ -850,6 +912,26 @@ public class Sku implements Serializable {
 			sb.append("\"cost\": ");
 
 			sb.append(cost);
+		}
+
+		if (customFields != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"customFields\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < customFields.length; i++) {
+				sb.append(String.valueOf(customFields[i]));
+
+				if ((i + 1) < customFields.length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
 		}
 
 		if (depth != null) {
@@ -1112,6 +1194,16 @@ public class Sku implements Serializable {
 			}
 
 			sb.append("]");
+		}
+
+		if (skuSubscriptionConfiguration != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"skuSubscriptionConfiguration\": ");
+
+			sb.append(String.valueOf(skuSubscriptionConfiguration));
 		}
 
 		if (unspsc != null) {

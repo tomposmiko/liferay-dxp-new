@@ -67,6 +67,10 @@ public class OptionSelectorInfoItemRenderer
 		}
 
 		try {
+			RequestDispatcher requestDispatcher =
+				_servletContext.getRequestDispatcher(
+					"/info/item/renderer/option_selector/page.jsp");
+
 			httpServletRequest.setAttribute(
 				CPContentWebKeys.CP_CONTENT_HELPER, _cpContentHelper);
 
@@ -114,10 +118,6 @@ public class OptionSelectorInfoItemRenderer
 			httpServletRequest.setAttribute(
 				"liferay-commerce:option-selector:productId",
 				cpDefinition.getCProductId());
-
-			RequestDispatcher requestDispatcher =
-				_servletContext.getRequestDispatcher(
-					"/info/item/renderer/option_selector/page.jsp");
 
 			requestDispatcher.include(httpServletRequest, httpServletResponse);
 		}

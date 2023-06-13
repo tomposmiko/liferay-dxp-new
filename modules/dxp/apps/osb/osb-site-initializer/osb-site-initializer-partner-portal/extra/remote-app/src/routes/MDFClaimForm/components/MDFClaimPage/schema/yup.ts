@@ -52,86 +52,125 @@ const claimSchema = object({
 					then: (schema) =>
 						schema.of(
 							object({
-								invoice: mixed().when('selected', {
-									is: (selected: boolean) => selected,
-									then: (schema) =>
-										schema
-											.test(
-												'fileSize',
-												validateDocument.fileSize
-													.message,
-												(invoice) => {
-													return invoice
-														? Math.ceil(
-																invoice.size /
-																	1000
-														  ) <=
-																validateDocument
-																	.fileSize
-																	.maxSize
-														: false;
-												}
-											)
-											.test(
-												'fileType',
-												validateDocument.imageDocument
-													.message,
-												(invoice) =>
-													invoice
-														? validateDocument.imageDocument.types.includes(
-																invoice.type
-														  )
-														: false
-											),
-								}),
-								invoiceAmount: number().when('selected', {
-									is: (selected: boolean) => selected,
-									then: (schema) =>
-										schema
-											.moreThan(
-												0,
-												'Need be bigger than 0'
-											)
-											.test(
-												'biggerAmount',
-												'Invoice amount is larger than the MDF requested amount',
-												(invoiceAmount, testContext) =>
-													Number(invoiceAmount) <=
-													Number(
-														testContext.parent
-															.requestAmount
-													)
-											),
-								}),
+								invoice: mixed()
+									.required()
+									.when('selected', {
+										is: (selected: boolean) => selected,
+										then: (schema) =>
+											schema
+												.test(
+													'fileSize',
+													validateDocument.fileSize
+														.message,
+													(invoice) => {
+														if (
+															invoice &&
+															!invoice.id
+														) {
+															return invoice
+																? Math.ceil(
+																		invoice.size /
+																			1000
+																  ) <=
+																		validateDocument
+																			.fileSize
+																			.maxSize
+																: false;
+														}
 
+														return true;
+													}
+												)
+												.test(
+													'fileType',
+													validateDocument
+														.imageDocument.message,
+													(invoice) => {
+														if (
+															invoice &&
+															!invoice.id
+														) {
+															return invoice
+																? validateDocument.imageDocument.types.includes(
+																		invoice.type
+																  )
+																: false;
+														}
+
+														return true;
+													}
+												),
+									}),
+								invoiceAmount: number()
+									.required()
+									.when('selected', {
+										is: (selected: boolean) => selected,
+										then: (schema) =>
+											schema
+												.moreThan(
+													0,
+													'Need be bigger than 0'
+												)
+												.test(
+													'biggerAmount',
+													'Invoice amount is larger than the MDF requested amount',
+													(
+														invoiceAmount,
+														testContext
+													) =>
+														Number(invoiceAmount) <=
+														Number(
+															testContext.parent
+																.requestAmount
+														)
+												),
+									}),
 								requestAmount: number(),
 							})
 						),
 				}),
-
-				listQualifiedLeads: mixed().when('selected', {
+				listOfQualifiedLeads: mixed().when('selected', {
 					is: (selected: boolean) => selected,
 					then: (schema) =>
 						schema
 							.test(
 								'fileSize',
 								validateDocument.fileSize.message,
-								(listQualifiedLeads) =>
-									listQualifiedLeads
-										? Math.ceil(
-												listQualifiedLeads.size / 1000
-										  ) <= validateDocument.fileSize.maxSize
-										: false
+								(listOfQualifiedLeads) => {
+									if (
+										listOfQualifiedLeads &&
+										!listOfQualifiedLeads.id
+									) {
+										return listOfQualifiedLeads
+											? Math.ceil(
+													listOfQualifiedLeads.size /
+														1000
+											  ) <=
+													validateDocument.fileSize
+														.maxSize
+											: false;
+									}
+
+									return true;
+								}
 							)
 							.test(
 								'fileType',
 								validateDocument.listOfLeadsDocuments.message,
-								(listQualifiedLeads) =>
-									listQualifiedLeads
-										? validateDocument.listOfLeadsDocuments.types.includes(
-												listQualifiedLeads.type
-										  )
-										: false
+								(listOfQualifiedLeads) => {
+									if (
+										listOfQualifiedLeads &&
+										!listOfQualifiedLeads.id
+									) {
+										return listOfQualifiedLeads
+											? validateDocument.listOfLeadsDocuments.types.includes(
+													listOfQualifiedLeads.type
+											  )
+											: false;
+									}
+
+									return true;
+								}
 							),
 				}),
 				metrics: string().max(
@@ -177,21 +216,31 @@ const claimSchema = object({
 		.test(
 			'fileSize',
 			validateDocument.fileSize.message,
-			(reimbursementInvoice) =>
-				reimbursementInvoice
-					? Math.ceil(reimbursementInvoice.size / 1000) <=
-					  validateDocument.fileSize.maxSize
-					: false
+			(reimbursementInvoice) => {
+				if (reimbursementInvoice && !reimbursementInvoice.id) {
+					return reimbursementInvoice
+						? Math.ceil(reimbursementInvoice.size / 1000) <=
+								validateDocument.fileSize.maxSize
+						: false;
+				}
+
+				return true;
+			}
 		)
 		.test(
 			'fileType',
 			validateDocument.imageDocument.message,
-			(reimbursementInvoice) =>
-				reimbursementInvoice
-					? validateDocument.imageDocument.types.includes(
-							reimbursementInvoice.type
-					  )
-					: false
+			(reimbursementInvoice) => {
+				if (reimbursementInvoice && !reimbursementInvoice.id) {
+					return reimbursementInvoice
+						? validateDocument.imageDocument.types.includes(
+								reimbursementInvoice.type
+						  )
+						: false;
+				}
+
+				return true;
+			}
 		),
 	totalClaimAmount: number()
 		.moreThan(0, 'Need be bigger than 0')
@@ -201,7 +250,7 @@ const claimSchema = object({
 			'Total Claim Amount cannot be greater than Total MDF Requested Amount',
 			(totalClaimAmount, testContext) =>
 				Number(totalClaimAmount) <=
-				Number(testContext.parent.totalrequestedAmount)
+				Number(testContext.parent.totalMDFRequestedAmount)
 		),
 });
 

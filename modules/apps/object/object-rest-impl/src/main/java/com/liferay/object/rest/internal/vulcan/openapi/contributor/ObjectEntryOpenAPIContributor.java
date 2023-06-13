@@ -173,6 +173,24 @@ public class ObjectEntryOpenAPIContributor extends BaseOpenAPIContributor {
 
 			paths.remove(key);
 		}
+
+		if (!_objectDefinition.isEnableCategorization()) {
+			Components components = openAPI.getComponents();
+
+			Map<String, Schema> schemas = components.getSchemas();
+
+			Schema objectDefinitionSchema = schemas.get(
+				_objectDefinition.getShortName());
+
+			Map<String, Schema> properties =
+				objectDefinitionSchema.getProperties();
+
+			properties.remove("keywords");
+			properties.remove("taxonomyCategoryBriefs");
+			properties.remove("taxonomyCategoryIds");
+
+			schemas.remove("TaxonomyCategoryBrief");
+		}
 	}
 
 	private void _addObjectActionPathItem(
@@ -225,7 +243,7 @@ public class ObjectEntryOpenAPIContributor extends BaseOpenAPIContributor {
 
 		Map<String, Schema> sourceSchemas = null;
 
-		if (objectDefinition.isSystem()) {
+		if (objectDefinition.isUnmodifiableSystemObject()) {
 			sourceSchemas = OpenAPIContributorUtil.getSystemObjectSchemas(
 				_bundleContext, getExternalDTOClassName(objectDefinition),
 				_openAPIResource);
@@ -239,7 +257,8 @@ public class ObjectEntryOpenAPIContributor extends BaseOpenAPIContributor {
 		}
 
 		OpenAPIContributorUtil.copySchemas(
-			schemaName, sourceSchemas, objectDefinition.isSystem(), openAPI);
+			schemaName, sourceSchemas,
+			objectDefinition.isUnmodifiableSystemObject(), openAPI);
 	}
 
 	private PathItem _createObjectActionPathItem(

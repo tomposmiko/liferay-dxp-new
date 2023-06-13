@@ -109,12 +109,12 @@ public class LongTextObjectFieldBusinessType
 
 	@Override
 	public void validateObjectFieldSettings(
-			long objectDefinitionId, String objectFieldName,
+			ObjectField objectField,
 			List<ObjectFieldSetting> objectFieldSettings)
 		throws PortalException {
 
 		ObjectFieldBusinessType.super.validateObjectFieldSettings(
-			objectDefinitionId, objectFieldName, objectFieldSettings);
+			objectField, objectFieldSettings);
 
 		Map<String, String> objectFieldSettingsValues = new HashMap<>();
 
@@ -129,7 +129,7 @@ public class LongTextObjectFieldBusinessType
 
 			if (objectFieldSettingsValues.containsKey("maxLength")) {
 				throw new ObjectFieldSettingNameException.NotAllowedNames(
-					objectFieldName, Collections.singleton("maxLength"));
+					objectField.getName(), Collections.singleton("maxLength"));
 			}
 		}
 		else if (StringUtil.equalsIgnoreCase(showCounter, StringPool.TRUE)) {
@@ -138,19 +138,20 @@ public class LongTextObjectFieldBusinessType
 			if (Validator.isNull(maxLength)) {
 				throw new ObjectFieldSettingValueException.
 					MissingRequiredValues(
-						objectFieldName, Collections.singleton("maxLength"));
+						objectField.getName(),
+						Collections.singleton("maxLength"));
 			}
 
 			int maxLengthInteger = GetterUtil.getInteger(maxLength);
 
 			if ((maxLengthInteger < 1) || (maxLengthInteger > 65000)) {
 				throw new ObjectFieldSettingValueException.InvalidValue(
-					objectFieldName, "maxLength", maxLength);
+					objectField.getName(), "maxLength", maxLength);
 			}
 		}
 		else {
 			throw new ObjectFieldSettingValueException.InvalidValue(
-				objectFieldName, "showCounter", showCounter);
+				objectField.getName(), "showCounter", showCounter);
 		}
 	}
 

@@ -117,14 +117,16 @@ public class AggregationObjectFieldBusinessType
 	}
 
 	@Override
-	public Set<String> getRequiredObjectFieldSettingsNames() {
+	public Set<String> getRequiredObjectFieldSettingsNames(
+		ObjectField objectField) {
+
 		return SetUtil.fromArray(
 			"function", "objectFieldName", "objectRelationshipName");
 	}
 
 	@Override
 	public void validateObjectFieldSettings(
-			long objectDefinitionId, String objectFieldName,
+			ObjectField objectField,
 			List<ObjectFieldSetting> objectFieldSettings)
 		throws PortalException {
 
@@ -133,7 +135,7 @@ public class AggregationObjectFieldBusinessType
 		for (ObjectFieldSetting objectFieldSetting : objectFieldSettings) {
 			String name = objectFieldSetting.getName();
 
-			if (Objects.equals("filters", name)) {
+			if (Objects.equals(name, "filters")) {
 				objectFieldSettingsValuesMap.put(
 					name, objectFieldSetting.getObjectFilters());
 
@@ -148,11 +150,11 @@ public class AggregationObjectFieldBusinessType
 			objectFieldSettingsValuesMap.get("function"));
 
 		Set<String> requiredObjectFieldSettingsNames =
-			getRequiredObjectFieldSettingsNames();
+			getRequiredObjectFieldSettingsNames(objectField);
 
 		if (!ArrayUtil.contains(_FUNCTION, function)) {
 			throw new ObjectFieldSettingValueException.InvalidValue(
-				objectFieldName, "function", function);
+				objectField.getName(), "function", function);
 		}
 		else if (Objects.equals(function, "COUNT")) {
 			requiredObjectFieldSettingsNames.remove("objectFieldName");
@@ -174,7 +176,7 @@ public class AggregationObjectFieldBusinessType
 
 		if (!missingRequiredObjectFieldSettingsNames.isEmpty()) {
 			throw new ObjectFieldSettingValueException.MissingRequiredValues(
-				objectFieldName, missingRequiredObjectFieldSettingsNames);
+				objectField.getName(), missingRequiredObjectFieldSettingsNames);
 		}
 
 		Set<String> notAllowedObjectFieldSettingsNames = new HashSet<>(
@@ -187,13 +189,13 @@ public class AggregationObjectFieldBusinessType
 
 		if (!notAllowedObjectFieldSettingsNames.isEmpty()) {
 			throw new ObjectFieldSettingNameException.NotAllowedNames(
-				objectFieldName, notAllowedObjectFieldSettingsNames);
+				objectField.getName(), notAllowedObjectFieldSettingsNames);
 		}
 
 		try {
 			ObjectRelationship objectRelationship =
 				_objectRelationshipLocalService.getObjectRelationship(
-					objectDefinitionId,
+					objectField.getObjectDefinitionId(),
 					GetterUtil.getString(
 						objectFieldSettingsValuesMap.get(
 							"objectRelationshipName")));
@@ -203,7 +205,7 @@ public class AggregationObjectFieldBusinessType
 					objectRelationship.getObjectDefinitionId2());
 
 			if (!Objects.equals(function, "COUNT")) {
-				ObjectField objectField =
+				ObjectField objectField1 =
 					_objectFieldLocalService.getObjectField(
 						objectDefinition.getObjectDefinitionId(),
 						GetterUtil.getString(
@@ -212,10 +214,10 @@ public class AggregationObjectFieldBusinessType
 
 				if (!ArrayUtil.contains(
 						_NUMERIC_BUSINESS_TYPES,
-						objectField.getBusinessType())) {
+						objectField1.getBusinessType())) {
 
 					throw new ObjectFieldSettingValueException.InvalidValue(
-						objectFieldName, "objectFieldName",
+						objectField.getName(), "objectFieldName",
 						GetterUtil.getString(
 							objectFieldSettingsValuesMap.get(
 								"objectFieldName")));
@@ -223,13 +225,13 @@ public class AggregationObjectFieldBusinessType
 			}
 
 			_validateObjectFilters(
-				objectDefinition, objectFieldName,
+				objectDefinition, objectField.getName(),
 				(List<ObjectFilter>)objectFieldSettingsValuesMap.get(
 					"filters"));
 		}
 		catch (NoSuchObjectFieldException noSuchObjectFieldException) {
 			throw new ObjectFieldSettingValueException.InvalidValue(
-				objectFieldName, "objectFieldName",
+				objectField.getName(), "objectFieldName",
 				GetterUtil.getString(
 					objectFieldSettingsValuesMap.get("objectFieldName")),
 				noSuchObjectFieldException);
@@ -238,7 +240,7 @@ public class AggregationObjectFieldBusinessType
 					noSuchObjectRelationshipException) {
 
 			throw new ObjectFieldSettingValueException.InvalidValue(
-				objectFieldName, "objectRelationshipName",
+				objectField.getName(), "objectRelationshipName",
 				GetterUtil.getString(
 					objectFieldSettingsValuesMap.get("objectRelationshipName")),
 				noSuchObjectRelationshipException);

@@ -31,7 +31,6 @@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %><%@
 taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 
 <%@ page import="com.liferay.asset.kernel.model.AssetVocabularyConstants" %><%@
-page import="com.liferay.client.extension.type.item.selector.CETItemSelectorReturnType" %><%@
 page import="com.liferay.document.library.kernel.exception.FileSizeException" %><%@
 page import="com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys" %><%@
 page import="com.liferay.exportimport.kernel.staging.LayoutStagingUtil" %><%@
@@ -40,6 +39,7 @@ page import="com.liferay.friendly.url.exception.DuplicateFriendlyURLEntryExcepti
 page import="com.liferay.frontend.taglib.form.navigator.constants.FormNavigatorConstants" %><%@
 page import="com.liferay.layout.admin.constants.LayoutAdminPortletKeys" %><%@
 page import="com.liferay.layout.admin.constants.LayoutScreenNavigationEntryConstants" %><%@
+page import="com.liferay.layout.admin.web.internal.constants.LayoutAdminFormNavigatorConstants" %><%@
 page import="com.liferay.layout.admin.web.internal.constants.LayoutAdminWebKeys" %><%@
 page import="com.liferay.layout.admin.web.internal.display.context.LayoutLookAndFeelDisplayContext" %><%@
 page import="com.liferay.layout.admin.web.internal.display.context.LayoutUtilityPageEntryDisplayContext" %><%@

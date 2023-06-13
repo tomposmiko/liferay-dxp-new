@@ -18,14 +18,18 @@ import com.liferay.document.library.kernel.model.DLFolder;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.kernel.service.DLAppService;
+import com.liferay.document.library.kernel.service.DLFolderService;
 import com.liferay.dynamic.data.mapping.util.DDMIndexer;
 import com.liferay.expando.kernel.service.ExpandoColumnLocalService;
 import com.liferay.expando.kernel.service.ExpandoTableLocalService;
 import com.liferay.headless.common.spi.odata.entity.EntityFieldsUtil;
+import com.liferay.headless.common.spi.resource.SPIRatingResource;
 import com.liferay.headless.common.spi.service.context.ServiceContextRequestUtil;
 import com.liferay.headless.delivery.dto.v1_0.DocumentFolder;
+import com.liferay.headless.delivery.dto.v1_0.Rating;
 import com.liferay.headless.delivery.dto.v1_0.util.CustomFieldsUtil;
 import com.liferay.headless.delivery.internal.dto.v1_0.converter.DocumentFolderDTOConverter;
+import com.liferay.headless.delivery.internal.dto.v1_0.util.RatingUtil;
 import com.liferay.headless.delivery.internal.odata.entity.v1_0.DocumentFolderEntityModel;
 import com.liferay.headless.delivery.resource.v1_0.DocumentFolderResource;
 import com.liferay.headless.delivery.search.aggregation.AggregationUtil;
@@ -40,10 +44,12 @@ import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.search.filter.TermFilter;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.odata.entity.EntityModel;
+import com.liferay.portal.repository.liferayrepository.model.LiferayFolder;
 import com.liferay.portal.search.aggregation.Aggregations;
 import com.liferay.portal.search.expando.ExpandoBridgeIndexer;
 import com.liferay.portal.search.legacy.searcher.SearchRequestBuilderFactory;
@@ -57,7 +63,10 @@ import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.util.SearchUtil;
 import com.liferay.portlet.documentlibrary.constants.DLConstants;
+import com.liferay.ratings.kernel.service.RatingsEntryLocalService;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -79,6 +88,15 @@ public class DocumentFolderResourceImpl extends BaseDocumentFolderResourceImpl {
 	@Override
 	public void deleteDocumentFolder(Long documentFolderId) throws Exception {
 		_dlAppService.deleteFolder(documentFolderId);
+	}
+
+	@Override
+	public void deleteDocumentFolderMyRating(Long documentFolderId)
+		throws Exception {
+
+		SPIRatingResource<Rating> spiRatingResource = _getSPIRatingResource();
+
+		spiRatingResource.deleteRating(documentFolderId);
 	}
 
 	@Override
@@ -138,6 +156,15 @@ public class DocumentFolderResourceImpl extends BaseDocumentFolderResourceImpl {
 	}
 
 	@Override
+	public Page<DocumentFolder> getAssetLibraryDocumentFoldersRatedByMePage(
+			Long assetLibraryId, Pagination pagination)
+		throws Exception {
+
+		return _getGroupDocumentFoldersRatedByMePage(
+			assetLibraryId, pagination);
+	}
+
+	@Override
 	public DocumentFolder getDocumentFolder(Long documentFolderId)
 		throws Exception {
 
@@ -169,6 +196,15 @@ public class DocumentFolderResourceImpl extends BaseDocumentFolderResourceImpl {
 			).build(),
 			folder.getFolderId(), folder.getGroupId(), flatten, search,
 			aggregation, filter, pagination, sorts);
+	}
+
+	@Override
+	public Rating getDocumentFolderMyRating(Long documentFolderId)
+		throws Exception {
+
+		SPIRatingResource<Rating> spiRatingResource = _getSPIRatingResource();
+
+		return spiRatingResource.getRating(documentFolderId);
 	}
 
 	@Override
@@ -225,6 +261,14 @@ public class DocumentFolderResourceImpl extends BaseDocumentFolderResourceImpl {
 	}
 
 	@Override
+	public Page<DocumentFolder> getSiteDocumentFoldersRatedByMePage(
+			Long siteId, Pagination pagination)
+		throws Exception {
+
+		return _getGroupDocumentFoldersRatedByMePage(siteId, pagination);
+	}
+
+	@Override
 	public DocumentFolder getSiteDocumentsFolderByExternalReferenceCode(
 			Long siteId, String externalReferenceCode)
 		throws Exception {
@@ -256,6 +300,17 @@ public class DocumentFolderResourceImpl extends BaseDocumentFolderResourceImpl {
 	}
 
 	@Override
+	public Rating postDocumentFolderMyRating(
+			Long documentFolderId, Rating rating)
+		throws Exception {
+
+		SPIRatingResource<Rating> spiRatingResource = _getSPIRatingResource();
+
+		return spiRatingResource.addOrUpdateRating(
+			rating.getRatingValue(), documentFolderId);
+	}
+
+	@Override
 	public DocumentFolder postSiteDocumentFolder(
 			Long siteId, DocumentFolder documentFolder)
 		throws Exception {
@@ -272,6 +327,17 @@ public class DocumentFolderResourceImpl extends BaseDocumentFolderResourceImpl {
 
 		return _updateDocumentFolder(
 			_dlAppService.getFolder(documentFolderId), documentFolder);
+	}
+
+	@Override
+	public Rating putDocumentFolderMyRating(
+			Long documentFolderId, Rating rating)
+		throws Exception {
+
+		SPIRatingResource<Rating> spiRatingResource = _getSPIRatingResource();
+
+		return spiRatingResource.addOrUpdateRating(
+			rating.getRatingValue(), documentFolderId);
 	}
 
 	@Override
@@ -402,6 +468,56 @@ public class DocumentFolderResourceImpl extends BaseDocumentFolderResourceImpl {
 					GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK)))));
 	}
 
+	private Page<DocumentFolder> _getGroupDocumentFoldersRatedByMePage(
+			long groupId, Pagination pagination)
+		throws Exception {
+
+		return Page.of(
+			_toDocumentFolders(
+				_dlFolderService.getFolders(
+					groupId, 0.1, pagination.getStartPosition(),
+					pagination.getEndPosition())),
+			pagination, _dlFolderService.getFoldersCount(groupId, 0.1));
+	}
+
+	private SPIRatingResource<Rating> _getSPIRatingResource() {
+		return new SPIRatingResource<>(
+			DLFolder.class.getName(), _ratingsEntryLocalService,
+			ratingsEntry -> {
+				Folder folder = _dlAppService.getFolder(
+					ratingsEntry.getClassPK());
+
+				return RatingUtil.toRating(
+					HashMapBuilder.put(
+						"create",
+						addAction(
+							ActionKeys.VIEW, folder.getPrimaryKey(),
+							"postDocumentFolderMyRating", folder.getUserId(),
+							DLFolder.class.getName(), folder.getGroupId())
+					).put(
+						"delete",
+						addAction(
+							ActionKeys.VIEW, folder.getPrimaryKey(),
+							"deleteDocumentFolderMyRating", folder.getUserId(),
+							DLFolder.class.getName(), folder.getGroupId())
+					).put(
+						"get",
+						addAction(
+							ActionKeys.VIEW, folder.getPrimaryKey(),
+							"getDocumentFolderMyRating", folder.getUserId(),
+							DLFolder.class.getName(), folder.getGroupId())
+					).put(
+						"replace",
+						addAction(
+							ActionKeys.VIEW, folder.getPrimaryKey(),
+							"putDocumentFolderMyRating", folder.getUserId(),
+							DLFolder.class.getName(), folder.getGroupId())
+					).build(),
+					_portal, ratingsEntry, _userLocalService);
+			},
+			contextUser);
+	}
+
 	private DocumentFolder _toDocumentFolder(Folder folder) throws Exception {
 		return _documentFolderDTOConverter.toDTO(
 			new DefaultDTOConverterContext(
@@ -448,6 +564,18 @@ public class DocumentFolderResourceImpl extends BaseDocumentFolderResourceImpl {
 				contextUser));
 	}
 
+	private List<DocumentFolder> _toDocumentFolders(List<DLFolder> dlFolders)
+		throws Exception {
+
+		List<DocumentFolder> documentFolders = new ArrayList<>();
+
+		for (DLFolder dlFolder : dlFolders) {
+			documentFolders.add(_toDocumentFolder(new LiferayFolder(dlFolder)));
+		}
+
+		return documentFolders;
+	}
+
 	private DocumentFolder _updateDocumentFolder(
 			Folder folder, DocumentFolder documentFolder)
 		throws Exception {
@@ -477,6 +605,9 @@ public class DocumentFolderResourceImpl extends BaseDocumentFolderResourceImpl {
 	private DLAppService _dlAppService;
 
 	@Reference
+	private DLFolderService _dlFolderService;
+
+	@Reference
 	private DocumentFolderDTOConverter _documentFolderDTOConverter;
 
 	@Reference
@@ -498,9 +629,15 @@ public class DocumentFolderResourceImpl extends BaseDocumentFolderResourceImpl {
 	private Queries _queries;
 
 	@Reference
+	private RatingsEntryLocalService _ratingsEntryLocalService;
+
+	@Reference
 	private SearchRequestBuilderFactory _searchRequestBuilderFactory;
 
 	@Reference
 	private Sorts _sorts;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }

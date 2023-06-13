@@ -14,16 +14,14 @@
 
 package com.liferay.jethr0.project;
 
-import com.liferay.jethr0.builds.Build;
+import com.liferay.jethr0.build.Build;
+import com.liferay.jethr0.entity.BaseEntity;
 import com.liferay.jethr0.gitbranch.GitBranch;
+import com.liferay.jethr0.task.Task;
 import com.liferay.jethr0.testsuite.TestSuite;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import org.json.JSONObject;
@@ -31,7 +29,7 @@ import org.json.JSONObject;
 /**
  * @author Michael Hashimoto
  */
-public abstract class BaseProject implements Project {
+public abstract class BaseProject extends BaseEntity implements Project {
 
 	@Override
 	public void addBuild(Build build) {
@@ -66,6 +64,22 @@ public abstract class BaseProject implements Project {
 	}
 
 	@Override
+	public void addTask(Task task) {
+		addTasks(Arrays.asList(task));
+	}
+
+	@Override
+	public void addTasks(List<Task> tasks) {
+		for (Task task : tasks) {
+			if (_tasks.contains(task)) {
+				continue;
+			}
+
+			_tasks.add(task);
+		}
+	}
+
+	@Override
 	public void addTestSuite(TestSuite testSuite) {
 		addTestSuites(Arrays.asList(testSuite));
 	}
@@ -87,32 +101,18 @@ public abstract class BaseProject implements Project {
 	}
 
 	@Override
-	public Date getCreatedDate() {
-		return _createdDate;
-	}
-
-	@Override
 	public List<GitBranch> getGitBranches() {
 		return _gitBranches;
 	}
 
 	@Override
-	public long getId() {
-		return _id;
-	}
-
-	@Override
 	public JSONObject getJSONObject() {
-		JSONObject jsonObject = new JSONObject();
+		JSONObject jsonObject = super.getJSONObject();
 
 		Project.State state = getState();
 		Project.Type type = getType();
 
 		jsonObject.put(
-			"dateCreated", _simpleDateFormat.format(getCreatedDate())
-		).put(
-			"id", getId()
-		).put(
 			"name", getName()
 		).put(
 			"priority", getPriority()
@@ -141,6 +141,11 @@ public abstract class BaseProject implements Project {
 	}
 
 	@Override
+	public List<Task> getTasks() {
+		return _tasks;
+	}
+
+	@Override
 	public List<TestSuite> getTestSuites() {
 		return _testSuites;
 	}
@@ -157,7 +162,7 @@ public abstract class BaseProject implements Project {
 
 	@Override
 	public void removeBuilds(List<Build> builds) {
-		_builds.remove(builds);
+		_builds.removeAll(builds);
 	}
 
 	@Override
@@ -167,7 +172,16 @@ public abstract class BaseProject implements Project {
 
 	@Override
 	public void removeGitBranches(List<GitBranch> gitBranches) {
-		_gitBranches.remove(gitBranches);
+		_gitBranches.removeAll(gitBranches);
+	}
+
+	@Override
+	public void removeTask(Task task) {
+		_tasks.remove(task);
+	}
+
+	public void removeTasks(List<Task> tasks) {
+		_tasks.removeAll(tasks);
 	}
 
 	@Override
@@ -195,37 +209,21 @@ public abstract class BaseProject implements Project {
 		_state = state;
 	}
 
-	@Override
-	public String toString() {
-		return String.valueOf(getJSONObject());
-	}
-
 	protected BaseProject(JSONObject jsonObject) {
-		try {
-			_createdDate = _simpleDateFormat.parse(
-				jsonObject.getString("dateCreated"));
-		}
-		catch (ParseException parseException) {
-			throw new RuntimeException(parseException);
-		}
+		super(jsonObject);
 
-		_id = jsonObject.getLong("id");
 		_name = jsonObject.getString("name");
 		_priority = jsonObject.optInt("priority");
 		_state = State.get(jsonObject.getJSONObject("state"));
 		_type = Type.get(jsonObject.getJSONObject("type"));
 	}
 
-	private static final SimpleDateFormat _simpleDateFormat =
-		new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-
 	private final List<Build> _builds = new ArrayList<>();
-	private final Date _createdDate;
 	private final List<GitBranch> _gitBranches = new ArrayList<>();
-	private final long _id;
 	private String _name;
 	private int _priority;
 	private State _state;
+	private final List<Task> _tasks = new ArrayList<>();
 	private final List<TestSuite> _testSuites = new ArrayList<>();
 	private final Type _type;
 

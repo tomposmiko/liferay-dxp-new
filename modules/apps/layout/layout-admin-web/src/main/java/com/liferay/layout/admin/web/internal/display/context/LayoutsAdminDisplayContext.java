@@ -36,6 +36,7 @@ import com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType;
 import com.liferay.item.selector.criteria.file.criterion.FileItemSelectorCriterion;
 import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
 import com.liferay.layout.admin.web.internal.util.FaviconUtil;
+import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalServiceUtil;
 import com.liferay.layout.util.LayoutCopyHelper;
@@ -363,27 +364,17 @@ public class LayoutsAdminDisplayContext {
 		).buildString();
 	}
 
-	public String getCopyLayoutRenderURL(Layout layout) throws Exception {
-		return PortletURLBuilder.createRenderURL(
-			_liferayPortletResponse
-		).setMVCRenderCommandName(
-			"/layout_admin/add_layout"
-		).setParameter(
-			"privateLayout", isPrivateLayout()
-		).setParameter(
-			"sourcePlid", layout.getPlid()
-		).setWindowState(
-			LiferayWindowState.POP_UP
-		).buildString();
-	}
+	public String getCopyLayoutActionURL(
+		boolean copyPermissions, long sourcePlid) {
 
-	public String getCopyLayoutURL(long sourcePlid) {
 		return PortletURLBuilder.createActionURL(
 			_liferayPortletResponse
 		).setActionName(
 			"/layout_admin/copy_layout"
 		).setRedirect(
 			getRedirect()
+		).setParameter(
+			"copyPermissions", copyPermissions
 		).setParameter(
 			"explicitCreation", Boolean.TRUE
 		).setParameter(
@@ -396,6 +387,24 @@ public class LayoutsAdminDisplayContext {
 			"sourcePlid", sourcePlid
 		).setParameter(
 			"stagingGroupId", getStagingGroupId()
+		).buildString();
+	}
+
+	public String getCopyLayoutRenderURL(boolean copyPermissions, Layout layout)
+		throws Exception {
+
+		return PortletURLBuilder.createRenderURL(
+			_liferayPortletResponse
+		).setMVCRenderCommandName(
+			"/layout_admin/add_layout"
+		).setParameter(
+			"copyPermissions", copyPermissions
+		).setParameter(
+			"privateLayout", isPrivateLayout()
+		).setParameter(
+			"sourcePlid", layout.getPlid()
+		).setWindowState(
+			LiferayWindowState.POP_UP
 		).buildString();
 	}
 
@@ -474,7 +483,7 @@ public class LayoutsAdminDisplayContext {
 			unicodeProperties.toString(), true, true, Collections.emptyMap(),
 			layout.getMasterLayoutPlid(), serviceContext);
 
-		draftLayout = _layoutCopyHelper.copyLayout(layout, draftLayout);
+		draftLayout = _layoutCopyHelper.copyLayoutContent(layout, draftLayout);
 
 		serviceContext.setAttribute("published", Boolean.TRUE);
 
@@ -511,14 +520,63 @@ public class LayoutsAdminDisplayContext {
 		return StringPool.BLANK;
 	}
 
+	public Map<String, Object> getFaviconButtonProps() {
+		return HashMapBuilder.<String, Object>put(
+			"clearButtonEnabled", isClearFaviconButtonEnabled()
+		).put(
+			"defaultImgURL", _getDefaultFaviconURL()
+		).put(
+			"defaultTitle", _getDefaultFaviconTitle()
+		).put(
+			"faviconFileEntryId",
+			() -> {
+				Layout selLayout = getSelLayout();
+
+				if (selLayout != null) {
+					return selLayout.getFaviconFileEntryId();
+				}
+
+				LayoutSet selLayoutSet = getSelLayoutSet();
+
+				return selLayoutSet.getFaviconFileEntryId();
+			}
+		).put(
+			"imgURL", getFaviconURL()
+		).put(
+			"themeFaviconCETExternalReferenceCode",
+			getThemeFaviconCETExternalReferenceCode()
+		).put(
+			"title", HtmlUtil.escape(getFaviconTitle())
+		).put(
+			"url", getFileEntryItemSelectorURL()
+		).build();
+	}
+
 	public String getFaviconTitle() {
+		if (getSelLayout() != null) {
+			return FaviconUtil.getFaviconTitle(
+				_cetManager, getSelLayout(), themeDisplay.getLocale());
+		}
+
 		return FaviconUtil.getFaviconTitle(
 			getSelLayoutSet(), themeDisplay.getLocale());
 	}
 
 	public String getFaviconURL() {
-		String faviconURL = FaviconUtil.getFaviconURL(
-			_cetManager, getSelLayoutSet());
+		String faviconURL = StringPool.BLANK;
+
+		if (getSelLayout() != null) {
+			faviconURL = FaviconUtil.getFaviconURL(_cetManager, getSelLayout());
+		}
+
+		if (Validator.isNotNull(faviconURL)) {
+			return faviconURL;
+		}
+
+		if (getSelLayoutSet() != null) {
+			faviconURL = FaviconUtil.getFaviconURL(
+				_cetManager, getSelLayoutSet());
+		}
 
 		if (Validator.isNotNull(faviconURL)) {
 			return faviconURL;
@@ -652,6 +710,34 @@ public class LayoutsAdminDisplayContext {
 		}
 
 		return _layoutId;
+	}
+
+	public PortletURL getLayoutScreenNavigationPortletURL() {
+		return PortletURLBuilder.create(
+			getPortletURL()
+		).setMVCRenderCommandName(
+			"/layout_admin/edit_layout"
+		).setBackURL(
+			getBackURL()
+		).setPortletResource(
+			ParamUtil.getString(httpServletRequest, "portletResource")
+		).setParameter(
+			"selPlid", getSelPlid()
+		).buildPortletURL();
+	}
+
+	public PortletURL getLayoutSetScreenNavigationPortletURL() {
+		return PortletURLBuilder.create(
+			getPortletURL()
+		).setMVCRenderCommandName(
+			"/layout_admin/edit_layout_set"
+		).setBackURL(
+			getBackURL()
+		).setPortletResource(
+			ParamUtil.getString(httpServletRequest, "portletResource")
+		).setParameter(
+			"privateLayout", isPrivateLayout()
+		).buildPortletURL();
 	}
 
 	public SearchContainer<Layout> getLayoutsSearchContainer()
@@ -1004,20 +1090,6 @@ public class LayoutsAdminDisplayContext {
 			privateLayout, themeDisplay.getLocale());
 	}
 
-	public PortletURL getScreenNavigationPortletURL() {
-		return PortletURLBuilder.create(
-			getPortletURL()
-		).setMVCRenderCommandName(
-			"/layout_admin/edit_layout"
-		).setBackURL(
-			getBackURL()
-		).setPortletResource(
-			ParamUtil.getString(httpServletRequest, "portletResource")
-		).setParameter(
-			"selPlid", getSelPlid()
-		).buildPortletURL();
-	}
-
 	public String getSelectFaviconEventName() {
 		return _liferayPortletResponse.getNamespace() + "selectImage";
 	}
@@ -1299,6 +1371,21 @@ public class LayoutsAdminDisplayContext {
 	}
 
 	public String getThemeFaviconCETExternalReferenceCode() {
+		Layout selLayout = getSelLayout();
+
+		if (selLayout != null) {
+			ClientExtensionEntryRel clientExtensionEntryRel =
+				ClientExtensionEntryRelLocalServiceUtil.
+					fetchClientExtensionEntryRel(
+						PortalUtil.getClassNameId(Layout.class),
+						selLayout.getPlid(),
+						ClientExtensionEntryConstants.TYPE_THEME_FAVICON);
+
+			if (clientExtensionEntryRel != null) {
+				return clientExtensionEntryRel.getCETExternalReferenceCode();
+			}
+		}
+
 		LayoutSet setLayoutSet = getSelLayoutSet();
 
 		ClientExtensionEntryRel clientExtensionEntryRel =
@@ -1434,6 +1521,38 @@ public class LayoutsAdminDisplayContext {
 		return virtualHostname;
 	}
 
+	public boolean hasEditableMasterLayout() {
+		if (_hasEditableMasterLayout != null) {
+			return _hasEditableMasterLayout;
+		}
+
+		boolean hasEditableMasterLayout = false;
+
+		Layout selLayout = getSelLayout();
+
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			LayoutPageTemplateEntryLocalServiceUtil.
+				fetchLayoutPageTemplateEntryByPlid(selLayout.getPlid());
+
+		if (layoutPageTemplateEntry == null) {
+			layoutPageTemplateEntry =
+				LayoutPageTemplateEntryLocalServiceUtil.
+					fetchLayoutPageTemplateEntryByPlid(selLayout.getClassPK());
+		}
+
+		if ((layoutPageTemplateEntry == null) ||
+			!Objects.equals(
+				layoutPageTemplateEntry.getType(),
+				LayoutPageTemplateEntryTypeConstants.TYPE_MASTER_LAYOUT)) {
+
+			hasEditableMasterLayout = true;
+		}
+
+		_hasEditableMasterLayout = hasEditableMasterLayout;
+
+		return _hasEditableMasterLayout;
+	}
+
 	public boolean hasLayouts() {
 		if (_hasLayouts != null) {
 			return _hasLayouts;
@@ -1468,6 +1587,27 @@ public class LayoutsAdminDisplayContext {
 	}
 
 	public boolean isClearFaviconButtonEnabled() {
+		Layout selLayout = getSelLayout();
+
+		if (selLayout != null) {
+			if (selLayout.getFaviconFileEntryId() > 0) {
+				return true;
+			}
+
+			ClientExtensionEntryRel clientExtensionEntryRel =
+				ClientExtensionEntryRelLocalServiceUtil.
+					fetchClientExtensionEntryRel(
+						PortalUtil.getClassNameId(Layout.class),
+						selLayout.getPlid(),
+						ClientExtensionEntryConstants.TYPE_THEME_FAVICON);
+
+			if (clientExtensionEntryRel != null) {
+				return true;
+			}
+
+			return false;
+		}
+
 		LayoutSet selLayoutSet = getSelLayoutSet();
 
 		if (selLayoutSet.getFaviconFileEntryId() > 0) {
@@ -2027,6 +2167,75 @@ public class LayoutsAdminDisplayContext {
 		return breadcrumbEntry;
 	}
 
+	private String _getDefaultFaviconTitle() {
+		Layout selLayout = getSelLayout();
+
+		if (selLayout != null) {
+			if (hasEditableMasterLayout() &&
+				(selLayout.getMasterLayoutPlid() > 0)) {
+
+				Layout masterLayout = LayoutLocalServiceUtil.fetchLayout(
+					selLayout.getMasterLayoutPlid());
+
+				if (masterLayout != null) {
+					ClientExtensionEntryRel clientExtensionEntryRel =
+						ClientExtensionEntryRelLocalServiceUtil.
+							fetchClientExtensionEntryRel(
+								PortalUtil.getClassNameId(Layout.class),
+								selLayout.getPlid(),
+								ClientExtensionEntryConstants.
+									TYPE_THEME_FAVICON);
+
+					if ((masterLayout.getFaviconFileEntryId() > 0) ||
+						(clientExtensionEntryRel != null)) {
+
+						return LanguageUtil.get(
+							httpServletRequest, "favicon-from-master");
+					}
+				}
+			}
+			else {
+				return FaviconUtil.getFaviconTitle(
+					getSelLayoutSet(), themeDisplay.getLocale());
+			}
+		}
+
+		return LanguageUtil.get(httpServletRequest, "favicon-from-theme");
+	}
+
+	private String _getDefaultFaviconURL() {
+		Layout selLayout = getSelLayout();
+
+		if (selLayout != null) {
+			if (hasEditableMasterLayout() &&
+				(selLayout.getMasterLayoutPlid() > 0)) {
+
+				Layout masterLayout = LayoutLocalServiceUtil.fetchLayout(
+					selLayout.getMasterLayoutPlid());
+
+				if (masterLayout != null) {
+					String faviconURL = FaviconUtil.getFaviconURL(
+						_cetManager, masterLayout);
+
+					if (Validator.isNotNull(faviconURL)) {
+						return faviconURL;
+					}
+				}
+			}
+			else {
+				String faviconURL = FaviconUtil.getFaviconURL(
+					_cetManager, getSelLayoutSet());
+
+				if (Validator.isNotNull(faviconURL)) {
+					return faviconURL;
+				}
+			}
+		}
+
+		return themeDisplay.getPathThemeImages() + "/" +
+			PropsUtil.get(PropsKeys.THEME_SHORTCUT_ICON);
+	}
+
 	private String _getDraftLayoutURL(Layout layout) throws Exception {
 		String layoutFullURL = HttpComponentsUtil.setParameter(
 			PortalUtil.getLayoutFullURL(getDraftLayout(layout), themeDisplay),
@@ -2261,6 +2470,7 @@ public class LayoutsAdminDisplayContext {
 	private String _displayStyle;
 	private Boolean _firstColumn;
 	private final GroupDisplayContextHelper _groupDisplayContextHelper;
+	private Boolean _hasEditableMasterLayout;
 	private Boolean _hasLayouts;
 	private final ItemSelector _itemSelector;
 	private String _keywords;

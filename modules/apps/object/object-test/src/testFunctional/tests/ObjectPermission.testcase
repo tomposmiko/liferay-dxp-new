@@ -1012,8 +1012,8 @@ definition {
 		Picklist.addPicklistViaAPI(picklistName = "Picklist Test");
 
 		Picklist.addPicklistItemViaAPI(
-			itemKey = "ItemTest",
-			itemName = "Picklist Item",
+			itemKey = "itemTest",
+			itemName = "Item Test",
 			picklistName = "Picklist Test");
 
 		JSONRole.addRegularRole(
@@ -1053,15 +1053,25 @@ definition {
 
 		Picklist.gotoPicklists();
 
-		Picklist.viewPicklist(picklistName = "Picklist Test");
+		WaitForElementPresent(
+			key_pageNumber = 1,
+			locator1 = "ObjectPortlet#ANY_PAGE");
+
+		Picklist.optionsPicklist(
+			menuItem = "View",
+			picklistName = "Picklist Test");
+
+		SelectFrame(locator1 = "Picklist#IFRAME_PICKLIST_MODAL");
+
+		Click(
+			key_picklistName = "Item Test",
+			locator1 = "Picklist#VIEW_PICKLIST");
 
 		Picklist.assertDisabledPicklistName();
 
 		Picklist.assertDisabledSaveButton();
 
-		Picklist.viewPicklist(picklistName = "Picklist Item");
-
-		Picklist.assertDisabledPicklistItem(keyName = "ItemTest");
+		Picklist.assertDisabledPicklistItem(keyName = "itemTest");
 
 		Picklist.assertDisabledSaveButton();
 	}
@@ -1271,6 +1281,8 @@ definition {
 		Refresh();
 
 		Picklist.gotoPicklistView(picklistName = "Picklist Test");
+
+		SelectFrame(locator1 = "Picklist#IFRAME_PICKLIST_MODAL");
 
 		Picklist.assertDisabledPicklistName();
 
@@ -1561,7 +1573,9 @@ definition {
 
 		Picklist.gotoPicklists();
 
-		Picklist.viewPicklist(picklistName = "Picklist Test");
+		Click(
+			key_picklistName = "Picklist Test",
+			locator1 = "Picklist#VIEW_PICKLIST");
 
 		Picklist.updatePicklistName(picklistName = "Update Picklist");
 
@@ -1902,7 +1916,9 @@ definition {
 
 		Picklist.gotoPicklists();
 
-		Picklist.viewPicklist(picklistName = "Custom Picklist 148939");
+		Click(
+			key_picklistName = "Custom Picklist 148939",
+			locator1 = "Picklist#VIEW_PICKLIST");
 
 		Picklist.updatePicklistName(picklistName = "Update Custom Picklist");
 
@@ -1960,7 +1976,9 @@ definition {
 
 		Picklist.assertPicklist(picklistName = "Picklist Test");
 
-		Picklist.viewPicklist(picklistName = "Picklist Test");
+		Click(
+			key_picklistName = "Picklist Test",
+			locator1 = "Picklist#VIEW_PICKLIST");
 
 		Picklist.updatePicklistName(picklistName = "Update Picklist");
 

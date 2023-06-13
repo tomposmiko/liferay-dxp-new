@@ -57,6 +57,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.servlet.DirectRequestDispatcherFactoryUtil;
+import com.liferay.portal.kernel.servlet.DummyHttpServletResponse;
 import com.liferay.portal.kernel.servlet.HttpMethods;
 import com.liferay.portal.kernel.servlet.ServletContextPool;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -748,7 +749,7 @@ public class FragmentCollectionContributorRegistryImpl
 		@Override
 		public RequestDispatcher getRequestDispatcher(String path) {
 			return DirectRequestDispatcherFactoryUtil.getRequestDispatcher(
-				ServletContextPool.get(StringPool.BLANK), path);
+				ServletContextPool.get(_portal.getServletContextName()), path);
 		}
 
 		@Override
@@ -783,7 +784,7 @@ public class FragmentCollectionContributorRegistryImpl
 
 		@Override
 		public ServletContext getServletContext() {
-			return ServletContextPool.get(StringPool.BLANK);
+			return ServletContextPool.get(_portal.getServletContextName());
 		}
 
 		@Override
@@ -894,7 +895,8 @@ public class FragmentCollectionContributorRegistryImpl
 
 		private final Map<String, Object> _attributes =
 			ConcurrentHashMapBuilder.<String, Object>put(
-				WebKeys.CTX, ServletContextPool.get(StringPool.BLANK)
+				WebKeys.CTX,
+				ServletContextPool.get(_portal.getServletContextName())
 			).build();
 
 		private final HttpSession _httpSession = new HttpSession() {
@@ -998,28 +1000,35 @@ public class FragmentCollectionContributorRegistryImpl
 			_originalServiceContext =
 				ServiceContextThreadLocal.getServiceContext();
 
-			ThemeDisplay themeDisplay =
-				_originalServiceContext.getThemeDisplay();
-
-			if (_originalServiceContext.getRequest() != null) {
-				_httpServletRequest = _originalServiceContext.getRequest();
-			}
-			else if ((themeDisplay != null) &&
-					 (themeDisplay.getRequest() != null)) {
-
-				_httpServletRequest = themeDisplay.getRequest();
-			}
-			else {
+			if (_originalServiceContext == null) {
 				_httpServletRequest = new MockHttpServletRequest();
-			}
-
-			if ((_originalServiceContext.getResponse() == null) &&
-				(themeDisplay != null)) {
-
-				_httpServletResponse = themeDisplay.getResponse();
+				_httpServletResponse = new DummyHttpServletResponse();
 			}
 			else {
-				_httpServletResponse = _originalServiceContext.getResponse();
+				ThemeDisplay themeDisplay =
+					_originalServiceContext.getThemeDisplay();
+
+				if (_originalServiceContext.getRequest() != null) {
+					_httpServletRequest = _originalServiceContext.getRequest();
+				}
+				else if ((themeDisplay != null) &&
+						 (themeDisplay.getRequest() != null)) {
+
+					_httpServletRequest = themeDisplay.getRequest();
+				}
+				else {
+					_httpServletRequest = new MockHttpServletRequest();
+				}
+
+				if ((_originalServiceContext.getResponse() == null) &&
+					(themeDisplay != null)) {
+
+					_httpServletResponse = themeDisplay.getResponse();
+				}
+				else {
+					_httpServletResponse =
+						_originalServiceContext.getResponse();
+				}
 			}
 
 			_setCompanyServiceContext();
@@ -1100,6 +1109,7 @@ public class FragmentCollectionContributorRegistryImpl
 			LayoutSet layoutSet = layout.getLayoutSet();
 
 			themeDisplay.setLayoutSet(layoutSet);
+
 			themeDisplay.setLayoutTypePortlet(
 				(LayoutTypePortlet)layout.getLayoutType());
 			themeDisplay.setLocale(

@@ -28,8 +28,6 @@ import com.liferay.source.formatter.parser.JavaParameter;
 import com.liferay.source.formatter.parser.JavaSignature;
 import com.liferay.source.formatter.parser.JavaTerm;
 
-import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -43,16 +41,6 @@ public class JavaComponentAnnotationsCheck extends JavaAnnotationsCheck {
 	@Override
 	public boolean isLiferaySourceCheck() {
 		return true;
-	}
-
-	@Override
-	protected String doProcess(
-			String fileName, String absolutePath, JavaTerm javaTerm,
-			String fileContent)
-		throws IOException {
-
-		return formatAnnotations(
-			fileName, absolutePath, (JavaClass)javaTerm, fileContent);
 	}
 
 	@Override
@@ -75,6 +63,8 @@ public class JavaComponentAnnotationsCheck extends JavaAnnotationsCheck {
 
 			return annotation;
 		}
+
+		_checkImmediateAttribute(fileName, absolutePath, annotation);
 
 		annotation = _formatAnnotationParameterProperties(annotation);
 		annotation = _formatConfigurationAttributes(
@@ -148,6 +138,36 @@ public class JavaComponentAnnotationsCheck extends JavaAnnotationsCheck {
 		}
 
 		return newProperties + properties;
+	}
+
+	private void _checkImmediateAttribute(
+		String fileName, String absolutePath, String annotation) {
+
+		if (absolutePath.contains("/modules/apps/archived/") ||
+			!isAttributeValue(_CHECK_IMMEDIATE_ATTRIBUTE_KEY, absolutePath)) {
+
+			return;
+		}
+
+		List<String> allowedImmediateAttributeClassNames = getAttributeValues(
+			_ALLOWED_IMMEDIATE_ATTRIBUTE_CLASS_NAMES_KEY, absolutePath);
+
+		for (String allowedImmediateAttributeClassName :
+				allowedImmediateAttributeClassNames) {
+
+			if (absolutePath.contains(allowedImmediateAttributeClassName)) {
+				return;
+			}
+		}
+
+		String immediateAttributeValue = _getAttributeValue(
+			annotation, "immediate");
+
+		if ((immediateAttributeValue != null) &&
+			immediateAttributeValue.equals("true")) {
+
+			addMessage(fileName, "Do not use 'immediate = true' in @Component");
+		}
 	}
 
 	private String _formatAnnotationParameterProperties(String annotation) {
@@ -512,8 +532,14 @@ public class JavaComponentAnnotationsCheck extends JavaAnnotationsCheck {
 		return javaMethods;
 	}
 
+	private static final String _ALLOWED_IMMEDIATE_ATTRIBUTE_CLASS_NAMES_KEY =
+		"allowedImmediateAttributeClassNames";
+
 	private static final String _CHECK_CONFIGURATION_POLICY_ATTRIBUTE_KEY =
 		"checkConfigurationPolicyAttribute";
+
+	private static final String _CHECK_IMMEDIATE_ATTRIBUTE_KEY =
+		"checkImmediateAttribute";
 
 	private static final String _CHECK_MISMATCHED_SERVICE_ATTRIBUTE_KEY =
 		"checkMismatchedServiceAttribute";

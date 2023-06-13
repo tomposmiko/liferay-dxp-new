@@ -5403,7 +5403,7 @@ components:
 info:
     description:
         "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID
-        'com.liferay.headless.delivery.client', and version '4.0.50'."
+        'com.liferay.headless.delivery.client', and version '4.0.52'."
     license:
         name: "Apache 2.0"
         url: "http://www.apache.org/licenses/LICENSE-2.0.html"
@@ -5870,6 +5870,40 @@ paths:
                         application/json: {}
                         application/xml: {}
             tags: ["DocumentFolder"]
+    "/asset-libraries/{assetLibraryId}/document-folders/rated-by-me":
+        get:
+            description:
+                Retrieves the document folders rated by the user.
+            operationId: getAssetLibraryDocumentFoldersRatedByMePage
+            parameters:
+                - in: path
+                  name: assetLibraryId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/DocumentFolder"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/DocumentFolder"
+                                type: array
+            tags: ["DocumentFolder"]
     "/asset-libraries/{assetLibraryId}/documents":
         get:
             operationId: getAssetLibraryDocumentsPage
@@ -6116,6 +6150,40 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
+            tags: ["Document"]
+    "/asset-libraries/{assetLibraryId}/documents/rated-by-me":
+        get:
+            description:
+                Retrieves the documents rated by the user.
+            operationId: getAssetLibraryDocumentsRatedByMePage
+            parameters:
+                - in: path
+                  name: assetLibraryId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/Document"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/Document"
+                                type: array
             tags: ["Document"]
     "/asset-libraries/{assetLibraryId}/languages":
         get:
@@ -7662,6 +7730,112 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/Document"
             tags: ["Document"]
+    "/document-folders/{documentFolderId}/my-rating":
+        delete:
+            description:
+                Deletes the document folder's rating and returns a 204 if the operation succeeded.
+            operationId: deleteDocumentFolderMyRating
+            parameters:
+                - in: path
+                  name: documentFolderId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            responses:
+                204:
+                    content:
+                        application/json: {}
+                        application/xml: {}
+            tags: ["DocumentFolder"]
+        get:
+            description:
+                Retrieves the document folder's rating.
+            operationId: getDocumentFolderMyRating
+            parameters:
+                - in: path
+                  name: documentFolderId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+                - in: query
+                  name: fields
+                  schema:
+                      type: string
+                - in: query
+                  name: restrictFields
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Rating"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/Rating"
+            tags: ["DocumentFolder"]
+        post:
+            description:
+                Creates a new rating for the document folder, by the user who authenticated the request.
+            operationId: postDocumentFolderMyRating
+            parameters:
+                - in: path
+                  name: documentFolderId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/Rating"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/Rating"
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Rating"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/Rating"
+            tags: ["DocumentFolder"]
+        put:
+            description:
+                Replaces the rating with the information sent in the request body. Any missing fields are deleted,
+                unless they are required.
+            operationId: putDocumentFolderMyRating
+            parameters:
+                - in: path
+                  name: documentFolderId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/Rating"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/Rating"
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Rating"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/Rating"
+            tags: ["DocumentFolder"]
     "/document-folders/{documentFolderId}/permissions":
         get:
             operationId: getDocumentFolderPermissionsPage
@@ -11729,6 +11903,40 @@ paths:
                         application/json: {}
                         application/xml: {}
             tags: ["DocumentFolder"]
+    "/sites/{siteId}/document-folders/rated-by-me":
+        get:
+            description:
+                Retrieves the document folders rated by the user.
+            operationId: getSiteDocumentFoldersRatedByMePage
+            parameters:
+                - in: path
+                  name: siteId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/DocumentFolder"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/DocumentFolder"
+                                type: array
+            tags: ["DocumentFolder"]
     "/sites/{siteId}/documents":
         get:
             description:
@@ -12182,6 +12390,40 @@ paths:
                     content:
                         application/json: {}
                         application/xml: {}
+            tags: ["Document"]
+    "/sites/{siteId}/documents/rated-by-me":
+        get:
+            description:
+                Retrieves the documents rated by the user.
+            operationId: getSiteDocumentsRatedByMePage
+            parameters:
+                - in: path
+                  name: siteId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/Document"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/Document"
+                                type: array
             tags: ["Document"]
     "/sites/{siteId}/knowledge-base-articles":
         get:

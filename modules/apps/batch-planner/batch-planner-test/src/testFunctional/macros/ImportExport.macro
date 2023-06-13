@@ -226,13 +226,23 @@ definition {
 
 		ImportExport.selectEntity(entityType = ${entityType});
 
+		if (isSet(importStrategy)) {
+			Select(
+				locator1 = "ImportExport#IMPORT_STRATEGY",
+				value1 = ${importStrategy});
+		}
+
 		if (${stopImportOnError} == "false") {
 			Uncheck.uncheckNotVisible(
 				checkboxName = "Stop the Import on Error",
 				locator1 = "Checkbox#ANY_CHECKBOX");
 		}
 
-		ImportExport.mapImport(fieldMappings = ${fieldMappings});
+		WaitForElementPresent(locator1 = "ImportExport#IMPORT_MAPPING_HEADER");
+
+		if (isSet(fieldMappings)) {
+			ImportExport.mapImport(fieldMappings = ${fieldMappings});
+		}
 
 		if (isSet(templateName)) {
 			ImportExport.saveAsTemplate(templateName = ${templateName});

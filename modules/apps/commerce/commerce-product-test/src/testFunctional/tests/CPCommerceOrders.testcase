@@ -713,7 +713,7 @@ definition {
 	test BulkDeleteOrders {
 		property portal.acceptance = "false";
 
-		task ("Given a Minium Site is created and account is created") {
+		task ("Given a Minium Site with an account is created") {
 			CommerceAccelerators.initializeNewSiteViaAccelerator(siteName = "Minium");
 
 			JSONAccountEntry.addAccountEntry(
@@ -721,7 +721,7 @@ definition {
 				accountEntryType = "Business");
 		}
 
-		task ("And the admin goes into the Minium and create orders") {
+		task ("And the admin navigates to the Minium and creates some orders") {
 			ApplicationsMenu.gotoSite(site = "Minium");
 
 			CommerceAcceleratorsInitializer.createNewOrderFromPendingOrders();
@@ -739,40 +739,26 @@ definition {
 			CommerceAcceleratorsInitializer.createNewOrderFromPendingOrders();
 		}
 
-		task ("And the admin goes into the Orders and verifies if the Trash icon is not present in the header") {
-			CommerceNavigator.gotoPortlet(
-				category = "Order Management",
-				portlet = "Orders");
+		task ("And the admin navigates to the Orders and verifies that the Trash icon is not present in the header") {
+			CommerceOrders.openOrdersAdmin();
 
 			AssertElementNotPresent(locator1 = "Button#TRASH_ENABLED");
 		}
 
-		task ("When the admin selects one order using the checkbox and verifies if the Trash icon is now present in the header") {
-			CommerceNavigator.searchEntry(entryName = ${getOrderId});
-
-			Click.clickNoMouseOverNoWaitForVisible(
-				key_productName = ${getOrderId},
-				locator1 = "CommerceEntry#PRODUCT_ENTRY_CHECKBOX");
+		task ("When the admin selects all the orders using the bulk delete and verifies that the trash icon is present in the header") {
+			if (IsElementPresent(locator1 = "CommerceNavigation#SELECT_ALL_CHECKBOX")) {
+				Click.clickNoMouseOverNoWaitForVisible(locator1 = "CommerceNavigation#SELECT_ALL_CHECKBOX");
+			}
 
 			AssertElementPresent(locator1 = "Button#TRASH_ENABLED");
 		}
 
-		task ("Then the admin can remove the order by clicking on the Trash icon") {
+		task ("Then the admin can remove all the orders by clicking on the Trash icon") {
 			ClickNoError(locator1 = "Button#TRASH_ENABLED");
 
-			CommerceNavigator.searchEntry(entryName = ${getOrderId});
+			AssertConfirm.assertPartialConfirmation(value1 = "Are you sure you want to delete all selected orders?");
 
-			AssertElementNotPresent(
-				key_entryName = ${getOrderId},
-				locator1 = "CommerceNavigation#ENTRY_NAME");
-		}
-
-		task ("And the admin can delete all the orders with one click by using the select all checkbox") {
-			CommerceNavigator.searchEntry(entryName = "");
-
-			while (IsElementNotPresent(locator1 = "CommerceNavigation#EMPTY_SEARCH_CONTAINER")) {
-				CommerceProducts.deleteEntries();
-			}
+			CommerceUtilities.checkSuccessAlertAppearsAndDisappears();
 
 			AssertElementPresent(locator1 = "CommerceNavigation#EMPTY_SEARCH_CONTAINER");
 		}
@@ -935,6 +921,99 @@ definition {
 
 		// TODO COMMERCE-6210 CancelShipmentAndCreateNewFromPendingOrder Pending Implementation
 
+	}
+
+	@description = "This is a test for COMMERCE-8970. As admin, when I try to delete orders one by one, a pop-up confirmation message will appear before removing the order."
+	@priority = 3
+	test CanDeleteSingleOrderUponConfirmation {
+		property custom.properties = "jsonws.web.service.paths.excludes=${line.separator}company.security.strangers.verify=false";
+		property portal.acceptance = "false";
+
+		var orderIds = ListUtil.newList();
+
+		task ("Given a Minium Site with a buyer user is created") {
+			CommerceAccelerators.initializeNewSiteViaAccelerator(siteName = "Minium");
+
+			CommerceEntry.addAccountEntryUser(
+				accountName = "Commerce Account",
+				accountType = "Business",
+				agreeToTermsAndAnswerReminderQuery = "true",
+				createNewAccount = "true",
+				requireReset = "false",
+				userEmailAddress = "buyer@liferay.com",
+				userFirstName = "Buyer",
+				userLastName = "User",
+				userRole = "Buyer",
+				userScreenName = "buyeruser",
+				userSiteMembership = "Minium");
+		}
+
+		task ("And a payment method is activated") {
+			CommerceChannels.openChannelsAdmin();
+
+			CommerceNavigator.gotoEntry(entryName = "Minium Portal");
+
+			CommerceChannels.activatePaymentMethod(paymentMethod = "Money Order");
+		}
+
+		task ("And there are 2 placed orders") {
+			for (var productSKU : list "MIN55858,MIN55855") {
+				var orderId = CommerceJSONOrdersAPI._addCommerceOrder(
+					accountEntryName = "Commerce Account",
+					orderItems = "${productSKU}:1",
+					orderStatus = 1,
+					paymentMethod = "money-order",
+					paymentStatus = 2);
+
+				ListUtil.add(${orderIds}, ${orderId});
+			}
+		}
+
+		task ("When buyer user creates an open order") {
+			User.logoutPG();
+
+			CommerceLogin.miniumLogin(
+				password = "test",
+				urlAppend = "web/minium",
+				userEmailAddress = "buyer@liferay.com");
+
+			CommerceAcceleratorsInitializer.createNewOrderFromPendingOrders();
+
+			WaitForVisible(locator1 = "CommerceOrders#PENDING_ORDERS_ORDER_ID");
+
+			var openOrderId = selenium.getText("CommerceOrders#PENDING_ORDERS_ORDER_ID");
+		}
+
+		task ("Then the admin can verify that the Trash icon is not present in the header of the Orders page") {
+			User.logoutAndLoginPG();
+
+			CommerceOrders.openOrdersAdmin();
+
+			AssertElementNotPresent(locator1 = "Button#TRASH_ENABLED");
+		}
+
+		task ("And the admin can delete orders one by one by clicking on the delete button upon confirmation of the pop-up message") {
+			var firstPlacedOrderId = ListUtil.get(${orderIds}, 0);
+			var secondPlacedOrderId = ListUtil.get(${orderIds}, 1);
+
+			for (var orderId : list "${firstPlacedOrderId},${secondPlacedOrderId},${openOrderId}") {
+				Click(
+					key_value = ${orderId},
+					locator1 = "CommerceEntry#BODY_VERTICAL_ELLIPSIS");
+
+				AssertElementNotPresent(locator1 = "Button#TRASH_ENABLED");
+
+				MenuItem.clickNoError(menuItem = "Delete");
+
+				AssertConfirm.assertPartialConfirmation(value1 = "Are you sure you want to delete order #${orderId}?");
+
+				CommerceUtilities.checkSuccessAlertAppearsAndDisappears();
+
+				AssertElementNotPresent(
+					key_entryName = ${orderId},
+					locator1 = "CommerceNavigation#ENTRY_NAME");
+			}
+		}
 	}
 
 	@description = "This is a test for bug COMMERCE-9467"
@@ -2336,6 +2415,115 @@ definition {
 		}
 	}
 
+	@description = "This is a test for the COMMERCE-10895. As a buyer user, I can only view the order created by myself when I log in via headless API"
+	@priority = 3
+	test CanViewOrderOnlyCreatedByCurrentUsersViaAPI {
+		property custom.properties = "jsonws.web.service.paths.excludes=${line.separator}company.security.strangers.verify=false";
+		property portal.acceptance = "false";
+
+		task ("Given a Minium site is created") {
+			CommerceAccelerators.initializeNewSiteViaAccelerator(siteName = "Minium");
+		}
+
+		task ("And two accounts are created") {
+			CommerceEntry.addAccountEntryUser(
+				accountName = "Commerce Account A",
+				accountType = "Business",
+				agreeToTermsAndAnswerReminderQuery = "true",
+				createNewAccount = "true",
+				requireReset = "false",
+				userEmailAddress = "buyer@liferay.com",
+				userFirstName = "Buyer",
+				userLastName = "User",
+				userRole = "Buyer",
+				userScreenName = "buyeruser",
+				userSiteMembership = "Minium");
+
+			JSONAccountEntry.addAccountEntry(
+				accountEntryName = "Commerce Account B",
+				accountEntryType = "Business");
+		}
+
+		task ("And buyer user logs in and completes an order with checkout") {
+			User.logoutPG();
+
+			CommerceLogin.miniumLogin(
+				password = "test",
+				urlAppend = "web/minium",
+				userEmailAddress = "buyer@liferay.com");
+
+			FrontStore.addInitializerProductToCart(
+				productName = "U-Joint",
+				productQuantity = 1);
+
+			var orderId1 = selenium.getText("CommerceEntry#ACTIVE_ORDER_ID");
+
+			CommerceCheckout.gotoCheckoutViaMiniCart();
+
+			CommerceCheckout.initializersCheckout(
+				newAddressAddress = "Test Address",
+				newAddressCity = "Test City",
+				newAddressCountry = "United States",
+				newAddressName = "Address Name",
+				newAddressZipCode = "Test Zip Code",
+				productName = "U-Joint",
+				productQuantity = 1,
+				productUnitPrice = 24,
+				shippingMethod = "Standard");
+		}
+
+		task ("And the GET order API is called") {
+			var orderCount = CommerceJSONOrdersAPI._getCommerceOrdersCount(email = "buyer@liferay.com");
+
+			TestUtils.assertEquals(
+				actual = ${orderCount},
+				expected = 1);
+		}
+
+		task ("When the admin changes the active account on Minium") {
+			User.logoutAndLoginPG(
+				userLoginEmailAddress = "test@liferay.com",
+				userLoginFullName = "Test Test");
+
+			Navigator.openWithAppendToBaseURL(urlAppend = "web/minium");
+
+			CommerceAcceleratorsInitializer.selectAccountFromAccountSelector(accountName = "Commerce Account B");
+		}
+
+		task ("And completes an order with checkout") {
+			FrontStore.addInitializerProductToCart(
+				productName = "U-Joint",
+				productQuantity = 1);
+
+			var orderId2 = selenium.getText("CommerceEntry#ACTIVE_ORDER_ID");
+
+			CommerceCheckout.gotoCheckoutViaMiniCart();
+
+			CommerceCheckout.initializersCheckout(
+				newAddressAddress = "Test Address",
+				newAddressCity = "Test City",
+				newAddressCountry = "United States",
+				newAddressName = "Address Name",
+				newAddressZipCode = "Test Zip Code",
+				productName = "U-Joint",
+				productQuantity = 1,
+				productUnitPrice = 24,
+				shippingMethod = "Standard");
+		}
+
+		task ("Then the GET order API only created by buyer user is called") {
+			var orderIds = CommerceJSONOrdersAPI._getCommerceOrderIds(email = "buyer@liferay.com");
+
+			TestUtils.assertEquals(
+				actual = ${orderId1},
+				expected = ${orderIds});
+
+			TestUtils.assertNotEquals(
+				actual = ${orderId2},
+				expected = ${orderIds});
+		}
+	}
+
 	@description = "This is a test for COMMERCE-10750. User can see if a SKU is on order and can search for Order Id or Account Name the orders under Order Tab in Inventory"
 	@priority = 5
 	test CanViewOrderSKUAndSearchForSpecificOrderIdAndAccountName {
@@ -3331,7 +3519,7 @@ definition {
 
 		AssertTextEquals(
 			locator1 = "CommerceEntry#PAGINATION_RESULTS",
-			value1 = "Showing 1 to 1 of 1");
+			value1 = "Showing 1 to 1 of 1 entries.");
 	}
 
 	@description = "This is a test for COMMERCE-5982. As an order manager, I want to sort orders by ascending or descending order date"

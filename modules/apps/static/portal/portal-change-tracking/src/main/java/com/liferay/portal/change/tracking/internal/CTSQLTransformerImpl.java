@@ -14,6 +14,9 @@
 
 package com.liferay.portal.change.tracking.internal;
 
+import com.liferay.osgi.service.tracker.collections.map.ServiceReferenceMapperFactory;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.petra.io.Deserializer;
 import com.liferay.petra.io.Serializer;
 import com.liferay.petra.io.unsync.UnsyncStringReader;
@@ -52,7 +55,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Alias;
@@ -184,9 +186,7 @@ import net.sf.jsqlparser.statement.values.ValuesStatement;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
-import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 /**
  * @author Preston Crary
@@ -204,11 +204,12 @@ public class CTSQLTransformerImpl implements CTSQLTransformer {
 
 		_readTransformedSQLsFile();
 
-		_ctServiceServiceTracker = new ServiceTracker<>(
-			_bundleContext, (Class<CTService<?>>)(Class<?>)CTService.class,
-			new CTServiceTrackerCustomizer(_bundleContext));
-
-		_ctServiceServiceTracker.open();
+		_ctServiceServiceTrackerMap =
+			ServiceTrackerMapFactory.openSingleValueMap(
+				_bundleContext, (Class<CTService<?>>)(Class<?>)CTService.class,
+				null,
+				ServiceReferenceMapperFactory.createFromFunction(
+					_bundleContext, CTService::getModelClass));
 
 		_releaseServiceTracker = new ServiceTracker<>(
 			_bundleContext,
@@ -226,7 +227,7 @@ public class CTSQLTransformerImpl implements CTSQLTransformer {
 	public void deactivate() {
 		_writeTransformedSQLsFile();
 
-		_ctServiceServiceTracker.close();
+		_ctServiceServiceTrackerMap.close();
 
 		_releaseServiceTracker.close();
 	}
@@ -422,9 +423,8 @@ public class CTSQLTransformerImpl implements CTSQLTransformer {
 	private static final JSqlParser _jSqlParser = new CCJSqlParserManager();
 
 	private BundleContext _bundleContext;
-	private final Map<Class<?>, CTService<?>> _ctServiceMap =
-		new ConcurrentHashMap<>();
-	private ServiceTracker<?, ?> _ctServiceServiceTracker;
+	private ServiceTrackerMap<Class<?>, CTService<?>>
+		_ctServiceServiceTrackerMap;
 	private LRUMap<String, String> _ctTransformedSQLs;
 	private LRUMap<String, String> _productionTransformedSQLs;
 	private ServiceTracker<?, ?> _releaseServiceTracker;
@@ -1286,45 +1286,6 @@ public class CTSQLTransformerImpl implements CTSQLTransformer {
 
 	}
 
-	private class CTServiceTrackerCustomizer
-		implements ServiceTrackerCustomizer<CTService<?>, Class<?>> {
-
-		@Override
-		public Class<?> addingService(
-			ServiceReference<CTService<?>> serviceReference) {
-
-			CTService<?> ctService = _bundleContext.getService(
-				serviceReference);
-
-			Class<?> modelClass = ctService.getModelClass();
-
-			_ctServiceMap.put(modelClass, ctService);
-
-			return modelClass;
-		}
-
-		@Override
-		public void modifiedService(
-			ServiceReference<CTService<?>> serviceReference,
-			Class<?> modelClass) {
-		}
-
-		@Override
-		public void removedService(
-			ServiceReference<CTService<?>> serviceReference,
-			Class<?> modelClass) {
-
-			_ctServiceMap.remove(modelClass);
-		}
-
-		private CTServiceTrackerCustomizer(BundleContext bundleContext) {
-			_bundleContext = bundleContext;
-		}
-
-		private final BundleContext _bundleContext;
-
-	}
-
 	private class SelectStatementVisitor extends BaseStatementVisitor {
 
 		@Override
@@ -1400,7 +1361,7 @@ public class CTSQLTransformerImpl implements CTSQLTransformer {
 
 			SelectBody selectBody = ctEntryPlainSelect;
 
-			CTService<?> ctService = _ctServiceMap.get(
+			CTService<?> ctService = _ctServiceServiceTrackerMap.getService(
 				ctModelRegistration.getModelClass());
 
 			List<String[]> uniqueIndexColumnNames = Collections.emptyList();

@@ -14,6 +14,7 @@
 
 package com.liferay.headless.commerce.admin.catalog.client.serdes.v1_0;
 
+import com.liferay.headless.commerce.admin.catalog.client.dto.v1_0.CustomField;
 import com.liferay.headless.commerce.admin.catalog.client.dto.v1_0.Sku;
 import com.liferay.headless.commerce.admin.catalog.client.dto.v1_0.SkuOption;
 import com.liferay.headless.commerce.admin.catalog.client.json.BaseJSONParser;
@@ -28,7 +29,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -71,6 +71,26 @@ public class SkuSerDes {
 			sb.append("\"cost\": ");
 
 			sb.append(sku.getCost());
+		}
+
+		if (sku.getCustomFields() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"customFields\": ");
+
+			sb.append("[");
+
+			for (int i = 0; i < sku.getCustomFields().length; i++) {
+				sb.append(String.valueOf(sku.getCustomFields()[i]));
+
+				if ((i + 1) < sku.getCustomFields().length) {
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
 		}
 
 		if (sku.getDepth() != null) {
@@ -336,6 +356,16 @@ public class SkuSerDes {
 			sb.append("]");
 		}
 
+		if (sku.getSkuSubscriptionConfiguration() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"skuSubscriptionConfiguration\": ");
+
+			sb.append(String.valueOf(sku.getSkuSubscriptionConfiguration()));
+		}
+
 		if (sku.getUnspsc() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -396,6 +426,13 @@ public class SkuSerDes {
 		}
 		else {
 			map.put("cost", String.valueOf(sku.getCost()));
+		}
+
+		if (sku.getCustomFields() == null) {
+			map.put("customFields", null);
+		}
+		else {
+			map.put("customFields", String.valueOf(sku.getCustomFields()));
 		}
 
 		if (sku.getDepth() == null) {
@@ -565,6 +602,15 @@ public class SkuSerDes {
 			map.put("skuOptions", String.valueOf(sku.getSkuOptions()));
 		}
 
+		if (sku.getSkuSubscriptionConfiguration() == null) {
+			map.put("skuSubscriptionConfiguration", null);
+		}
+		else {
+			map.put(
+				"skuSubscriptionConfiguration",
+				String.valueOf(sku.getSkuSubscriptionConfiguration()));
+		}
+
 		if (sku.getUnspsc() == null) {
 			map.put("unspsc", null);
 		}
@@ -608,6 +654,22 @@ public class SkuSerDes {
 			if (Objects.equals(jsonParserFieldName, "cost")) {
 				if (jsonParserFieldValue != null) {
 					sku.setCost(new BigDecimal((String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "customFields")) {
+				if (jsonParserFieldValue != null) {
+					Object[] jsonParserFieldValues =
+						(Object[])jsonParserFieldValue;
+
+					CustomField[] customFieldsArray =
+						new CustomField[jsonParserFieldValues.length];
+
+					for (int i = 0; i < customFieldsArray.length; i++) {
+						customFieldsArray[i] = CustomFieldSerDes.toDTO(
+							(String)jsonParserFieldValues[i]);
+					}
+
+					sku.setCustomFields(customFieldsArray);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "depth")) {
@@ -731,14 +793,27 @@ public class SkuSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "skuOptions")) {
 				if (jsonParserFieldValue != null) {
-					sku.setSkuOptions(
-						Stream.of(
-							toStrings((Object[])jsonParserFieldValue)
-						).map(
-							object -> SkuOptionSerDes.toDTO((String)object)
-						).toArray(
-							size -> new SkuOption[size]
-						));
+					Object[] jsonParserFieldValues =
+						(Object[])jsonParserFieldValue;
+
+					SkuOption[] skuOptionsArray =
+						new SkuOption[jsonParserFieldValues.length];
+
+					for (int i = 0; i < skuOptionsArray.length; i++) {
+						skuOptionsArray[i] = SkuOptionSerDes.toDTO(
+							(String)jsonParserFieldValues[i]);
+					}
+
+					sku.setSkuOptions(skuOptionsArray);
+				}
+			}
+			else if (Objects.equals(
+						jsonParserFieldName, "skuSubscriptionConfiguration")) {
+
+				if (jsonParserFieldValue != null) {
+					sku.setSkuSubscriptionConfiguration(
+						SkuSubscriptionConfigurationSerDes.toDTO(
+							(String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "unspsc")) {

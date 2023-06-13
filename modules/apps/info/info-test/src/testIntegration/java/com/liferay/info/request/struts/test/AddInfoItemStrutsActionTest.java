@@ -296,7 +296,7 @@ public class AddInfoItemStrutsActionTest {
 
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
-				_user.getUserId(), false,
+				_user.getUserId(), false, false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				"A" + RandomTestUtil.randomString(), null,
 				"control_panel.sites",
@@ -308,9 +308,9 @@ public class AddInfoItemStrutsActionTest {
 			null, _user.getUserId(), 0,
 			objectDefinition.getObjectDefinitionId(),
 			ObjectFieldConstants.BUSINESS_TYPE_TEXT,
-			ObjectFieldConstants.DB_TYPE_STRING, null, true, true, null,
+			ObjectFieldConstants.DB_TYPE_STRING, true, true, null,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			"myText", false, false, Collections.emptyList());
+			false, "myText", false, false, Collections.emptyList());
 
 		objectDefinition.setTitleObjectFieldId(objectField.getObjectFieldId());
 

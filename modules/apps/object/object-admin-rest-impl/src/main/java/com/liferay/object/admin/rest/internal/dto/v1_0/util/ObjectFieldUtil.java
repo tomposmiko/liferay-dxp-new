@@ -25,7 +25,6 @@ import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.object.service.ObjectFilterLocalService;
-import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -142,6 +141,7 @@ public class ObjectFieldUtil {
 	}
 
 	public static com.liferay.object.model.ObjectField toObjectField(
+		boolean enableLocalization,
 		ListTypeDefinitionLocalService listTypeDefinitionLocalService,
 		ObjectField objectField,
 		ObjectFieldLocalService objectFieldLocalService,
@@ -174,12 +174,6 @@ public class ObjectFieldUtil {
 			getDBType(
 				objectField.getDBTypeAsString(),
 				objectField.getTypeAsString()));
-
-		if (Validator.isNotNull(objectField.getDefaultValue())) {
-			serviceBuilderObjectField.setDefaultValue(
-				objectField.getDefaultValue());
-		}
-
 		serviceBuilderObjectField.setIndexed(
 			GetterUtil.getBoolean(objectField.getIndexed()));
 		serviceBuilderObjectField.setIndexedAsKeyword(
@@ -188,16 +182,28 @@ public class ObjectFieldUtil {
 			objectField.getIndexedLanguageId());
 		serviceBuilderObjectField.setLabelMap(
 			LocalizedMapUtil.getLocalizedMap(objectField.getLabel()));
+
+		if (FeatureFlagManagerUtil.isEnabled("LPS-146755") &&
+			(Objects.equals(
+				ObjectField.BusinessType.LONG_TEXT,
+				objectField.getBusinessType()) ||
+			 Objects.equals(
+				 ObjectField.BusinessType.RICH_TEXT,
+				 objectField.getBusinessType()) ||
+			 Objects.equals(
+				 ObjectField.BusinessType.TEXT,
+				 objectField.getBusinessType()))) {
+
+			serviceBuilderObjectField.setLocalized(
+				GetterUtil.getBoolean(
+					objectField.getLocalized(), enableLocalization));
+		}
+
 		serviceBuilderObjectField.setName(objectField.getName());
 		serviceBuilderObjectField.setObjectFieldSettings(
-			TransformUtil.transformToList(
-				objectField.getObjectFieldSettings(),
-				objectFieldSetting ->
-					ObjectFieldSettingUtil.toObjectFieldSetting(
-						objectField.getBusinessTypeAsString(),
-						listTypeDefinitionId, objectFieldSetting,
-						objectFieldSettingLocalService,
-						objectFilterLocalService)));
+			ObjectFieldSettingUtil.toObjectFieldSettings(
+				listTypeDefinitionId, objectField,
+				objectFieldSettingLocalService, objectFilterLocalService));
 		serviceBuilderObjectField.setRequired(
 			GetterUtil.getBoolean(objectField.getRequired()));
 

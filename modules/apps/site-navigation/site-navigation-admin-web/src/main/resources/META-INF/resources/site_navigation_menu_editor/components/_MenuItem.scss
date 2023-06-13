@@ -4,14 +4,47 @@
 	width: 40ch;
 
 	&:focus,
-	&:focus-within {
+	&:focus-within,
+	&.active {
 		outline: none;
 
 		.card {
 			box-shadow: 0 0 0 2px $primary-l1;
 		}
 
-		.delete-item-button {
+		.delete-item-button,
+		.menu-item-options-button,
+		.site_navigation_menu_editor_MenuItem-add-button {
+			opacity: 1;
+		}
+	}
+
+	&-add-button {
+		opacity: 0;
+
+		&:focus {
+			opacity: 1;
+		}
+	}
+
+	&-add-button-dropdown {
+		right: 50%;
+
+		&.bottom-button {
+			bottom: 0;
+			transform: translate(50%, 50%);
+		}
+
+		.lexicon-icon {
+			font-size: 0.75rem;
+		}
+
+		&.top-button {
+			top: 0;
+			transform: translate(50%, -50%);
+		}
+
+		&:focus {
 			opacity: 1;
 		}
 	}
@@ -24,9 +57,18 @@
 		}
 	}
 
-	&:hover,
-	&.active {
-		.delete-item-button {
+	.menu-item-options-button {
+		opacity: 0;
+
+		&:focus {
+			opacity: 1;
+		}
+	}
+
+	&:hover {
+		.delete-item-button,
+		.menu-item-options-button,
+		.site_navigation_menu_editor_MenuItem-add-button {
 			opacity: 1;
 		}
 	}

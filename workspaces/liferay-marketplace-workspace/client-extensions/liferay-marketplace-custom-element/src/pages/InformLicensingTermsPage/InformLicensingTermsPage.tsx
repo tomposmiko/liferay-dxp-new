@@ -8,12 +8,19 @@ import {Section} from '../../components/Section/Section';
 
 import './InformLicensingTermsPage.scss';
 import {NewAppPageFooterButtons} from '../../components/NewAppPageFooterButtons/NewAppPageFooterButtons';
+import {getCompanyId} from '../../liferay/constants';
 import {useAppContext} from '../../manage-app-state/AppManageState';
 import {TYPES} from '../../manage-app-state/actionTypes';
 import {
-	createAppLicensePrice,
+	addSkuExpandoValue,
+	createAppSKU,
 	createProductSubscriptionConfiguration,
+	deleteTrialSKU,
+	getProductSKU,
+	getSKUById,
+	patchSKUById,
 } from '../../utils/api';
+import {createSkuName} from '../../utils/util';
 
 interface InformLicensingTermsPageProps {
 	onClickBack: () => void;
@@ -24,8 +31,22 @@ export function InformLicensingTermsPage({
 	onClickBack,
 	onClickContinue,
 }: InformLicensingTermsPageProps) {
-	const [{appERC, appLicense, appProductId, dayTrial, priceModel}, dispatch] =
-		useAppContext();
+	const [
+		{
+			appERC,
+			appLicense,
+			appNotes,
+			appProductId,
+			appVersion,
+			dayTrial,
+			optionValuesId,
+			priceModel,
+			productOptionId,
+			skuTrialId,
+			skuVersionId,
+		},
+		dispatch,
+	] = useAppContext();
 
 	return (
 		<div className="informing-licensing-terms-page-container">
@@ -81,6 +102,7 @@ export function InformLicensingTermsPage({
 				<div className="informing-licensing-terms-page-day-trial-container">
 					<RadioCard
 						description="Offer a 30-day free trial for this app"
+						disabled={priceModel === 'free'}
 						icon={taskCheckedIcon}
 						onChange={() => {
 							dispatch({
@@ -114,45 +136,125 @@ export function InformLicensingTermsPage({
 				onClickContinue={() => {
 					const submitLicenseTermsPage = async () => {
 						if (priceModel === 'free') {
-							createAppLicensePrice({
-								appProductId,
-								body: {
-									neverExpire: true,
-									price: 0,
-									published: true,
-									purchasable: true,
-									sku: 'default',
-								},
-							});
-						}
+							const skuJSON = await getSKUById(skuVersionId);
 
-						if (dayTrial === 'yes') {
-							createAppLicensePrice({
-								appProductId,
-								body: {
-									neverExpire: true,
-									price: 0,
-									published: true,
-									purchasable: true,
-									sku: 'trial',
-								},
-							});
-						}
+							const skuBody = {
+								...skuJSON,
+								neverExpire: true,
+								price: 0,
+								published: true,
+								purchasable: true,
 
-						if (appLicense === 'non-perpetual') {
-							createProductSubscriptionConfiguration({
-								body: {
-									length: 1,
-									numberOfLength: 0,
-									subscriptionType: 'yearly',
-									subscriptionTypeSettings: {
-										month: '0',
-										monthDay: '1',
-										yearlyMode: '0',
+								// skuOptions: [
+								// 	{
+								// 		key: productOptionId,
+								// 		value: optionValuesId.noOptionId,
+								// 	},
+								// ],
+
+							};
+
+							await patchSKUById(skuVersionId, skuBody);
+						}
+						else {
+							if (appLicense === 'non-perpetual') {
+								createProductSubscriptionConfiguration({
+									body: {
+										length: 1,
+										numberOfLength: 1,
+										subscriptionType: 'yearly',
 									},
-								},
-								externalReferenceCode: appERC,
+									externalReferenceCode: appERC,
+								});
+							}
+
+							const skuJSON = await getSKUById(skuVersionId);
+
+							const skuBody = {
+								...skuJSON,
+								neverExpire: appLicense === 'perpetual',
+								price: 0,
+								published: true,
+								purchasable: true,
+
+								// skuOptions: [
+								// 	{
+								// 		key: productOptionId,
+								// 		value:
+								// 			dayTrial === 'yes'
+								// 				? optionValuesId.yesOptionId
+								// 				: optionValuesId.noOptionId,
+								// 	},
+								// ],
+
+							};
+
+							await patchSKUById(skuVersionId, skuBody);
+						}
+
+						if (dayTrial === 'yes' && priceModel !== 'free') {
+							const skuResponse = await getProductSKU({
+								appProductId,
 							});
+
+							const trialSku = skuResponse.items.find(
+								({sku}) =>
+									sku ===
+									createSkuName(
+										appProductId,
+										appVersion,
+										'ts'
+									)
+							);
+
+							let skuTrialId;
+
+							if (trialSku) {
+								skuTrialId = trialSku.id;
+							}
+							else {
+								const response = await createAppSKU({
+									appProductId,
+									body: {
+										neverExpire: false,
+										price: 0,
+										published: true,
+										purchasable: true,
+										sku: createSkuName(
+											appProductId,
+											appVersion,
+											'ts'
+										),
+
+										// skuOptions: [
+										// 	{
+										// 		key: productOptionId,
+										// 		value: optionValuesId.yesOptionId,
+										// 	},
+										// ],
+
+									},
+								});
+
+								skuTrialId = response.id;
+
+								dispatch({
+									payload: {
+										value: response.id,
+									},
+									type: TYPES.UPDATE_SKU_TRIAL_ID,
+								});
+							}
+
+							addSkuExpandoValue({
+								companyId: parseInt(getCompanyId()),
+								notesValue: appNotes,
+								skuId: skuTrialId,
+								versionValue: appVersion,
+							});
+						}
+						else if (skuTrialId) {
+							deleteTrialSKU(skuTrialId);
 						}
 					};
 

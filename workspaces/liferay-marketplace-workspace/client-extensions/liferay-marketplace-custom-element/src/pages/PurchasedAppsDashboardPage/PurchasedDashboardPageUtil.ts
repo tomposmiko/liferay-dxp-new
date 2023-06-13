@@ -5,6 +5,14 @@ import appsIcon from '../../assets/icons/apps-fill.svg';
 
 export const appList: AppProps[] = [];
 
+export const initialAccountState: Account[] = [
+	{
+		externalReferenceCode: '',
+		id: 0,
+		name: '',
+	},
+];
+
 export const initialDashboardNavigationItems: DashboardListItems[] = [
 	{
 		itemIcon: appsIcon,

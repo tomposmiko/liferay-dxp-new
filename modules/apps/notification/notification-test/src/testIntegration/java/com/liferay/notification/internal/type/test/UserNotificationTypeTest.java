@@ -16,7 +16,6 @@ package com.liferay.notification.internal.type.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.notification.constants.NotificationConstants;
-import com.liferay.notification.constants.NotificationQueueEntryConstants;
 import com.liferay.notification.constants.NotificationRecipientConstants;
 import com.liferay.notification.constants.NotificationTemplateConstants;
 import com.liferay.notification.context.NotificationContext;
@@ -25,34 +24,23 @@ import com.liferay.notification.model.NotificationQueueEntry;
 import com.liferay.notification.model.NotificationRecipient;
 import com.liferay.notification.model.NotificationRecipientSetting;
 import com.liferay.notification.model.NotificationTemplate;
-import com.liferay.object.constants.ObjectDefinitionConstants;
-import com.liferay.object.field.builder.TextObjectFieldBuilder;
-import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
-import com.liferay.object.service.ObjectDefinitionLocalService;
-import com.liferay.object.service.ObjectEntryLocalService;
-import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.service.UserNotificationEventLocalService;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
-import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
-import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.portal.vulcan.util.LocalizedMapUtil;
-
-import java.io.Serializable;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -69,66 +57,51 @@ public class UserNotificationTypeTest extends BaseNotificationTypeTest {
 	public static final AggregateTestRule aggregateTestRule =
 		new LiferayIntegrationTestRule();
 
-	@Before
-	public void setUp() throws Exception {
-		user = TestPropsValues.getUser();
-
-		_objectDefinition =
-			_objectDefinitionLocalService.addCustomObjectDefinition(
-				user.getUserId(), false,
-				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				"A" + RandomTestUtil.randomString(), null, null,
-				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-				ObjectDefinitionConstants.SCOPE_COMPANY,
-				ObjectDefinitionConstants.STORAGE_TYPE_DEFAULT,
-				Arrays.asList(
-					new TextObjectFieldBuilder(
-					).labelMap(
-						LocalizedMapUtil.getLocalizedMap(
-							RandomTestUtil.randomString())
-					).name(
-						"textObjectFieldName"
-					).objectFieldSettings(
-						Collections.emptyList()
-					).build()));
-
-		_objectDefinition =
-			_objectDefinitionLocalService.publishCustomObjectDefinition(
-				user.getUserId(), _objectDefinition.getObjectDefinitionId());
-	}
-
 	@Test
 	public void testSendNotificationRecipientTypeRole() throws Exception {
 		_testSendNotification(
-			1,
 			Arrays.asList(
-				createNotificationRecipientSetting("roleName", "Administrator"),
-				createNotificationRecipientSetting("roleName", "User")),
+				createNotificationRecipientSetting(
+					"roleName", RoleConstants.ADMINISTRATOR),
+				createNotificationRecipientSetting("roleName", role.getName())),
 			NotificationRecipientConstants.TYPE_ROLE);
 	}
 
 	@Test
 	public void testSendNotificationRecipientTypeTerm() throws Exception {
 		_testSendNotification(
-			2,
 			Arrays.asList(
-				createNotificationRecipientSetting("term", _getTerm("creator")),
-				createNotificationRecipientSetting("term", "test")),
+				createNotificationRecipientSetting("term", getTerm("creator")),
+				createNotificationRecipientSetting(
+					"term", user1.getScreenName())),
 			NotificationRecipientConstants.TYPE_TERM);
 	}
 
 	@Test
 	public void testSendNotificationRecipientTypeUser() throws Exception {
 		_testSendNotification(
-			1,
 			Arrays.asList(
-				createNotificationRecipientSetting("userScreenName", "test")),
+				createNotificationRecipientSetting(
+					"userScreenName", user1.getScreenName()),
+				createNotificationRecipientSetting(
+					"userScreenName", user2.getScreenName())),
 			NotificationRecipientConstants.TYPE_USER);
 	}
 
+	private void _assertNotificationRecipientSetting(
+		NotificationRecipientSetting notificationRecipientSetting,
+		String userFullName) {
+
+		Assert.assertEquals(
+			"userFullName", notificationRecipientSetting.getName());
+		Assert.assertEquals(
+			notificationRecipientSetting.getValue(), userFullName);
+	}
+
 	private NotificationContext _createNotificationContext(
-		List<NotificationRecipientSetting> notificationRecipientSettings,
-		String recipientType) {
+			List<NotificationRecipientSetting> notificationRecipientSettings,
+			String recipientType)
+		throws Exception {
 
 		NotificationContext notificationContext = new NotificationContext();
 
@@ -143,7 +116,7 @@ public class UserNotificationTypeTest extends BaseNotificationTypeTest {
 		notificationTemplate.setName(RandomTestUtil.randomString());
 		notificationTemplate.setRecipientType(recipientType);
 		notificationTemplate.setSubject(
-			"Subject " + _getTerm("textObjectFieldName"));
+			ListUtil.toString(getTermNames(), StringPool.BLANK));
 		notificationTemplate.setType(
 			NotificationConstants.TYPE_USER_NOTIFICATION);
 
@@ -159,14 +132,7 @@ public class UserNotificationTypeTest extends BaseNotificationTypeTest {
 		return notificationContext;
 	}
 
-	private String _getTerm(String objectFieldName) {
-		return StringBundler.concat(
-			"[%", StringUtil.upperCase(_objectDefinition.getShortName()), "_",
-			StringUtil.upperCase(objectFieldName), "%]");
-	}
-
 	private void _testSendNotification(
-			long expectedUserNotificationEventsCount,
 			List<NotificationRecipientSetting> notificationRecipientSettings,
 			String recipientType)
 		throws Exception {
@@ -179,22 +145,20 @@ public class UserNotificationTypeTest extends BaseNotificationTypeTest {
 			notificationQueueEntries.toString(), 0,
 			notificationQueueEntries.size());
 
-		ObjectEntry objectEntry = _objectEntryLocalService.addObjectEntry(
-			user.getUserId(), 0, _objectDefinition.getObjectDefinitionId(),
-			HashMapBuilder.<String, Serializable>put(
-				"textObjectFieldName", "textObjectFieldNameValue"
-			).build(),
-			ServiceContextTestUtil.getServiceContext());
-
 		Assert.assertEquals(
 			0,
 			_userNotificationEventLocalService.getUserNotificationEventsCount(
-				user.getUserId()));
+				user1.getUserId()));
+
+		ObjectEntry objectEntry = objectEntryLocalService.addObjectEntry(
+			user2.getUserId(), 0, objectDefinition.getObjectDefinitionId(),
+			randomObjectEntryValues,
+			ServiceContextTestUtil.getServiceContext());
 
 		sendNotification(
 			new NotificationContextBuilder(
 			).className(
-				_objectDefinition.getClassName()
+				objectDefinition.getClassName()
 			).classPK(
 				objectEntry.getObjectEntryId()
 			).notificationTemplate(
@@ -203,12 +167,14 @@ public class UserNotificationTypeTest extends BaseNotificationTypeTest {
 						notificationRecipientSettings, recipientType))
 			).termValues(
 				HashMapBuilder.<String, Object>put(
-					"creator", String.valueOf(user.getUserId())
+					"creator", user2.getUserId()
 				).put(
-					"textObjectFieldName", "textObjectFieldNameValue"
+					"currentUserId", user2.getUserId()
+				).putAll(
+					randomObjectEntryValues
 				).build()
 			).userId(
-				user.getUserId()
+				user2.getUserId()
 			).build(),
 			NotificationConstants.TYPE_USER_NOTIFICATION);
 
@@ -217,50 +183,38 @@ public class UserNotificationTypeTest extends BaseNotificationTypeTest {
 				QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
 		Assert.assertEquals(
-			expectedUserNotificationEventsCount,
+			1,
 			_userNotificationEventLocalService.getUserNotificationEventsCount(
-				user.getUserId()));
+				user1.getUserId()));
 
 		_userNotificationEventLocalService.deleteUserNotificationEvents(
-			user.getUserId());
+			user1.getUserId());
 
 		Assert.assertEquals(
 			notificationQueueEntries.toString(), 1,
 			notificationQueueEntries.size());
 
-		_notificationQueueEntry = notificationQueueEntries.get(0);
+		notificationQueueEntry = notificationQueueEntries.get(0);
 
-		Assert.assertEquals(
-			NotificationQueueEntryConstants.STATUS_SENT,
-			_notificationQueueEntry.getStatus());
-		Assert.assertEquals(
-			"Subject textObjectFieldNameValue",
-			_notificationQueueEntry.getSubject());
+		assertTerms(
+			getTermValues(),
+			ListUtil.fromString(
+				notificationQueueEntry.getSubject(), StringPool.COMMA));
 
 		NotificationRecipient notificationRecipient =
-			_notificationQueueEntry.getNotificationRecipient();
+			notificationQueueEntry.getNotificationRecipient();
 
-		for (NotificationRecipientSetting notificationRecipientSetting :
-				notificationRecipient.getNotificationRecipientSettings()) {
+		notificationRecipientSettings =
+			notificationRecipient.getNotificationRecipientSettings();
 
-			Assert.assertEquals(
-				"userFullName", notificationRecipientSetting.getName());
-			Assert.assertEquals(
-				"Test Test", notificationRecipientSetting.getValue());
-		}
+		Assert.assertEquals(
+			notificationRecipientSettings.toString(), 2,
+			notificationRecipientSettings.size());
+		_assertNotificationRecipientSetting(
+			notificationRecipientSettings.get(0), user1.getFullName());
+		_assertNotificationRecipientSetting(
+			notificationRecipientSettings.get(1), user2.getFullName());
 	}
-
-	@DeleteAfterTestRun
-	private static ObjectDefinition _objectDefinition;
-
-	@Inject
-	private static ObjectDefinitionLocalService _objectDefinitionLocalService;
-
-	@DeleteAfterTestRun
-	private NotificationQueueEntry _notificationQueueEntry;
-
-	@Inject
-	private ObjectEntryLocalService _objectEntryLocalService;
 
 	@Inject
 	private UserNotificationEventLocalService

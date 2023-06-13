@@ -54,6 +54,10 @@ CPCatalogEntry cpCatalogEntry = cpContentHelper.getCPCatalogEntry(request);
 					<commerce-ui:availability-label
 						CPCatalogEntry="<%= cpCatalogEntry %>"
 					/>
+
+					<commerce-ui:discontinued-label
+						CPCatalogEntry="<%= cpCatalogEntry %>"
+					/>
 				</div>
 			</a>
 		</div>

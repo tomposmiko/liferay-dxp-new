@@ -11,18 +11,24 @@
 
 import {FormikHelpers} from 'formik';
 
+import mdfClaimDTO from '../../../common/interfaces/dto/mdfClaimDTO';
 import MDFRequestDTO from '../../../common/interfaces/dto/mdfRequestDTO';
+import LiferayFile from '../../../common/interfaces/liferayFile';
 import LiferayPicklist from '../../../common/interfaces/liferayPicklist';
 import MDFClaim from '../../../common/interfaces/mdfClaim';
+import Role from '../../../common/interfaces/role';
 import {Liferay} from '../../../common/services/liferay';
-import createDocumentFolder from '../../../common/services/liferay/headless-delivery/createDocumentFolder';
 import createDocumentFolderDocument from '../../../common/services/liferay/headless-delivery/createDocumentFolderDocument';
-import createMDFClaimActivities from '../../../common/services/liferay/object/claim-activity/createMDFClaimActivities';
-import createMDFClaimActivityBudgets from '../../../common/services/liferay/object/claim-budgets/createMDFClaimActivityBudgets';
+import createMDFClaimActivity from '../../../common/services/liferay/object/claim-activity/createMDFClaimActivity';
+import updateMDFClaimActivity from '../../../common/services/liferay/object/claim-activity/updateMDFClaimActivity';
+import createMDFClaimActivityBudget from '../../../common/services/liferay/object/claim-budgets/createMDFClaimActivityBudget';
+import updateMDFClaimActivityBudget from '../../../common/services/liferay/object/claim-budgets/updateMDFClaimActivityBudget';
 import {ResourceName} from '../../../common/services/liferay/object/enum/resourceName';
-import createMDFClaimDocuments from '../../../common/services/liferay/object/mdf-claim-documents/createMDFClaimDocuments';
+import createMDFClaimActivityDocument from '../../../common/services/liferay/object/mdf-claim-activity-documents/createMDFClaimActivityDocument';
 import createMDFClaim from '../../../common/services/liferay/object/mdf-claim/createMDFClaim';
+import updateMDFClaim from '../../../common/services/liferay/object/mdf-claim/updateMDFClaim';
 import {Status} from '../../../common/utils/constants/status';
+import updateStatus from '../../../common/utils/updateStatus';
 import renameFileKeepingExtention from './RenameFile';
 import createMDFClaimProxyAPI from './createMDFClaimProxyAPI';
 
@@ -32,157 +38,198 @@ export default async function submitForm(
 	mdfRequest: MDFRequestDTO,
 	claimParentFolderId: number,
 	siteURL: string,
-	currentClaimStatus?: LiferayPicklist
+	currentClaimStatus?: LiferayPicklist,
+	roles?: Role[]
 ) {
-	if (currentClaimStatus) {
-		values.mdfClaimStatus = currentClaimStatus;
-	}
-
 	formikHelpers.setSubmitting(true);
+
+	const updatedStatus = updateStatus(
+		values.mdfClaimStatus,
+		currentClaimStatus,
+		roles,
+		values.id
+	);
+
+	values.mdfClaimStatus = updatedStatus;
 
 	values.partial = values.activities?.some((activity) =>
 		Boolean(activity.budgets?.some((budget) => !budget.selected))
 	);
 
-	const dtoMDFClaim =
-		Liferay.FeatureFlags['LPS-164528'] &&
-		values.mdfClaimStatus !== Status.DRAFT
-			? await createMDFClaimProxyAPI(values, mdfRequest)
-			: await createMDFClaim(
-					ResourceName.MDF_CLAIM_DXP,
-					values,
-					mdfRequest
-			  );
+	let dtoMDFClaim: mdfClaimDTO | undefined = undefined;
 
-	if (dtoMDFClaim?.id) {
-		const claimFolder = await createDocumentFolder(
-			claimParentFolderId,
-			`claim#${dtoMDFClaim.id}`
+	if (values.mdfClaimStatus !== Status.DRAFT) {
+		dtoMDFClaim = await createMDFClaimProxyAPI(values, mdfRequest);
+	}
+	else if (values.id) {
+		dtoMDFClaim = await updateMDFClaim(
+			ResourceName.MDF_CLAIM_DXP,
+			values,
+			mdfRequest,
+			values.id
+		);
+	}
+	else {
+		dtoMDFClaim = await createMDFClaim(
+			ResourceName.MDF_CLAIM_DXP,
+			values,
+			mdfRequest
+		);
+	}
+
+	if (
+		values.reimbursementInvoice &&
+		!values.reimbursementInvoice.id &&
+		dtoMDFClaim?.id
+	) {
+		const reimbursementInvoiceRenamed = renameFileKeepingExtention(
+			values.reimbursementInvoice,
+			`${values.reimbursementInvoice.name}#${dtoMDFClaim.id}`
 		);
 
-		if (values.reimbursementInvoice && claimFolder?.id) {
-			const claimDocument = await createDocumentFolderDocument(
-				claimFolder.id,
-				values.reimbursementInvoice
+		if (reimbursementInvoiceRenamed) {
+			const dtoReimbursementInvoice = await createDocumentFolderDocument(
+				claimParentFolderId,
+				reimbursementInvoiceRenamed
 			);
 
-			if (claimDocument?.contentUrl) {
-				await createMDFClaimDocuments(
-					values.reimbursementInvoice,
-					claimDocument.contentUrl,
-					dtoMDFClaim?.id
+			if (dtoReimbursementInvoice.id) {
+				await updateMDFClaim(
+					ResourceName.MDF_CLAIM_DXP,
+					values,
+					mdfRequest,
+					dtoMDFClaim.id,
+					dtoReimbursementInvoice.id as LiferayFile & number,
+					dtoMDFClaim.externalReferenceCode
 				);
 			}
 		}
+	}
 
-		if (values.activities?.length) {
-			const dtoMDFClaimActivities = await createMDFClaimActivities(
-				dtoMDFClaim.id,
-				values.activities.filter((activity) => activity.selected)
-			);
+	if (values.activities?.length && dtoMDFClaim?.id) {
+		await Promise.all(
+			values.activities
+				.filter((activity) => activity.selected)
+				.map(async (activity) => {
+					const dtoMDFClaimActivity = activity.id
+						? await updateMDFClaimActivity(
+								activity,
+								dtoMDFClaim?.id,
+								activity.id
+						  )
+						: await createMDFClaimActivity(
+								activity,
+								dtoMDFClaim?.id
+						  );
 
-			if (dtoMDFClaimActivities?.length) {
-				values.activities.map(async (activity, index) => {
-					const dtoActivity = dtoMDFClaimActivities[index];
-
-					if (dtoActivity?.id && claimFolder.id) {
-						const activityFolder = await createDocumentFolder(
-							claimFolder.id,
-							`activity#${dtoActivity.id}`
+					if (
+						activity.listOfQualifiedLeads &&
+						!activity.listOfQualifiedLeads.id &&
+						dtoMDFClaimActivity.id
+					) {
+						const listOfQualifiedLeadsRenamed = renameFileKeepingExtention(
+							activity.listOfQualifiedLeads,
+							`${activity.listOfQualifiedLeads.name}#${dtoMDFClaimActivity.id}`
 						);
 
-						if (activityFolder?.id) {
-							if (activity.listQualifiedLeads) {
-								const listOfQualifiedLeadsWithId = renameFileKeepingExtention(
-									activity.listQualifiedLeads,
-									`list_of_qualified_leads#${dtoActivity.id}`
+						if (listOfQualifiedLeadsRenamed) {
+							const dtoListOfQualifiedLeads = await createDocumentFolderDocument(
+								claimParentFolderId,
+								listOfQualifiedLeadsRenamed
+							);
+
+							if (dtoListOfQualifiedLeads.id) {
+								updateMDFClaimActivity(
+									activity,
+									dtoMDFClaim?.id,
+									dtoMDFClaimActivity.id,
+									dtoListOfQualifiedLeads.id as LiferayFile &
+										number
 								);
-
-								const activityListQualifiedLeads = await createDocumentFolderDocument(
-									activityFolder.id,
-									listOfQualifiedLeadsWithId
-								);
-
-								if (activityListQualifiedLeads?.contentUrl) {
-									createMDFClaimDocuments(
-										listOfQualifiedLeadsWithId,
-										activityListQualifiedLeads.contentUrl,
-										dtoActivity?.id
-									);
-								}
-							}
-
-							if (activity.documents?.length) {
-								activity.documents.map(async (document) => {
-									if (activityFolder?.id) {
-										const activityDocument = await createDocumentFolderDocument(
-											activityFolder.id,
-											document
-										);
-
-										if (activityDocument?.contentUrl) {
-											createMDFClaimDocuments(
-												document,
-												activityDocument.contentUrl,
-												dtoActivity?.id
-											);
-										}
-									}
-								});
-							}
-
-							if (activity.budgets?.length) {
-								const dtoMDFClaimBudgets = await createMDFClaimActivityBudgets(
-									dtoActivity.id,
-									activity.budgets?.filter((budget) => {
-										return budget.invoice;
-									})
-								);
-
-								if (dtoMDFClaimBudgets?.length) {
-									activity.budgets.map(
-										async (budget, index) => {
-											const dtoBudget =
-												dtoMDFClaimBudgets[index];
-
-											if (
-												dtoBudget?.id &&
-												activityFolder?.id
-											) {
-												const budgetFolder = await createDocumentFolder(
-													activityFolder.id,
-													`budget#${dtoBudget.id}`
-												);
-
-												if (
-													budget.invoice &&
-													budgetFolder?.id
-												) {
-													const budgetDocument = await createDocumentFolderDocument(
-														budgetFolder.id,
-														budget.invoice
-													);
-
-													if (
-														budgetDocument?.contentUrl
-													) {
-														await createMDFClaimDocuments(
-															budget.invoice,
-															budgetDocument.contentUrl,
-															dtoBudget?.id
-														);
-													}
-												}
-											}
-										}
-									);
-								}
 							}
 						}
 					}
-				});
-			}
-		}
+
+					if (
+						activity.allContents?.length &&
+						dtoMDFClaimActivity.id
+					) {
+						await Promise.all(
+							activity.allContents.map(
+								async (allContentDocument) => {
+									if (!allContentDocument.id) {
+										const allContentDocumentRenamed = renameFileKeepingExtention(
+											allContentDocument,
+											`${allContentDocument.name}#${dtoMDFClaimActivity.id}`
+										);
+
+										if (allContentDocumentRenamed) {
+											const dtoAllContentDocument = await createDocumentFolderDocument(
+												claimParentFolderId,
+												allContentDocumentRenamed
+											);
+
+											if (dtoAllContentDocument.id) {
+												createMDFClaimActivityDocument(
+													dtoAllContentDocument.id as LiferayFile &
+														number,
+													dtoMDFClaimActivity.id
+												);
+											}
+										}
+									}
+								}
+							)
+						);
+					}
+
+					if (activity.budgets?.length && dtoMDFClaimActivity.id) {
+						await Promise.all(
+							activity.budgets.map(async (budget) => {
+								const dtoMDFClaimBudget = budget.id
+									? await updateMDFClaimActivityBudget(
+											budget,
+											dtoMDFClaimActivity.id,
+											budget.id
+									  )
+									: await createMDFClaimActivityBudget(
+											budget,
+											dtoMDFClaimActivity.id
+									  );
+
+								if (
+									budget.invoice &&
+									!budget.invoice.id &&
+									dtoMDFClaimBudget.id
+								) {
+									const budgetInvoiceRenamed = renameFileKeepingExtention(
+										budget.invoice,
+										`${budget.invoice.name}#${dtoMDFClaimBudget.id}`
+									);
+
+									if (budgetInvoiceRenamed) {
+										const dtoBudgetInvoice = await createDocumentFolderDocument(
+											claimParentFolderId,
+											budgetInvoiceRenamed
+										);
+
+										if (dtoBudgetInvoice.id) {
+											updateMDFClaimActivityBudget(
+												budget,
+												dtoMDFClaimActivity.id,
+												dtoMDFClaimBudget.id,
+												dtoBudgetInvoice.id as LiferayFile &
+													number
+											);
+										}
+									}
+								}
+							})
+						);
+					}
+				})
+		);
 	}
+
 	Liferay.Util.navigate(`${siteURL}/l/${mdfRequest.id}`);
 }

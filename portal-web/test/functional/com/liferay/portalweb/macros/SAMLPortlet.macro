@@ -461,6 +461,14 @@ definition {
 		PortletEntry.save();
 	}
 
+	macro viewIdentityProviderConfigurations {
+		AssertValue(
+			locator1 = "CPSAMLAdminIdentityProvider#IDENTITY_PROVIDER_SESSION_MAXIMUM_AGE_INPUT",
+			value1 = ${sessionMaximum});
+
+		AssertNotChecked(locator1 = "CPSAMLAdminIdentityProvider#IDENTITY_PROVIDER_AUTHN_REQUEST_SIGNATURE_REQUIRED_CHECKBOX");
+	}
+
 	@description = "View metadata configurations of SP, in Identity Provider Configurations"
 	macro viewMetadataConfigurationsOfSP {
 		AssertClick(
@@ -483,6 +491,14 @@ definition {
 		}
 
 		PortletEntry.save();
+	}
+
+	macro viewServiceProviderConfigurations {
+		AssertValue(
+			locator1 = "CPSAMLAdminServiceProvider#SERVICE_PROVIDER_CLOCK_SKEW_INPUT",
+			value1 = ${clockSkew});
+
+		AssertChecked(locator1 = "CPSAMLAdminServiceProvider#SERVICE_PROVIDER_LDAP_IMPORT_ENABLED_CHECKBOX");
 	}
 
 }

@@ -10,7 +10,7 @@ definition {
 
 		User.firstLoginPG();
 
-		JSONGroup.addGroup(groupName = "Test Site Name");
+		HeadlessSite.addSite(siteName = "Test Site Name");
 
 		Navigator.openURL();
 
@@ -543,7 +543,7 @@ definition {
 		property portal.acceptance = "true";
 
 		task ("Create another site") {
-			JSONGroup.addGroup(groupName = "Test Site Name 2");
+			HeadlessSite.addSite(siteName = "Test Site Name 2");
 		}
 
 		task ("Create a blog in the first site") {
@@ -1461,7 +1461,6 @@ definition {
 	}
 
 	@description = "LPS-152906 Given a Blogs Asset at Content Dashboard When the user accesses the its information panel Then the share button must be present"
-	@ignore = "true"
 	@priority = 4
 	test CheckShareButtonIsPresentForBlogs {
 		task ("Create a Blog Entry asset") {
@@ -1476,7 +1475,7 @@ definition {
 
 			LexiconTable.clickEllipsisItem(
 				item = "Info",
-				tableEntry = "Blogs Entry Content");
+				tableEntry = "Blogs Entry Title");
 		}
 
 		task ("Check if the share button is not present at info panel") {
@@ -1487,7 +1486,6 @@ definition {
 	}
 
 	@description = "LPS-152906 Given the Info panel of the Content Dashboard When the user accesses the Web Content information panel Then share button must not be present for Web Content"
-	@ignore = "true"
 	@priority = 4
 	test CheckShareButtonNotPresentForWebContent {
 		task ("Create a Web Content and set a Display Page") {
@@ -1537,7 +1535,7 @@ definition {
 		property portal.acceptance = "true";
 
 		task ("Create new Group") {
-			JSONGroup.addGroup(groupName = "Second Test Site Name");
+			HeadlessSite.addSite(siteName = "Second Test Site Name");
 		}
 
 		task ("Create a Web Content for each group") {
@@ -2753,9 +2751,9 @@ definition {
 		property portal.acceptance = "true";
 
 		task ("Add two different sites") {
-			JSONGroup.addGroup(groupName = "Site Name 1");
+			HeadlessSite.addSite(siteName = "Site Name 1");
 
-			JSONGroup.addGroup(groupName = "Site Name 2");
+			HeadlessSite.addSite(siteName = "Site Name 2");
 		}
 
 		task ("Add a document for each site") {
@@ -2917,6 +2915,8 @@ definition {
 
 		task ("When the user clicks on Download option the kebab menu") {
 			ContentDashboard.downloadVersion(version = "1.2");
+
+			DownloadTempFile();
 		}
 
 		task ("Then the document is downloaded") {
@@ -3378,6 +3378,8 @@ definition {
 			ContentDashboard.clickMenuOfVersion(
 				menuItem = "Download",
 				versionName = "Version 1.0");
+
+			DownloadTempFile();
 		}
 
 		task ("Then the version of that document is downloaded") {
@@ -4909,7 +4911,7 @@ definition {
 		}
 
 		task ("Create the second site") {
-			JSONGroup.addGroup(groupName = "Test Site Name 2");
+			HeadlessSite.addSite(siteName = "Test Site Name 2");
 		}
 
 		task ("Add web content with tag to the second site") {

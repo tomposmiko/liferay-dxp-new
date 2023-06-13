@@ -16,6 +16,7 @@ package com.liferay.change.tracking.web.internal.display.context;
 
 import com.liferay.change.tracking.model.CTCollectionTemplate;
 import com.liferay.change.tracking.service.CTCollectionTemplateService;
+import com.liferay.change.tracking.web.internal.configuration.helper.CTSettingsConfigurationHelper;
 import com.liferay.change.tracking.web.internal.security.permission.resource.CTCollectionTemplatePermission;
 import com.liferay.portal.kernel.dao.search.DisplayTerms;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -45,12 +46,14 @@ public class ViewTemplatesDisplayContext
 
 	public ViewTemplatesDisplayContext(
 		CTCollectionTemplateService ctCollectionTemplateService,
+		CTSettingsConfigurationHelper ctSettingsConfigurationHelper,
 		HttpServletRequest httpServletRequest, Language language,
 		RenderRequest renderRequest, RenderResponse renderResponse) {
 
 		super(httpServletRequest);
 
 		_ctCollectionTemplateService = ctCollectionTemplateService;
+		_ctSettingsConfigurationHelper = ctSettingsConfigurationHelper;
 		_httpServletRequest = httpServletRequest;
 		_language = language;
 		_renderRequest = renderRequest;
@@ -147,6 +150,25 @@ public class ViewTemplatesDisplayContext
 		return _searchContainer;
 	}
 
+	public boolean isDefaultCTCollectionTemplate(
+			CTCollectionTemplate ctCollectionTemplate)
+		throws PortalException {
+
+		return _ctSettingsConfigurationHelper.isDefaultCTCollectionTemplate(
+			ctCollectionTemplate.getCompanyId(),
+			ctCollectionTemplate.getCtCollectionTemplateId());
+	}
+
+	public boolean isDefaultSandboxCTCollectionTemplate(
+			CTCollectionTemplate ctCollectionTemplate)
+		throws PortalException {
+
+		return _ctSettingsConfigurationHelper.
+			isDefaultSandboxCTCollectionTemplate(
+				ctCollectionTemplate.getCompanyId(),
+				ctCollectionTemplate.getCtCollectionTemplateId());
+	}
+
 	@Override
 	protected String getDefaultOrderByCol() {
 		return "name";
@@ -179,6 +201,7 @@ public class ViewTemplatesDisplayContext
 	}
 
 	private final CTCollectionTemplateService _ctCollectionTemplateService;
+	private final CTSettingsConfigurationHelper _ctSettingsConfigurationHelper;
 	private final HttpServletRequest _httpServletRequest;
 	private final Language _language;
 	private final RenderRequest _renderRequest;

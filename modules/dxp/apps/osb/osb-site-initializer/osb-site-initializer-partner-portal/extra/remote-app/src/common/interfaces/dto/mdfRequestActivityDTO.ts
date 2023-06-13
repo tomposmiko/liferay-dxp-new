@@ -23,11 +23,12 @@ type MDFRequestActivityDTO = Omit<
 		actToBgts?: MDFRequestBudgetDTO[];
 		actToMDFClmActs?: MDFClaimActivityDTO[];
 		currency?: LiferayPicklist;
-		externalReferenceCodeSF?: string;
+		externalReferenceCode?: string;
 		leadFollowUpStrategies?: string;
-		mdfRequestExternalReferenceCodeSF?: string;
+		mdfRequestExternalReferenceCode?: string;
 		r_accToActs_accountEntryId?: number;
 		r_mdfReqToActs_c_mdfRequestId?: number;
+		selected?: boolean;
 	};
 
 export default MDFRequestActivityDTO;

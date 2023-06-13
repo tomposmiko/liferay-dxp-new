@@ -30,6 +30,7 @@ import com.liferay.headless.admin.taxonomy.client.permission.Permission;
 import com.liferay.headless.admin.taxonomy.client.resource.v1_0.TaxonomyCategoryResource;
 import com.liferay.headless.admin.taxonomy.client.serdes.v1_0.TaxonomyCategorySerDes;
 import com.liferay.petra.function.UnsafeTriConsumer;
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -70,8 +71,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -1041,7 +1040,7 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 		Page<TaxonomyCategory> page =
 			taxonomyCategoryResource.
 				getTaxonomyVocabularyTaxonomyCategoriesPage(
-					taxonomyVocabularyId, null, null, null,
+					taxonomyVocabularyId, null, null, null, null,
 					Pagination.of(1, 10), null);
 
 		Assert.assertEquals(0, page.getTotalCount());
@@ -1055,7 +1054,7 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 			page =
 				taxonomyCategoryResource.
 					getTaxonomyVocabularyTaxonomyCategoriesPage(
-						irrelevantTaxonomyVocabularyId, null, null, null,
+						irrelevantTaxonomyVocabularyId, null, null, null, null,
 						Pagination.of(1, 2), null);
 
 			Assert.assertEquals(1, page.getTotalCount());
@@ -1080,7 +1079,7 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 		page =
 			taxonomyCategoryResource.
 				getTaxonomyVocabularyTaxonomyCategoriesPage(
-					taxonomyVocabularyId, null, null, null,
+					taxonomyVocabularyId, null, null, null, null,
 					Pagination.of(1, 10), null);
 
 		Assert.assertEquals(2, page.getTotalCount());
@@ -1145,7 +1144,7 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 			Page<TaxonomyCategory> page =
 				taxonomyCategoryResource.
 					getTaxonomyVocabularyTaxonomyCategoriesPage(
-						taxonomyVocabularyId, null, null,
+						taxonomyVocabularyId, null, null, null,
 						getFilterString(
 							entityField, "between", taxonomyCategory1),
 						Pagination.of(1, 2), null);
@@ -1183,7 +1182,7 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 			Page<TaxonomyCategory> page =
 				taxonomyCategoryResource.
 					getTaxonomyVocabularyTaxonomyCategoriesPage(
-						taxonomyVocabularyId, null, null,
+						taxonomyVocabularyId, null, null, null,
 						getFilterString(entityField, "eq", taxonomyCategory1),
 						Pagination.of(1, 2), null);
 
@@ -1220,7 +1219,7 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 			Page<TaxonomyCategory> page =
 				taxonomyCategoryResource.
 					getTaxonomyVocabularyTaxonomyCategoriesPage(
-						taxonomyVocabularyId, null, null,
+						taxonomyVocabularyId, null, null, null,
 						getFilterString(entityField, "eq", taxonomyCategory1),
 						Pagination.of(1, 2), null);
 
@@ -1252,8 +1251,8 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 		Page<TaxonomyCategory> page1 =
 			taxonomyCategoryResource.
 				getTaxonomyVocabularyTaxonomyCategoriesPage(
-					taxonomyVocabularyId, null, null, null, Pagination.of(1, 2),
-					null);
+					taxonomyVocabularyId, null, null, null, null,
+					Pagination.of(1, 2), null);
 
 		List<TaxonomyCategory> taxonomyCategories1 =
 			(List<TaxonomyCategory>)page1.getItems();
@@ -1264,8 +1263,8 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 		Page<TaxonomyCategory> page2 =
 			taxonomyCategoryResource.
 				getTaxonomyVocabularyTaxonomyCategoriesPage(
-					taxonomyVocabularyId, null, null, null, Pagination.of(2, 2),
-					null);
+					taxonomyVocabularyId, null, null, null, null,
+					Pagination.of(2, 2), null);
 
 		Assert.assertEquals(3, page2.getTotalCount());
 
@@ -1278,8 +1277,8 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 		Page<TaxonomyCategory> page3 =
 			taxonomyCategoryResource.
 				getTaxonomyVocabularyTaxonomyCategoriesPage(
-					taxonomyVocabularyId, null, null, null, Pagination.of(1, 3),
-					null);
+					taxonomyVocabularyId, null, null, null, null,
+					Pagination.of(1, 3), null);
 
 		assertEqualsIgnoringOrder(
 			Arrays.asList(
@@ -1417,7 +1416,7 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 			Page<TaxonomyCategory> ascPage =
 				taxonomyCategoryResource.
 					getTaxonomyVocabularyTaxonomyCategoriesPage(
-						taxonomyVocabularyId, null, null, null,
+						taxonomyVocabularyId, null, null, null, null,
 						Pagination.of(1, 2), entityField.getName() + ":asc");
 
 			assertEquals(
@@ -1427,7 +1426,7 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 			Page<TaxonomyCategory> descPage =
 				taxonomyCategoryResource.
 					getTaxonomyVocabularyTaxonomyCategoriesPage(
-						taxonomyVocabularyId, null, null, null,
+						taxonomyVocabularyId, null, null, null, null,
 						Pagination.of(1, 2), entityField.getName() + ":desc");
 
 			assertEquals(
@@ -2346,14 +2345,16 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz)
 		throws Exception {
 
-		Stream<java.lang.reflect.Field> stream = Stream.of(
-			ReflectionUtil.getDeclaredFields(clazz));
+		return TransformUtil.transform(
+			ReflectionUtil.getDeclaredFields(clazz),
+			field -> {
+				if (field.isSynthetic()) {
+					return null;
+				}
 
-		return stream.filter(
-			field -> !field.isSynthetic()
-		).toArray(
-			java.lang.reflect.Field[]::new
-		);
+				return field;
+			},
+			java.lang.reflect.Field.class);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields()
@@ -2383,18 +2384,18 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 	protected List<EntityField> getEntityFields(EntityField.Type type)
 		throws Exception {
 
-		java.util.Collection<EntityField> entityFields = getEntityFields();
+		return TransformUtil.transform(
+			getEntityFields(),
+			entityField -> {
+				if (!Objects.equals(entityField.getType(), type) ||
+					ArrayUtil.contains(
+						getIgnoredEntityFieldNames(), entityField.getName())) {
 
-		Stream<EntityField> stream = entityFields.stream();
+					return null;
+				}
 
-		return stream.filter(
-			entityField ->
-				Objects.equals(entityField.getType(), type) &&
-				!ArrayUtil.contains(
-					getIgnoredEntityFieldNames(), entityField.getName())
-		).collect(
-			Collectors.toList()
-		);
+				return entityField;
+			});
 	}
 
 	protected String getFilterString(

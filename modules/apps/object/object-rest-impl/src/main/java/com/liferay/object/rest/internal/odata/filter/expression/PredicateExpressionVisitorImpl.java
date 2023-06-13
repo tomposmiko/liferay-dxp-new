@@ -14,25 +14,24 @@
 
 package com.liferay.object.rest.internal.odata.filter.expression;
 
-import com.liferay.asset.kernel.model.AssetEntries_AssetTagsTable;
-import com.liferay.asset.kernel.model.AssetEntryTable;
-import com.liferay.asset.kernel.model.AssetTagTable;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
 import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
+import com.liferay.object.odata.filter.expression.field.predicate.provider.FieldPredicateProvider;
 import com.liferay.object.related.models.ObjectRelatedModelsPredicateProvider;
 import com.liferay.object.related.models.ObjectRelatedModelsPredicateProviderRegistry;
 import com.liferay.object.rest.internal.odata.entity.v1_0.ObjectEntryEntityModel;
+import com.liferay.object.rest.internal.odata.filter.expression.field.predicate.provider.FieldPredicateProviderTracker;
+import com.liferay.object.rest.internal.util.BinaryExpressionConverterUtil;
 import com.liferay.object.service.ObjectDefinitionLocalServiceUtil;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalServiceUtil;
 import com.liferay.petra.function.UnsafeBiFunction;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.sql.dsl.Column;
-import com.liferay.petra.sql.dsl.DSLQueryFactoryUtil;
 import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.petra.sql.dsl.spi.expression.DefaultPredicate;
 import com.liferay.petra.sql.dsl.spi.expression.Operand;
@@ -42,7 +41,6 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.db.DBType;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
@@ -51,6 +49,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.odata.filter.expression.BinaryExpression;
@@ -90,15 +89,18 @@ public class PredicateExpressionVisitorImpl
 	implements ExpressionVisitor<Object> {
 
 	public PredicateExpressionVisitorImpl(
-		EntityModel entityModel, long objectDefinitionId,
+		EntityModel entityModel,
+		FieldPredicateProviderTracker fieldPredicateProviderTracker,
+		long objectDefinitionId,
 		ObjectFieldBusinessTypeRegistry objectFieldBusinessTypeRegistry,
 		ObjectFieldLocalService objectFieldLocalService,
 		ObjectRelatedModelsPredicateProviderRegistry
 			objectRelatedModelsPredicateProviderRegistry) {
 
 		this(
-			entityModel, new HashMap<>(), objectDefinitionId,
-			objectFieldBusinessTypeRegistry, objectFieldLocalService,
+			entityModel, fieldPredicateProviderTracker, new HashMap<>(),
+			objectDefinitionId, objectFieldBusinessTypeRegistry,
+			objectFieldLocalService,
 			objectRelatedModelsPredicateProviderRegistry);
 	}
 
@@ -340,6 +342,7 @@ public class PredicateExpressionVisitorImpl
 
 	private PredicateExpressionVisitorImpl(
 		EntityModel entityModel,
+		FieldPredicateProviderTracker fieldPredicateProviderTracker,
 		Map<String, String> lambdaVariableExpressionFieldNames,
 		long objectDefinitionId,
 		ObjectFieldBusinessTypeRegistry objectFieldBusinessTypeRegistry,
@@ -348,6 +351,7 @@ public class PredicateExpressionVisitorImpl
 			objectRelatedModelsPredicateProviderRegistry) {
 
 		_entityModels.put(objectDefinitionId, entityModel);
+		_fieldPredicateProviderTracker = fieldPredicateProviderTracker;
 		_lambdaVariableExpressionFieldNames =
 			lambdaVariableExpressionFieldNames;
 		_objectDefinitionId = objectDefinitionId;
@@ -364,10 +368,13 @@ public class PredicateExpressionVisitorImpl
 	private Predicate _contains(
 		Object fieldName, Object fieldValue, long objectDefinitionId) {
 
-		if (_isKeywords(fieldName)) {
-			return _getKeywordsPredicate(
-				objectDefinitionId,
-				_contains(AssetTagTable.INSTANCE.name, fieldValue));
+		FieldPredicateProvider fieldPredicateProvider =
+			_fieldPredicateProviderTracker.getFieldPredicateProvider(
+				String.valueOf(fieldName));
+
+		if (fieldPredicateProvider != null) {
+			return fieldPredicateProvider.getContainsPredicate(
+				name -> _getColumn(name, objectDefinitionId), fieldValue);
 		}
 
 		return _contains(
@@ -435,40 +442,16 @@ public class PredicateExpressionVisitorImpl
 		return entityModel.getEntityFieldsMap();
 	}
 
-	private <T> Predicate _getExpressionPredicate(
-		Column<?, T> column, BinaryExpression.Operation operation, T value) {
-
-		if (Objects.equals(BinaryExpression.Operation.EQ, operation)) {
-			return column.eq(value);
-		}
-		else if (Objects.equals(BinaryExpression.Operation.GE, operation)) {
-			return column.gte(value);
-		}
-		else if (Objects.equals(BinaryExpression.Operation.GT, operation)) {
-			return column.gt(value);
-		}
-		else if (Objects.equals(BinaryExpression.Operation.LE, operation)) {
-			return column.lte(value);
-		}
-		else if (Objects.equals(BinaryExpression.Operation.LT, operation)) {
-			return column.lt(value);
-		}
-		else if (Objects.equals(BinaryExpression.Operation.NE, operation)) {
-			return column.neq(value);
-		}
-
-		return null;
-	}
-
 	private Predicate _getInPredicate(
 		Object left, long objectDefinitionId, List<Object> rights) {
 
-		if (_isKeywords(left)) {
-			return _getKeywordsPredicate(
-				objectDefinitionId,
-				AssetTagTable.INSTANCE.name.in(
-					TransformUtil.transformToArray(
-						rights, String::valueOf, Object.class)));
+		FieldPredicateProvider fieldPredicateProvider =
+			_fieldPredicateProviderTracker.getFieldPredicateProvider(
+				String.valueOf(left));
+
+		if (fieldPredicateProvider != null) {
+			return fieldPredicateProvider.getInPredicate(
+				name -> _getColumn(name, objectDefinitionId), rights);
 		}
 
 		return _getColumn(
@@ -477,33 +460,6 @@ public class PredicateExpressionVisitorImpl
 			TransformUtil.transformToArray(
 				rights, right -> _getValue(left, objectDefinitionId, right),
 				Object.class)
-		);
-	}
-
-	private Predicate _getKeywordsPredicate(
-		long objectDefinitionId,
-		com.liferay.petra.sql.dsl.expression.Expression<Boolean>
-			valueExpression) {
-
-		return _getColumn(
-			"id", objectDefinitionId
-		).in(
-			DSLQueryFactoryUtil.select(
-				AssetEntryTable.INSTANCE.classPK
-			).from(
-				AssetEntryTable.INSTANCE
-			).innerJoinON(
-				AssetEntries_AssetTagsTable.INSTANCE,
-				AssetEntryTable.INSTANCE.entryId.eq(
-					AssetEntries_AssetTagsTable.INSTANCE.entryId)
-			).innerJoinON(
-				AssetTagTable.INSTANCE,
-				AssetTagTable.INSTANCE.tagId.eq(
-					AssetEntries_AssetTagsTable.INSTANCE.tagId
-				).and(
-					valueExpression
-				)
-			)
 		);
 	}
 
@@ -637,20 +593,26 @@ public class PredicateExpressionVisitorImpl
 				Predicate.withParentheses((Predicate)left),
 				Predicate.withParentheses((Predicate)right));
 		}
-		else if (_isKeywords(left)) {
-			predicate = _getKeywordsPredicate(
-				objectDefinitionId,
-				_getExpressionPredicate(
-					AssetTagTable.INSTANCE.name, operation, (String)right));
-		}
 		else {
 			ObjectField objectField = _objectFieldLocalService.fetchObjectField(
 				objectDefinitionId, String.valueOf(left));
 
-			if ((objectField != null) &&
-				StringUtil.equals(
-					objectField.getBusinessType(),
-					ObjectFieldConstants.BUSINESS_TYPE_MULTISELECT_PICKLIST)) {
+			if (objectField == null) {
+				FieldPredicateProvider fieldPredicateProvider =
+					_fieldPredicateProviderTracker.getFieldPredicateProvider(
+						String.valueOf(left));
+
+				if (fieldPredicateProvider != null) {
+					predicate =
+						fieldPredicateProvider.getBinaryExpressionPredicate(
+							name -> _getColumn(name, objectDefinitionId), left,
+							objectDefinitionId, operation, right);
+				}
+			}
+			else if (StringUtil.equals(
+						objectField.getBusinessType(),
+						ObjectFieldConstants.
+							BUSINESS_TYPE_MULTISELECT_PICKLIST)) {
 
 				predicate = _contains(left, right, objectDefinitionId);
 			}
@@ -660,7 +622,7 @@ public class PredicateExpressionVisitorImpl
 			return predicate;
 		}
 
-		return _getExpressionPredicate(
+		return BinaryExpressionConverterUtil.getExpressionPredicate(
 			_getColumn(left, objectDefinitionId), operation,
 			_getValue(left, objectDefinitionId, right));
 	}
@@ -724,7 +686,8 @@ public class PredicateExpressionVisitorImpl
 
 			if (Objects.equals(
 					objectFieldBusinessType.getDBType(),
-					ObjectFieldConstants.DB_TYPE_LONG)) {
+					ObjectFieldConstants.DB_TYPE_LONG) &&
+				Validator.isNumber(String.valueOf(value))) {
 
 				return GetterUtil.getLong(value);
 			}
@@ -750,16 +713,6 @@ public class PredicateExpressionVisitorImpl
 		return false;
 	}
 
-	private boolean _isKeywords(Object fieldName) {
-		if (fieldName.equals("keywords") &&
-			FeatureFlagManagerUtil.isEnabled("LPS-176651")) {
-
-			return true;
-		}
-
-		return false;
-	}
-
 	private Predicate _startsWith(Column<?, ?> column, Object value) {
 		return column.like(value + StringPool.PERCENT);
 	}
@@ -767,10 +720,13 @@ public class PredicateExpressionVisitorImpl
 	private Predicate _startsWith(
 		Object fieldName, Object fieldValue, long objectDefinitionId) {
 
-		if (_isKeywords(fieldName)) {
-			return _getKeywordsPredicate(
-				objectDefinitionId,
-				_startsWith(AssetTagTable.INSTANCE.name, fieldValue));
+		FieldPredicateProvider fieldPredicateProvider =
+			_fieldPredicateProviderTracker.getFieldPredicateProvider(
+				String.valueOf(fieldName));
+
+		if (fieldPredicateProvider != null) {
+			return fieldPredicateProvider.getStartsWithPredicate(
+				name -> _getColumn(name, objectDefinitionId), fieldValue);
 		}
 
 		return _startsWith(
@@ -789,6 +745,7 @@ public class PredicateExpressionVisitorImpl
 		return (Predicate)lambdaFunctionExpression.accept(
 			new PredicateExpressionVisitorImpl(
 				_getObjectDefinitionEntityModel(objectDefinitionId),
+				_fieldPredicateProviderTracker,
 				Collections.singletonMap(
 					lambdaFunctionExpression.getVariableName(),
 					collectionPropertyExpression.getName()),
@@ -801,6 +758,7 @@ public class PredicateExpressionVisitorImpl
 		PredicateExpressionVisitorImpl.class);
 
 	private final Map<Long, EntityModel> _entityModels = new HashMap<>();
+	private FieldPredicateProviderTracker _fieldPredicateProviderTracker;
 	private final Map<String, String> _lambdaVariableExpressionFieldNames;
 	private final long _objectDefinitionId;
 	private final ObjectFieldBusinessTypeRegistry

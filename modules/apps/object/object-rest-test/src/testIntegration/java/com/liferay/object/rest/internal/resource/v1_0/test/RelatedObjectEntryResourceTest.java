@@ -183,7 +183,7 @@ public class RelatedObjectEntryResourceTest {
 	}
 
 	@Test
-	public void testDeleteManyToManySystemObjectRelatedObjectNotFound()
+	public void testDeleteManyToManySystemObjectRelatedObjectEntryNotFound()
 		throws Exception {
 
 		JaxRsApplicationDescriptor jaxRsApplicationDescriptor =
@@ -348,7 +348,7 @@ public class RelatedObjectEntryResourceTest {
 	}
 
 	@Test
-	public void testDeleteOneToManySystemObjectRelatedObjectNotFound()
+	public void testDeleteOneToManySystemObjectRelatedObjectEntryNotFound()
 		throws Exception {
 
 		JaxRsApplicationDescriptor jaxRsApplicationDescriptor =
@@ -411,7 +411,9 @@ public class RelatedObjectEntryResourceTest {
 	}
 
 	@Test
-	public void testGetSystemObjectNotFoundRelatedObjects() throws Exception {
+	public void testGetNotFoundSystemObjectRelatedObjectEntries()
+		throws Exception {
+
 		JaxRsApplicationDescriptor jaxRsApplicationDescriptor =
 			_userSystemObjectDefinitionMetadata.getJaxRsApplicationDescriptor();
 		Long irrelevantUserId = RandomTestUtil.randomLong();
@@ -436,7 +438,7 @@ public class RelatedObjectEntryResourceTest {
 	}
 
 	@Test
-	public void testGetSystemObjectRelatedObjects() throws Exception {
+	public void testGetSystemObjectRelatedObjectEntries() throws Exception {
 		JaxRsApplicationDescriptor jaxRsApplicationDescriptor =
 			_userSystemObjectDefinitionMetadata.getJaxRsApplicationDescriptor();
 
@@ -464,6 +466,41 @@ public class RelatedObjectEntryResourceTest {
 
 		Assert.assertEquals(
 			_OBJECT_FIELD_VALUE, itemJSONObject.getString(_OBJECT_FIELD_NAME));
+	}
+
+	@Test
+	public void testGetSystemObjectRelatedObjectEntriesWithPagination()
+		throws Exception {
+
+		JaxRsApplicationDescriptor jaxRsApplicationDescriptor =
+			_userSystemObjectDefinitionMetadata.getJaxRsApplicationDescriptor();
+
+		_objectRelationship = _addObjectRelationship(
+			StringUtil.randomId(), _objectDefinition.getObjectDefinitionId(),
+			_userSystemObjectDefinition.getObjectDefinitionId(),
+			_objectEntry.getPrimaryKey(), _user.getUserId(),
+			ObjectRelationshipConstants.TYPE_MANY_TO_MANY);
+
+		ObjectEntry objectEntry = ObjectEntryTestUtil.addObjectEntry(
+			_objectDefinition, _OBJECT_FIELD_NAME, _OBJECT_FIELD_VALUE);
+
+		_objectRelationshipLocalService.addObjectRelationshipMappingTableValues(
+			_user.getUserId(), _objectRelationship.getObjectRelationshipId(),
+			objectEntry.getPrimaryKey(), _user.getUserId(),
+			ServiceContextTestUtil.getServiceContext());
+
+		JSONObject jsonObject = HTTPTestUtil.invoke(
+			null,
+			StringBundler.concat(
+				jaxRsApplicationDescriptor.getRESTContextPath(),
+				StringPool.SLASH, _user.getUserId(), StringPool.SLASH,
+				_objectRelationship.getName(), "?page=1&pageSize=1"),
+			Http.Method.GET);
+
+		Assert.assertEquals(2, jsonObject.getLong("lastPage"));
+		Assert.assertEquals(1, jsonObject.getLong("page"));
+		Assert.assertEquals(1, jsonObject.getLong("pageSize"));
+		Assert.assertEquals(2, jsonObject.getLong("totalCount"));
 	}
 
 	@Test

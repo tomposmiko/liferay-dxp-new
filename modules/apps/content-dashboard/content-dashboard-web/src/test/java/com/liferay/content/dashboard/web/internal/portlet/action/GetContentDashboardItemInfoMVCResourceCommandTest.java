@@ -61,7 +61,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -105,6 +104,12 @@ public class GetContentDashboardItemInfoMVCResourceCommandTest {
 		User user = Mockito.mock(User.class);
 
 		Mockito.when(
+			user.getFirstName()
+		).thenReturn(
+			RandomTestUtil.randomString()
+		);
+
+		Mockito.when(
 			user.getPortraitId()
 		).thenReturn(
 			12345L
@@ -114,6 +119,12 @@ public class GetContentDashboardItemInfoMVCResourceCommandTest {
 			user.getPortraitURL(Mockito.any(ThemeDisplay.class))
 		).thenReturn(
 			"portraitURL"
+		);
+
+		Mockito.when(
+			user.getUserId()
+		).thenReturn(
+			RandomTestUtil.randomLong()
 		);
 
 		ContentDashboardItem<?> contentDashboardItem =
@@ -659,22 +670,6 @@ public class GetContentDashboardItemInfoMVCResourceCommandTest {
 		}
 
 		public ContentDashboardItem build() {
-			String userName = Optional.ofNullable(
-				_user
-			).map(
-				user -> user.getFirstName()
-			).orElseGet(
-				RandomTestUtil::randomString
-			);
-
-			long userId = Optional.ofNullable(
-				_user
-			).map(
-				user -> user.getUserId()
-			).orElseGet(
-				RandomTestUtil::randomLong
-			);
-
 			AssetCategory assetCategory1 = Mockito.mock(AssetCategory.class);
 
 			Mockito.when(
@@ -722,6 +717,17 @@ public class GetContentDashboardItemInfoMVCResourceCommandTest {
 			).thenReturn(
 				RandomTestUtil.randomString()
 			);
+
+			long userId = RandomTestUtil.randomLong();
+			String userName = RandomTestUtil.randomString();
+
+			if (_user != null) {
+				userId = _user.getUserId();
+				userName = _user.getFirstName();
+			}
+
+			long finalUserId = userId;
+			String finalUserName = userName;
 
 			return new ContentDashboardItem() {
 
@@ -800,6 +806,11 @@ public class GetContentDashboardItemInfoMVCResourceCommandTest {
 				}
 
 				@Override
+				public long getId() {
+					return 123456;
+				}
+
+				@Override
 				public InfoItemReference getInfoItemReference() {
 					return new InfoItemReference(_className, _classPK);
 				}
@@ -848,12 +859,12 @@ public class GetContentDashboardItemInfoMVCResourceCommandTest {
 
 				@Override
 				public long getUserId() {
-					return userId;
+					return finalUserId;
 				}
 
 				@Override
 				public String getUserName() {
-					return userName;
+					return finalUserName;
 				}
 
 				@Override

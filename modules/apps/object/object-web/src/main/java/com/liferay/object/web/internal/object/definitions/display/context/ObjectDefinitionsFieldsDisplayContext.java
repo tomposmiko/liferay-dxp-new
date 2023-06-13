@@ -23,6 +23,7 @@ import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
+import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.web.internal.object.definitions.display.context.util.ObjectCodeEditorUtil;
 import com.liferay.object.web.internal.util.ObjectFieldBusinessTypeUtil;
@@ -62,12 +63,14 @@ public class ObjectDefinitionsFieldsDisplayContext
 		ModelResourcePermission<ObjectDefinition>
 			objectDefinitionModelResourcePermission,
 		ObjectFieldBusinessTypeRegistry objectFieldBusinessTypeRegistry,
+		ObjectFieldSettingLocalService objectFieldSettingLocalService,
 		ObjectRelationshipLocalService objectRelationshipLocalService) {
 
 		super(httpServletRequest, objectDefinitionModelResourcePermission);
 
 		_listTypeDefinitionService = listTypeDefinitionService;
 		_objectFieldBusinessTypeRegistry = objectFieldBusinessTypeRegistry;
+		_objectFieldSettingLocalService = objectFieldSettingLocalService;
 		_objectRelationshipLocalService = objectRelationshipLocalService;
 	}
 
@@ -149,8 +152,13 @@ public class ObjectDefinitionsFieldsDisplayContext
 					 includeRelationshipObjectFieldBusinessType)));
 	}
 
-	public List<Map<String, Object>> getObjectFieldCodeEditorElements() {
-		if (FeatureFlagManagerUtil.isEnabled("LPS-164948")) {
+	public List<Map<String, Object>> getObjectFieldCodeEditorElements(
+		String businessType) {
+
+		if (StringUtil.equals(
+				businessType, ObjectFieldConstants.BUSINESS_TYPE_FORMULA) &&
+			FeatureFlagManagerUtil.isEnabled("LPS-164948")) {
+
 			return ObjectCodeEditorUtil.getCodeEditorElements(
 				ddmExpressionOperator ->
 					_filterableDDMExpressionOperators.contains(
@@ -160,12 +168,15 @@ public class ObjectDefinitionsFieldsDisplayContext
 					objectField.getBusinessType()));
 		}
 
-		return null;
+		return ObjectCodeEditorUtil.getCodeEditorElements(
+			true, false, objectRequestHelper.getLocale(),
+			getObjectDefinitionId(), objectField -> !objectField.isSystem());
 	}
 
 	public JSONObject getObjectFieldJSONObject(ObjectField objectField) {
 		return ObjectFieldUtil.toJSONObject(
-			_listTypeDefinitionService, objectField);
+			_listTypeDefinitionService, objectField,
+			_objectFieldSettingLocalService);
 	}
 
 	public Long getObjectRelationshipId(ObjectField objectField) {
@@ -207,6 +218,8 @@ public class ObjectDefinitionsFieldsDisplayContext
 	private final ListTypeDefinitionService _listTypeDefinitionService;
 	private final ObjectFieldBusinessTypeRegistry
 		_objectFieldBusinessTypeRegistry;
+	private final ObjectFieldSettingLocalService
+		_objectFieldSettingLocalService;
 	private final ObjectRelationshipLocalService
 		_objectRelationshipLocalService;
 

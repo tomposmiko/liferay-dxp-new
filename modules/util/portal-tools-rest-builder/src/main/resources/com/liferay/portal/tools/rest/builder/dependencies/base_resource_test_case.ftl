@@ -29,6 +29,13 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+<#if freeMarkerTool.isVersionCompatible(configYAML, 2)>
+	import com.liferay.petra.function.transform.TransformUtil;
+
+<#else>
+	import com.liferay.portal.vulcan.util.TransformUtil;
+</#if>
+
 <#assign
 	javaMethodSignatures = freeMarkerTool.getResourceTestCaseJavaMethodSignatures(configYAML, openAPIYAML, schemaName)
 
@@ -89,8 +96,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.annotation.Generated;
 
@@ -246,7 +251,7 @@ public abstract class Base${schemaName}ResourceTestCase {
 			parameters = freeMarkerTool.getResourceTestCaseParameters(javaMethodSignature.javaMethodParameters, openAPIYAML, javaMethodSignature.operation, false)
 		/>
 
-		<#if stringUtil.endsWith(javaMethodSignature.methodName, schemaName + "Batch")>
+		<#if stringUtil.endsWith(javaMethodSignature.methodName, schemaName + "Batch") || stringUtil.endsWith(javaMethodSignature.methodName, schemaName + "sPageExportBatch")>
 			<#continue>
 		</#if>
 
@@ -1464,6 +1469,7 @@ public abstract class Base${schemaName}ResourceTestCase {
 		<#elseif freeMarkerTool.hasHTTPMethod(javaMethodSignature, "put") && javaMethodSignature.returnType?ends_with(schemaName)>
 			<#assign
 				addGetterMethod = false
+				addResourceGetterMethod = false
 				getterJavaMethodParametersMap = {}
 			/>
 
@@ -1496,9 +1502,17 @@ public abstract class Base${schemaName}ResourceTestCase {
 					assertEquals(random${schemaName}, put${schemaName});
 					assertValid(put${schemaName});
 
-					${schemaName} get${schemaName} = ${schemaVarName}Resource.${javaMethodSignature.methodName?replace("put", "get")}(
-						<@getGetterParameters javaMethodSignature=javaMethodSignature />
-					);
+					${schemaName} get${schemaName} =
+
+					<#assign getJavaMethodSignature = javaMethodSignature.methodName?replace("put", "get", "f") />
+
+					<#if freeMarkerTool.containsJavaMethodSignature(javaMethodSignatures, getJavaMethodSignature)>
+						${schemaVarName}Resource.${getJavaMethodSignature}(<@getGetterParameters javaMethodSignature=javaMethodSignature />);
+					<#else>
+						<#assign addResourceGetterMethod = true />
+
+						test${javaMethodSignature.methodName?cap_first}_get${schemaName}(<@getGetterParameters javaMethodSignature=javaMethodSignature />);
+					</#if>
 
 					assertEquals(random${schemaName}, get${schemaName});
 					assertValid(get${schemaName});
@@ -1525,17 +1539,35 @@ public abstract class Base${schemaName}ResourceTestCase {
 					assertEquals(new${schemaName}, put${schemaName});
 					assertValid(put${schemaName});
 
-					get${schemaName} = ${schemaVarName}Resource.${javaMethodSignature.methodName?replace("put", "get")}(
-						<@getGetterParameters javaMethodSignature=javaMethodSignature />
-					);
+					get${schemaName} =
+
+					<#assign getJavaMethodSignature = javaMethodSignature.methodName?replace("put", "get", "f") />
+
+					<#if freeMarkerTool.containsJavaMethodSignature(javaMethodSignatures, getJavaMethodSignature)>
+						${schemaVarName}Resource.${getJavaMethodSignature}(<@getGetterParameters javaMethodSignature=javaMethodSignature />);
+					<#else>
+						<#assign addResourceGetterMethod = true />
+
+						test${javaMethodSignature.methodName?cap_first}_get${schemaName}(<@getGetterParameters javaMethodSignature=javaMethodSignature />);
+					</#if>
 
 					assertEquals(new${schemaName}, get${schemaName});
 
-					Assert.assertEquals(
-						new${schemaName}.getExternalReferenceCode(),
-						put${schemaName}.getExternalReferenceCode());
+					Assert.assertEquals(new${schemaName}.getExternalReferenceCode(), put${schemaName}.getExternalReferenceCode());
 				</#if>
 			}
+
+			<#if addResourceGetterMethod>
+				protected ${schemaName} test${javaMethodSignature.methodName?cap_first}_get${schemaName}(
+					<#list javaMethodSignature.pathJavaMethodParameters as javaMethodParameter>
+						${javaMethodParameter.parameterType} ${javaMethodParameter.parameterName}
+
+						<#sep>, </#sep>
+					</#list>
+				) {
+					throw new UnsupportedOperationException("This method needs to be implemented");
+				}
+			</#if>
 
 			<@getTestGetterMethods
 				getterJavaMethodParametersMap=getterJavaMethodParametersMap
@@ -2562,11 +2594,16 @@ public abstract class Base${schemaName}ResourceTestCase {
 	</#list>
 
 	protected java.lang.reflect.Field[] getDeclaredFields(Class clazz) throws Exception {
-		Stream<java.lang.reflect.Field> stream = Stream.of(ReflectionUtil.getDeclaredFields(clazz));
+		return TransformUtil.transform(
+			ReflectionUtil.getDeclaredFields(clazz),
+			field -> {
+				if (field.isSynthetic()) {
+					return null;
+				}
 
-		return stream.filter(
-			field -> !field.isSynthetic()
-		).toArray(java.lang.reflect.Field[]::new);
+				return field;
+			},
+			java.lang.reflect.Field.class);
 	}
 
 	protected java.util.Collection<EntityField> getEntityFields() throws Exception {
@@ -2588,15 +2625,18 @@ public abstract class Base${schemaName}ResourceTestCase {
 	}
 
 	protected List<EntityField> getEntityFields(EntityField.Type type) throws Exception {
-		java.util.Collection<EntityField> entityFields = getEntityFields();
+		return TransformUtil.transform(
+			getEntityFields(),
+			entityField -> {
+				if (!Objects.equals(entityField.getType(), type) ||
+					ArrayUtil.contains(
+					   getIgnoredEntityFieldNames(), entityField.getName())) {
 
-		Stream<EntityField> stream = entityFields.stream();
+					return null;
+				}
 
-		return stream.filter(
-			entityField -> Objects.equals(entityField.getType(), type) && !ArrayUtil.contains(getIgnoredEntityFieldNames(), entityField.getName())
-		).collect(
-			Collectors.toList()
-		);
+				return entityField;
+			});
 	}
 
 	protected String getFilterString(EntityField entityField, String operator, ${schemaClientJavaType} ${schemaVarName}) {

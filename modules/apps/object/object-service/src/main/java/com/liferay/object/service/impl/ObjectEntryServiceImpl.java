@@ -21,9 +21,9 @@ import com.liferay.account.service.AccountEntryLocalService;
 import com.liferay.account.service.AccountEntryOrganizationRelLocalService;
 import com.liferay.object.configuration.ObjectConfiguration;
 import com.liferay.object.constants.ObjectActionKeys;
+import com.liferay.object.entry.util.ObjectEntryThreadLocal;
 import com.liferay.object.exception.ObjectDefinitionAccountEntryRestrictedException;
 import com.liferay.object.exception.ObjectEntryCountException;
-import com.liferay.object.internal.entry.util.ObjectEntryThreadLocal;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
@@ -268,10 +268,12 @@ public class ObjectEntryServiceImpl extends ObjectEntryServiceBaseImpl {
 			objectEntryLocalService.getOneToManyObjectEntries(
 				groupId, objectRelationshipId, primaryKey, related, start, end);
 
-		for (ObjectEntry objectEntry : objectEntries) {
-			objectEntryService.checkModelResourcePermission(
-				objectEntry.getObjectDefinitionId(),
-				objectEntry.getObjectEntryId(), ActionKeys.VIEW);
+		if (!ObjectEntryThreadLocal.isSkipObjectEntryResourcePermission()) {
+			for (ObjectEntry objectEntry : objectEntries) {
+				objectEntryService.checkModelResourcePermission(
+					objectEntry.getObjectDefinitionId(),
+					objectEntry.getObjectEntryId(), ActionKeys.VIEW);
+			}
 		}
 
 		return objectEntries;

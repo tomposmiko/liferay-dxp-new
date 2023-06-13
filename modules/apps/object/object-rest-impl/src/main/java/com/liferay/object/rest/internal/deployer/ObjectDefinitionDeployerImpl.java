@@ -25,6 +25,7 @@ import com.liferay.object.rest.internal.jaxrs.context.provider.ObjectDefinitionC
 import com.liferay.object.rest.internal.jaxrs.context.provider.PredicateContextProvider;
 import com.liferay.object.rest.internal.jaxrs.exception.mapper.ObjectEntryManagerHttpExceptionMapper;
 import com.liferay.object.rest.internal.jaxrs.exception.mapper.ObjectEntryValuesExceptionMapper;
+import com.liferay.object.rest.internal.jaxrs.exception.mapper.ObjectRelationshipDeletionTypeExceptionMapper;
 import com.liferay.object.rest.internal.jaxrs.exception.mapper.ObjectValidationRuleEngineExceptionMapper;
 import com.liferay.object.rest.internal.jaxrs.exception.mapper.RequiredObjectRelationshipExceptionMapper;
 import com.liferay.object.rest.internal.jaxrs.exception.mapper.UnsupportedOperationExceptionMapper;
@@ -114,7 +115,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 	public synchronized List<ServiceRegistration<?>> deploy(
 		ObjectDefinition objectDefinition) {
 
-		if (objectDefinition.isSystem()) {
+		if (objectDefinition.isUnmodifiableSystemObject()) {
 			_initSystemObjectDefinition(
 				_systemObjectDefinitionMetadataRegistry.
 					getSystemObjectDefinitionMetadata(
@@ -286,9 +287,10 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 
 	private ObjectEntryResourceImpl _createObjectEntryResourceImpl() {
 		return new ObjectEntryResourceImpl(
-			_objectDefinitionLocalService, _objectEntryLocalService,
-			_objectEntryManagerRegistry, _objectFieldLocalService,
-			_objectRelationshipService, _objectScopeProviderRegistry,
+			_dtoConverterRegistry, _objectDefinitionLocalService,
+			_objectEntryLocalService, _objectEntryManagerRegistry,
+			_objectFieldLocalService, _objectRelationshipService,
+			_objectScopeProviderRegistry,
 			_systemObjectDefinitionMetadataRegistry);
 	}
 
@@ -509,7 +511,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 					).build()),
 				_bundleContext.registerService(
 					ExceptionMapper.class,
-					new ObjectEntryValuesExceptionMapper(),
+					new ObjectEntryValuesExceptionMapper(_language),
 					HashMapDictionaryBuilder.<String, Object>put(
 						"osgi.jaxrs.application.select",
 						"(osgi.jaxrs.name=" + osgiJaxRsName + ")"
@@ -519,6 +521,19 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 						"osgi.jaxrs.name",
 						objectDefinition.getOSGiJaxRsName(
 							"ObjectEntryValuesExceptionMapper")
+					).build()),
+				_bundleContext.registerService(
+					ExceptionMapper.class,
+					new ObjectRelationshipDeletionTypeExceptionMapper(),
+					HashMapDictionaryBuilder.<String, Object>put(
+						"osgi.jaxrs.application.select",
+						"(osgi.jaxrs.name=" + osgiJaxRsName + ")"
+					).put(
+						"osgi.jaxrs.extension", "true"
+					).put(
+						"osgi.jaxrs.name",
+						objectDefinition.getOSGiJaxRsName(
+							"ObjectRelationshipDeletionTypeExceptionMapper")
 					).build()),
 				_bundleContext.registerService(
 					ExceptionMapper.class,

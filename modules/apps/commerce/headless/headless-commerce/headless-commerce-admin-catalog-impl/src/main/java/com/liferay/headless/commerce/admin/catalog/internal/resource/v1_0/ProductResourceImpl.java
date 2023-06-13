@@ -20,6 +20,8 @@ import com.liferay.asset.kernel.service.AssetTagService;
 import com.liferay.commerce.account.model.CommerceAccountGroup;
 import com.liferay.commerce.account.service.CommerceAccountGroupRelService;
 import com.liferay.commerce.account.service.CommerceAccountGroupService;
+import com.liferay.commerce.price.list.service.CommercePriceEntryLocalService;
+import com.liferay.commerce.price.list.service.CommercePriceListLocalService;
 import com.liferay.commerce.product.configuration.CProductVersionConfiguration;
 import com.liferay.commerce.product.constants.CPAttachmentFileEntryConstants;
 import com.liferay.commerce.product.exception.NoSuchCPDefinitionException;
@@ -27,6 +29,7 @@ import com.liferay.commerce.product.exception.NoSuchCatalogException;
 import com.liferay.commerce.product.model.CPAttachmentFileEntry;
 import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.model.CPDefinitionOptionRel;
+import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.model.CProduct;
 import com.liferay.commerce.product.model.CommerceCatalog;
 import com.liferay.commerce.product.model.CommerceChannel;
@@ -105,7 +108,6 @@ import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermi
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.settings.SystemSettingsLocator;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -123,16 +125,14 @@ import com.liferay.upload.UniqueFileNameProvider;
 
 import java.io.Serializable;
 
-import java.util.ArrayList;
+import java.math.BigDecimal;
+
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -467,12 +467,8 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 
 		serviceContext.setAssetTagNames(assetTagNames);
 
-		Map<String, Serializable> expandoBridgeAttributes =
-			_getExpandoBridgeAttributes(product);
-
-		if (expandoBridgeAttributes != null) {
-			serviceContext.setExpandoBridgeAttributes(expandoBridgeAttributes);
-		}
+		serviceContext.setExpandoBridgeAttributes(
+			_getExpandoBridgeAttributes(product));
 
 		DateConfig displayDateConfig = DateConfig.toDisplayDateConfig(
 			product.getDisplayDate(), serviceContext.getTimeZone());
@@ -495,16 +491,9 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 		Category[] categories = product.getCategories();
 
 		if (categories != null) {
-			List<Long> assetCategoryIds = new ArrayList<>();
-
-			for (Category category : categories) {
-				if (category.getId() != null) {
-					assetCategoryIds.add(category.getId());
-				}
-			}
-
 			serviceContext.setAssetCategoryIds(
-				ArrayUtil.toLongArray(assetCategoryIds));
+				transformToLongArray(
+					Arrays.asList(categories), Category::getId));
 		}
 		else if (cpDefinition != null) {
 			serviceContext.setAssetCategoryIds(
@@ -654,19 +643,6 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 		).build();
 	}
 
-	private String[] _getAssetTags(CPDefinition cpDefinition) {
-		List<AssetTag> assetEntryAssetTags = _assetTagService.getTags(
-			cpDefinition.getModelClassName(), cpDefinition.getCPDefinitionId());
-
-		Stream<AssetTag> stream = assetEntryAssetTags.stream();
-
-		return stream.map(
-			AssetTag::getName
-		).toArray(
-			String[]::new
-		);
-	}
-
 	private CPDefinition _getCPDefinition(
 			CPDefinition cpDefinition, ServiceContext serviceContext)
 		throws Exception {
@@ -682,14 +658,11 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 						CProductVersionConfiguration.class.getName()));
 
 			if (cProductVersionConfiguration.enabled()) {
-				List<CPDefinition> cProductCPDefinitions =
-					_cpDefinitionService.getCProductCPDefinitions(
-						cpDefinition.getCProductId(),
-						WorkflowConstants.STATUS_DRAFT, QueryUtil.ALL_POS,
-						QueryUtil.ALL_POS);
-
 				for (CPDefinition cProductCPDefinition :
-						cProductCPDefinitions) {
+						_cpDefinitionService.getCProductCPDefinitions(
+							cpDefinition.getCProductId(),
+							WorkflowConstants.STATUS_DRAFT, QueryUtil.ALL_POS,
+							QueryUtil.ALL_POS)) {
 
 					_cpDefinitionService.updateStatus(
 						cProductCPDefinition.getCPDefinitionId(),
@@ -722,6 +695,12 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 			CPDefinition.class.getName(), contextCompany.getCompanyId(),
 			product.getCustomFields(),
 			contextAcceptLanguage.getPreferredLocale());
+	}
+
+	private Map<String, Serializable> _getExpandoBridgeAttributes(Sku sku) {
+		return CustomFieldsUtil.toMap(
+			CPInstance.class.getName(), contextCompany.getCompanyId(),
+			sku.getCustomFields(), contextAcceptLanguage.getPreferredLocale());
 	}
 
 	private ProductShippingConfiguration _getProductShippingConfiguration(
@@ -902,8 +881,25 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 
 		if (skus != null) {
 			for (Sku sku : skus) {
-				SkuUtil.addOrUpdateCPInstance(
-					_cpInstanceService, sku, cpDefinition, serviceContext);
+				serviceContext.setExpandoBridgeAttributes(
+					_getExpandoBridgeAttributes(sku));
+
+				CPInstance cpInstance = SkuUtil.addOrUpdateCPInstance(
+					_cpInstanceService, sku, cpDefinition,
+					_cpDefinitionOptionRelService,
+					_cpDefinitionOptionValueRelService, serviceContext);
+
+				serviceContext.setExpandoBridgeAttributes(null);
+
+				SkuUtil.updateCommercePriceEntries(
+					_commercePriceEntryLocalService,
+					_commercePriceListLocalService, _configurationProvider,
+					cpInstance,
+					(BigDecimal)GetterUtil.get(
+						sku.getPrice(), cpInstance.getPrice()),
+					(BigDecimal)GetterUtil.get(
+						sku.getPromoPrice(), cpInstance.getPromoPrice()),
+					serviceContext);
 			}
 		}
 
@@ -913,13 +909,8 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 
 		if (images != null) {
 			for (Attachment attachment : images) {
-				Map<String, Serializable> expandoBridgeAttributes =
-					_getExpandoBridgeAttributes(attachment);
-
-				if (expandoBridgeAttributes != null) {
-					serviceContext.setExpandoBridgeAttributes(
-						expandoBridgeAttributes);
-				}
+				serviceContext.setExpandoBridgeAttributes(
+					_getExpandoBridgeAttributes(attachment));
 
 				AttachmentUtil.addOrUpdateCPAttachmentFileEntry(
 					cpDefinition.getGroupId(), _cpAttachmentFileEntryService,
@@ -939,13 +930,8 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 
 		if (attachments != null) {
 			for (Attachment attachment : attachments) {
-				Map<String, Serializable> expandoBridgeAttributes =
-					_getExpandoBridgeAttributes(attachment);
-
-				if (expandoBridgeAttributes != null) {
-					serviceContext.setExpandoBridgeAttributes(
-						expandoBridgeAttributes);
-				}
+				serviceContext.setExpandoBridgeAttributes(
+					_getExpandoBridgeAttributes(attachment));
 
 				AttachmentUtil.addOrUpdateCPAttachmentFileEntry(
 					cpDefinition.getGroupId(), _cpAttachmentFileEntryService,
@@ -973,48 +959,42 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 			_commerceChannelRelService.deleteCommerceChannelRels(
 				CPDefinition.class.getName(), cpDefinition.getCPDefinitionId());
 
-			Stream<ProductChannel> stream = Arrays.stream(productChannels);
+			for (ProductChannel productChannel : productChannels) {
+				if (productChannel.getExternalReferenceCode() == null) {
+					Long commerceChannelId = productChannel.getChannelId();
 
-			List<Long> channelIds = stream.map(
-				productChannel -> {
-					if (productChannel.getExternalReferenceCode() == null) {
-						return productChannel.getChannelId();
+					if (commerceChannelId != null) {
+						_commerceChannelRelService.addCommerceChannelRel(
+							CPDefinition.class.getName(),
+							cpDefinition.getCPDefinitionId(), commerceChannelId,
+							serviceContext);
 					}
 
-					CommerceChannel commerceChannel = null;
-
-					try {
-						commerceChannel =
-							_commerceChannelService.
-								fetchByExternalReferenceCode(
-									productChannel.getExternalReferenceCode(),
-									contextCompany.getCompanyId());
-					}
-					catch (PortalException portalException) {
-						if (_log.isDebugEnabled()) {
-							_log.debug(portalException);
-						}
-					}
-
-					if (commerceChannel == null) {
-						return null;
-					}
-
-					return commerceChannel.getCommerceChannelId();
+					continue;
 				}
-			).collect(
-				Collectors.toList()
-			);
 
-			for (Long commerceChannelId : channelIds) {
-				if (commerceChannelId == null) {
+				CommerceChannel commerceChannel = null;
+
+				try {
+					commerceChannel =
+						_commerceChannelService.fetchByExternalReferenceCode(
+							productChannel.getExternalReferenceCode(),
+							contextCompany.getCompanyId());
+				}
+				catch (PortalException portalException) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(portalException);
+					}
+				}
+
+				if (commerceChannel == null) {
 					continue;
 				}
 
 				_commerceChannelRelService.addCommerceChannelRel(
 					CPDefinition.class.getName(),
-					cpDefinition.getCPDefinitionId(), commerceChannelId,
-					serviceContext);
+					cpDefinition.getCPDefinitionId(),
+					commerceChannel.getCommerceChannelId(), serviceContext);
 			}
 		}
 
@@ -1033,51 +1013,50 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 			_commerceAccountGroupRelService.deleteCommerceAccountGroupRels(
 				CPDefinition.class.getName(), cpDefinition.getCPDefinitionId());
 
-			Stream<ProductAccountGroup> productAccountGroupStream =
-				Arrays.stream(productAccountGroups);
+			for (ProductAccountGroup productAccountGroup :
+					productAccountGroups) {
 
-			List<Long> accountGroupIds = productAccountGroupStream.map(
-				productAccountGroup -> {
-					if (productAccountGroup.getExternalReferenceCode() ==
-							null) {
+				String externalReferenceCode =
+					productAccountGroup.getExternalReferenceCode();
 
-						return productAccountGroup.getAccountGroupId();
+				if (externalReferenceCode == null) {
+					Long accountGroupId =
+						productAccountGroup.getAccountGroupId();
+
+					if (accountGroupId != null) {
+						_commerceAccountGroupRelService.
+							addCommerceAccountGroupRel(
+								CPDefinition.class.getName(),
+								cpDefinition.getCPDefinitionId(),
+								accountGroupId, serviceContext);
 					}
 
-					CommerceAccountGroup commerceAccountGroup = null;
-
-					try {
-						commerceAccountGroup =
-							_commerceAccountGroupService.
-								fetchByExternalReferenceCode(
-									contextCompany.getCompanyId(),
-									productAccountGroup.
-										getExternalReferenceCode());
-					}
-					catch (PortalException portalException) {
-						if (_log.isDebugEnabled()) {
-							_log.debug(portalException);
-						}
-					}
-
-					if (commerceAccountGroup == null) {
-						return null;
-					}
-
-					return commerceAccountGroup.getCommerceAccountGroupId();
+					continue;
 				}
-			).collect(
-				Collectors.toList()
-			);
 
-			for (Long accountGroupId : accountGroupIds) {
-				if (accountGroupId == null) {
+				CommerceAccountGroup commerceAccountGroup = null;
+
+				try {
+					commerceAccountGroup =
+						_commerceAccountGroupService.
+							fetchByExternalReferenceCode(
+								contextCompany.getCompanyId(),
+								productAccountGroup.getExternalReferenceCode());
+				}
+				catch (PortalException portalException) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(portalException);
+					}
+				}
+
+				if (commerceAccountGroup == null) {
 					continue;
 				}
 
 				_commerceAccountGroupRelService.addCommerceAccountGroupRel(
 					CPDefinition.class.getName(),
-					cpDefinition.getCPDefinitionId(), accountGroupId,
+					cpDefinition.getCPDefinitionId(),
+					commerceAccountGroup.getCommerceAccountGroupId(),
 					serviceContext);
 			}
 		}
@@ -1155,20 +1134,20 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 
 		cpDefinition = _getCPDefinition(cpDefinition, serviceContext);
 
-		String[] assetTags = product.getTags();
+		String[] assetTagNames = product.getTags();
 
-		if (product.getTags() == null) {
-			assetTags = _getAssetTags(cpDefinition);
+		if (assetTagNames == null) {
+			assetTagNames = transformToArray(
+				_assetTagService.getTags(
+					cpDefinition.getModelClassName(),
+					cpDefinition.getCPDefinitionId()),
+				AssetTag::getName, String.class);
 		}
 
-		serviceContext.setAssetTagNames(assetTags);
+		serviceContext.setAssetTagNames(assetTagNames);
 
-		Map<String, Serializable> expandoBridgeAttributes =
-			_getExpandoBridgeAttributes(product);
-
-		if (expandoBridgeAttributes != null) {
-			serviceContext.setExpandoBridgeAttributes(expandoBridgeAttributes);
-		}
+		serviceContext.setExpandoBridgeAttributes(
+			_getExpandoBridgeAttributes(product));
 
 		Calendar displayCalendar = CalendarFactoryUtil.getCalendar(
 			serviceContext.getTimeZone());
@@ -1191,16 +1170,9 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 					cpDefinition.getCPDefinitionId()));
 		}
 		else {
-			List<Long> assetCategoryIds = new ArrayList<>();
-
-			for (Category category : categories) {
-				if (category.getId() != null) {
-					assetCategoryIds.add(category.getId());
-				}
-			}
-
 			serviceContext.setAssetCategoryIds(
-				ArrayUtil.toLongArray(assetCategoryIds));
+				transformToLongArray(
+					Arrays.asList(categories), Category::getId));
 		}
 
 		Map<String, String> nameMap = product.getName();
@@ -1316,6 +1288,12 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 
 	@Reference
 	private CommerceChannelService _commerceChannelService;
+
+	@Reference
+	private CommercePriceEntryLocalService _commercePriceEntryLocalService;
+
+	@Reference
+	private CommercePriceListLocalService _commercePriceListLocalService;
 
 	@Reference
 	private ConfigurationProvider _configurationProvider;

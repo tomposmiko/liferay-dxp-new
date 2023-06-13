@@ -25,7 +25,7 @@ import {ResourceName} from '../../../common/services/liferay/object/enum/resourc
 import createMDFRequest from '../../../common/services/liferay/object/mdf-requests/createMDFRequest';
 import updateMDFRequest from '../../../common/services/liferay/object/mdf-requests/updateMDFRequest';
 import {Status} from '../../../common/utils/constants/status';
-import {isLiferayManager} from '../../../common/utils/isLiferayManager';
+import updateStatus from '../../../common/utils/updateStatus';
 import createMDFRequestActivitiesProxyAPI from './createMDFRequestActivitiesProxyAPI';
 import createMDFRequestProxyAPI from './createMDFRequestProxyAPI';
 
@@ -38,31 +38,26 @@ export default async function submitForm(
 ) {
 	formikHelpers.setSubmitting(true);
 
-	if (!values.id) {
-		values.mdfRequestStatus = currentRequestStatus;
-	}
+	const updatedStatus = updateStatus(
+		values.mdfRequestStatus,
+		currentRequestStatus,
+		roles,
+		values.id,
+		values.totalMDFRequestAmount
+	);
 
-	if (
-		roles &&
-		!isLiferayManager(roles) &&
-		values.totalMDFRequestAmount >= 15000 &&
-		values.mdfRequestStatus !== Status.DRAFT
-	) {
-		values.mdfRequestStatus = Status.MARKETING_DIRECTOR_REVIEW;
-	}
+	values.mdfRequestStatus = updatedStatus && updatedStatus;
 
 	let dtoMDFRequest: mdfRequestDTO | undefined = undefined;
 
-	if (
-		Liferay.FeatureFlags['LPS-164528'] &&
-		values.mdfRequestStatus !== Status.DRAFT
-	) {
+	if (values.mdfRequestStatus !== Status.DRAFT) {
 		dtoMDFRequest = await createMDFRequestProxyAPI(values);
 	}
 	else if (values.id) {
 		dtoMDFRequest = await updateMDFRequest(
 			ResourceName.MDF_REQUEST_DXP,
-			values
+			values,
+			values.id
 		);
 	}
 	else {
@@ -74,54 +69,51 @@ export default async function submitForm(
 
 	if (values?.activities?.length && dtoMDFRequest?.id) {
 		const dtoMDFRequestActivities = await Promise.all(
-			values?.activities?.map(async (activity) => {
-				if (
-					Liferay.FeatureFlags['LPS-164528'] &&
-					values.mdfRequestStatus !== Status.DRAFT
-				) {
-					return await createMDFRequestActivitiesProxyAPI(
+			values?.activities?.map((activity) => {
+				if (values.mdfRequestStatus !== Status.DRAFT) {
+					return createMDFRequestActivitiesProxyAPI(
 						activity,
 						values.company,
 						dtoMDFRequest?.id,
-						dtoMDFRequest?.externalReferenceCodeSF
+						dtoMDFRequest?.externalReferenceCode
 					);
 				}
 
 				if (activity.id) {
-					return await updateMDFRequestActivities(
+					return updateMDFRequestActivities(
 						ResourceName.ACTIVITY_DXP,
 						activity,
 						values.company,
 						dtoMDFRequest?.id,
-						dtoMDFRequest?.externalReferenceCodeSF
+						dtoMDFRequest?.externalReferenceCode
 					);
 				}
 
-				return await createMDFRequestActivities(
+				return createMDFRequestActivities(
 					ResourceName.ACTIVITY_DXP,
 					activity,
 					values.company,
 					dtoMDFRequest?.id,
-					dtoMDFRequest?.externalReferenceCodeSF
+					dtoMDFRequest?.externalReferenceCode
 				);
 			})
 		);
 
 		if (dtoMDFRequestActivities?.length) {
 			await Promise.all(
-				values.activities.map(async (activity, index) => {
+				values.activities.map((activity, index) => {
 					const dtoActivity = dtoMDFRequestActivities[index];
 
 					if (activity.budgets?.length && dtoActivity?.id) {
-						activity.budgets?.map(async (budget) => {
+						activity.budgets?.map((budget) => {
 							if (budget?.id) {
-								return await updateMDFRequestActivityBudget(
+								return updateMDFRequestActivityBudget(
 									dtoActivity.id as number,
 									budget
 								);
 							}
 
-							return await createMDFRequestActivityBudget(
+							createMDFRequestActivityBudget(
 								dtoActivity.id as number,
 								budget
 							);

@@ -175,7 +175,7 @@ definition {
 
 			WaitForPageLoad();
 
-			Navigator.gotoNavTab(navTab = "Look and Feel");
+			Navigator.gotoNavTab(navTab = "Design");
 
 			Panel.expandPanel(panel = "Look and Feel");
 
@@ -398,13 +398,15 @@ definition {
 
 			WaitForPageLoad();
 
-			Navigator.gotoNavTab(navTab = "Look and Feel");
+			Navigator.gotoNavTab(navTab = "Design");
 
 			Panel.expandPanel(panel = "Look and Feel");
 
 			PagesAdmin.addThemeCSSExtension(extensionName = "FontFamily");
 
 			PortletEntry.save();
+
+			Navigator.gotoBack();
 		}
 
 		task ("When the site designer adds a widget page") {

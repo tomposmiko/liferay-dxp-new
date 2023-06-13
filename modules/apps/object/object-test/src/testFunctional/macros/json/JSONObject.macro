@@ -198,6 +198,60 @@ definition {
 					}'
 			''';
 		}
+		else if (${fieldBusinessType} == "Formula") {
+			var curl = '''
+				${portalURL}/o/object-admin/v1.0/object-definitions/${objectId}/object-fields \
+					-H 'Content-Type: application/json' \
+					-u ${userEmailAddress}:${userPassword} \
+					-d '{
+						"DBType": "${fieldType}",
+						"businessType": "${fieldBusinessType}",
+						"indexed": ${indexed},
+						"indexedAsKeyword": ${indexedAsKeyword},
+						"label": {
+							"en_US": "${fieldLabelName}"
+						},
+						"listTypeDefinitionId": ${picklistId},
+						"name": "${fieldName}",
+						"objectFieldSettings": [
+							{
+								"name": "output",
+								"value": "${outputOption}"
+							},
+							{
+								"name": "script",
+								"value": "${formulaScript}"
+							}
+						],
+						"required": ${isRequired}
+					}'
+			''';
+		}
+		else if (${fieldBusinessType} == "MultiselectPicklist") {
+			var picklist = JSONObject.getPicklistId(
+				picklistName = ${picklistName},
+				userEmailAddress = ${userEmailAddress},
+				userPassword = ${userPassword});
+
+			var curl = '''
+				${portalURL}/o/object-admin/v1.0/object-definitions/${objectId}/object-fields \
+					-H 'Content-Type: application/json' \
+					-u ${userEmailAddress}:${userPassword} \
+					-d '{
+						"DBType": "${fieldType}",
+						"businessType": "${fieldBusinessType}",
+						"label": {
+							"en_US": "${fieldLabelName}"
+						},
+						"listTypeDefinitionId": ${picklist},
+						"name": "${fieldName}",
+						"objectFieldSettings": [],
+						"required": ${isRequired},
+						"system": false,
+						"type": "String"
+					}'
+			''';
+		}
 		else {
 			var curl = '''
 				${portalURL}/o/object-admin/v1.0/object-definitions/${objectId}/object-fields \
@@ -365,6 +419,8 @@ definition {
 
 	@summary = "This calls the JSON WS API to add a picklist"
 	macro addPicklist {
+		Variables.assertDefined(parameterList = ${picklistName});
+
 		var portalURL = JSONCompany.getPortalURL();
 
 		if (!(isSet(userEmailAddress))) {
@@ -375,11 +431,16 @@ definition {
 			var userPassword = "test";
 		}
 
+		if (!(isSet(externalReferenceCode))) {
+			var externalReferenceCode = "";
+		}
+
 		var curl = '''
 			${portalURL}/o/headless-admin-list-type/v1.0/list-type-definitions \
 				-H 'Content-Type: application/json' \
 				-u ${userEmailAddress}:${userPassword} \
 				-d '{
+					"externalReferenceCode": "${externalReferenceCode}",
 					"name": "${picklistName}",
 					"name_i18n": {
 						"en_US": "${picklistName}"
@@ -501,7 +562,8 @@ definition {
 			objectName = ${objectName},
 			token = ${token},
 			userEmailAddress = ${userEmailAddress},
-			userPassword = ${userPassword});
+			userPassword = ${userPassword},
+			virtualHost = ${virtualHost});
 
 		if (!(isSet(userEmailAddress))) {
 			var userEmailAddress = "test@liferay.com";
@@ -644,6 +706,23 @@ definition {
 		return ${objectDefinitionIdList};
 	}
 
+	@summary = "This macro calls the Headless API to return an object definition"
+	macro getObjectDefinition {
+		Variables.assertDefined(parameterList = ${objectName});
+
+		var portalURL = JSONCompany.getPortalURL();
+		var objectId = JSONObject.getObjectId(objectName = ${objectName});
+
+		var curl = '''
+			${portalURL}/o/object-admin/v1.0/object-definitions/${objectId} \
+				-u test@liferay.com:test
+		''';
+
+		var objectDefinition = JSONCurlUtil.get(${curl});
+
+		return ${objectDefinition};
+	}
+
 	@summary = "Get a objectDefinitionId by name"
 	macro getObjectDefinitionId {
 		Variables.assertDefined(parameterList = ${name});
@@ -727,7 +806,16 @@ definition {
 	}
 
 	macro getObjectId {
-		var portalURL = JSONCompany.getPortalURL();
+		if (isSet(virtualHost)) {
+			if (!(isSet(port))) {
+				var port = 8080;
+			}
+
+			var portalURL = "http://${virtualHost}:${port}";
+		}
+		else {
+			var portalURL = JSONCompany.getPortalURL();
+		}
 
 		if (!(isSet(userEmailAddress))) {
 			var userEmailAddress = "test@liferay.com";
@@ -867,6 +955,33 @@ definition {
 		''';
 
 		JSONCurlUtil.post(${curl});
+	}
+
+	@summary = "This macro calls the Headless API to set the account restriction property to an object definition"
+	macro setAccountRestriction {
+		Variables.assertDefined(parameterList = ${objectName});
+
+		var portalURL = JSONCompany.getPortalURL();
+		var objectId = JSONObject.getObjectId(objectName = ${objectName});
+		var objectDefinition = JSONObject.getObjectDefinition(objectName = ${objectName});
+
+		var accountEntryRestrictedObjectFieldName = JSONUtil.getWithJSONPath(${objectDefinition}, "$..objectFields[?(@.businessType=='Relationship')].name");
+
+		if (${accountEntryRestrictedObjectFieldName} == "") {
+			fail("FAIL. Cannot find relationship between ${objectName} and AccountEntry.");
+		}
+
+		var curl = '''
+			${portalURL}/o/object-admin/v1.0/object-definitions/${objectId} \
+				-H 'Content-Type: application/json' \
+				-u test@liferay.com:test \
+				-d '{
+					"accountEntryRestricted": true,
+					"accountEntryRestrictedObjectFieldName": "${accountEntryRestrictedObjectFieldName}"
+				}'
+		''';
+
+		JSONCurlUtil.patch(${curl});
 	}
 
 }

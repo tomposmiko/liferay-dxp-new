@@ -709,6 +709,44 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			description, type, hidden, false, friendlyURL, serviceContext);
 	}
 
+	public Layout copyLayout(
+			long userId, long groupId, boolean privateLayout,
+			Map<Locale, String> nameMap, boolean hidden, boolean system,
+			boolean copyPermissions, long sourcePlid,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		Layout sourceLayout = layoutLocalService.getLayout(sourcePlid);
+
+		UnicodeProperties sourceUnicodeProperties =
+			sourceLayout.getTypeSettingsProperties();
+
+		Layout targetLayout = layoutLocalService.addLayout(
+			userId, groupId, privateLayout, sourceLayout.getParentLayoutId(),
+			sourceLayout.getClassNameId(), sourceLayout.getClassPK(), nameMap,
+			sourceLayout.getTitleMap(), sourceLayout.getDescriptionMap(),
+			sourceLayout.getKeywordsMap(), sourceLayout.getRobotsMap(),
+			sourceLayout.getType(), sourceUnicodeProperties.toString(), hidden,
+			system, new HashMap<>(), sourceLayout.getMasterLayoutPlid(),
+			serviceContext);
+
+		if (copyPermissions) {
+			_resourceLocalService.deleteResource(
+				targetLayout.getCompanyId(), Layout.class.getName(),
+				ResourceConstants.SCOPE_INDIVIDUAL, targetLayout.getPlid());
+			_resourceLocalService.copyModelResources(
+				sourceLayout.getCompanyId(), Layout.class.getName(),
+				sourceLayout.getPlid(), targetLayout.getPlid());
+		}
+
+		UnicodeProperties targetUnicodeProperties =
+			targetLayout.getTypeSettingsProperties();
+
+		targetUnicodeProperties.put("published", Boolean.FALSE.toString());
+
+		return layoutLocalService.updateLayout(targetLayout);
+	}
+
 	/**
 	 * Deletes the layout, its child layouts, and its associated resources.
 	 *

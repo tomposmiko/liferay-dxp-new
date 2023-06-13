@@ -17,6 +17,7 @@
 <%@ include file="/init.jsp" %>
 
 <%
+boolean copyPermissions = ParamUtil.getBoolean(request, "copyPermissions");
 long sourcePlid = ParamUtil.getLong(request, "sourcePlid");
 
 List<SiteNavigationMenu> autoSiteNavigationMenus = layoutsAdminDisplayContext.getAutoSiteNavigationMenus();
@@ -24,7 +25,7 @@ List<SiteNavigationMenu> autoSiteNavigationMenus = layoutsAdminDisplayContext.ge
 
 <clay:container-fluid>
 	<liferay-frontend:edit-form
-		action="<%= (sourcePlid <= 0) ? layoutsAdminDisplayContext.getAddLayoutURL() : layoutsAdminDisplayContext.getCopyLayoutURL(sourcePlid) %>"
+		action="<%= (sourcePlid <= 0) ? layoutsAdminDisplayContext.getAddLayoutURL() : layoutsAdminDisplayContext.getCopyLayoutActionURL(copyPermissions, sourcePlid) %>"
 		cssClass="add-layout-form"
 		method="post"
 		name="fm"

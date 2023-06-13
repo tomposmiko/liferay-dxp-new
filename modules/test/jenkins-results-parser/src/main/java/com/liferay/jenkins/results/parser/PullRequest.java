@@ -159,6 +159,45 @@ public class PullRequest {
 		_jsonObject.put("state", "closed");
 	}
 
+	public String forward(
+		String commentBody, String consoleURL, String forwardReceiverUsername,
+		String forwardBranchName, String forwardSenderUsername,
+		File gitRepositoryDir) {
+
+		GitWorkingDirectory gitWorkingDirectory =
+			GitWorkingDirectoryFactory.newGitWorkingDirectory(
+				getUpstreamRemoteGitBranchName(),
+				gitRepositoryDir.getAbsolutePath(), getGitRepositoryName());
+
+		LocalGitBranch forwardLocalGitBranch =
+			gitWorkingDirectory.getRebasedLocalGitBranch(
+				forwardBranchName, getSenderBranchName(), getSenderRemoteURL(),
+				getSenderSHA(), getUpstreamRemoteGitBranchName(),
+				getUpstreamBranchSHA());
+
+		RemoteGitBranch forwardRemoteGitBranch =
+			gitWorkingDirectory.pushToRemoteGitRepository(
+				true, forwardLocalGitBranch, forwardLocalGitBranch.getName(),
+				GitUtil.getUserRemoteURL(
+					getGitRepositoryName(), forwardSenderUsername));
+
+		if (forwardRemoteGitBranch == null) {
+			throw new RuntimeException("Unable to push branch to GitHub");
+		}
+
+		try {
+			return gitWorkingDirectory.createPullRequest(
+				commentBody, forwardBranchName, forwardReceiverUsername,
+				forwardSenderUsername, getTitle());
+		}
+		catch (IOException ioException) {
+			ioException.printStackTrace();
+
+			throw new RuntimeException(
+				"Unable to create new pull request", ioException);
+		}
+	}
+
 	public String getCIMergeSHA() {
 		getFileNames();
 
@@ -264,8 +303,8 @@ public class PullRequest {
 
 			String state = jsonObject.getString("state");
 
-			if (!Objects.equals("failure", state) &&
-				!Objects.equals("success", state)) {
+			if (!Objects.equals(state, "failure") &&
+				!Objects.equals(state, "success")) {
 
 				continue;
 			}
@@ -429,7 +468,7 @@ public class PullRequest {
 			String testSuiteName = matcher.group("testSuiteName");
 
 			if (testSuiteNames.contains(testSuiteName) ||
-				!Objects.equals("success", jsonObject.getString("state"))) {
+				!Objects.equals(jsonObject.getString("state"), "success")) {
 
 				continue;
 			}

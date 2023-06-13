@@ -4,10 +4,10 @@ import {UploadedFile} from '../components/FileList/FileList';
 import {TAction, appReducer} from './reducer';
 
 type Categories = {
-	externalReferenceCode: string,
-	id: number,
-	name: string,
-	vocabulary: string
+	externalReferenceCode: string;
+	id: number;
+	name: string;
+	vocabulary: string;
 };
 
 type Specification = {
@@ -27,26 +27,31 @@ export interface InitialStateProps {
 	appLicensePrice: string;
 	appLogo: UploadedFile;
 	appName: string;
-	appNotes: Specification;
+	appNotes: string;
 	appProductId: number;
 	appStorefrontImages: UploadedFile[];
-	appTags: Categories[],
+	appTags: Categories[];
 	appType: Specification;
 	appUsageTermsURL: Specification;
-	appVersion: Specification;
+	appVersion: string;
 	appWorkflowStatusInfo: string;
 	buildZIPFiles: UploadedFile[];
 	catalogId: number;
 	dayTrial: string;
+	optionId: number;
+	optionValuesId: {noOptionId: number; yesOptionId: number};
 	priceModel: string;
+	productOptionId: number;
 	publisherWebsiteURL: Specification;
+	skuTrialId: number;
+	skuVersionId: number;
 	supportURL: Specification;
 }
 
 const initialState = {
 	appBuild: 'upload',
 	appLicense: 'perpetual',
-	appType: {value: 'saas'},
+	appType: {value: 'cloud'},
 	dayTrial: 'no',
 	priceModel: 'paid',
 } as InitialStateProps;

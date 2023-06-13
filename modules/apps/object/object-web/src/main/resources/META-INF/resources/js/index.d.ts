@@ -87,7 +87,6 @@ interface ObjectField {
 	DBType: string;
 	businessType: ObjectFieldBusinessType;
 	defaultValue?: string;
-	enableLocalization: boolean;
 	externalReferenceCode?: string;
 	id: number;
 	indexed: boolean;
@@ -96,6 +95,7 @@ interface ObjectField {
 	label: LocalizedValue<string>;
 	listTypeDefinitionExternalReferenceCode: string;
 	listTypeDefinitionId?: number;
+	localized: boolean;
 	name: string;
 	objectFieldSettings?: ObjectFieldSetting[];
 	relationshipId?: number;
@@ -128,6 +128,7 @@ interface ObjectDefinition {
 	externalReferenceCode: string;
 	id: number;
 	label: LocalizedValue<string>;
+	modifiable?: boolean;
 	name: string;
 	objectActions: [];
 	objectFields: ObjectField[];
@@ -151,16 +152,18 @@ interface ObjectDefinition {
 	titleObjectFieldName: string;
 }
 
+type ObjectFieldSettingValue =
+	| NameValueObject[]
+	| ObjectFieldFilterSetting[]
+	| ObjectFieldPicklistSetting
+	| boolean
+	| number
+	| string;
+
 interface ObjectFieldSetting {
 	name: ObjectFieldSettingName;
 	objectFieldId?: number;
-	value:
-		| string
-		| number
-		| boolean
-		| NameValueObject[]
-		| ObjectFieldFilterSetting[]
-		| ObjectFieldPicklistSetting;
+	value: ObjectFieldSettingValue;
 }
 
 interface ObjectEntry {
@@ -232,6 +235,8 @@ type TFilterOperators = {
 
 type ObjectFieldSettingName =
 	| 'acceptedFileExtensions'
+	| 'defaultValue'
+	| 'defaultValueType'
 	| 'fileSource'
 	| 'filters'
 	| 'function'

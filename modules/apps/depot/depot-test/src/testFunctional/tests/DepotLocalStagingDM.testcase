@@ -296,12 +296,13 @@ definition {
 		BlogsEntry.viewSmallImage(uploadFileName = "Document_1.jpg");
 	}
 
-	@description = "This ensures that image in depot can be removed and republished in AP through widget config manual selection when enabling local staging."
+	@description = "This ensures that image in depot can be removed and republished in AP through widget config manual selection when enabling local staging. Skip the instance for performance improvement."
 	@e2e
 	@priority = 5
 	@refactordone
 	test CanDeleteDMImage {
 		property portal.acceptance = "true";
+		property test.name.skip.portal.instance = "DepotLocalStagingDM#CanDeleteDMImage";
 
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
@@ -372,10 +373,12 @@ definition {
 		Navigator.gotoStagedView();
 	}
 
-	@description = "This ensures that a document in depot can be removed and republished in AP through widget config manual selection when enabling local staging."
+	@description = "This ensures that a document in depot can be removed and republished in AP through widget config manual selection when enabling local staging. Skip the instance for performance improvement."
 	@priority = 5
 	@refactordone
 	test CanDeleteDocument {
+		property test.name.skip.portal.instance = "DepotLocalStagingDM#CanDeleteDocument";
+
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "Document_1.doc",
@@ -453,10 +456,12 @@ definition {
 		AssetPublisherPortlet.viewAssetNotPresentPG(assetTitle = "Document_1.doc");
 	}
 
-	@description = "This ensures that custom field in document from depot can be deleted and republished in the site when enabling local staging."
+	@description = "This ensures that custom field in document from depot can be deleted and republished in the site when enabling local staging. Skip the instance for performance improvement."
 	@priority = 5
 	@refactordone
 	test CanDeleteDocumentWithCustomField {
+		property test.name.skip.portal.instance = "DepotLocalStagingDM#CanDeleteDocumentWithCustomField";
+
 		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
@@ -827,10 +832,12 @@ definition {
 			locator1 = "WCD#WEB_CONTENT_IMAGE");
 	}
 
-	@description = "This ensures that the blog image from a depot can be edited and republished when enabling local staging."
+	@description = "This ensures that the blog image from a depot can be edited and republished when enabling local staging. Skip the instance for performance improvement."
 	@priority = 5
 	@refactordone
 	test CanEditBlogCoverImage {
+		property test.name.skip.portal.instance = "DepotLocalStagingDM#CanEditBlogCoverImage";
+
 		for (var num : list "1,2") {
 			JSONDocument.addFileWithUploadedFile(
 				dmDocumentDescription = "DM Document Description",
@@ -1090,10 +1097,12 @@ definition {
 		BlogsEntry.viewSmallImage(uploadFileName = "Document_2.jpg");
 	}
 
-	@description = "This ensures that an image in depot can be replaced and republished in AP through widget config manual selection when enabling local staging."
+	@description = "This ensures that an image in depot can be replaced and republished in AP through widget config manual selection when enabling local staging. Skip the instance for performance improvement."
 	@priority = 5
 	@refactordone
 	test CanEditDMImage {
+		property test.name.skip.portal.instance = "DepotLocalStagingDM#CanEditDMImage";
+
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "Document_2.jpg",
@@ -1170,11 +1179,12 @@ definition {
 		AssetPublisherPortlet.viewAssetPG(assetTitle = "Document_1.jpg");
 	}
 
-	@description = "This ensures that document in depot can be replaced and republished in AP through widget config manual selection when enabling local staging."
+	@description = "This ensures that document in depot can be replaced and republished in AP through widget config manual selection when enabling local staging. Skip the instance for performance improvement."
 	@priority = 5
 	@refactordone
 	test CanEditDocument {
 		property portal.acceptance = "true";
+		property test.name.skip.portal.instance = "DepotLocalStagingDM#CanEditDocument";
 
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
@@ -1252,10 +1262,12 @@ definition {
 		AssetPublisherPortlet.viewAssetPG(assetTitle = "Document_3.doc");
 	}
 
-	@description = "This ensures that the custom field in document from depot can be edited and republished in the site when enabling local staging."
+	@description = "This ensures that the custom field in document from depot can be edited and republished in the site when enabling local staging. Skip the instance for performance improvement."
 	@priority = 5
 	@refactordone
 	test CanEditDocumentWithCustomField {
+		property test.name.skip.portal.instance = "DepotLocalStagingDM#CanEditDocumentWithCustomField";
+
 		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
@@ -1529,10 +1541,12 @@ definition {
 		OpenGraph.viewPreviewImage(imageName = "Document_2.jpg");
 	}
 
-	@description = "This ensures that the image in depot can be replaced and republished in web content when enabling local staging."
+	@description = "This ensures that the image in depot can be replaced and republished in web content when enabling local staging. Skip the instance for performance improvement."
 	@priority = 5
 	@refactordone
 	test CanEditWCImage {
+		property test.name.skip.portal.instance = "DepotLocalStagingDM#CanEditWCImage";
+
 		for (var num : list "1,2") {
 			JSONDocument.addFileWithUploadedFile(
 				dmDocumentDescription = "DM Document Description",
@@ -1652,7 +1666,7 @@ definition {
 
 		DMDocument.addWithWorkflowCP(
 			dmDocumentDescription = "DM Document Description",
-			dmDocumentFile = "Document_1.doc",
+			dmDocumentFile = "Document_1.jpg",
 			dmDocumentTitle = "DM Document Title");
 
 		DepotNavigator.switchStagingStatus(stagingItem = "Publish to Live");
@@ -2248,10 +2262,12 @@ definition {
 			dmDocumentType = "DM Document Type Depot");
 	}
 
-	@description = "This ensures that a folder with a document in depot can be published in AP through widget config manual selection when enabling local staging."
+	@description = "This ensures that a folder with a document in depot can be published in AP through widget config manual selection when enabling local staging. Skip the instance for performance improvement."
 	@priority = 5
 	@refactordone
 	test CanPublishDocumentFolder {
+		property test.name.skip.portal.instance = "DepotLocalStagingDM#CanPublishDocumentFolder";
+
 		JSONFolder.addFolder(
 			dmFolderDescription = "DM Folder Description",
 			dmFolderName = "DM Folder Name",
@@ -2425,9 +2441,11 @@ definition {
 		DMDocument.viewPG(dmDocumentTitle = "DM Document Title");
 	}
 
-	@description = "This ensures that a document stored in a DM folder of asset library can be edited and republished in DM widget when local staging is enabled."
+	@description = "This ensures that a document stored in a DM folder of asset library can be edited and republished in DM widget when local staging is enabled. Skip the instance for performance improvement."
 	@priority = 4
 	test CanPublishEditedDocumentFromFolderViaWidget {
+		property test.name.skip.portal.instance = "DepotLocalStagingDM#CanPublishEditedDocumentFromFolderViaWidget";
+
 		JSONFolder.addFolder(
 			dmFolderDescription = "DM Folder Description",
 			dmFolderName = "Depot Folder Name",
@@ -2507,9 +2525,11 @@ definition {
 		DMDocument.viewPG(dmDocumentTitle = "Document_2.doc");
 	}
 
-	@description = "This ensures that a document stored in an asset library can be edited and republished in DM widget when local staging is enabled."
+	@description = "This ensures that a document stored in an asset library can be edited and republished in DM widget when local staging is enabled. Skip the instance for performance improvement."
 	@priority = 4
 	test CanPublishEditedDocumentViaWidget {
+		property test.name.skip.portal.instance = "DepotLocalStagingDM#CanPublishEditedDocumentViaWidget";
+
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Description",
 			dmDocumentTitle = "Document_1.doc",
@@ -2578,9 +2598,11 @@ definition {
 		DMDocument.viewPG(dmDocumentTitle = "Document_2.doc");
 	}
 
-	@description = "This ensures that an image stored in a DM folder of asset library can be edited and republished in DM widget when local staging is enabled."
+	@description = "This ensures that an image stored in a DM folder of asset library can be edited and republished in DM widget when local staging is enabled. Skip the instance for performance improvement."
 	@priority = 4
 	test CanPublishEditedImageFromFolderViaWidget {
+		property test.name.skip.portal.instance = "DepotLocalStagingDM#CanPublishEditedImageFromFolderViaWidget";
+
 		JSONFolder.addFolder(
 			dmFolderDescription = "DM Folder Description",
 			dmFolderName = "Depot Folder Name",
@@ -2731,9 +2753,11 @@ definition {
 		DMDocument.viewPG(dmDocumentTitle = "Document_1.png");
 	}
 
-	@description = "This ensures that the folders stored in different asset libraries can be changed and republished in DM widget when local staging is enabled."
+	@description = "This ensures that the folders stored in different asset libraries can be changed and republished in DM widget when local staging is enabled. Skip the instance for performance improvement."
 	@priority = 4
 	test CanPublishImageAfterChangingDepot {
+		property test.name.skip.portal.instance = "DepotLocalStagingDM#CanPublishImageAfterChangingDepot";
+
 		JSONDepot.addDepot(
 			depotDescription = "This is the description of a depot",
 			depotName = "Test Depot Name 2");
@@ -3007,10 +3031,12 @@ definition {
 		DMDocument.viewPG(dmDocumentTitle = "DM Document Title");
 	}
 
-	@description = "This ensures that an image with custom field in depot can be published in staging site when enabling local staging."
+	@description = "This ensures that an image with custom field in depot can be published in staging site when enabling local staging. Skip the instance for performance improvement."
 	@priority = 5
 	@refactordone
 	test CanPublishImageWithCustomField {
+		property test.name.skip.portal.instance = "DepotLocalStagingDM#CanPublishImageWithCustomField";
+
 		ApplicationsMenu.gotoPortlet(
 			category = "Configuration",
 			panel = "Control Panel",
@@ -3068,10 +3094,12 @@ definition {
 		AssetPublisherPortlet.viewAssetPG(assetTitle = "Document_2.jpg");
 	}
 
-	@description = "This ensures that the latest version of an image in a depot can be published in local staging site."
+	@description = "This ensures that the latest version of an image in a depot can be published in local staging site. Skip the instance for performance improvement."
 	@priority = 5
 	@refactordone
 	test CanPublishImageWithLatestVersion {
+		property test.name.skip.portal.instance = "DepotLocalStagingDM#CanPublishImageWithLatestVersion";
+
 		JSONDocument.addFileWithUploadedFile(
 			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "Document_2.jpg",
@@ -3220,10 +3248,12 @@ definition {
 		BlogsEntry.viewCoverImage(uploadFileName = "Document_2.jpg");
 	}
 
-	@description = "This ensures that the thumbnail of a video shortcut in depot can be published through AP when enabling local staging."
+	@description = "This ensures that the thumbnail of a video shortcut in depot can be published through AP when enabling local staging. Skip the instance for performance improvement."
 	@priority = 3
 	@refactordone
 	test CanPublishVideoShortcutThumbnail {
+		property test.name.skip.portal.instance = "DepotLocalStagingDM#CanPublishVideoShortcutThumbnail";
+
 		DepotNavigator.openDepotDocumentsAndMediaAdminStaging(depotName = "Test Depot Name");
 
 		VideoShortcut.addCP(

@@ -21,10 +21,11 @@ import com.liferay.object.action.engine.ObjectActionEngine;
 import com.liferay.object.action.executor.ObjectActionExecutor;
 import com.liferay.object.action.executor.ObjectActionExecutorRegistry;
 import com.liferay.object.constants.ObjectActionConstants;
+import com.liferay.object.entry.util.ObjectEntryThreadLocal;
 import com.liferay.object.internal.action.util.ObjectActionThreadLocal;
 import com.liferay.object.internal.action.util.ObjectEntryVariablesUtil;
+import com.liferay.object.internal.dynamic.data.mapping.expression.ObjectEntryDDMExpressionFieldAccessor;
 import com.liferay.object.internal.dynamic.data.mapping.expression.ObjectEntryDDMExpressionParameterAccessor;
-import com.liferay.object.internal.entry.util.ObjectEntryThreadLocal;
 import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectActionLocalService;
@@ -77,7 +78,7 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 
 			_executeObjectAction(
 				objectAction, objectDefinition, payloadJSONObject, userId,
-				ObjectEntryVariablesUtil.getActionVariables(
+				ObjectEntryVariablesUtil.getVariables(
 					_dtoConverterRegistry, objectDefinition, payloadJSONObject,
 					_systemObjectDefinitionMetadataRegistry));
 		}
@@ -122,7 +123,7 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 			_updatePayloadJSONObject(objectDefinition, payloadJSONObject, user);
 
 			Map<String, Object> variables =
-				ObjectEntryVariablesUtil.getActionVariables(
+				ObjectEntryVariablesUtil.getVariables(
 					_dtoConverterRegistry, objectDefinition, payloadJSONObject,
 					_systemObjectDefinitionMetadataRegistry);
 
@@ -160,6 +161,9 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 			_ddmExpressionFactory.createExpression(
 				CreateExpressionRequest.Builder.newBuilder(
 					conditionExpression
+				).withDDMExpressionFieldAccessor(
+					new ObjectEntryDDMExpressionFieldAccessor(
+						(Map<String, Object>)variables.get("baseModel"))
 				).withDDMExpressionParameterAccessor(
 					new ObjectEntryDDMExpressionParameterAccessor(
 						(Map<String, Object>)variables.get("originalBaseModel"))

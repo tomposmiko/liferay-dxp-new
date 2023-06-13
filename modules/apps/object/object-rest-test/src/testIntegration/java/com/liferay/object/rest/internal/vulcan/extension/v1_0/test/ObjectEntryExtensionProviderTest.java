@@ -120,7 +120,7 @@ public class ObjectEntryExtensionProviderTest {
 
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
-				TestPropsValues.getUserId(), false,
+				TestPropsValues.getUserId(), false, false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				"A" + RandomTestUtil.randomString(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -190,10 +190,10 @@ public class ObjectEntryExtensionProviderTest {
 
 		_objectFieldLocalService.addCustomObjectField(
 			null, TestPropsValues.getUserId(), 0, objectDefinitionId,
-			businessType, dbType, null, RandomTestUtil.randomBoolean(),
+			businessType, dbType, RandomTestUtil.randomBoolean(),
 			RandomTestUtil.randomBoolean(), null,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
-			name, required, false, Collections.emptyList());
+			false, name, required, false, Collections.emptyList());
 	}
 
 	private void _assertPropertyDefinition(

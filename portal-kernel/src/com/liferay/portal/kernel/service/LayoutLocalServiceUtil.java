@@ -378,6 +378,18 @@ public class LayoutLocalServiceUtil {
 			description, type, hidden, friendlyURL, serviceContext);
 	}
 
+	public static Layout copyLayout(
+			long userId, long groupId, boolean privateLayout,
+			Map<java.util.Locale, String> nameMap, boolean hidden,
+			boolean system, boolean copyPermissions, long sourcePlid,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		return getService().copyLayout(
+			userId, groupId, privateLayout, nameMap, hidden, system,
+			copyPermissions, sourcePlid, serviceContext);
+	}
+
 	/**
 	 * Creates a new layout with the primary key. Does not add the layout to the database.
 	 *

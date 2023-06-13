@@ -21,6 +21,7 @@ import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
 import com.liferay.document.library.kernel.model.DLFileEntryType;
 import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalServiceUtil;
+import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -47,9 +48,8 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -102,30 +102,26 @@ public class ContentDashboardSearchContextBuilder {
 
 		if (!ArrayUtil.isEmpty(contentDashboardItemSubtypePayloads)) {
 			searchContext.setClassTypeIds(
-				Stream.of(
-					contentDashboardItemSubtypePayloads
-				).map(
+				TransformUtil.transformToLongArray(
+					Arrays.asList(contentDashboardItemSubtypePayloads),
 					contentDashboardItemSubtypePayload -> {
 						try {
-							return Optional.of(
+							JSONObject jsonObject =
 								JSONFactoryUtil.createJSONObject(
-									contentDashboardItemSubtypePayload));
+									contentDashboardItemSubtypePayload);
+
+							if (jsonObject.isNull("classPK")) {
+								return null;
+							}
+
+							return jsonObject.getLong("classPK");
 						}
 						catch (JSONException jsonException) {
 							_log.error(jsonException);
 
-							return Optional.<JSONObject>empty();
+							return null;
 						}
-					}
-				).filter(
-					Optional::isPresent
-				).map(
-					Optional::get
-				).filter(
-					jsonObject -> !jsonObject.isNull("classPK")
-				).mapToLong(
-					jsonObject -> jsonObject.getLong("classPK")
-				).toArray());
+					}));
 		}
 
 		if (_end != null) {
@@ -134,32 +130,30 @@ public class ContentDashboardSearchContextBuilder {
 
 		if (!ArrayUtil.isEmpty(contentDashboardItemSubtypePayloads)) {
 			searchContext.setEntryClassNames(
-				Stream.of(
-					contentDashboardItemSubtypePayloads
-				).map(
+				TransformUtil.transform(
+					contentDashboardItemSubtypePayloads,
 					contentDashboardItemSubtypePayload -> {
 						try {
-							return Optional.of(
+							JSONObject jsonObject =
 								JSONFactoryUtil.createJSONObject(
-									contentDashboardItemSubtypePayload));
+									contentDashboardItemSubtypePayload);
+
+							String entryClassName = jsonObject.getString(
+								Field.ENTRY_CLASS_NAME);
+
+							if (Validator.isNull(entryClassName)) {
+								return null;
+							}
+
+							return entryClassName;
 						}
 						catch (JSONException jsonException) {
 							_log.error(jsonException);
 
-							return Optional.<JSONObject>empty();
+							return null;
 						}
-					}
-				).filter(
-					Optional::isPresent
-				).map(
-					Optional::get
-				).map(
-					jsonObject -> jsonObject.getString(Field.ENTRY_CLASS_NAME)
-				).filter(
-					Validator::isNotNull
-				).toArray(
-					String[]::new
-				));
+					},
+					String.class));
 		}
 
 		long groupId = ParamUtil.getLong(_httpServletRequest, "scopeId");
@@ -203,7 +197,7 @@ public class ContentDashboardSearchContextBuilder {
 		return this;
 	}
 
-	private Optional<Filter> _getAssetCategoryIdsFilterOptional(
+	private Filter _getAssetCategoryIdsFilter(
 		AssetCategoryIds assetCategoryIds) {
 
 		if ((assetCategoryIds == null) ||
@@ -212,7 +206,7 @@ public class ContentDashboardSearchContextBuilder {
 			 ArrayUtil.isEmpty(
 				 assetCategoryIds.getInternalAssetCategoryIds()))) {
 
-			return Optional.empty();
+			return null;
 		}
 
 		BooleanFilter booleanFilter = new BooleanFilter();
@@ -237,14 +231,12 @@ public class ContentDashboardSearchContextBuilder {
 				BooleanClauseOccur.MUST);
 		}
 
-		return Optional.of(booleanFilter);
+		return booleanFilter;
 	}
 
-	private Optional<Filter> _getAssetTagNamesFilterOptional(
-		String[] assetTagNames) {
-
+	private Filter _getAssetTagNamesFilter(String[] assetTagNames) {
 		if (ArrayUtil.isEmpty(assetTagNames)) {
-			return Optional.empty();
+			return null;
 		}
 
 		BooleanFilter booleanFilter = new BooleanFilter();
@@ -255,12 +247,12 @@ public class ContentDashboardSearchContextBuilder {
 				BooleanClauseOccur.MUST);
 		}
 
-		return Optional.of(booleanFilter);
+		return booleanFilter;
 	}
 
-	private Optional<Filter> _getAuthorIdsFilterOptional(long[] authorIds) {
+	private Filter _getAuthorIdsFilter(long[] authorIds) {
 		if (ArrayUtil.isEmpty(authorIds)) {
-			return Optional.empty();
+			return null;
 		}
 
 		TermsFilter termsFilter = new TermsFilter(Field.USER_ID);
@@ -269,7 +261,7 @@ public class ContentDashboardSearchContextBuilder {
 			termsFilter.addValue(String.valueOf(authorId));
 		}
 
-		return Optional.of(termsFilter);
+		return termsFilter;
 	}
 
 	private BooleanClause[] _getBooleanClauses(
@@ -280,16 +272,18 @@ public class ContentDashboardSearchContextBuilder {
 
 		BooleanFilter booleanFilter = new BooleanFilter();
 
-		Stream.of(
-			_getAssetCategoryIdsFilterOptional(assetCategoryIds),
-			_getAssetTagNamesFilterOptional(assetTagNames),
-			_getAuthorIdsFilterOptional(authorIds),
-			_getFileExtensionsFilterOptional(fileExtensions),
-			_getGoogleDriveShortcutFilterOptional(companyId)
-		).forEach(
-			filterOptional -> filterOptional.map(
-				filter -> booleanFilter.add(filter, BooleanClauseOccur.MUST))
-		);
+		for (Filter filter :
+				Arrays.asList(
+					_getAssetCategoryIdsFilter(assetCategoryIds),
+					_getAssetTagNamesFilter(assetTagNames),
+					_getAuthorIdsFilter(authorIds),
+					_getFileExtensionsFilter(fileExtensions),
+					_getGoogleDriveShortcutFilter(companyId))) {
+
+			if (filter != null) {
+				booleanFilter.add(filter, BooleanClauseOccur.MUST);
+			}
+		}
 
 		booleanQueryImpl.setPreBooleanFilter(booleanFilter);
 
@@ -299,11 +293,9 @@ public class ContentDashboardSearchContextBuilder {
 		};
 	}
 
-	private Optional<Filter> _getFileExtensionsFilterOptional(
-		String[] fileExtensions) {
-
+	private Filter _getFileExtensionsFilter(String[] fileExtensions) {
 		if (ArrayUtil.isEmpty(fileExtensions)) {
-			return Optional.empty();
+			return null;
 		}
 
 		TermsFilter termsFilter = new TermsFilter("fileExtension");
@@ -312,12 +304,10 @@ public class ContentDashboardSearchContextBuilder {
 			termsFilter.addValue(fileExtension);
 		}
 
-		return Optional.of(termsFilter);
+		return termsFilter;
 	}
 
-	private Optional<Filter> _getGoogleDriveShortcutFilterOptional(
-		long companyId) {
-
+	private Filter _getGoogleDriveShortcutFilter(long companyId) {
 		try {
 			Company company = CompanyLocalServiceUtil.getCompany(companyId);
 
@@ -326,7 +316,7 @@ public class ContentDashboardSearchContextBuilder {
 					company.getGroupId(), "GOOGLE_DOCS");
 
 			if (googleDocsDLFileEntryType == null) {
-				return Optional.empty();
+				return null;
 			}
 
 			BooleanFilter booleanFilter = new BooleanFilter();
@@ -336,13 +326,13 @@ public class ContentDashboardSearchContextBuilder {
 				String.valueOf(googleDocsDLFileEntryType.getFileEntryTypeId()),
 				BooleanClauseOccur.MUST_NOT);
 
-			return Optional.of(booleanFilter);
+			return booleanFilter;
 		}
 		catch (PortalException portalException) {
 			_log.error(portalException);
 		}
 
-		return Optional.empty();
+		return null;
 	}
 
 	private BooleanFilter _getTermsFilter(String field, long[] values) {

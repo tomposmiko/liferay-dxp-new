@@ -14,6 +14,9 @@
 
 package com.liferay.frontend.data.set.sample.web.internal.view;
 
+import com.liferay.client.extension.constants.ClientExtensionEntryConstants;
+import com.liferay.client.extension.type.FDSCellRendererCET;
+import com.liferay.client.extension.type.manager.CETManager;
 import com.liferay.frontend.data.set.sample.web.internal.constants.FDSSampleFDSNames;
 import com.liferay.frontend.data.set.view.FDSView;
 import com.liferay.frontend.data.set.view.table.BaseTableFDSView;
@@ -21,8 +24,13 @@ import com.liferay.frontend.data.set.view.table.FDSTableSchema;
 import com.liferay.frontend.data.set.view.table.FDSTableSchemaBuilder;
 import com.liferay.frontend.data.set.view.table.FDSTableSchemaBuilderFactory;
 import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolver;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.vulcan.pagination.Pagination;
 
+import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -45,7 +53,13 @@ public class CustomizedTableFDSView extends BaseTableFDSView {
 
 		return fdsTableSchemaBuilder.add(
 			"id", "id",
-			fdsTableSchemaField -> fdsTableSchemaField.setSortable(true)
+			fdsTableSchemaField -> fdsTableSchemaField.setActionId(
+				"sampleEditMessage"
+			).setContentRenderer(
+				"actionLink"
+			).setSortable(
+				true
+			)
 		).add(
 			"title", "title",
 			fdsTableSchemaField -> fdsTableSchemaField.setSortable(true)
@@ -60,9 +74,51 @@ public class CustomizedTableFDSView extends BaseTableFDSView {
 		).add(
 			"color", "color",
 			fdsTableSchemaField -> {
-				String moduleName = _npmResolver.resolveModuleName(
-					"@liferay/frontend-data-set-sample-web/js" +
-						"/GreenCheckDataRenderer");
+				String moduleName = null;
+
+				List<FDSCellRendererCET> fdsCellRendererCETs =
+					(List)_cetManager.getCETs(
+						CompanyThreadLocal.getCompanyId(), null,
+						ClientExtensionEntryConstants.TYPE_FDS_CELL_RENDERER,
+						Pagination.of(QueryUtil.ALL_POS, QueryUtil.ALL_POS),
+						null);
+
+				// Use the UI client extension if available
+
+				for (FDSCellRendererCET fdsCellRendererCET :
+						fdsCellRendererCETs) {
+
+					if (!fdsCellRendererCET.isReadOnly()) {
+						moduleName =
+							"default from " + fdsCellRendererCET.getURL();
+
+						break;
+					}
+				}
+
+				// Use the workspace client extension if available
+
+				if (moduleName == null) {
+					for (FDSCellRendererCET fdsCellRendererCET :
+							fdsCellRendererCETs) {
+
+						if (Objects.equals(
+								fdsCellRendererCET.getExternalReferenceCode(),
+								"LXC:liferay-sample-fds-cell-renderer")) {
+
+							moduleName =
+								"default from " + fdsCellRendererCET.getURL();
+						}
+					}
+				}
+
+				// Use the built-in AMD provided sample as a last resort
+
+				if (moduleName == null) {
+					moduleName = _npmResolver.resolveModuleName(
+						"@liferay/frontend-data-set-sample-web/js" +
+							"/GreenCheckDataRenderer");
+				}
 
 				fdsTableSchemaField.setContentRendererModuleURL(moduleName);
 			}
@@ -89,6 +145,9 @@ public class CustomizedTableFDSView extends BaseTableFDSView {
 	public boolean isQuickActionsEnabled() {
 		return true;
 	}
+
+	@Reference
+	private CETManager _cetManager;
 
 	@Reference
 	private FDSTableSchemaBuilderFactory _fdsTableSchemaBuilderFactory;

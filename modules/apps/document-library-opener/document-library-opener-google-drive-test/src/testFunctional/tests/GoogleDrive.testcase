@@ -783,26 +783,28 @@ definition {
 			userPassword = PropsUtil.get("email.password.2"),
 			windowTitle = "Documents and Media Page - Liferay");
 
+		GoogleDoc.editTitleInGoogleDoc(dmDocumentTitle = "Google Slide");
+
 		GoogleDoc.saveAndExit();
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
 
-		DMNavigator.gotoEditDocumentPG(dmDocumentTitle = "Untitled");
+		DMNavigator.gotoEditDocumentPG(dmDocumentTitle = "Google Slide");
 
 		AssertTextEquals(
 			key_fieldLabel = "Title",
 			locator1 = "TextInput#GENERIC_TEXT_INPUT",
-			value1 = "Untitled");
+			value1 = "Google Slide");
 
 		AssertTextEquals(
 			key_fieldLabel = "File Name",
 			locator1 = "TextInput#GENERIC_TEXT_INPUT",
-			value1 = "Untitled.pptx");
+			value1 = "Google Slide.pptx");
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
 
 		GoogleDoc.gotoEdit(
-			dmDocumentTitle = "Untitled",
+			dmDocumentTitle = "Google Slide",
 			dmDocumentTypeName = "Google Slides");
 
 		GoogleDoc.editTitleInGoogleDoc(dmDocumentTitle = "Edited Google Slide");

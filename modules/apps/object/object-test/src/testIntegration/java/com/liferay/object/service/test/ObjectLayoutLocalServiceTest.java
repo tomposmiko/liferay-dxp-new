@@ -393,7 +393,7 @@ public class ObjectLayoutLocalServiceTest {
 		List<ScreenNavigationCategory> screenNavigationCategories =
 			_screenNavigationRegistry.getScreenNavigationCategories(
 				_objectDefinition.getClassName(), TestPropsValues.getUser(),
-				ObjectLayoutTab.class);
+				null);
 
 		Assert.assertTrue(screenNavigationCategories.isEmpty());
 
@@ -408,7 +408,7 @@ public class ObjectLayoutLocalServiceTest {
 		screenNavigationCategories =
 			_screenNavigationRegistry.getScreenNavigationCategories(
 				_objectDefinition.getClassName(), TestPropsValues.getUser(),
-				ObjectLayoutTab.class);
+				null);
 
 		Assert.assertEquals(
 			screenNavigationCategories.toString(), 1,
@@ -419,7 +419,7 @@ public class ObjectLayoutLocalServiceTest {
 		screenNavigationCategories =
 			_screenNavigationRegistry.getScreenNavigationCategories(
 				_objectDefinition.getClassName(), TestPropsValues.getUser(),
-				ObjectLayoutTab.class);
+				null);
 
 		Assert.assertEquals(
 			screenNavigationCategories.toString(), 1,
@@ -432,7 +432,7 @@ public class ObjectLayoutLocalServiceTest {
 		screenNavigationCategories =
 			_screenNavigationRegistry.getScreenNavigationCategories(
 				_objectDefinition.getClassName(), TestPropsValues.getUser(),
-				ObjectLayoutTab.class);
+				null);
 
 		Assert.assertTrue(screenNavigationCategories.isEmpty());
 	}
@@ -444,9 +444,9 @@ public class ObjectLayoutLocalServiceTest {
 			null, TestPropsValues.getUserId(), 0,
 			_objectDefinition.getObjectDefinitionId(),
 			ObjectFieldConstants.BUSINESS_TYPE_TEXT,
-			ObjectFieldConstants.DB_TYPE_STRING, null, false, false, null,
-			LocalizedMapUtil.getLocalizedMap(name), StringUtil.randomId(), true,
-			false, Collections.emptyList());
+			ObjectFieldConstants.DB_TYPE_STRING, false, false, null,
+			LocalizedMapUtil.getLocalizedMap(name), false,
+			StringUtil.randomId(), true, false, Collections.emptyList());
 
 		return objectField.getObjectFieldId();
 	}

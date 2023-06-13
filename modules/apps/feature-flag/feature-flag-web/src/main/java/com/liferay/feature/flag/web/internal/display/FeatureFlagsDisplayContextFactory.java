@@ -89,7 +89,7 @@ public class FeatureFlagsDisplayContextFactory {
 				portletRequest,
 				PortletURLUtil.getCurrent(
 					liferayPortletRequest, liferayPortletResponse),
-				null, "no-feature-flags-found");
+				null, "no-feature-flags-were-found");
 
 		searchContainer.setId("accountEntryAccountGroupsSearchContainer");
 		searchContainer.setOrderByCol(
@@ -138,7 +138,7 @@ public class FeatureFlagsDisplayContextFactory {
 		Comparator<FeatureFlagDisplay> comparator = Comparator.comparing(
 			FeatureFlagDisplay::getTitle);
 
-		if (Objects.equals("desc", searchContainer.getOrderByType())) {
+		if (Objects.equals(searchContainer.getOrderByType(), "desc")) {
 			comparator = comparator.reversed();
 		}
 

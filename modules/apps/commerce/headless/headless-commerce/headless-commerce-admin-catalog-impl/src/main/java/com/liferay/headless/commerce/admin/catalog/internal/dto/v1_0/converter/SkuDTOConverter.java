@@ -15,12 +15,17 @@
 package com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.converter;
 
 import com.liferay.commerce.product.model.CPDefinition;
+import com.liferay.commerce.product.model.CPDefinitionOptionRel;
+import com.liferay.commerce.product.model.CPDefinitionOptionValueRel;
 import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.model.CPInstanceOptionValueRel;
+import com.liferay.commerce.product.service.CPDefinitionOptionRelLocalService;
+import com.liferay.commerce.product.service.CPDefinitionOptionValueRelLocalService;
 import com.liferay.commerce.product.service.CPInstanceService;
 import com.liferay.commerce.product.util.CPInstanceHelper;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.Sku;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.SkuOption;
+import com.liferay.headless.commerce.admin.catalog.internal.dto.v1_0.util.CustomFieldsUtil;
 import com.liferay.headless.commerce.core.util.LanguageUtils;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
@@ -59,6 +64,10 @@ public class SkuDTOConverter implements DTOConverter<CPInstance, Sku> {
 		return new Sku() {
 			{
 				cost = cpInstance.getCost();
+				customFields = CustomFieldsUtil.toCustomFields(
+					dtoConverterContext.isAcceptAllLanguages(),
+					CPInstance.class.getName(), cpInstance.getCPInstanceId(),
+					cpInstance.getCompanyId(), dtoConverterContext.getLocale());
 				depth = cpInstance.getDepth();
 				discontinued = cpInstance.isDiscontinued();
 				discontinuedDate = cpInstance.getDiscontinuedDate();
@@ -111,14 +120,29 @@ public class SkuDTOConverter implements DTOConverter<CPInstance, Sku> {
 						for (CPInstanceOptionValueRel cpInstanceOptionValueRel :
 								cpInstanceOptionValueRels) {
 
+							CPDefinitionOptionRel cpDefinitionOptionRel =
+								_cpDefinitionOptionRelLocalService.
+									getCPDefinitionOptionRel(
+										cpInstanceOptionValueRel.
+											getCPDefinitionOptionRelId());
+
+							CPDefinitionOptionValueRel
+								cpDefinitionOptionValueRel =
+									_cpDefinitionOptionValueRelLocalService.
+										getCPDefinitionOptionValueRel(
+											cpInstanceOptionValueRel.
+												getCPDefinitionOptionValueRelId());
+
 							SkuOption skuOption = new SkuOption() {
 								{
-									key =
-										cpInstanceOptionValueRel.
+									key = cpDefinitionOptionRel.getKey();
+									optionId =
+										cpDefinitionOptionRel.
 											getCPDefinitionOptionRelId();
-									value =
-										cpInstanceOptionValueRel.
+									optionValueId =
+										cpDefinitionOptionValueRel.
 											getCPDefinitionOptionValueRelId();
+									value = cpDefinitionOptionValueRel.getKey();
 								}
 							};
 
@@ -130,6 +154,14 @@ public class SkuDTOConverter implements DTOConverter<CPInstance, Sku> {
 			}
 		};
 	}
+
+	@Reference
+	private CPDefinitionOptionRelLocalService
+		_cpDefinitionOptionRelLocalService;
+
+	@Reference
+	private CPDefinitionOptionValueRelLocalService
+		_cpDefinitionOptionValueRelLocalService;
 
 	@Reference
 	private CPInstanceHelper _cpInstanceHelper;

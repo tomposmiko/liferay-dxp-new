@@ -2,11 +2,24 @@ import {Header} from '../../components/Header/Header';
 import {Input} from '../../components/Input/Input';
 import {NewAppPageFooterButtons} from '../../components/NewAppPageFooterButtons/NewAppPageFooterButtons';
 import {Section} from '../../components/Section/Section';
+import {getCompanyId} from '../../liferay/constants';
 import {useAppContext} from '../../manage-app-state/AppManageState';
 import {TYPES} from '../../manage-app-state/actionTypes';
-import {saveSpecification} from '../../utils/util';
+import {
+	addSkuExpandoValue,
+	createAppSKU,
+	getOptions,
+	getProductSKU,
+	postOptionValue,
+	postTrialOption,
+	postTrialProductOption,
+} from '../../utils/api';
 
 import './ProvideVersionDetailsPage.scss';
+
+import {useEffect} from 'react';
+
+import {createSkuName} from '../../utils/util';
 
 interface ProvideVersionDetailsPageProps {
 	onClickBack: () => void;
@@ -17,14 +30,76 @@ export function ProvideVersionDetailsPage({
 	onClickBack,
 	onClickContinue,
 }: ProvideVersionDetailsPageProps) {
-	const [{appId, appNotes, appProductId, appVersion}, dispatch] =
-		useAppContext();
+	const [
+		{
+			appNotes,
+			appProductId,
+			appVersion,
+			optionId,
+			optionValuesId,
+			productOptionId,
+		},
+		dispatch,
+	] = useAppContext();
+
+	// useEffect(() => {
+	// 	if (!productOptionId) {
+	// 		const makeFetch = async () => {
+	// 			let newOptionId: number;
+	// 			const options = await getOptions();
+
+	// 			const trialOption = options.find(({key}) => key === 'trial');
+
+	// 			if (!optionId && !trialOption) {
+	// 				newOptionId = await postTrialOption();
+	// 			}
+	// 			else {
+	// 				newOptionId = optionId ?? trialOption!.id;
+	// 			}
+
+	// 			dispatch({
+	// 				payload: {value: newOptionId},
+	// 				type: TYPES.UPDATE_OPTION_ID,
+	// 			});
+
+	// 			const newProductOptionId = await postTrialProductOption(
+	// 				newOptionId,
+	// 				appProductId
+	// 			);
+
+	// 			dispatch({
+	// 				payload: {value: newProductOptionId},
+	// 				type: TYPES.UPDATE_PRODUCT_OPTION_ID,
+	// 			});
+
+	// 			const noOptionId = await postOptionValue(
+	// 				'no',
+	// 				'No',
+	// 				newProductOptionId,
+	// 				0
+	// 			);
+	// 			const yesOptionId = await postOptionValue(
+	// 				'yes',
+	// 				'Yes',
+	// 				newProductOptionId,
+	// 				1
+	// 			);
+
+	// 			dispatch({
+	// 				payload: {noOptionId, yesOptionId},
+	// 				type: TYPES.UPDATE_PRODUCT_OPTION_VALUES_ID,
+	// 			});
+	// 		};
+
+	// 		makeFetch();
+	// 	}
+	// }, []);
 
 	return (
 		<div className="provide-version-details-page-container">
 			<div className="provide-version-details-page-header">
 				<Header
-					description="Define version information for your app. This will inform users about this version’s updates on the storefront."
+					description="Define version information for your app. This will inform users about this version's updates on the storefront."
 					title="Provide version details"
 				/>
 			</div>
@@ -39,14 +114,14 @@ export function ProvideVersionDetailsPage({
 					label="Version"
 					onChange={({target}) =>
 						dispatch({
-							payload: {id: appVersion?.id, value: target.value},
+							payload: {value: target.value},
 							type: TYPES.UPDATE_APP_VERSION,
 						})
 					}
 					placeholder="0.0.0"
 					required
 					tooltip="version"
-					value={appVersion?.value}
+					value={appVersion}
 				/>
 
 				<Input
@@ -55,14 +130,14 @@ export function ProvideVersionDetailsPage({
 					localized
 					onChange={({target}) =>
 						dispatch({
-							payload: {id: appNotes?.id, value: target.value},
+							payload: {value: target.value},
 							type: TYPES.UPDATE_APP_NOTES,
 						})
 					}
 					placeholder="Enter app description"
 					required
 					tooltip="notes"
-					value={appNotes?.value}
+					value={appNotes}
 				/>
 			</Section>
 
@@ -70,58 +145,53 @@ export function ProvideVersionDetailsPage({
 				disableContinueButton={!appVersion || !appNotes}
 				onClickBack={() => onClickBack()}
 				onClickContinue={async () => {
-					const versionSpecificationId = await saveSpecification(
-						appId,
-						appProductId,
-						appVersion?.id,
-						'version',
-						'Version',
-						appVersion?.value
+					const skuResponse = await getProductSKU({appProductId});
+
+					const versionSku = skuResponse.items.find(
+						({sku}) =>
+							sku === createSkuName(appProductId, appVersion)
 					);
 
-					if (versionSpecificationId !== -1) {
-						dispatch({
-							payload: {
-								id: versionSpecificationId,
-								value: appVersion.value,
-							},
-							type: TYPES.UPDATE_APP_VERSION,
-						});
+					let id;
+
+					if (versionSku) {
+						id = versionSku.id;
 					}
 					else {
+						const response = await createAppSKU({
+							appProductId,
+							body: {
+								sku: createSkuName(appProductId, appVersion),
+								published: true,
+								purchasable: true,
+
+								// skuOptions: [
+								// 	{
+								// 		key: productOptionId,
+								// 		value: optionValuesId.noOptionId,
+								// 	},
+								// ],
+
+							},
+						});
+
+						id = response.id;
+
 						dispatch({
 							payload: {
-								id: appVersion?.id,
-								value: appVersion.value,
+								value: response.id,
 							},
-							type: TYPES.UPDATE_APP_VERSION,
+							type: TYPES.UPDATE_SKU_VERSION_ID,
 						});
 					}
 
-					const noteSpecificationId = await saveSpecification(
-						appId,
-						appProductId,
-						appNotes?.id,
-						'notes',
-						'Notes',
-						appNotes?.value
-					);
+					addSkuExpandoValue({
+						companyId: parseInt(getCompanyId()),
+						notesValue: appNotes,
+						skuId: id,
+						versionValue: appVersion,
+					});
 
-					if (noteSpecificationId !== -1) {
-						dispatch({
-							payload: {
-								id: noteSpecificationId,
-								value: appNotes.value,
-							},
-							type: TYPES.UPDATE_APP_NOTES,
-						});
-					}
-					else {
-						dispatch({
-							payload: {id: appNotes?.id, value: appNotes.value},
-							type: TYPES.UPDATE_APP_NOTES,
-						});
-					}
 					onClickContinue();
 				}}
 			/>

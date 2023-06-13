@@ -1,3 +1,7 @@
+body {
+	font-family: 'Source Sans Pro', sans-serif;
+}
+
 html.dev body {
 	align-items: center;
 	display: flex;
@@ -7,7 +11,7 @@ html.dev body {
 	min-width: 320px;
 	place-items: center;
 
-	liferay-marketplace-custom-element {
+	#liferay-marketplace-custom-element {
 		flex: 1;
 	}
 }
