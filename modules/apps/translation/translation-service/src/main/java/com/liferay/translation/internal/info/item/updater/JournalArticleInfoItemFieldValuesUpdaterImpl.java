@@ -22,6 +22,7 @@ import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.storage.Field;
 import com.liferay.dynamic.data.mapping.storage.Fields;
 import com.liferay.dynamic.data.mapping.storage.constants.FieldConstants;
+import com.liferay.dynamic.data.mapping.util.DDM;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.info.field.InfoField;
 import com.liferay.info.field.InfoFieldValue;
@@ -32,16 +33,24 @@ import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.util.JournalConverter;
 import com.liferay.petra.reflect.ReflectionUtil;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
+import java.io.Serializable;
+
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -73,10 +82,10 @@ public class JournalArticleInfoItemFieldValuesUpdaterImpl
 
 		Map<Locale, String> importedLocaleTitleMap = new HashMap<>();
 		Map<Locale, String> importedLocaleDescriptionMap = new HashMap<>();
-		Map<Locale, Map<String, String>> importedLocaleContentMap =
+		Map<Locale, Map<String, List<String>>> importedLocaleContentMap =
 			new HashMap<>();
 		Set<Locale> translatedLocales = new HashSet<>();
-		Map<String, String> fieldNameContentMap = new HashMap<>();
+		Map<String, List<String>> fieldNameContentMap = new HashMap<>();
 
 		for (InfoFieldValue<Object> infoFieldValue :
 				infoItemFieldValues.getInfoFieldValues()) {
@@ -97,19 +106,32 @@ public class JournalArticleInfoItemFieldValuesUpdaterImpl
 							translatedLocales.add(locale);
 
 							String fieldName = infoField.getName();
+							String fieldUniqueId = infoField.getUniqueId();
 
 							String valueString = String.valueOf(
 								infoFieldValue.getValue(locale));
 
-							if (Objects.equals("description", fieldName)) {
+							if (Objects.equals(fieldName, "description") &&
+								fieldUniqueId.startsWith(
+									JournalArticle.class.getSimpleName() +
+										StringPool.UNDERLINE)) {
+
 								importedLocaleDescriptionMap.put(
 									locale, valueString);
 							}
-							else if (Objects.equals("title", fieldName)) {
+							else if (Objects.equals(fieldName, "title") &&
+									 fieldUniqueId.startsWith(
+										 JournalArticle.class.getSimpleName() +
+											 StringPool.UNDERLINE)) {
+
 								importedLocaleTitleMap.put(locale, valueString);
 							}
 							else {
-								fieldNameContentMap.put(fieldName, valueString);
+								List<String> values =
+									fieldNameContentMap.computeIfAbsent(
+										fieldName, name -> new ArrayList<>());
+
+								values.add(valueString);
 
 								importedLocaleContentMap.put(
 									locale, fieldNameContentMap);
@@ -176,6 +198,26 @@ public class JournalArticleInfoItemFieldValuesUpdaterImpl
 			latestArticle.getSmallImageURL(), null, null, null, serviceContext);
 	}
 
+	private void _addNewTranslatedDDMField(
+			DDMStructure ddmStructure, Locale targetLocale, String ddmFieldName,
+			Fields ddmFields, List<String> ddmFieldValues)
+		throws Exception {
+
+		Field ddmField = new Field(
+			ddmStructure.getStructureId(), ddmFieldName,
+			Collections.emptyList(), ddmFields.getDefaultLocale());
+
+		ddmField.setValues(
+			targetLocale,
+			ListUtil.toList(
+				ddmFieldValues,
+				value -> _getSerializable(ddmField, value, targetLocale)));
+
+		ddmFields.put(ddmField);
+
+		_updateFieldsDisplay(ddmFields, ddmFieldName);
+	}
+
 	private AssetEntry _getAssetLinkEntry(
 		long assetEntryId, AssetLink assetLink) {
 
@@ -236,6 +278,18 @@ public class JournalArticleInfoItemFieldValuesUpdaterImpl
 		return Optional.empty();
 	}
 
+	private Serializable _getSerializable(
+		Field field, String value, Locale targetLocale) {
+
+		try {
+			return FieldConstants.getSerializable(
+				targetLocale, targetLocale, field.getDataType(), value);
+		}
+		catch (PortalException portalException) {
+			return ReflectionUtil.throwException(portalException);
+		}
+	}
+
 	private ServiceContext _getServiceContext(JournalArticle journalArticle)
 		throws Exception {
 
@@ -280,12 +334,12 @@ public class JournalArticleInfoItemFieldValuesUpdaterImpl
 
 	private String _getTranslatedContent(
 			String content, DDMStructure ddmStructure,
-			Map<Locale, Map<String, String>> importedLocaleContentMap,
+			Map<Locale, Map<String, List<String>>> importedLocaleContentMap,
 			Locale targetLocale)
 		throws Exception {
 
-		Map<String, String> contentFieldMap = importedLocaleContentMap.get(
-			targetLocale);
+		Map<String, List<String>> contentFieldMap =
+			importedLocaleContentMap.get(targetLocale);
 
 		if ((contentFieldMap == null) || contentFieldMap.isEmpty()) {
 			return content;
@@ -294,15 +348,22 @@ public class JournalArticleInfoItemFieldValuesUpdaterImpl
 		Fields ddmFields = _journalConverter.getDDMFields(
 			ddmStructure, content);
 
-		for (Map.Entry<String, String> entry : contentFieldMap.entrySet()) {
+		for (Map.Entry<String, List<String>> entry :
+				contentFieldMap.entrySet()) {
+
 			Field field = ddmFields.get(entry.getKey());
 
 			if (field != null) {
-				field.setValue(
+				field.setValues(
 					targetLocale,
-					FieldConstants.getSerializable(
-						targetLocale, targetLocale, field.getDataType(),
-						entry.getValue()));
+					ListUtil.toList(
+						entry.getValue(),
+						value -> _getSerializable(field, value, targetLocale)));
+			}
+			else if (ddmStructure.hasField(entry.getKey())) {
+				_addNewTranslatedDDMField(
+					ddmStructure, targetLocale, entry.getKey(), ddmFields,
+					entry.getValue());
 			}
 		}
 
@@ -337,6 +398,21 @@ public class JournalArticleInfoItemFieldValuesUpdaterImpl
 		}
 
 		return false;
+	}
+
+	private void _updateFieldsDisplay(Fields ddmFields, String fieldName) {
+		String fieldsDisplayValue = StringBundler.concat(
+			fieldName, DDM.INSTANCE_SEPARATOR, StringUtil.randomString());
+
+		Field fieldsDisplayField = ddmFields.get(DDM.FIELDS_DISPLAY_NAME);
+
+		String[] fieldsDisplayValues = StringUtil.split(
+			(String)fieldsDisplayField.getValue());
+
+		fieldsDisplayValues = ArrayUtil.append(
+			fieldsDisplayValues, fieldsDisplayValue);
+
+		fieldsDisplayField.setValue(StringUtil.merge(fieldsDisplayValues));
 	}
 
 	@Reference

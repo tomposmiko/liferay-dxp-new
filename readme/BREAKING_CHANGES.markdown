@@ -12,7 +12,7 @@ Here are some of the types of changes documented in this file:
 * Execution requirements: Java version, J2EE Version, browser versions, etc.
 * Deprecations or end of support: For example, warning that a certain feature or API will be dropped in an upcoming version.
 
-*This document has been reviewed through commit `f80a672a0e625`.*
+*This document has been reviewed through commit `851ef01d7128`.*
 
 ## Breaking Changes Contribution Guidelines
 
@@ -1061,5 +1061,27 @@ If you are using the `*_<languageId>_sortable` and `ddmFieldArray.ddmFieldValueT
 If you want to maintain the old sort behavior, you will have to customize the Elasticsearch mappings, removing the `icu_collation_keyword`. For more information about how to personalize them, see: https://learn.liferay.com/dxp/latest/en/using-search/installing-and-upgrading-a-search-engine/elasticsearch/advanced-configuration-of-the-liferay-elasticsearch-connector.html
 
 If you need to retrieve data from these fields, you can get the same information from the _source field of Elasticsearch https://www.elastic.co/guide/en/elasticsearch/reference/7.17/mapping-source-field.html or you can also remove the `icu_collation_keyword` as it is explained in the previous paragraph.
+
+---------------------------------------
+
+## The getSegmentsExperienceIds methods in FragmentEntryProcessorContext, DefaultFragmentEntryProcessorContext, FragmentRendererContext, DefaultFragmentRendererContext have been removed.
+- **Date:** 2021-Dec-17
+- **JIRA Ticket:** [LPS-141471](https://issues.liferay.com/browse/LPS-141471)
+
+### What changed?
+
+The `getSegmentsExperienceIds` methods from `FragmentEntryProcessorContext`, `DefaultFragmentEntryProcessorContext`, `FragmentRendererContext` and `DefaultFragmentRendererContext` have been removed. The method with signature `getContextObjects(JSONObject, String)` from `FragmentEntryConfigurationParser` has been removed.
+
+### Who is affected?
+
+This affects anyone using `FragmentEntryProcessorContext`, `DefaultFragmentEntryProcessorContext`, `FragmentRendererContext` or `DefaultFragmentRendererContext` to get the `long array` of `segmentsExperienceIds`, or if you use the method with signature `getContextObjects(JSONObject, String)` from `FragmentEntryConfigurationParser`.
+
+### How should I update my code?
+
+Use `getSegmentsEntryIds` in `FragmentEntryProcessorContext`, `DefaultFragmentEntryProcessorContext`, `FragmentRendererContext` and `DefaultFragmentRendererContext`. Use the method with signature `getContextObjects(JSONObject, String, long[])` from `FragmentEntryConfigurationParser`, where the third parameter represents the `long array` of `segmentsEntryIds`.
+
+### Why was this change made?
+
+This change was made so that a collection's variations can be retrieved when using collections in a fragment.
 
 ---------------------------------------

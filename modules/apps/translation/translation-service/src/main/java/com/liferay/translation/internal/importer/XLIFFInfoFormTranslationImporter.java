@@ -60,6 +60,7 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.filters.autoxliff.AutoXLIFFFilter;
 import net.sf.okapi.lib.xliff2.InvalidParameterException;
 import net.sf.okapi.lib.xliff2.XLIFFException;
@@ -110,11 +111,15 @@ public class XLIFFInfoFormTranslationImporter
 	}
 
 	private InfoField _createInfoField(Locale locale, String value) {
+		String[] namespaceAndNameArray = _getNamespaceAndNameArray(value);
+
 		return InfoField.builder(
 		).infoFieldType(
 			TextInfoFieldType.INSTANCE
+		).namespace(
+			namespaceAndNameArray[0]
 		).name(
-			value
+			namespaceAndNameArray[1]
 		).labelInfoLocalizedValue(
 			InfoLocalizedValue.<String>builder(
 			).value(
@@ -174,6 +179,16 @@ public class XLIFFInfoFormTranslationImporter
 		).infoItemReference(
 			infoItemReference
 		).build();
+	}
+
+	private String[] _getNamespaceAndNameArray(String value) {
+		String[] parts = value.split(StringPool.UNDERLINE, 2);
+
+		if (parts.length != 2) {
+			return new String[] {StringPool.BLANK, value};
+		}
+
+		return parts;
 	}
 
 	private Locale _getSourceLocale(StartSubDocument startSubDocument) {
@@ -321,27 +336,34 @@ public class XLIFFInfoFormTranslationImporter
 				TextContainer targetTextContainer = iTextUnit.getTarget(
 					targetLocaleId);
 
-				TextFragment targetTextFragment =
-					targetTextContainer.getFirstContent();
+				for (TextPart targetTextPart : targetTextContainer.getParts()) {
+					TextFragment targetTextFragment =
+						targetTextPart.getContent();
 
-				consumer.accept(
-					new InfoFieldValue<>(
-						_createInfoField(targetLocale, iTextUnit.getId()),
-						InfoLocalizedValue.builder(
-						).value(
-							targetLocale, targetTextFragment.getText()
-						).value(
-							biConsumer -> {
-								if (includeSource) {
-									TextFragment sourceTextFragment =
-										sourceTextContainer.getFirstContent();
+					if (Validator.isNull(targetTextFragment.getText())) {
+						continue;
+					}
 
-									biConsumer.accept(
-										sourceLocale,
-										sourceTextFragment.getText());
+					consumer.accept(
+						new InfoFieldValue<>(
+							_createInfoField(targetLocale, iTextUnit.getId()),
+							InfoLocalizedValue.builder(
+							).value(
+								targetLocale, targetTextFragment.getText()
+							).value(
+								biConsumer -> {
+									if (includeSource) {
+										TextFragment sourceTextFragment =
+											sourceTextContainer.
+												getFirstContent();
+
+										biConsumer.accept(
+											sourceLocale,
+											sourceTextFragment.getText());
+									}
 								}
-							}
-						).build()));
+							).build()));
+				}
 			}
 		}
 	}
@@ -353,37 +375,34 @@ public class XLIFFInfoFormTranslationImporter
 		throws XLIFFFileException {
 
 		for (Unit unit : xliffDocument.getUnits()) {
-			if (unit.getPartCount() != 1) {
-				throw new XLIFFFileException.MustNotHaveMoreThanOne(
-					"The file only can have one unit");
-			}
+			for (int i = 0; i < unit.getPartCount(); i++) {
+				Part part = unit.getPart(i);
 
-			Part part = unit.getPart(0);
+				Fragment targetFragment = part.getTarget();
 
-			Fragment targetFragment = part.getTarget();
+				if (targetFragment == null) {
+					throw new XLIFFFileException.MustBeWellFormed(
+						"There is no translation target");
+				}
 
-			if (targetFragment == null) {
-				throw new XLIFFFileException.MustBeWellFormed(
-					"There is no translation target");
-			}
+				consumer.accept(
+					new InfoFieldValue<>(
+						_createInfoField(targetLocale, unit.getId()),
+						InfoLocalizedValue.builder(
+						).value(
+							targetLocale, targetFragment.getPlainText()
+						).value(
+							biConsumer -> {
+								if (includeSource) {
+									Fragment sourceFragment = part.getSource();
 
-			consumer.accept(
-				new InfoFieldValue<>(
-					_createInfoField(targetLocale, unit.getId()),
-					InfoLocalizedValue.builder(
-					).value(
-						targetLocale, targetFragment.getPlainText()
-					).value(
-						biConsumer -> {
-							if (includeSource) {
-								Fragment sourceFragment = part.getSource();
-
-								biConsumer.accept(
-									sourceLocale,
-									sourceFragment.getPlainText());
+									biConsumer.accept(
+										sourceLocale,
+										sourceFragment.getPlainText());
+								}
 							}
-						}
-					).build()));
+						).build()));
+			}
 		}
 	}
 

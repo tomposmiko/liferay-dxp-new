@@ -19,7 +19,8 @@ import com.liferay.asset.kernel.service.AssetTagServiceUtil;
 import com.liferay.asset.taglib.internal.servlet.ServletContextUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.petra.string.StringUtil;
-import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
@@ -172,26 +173,24 @@ public class AssetTagsSelectorTag extends IncludeTag {
 			return _groupIds;
 		}
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		try {
+			if (ArrayUtil.isEmpty(_groupIds)) {
+				ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+					WebKeys.THEME_DISPLAY);
 
-		long[] groupIds = null;
+				return PortalUtil.getCurrentAndAncestorSiteGroupIds(
+					themeDisplay.getScopeGroupId());
+			}
 
-		Group group = themeDisplay.getScopeGroup();
-
-		if (group.isLayout()) {
-			groupIds = new long[] {group.getParentGroupId()};
+			return PortalUtil.getCurrentAndAncestorSiteGroupIds(_groupIds);
 		}
-		else {
-			groupIds = new long[] {group.getGroupId()};
-		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
 
-		if (group.getParentGroupId() != themeDisplay.getCompanyGroupId()) {
-			groupIds = ArrayUtil.append(
-				groupIds, themeDisplay.getCompanyGroupId());
+			return new long[0];
 		}
-
-		return groupIds;
 	}
 
 	protected String getId() {
@@ -220,11 +219,8 @@ public class AssetTagsSelectorTag extends IncludeTag {
 				return null;
 			}
 
-			if (_groupIds != null) {
-				portletURL.setParameter(
-					"groupIds", StringUtil.merge(_groupIds, StringPool.COMMA));
-			}
-
+			portletURL.setParameter(
+				"groupIds", StringUtil.merge(getGroupIds(), StringPool.COMMA));
 			portletURL.setParameter("eventName", getEventName());
 			portletURL.setParameter("selectedTagNames", "{selectedTagNames}");
 			portletURL.setWindowState(LiferayWindowState.POP_UP);
@@ -232,6 +228,9 @@ public class AssetTagsSelectorTag extends IncludeTag {
 			return portletURL;
 		}
 		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
 		}
 
 		return null;
@@ -347,6 +346,9 @@ public class AssetTagsSelectorTag extends IncludeTag {
 	}
 
 	private static final String _PAGE = "/asset_tags_selector/page.jsp";
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		AssetTagsSelectorTag.class);
 
 	private String _addCallback;
 	private boolean _allowAddEntry = true;
