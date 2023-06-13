@@ -7,6 +7,7 @@
 
 @import '_edit_title_modal';
 @import '_field_row_dropdown';
+@import '_modal_position_fix';
 @import '_preview_attributes_modal';
 @import '_preview_modal';
 @import '_searchable_types_modal';
@@ -24,13 +25,14 @@
 	// Components
 
 	@import '_add_sxp_element_sidebar';
-	@import '_clause_contributors_tab';
+	@import '_clause_contributors_sidebar';
 	@import '_edit_sxp_element';
 	@import '_import_sxp_blueprint';
 	@import '_page_toolbar';
 	@import '_preview_sidebar';
 	@import '_query_builder_tab';
 	@import '_result_list_item';
+	@import '_sort_button';
 	@import '_sxp_blueprints_search_container';
 	@import '_sxp_element';
 }

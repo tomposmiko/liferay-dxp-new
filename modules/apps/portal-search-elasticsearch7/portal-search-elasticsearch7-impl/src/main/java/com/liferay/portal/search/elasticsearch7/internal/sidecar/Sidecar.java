@@ -277,6 +277,8 @@ public class Sidecar {
 			System.getenv()
 		).put(
 			"HOSTNAME", "localhost"
+		).put(
+			"LIBFFI_TMPDIR", _sidecarHomePath.toString()
 		).build();
 	}
 
@@ -413,16 +415,8 @@ public class Sidecar {
 		String versionNumber = ResourceUtil.getResourceAsString(
 			getClass(), SidecarVersionConstants.SIDECAR_VERSION_FILE_NAME);
 
-		if (versionNumber.equals("7.3.0")) {
-			return new Elasticsearch730Distribution();
-		}
-
-		if (versionNumber.equals("7.7.0")) {
-			return new Elasticsearch770Distribution();
-		}
-
-		if (versionNumber.equals("7.9.0")) {
-			return new Elasticsearch790Distribution();
+		if (versionNumber.equals(ElasticsearchDistribution.VERSION)) {
+			return new ElasticsearchDistribution();
 		}
 
 		throw new IllegalArgumentException(
@@ -529,6 +523,27 @@ public class Sidecar {
 				"org.elasticsearch.common.settings.KeyStoreWrapper",
 				ClassModificationUtil.getModifiedClassBytes(
 					"org.elasticsearch.common.settings.KeyStoreWrapper", "save",
+					methodVisitor -> {
+						methodVisitor.visitCode();
+						methodVisitor.visitInsn(Opcodes.RETURN);
+					},
+					classLoader));
+
+			modifiedClasses.put(
+				"org.elasticsearch.bootstrap.Security",
+				ClassModificationUtil.getModifiedClassBytes(
+					"org.elasticsearch.bootstrap.Security", "configure",
+					methodVisitor -> {
+						methodVisitor.visitCode();
+						methodVisitor.visitInsn(Opcodes.RETURN);
+					},
+					classLoader));
+
+			modifiedClasses.put(
+				"org.elasticsearch.bootstrap.Spawner",
+				ClassModificationUtil.getModifiedClassBytes(
+					"org.elasticsearch.bootstrap.Spawner",
+					"spawnNativeControllers",
 					methodVisitor -> {
 						methodVisitor.visitCode();
 						methodVisitor.visitInsn(Opcodes.RETURN);

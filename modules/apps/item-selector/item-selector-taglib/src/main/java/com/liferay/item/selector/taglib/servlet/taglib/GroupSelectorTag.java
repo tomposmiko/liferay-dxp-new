@@ -26,7 +26,6 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.taglib.util.IncludeTag;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -94,55 +93,7 @@ public class GroupSelectorTag extends IncludeTag {
 	}
 
 	private List<Group> _getGroups(HttpServletRequest httpServletRequest) {
-		String groupType = _getGroupType(httpServletRequest);
-
 		Optional<GroupItemSelectorProvider> groupItemSelectorProviderOptional =
-			GroupItemSelectorTrackerUtil.getGroupItemSelectorProviderOptional(
-				groupType);
-
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		Group group = _getGroup(themeDisplay);
-
-		String scopeGroupType = ParamUtil.getString(
-			httpServletRequest, "scopeGroupType");
-
-		if (Validator.isNotNull(scopeGroupType) && groupType.equals("site")) {
-			_groups = new ArrayList<>();
-
-			_groups.add(group);
-		}
-		else {
-			String keywords = ParamUtil.getString(
-				httpServletRequest, "keywords");
-
-			int cur = ParamUtil.getInteger(
-				httpServletRequest, SearchContainer.DEFAULT_CUR_PARAM,
-				SearchContainer.DEFAULT_CUR);
-			int delta = ParamUtil.getInteger(
-				httpServletRequest, SearchContainer.DEFAULT_DELTA_PARAM,
-				SearchContainer.DEFAULT_DELTA);
-
-			int[] startAndEnd = SearchPaginationUtil.calculateStartAndEnd(
-				cur, delta);
-
-			_groups = groupItemSelectorProviderOptional.map(
-				groupItemSelectorProvider ->
-					groupItemSelectorProvider.getGroups(
-						group.getCompanyId(), group.getGroupId(), keywords,
-						startAndEnd[0], startAndEnd[1])
-			).orElse(
-				Collections.emptyList()
-			);
-		}
-
-		return _groups;
-	}
-
-	private int _getGroupsCount(HttpServletRequest httpServletRequest) {
-		Optional<GroupItemSelectorProvider> groupSelectorProviderOptional =
 			GroupItemSelectorTrackerUtil.getGroupItemSelectorProviderOptional(
 				_getGroupType(httpServletRequest));
 
@@ -154,12 +105,56 @@ public class GroupSelectorTag extends IncludeTag {
 
 		String keywords = ParamUtil.getString(httpServletRequest, "keywords");
 
-		_groupsCount = groupSelectorProviderOptional.map(
-			groupSelectorProvider -> groupSelectorProvider.getGroupsCount(
-				group.getCompanyId(), group.getGroupId(), keywords)
+		int cur = ParamUtil.getInteger(
+			httpServletRequest, SearchContainer.DEFAULT_CUR_PARAM,
+			SearchContainer.DEFAULT_CUR);
+		int delta = ParamUtil.getInteger(
+			httpServletRequest, SearchContainer.DEFAULT_DELTA_PARAM,
+			SearchContainer.DEFAULT_DELTA);
+
+		int[] startAndEnd = SearchPaginationUtil.calculateStartAndEnd(
+			cur, delta);
+
+		_groups = groupItemSelectorProviderOptional.map(
+			groupItemSelectorProvider -> groupItemSelectorProvider.getGroups(
+				group.getCompanyId(), group.getGroupId(), keywords,
+				startAndEnd[0], startAndEnd[1])
 		).orElse(
-			0
+			Collections.emptyList()
 		);
+
+		return _groups;
+	}
+
+	private int _getGroupsCount(HttpServletRequest httpServletRequest) {
+		String scopeGroupType = ParamUtil.getString(
+			httpServletRequest, "scopeGroupType");
+
+		if (Validator.isNotNull(scopeGroupType)) {
+			_groupsCount = 1;
+		}
+		else {
+			Optional<GroupItemSelectorProvider> groupSelectorProviderOptional =
+				GroupItemSelectorTrackerUtil.
+					getGroupItemSelectorProviderOptional(
+						_getGroupType(httpServletRequest));
+
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)httpServletRequest.getAttribute(
+					WebKeys.THEME_DISPLAY);
+
+			Group group = _getGroup(themeDisplay);
+
+			String keywords = ParamUtil.getString(
+				httpServletRequest, "keywords");
+
+			_groupsCount = groupSelectorProviderOptional.map(
+				groupSelectorProvider -> groupSelectorProvider.getGroupsCount(
+					group.getCompanyId(), group.getGroupId(), keywords)
+			).orElse(
+				0
+			);
+		}
 
 		return _groupsCount;
 	}

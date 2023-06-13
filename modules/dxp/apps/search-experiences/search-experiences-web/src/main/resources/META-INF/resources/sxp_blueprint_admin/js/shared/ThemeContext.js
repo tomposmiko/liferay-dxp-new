@@ -15,6 +15,8 @@ export default React.createContext({
 	availableLanguages: {},
 	contextPath: '/o/search-experiences-web',
 	defaultLocale: 'en_US',
+	jsonAutocompleteEnabled: false,
+	learnMessages: {},
 	locale: 'en_US',
 	namespace: '',
 	redirectURL: '',

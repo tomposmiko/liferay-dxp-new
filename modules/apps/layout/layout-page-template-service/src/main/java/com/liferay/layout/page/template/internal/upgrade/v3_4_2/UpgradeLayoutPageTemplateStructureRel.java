@@ -246,7 +246,7 @@ public class UpgradeLayoutPageTemplateStructureRel extends UpgradeProcess {
 						"com.liferay.fragment.entry.processor.freemarker." +
 							"FreeMarkerFragmentEntryProcessor");
 
-				if (_isEmpty(fragmentConfigValuesJSONObject)) {
+				if (fragmentConfigValuesJSONObject == null) {
 					continue;
 				}
 
@@ -255,6 +255,10 @@ public class UpgradeLayoutPageTemplateStructureRel extends UpgradeProcess {
 						getConfigurationDefaultValuesJSONObject(
 							fragmentEntryLink.getConfiguration()),
 					fragmentConfigValuesJSONObject, stylesJSONObject);
+
+				if (_isEmpty(fragmentConfigValuesJSONObject)) {
+					continue;
+				}
 
 				_replaceAlign(fragmentConfigValuesJSONObject, stylesJSONObject);
 				_replaceBorderRadius(

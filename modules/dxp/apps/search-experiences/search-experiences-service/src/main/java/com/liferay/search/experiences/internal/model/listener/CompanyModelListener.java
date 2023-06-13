@@ -53,7 +53,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Brian Wing Shun Chan
  */
 @Component(
-	enabled = false, immediate = true,
+	immediate = true,
 	service = {CompanyModelListener.class, ModelListener.class}
 )
 public class CompanyModelListener extends BaseModelListener<Company> {
@@ -88,6 +88,7 @@ public class CompanyModelListener extends BaseModelListener<Company> {
 				LocalizedMapUtil.getLocalizedMap(
 					sxpElement.getDescription_i18n()),
 				String.valueOf(sxpElement.getElementDefinition()), true,
+				_SCHEMA_VERSION,
 				LocalizedMapUtil.getLocalizedMap(sxpElement.getTitle_i18n()), 0,
 				new ServiceContext() {
 					{
@@ -158,6 +159,12 @@ public class CompanyModelListener extends BaseModelListener<Company> {
 
 		return sxpElements;
 	}
+
+	private static final String _SCHEMA_VERSION = StringUtil.replace(
+		StringUtil.extractFirst(
+			StringUtil.extractLast(SXPElement.class.getName(), ".v"),
+			CharPool.PERIOD),
+		CharPool.UNDERLINE, CharPool.PERIOD);
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		CompanyModelListener.class);

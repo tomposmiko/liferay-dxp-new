@@ -39,9 +39,9 @@ import com.liferay.portal.search.significance.SignificanceHeuristics;
 import com.liferay.portal.search.sort.Sorts;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
+import com.liferay.search.experiences.blueprint.exception.InvalidElementInstanceException;
 import com.liferay.search.experiences.blueprint.parameter.SXPParameter;
 import com.liferay.search.experiences.blueprint.search.request.enhancer.SXPBlueprintSearchRequestEnhancer;
-import com.liferay.search.experiences.internal.blueprint.exception.InvalidElementInstanceException;
 import com.liferay.search.experiences.internal.blueprint.highlight.HighlightConverter;
 import com.liferay.search.experiences.internal.blueprint.parameter.SXPParameterData;
 import com.liferay.search.experiences.internal.blueprint.parameter.SXPParameterDataCreator;
@@ -88,10 +88,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Petteri Karttunen
  */
-@Component(
-	enabled = false, immediate = true,
-	service = SXPBlueprintSearchRequestEnhancer.class
-)
+@Component(immediate = true, service = SXPBlueprintSearchRequestEnhancer.class)
 public class SXPBlueprintSearchRequestEnhancerImpl
 	implements SXPBlueprintSearchRequestEnhancer {
 
@@ -202,12 +199,13 @@ public class SXPBlueprintSearchRequestEnhancerImpl
 						key, (Serializable)value)));
 		}
 
+		RuntimeException runtimeException = new RuntimeException();
+
 		SXPParameterData sxpParameterData = _sxpParameterDataCreator.create(
+			runtimeException::addSuppressed,
 			searchRequestBuilder.withSearchContextGet(
 				searchContext -> searchContext),
 			sxpBlueprint);
-
-		RuntimeException runtimeException = new RuntimeException();
 
 		if (configuration != null) {
 			_contributeSXPSearchRequestBodyContributors(

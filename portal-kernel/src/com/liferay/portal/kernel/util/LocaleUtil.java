@@ -321,13 +321,27 @@ public class LocaleUtil {
 		return _locale;
 	}
 
+	private String _getDisplayCountry(Locale displayLocale, Locale locale) {
+		String country = displayLocale.getDisplayCountry(locale);
+		String variant = displayLocale.getDisplayVariant(locale);
+
+		if (Validator.isNull(variant)) {
+			return country;
+		}
+
+		return StringUtil.merge(
+			new String[] {country, variant}, StringPool.COMMA_AND_SPACE);
+	}
+
 	private String _getDisplayName(
 		String language, String country, Locale locale,
 		Set<String> duplicateLanguages) {
 
 		String displayName = null;
 
-		if (duplicateLanguages.contains(locale.getLanguage())) {
+		if (duplicateLanguages.contains(locale.getLanguage()) &&
+			Validator.isNotNull(country)) {
+
 			displayName = StringUtil.appendParentheticalSuffix(
 				language, country);
 		}
@@ -360,8 +374,8 @@ public class LocaleUtil {
 		Locale locale, Set<String> duplicateLanguages) {
 
 		return _getDisplayName(
-			locale.getDisplayLanguage(locale), locale.getDisplayCountry(locale),
-			locale, duplicateLanguages);
+			locale.getDisplayLanguage(locale),
+			_getDisplayCountry(locale, locale), locale, duplicateLanguages);
 	}
 
 	private Locale _getMostRelevantLocale() {

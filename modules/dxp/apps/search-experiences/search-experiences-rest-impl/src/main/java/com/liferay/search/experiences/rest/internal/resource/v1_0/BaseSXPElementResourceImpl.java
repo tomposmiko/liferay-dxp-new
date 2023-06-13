@@ -55,6 +55,7 @@ import javax.annotation.Generated;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import javax.ws.rs.NotSupportedException;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -121,7 +122,7 @@ public abstract class BaseSXPElementResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'POST' 'http://localhost:8080/o/search-experiences-rest/v1.0/sxp-elements' -d $'{"createDate": ___, "description": ___, "description_i18n": ___, "elementDefinition": ___, "hidden": ___, "id": ___, "modifiedDate": ___, "readOnly": ___, "title": ___, "title_i18n": ___, "type": ___, "userName": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'POST' 'http://localhost:8080/o/search-experiences-rest/v1.0/sxp-elements' -d $'{"createDate": ___, "description": ___, "description_i18n": ___, "elementDefinition": ___, "hidden": ___, "id": ___, "modifiedDate": ___, "readOnly": ___, "schemaVersion": ___, "title": ___, "title_i18n": ___, "type": ___, "userName": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.tags.Tags(
 		value = {@io.swagger.v3.oas.annotations.tags.Tag(name = "SXPElement")}
@@ -138,7 +139,7 @@ public abstract class BaseSXPElementResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'POST' 'http://localhost:8080/o/search-experiences-rest/v1.0/sxp-elements/batch' -d $'{"createDate": ___, "description": ___, "description_i18n": ___, "elementDefinition": ___, "hidden": ___, "id": ___, "modifiedDate": ___, "readOnly": ___, "title": ___, "title_i18n": ___, "type": ___, "userName": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'POST' 'http://localhost:8080/o/search-experiences-rest/v1.0/sxp-elements/batch' -d $'{"createDate": ___, "description": ___, "description_i18n": ___, "elementDefinition": ___, "hidden": ___, "id": ___, "modifiedDate": ___, "readOnly": ___, "schemaVersion": ___, "title": ___, "title_i18n": ___, "type": ___, "userName": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
@@ -310,7 +311,7 @@ public abstract class BaseSXPElementResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'PATCH' 'http://localhost:8080/o/search-experiences-rest/v1.0/sxp-elements/{sxpElementId}' -d $'{"createDate": ___, "description": ___, "description_i18n": ___, "elementDefinition": ___, "hidden": ___, "id": ___, "modifiedDate": ___, "readOnly": ___, "title": ___, "title_i18n": ___, "type": ___, "userName": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'PATCH' 'http://localhost:8080/o/search-experiences-rest/v1.0/sxp-elements/{sxpElementId}' -d $'{"createDate": ___, "description": ___, "description_i18n": ___, "elementDefinition": ___, "hidden": ___, "id": ___, "modifiedDate": ___, "readOnly": ___, "schemaVersion": ___, "title": ___, "title_i18n": ___, "type": ___, "userName": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@io.swagger.v3.oas.annotations.Parameters(
 		value = {
@@ -408,8 +409,20 @@ public abstract class BaseSXPElementResourceImpl
 			Map<String, Serializable> parameters)
 		throws Exception {
 
-		UnsafeConsumer<SXPElement, Exception> sxpElementUnsafeConsumer =
-			sxpElement -> postSXPElement(sxpElement);
+		UnsafeConsumer<SXPElement, Exception> sxpElementUnsafeConsumer = null;
+
+		String createStrategy = (String)parameters.getOrDefault(
+			"createStrategy", "INSERT");
+
+		if ("INSERT".equalsIgnoreCase(createStrategy)) {
+			sxpElementUnsafeConsumer = sxpElement -> postSXPElement(sxpElement);
+		}
+
+		if (sxpElementUnsafeConsumer == null) {
+			throw new NotSupportedException(
+				"Create strategy \"" + createStrategy +
+					"\" is not supported for SxpElement");
+		}
 
 		if (contextBatchUnsafeConsumer != null) {
 			contextBatchUnsafeConsumer.accept(
@@ -488,6 +501,34 @@ public abstract class BaseSXPElementResourceImpl
 			java.util.Collection<SXPElement> sxpElements,
 			Map<String, Serializable> parameters)
 		throws Exception {
+
+		UnsafeConsumer<SXPElement, Exception> sxpElementUnsafeConsumer = null;
+
+		String updateStrategy = (String)parameters.getOrDefault(
+			"updateStrategy", "UPDATE");
+
+		if ("PARTIAL_UPDATE".equalsIgnoreCase(updateStrategy)) {
+			sxpElementUnsafeConsumer = sxpElement -> patchSXPElement(
+				sxpElement.getId() != null ? sxpElement.getId() :
+					Long.parseLong((String)parameters.get("sxpElementId")),
+				sxpElement);
+		}
+
+		if (sxpElementUnsafeConsumer == null) {
+			throw new NotSupportedException(
+				"Update strategy \"" + updateStrategy +
+					"\" is not supported for SxpElement");
+		}
+
+		if (contextBatchUnsafeConsumer != null) {
+			contextBatchUnsafeConsumer.accept(
+				sxpElements, sxpElementUnsafeConsumer);
+		}
+		else {
+			for (SXPElement sxpElement : sxpElements) {
+				sxpElementUnsafeConsumer.accept(sxpElement);
+			}
+		}
 	}
 
 	public void setContextAcceptLanguage(AcceptLanguage contextAcceptLanguage) {

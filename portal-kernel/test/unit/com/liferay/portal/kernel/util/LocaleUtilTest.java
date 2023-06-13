@@ -18,14 +18,18 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.test.CaptureHandler;
 import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import org.mockito.Matchers;
 
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -100,6 +104,36 @@ public class LocaleUtilTest extends PowerMockito {
 		Assert.assertEquals(
 			Locale.TRADITIONAL_CHINESE,
 			LocaleUtil.fromLanguageId("zh-Hant-TW"));
+	}
+
+	@Test
+	public void testGetLongDisplayName() {
+		mockStatic(LanguageUtil.class);
+
+		when(
+			LanguageUtil.isBetaLocale(Matchers.anyObject())
+		).thenReturn(
+			false
+		);
+
+		Set<String> duplicateLanguages = Collections.singleton("ca");
+
+		Assert.assertEquals(
+			"English",
+			LocaleUtil.getLongDisplayName(Locale.US, duplicateLanguages));
+
+		Locale catalanLocale = new Locale("ca", "ES");
+
+		Assert.assertEquals(
+			"catal\u00e0 (Espanya)",
+			LocaleUtil.getLongDisplayName(catalanLocale, duplicateLanguages));
+
+		Locale catalanValenciaLocale = new Locale("ca", "ES", "VALENCIA");
+
+		Assert.assertEquals(
+			"catal\u00e0 (Espanya, VALENCIA)",
+			LocaleUtil.getLongDisplayName(
+				catalanValenciaLocale, duplicateLanguages));
 	}
 
 }

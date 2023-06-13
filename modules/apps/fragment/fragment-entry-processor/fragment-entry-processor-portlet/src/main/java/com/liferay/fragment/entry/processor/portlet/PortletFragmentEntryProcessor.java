@@ -23,6 +23,7 @@ import com.liferay.fragment.processor.PortletRegistry;
 import com.liferay.fragment.renderer.FragmentPortletRenderer;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
+import com.liferay.layout.service.LayoutClassedModelUsageLocalService;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -35,17 +36,20 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.ModelHintsConstants;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
+import com.liferay.portal.kernel.portlet.PortletPreferencesFactory;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portlet.PortletPreferencesImpl;
+import com.liferay.portlet.exportimport.staging.StagingAdvicesThreadLocal;
 
 import java.util.HashSet;
 import java.util.List;
@@ -80,31 +84,19 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 	public void deleteFragmentEntryLinkData(
 		FragmentEntryLink fragmentEntryLink) {
 
-		Document document = _getDocument(fragmentEntryLink.getHtml());
-
-		for (Element element : document.select("*")) {
-			String tagName = element.tagName();
-
-			if (!StringUtil.startsWith(tagName, "lfr-widget-")) {
-				continue;
-			}
-
-			String alias = StringUtil.removeSubstring(tagName, "lfr-widget-");
-
-			String portletName = _portletRegistry.getPortletName(alias);
-
-			if (Validator.isNull(portletName)) {
-				continue;
-			}
+		for (String portletId :
+				_portletRegistry.getFragmentEntryLinkPortletIds(
+					fragmentEntryLink)) {
 
 			try {
-				_portletPreferencesLocalService.deletePortletPreferences(
-					PortletKeys.PREFS_OWNER_ID_DEFAULT,
-					PortletKeys.PREFS_OWNER_TYPE_LAYOUT,
-					fragmentEntryLink.getPlid(),
-					_getPortletId(
-						portletName, fragmentEntryLink.getNamespace(),
-						element.attr("id")));
+				_portletLocalService.deletePortlet(
+					fragmentEntryLink.getCompanyId(), portletId,
+					fragmentEntryLink.getPlid());
+
+				_layoutClassedModelUsageLocalService.
+					deleteLayoutClassedModelUsages(
+						portletId, _portal.getClassNameId(Portlet.class),
+						fragmentEntryLink.getPlid());
 			}
 			catch (Exception exception) {
 			}
@@ -212,13 +204,26 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 
 			String defaultPreferences = StringPool.BLANK;
 
-			if (originalFragmentEntryLink != null) {
-				defaultPreferences = _getPreferences(
-					plid, portletName, originalFragmentEntryLink, id,
-					StringPool.BLANK);
+			boolean stagingAdvicesThreadLocalEnabled =
+				StagingAdvicesThreadLocal.isEnabled();
+
+			try {
+				StagingAdvicesThreadLocal.setEnabled(false);
+
+				if (originalFragmentEntryLink != null) {
+					defaultPreferences = _getPreferences(
+						plid, portletName, originalFragmentEntryLink, id,
+						StringPool.BLANK);
+				}
+				else {
+					defaultPreferences = _getPreferences(
+						plid, portletName, fragmentEntryLink, id,
+						portlet.getDefaultPreferences());
+				}
 			}
-			else {
-				defaultPreferences = portlet.getDefaultPreferences();
+			finally {
+				StagingAdvicesThreadLocal.setEnabled(
+					stagingAdvicesThreadLocalEnabled);
 			}
 
 			String portletHTML = _fragmentPortletRenderer.renderPortlet(
@@ -525,11 +530,21 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 	private FragmentPortletRenderer _fragmentPortletRenderer;
 
 	@Reference
+	private LayoutClassedModelUsageLocalService
+		_layoutClassedModelUsageLocalService;
+
+	@Reference
 	private LayoutPageTemplateEntryLocalService
 		_layoutPageTemplateEntryLocalService;
 
 	@Reference
+	private Portal _portal;
+
+	@Reference
 	private PortletLocalService _portletLocalService;
+
+	@Reference
+	private PortletPreferencesFactory _portletPreferencesFactory;
 
 	@Reference
 	private PortletPreferencesLocalService _portletPreferencesLocalService;

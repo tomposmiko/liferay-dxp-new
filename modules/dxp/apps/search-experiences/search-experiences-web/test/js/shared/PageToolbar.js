@@ -18,6 +18,7 @@ import '@testing-library/jest-dom/extend-expect';
 
 jest.useFakeTimers();
 
+const onChangeTitleAndDescription = jest.fn();
 const onSubmit = jest.fn();
 
 Liferay.ThemeDisplay.getDefaultLanguageId = () => 'en_US';
@@ -25,15 +26,16 @@ Liferay.ThemeDisplay.getDefaultLanguageId = () => 'en_US';
 function renderPageToolbar(props) {
 	return render(
 		<PageToolbar
-			initialDescription={{}}
-			initialTitle={{}}
+			description=""
 			onCancel="/link"
 			onChangeTab={jest.fn()}
+			onChangeTitleAndDescription={onChangeTitleAndDescription}
 			onSubmit={onSubmit}
 			tab="query-builder"
 			tabs={{
 				'query-builder': 'query-builder',
 			}}
+			title=""
 			{...props}
 		/>
 	);
@@ -47,33 +49,27 @@ describe('PageToolbar', () => {
 	});
 
 	it('renders the title', () => {
-		const initialTitle = {
-			'en-US': 'Apple',
-		};
+		const title = 'Apple';
 
-		const {getByText} = renderPageToolbar({
-			initialTitle,
-		});
+		const {getByText} = renderPageToolbar({title});
 
-		getByText(initialTitle['en-US']);
+		getByText(title);
 	});
 
-	it('updates the title', () => {
-		const initialTitle = {
-			'en-US': 'Apple',
-		};
+	it('calls onChangeTitle when updating title', () => {
+		const title = 'Apple';
 
-		const {getByLabelText, getByText, queryByText} = renderPageToolbar({
-			initialTitle,
+		const {getByLabelText, getByText} = renderPageToolbar({
+			title,
 		});
 
-		getByText('Apple');
+		getByText(title);
 
-		fireEvent.click(getByLabelText('edit-name'));
+		fireEvent.click(getByLabelText('edit-title'));
 
 		act(() => jest.runAllTimers());
 
-		fireEvent.change(getByLabelText('name'), {
+		fireEvent.change(getByLabelText('title'), {
 			target: {value: 'Banana'},
 		});
 
@@ -81,22 +77,17 @@ describe('PageToolbar', () => {
 
 		act(() => jest.runAllTimers());
 
-		expect(queryByText('Apple')).toBeNull();
-		getByText('Banana');
+		expect(onChangeTitleAndDescription).toHaveBeenCalled();
 	});
 
-	it('updates the description', () => {
-		const initialTitle = {
-			'en-US': 'Apple',
-		};
+	it('calls onChangeTitle when updating description', () => {
+		const title = 'Apple';
 
-		const initialDescription = {
-			'en-US': 'A fruit',
-		};
+		const description = 'A fruit';
 
-		const {getByLabelText, getByText, queryByText} = renderPageToolbar({
-			initialDescription,
-			initialTitle,
+		const {getByLabelText, getByText} = renderPageToolbar({
+			description,
+			title,
 		});
 
 		getByText('A fruit');
@@ -113,8 +104,7 @@ describe('PageToolbar', () => {
 
 		act(() => jest.runAllTimers());
 
-		expect(queryByText('A fruit')).toBeNull();
-		getByText('A red fruit');
+		expect(onChangeTitleAndDescription).toHaveBeenCalled();
 	});
 
 	it('offers link to cancel', () => {
@@ -137,29 +127,25 @@ describe('PageToolbar', () => {
 		expect(getByText('save')).toBeDisabled();
 	});
 
-	it('focuses on the name input when clicked on', () => {
-		const initialTitle = {
-			'en-US': 'Apple',
-		};
+	it('focuses on the title input when clicked on', () => {
+		const title = 'Apple';
 
 		const {getByLabelText} = renderPageToolbar({
-			initialTitle,
+			title,
 		});
 
-		fireEvent.click(getByLabelText('edit-name'));
+		fireEvent.click(getByLabelText('edit-title'));
 
 		act(() => jest.runAllTimers());
 
-		expect(getByLabelText('name')).toHaveFocus();
+		expect(getByLabelText('title')).toHaveFocus();
 	});
 
 	it('focuses on the description input when clicked on', () => {
-		const initialTitle = {
-			'en-US': 'Apple',
-		};
+		const title = 'Apple';
 
 		const {getByLabelText} = renderPageToolbar({
-			initialTitle,
+			title,
 		});
 
 		fireEvent.click(getByLabelText('edit-description'));

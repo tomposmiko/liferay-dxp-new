@@ -15,9 +15,12 @@
 package com.liferay.search.experiences.rest.resource.v1_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.search.experiences.rest.client.dto.v1_0.SXPBlueprint;
+import com.liferay.search.experiences.rest.client.http.HttpInvoker;
+import com.liferay.search.experiences.rest.client.pagination.Page;
 
 import java.util.Collections;
 
@@ -31,6 +34,45 @@ import org.junit.runner.RunWith;
  */
 @RunWith(Arquillian.class)
 public class SXPBlueprintResourceTest extends BaseSXPBlueprintResourceTestCase {
+
+	@Override
+	@Test
+	public void testGetSXPBlueprintExport() throws Exception {
+		SXPBlueprint sxpBlueprint = randomSXPBlueprint();
+
+		SXPBlueprint postSXPBlueprint = testPostSXPBlueprint_addSXPBlueprint(
+			sxpBlueprint);
+
+		HttpInvoker.HttpResponse httpResponse =
+			sxpBlueprintResource.getSXPBlueprintExportHttpResponse(
+				postSXPBlueprint.getId());
+
+		Assert.assertTrue(
+			JSONUtil.equals(
+				JSONFactoryUtil.createJSONObject(httpResponse.getContent()),
+				JSONUtil.put(
+					"configuration", JSONFactoryUtil.createJSONObject()
+				).put(
+					"description_i18n",
+					JSONUtil.put("en_US", sxpBlueprint.getDescription())
+				).put(
+					"elementInstances", JSONFactoryUtil.createJSONArray()
+				).put(
+					"schemaVersion", postSXPBlueprint.getSchemaVersion()
+				).put(
+					"title_i18n", JSONUtil.put("en_US", sxpBlueprint.getTitle())
+				)));
+	}
+
+	@Override
+	@Test
+	public void testGetSXPBlueprintsPageWithFilterDateTimeEquals()
+		throws Exception {
+
+		_deleteSXPBlueprints();
+
+		super.testGetSXPBlueprintsPageWithFilterDateTimeEquals();
+	}
 
 	@Ignore
 	@Override
@@ -49,8 +91,6 @@ public class SXPBlueprintResourceTest extends BaseSXPBlueprintResourceTestCase {
 	public void testPostSXPBlueprint() throws Exception {
 		super.testPostSXPBlueprint();
 
-		// Missing i18n
-
 		SXPBlueprint sxpBlueprint = SXPBlueprint.toDTO(
 			JSONUtil.put(
 				"description", RandomTestUtil.randomString()
@@ -64,6 +104,7 @@ public class SXPBlueprintResourceTest extends BaseSXPBlueprintResourceTestCase {
 		sxpBlueprint.setCreateDate(postSXPBlueprint.getCreateDate());
 		sxpBlueprint.setId(postSXPBlueprint.getId());
 		sxpBlueprint.setModifiedDate(postSXPBlueprint.getModifiedDate());
+		sxpBlueprint.setSchemaVersion(postSXPBlueprint.getSchemaVersion());
 		sxpBlueprint.setUserName(postSXPBlueprint.getUserName());
 
 		Assert.assertEquals(
@@ -82,11 +123,11 @@ public class SXPBlueprintResourceTest extends BaseSXPBlueprintResourceTestCase {
 	protected SXPBlueprint randomSXPBlueprint() throws Exception {
 		SXPBlueprint sxpBlueprint = super.randomSXPBlueprint();
 
-		sxpBlueprint.setTitle_i18n(
-			Collections.singletonMap("en_US", sxpBlueprint.getTitle()));
-
 		sxpBlueprint.setDescription_i18n(
 			Collections.singletonMap("en_US", sxpBlueprint.getDescription()));
+		sxpBlueprint.setTitle(_TITLE_PREFIX + sxpBlueprint.getTitle());
+		sxpBlueprint.setTitle_i18n(
+			Collections.singletonMap("en_US", sxpBlueprint.getTitle()));
 
 		return sxpBlueprint;
 	}
@@ -148,5 +189,20 @@ public class SXPBlueprintResourceTest extends BaseSXPBlueprintResourceTestCase {
 
 		return sxpBlueprintResource.postSXPBlueprint(sxpBlueprint);
 	}
+
+	private void _deleteSXPBlueprints() throws Exception {
+		Page<SXPBlueprint> page = sxpBlueprintResource.getSXPBlueprintsPage(
+			null, null, null, null);
+
+		for (SXPBlueprint sxpBlueprint : page.getItems()) {
+			String title = sxpBlueprint.getTitle();
+
+			if (title.startsWith(_TITLE_PREFIX)) {
+				sxpBlueprintResource.deleteSXPBlueprint(sxpBlueprint.getId());
+			}
+		}
+	}
+
+	private static final String _TITLE_PREFIX = "SXPBRT";
 
 }

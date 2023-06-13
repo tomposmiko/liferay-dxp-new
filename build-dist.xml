@@ -2700,14 +2700,14 @@ plugins.includes=</echo>
 				</if>
 
 				<if>
-					<available file="${zip.executable.dir}/../elasticsearch7" />
+					<available file="${zip.executable.dir}/../elasticsearch-sidecar" />
 					<then>
 						<copy
 							preservelastmodified="true"
-							todir="dist/${tstamp.value}/liferay-portal-${lp.version}/elasticsearch7"
+							todir="dist/${tstamp.value}/liferay-portal-${lp.version}/elasticsearch-sidecar"
 						>
 							<fileset
-								dir="${zip.executable.dir}/../elasticsearch7"
+								dir="${zip.executable.dir}/../elasticsearch-sidecar"
 							/>
 						</copy>
 					</then>
@@ -2987,7 +2987,7 @@ plugins.includes=</echo>
 			todir="${tstamp.value}"
 		>
 			<fileset
-				dir="${liferay.home}/elasticsearch7"
+				dir="${liferay.home}/elasticsearch-sidecar"
 			/>
 		</copy>
 
@@ -2996,7 +2996,7 @@ plugins.includes=</echo>
 		>
 			<zipfileset
 				dir="${tstamp.value}"
-				prefix="liferay-portal-elasticsearch-${lp.version}/elasticsearch7"
+				prefix="liferay-portal-elasticsearch-${lp.version}/elasticsearch-sidecar"
 			/>
 		</zip>
 

@@ -523,6 +523,98 @@ public class Product implements Cloneable, Serializable {
 
 	protected Boolean neverExpire;
 
+	public Boolean getProductAccountGroupFilter() {
+		return productAccountGroupFilter;
+	}
+
+	public void setProductAccountGroupFilter(
+		Boolean productAccountGroupFilter) {
+
+		this.productAccountGroupFilter = productAccountGroupFilter;
+	}
+
+	public void setProductAccountGroupFilter(
+		UnsafeSupplier<Boolean, Exception>
+			productAccountGroupFilterUnsafeSupplier) {
+
+		try {
+			productAccountGroupFilter =
+				productAccountGroupFilterUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected Boolean productAccountGroupFilter;
+
+	public ProductAccountGroup[] getProductAccountGroups() {
+		return productAccountGroups;
+	}
+
+	public void setProductAccountGroups(
+		ProductAccountGroup[] productAccountGroups) {
+
+		this.productAccountGroups = productAccountGroups;
+	}
+
+	public void setProductAccountGroups(
+		UnsafeSupplier<ProductAccountGroup[], Exception>
+			productAccountGroupsUnsafeSupplier) {
+
+		try {
+			productAccountGroups = productAccountGroupsUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected ProductAccountGroup[] productAccountGroups;
+
+	public Boolean getProductChannelFilter() {
+		return productChannelFilter;
+	}
+
+	public void setProductChannelFilter(Boolean productChannelFilter) {
+		this.productChannelFilter = productChannelFilter;
+	}
+
+	public void setProductChannelFilter(
+		UnsafeSupplier<Boolean, Exception> productChannelFilterUnsafeSupplier) {
+
+		try {
+			productChannelFilter = productChannelFilterUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected Boolean productChannelFilter;
+
+	public ProductChannel[] getProductChannels() {
+		return productChannels;
+	}
+
+	public void setProductChannels(ProductChannel[] productChannels) {
+		this.productChannels = productChannels;
+	}
+
+	public void setProductChannels(
+		UnsafeSupplier<ProductChannel[], Exception>
+			productChannelsUnsafeSupplier) {
+
+		try {
+			productChannels = productChannelsUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected ProductChannel[] productChannels;
+
 	public Long getProductId() {
 		return productId;
 	}

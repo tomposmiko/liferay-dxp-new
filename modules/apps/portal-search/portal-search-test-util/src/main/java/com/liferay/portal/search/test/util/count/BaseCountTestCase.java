@@ -40,9 +40,20 @@ public abstract class BaseCountTestCase extends BaseIndexingTestCase {
 		super.setUp();
 
 		for (int i = 0; i < _TOTAL_DOCUMENTS; i++) {
-			addDocument(
-				DocumentCreationHelpers.singleText(
-					_FIELD, StringUtil.toLowerCase(testName.getMethodName())));
+			if ((i % 2) == 0) {
+				addDocument(
+					DocumentCreationHelpers.twoKeywords(
+						_FIELD,
+						StringUtil.toLowerCase(testName.getMethodName()),
+						_FIELD_2,
+						StringUtil.toLowerCase(testName.getMethodName())));
+			}
+			else {
+				addDocument(
+					DocumentCreationHelpers.singleKeyword(
+						_FIELD,
+						StringUtil.toLowerCase(testName.getMethodName())));
+			}
 		}
 	}
 
@@ -51,6 +62,68 @@ public abstract class BaseCountTestCase extends BaseIndexingTestCase {
 		assertSearch(
 			indexingTestHelper -> Assert.assertEquals(
 				_TOTAL_DOCUMENTS, indexingTestHelper.searchCount()));
+	}
+
+	@Test
+	public void testNested() throws Exception {
+		assertSearch(
+			indexingTestHelper -> {
+				BooleanQueryImpl booleanQueryImpl = new BooleanQueryImpl();
+
+				BooleanQueryImpl nestedBooleanQueryImpl =
+					new BooleanQueryImpl();
+
+				booleanQueryImpl.add(
+					nestedBooleanQueryImpl, BooleanClauseOccur.MUST);
+
+				indexingTestHelper.setQuery(booleanQueryImpl);
+
+				Assert.assertEquals(
+					_TOTAL_DOCUMENTS, indexingTestHelper.searchCount());
+			});
+	}
+
+	@Test
+	public void testNestedPostFilter() throws Exception {
+		assertSearch(
+			indexingTestHelper -> {
+				BooleanQueryImpl booleanQueryImpl = new BooleanQueryImpl();
+
+				BooleanQueryImpl nestedBooleanQueryImpl =
+					new BooleanQueryImpl();
+
+				nestedBooleanQueryImpl.setPostFilter(_createBooleanFilter());
+
+				booleanQueryImpl.add(
+					nestedBooleanQueryImpl, BooleanClauseOccur.MUST);
+
+				indexingTestHelper.setQuery(booleanQueryImpl);
+
+				Assert.assertEquals(
+					_TOTAL_DOCUMENTS, indexingTestHelper.searchCount());
+			});
+	}
+
+	@Test
+	public void testNestedPreFilter() throws Exception {
+		assertSearch(
+			indexingTestHelper -> {
+				BooleanQueryImpl booleanQueryImpl = new BooleanQueryImpl();
+
+				BooleanQueryImpl nestedBooleanQueryImpl =
+					new BooleanQueryImpl();
+
+				nestedBooleanQueryImpl.setPreBooleanFilter(
+					_createBooleanFilter());
+
+				booleanQueryImpl.add(
+					nestedBooleanQueryImpl, BooleanClauseOccur.MUST);
+
+				indexingTestHelper.setQuery(booleanQueryImpl);
+
+				Assert.assertEquals(
+					_TOTAL_DOCUMENTS / 2, indexingTestHelper.searchCount());
+			});
 	}
 
 	@Test
@@ -81,7 +154,7 @@ public abstract class BaseCountTestCase extends BaseIndexingTestCase {
 				indexingTestHelper.setQuery(query);
 
 				Assert.assertEquals(
-					_TOTAL_DOCUMENTS, indexingTestHelper.searchCount());
+					_TOTAL_DOCUMENTS / 2, indexingTestHelper.searchCount());
 			});
 	}
 
@@ -96,7 +169,7 @@ public abstract class BaseCountTestCase extends BaseIndexingTestCase {
 				indexingTestHelper.setQuery(query);
 
 				Assert.assertEquals(
-					_TOTAL_DOCUMENTS, indexingTestHelper.searchCount());
+					_TOTAL_DOCUMENTS / 2, indexingTestHelper.searchCount());
 			});
 	}
 
@@ -105,13 +178,15 @@ public abstract class BaseCountTestCase extends BaseIndexingTestCase {
 
 		booleanFilter.add(
 			new TermFilter(
-				_FIELD, StringUtil.toLowerCase(testName.getMethodName())),
+				_FIELD_2, StringUtil.toLowerCase(testName.getMethodName())),
 			BooleanClauseOccur.MUST);
 
 		return booleanFilter;
 	}
 
 	private static final String _FIELD = "test-field";
+
+	private static final String _FIELD_2 = "test-field-2";
 
 	private static final int _TOTAL_DOCUMENTS = 20;
 

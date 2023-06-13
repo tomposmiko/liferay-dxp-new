@@ -26,6 +26,7 @@ import com.liferay.asset.util.AssetHelper;
 import com.liferay.depot.model.DepotEntry;
 import com.liferay.depot.service.DepotEntryServiceUtil;
 import com.liferay.item.selector.constants.ItemSelectorPortletKeys;
+import com.liferay.item.selector.criteria.constants.ItemSelectorCriteriaConstants;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -419,6 +420,16 @@ public class AssetBrowserDisplayContext {
 	}
 
 	public boolean isShowBreadcrumb() {
+		String scopeGroupType = ParamUtil.getString(
+			_httpServletRequest, "scopeGroupType");
+
+		if (Validator.isNotNull(scopeGroupType) &&
+			scopeGroupType.equals(
+				ItemSelectorCriteriaConstants.SCOPE_GROUP_TYPE_PAGE)) {
+
+			return false;
+		}
+
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)_httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
@@ -594,6 +605,9 @@ public class AssetBrowserDisplayContext {
 
 		portletURL.setParameter("groupType", "site");
 		portletURL.setParameter("showGroupSelector", Boolean.TRUE.toString());
+		portletURL.setParameter(
+			"scopeGroupType",
+			ParamUtil.getString(_httpServletRequest, "scopeGroupType"));
 
 		breadcrumbEntry.setURL(portletURL.toString());
 

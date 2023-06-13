@@ -12,6 +12,7 @@
 <tbody>
 
 <!--TOOLBAR-->
+
 <tr>
 	<td>TOOLBAR_ADD</td>
 	<td>//a[@*='Add ${key_ddlDataDefinitionName}']</td>
@@ -72,7 +73,7 @@
 </tr>
 <tr>
 	<td>RECORD_TABLE_PREVIEW</td>
-	<td>//div[contains(@class,'modal-body')]/p</td>
+	<td>//div[contains(@class,'modal-body')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -82,7 +83,7 @@
 </tr>
 <tr>
 	<td>RECORD_TABLE_PREVIEW_INVALID_IMG</td>
-	<td>//p[contains(text(), 'img src=x')]</td>
+	<td>//div[contains(text(), 'img src=x')]</td>
 	<td></td>
 </tr>
 <tr>
