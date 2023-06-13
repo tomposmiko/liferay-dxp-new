@@ -2920,6 +2920,22 @@ definition {
 				entryTitle = "Blogs Entry Title With Video");
 		}
 
+		User.logoutPG();
+
+		User.loginUserPG(
+			password = "test",
+			userEmailAddress = "user1@liferay.com");
+
+		Navigator.gotoPage(pageName = "Blogs");
+
+		AssertVisible(locator1 = "Blogs#UNSUBSCRIBE_LINK");
+
+		User.logoutPG();
+
+		User.loginUserPG(
+			password = "test",
+			userEmailAddress = "test@liferay.com");
+
 		Navigator.gotoPage(pageName = "Blogs");
 
 		Ratings.viewRateThumb(
@@ -5169,6 +5185,16 @@ definition {
 		User.loginUserPG(
 			password = "test",
 			userEmailAddress = "test@liferay.com");
+	}
+
+	macro viewSpecificDisplayPageTemplateViaAssetPublisher {
+		Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/Document Display Page");
+
+		AssetPublisherPortlet.clickAssetTitle(assetTitle = "DM Document Title");
+
+		AssertElementPresent(
+			key_text = "DM Document Title",
+			locator1 = "Fragment#EDITABLE_FIELD_CONTENT");
 	}
 
 	macro viewStagingConfiguration {

@@ -15,7 +15,7 @@
 import {HashRouter, Route, Routes} from 'react-router-dom';
 
 import Layout from './components/Layout/Layout';
-import Manage from './pages/Manage';
+import Manager from './pages/Manage';
 import OutletBridge from './pages/OutletBridge';
 import Cases from './pages/Project/Cases';
 import Case from './pages/Project/Cases/Case';
@@ -29,6 +29,9 @@ import Requirement from './pages/Project/Requirements/Requirement';
 import Routine from './pages/Project/Routines';
 import Build from './pages/Project/Routines/Builds/Build';
 import BuildOutlet from './pages/Project/Routines/Builds/BuildOutlet';
+import CaseResult from './pages/Project/Routines/Builds/Inner/CaseResult';
+import CaseResultOutlet from './pages/Project/Routines/Builds/Inner/CaseResult/CaseResultOutlet';
+import CaseResultHistory from './pages/Project/Routines/Builds/Inner/CaseResult/History';
 import CaseTypes from './pages/Project/Routines/Builds/Inner/CaseTypes';
 import Components from './pages/Project/Routines/Builds/Inner/Components';
 import Results from './pages/Project/Routines/Builds/Inner/Results';
@@ -40,6 +43,7 @@ import Routines from './pages/Project/Routines/Routines';
 import Suites from './pages/Project/Suites';
 import Suite from './pages/Project/Suites/Suite';
 import Testflow from './pages/Testflow';
+import Subtasks from './pages/Testflow/Subtask';
 import TestflowArchived from './pages/Testflow/TestflowArchived';
 import TestflowOutlet from './pages/Testflow/TestflowOutlet';
 import TestFlowTasks from './pages/Testflow/TestflowTasks';
@@ -95,10 +99,24 @@ const TestrayRoute = () => (
 							/>
 
 							<Route
-								element={<BuildOutlet />}
+								element={
+									<BuildOutlet ignorePath="case-result" />
+								}
 								path="build/:testrayBuildId"
 							>
 								<Route element={<Build />} index />
+
+								<Route
+									element={<CaseResultOutlet />}
+									path="case-result/:testrayCaseResultId"
+								>
+									<Route element={<CaseResult />} index />
+
+									<Route
+										element={<CaseResultHistory />}
+										path="history"
+									/>
+								</Route>
 
 								<Route element={<Runs />} path="runs" />
 
@@ -120,12 +138,16 @@ const TestrayRoute = () => (
 					</Route>
 				</Route>
 
-				<Route element={<Manage />} path="manage" />
+				<Route element={<OutletBridge />} path="manage">
+					<Route element={<Manager />} path="user" />
+				</Route>
 
 				<Route element={<TestflowOutlet />} path="testflow">
 					<Route element={<Testflow />} index />
 
 					<Route element={<TestflowArchived />} path="archived" />
+
+					<Route element={<Subtasks />} path="subtasks" />
 
 					<Route element={<TestFlowTasks />} path=":testflowId" />
 				</Route>

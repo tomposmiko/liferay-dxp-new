@@ -36,6 +36,7 @@ import {getResponsiveConfig} from '../../../../../../app/utils/getResponsiveConf
 import isEmptyArray from '../../../../../../app/utils/isEmptyArray';
 import isEmptyObject from '../../../../../../app/utils/isEmptyObject';
 import updateConfigurationValue from '../../../../../../app/utils/updateConfigurationValue';
+import Collapse from '../../../../../../common/components/Collapse';
 import getLayoutDataItemPropTypes from '../../../../../../prop-types/getLayoutDataItemPropTypes';
 import {CommonStyles} from './CommonStyles';
 import {FieldSet} from './FieldSet';
@@ -97,13 +98,7 @@ export function CollectionFilterGeneralPanel({item}) {
 
 	return (
 		<>
-			<CommonStyles
-				commonStylesValues={itemConfig.styles}
-				item={item}
-				role={COMMON_STYLES_ROLES.general}
-			/>
-
-			<div className="page-editor__item-general-configuration">
+			<div className="mb-3">
 				{isEmptyObject(filterableCollections) ? (
 					<p
 						className="alert alert-info mt-2 text-center"
@@ -120,6 +115,12 @@ export function CollectionFilterGeneralPanel({item}) {
 					/>
 				)}
 			</div>
+
+			<CommonStyles
+				commonStylesValues={itemConfig.styles}
+				item={item}
+				role={COMMON_STYLES_ROLES.general}
+			/>
 		</>
 	);
 }
@@ -176,76 +177,85 @@ export function CollectionFilterGeneralPanelContent({
 
 	return (
 		<>
-			<TargetCollectionsField
-				enableCompatibleCollections
-				filterableCollections={filterableCollections}
-				onValueSelect={(name, value) => {
-					if (!isEmptyArray(value)) {
-						onValueSelect(name, value);
-					}
-					else {
-						const nextConfigurationValues = {
-							filterKey: '',
-							[name]: value,
-						};
+			<Collapse
+				label={Liferay.Language.get('collection-filter-options')}
+				open
+			>
+				<TargetCollectionsField
+					enableCompatibleCollections
+					filterableCollections={filterableCollections}
+					onValueSelect={(name, value) => {
+						if (!isEmptyArray(value)) {
+							onValueSelect(name, value);
+						}
+						else {
+							const nextConfigurationValues = {
+								filterKey: '',
+								[name]: value,
+							};
 
-						dispatch(
-							updateFragmentConfiguration({
-								configurationValues: nextConfigurationValues,
-								fragmentEntryLink,
-								languageId,
-							})
-						);
-					}
-				}}
-				value={targetCollections}
-			/>
+							dispatch(
+								updateFragmentConfiguration({
+									configurationValues: nextConfigurationValues,
+									fragmentEntryLink,
+									languageId,
+								})
+							);
+						}
+					}}
+					value={targetCollections}
+				/>
 
-			{!isEmptyArray(targetCollections) &&
-				!isEmptyObject(collectionFilters) && (
-					<SelectField
-						field={{
-							label: Liferay.Language.get('filter'),
-							name: 'filterKey',
-							typeOptions: {
-								validValues: [
-									{
-										label: Liferay.Language.get('none'),
-										value: '',
-									},
-									...filterSupportedFilters({
-										collectionFilters: Object.values(
-											collectionFilters
-										),
-										filterableCollections,
-										targetCollections,
-									}).map(({key, label}) => ({
-										label,
-										value: key,
-									})),
-								],
-							},
-						}}
-						onValueSelect={onValueSelect}
-						value={configurationValues.filterKey}
-					/>
-				)}
+				{!isEmptyArray(targetCollections) &&
+					!isEmptyObject(collectionFilters) && (
+						<SelectField
+							field={{
+								label: Liferay.Language.get('filter'),
+								name: 'filterKey',
+								typeOptions: {
+									validValues: [
+										{
+											label: Liferay.Language.get('none'),
+											value: '',
+										},
+										...filterSupportedFilters({
+											collectionFilters: Object.values(
+												collectionFilters
+											),
+											filterableCollections,
+											targetCollections,
+										}).map(({key, label}) => ({
+											label,
+											value: key,
+										})),
+									],
+								},
+							}}
+							onValueSelect={onValueSelect}
+							value={configurationValues.filterKey}
+						/>
+					)}
+			</Collapse>
 
 			{!isEmptyArray(targetCollections) &&
 				selectedFilter?.configuration &&
 				selectedFilter.configuration.fieldSets
 					?.filter((fieldSet) => fieldSet.fields.length)
 					.map((fieldSet, index) => (
-						<FieldSet
-							fields={fieldSet.fields}
+						<div
+							className="mt-3"
 							key={`${fieldSet.label || ''}-${index}`}
-							label={fieldSet.label}
-							languageId={languageId}
-							onValueSelect={(name, value) =>
-								onValueSelect(name, value)
-							}
-							values={configurationValues}
-						/>
+						>
+							<FieldSet
+								fields={fieldSet.fields}
+								label={fieldSet.label}
+								languageId={languageId}
+								onValueSelect={(name, value) =>
+									onValueSelect(name, value)
+								}
+								values={configurationValues}
+							/>
+						</div>
 					))}
 		</>
 	);

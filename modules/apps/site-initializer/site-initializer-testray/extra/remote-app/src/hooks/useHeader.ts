@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-console */
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -61,7 +59,7 @@ const useHeader = ({
 	);
 
 	useEffect(() => {
-		if (shouldUpdate) {
+		if (shouldUpdate && useHeadingString) {
 			setTimeout(() => {
 				setHeading(JSON.parse(useHeadingString));
 			}, timeout);
@@ -69,7 +67,7 @@ const useHeader = ({
 	}, [setHeading, shouldUpdate, timeout, useHeadingString]);
 
 	useEffect(() => {
-		if (shouldUpdate) {
+		if (shouldUpdate && useTabsString) {
 			setTimeout(() => {
 				setTabs(JSON.parse(useTabsString));
 			}, timeout);

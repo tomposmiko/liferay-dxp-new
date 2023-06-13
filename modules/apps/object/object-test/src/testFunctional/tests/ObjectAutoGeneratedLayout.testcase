@@ -1,6 +1,7 @@
 @component-name = "portal-object"
 definition {
 
+	property portal.acceptance = "true";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Object";
@@ -20,6 +21,16 @@ definition {
 		else {
 			ObjectAdmin.deleteAllCustomObjectsViaAPI();
 		}
+	}
+
+	@description = "LPS-147658 - Verify it is possible to submit an empty value for a Date field and it will be correctly displayed on the Layout"
+	@ignore = "Test Stub"
+	@priority = "5"
+	test CanDisplayEmptyDateValue {
+		property portal.acceptance = "true";
+
+		// TODO LPS-147870 CanDisplayEmptyDateValue pending implementation
+
 	}
 
 	@description = "LPS-142659 - Verify it is possible to view a Clob entry and label on layout"

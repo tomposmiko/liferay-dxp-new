@@ -276,10 +276,6 @@ public interface PropsKeys {
 	public static final String AUTO_LOGIN_IGNORE_PATHS =
 		"auto.login.ignore.paths";
 
-	public static final String AXIS_SERVLET_ENABLED = "axis.servlet.enabled";
-
-	public static final String AXIS_SERVLET_MAPPING = "axis.servlet.mapping";
-
 	public static final String BASIC_AUTH_PASSWORD_REQUIRED =
 		"basic.auth.password.required";
 
@@ -2797,6 +2793,9 @@ public interface PropsKeys {
 
 	public static final String SETUP_DATABASE_JAR_NAME =
 		"setup.database.jar.name";
+
+	public static final String SETUP_DATABASE_JAR_SHA1 =
+		"setup.database.jar.sha1";
 
 	public static final String SETUP_DATABASE_JAR_URL =
 		"setup.database.jar.url";

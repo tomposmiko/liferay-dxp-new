@@ -22,6 +22,14 @@ const contents = {
 	'actions': {
 		backButton: (setContentName, selectedItemType) => () =>
 			setContentName(selectedItemType),
+		deleteFunction: (setSelectedItem) => () =>
+			setSelectedItem((previousValue) => ({
+				...previousValue,
+				data: {
+					...previousValue.data,
+					actions: null,
+				},
+			})),
 		sections: ['actions'],
 		showDeleteButton: true,
 		title: Liferay.Language.get('actions'),
@@ -94,9 +102,24 @@ const contents = {
 			'assignmentsSummary',
 			'notificationsSummary',
 			'actionsSummary',
+			'timersSummary',
 		],
 		showDeleteButton: true,
 		title: Liferay.Language.get('task'),
+	},
+	'timers': {
+		backButton: (setContentName) => () => setContentName('task'),
+		deleteFunction: (setSelectedItem) => () =>
+			setSelectedItem((previousValue) => ({
+				...previousValue,
+				data: {
+					...previousValue.data,
+					taskTimers: null,
+				},
+			})),
+		sections: ['timers'],
+		showDeleteButton: true,
+		title: Liferay.Language.get('timers'),
 	},
 	'transition': {
 		sections: ['edgeInformation'],

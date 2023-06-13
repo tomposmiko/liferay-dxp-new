@@ -302,6 +302,10 @@ public class AssetTagsSelectorTag extends IncludeTag {
 				List<Map<String, String>> selectedItems = new ArrayList<>();
 
 				for (String tagName : getTagNames()) {
+					if (Validator.isNull(tagName)) {
+						continue;
+					}
+
 					selectedItems.add(
 						HashMapBuilder.put(
 							"label", tagName

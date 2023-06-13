@@ -42,11 +42,43 @@ public interface DB {
 	public static final int SQL_VARCHAR_MAX_SIZE_THRESHOLD = 9999999;
 
 	public void addIndexes(
+			Connection connection, List<IndexMetadata> indexMetadatas)
+		throws IOException, SQLException;
+
+	/**
+	 *   @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 *          #addIndexes(Connection, List)}
+	 */
+	@Deprecated
+	public void addIndexes(
 			Connection connection, String indexesSQL,
 			Set<String> validIndexNames)
 		throws IOException;
 
+	public void alterColumnName(
+			Connection connection, String tableName, String oldColumnName,
+			String newColumnDefinition)
+		throws Exception;
+
+	public void alterColumnType(
+			Connection connection, String tableName, String columnName,
+			String newColumnType)
+		throws Exception;
+
+	public void alterTableAddColumn(
+			Connection connection, String tableName, String columnName,
+			String columnType)
+		throws Exception;
+
+	public void alterTableDropColumn(
+			Connection connection, String tableName, String columnName)
+		throws Exception;
+
 	public String buildSQL(String template) throws IOException, SQLException;
+
+	public List<IndexMetadata> dropIndexes(
+			Connection connection, String tableName, String columnName)
+		throws IOException, SQLException;
 
 	public DBType getDBType();
 
@@ -65,6 +97,15 @@ public interface DB {
 
 	public String getPopulateSQL(String databaseName, String sqlContent);
 
+	public String[] getPrimaryKeyColumnNames(
+			Connection connection, String tableName)
+		throws SQLException;
+
+	/**
+	 *   @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 *          #getPrimaryKeyColumnNames(Connection, String)}
+	 */
+	@Deprecated
 	public ResultSet getPrimaryKeysResultSet(
 			Connection connection, String tableName)
 		throws SQLException;
@@ -103,6 +144,9 @@ public interface DB {
 
 	public void process(UnsafeConsumer<Long, Exception> unsafeConsumer)
 		throws Exception;
+
+	public void removePrimaryKey(Connection connection, String tableName)
+		throws IOException, SQLException;
 
 	public default void runSQL(
 			Connection connection, DBTypeToSQLMap dbTypeToSQLMap)

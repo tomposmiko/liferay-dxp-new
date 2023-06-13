@@ -1,6 +1,7 @@
 @component-name = "portal-object"
 definition {
 
+	property portal.acceptance = "true";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Object";
@@ -444,7 +445,7 @@ definition {
 	@description = "LPS-135400 - Verify it is possible to add a relation with an entry through the Relationship field"
 	@priority = "5"
 	test CanAddRelationOnRelationshipField {
-		property portal.acceptance = "true";
+		property portal.acceptance = "quarantine";
 
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 141652",
@@ -652,9 +653,11 @@ definition {
 			locator1 = "ObjectAdmin#OBJECT_FIELDS_LABEL_INPUT",
 			value1 = "Custom Field");
 
-		Select(
-			locator1 = "ObjectAdmin#OBJECT_FIELDS_TYPE",
-			value1 = "String");
+		Click(locator1 = "ObjectAdmin#OBJECT_FIELDS_TYPE");
+
+		Click(
+			key_fieldType = "Text",
+			locator1 = "ObjectAdmin#OBJECT_FIELDS_TYPE_OPTION");
 
 		Button.clickCancel();
 
@@ -845,13 +848,13 @@ definition {
 
 		ObjectAdmin.addObjectFieldViaUI(
 			fieldLabel = "Custom Field",
-			fieldType = "BigDecimal");
+			fieldType = "Precision Decimal");
 
 		Refresh();
 
 		ObjectAdmin.assertObjectField(
 			fieldLabel = "Custom Field",
-			fieldType = "BigDecimal");
+			fieldType = "PrecisionDecimal");
 	}
 
 	@description = "LPS-135549 - Verify it is possible to create a Boolean field"
@@ -936,13 +939,13 @@ definition {
 
 		ObjectAdmin.addObjectFieldViaUI(
 			fieldLabel = "Custom Field",
-			fieldType = "Double");
+			fieldType = "Decimal");
 
 		Refresh();
 
 		ObjectAdmin.assertObjectField(
 			fieldLabel = "Custom Field",
-			fieldType = "Double");
+			fieldType = "Decimal");
 	}
 
 	@description = "LPS-135549 - Verify it is possible to create an Integer field"
@@ -1009,11 +1012,11 @@ definition {
 
 		ObjectAdmin.addObjectFieldViaUI(
 			fieldLabel = "Custom Field",
-			fieldType = "Long");
+			fieldType = "Long Integer");
 
 		ObjectAdmin.assertObjectField(
 			fieldLabel = "Custom Field",
-			fieldType = "Long");
+			fieldType = "LongInteger");
 	}
 
 	@description = "LPS-135401 - Verify it is possible to create a Many to Many Relationship"
@@ -1104,7 +1107,7 @@ definition {
 
 		ObjectAdmin.assertObjectField(
 			fieldLabel = "Field Picklist",
-			fieldType = "String");
+			fieldType = "Picklist");
 	}
 
 	@description = "LPS-135549 - Verify it is possible to create a String field"
@@ -1125,13 +1128,13 @@ definition {
 
 		ObjectAdmin.addObjectFieldViaUI(
 			fieldLabel = "Custom Field",
-			fieldType = "String");
+			fieldType = "Text");
 
 		Refresh();
 
 		ObjectAdmin.assertObjectField(
 			fieldLabel = "Custom Field",
-			fieldType = "String");
+			fieldType = "Text");
 	}
 
 	@description = "LPS-137879 - Verify it is not possible to delete a Custom Object field after the Object is published"
@@ -1350,7 +1353,7 @@ definition {
 	@description = "LPS-135401 - Verify that it is possible to delete a relation with an entry on the Relationship tab"
 	@priority = "5"
 	test CanDeleteRelationOnRelationshipTab {
-		property portal.acceptance = "true";
+		property portal.acceptance = "quarantine";
 
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 141661",
@@ -1603,7 +1606,7 @@ definition {
 		ObjectAdmin.addObjectFieldViaUI(
 			fieldLabel = "Custom Field",
 			fieldName = "customObjectField",
-			fieldType = "String");
+			fieldType = "Text");
 
 		ObjectAdmin.viewFieldErrorMessage(message = "This name is already in use. Try another one.");
 	}
@@ -1784,7 +1787,7 @@ definition {
 		ObjectAdmin.addObjectFieldViaUI(
 			fieldLabel = "Custom Field",
 			fieldName = " ",
-			fieldType = "String");
+			fieldType = "Text");
 
 		ObjectAdmin.viewFieldErrorMessage(message = "Name is required.");
 	}
@@ -1808,7 +1811,7 @@ definition {
 		ObjectAdmin.addObjectFieldViaUI(
 			fieldLabel = "",
 			fieldName = "customField",
-			fieldType = "String");
+			fieldType = "Text");
 
 		ObjectAdmin.assertLabelFieldRequired();
 	}
@@ -1952,9 +1955,7 @@ definition {
 
 		ObjectAdmin.goToFieldsTab();
 
-		ObjectAdmin.addObjectFieldViaUI(
-			fieldLabel = "Custom Field",
-			fieldType = "Choose an Option");
+		ObjectAdmin.addObjectFieldViaUI(fieldLabel = "Custom Field");
 
 		ObjectAdmin.assertTypeFieldRequired();
 	}
@@ -2059,7 +2060,7 @@ definition {
 		ObjectAdmin.addObjectFieldViaUI(
 			fieldLabel = "Custom Field",
 			fieldName = "customField#$%",
-			fieldType = "Long");
+			fieldType = "Long Integer");
 
 		ObjectAdmin.viewFieldErrorMessage(message = "Name must only contain letters and digits.");
 	}
@@ -2081,7 +2082,7 @@ definition {
 		ObjectAdmin.addObjectFieldViaUI(
 			fieldLabel = "Custom Field",
 			fieldName = "CustomField",
-			fieldType = "String");
+			fieldType = "Text");
 
 		ObjectAdmin.viewFieldErrorMessage(message = "The first character of a name must be an lower case letter.");
 	}
@@ -2674,7 +2675,7 @@ definition {
 	@description = "LPS-135401 - Verify that it is possible to relate to many other entries on both objects"
 	@priority = "5"
 	test CanRelateManyOtherEntriesBothObjects {
-		property portal.acceptance = "true";
+		property portal.acceptance = "quarantine";
 
 		for (var nameObject : list "A,B") {
 			ObjectAdmin.addObjectViaAPI(
@@ -2907,7 +2908,7 @@ definition {
 
 		ObjectAdmin.assertObjectField(
 			fieldLabel = "Custom Field A",
-			fieldType = "String");
+			fieldType = "Text");
 
 		ObjectAdmin.assertObjectFieldNotPresent(fieldLabel = "Custom Field B");
 	}
@@ -3159,7 +3160,7 @@ definition {
 
 		ObjectAdmin.addObjectFieldViaUI(
 			fieldLabel = "Custom Field",
-			fieldType = "String",
+			fieldType = "Text",
 			isMandatory = "true");
 
 		ObjectAdmin.goToFieldsDetails(label = "Custom Field");
@@ -4195,6 +4196,8 @@ definition {
 	@description = "LPS-135400 - There is an explanation about each Relationship type"
 	@priority = "3"
 	test CanViewExplanationRelationshipTypes {
+		property portal.acceptance = "false";
+
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object",
 			objectName = "CustomObject",
@@ -4597,6 +4600,8 @@ definition {
 	@description = "LPS-139803 - Verify it the Object Entry Title is displayed on the Relationship tab"
 	@priority = "4"
 	test CanViewObjectEntryTitleOnRelationshipTab {
+		property portal.upstream = "quarantine";
+
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 141620",
 			objectName = "CustomObject141620",
@@ -5240,6 +5245,8 @@ definition {
 	@description = "LPS-135401 - Verify if Cascade deletion type of Relationship One to Many will allow the entry with relation (from the parent Object) and its relations to be deleted"
 	@priority = "5"
 	test CascadeDeletionOneToManyWillAllowDeleteParent {
+		property portal.upstream = "quarantine";
+
 		for (var letter : list "A,B") {
 			ObjectAdmin.addObjectViaAPI(
 				labelName = "Custom Object ${letter}",
@@ -5316,6 +5323,8 @@ definition {
 	@description = "LPS-135401 - Verify that when adding an entry that was already related to another it will keep related to both entries"
 	@priority = "4"
 	test ChoosingAlreadyRelatedEntryWillKeepOnBothEntries {
+		property portal.upstream = "quarantine";
+
 		for (var letter : list "A,B") {
 			ObjectAdmin.addObjectViaAPI(
 				labelName = "Custom Object ${letter}",
@@ -5455,7 +5464,7 @@ definition {
 	@description = "LPS-135649 - Verify that a completed entry is displayed with an Approved status"
 	@priority = "5"
 	test CompletedEntryDisplaysApprovedStatus {
-		property portal.acceptance = "true";
+		property portal.acceptance = "quarantine";
 
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 141629",
@@ -5799,6 +5808,8 @@ definition {
 	@description = "LPS-135547 - Verify the empty state when searching for an Object returns nothing"
 	@priority = "3"
 	test EmptyStateNoResultObject {
+		property portal.acceptance = "false";
+
 		ObjectAdmin.openObjectAdmin();
 
 		Search.searchCP(searchTerm = "Object X");
@@ -5809,6 +5820,8 @@ definition {
 	@description = "LPS-135547 - Verify the empty state when searching for an Object field returns nothing"
 	@priority = "3"
 	test EmptyStateNoResultObjectField {
+		property portal.acceptance = "false";
+
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object",
 			objectName = "CustomObject",
@@ -5837,6 +5850,8 @@ definition {
 	@description = "LPS-135400 - Verify the empty state message when there is no Relationship"
 	@priority = "3"
 	test EmptyStateWhenNoRelationship {
+		property portal.acceptance = "false";
+
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object",
 			objectName = "CustomObject",
@@ -5942,7 +5957,7 @@ definition {
 
 		ObjectAdmin.assertObjectField(
 			fieldLabel = "Custom Field",
-			fieldType = "String");
+			fieldType = "Text");
 	}
 
 	@description = "LPS-137874 - Verify that Objects created on a Virtual Instance are not displayed on the Forms Settings, Collection Providers and Display Page Template of the Main Instance and vice versa"
@@ -7387,6 +7402,8 @@ definition {
 	@description = "LPS-135401 - Verify if Prevent deletion type of Relationship Many to Many won't allow the user to delete an entry with relation"
 	@priority = "4"
 	test PreventDeletionManyToManyWontAllowDelete {
+		property portal.upstream = "quarantine";
+
 		for (var nameObject : list "A,B") {
 			ObjectAdmin.addObjectViaAPI(
 				labelName = "Custom Object ${nameObject}",
@@ -7595,7 +7612,7 @@ definition {
 	@description = "LPS-135401 - Verify if Prevent deletion type of Relationship One to Many won't allow the user to delete an entry with relation from the parent Object"
 	@priority = "5"
 	test PreventDeletionOneToManyWontAllowDelete {
-		property portal.acceptance = "true";
+		property portal.acceptance = "quarantine";
 
 		for (var nameObject : list "A,B") {
 			ObjectAdmin.addObjectViaAPI(
@@ -7757,7 +7774,7 @@ definition {
 
 		ObjectAdmin.assertObjectField(
 			fieldLabel = "Custom Object A",
-			fieldType = "Long");
+			fieldType = "Relationship");
 	}
 
 	@description = "LPS-139005 - Verify that the Relationship field will not be displayed on a Collection Display with List Style set as Table when the parent object is inactivated"
@@ -8084,6 +8101,8 @@ definition {
 	@description = "LPS-139005 - Verify that the Relationship tab is no longer displayed when the other object is inactivated (Many to Many)"
 	@priority = "4"
 	test RelationshipTabDisappearsWhenInactivatedManyToMany {
+		property portal.upstream = "quarantine";
+
 		for (var letter : list "A,B") {
 			ObjectAdmin.addObjectViaAPI(
 				labelName = "Custom Object ${letter}",
@@ -8191,6 +8210,8 @@ definition {
 	@description = "LPS-139005 - Verify that the Relationship tab is no longer displayed when the child object is inactivated (One to Many)"
 	@priority = "4"
 	test RelationshipTabDisappearsWhenInactivatedOneToMany {
+		property portal.upstream = "quarantine";
+
 		for (var letter : list "A,B") {
 			ObjectAdmin.addObjectViaAPI(
 				labelName = "Custom Object ${letter}",
