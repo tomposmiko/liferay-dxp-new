@@ -110,6 +110,10 @@ public class JournalArticleTag extends IncludeTag {
 		return _wrapperCssClass;
 	}
 
+	public boolean isDataAnalyticsTrackingEnabled() {
+		return _dataAnalyticsTrackingEnabled;
+	}
+
 	public boolean isShowTitle() {
 		return _showTitle;
 	}
@@ -120,6 +124,12 @@ public class JournalArticleTag extends IncludeTag {
 
 	public void setArticleId(String articleId) {
 		_articleId = articleId;
+	}
+
+	public void setDataAnalyticsTrackingEnabled(
+		boolean dataAnalyticsTrackingEnabled) {
+
+		_dataAnalyticsTrackingEnabled = dataAnalyticsTrackingEnabled;
 	}
 
 	public void setDdmTemplateKey(String ddmTemplateKey) {
@@ -156,6 +166,7 @@ public class JournalArticleTag extends IncludeTag {
 		_article = null;
 		_articleDisplay = null;
 		_articleId = null;
+		_dataAnalyticsTrackingEnabled = true;
 		_ddmTemplateKey = null;
 		_groupId = 0;
 		_languageId = null;
@@ -190,6 +201,9 @@ public class JournalArticleTag extends IncludeTag {
 			"liferay-journal:journal-article:article", _article);
 		httpServletRequest.setAttribute(
 			"liferay-journal:journal-article:articleDisplay", _articleDisplay);
+		httpServletRequest.setAttribute(
+			"liferay-journal:journal-article:dataAnalyticsTrackingEnabled",
+			String.valueOf(_dataAnalyticsTrackingEnabled));
 		httpServletRequest.setAttribute(
 			"liferay-journal:journal-article:showTitle",
 			String.valueOf(_showTitle));
@@ -231,6 +245,7 @@ public class JournalArticleTag extends IncludeTag {
 	private JournalArticle _article;
 	private JournalArticleDisplay _articleDisplay;
 	private String _articleId;
+	private boolean _dataAnalyticsTrackingEnabled = true;
 	private String _ddmTemplateKey;
 	private long _groupId;
 	private String _languageId;

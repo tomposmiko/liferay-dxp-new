@@ -64,6 +64,7 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portlet.layoutsadmin.display.context.GroupDisplayContextHelper;
@@ -154,8 +155,9 @@ public class LayoutsSEODisplayContext {
 	}
 
 	public String getDefaultCanonicalURL() throws PortalException {
-		return _layoutSEOCanonicalURLProvider.getDefaultCanonicalURL(
-			_selLayout, _themeDisplay);
+		return URLCodec.decodeURL(
+			_layoutSEOCanonicalURLProvider.getDefaultCanonicalURL(
+				_selLayout, _themeDisplay));
 	}
 
 	public Map<Locale, String> getDefaultCanonicalURLMap()

@@ -41,9 +41,8 @@ public enum OSBCommercePortalInstanceStatus {
 
 			return OSBCommercePortalInstanceStatus.CANCELLED;
 		}
-		else {
-			return OSBCommercePortalInstanceStatus.IN_PROGRESS;
-		}
+
+		return OSBCommercePortalInstanceStatus.IN_PROGRESS;
 	}
 
 	public int getStatus() {

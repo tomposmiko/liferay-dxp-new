@@ -184,10 +184,9 @@ public class BatchScheduledTaskExecutorService
 
 				throw new Exception("ML Job failed with an error");
 			}
-			else {
-				if (_log.isDebugEnabled()) {
-					_log.debug("Remote application status: " + state);
-				}
+
+			if (_log.isDebugEnabled()) {
+				_log.debug("Remote application status: " + state);
 			}
 
 			pollCount++;

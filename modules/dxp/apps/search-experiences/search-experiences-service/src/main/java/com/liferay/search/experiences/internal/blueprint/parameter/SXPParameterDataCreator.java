@@ -157,17 +157,14 @@ public class SXPParameterDataCreator
 
 		String keywords = GetterUtil.getString(searchContext.getKeywords());
 
-		_add(
-			new StringSXPParameter("keywords.raw", true, keywords),
-			sxpParameters);
-
 		if ((StringUtil.count(keywords, CharPool.QUOTE) % 2) != 0) {
 			keywords = StringUtil.replace(
 				keywords, CharPool.QUOTE, StringPool.BLANK);
 		}
 
 		keywords = keywords.replaceAll("/", "&#8725;");
-		keywords = keywords.replaceAll("\"", "\\\\\"");
+		keywords = keywords.replaceAll("\"", "&#34;");
+		keywords = keywords.replaceAll("\\$", "&#36;");
 		keywords = keywords.replaceAll("\\[", "&#91;");
 		keywords = keywords.replaceAll("\\\\", "&#92;");
 		keywords = keywords.replaceAll("\\]", "&#93;");

@@ -56,6 +56,7 @@ import com.liferay.portal.kernel.servlet.HttpMethods;
 import com.liferay.portal.kernel.servlet.ServletContextPool;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ConcurrentHashMapBuilder;
+import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Html;
 import com.liferay.portal.kernel.util.Http;
@@ -186,7 +187,10 @@ public class LayoutModelDocumentContributor
 
 		if ((serviceContext != null) && (serviceContext.getRequest() != null)) {
 			httpServletRequest = DynamicServletRequest.addQueryString(
-				serviceContext.getRequest(), "p_l_id=" + layout.getPlid(),
+				serviceContext.getRequest(),
+				StringBundler.concat(
+					"p_l_id=", layout.getPlid(), "&p_l_mode=",
+					Constants.SEARCH),
 				false);
 
 			httpServletResponse = serviceContext.getResponse();

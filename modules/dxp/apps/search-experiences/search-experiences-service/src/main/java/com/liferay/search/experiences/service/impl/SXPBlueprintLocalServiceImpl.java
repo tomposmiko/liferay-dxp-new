@@ -30,7 +30,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
 import com.liferay.search.experiences.exception.DuplicateSXPBlueprintExternalReferenceCodeException;
-import com.liferay.search.experiences.exception.SXPBlueprintConfigurationJSONException;
 import com.liferay.search.experiences.exception.SXPBlueprintTitleException;
 import com.liferay.search.experiences.model.SXPBlueprint;
 import com.liferay.search.experiences.service.base.SXPBlueprintLocalServiceBaseImpl;
@@ -68,7 +67,7 @@ public class SXPBlueprintLocalServiceImpl
 		_validateExternalReferenceCode(
 			user.getCompanyId(), externalReferenceCode);
 
-		_validate(configurationJSON, titleMap, serviceContext);
+		_validate(titleMap, serviceContext);
 
 		SXPBlueprint sxpBlueprint = sxpBlueprintPersistence.create(
 			counterLocalService.increment());
@@ -182,7 +181,7 @@ public class SXPBlueprintLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		_validate(configurationJSON, titleMap, serviceContext);
+		_validate(titleMap, serviceContext);
 
 		SXPBlueprint sxpBlueprint = sxpBlueprintPersistence.findByPrimaryKey(
 			sxpBlueprintId);
@@ -211,10 +210,8 @@ public class SXPBlueprintLocalServiceImpl
 	}
 
 	private void _validate(
-			String configurationJSON, Map<Locale, String> titleMap,
-			ServiceContext serviceContext)
-		throws SXPBlueprintConfigurationJSONException,
-			   SXPBlueprintTitleException {
+			Map<Locale, String> titleMap, ServiceContext serviceContext)
+		throws SXPBlueprintTitleException {
 
 		if (!GetterUtil.getBoolean(
 				serviceContext.getAttribute(
@@ -225,7 +222,7 @@ public class SXPBlueprintLocalServiceImpl
 			return;
 		}
 
-		_sxpBlueprintValidator.validate(configurationJSON, titleMap);
+		_sxpBlueprintValidator.validate(titleMap);
 	}
 
 	private void _validateExternalReferenceCode(

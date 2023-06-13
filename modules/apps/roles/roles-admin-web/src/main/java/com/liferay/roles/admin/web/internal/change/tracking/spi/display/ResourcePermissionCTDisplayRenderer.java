@@ -150,11 +150,10 @@ public class ResourcePermissionCTDisplayRenderer
 				resourceBundle, "x-permissions-for-x-x",
 				arguments.toArray(new String[0]), false);
 		}
-		else {
-			return LanguageUtil.format(
-				resourceBundle, "x-permissions-for-x-x-x",
-				arguments.toArray(new String[0]), false);
-		}
+
+		return LanguageUtil.format(
+			resourceBundle, "x-permissions-for-x-x-x",
+			arguments.toArray(new String[0]), false);
 	}
 
 	@Override

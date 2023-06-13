@@ -70,11 +70,12 @@ String eventName = liferayPortletResponse.getNamespace() + "selectLayout";
 
 ItemSelector itemSelector = (ItemSelector)request.getAttribute(SiteNavigationMenuItemTypeLayoutWebKeys.ITEM_SELECTOR);
 
-ItemSelectorCriterion itemSelectorCriterion = new LayoutItemSelectorCriterion();
+LayoutItemSelectorCriterion layoutItemSelectorCriterion = new LayoutItemSelectorCriterion();
 
-itemSelectorCriterion.setDesiredItemSelectorReturnTypes(new UUIDItemSelectorReturnType());
+layoutItemSelectorCriterion.setDesiredItemSelectorReturnTypes(new UUIDItemSelectorReturnType());
+layoutItemSelectorCriterion.setShowHiddenPages(true);
 
-PortletURL itemSelectorURL = itemSelector.getItemSelectorURL(RequestBackedPortletURLFactoryUtil.create(renderRequest), eventName, itemSelectorCriterion);
+PortletURL itemSelectorURL = itemSelector.getItemSelectorURL(RequestBackedPortletURLFactoryUtil.create(renderRequest), eventName, layoutItemSelectorCriterion);
 
 if (selLayout != null) {
 	itemSelectorURL.setParameter("layoutUuid", selLayout.getUuid());

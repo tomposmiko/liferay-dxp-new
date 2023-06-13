@@ -34,6 +34,10 @@ public class RenderLayoutStructureTag extends IncludeTag {
 
 	@Override
 	public int doStartTag() throws JspException {
+		_previousRenderLayoutStructureDisplayContext =
+			(RenderLayoutStructureDisplayContext)request.getAttribute(
+				RenderLayoutStructureDisplayContext.class.getName());
+
 		request.setAttribute(
 			RenderLayoutStructureDisplayContext.class.getName(),
 			new RenderLayoutStructureDisplayContext(
@@ -108,10 +112,21 @@ public class RenderLayoutStructureTag extends IncludeTag {
 	protected void cleanUp() {
 		super.cleanUp();
 
+		if (_previousRenderLayoutStructureDisplayContext != null) {
+			request.setAttribute(
+				RenderLayoutStructureDisplayContext.class.getName(),
+				_previousRenderLayoutStructureDisplayContext);
+		}
+		else {
+			request.removeAttribute(
+				RenderLayoutStructureDisplayContext.class.getName());
+		}
+
 		_fieldValues = null;
 		_layoutStructure = null;
 		_mainItemId = null;
 		_mode = FragmentEntryLinkConstants.VIEW;
+		_previousRenderLayoutStructureDisplayContext = null;
 		_showPreview = false;
 	}
 
@@ -134,6 +149,8 @@ public class RenderLayoutStructureTag extends IncludeTag {
 	private LayoutStructure _layoutStructure;
 	private String _mainItemId;
 	private String _mode = FragmentEntryLinkConstants.VIEW;
+	private RenderLayoutStructureDisplayContext
+		_previousRenderLayoutStructureDisplayContext;
 	private boolean _showPreview;
 
 }

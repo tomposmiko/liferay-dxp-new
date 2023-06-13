@@ -21,8 +21,6 @@ jest.useFakeTimers();
 const onChangeTitleAndDescription = jest.fn();
 const onSubmit = jest.fn();
 
-Liferay.ThemeDisplay.getDefaultLanguageId = () => 'en_US';
-
 function renderPageToolbar(props) {
 	return render(
 		<PageToolbar

@@ -32,6 +32,8 @@ import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.change.tracking.CTCollectionThreadLocal;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.Property;
+import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -784,6 +786,15 @@ public class JournalArticleIndexer extends BaseIndexer<JournalArticle> {
 				_journalArticleLocalService.
 					getIndexableActionableDynamicQuery();
 
+			indexableActionableDynamicQuery.setAddCriteriaMethod(
+				dynamicQuery -> {
+					Property property = PropertyFactoryUtil.forName(
+						"classNameId");
+
+					dynamicQuery.add(
+						property.ne(
+							_portal.getClassNameId(DDMStructure.class)));
+				});
 			indexableActionableDynamicQuery.setInterval(
 				_batchIndexingHelper.getBulkSize(
 					JournalArticle.class.getName()));

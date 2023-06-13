@@ -12,7 +12,7 @@
 import ClayLink from '@clayui/link';
 import React, {useContext} from 'react';
 
-import {getLocalizedLearnMessageObject} from '../utils/language';
+import getLocalizedLearnMessageObject from '../utils/language/get_localized_learn_message_object';
 import ThemeContext from './ThemeContext';
 
 /**

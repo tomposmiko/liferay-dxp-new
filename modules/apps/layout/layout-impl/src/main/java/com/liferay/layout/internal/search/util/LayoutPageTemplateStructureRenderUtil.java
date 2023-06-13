@@ -26,10 +26,13 @@ import com.liferay.layout.util.structure.LayoutStructureItem;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -138,6 +141,15 @@ public class LayoutPageTemplateStructureRenderUtil {
 
 			if (fragmentStyledLayoutStructureItem.getFragmentEntryLinkId() <=
 					0) {
+
+				continue;
+			}
+
+			if (Objects.equals(
+					ParamUtil.getString(
+						httpServletRequest, "p_l_mode", Constants.VIEW),
+					Constants.SEARCH) &&
+				!fragmentStyledLayoutStructureItem.isIndexed()) {
 
 				continue;
 			}

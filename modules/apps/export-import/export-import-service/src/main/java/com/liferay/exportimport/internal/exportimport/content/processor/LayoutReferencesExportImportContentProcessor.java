@@ -1183,19 +1183,23 @@ public class LayoutReferencesExportImportContentProcessor
 		try {
 			URI uri = _http.getURI(url);
 
-			if ((uri != null) &&
-				InetAddressUtil.isLocalInetAddress(
-					InetAddress.getByName(uri.getHost()))) {
+			if ((uri != null) && Validator.isIPAddress(uri.getHost())) {
+				InetAddress inetAddress = InetAddressUtil.getInetAddressByName(
+					uri.getHost());
 
-				StringBundler sb = new StringBundler(5);
+				if ((inetAddress != null) &&
+					InetAddressUtil.isLocalInetAddress(inetAddress)) {
 
-				sb.append(uri.getScheme());
-				sb.append("://");
-				sb.append(uri.getHost());
-				sb.append(StringPool.COLON);
-				sb.append(uri.getPort());
+					StringBundler sb = new StringBundler(5);
 
-				return sb.toString();
+					sb.append(uri.getScheme());
+					sb.append("://");
+					sb.append(uri.getHost());
+					sb.append(StringPool.COLON);
+					sb.append(uri.getPort());
+
+					return sb.toString();
+				}
 			}
 		}
 		catch (UnknownHostException unknownHostException) {

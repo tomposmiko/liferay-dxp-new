@@ -438,12 +438,8 @@ public class InlineSQLHelperImpl implements InlineSQLHelper {
 		PermissionChecker permissionChecker, Class<?> modelClass,
 		Column<T, Long> classPKColumn, long[] groupIds) {
 
-		T table = classPKColumn.getTable();
-
-		Column<T, Long> userIdColumn = table.getColumn("userId", Long.class);
-
 		DSLQuery resourcePermissionDSLQuery = _getResourcePermissionQuery(
-			permissionChecker, modelClass, userIdColumn, groupIds);
+			permissionChecker, modelClass, groupIds);
 
 		Predicate permissionPredicate = classPKColumn.in(
 			resourcePermissionDSLQuery);
@@ -482,6 +478,8 @@ public class InlineSQLHelperImpl implements InlineSQLHelper {
 		}
 
 		if (groupIdSet != null) {
+			T table = classPKColumn.getTable();
+
 			Column<T, Long> groupIdColumn = table.getColumn(
 				"groupId", Long.class);
 
@@ -501,7 +499,7 @@ public class InlineSQLHelperImpl implements InlineSQLHelper {
 
 	private DSLQuery _getResourcePermissionQuery(
 		PermissionChecker permissionChecker, Class<?> modelClass,
-		Column<?, Long> userIdColumn, long[] groupIds) {
+		long[] groupIds) {
 
 		Predicate roleIdsOrOwnerIdsPredicate = null;
 
@@ -516,10 +514,6 @@ public class InlineSQLHelperImpl implements InlineSQLHelper {
 		if (permissionChecker.isSignedIn()) {
 			Expression<Long> ownerIdExpression =
 				ResourcePermissionTable.INSTANCE.ownerId;
-
-			if (userIdColumn != null) {
-				ownerIdExpression = userIdColumn;
-			}
 
 			Predicate ownerIdPredicate = ownerIdExpression.eq(
 				permissionChecker.getUserId());

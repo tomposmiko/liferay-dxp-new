@@ -17,11 +17,12 @@ import ClayIcon from '@clayui/icon';
 import {FocusScope} from '@clayui/shared';
 import {ClayTooltipProvider} from '@clayui/tooltip';
 import fuzzy from 'fuzzy';
-import React, {useContext, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
-import {alphabeticalSort, stringLengthSort} from '../../utils/sort';
-import {isDefined, isEmpty} from '../../utils/utils';
-import ThemeContext from '../ThemeContext';
+import isDefined from '../../utils/functions/is_defined';
+import isEmpty from '../../utils/functions/is_empty';
+import sortAlphabetically from '../../utils/functions/sort_alphabetically';
+import sortByStringLength from '../../utils/functions/sort_by_string_length';
 
 const USER_LANGUAGE_VARIABLE = '${context.language_id}';
 
@@ -39,10 +40,10 @@ function filterAndSortIndexFields(indexFields, field) {
 			indexField.name.toLowerCase().includes(field.toLowerCase())
 		)
 		.sort((a, b) => {
-			const sort = stringLengthSort(a.name, b.name);
+			const sort = sortByStringLength(a.name, b.name);
 
 			if (sort === 0 || field === '') {
-				return alphabeticalSort(a.name, b.name);
+				return sortAlphabetically(a.name, b.name);
 			}
 
 			return sort;
@@ -98,8 +99,6 @@ function FieldRow({
 	onDelete,
 	showBoost,
 }) {
-	const {availableLanguages} = useContext(ThemeContext);
-
 	const inputRef = useRef();
 
 	const [filteredIndexFields, setFilteredIndexFields] = useState(
@@ -213,7 +212,7 @@ function FieldRow({
 								}
 								onSetActive={setShowDropDown}
 							>
-								<ClayDropDown.ItemList className="sxp-blueprint-field-row-dropdown">
+								<ClayDropDown.ItemList className="sxp-field-row-dropdown-root">
 									{filteredIndexFields.map(
 										(indexField, index) => (
 											<AutocompleteItem
@@ -256,13 +255,17 @@ function FieldRow({
 								value={USER_LANGUAGE_VARIABLE}
 							/>
 
-							{Object.keys(availableLanguages).map((locale) => (
-								<ClaySelect.Option
-									key={`${index}-${locale}`}
-									label={availableLanguages[locale]}
-									value={locale}
-								/>
-							))}
+							{Object.keys(Liferay.Language.available).map(
+								(locale) => (
+									<ClaySelect.Option
+										key={`${index}-${locale}`}
+										label={
+											Liferay.Language.available[locale]
+										}
+										value={locale}
+									/>
+								)
+							)}
 						</ClaySelect>
 					</ClayInput.GroupItem>
 				)}

@@ -149,14 +149,13 @@ public class JournalArticleInfoItemObjectProvider
 				articleResource.getGroupId(), articleResource.getArticleId(),
 				WorkflowConstants.STATUS_ANY);
 		}
-		else {
-			JournalArticleResource articleResource =
-				_journalArticleResourceLocalService.getArticleResource(classPK);
 
-			return _journalArticleLocalService.getArticle(
-				articleResource.getGroupId(), articleResource.getArticleId(),
-				GetterUtil.getDouble(version));
-		}
+		JournalArticleResource articleResource =
+			_journalArticleResourceLocalService.getArticleResource(classPK);
+
+		return _journalArticleLocalService.getArticle(
+			articleResource.getGroupId(), articleResource.getArticleId(),
+			GetterUtil.getDouble(version));
 	}
 
 	private JournalArticle _getArticle(
@@ -174,10 +173,9 @@ public class JournalArticleInfoItemObjectProvider
 			return _journalArticleLocalService.fetchLatestArticle(
 				groupId, articleId, WorkflowConstants.STATUS_ANY);
 		}
-		else {
-			return _journalArticleLocalService.getArticle(
-				groupId, articleId, GetterUtil.getDouble(version));
-		}
+
+		return _journalArticleLocalService.getArticle(
+			groupId, articleId, GetterUtil.getDouble(version));
 	}
 
 	private JournalArticle _getArticleByUrlTitle(
@@ -195,15 +193,14 @@ public class JournalArticleInfoItemObjectProvider
 			return _journalArticleLocalService.fetchLatestArticleByUrlTitle(
 				groupId, urlTitle, WorkflowConstants.STATUS_ANY);
 		}
-		else {
-			JournalArticle journalArticle =
-				_journalArticleLocalService.fetchLatestArticleByUrlTitle(
-					groupId, urlTitle, WorkflowConstants.STATUS_ANY);
 
-			return _journalArticleLocalService.getArticle(
-				groupId, journalArticle.getArticleId(),
-				GetterUtil.getDouble(version));
-		}
+		JournalArticle journalArticle =
+			_journalArticleLocalService.fetchLatestArticleByUrlTitle(
+				groupId, urlTitle, WorkflowConstants.STATUS_ANY);
+
+		return _journalArticleLocalService.getArticle(
+			groupId, journalArticle.getArticleId(),
+			GetterUtil.getDouble(version));
 	}
 
 	@Reference

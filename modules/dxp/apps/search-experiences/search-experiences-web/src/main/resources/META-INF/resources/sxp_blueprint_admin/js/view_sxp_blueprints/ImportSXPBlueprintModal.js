@@ -18,6 +18,8 @@ import {useIsMounted} from 'frontend-js-react-web';
 import {fetch} from 'frontend-js-web';
 import React, {useState} from 'react';
 
+import {DEFAULT_HEADERS} from '../utils/fetch/fetch_data';
+
 const VALID_EXTENSIONS = '.json';
 
 const ImportSXPBlueprintModal = ({redirectURL}) => {
@@ -58,9 +60,7 @@ const ImportSXPBlueprintModal = ({redirectURL}) => {
 
 				fetch(fetchURL, {
 					body: importText,
-					headers: new Headers({
-						'Content-Type': 'application/json',
-					}),
+					headers: DEFAULT_HEADERS,
 					method: 'POST',
 				})
 					.then((response) => {
@@ -103,7 +103,7 @@ const ImportSXPBlueprintModal = ({redirectURL}) => {
 	};
 
 	return (
-		<div className="import-sxp-blueprint-form">
+		<div className="sxp-import-modal-root">
 			<ClayModal.Body>
 				{errorMessage && (
 					<ClayAlert

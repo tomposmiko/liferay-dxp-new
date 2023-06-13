@@ -193,7 +193,7 @@ definition {
 
 		AntCommand(
 			locator1 = "build-test.xml",
-			value1 = "portal-ext-properties-update -Dapp.server.bundle.index=${bundleIndex} -Dupdate.properties.original=${propertiesOriginal} -Dupdate.properties=${propertiesUpdate}");
+			value1 = "portal-ext-properties-update -Dapp.server.bundle.index=${bundleIndex} -Dupdate.properties=${propertiesUpdate} -Dupdate.properties.original=${propertiesOriginal}");
 	}
 
 	macro viewClusterStatusInConsole {

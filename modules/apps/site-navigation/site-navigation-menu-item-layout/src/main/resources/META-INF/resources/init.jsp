@@ -27,7 +27,6 @@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 
 <%@ page import="com.liferay.frontend.taglib.clay.servlet.taglib.util.JSPNavigationItemList" %><%@
 page import="com.liferay.item.selector.ItemSelector" %><%@
-page import="com.liferay.item.selector.ItemSelectorCriterion" %><%@
 page import="com.liferay.item.selector.criteria.UUIDItemSelectorReturnType" %><%@
 page import="com.liferay.layout.item.selector.criterion.LayoutItemSelectorCriterion" %><%@
 page import="com.liferay.petra.string.StringPool" %><%@

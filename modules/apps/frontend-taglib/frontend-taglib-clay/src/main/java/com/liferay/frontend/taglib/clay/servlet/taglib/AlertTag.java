@@ -262,9 +262,8 @@ public class AlertTag extends BaseContainerTag {
 		else if (displayType.equals("warning")) {
 			return "warning-full";
 		}
-		else {
-			return "info-circle";
-		}
+
+		return "info-circle";
 	}
 
 	private String _getTitle(String title, String displayType) {

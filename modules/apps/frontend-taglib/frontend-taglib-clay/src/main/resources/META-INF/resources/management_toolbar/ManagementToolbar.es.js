@@ -61,6 +61,26 @@ class ManagementToolbar extends ClayComponent {
 					const bulkSelection =
 						this.supportsBulkActions && select.get('bulkSelection');
 
+					const actions = select._getActions(
+						select.getAllSelectedElements()
+					);
+
+					if (this.actionItems) {
+						this.actionItems = this.actionItems.map(
+							(actionItem) => {
+								return Object.assign(actionItem, {
+									disabled:
+										actions &&
+										actions.indexOf(
+											actionItem.data.action
+										) === -1 &&
+										(!bulkSelection ||
+											!actionItem.data.enableOnBulk),
+								});
+							}
+						);
+					}
+
 					this._setActiveStatus(
 						{
 							allSelectedElements: select.getAllSelectedElements(),

@@ -50,9 +50,8 @@ public abstract class DescendingPriorityComparator<T> implements Comparator<T> {
 		else if (priority2 == null) {
 			return Integer.compare(_defaultPriority, priority1.value());
 		}
-		else {
-			return Integer.compare(priority1.value(), priority2.value());
-		}
+
+		return Integer.compare(priority1.value(), priority2.value());
 	}
 
 	private int _defaultPriority;

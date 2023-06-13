@@ -17,16 +17,16 @@ import {useIsMounted} from 'frontend-js-react-web';
 import {fetch, navigate} from 'frontend-js-web';
 import React, {useContext, useEffect, useState} from 'react';
 
-import {DEFAULT_ERROR} from '../utils/constants';
 import {
 	DEFAULT_ADVANCED_CONFIGURATION,
 	DEFAULT_HIGHLIGHT_CONFIGURATION,
 	DEFAULT_PARAMETER_CONFIGURATION,
 	DEFAULT_SORT_CONFIGURATION,
 } from '../utils/data';
-import {fetchData} from '../utils/fetch';
+import {DEFAULT_ERROR} from '../utils/errorMessages';
+import fetchData, {DEFAULT_HEADERS} from '../utils/fetch/fetch_data';
+import filterAndSortClassNames from '../utils/functions/filter_and_sort_class_names';
 import {setInitialSuccessToast} from '../utils/toasts';
-import {filterAndSortClassNames} from '../utils/utils';
 import PortletContext from './PortletContext';
 
 const AddSXPBlueprintModal = ({children}) => {
@@ -118,9 +118,7 @@ const AddSXPBlueprintModal = ({children}) => {
 				elementInstances: [],
 				title_i18n: {[defaultLocale]: titleInputValue},
 			}),
-			headers: new Headers({
-				'Content-Type': 'application/json',
-			}),
+			headers: DEFAULT_HEADERS,
 			method: 'POST',
 		})
 			.then((response) => {
@@ -179,7 +177,7 @@ const AddSXPBlueprintModal = ({children}) => {
 		<>
 			{visibleModal && (
 				<ClayModal
-					className="sxp-blueprint-edit-title-modal"
+					className="sxp-add-blueprint-modal-root"
 					observer={observer}
 					size="md"
 				>

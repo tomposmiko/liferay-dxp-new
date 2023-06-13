@@ -414,7 +414,7 @@ public class JournalArticleAssetRenderer
 			if (Validator.isNotNull(friendlyURL)) {
 				if (!_article.isApproved()) {
 					friendlyURL = HttpUtil.addParameter(
-						friendlyURL, "version", _article.getId());
+						friendlyURL, "version", _article.getVersion());
 				}
 
 				return friendlyURL;
@@ -424,7 +424,18 @@ public class JournalArticleAssetRenderer
 		Layout layout = _article.getLayout();
 
 		if (layout == null) {
-			return noSuchEntryRedirect;
+			AssetRendererFactory<JournalArticle> assetRendererFactory =
+				getAssetRendererFactory();
+
+			AssetEntry assetEntry = assetRendererFactory.getAssetEntry(
+				getClassName(), getClassPK());
+
+			layout = _getArticleLayout(
+				assetEntry.getLayoutUuid(), assetEntry.getGroupId());
+
+			if (layout == null) {
+				return noSuchEntryRedirect;
+			}
 		}
 
 		String groupFriendlyURL = PortalUtil.getGroupFriendlyURL(
@@ -442,7 +453,7 @@ public class JournalArticleAssetRenderer
 
 		if (!_article.isApproved()) {
 			friendlyURL = HttpUtil.addParameter(
-				friendlyURL, "version", _article.getId());
+				friendlyURL, "version", _article.getVersion());
 		}
 
 		return PortalUtil.addPreservedParameters(themeDisplay, friendlyURL);
@@ -651,6 +662,22 @@ public class JournalArticleAssetRenderer
 		return new PortletRequestModel(portletRequest, portletResponse);
 	}
 
+	private Layout _getArticleLayout(String layoutUuid, long groupId) {
+		if (Validator.isNull(layoutUuid)) {
+			return null;
+		}
+
+		Layout layout = LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
+			layoutUuid, groupId, false);
+
+		if (layout == null) {
+			layout = LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
+				layoutUuid, groupId, true);
+		}
+
+		return layout;
+	}
+
 	private boolean _isShowDisplayPage(long groupId, JournalArticle article)
 		throws PortalException {
 
@@ -658,12 +685,16 @@ public class JournalArticleAssetRenderer
 			getAssetRendererFactory();
 
 		AssetEntry assetEntry = assetRendererFactory.getAssetEntry(
-			JournalArticle.class.getName(), article.getResourcePrimKey());
+			getClassName(), getClassPK());
 
-		boolean hasDisplayPage = AssetDisplayPageUtil.hasAssetDisplayPage(
-			groupId, assetEntry);
+		if (Validator.isNull(article.getLayoutUuid()) &&
+			Validator.isNull(assetEntry.getLayoutUuid()) &&
+			!AssetDisplayPageUtil.hasAssetDisplayPage(
+				groupId,
+				assetRendererFactory.getAssetEntry(
+					JournalArticle.class.getName(),
+					article.getResourcePrimKey()))) {
 
-		if (Validator.isNull(article.getLayoutUuid()) && !hasDisplayPage) {
 			return false;
 		}
 

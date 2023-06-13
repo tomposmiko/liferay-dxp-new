@@ -1299,9 +1299,8 @@ public class PortalImpl implements Portal {
 			else if (throwable instanceof SystemException) {
 				throw (SystemException)throwable;
 			}
-			else {
-				throw new SystemException(throwable);
-			}
+
+			throw new SystemException(throwable);
 		}
 	}
 

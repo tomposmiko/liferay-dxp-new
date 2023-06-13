@@ -38,10 +38,13 @@ import Sidebar from '../shared/Sidebar';
 import SubmitWarningModal from '../shared/SubmitWarningModal';
 import ThemeContext from '../shared/ThemeContext';
 import SXPElement from '../shared/sxp_element/index';
-import {CONFIG_PREFIX, DEFAULT_ERROR} from '../utils/constants';
-import {sub} from '../utils/language';
+import {CONFIG_PREFIX} from '../utils/constants';
+import {DEFAULT_ERROR} from '../utils/errorMessages';
+import {DEFAULT_HEADERS} from '../utils/fetch/fetch_data';
+import sub from '../utils/language/sub';
+import getUIConfigurationValues from '../utils/sxp_element/get_ui_configuration_values';
+import isCustomJSONSXPElement from '../utils/sxp_element/is_custom_json_sxp_element';
 import {openErrorToast, setInitialSuccessToast} from '../utils/toasts';
-import {getUIConfigurationValues, isCustomJSONSXPElement} from '../utils/utils';
 import SidebarPanel from './SidebarPanel';
 
 /**
@@ -285,9 +288,7 @@ function EditSXPElementForm({
 						title_i18n,
 						type,
 					}),
-					headers: new Headers({
-						'Content-Type': 'application/json',
-					}),
+					headers: DEFAULT_HEADERS,
 					method: 'PATCH',
 				}
 			)

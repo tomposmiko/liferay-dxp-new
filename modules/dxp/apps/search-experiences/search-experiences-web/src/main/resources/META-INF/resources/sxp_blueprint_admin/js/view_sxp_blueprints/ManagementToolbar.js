@@ -18,7 +18,7 @@ import ClayManagementToolbar, {
 import getCN from 'classnames';
 import React, {useContext, useState} from 'react';
 
-import {sub} from '../utils/language';
+import sub from '../utils/language/sub';
 import AddSXPBlueprintModal from './AddSXPBlueprintModal';
 import PortletContext from './PortletContext';
 

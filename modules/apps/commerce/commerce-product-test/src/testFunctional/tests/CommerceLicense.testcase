@@ -53,7 +53,7 @@ definition {
 
 		AntCommand(
 			locator1 = "build-test.xml",
-			value1 = "portal-ext-properties-update -Dupdate.properties.original=enterprise.product.commerce.enabled=true -Dupdate.properties=enterprise.product.commerce.enabled=false");
+			value1 = "portal-ext-properties-update -Dupdate.properties=enterprise.product.commerce.enabled=false -Dupdate.properties.original=enterprise.product.commerce.enabled=true");
 
 		Portlet.startServer(commerceEnabled = "false");
 

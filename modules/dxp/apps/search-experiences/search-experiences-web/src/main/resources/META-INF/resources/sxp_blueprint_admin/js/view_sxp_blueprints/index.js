@@ -25,7 +25,11 @@ import React, {useEffect, useState} from 'react';
 
 import SortButton from '../shared/SortButton';
 import {DEFAULT_ERROR} from '../utils/constants';
-import {sub} from '../utils/language';
+import {
+	DEFAULT_HEADERS,
+	DEFAULT_HEADERS_OBJECT,
+} from '../utils/fetch/fetch_data';
+import sub from '../utils/language/sub';
 import {checkPermission} from '../utils/permissions';
 import {formatDate, truncateString} from '../utils/strings';
 import {openErrorToast, openSuccessToast} from '../utils/toasts';
@@ -73,7 +77,10 @@ const ViewSXPBlueprints = ({
 	const {refetch, resource} = useResource({
 		fetchOptions: {
 			credentials: 'include',
-			headers: new Headers({'x-csrf-token': Liferay.authToken}),
+			headers: new Headers({
+				...DEFAULT_HEADERS_OBJECT,
+				'x-csrf-token': Liferay.authToken,
+			}),
 			method: 'GET',
 		},
 		fetchRetry: {
@@ -137,6 +144,7 @@ const ViewSXPBlueprints = ({
 
 	const _handleActionCopy = (id) => () => {
 		fetch(`${apiURL}/${id}/copy`, {
+			headers: DEFAULT_HEADERS,
 			method: 'POST',
 		})
 			.then(() => {
@@ -151,6 +159,7 @@ const ViewSXPBlueprints = ({
 
 	const _handleActionDownload = (id, title) => () => {
 		fetch(`${apiURL}/${id}/export`, {
+			headers: DEFAULT_HEADERS,
 			method: 'GET',
 		})
 			.then((response) => {
