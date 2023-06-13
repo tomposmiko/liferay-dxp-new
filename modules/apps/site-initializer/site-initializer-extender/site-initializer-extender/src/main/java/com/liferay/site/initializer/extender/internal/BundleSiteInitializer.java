@@ -76,6 +76,8 @@ import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalServ
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
 import com.liferay.layout.util.LayoutCopyHelper;
 import com.liferay.layout.util.structure.LayoutStructure;
+import com.liferay.notification.rest.dto.v1_0.NotificationTemplate;
+import com.liferay.notification.rest.resource.v1_0.NotificationTemplateResource;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectDefinition;
 import com.liferay.object.admin.rest.dto.v1_0.ObjectRelationship;
 import com.liferay.object.admin.rest.dto.v1_0.util.ObjectActionUtil;
@@ -230,6 +232,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 		ListTypeDefinitionResource.Factory listTypeDefinitionResourceFactory,
 		ListTypeEntryResource listTypeEntryResource,
 		ListTypeEntryResource.Factory listTypeEntryResourceFactory,
+		NotificationTemplateResource.Factory notificationTemplateResource,
 		ObjectActionLocalService objectActionLocalService,
 		ObjectDefinitionLocalService objectDefinitionLocalService,
 		ObjectDefinitionResource.Factory objectDefinitionResourceFactory,
@@ -291,6 +294,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 		_listTypeDefinitionResourceFactory = listTypeDefinitionResourceFactory;
 		_listTypeEntryResource = listTypeEntryResource;
 		_listTypeEntryResourceFactory = listTypeEntryResourceFactory;
+		_notificationTemplateResourceFactory = notificationTemplateResource;
 		_objectActionLocalService = objectActionLocalService;
 		_objectDefinitionLocalService = objectDefinitionLocalService;
 		_objectDefinitionResourceFactory = objectDefinitionResourceFactory;
@@ -473,6 +477,11 @@ public class BundleSiteInitializer implements SiteInitializer {
 
 			_invoke(
 				() -> _addCPDefinitions(
+					documentsStringUtilReplaceValues,
+					objectDefinitionIdsAndObjectEntryIdsStringUtilReplaceValues,
+					serviceContext));
+			_invoke(
+				() -> _addNotificationTemplates(
 					documentsStringUtilReplaceValues,
 					objectDefinitionIdsAndObjectEntryIdsStringUtilReplaceValues,
 					serviceContext));
@@ -1532,6 +1541,11 @@ public class BundleSiteInitializer implements SiteInitializer {
 			type, null, jsonObject.getBoolean("hidden"),
 			jsonObject.getBoolean("system"), friendlyURLMap, serviceContext);
 
+		_setResourcePermissions(
+			layout.getCompanyId(), layout.getModelClassName(),
+			jsonObject.getJSONArray("permissions"),
+			String.valueOf(layout.getPlid()));
+
 		if (jsonObject.has("priority")) {
 			layout = _layoutLocalService.updatePriority(
 				layout.getPlid(), jsonObject.getInt("priority"));
@@ -1958,6 +1972,135 @@ public class BundleSiteInitializer implements SiteInitializer {
 		}
 
 		return listTypeDefinitionIdsStringUtilReplaceValues;
+	}
+
+	private void _addNotificationTemplate(
+			Map<String, String> documentsStringUtilReplaceValues,
+			Map<String, String>
+				objectDefinitionIdsAndObjectEntryIdsStringUtilReplaceValues,
+			String resourcePath, ServiceContext serviceContext)
+		throws Exception {
+
+		String json = SiteInitializerUtil.read(
+			resourcePath + "notification-template.json", _servletContext);
+
+		if (json == null) {
+			return;
+		}
+
+		JSONObject bodyJSONObject = _jsonFactory.createJSONObject();
+
+		Enumeration<URL> enumeration = _bundle.findEntries(
+			resourcePath, "*.html", false);
+
+		if (enumeration == null) {
+			return;
+		}
+
+		while (enumeration.hasMoreElements()) {
+			URL url = enumeration.nextElement();
+
+			bodyJSONObject.put(
+				FileUtil.getShortFileName(
+					FileUtil.stripExtension(url.getPath())),
+				_replace(
+					StringUtil.read(url.openStream()), "[$", "$]",
+					documentsStringUtilReplaceValues));
+		}
+
+		JSONObject notificationTemplateJSONObject =
+			JSONFactoryUtil.createJSONObject(json);
+
+		notificationTemplateJSONObject.put("body", bodyJSONObject);
+
+		NotificationTemplate notificationTemplate = NotificationTemplate.toDTO(
+			notificationTemplateJSONObject.toString());
+
+		NotificationTemplateResource.Builder
+			notificationTemplateResourceBuilder =
+				_notificationTemplateResourceFactory.create();
+
+		NotificationTemplateResource notificationTemplateResource =
+			notificationTemplateResourceBuilder.user(
+				serviceContext.fetchUser()
+			).build();
+
+		Page<NotificationTemplate> notificationTemplatesPage =
+			notificationTemplateResource.getNotificationTemplatesPage(
+				null, null,
+				notificationTemplateResource.toFilter(
+					StringBundler.concat(
+						"name eq '", notificationTemplate.getName(), "'")),
+				null, null);
+
+		NotificationTemplate existingNotificationTemplate =
+			notificationTemplatesPage.fetchFirstItem();
+
+		if (existingNotificationTemplate == null) {
+			notificationTemplate =
+				notificationTemplateResource.postNotificationTemplate(
+					notificationTemplate);
+		}
+		else {
+			notificationTemplate =
+				notificationTemplateResource.putNotificationTemplate(
+					existingNotificationTemplate.getId(), notificationTemplate);
+		}
+
+		json = SiteInitializerUtil.read(
+			resourcePath + "notification-template.object-actions.json",
+			_servletContext);
+
+		if (json == null) {
+			return;
+		}
+
+		json = _replace(
+			json, "[$", "$]",
+			objectDefinitionIdsAndObjectEntryIdsStringUtilReplaceValues);
+
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray(json);
+
+		Map<String, Long> parametersMap = HashMapBuilder.put(
+			"notificationTemplateId", notificationTemplate.getId()
+		).build();
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+			_objectActionLocalService.addObjectAction(
+				serviceContext.getUserId(),
+				jsonObject.getLong("objectDefinitionId"),
+				jsonObject.getBoolean("active"),
+				jsonObject.getString("conditionExpression"),
+				jsonObject.getString("description"),
+				jsonObject.getString("name"),
+				jsonObject.getString("objectActionExecutorKey"),
+				jsonObject.getString("objectActionTriggerKey"),
+				ObjectActionUtil.toParametersUnicodeProperties(parametersMap));
+		}
+	}
+
+	private void _addNotificationTemplates(
+			Map<String, String> documentsStringUtilReplaceValues,
+			Map<String, String>
+				objectDefinitionIdsAndObjectEntryIdsStringUtilReplaceValues,
+			ServiceContext serviceContext)
+		throws Exception {
+
+		Set<String> resourcePaths = _servletContext.getResourcePaths(
+			"/site-initializer/notification-templates");
+
+		if (SetUtil.isEmpty(resourcePaths)) {
+			return;
+		}
+
+		for (String resourcePath : resourcePaths) {
+			_addNotificationTemplate(
+				documentsStringUtilReplaceValues,
+				objectDefinitionIdsAndObjectEntryIdsStringUtilReplaceValues,
+				resourcePath, serviceContext);
+		}
 	}
 
 	private Map<String, String> _addObjectDefinitions(
@@ -3696,6 +3839,42 @@ public class BundleSiteInitializer implements SiteInitializer {
 		return StringUtil.replace(s, oldSubs, newSubs);
 	}
 
+	private void _setResourcePermissions(
+			long companyId, String name, JSONArray permissionsJSONArray,
+			String primKey)
+		throws Exception {
+
+		if (permissionsJSONArray == null) {
+			return;
+		}
+
+		for (int i = 0; i < permissionsJSONArray.length(); i++) {
+			JSONObject permissionsJSONObject =
+				permissionsJSONArray.getJSONObject(i);
+
+			int scope = permissionsJSONObject.getInt("scope");
+
+			String roleName = permissionsJSONObject.getString("roleName");
+
+			Role role = _roleLocalService.getRole(companyId, roleName);
+
+			String[] actionIds = new String[0];
+
+			JSONArray actionIdsJSONArray = permissionsJSONObject.getJSONArray(
+				"actionIds");
+
+			if (actionIdsJSONArray != null) {
+				for (int j = 0; j < actionIdsJSONArray.length(); j++) {
+					actionIds = ArrayUtil.append(
+						actionIds, actionIdsJSONArray.getString(j));
+				}
+			}
+
+			_resourcePermissionLocalService.setResourcePermissions(
+				companyId, name, scope, primKey, role.getRoleId(), actionIds);
+		}
+	}
+
 	private Layout _updateDraftLayout(
 			Layout draftLayout, JSONObject settingsJSONObject)
 		throws Exception {
@@ -3878,6 +4057,8 @@ public class BundleSiteInitializer implements SiteInitializer {
 		_listTypeDefinitionResourceFactory;
 	private final ListTypeEntryResource _listTypeEntryResource;
 	private final ListTypeEntryResource.Factory _listTypeEntryResourceFactory;
+	private final NotificationTemplateResource.Factory
+		_notificationTemplateResourceFactory;
 	private final ObjectActionLocalService _objectActionLocalService;
 	private final ObjectDefinitionLocalService _objectDefinitionLocalService;
 	private final ObjectDefinitionResource.Factory

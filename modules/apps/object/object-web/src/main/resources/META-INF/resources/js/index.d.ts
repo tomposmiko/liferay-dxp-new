@@ -147,7 +147,19 @@ type ObjectFieldFilterSetting = {
 					| ObjectFieldDateRangeFilterSettings
 					| undefined;
 		  }
+		| ExcludesFilterOperator
+		| IncludesFilterOperator
 		| string;
+};
+
+type ExcludesFilterOperator = {
+	not: {
+		in: string[] | number[];
+	};
+};
+
+type IncludesFilterOperator = {
+	in: string[] | number[];
 };
 
 type ObjectFieldDateRangeFilterSettings = {
@@ -157,6 +169,12 @@ type ObjectFieldDateRangeFilterSettings = {
 interface IItem extends LabelValueObject {
 	checked?: boolean;
 }
+
+type TFilterOperators = {
+	dateOperators: LabelValueObject[];
+	numericOperators: LabelValueObject[];
+	picklistOperators: LabelValueObject[];
+};
 
 type ObjectFieldSettingName =
 	| 'acceptedFileExtensions'

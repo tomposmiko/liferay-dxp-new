@@ -13,19 +13,26 @@
  */
 
 import {ClayButtonWithIcon} from '@clayui/button';
-import React, {useMemo, useState} from 'react';
+import {debounce} from 'frontend-js-web';
+import React, {
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+	useState,
+} from 'react';
 
 import {FRAGMENTS_DISPLAY_STYLES} from '../../../app/config/constants/fragmentsDisplayStyles';
 import {LAYOUT_DATA_ITEM_TYPES} from '../../../app/config/constants/layoutDataItemTypes';
+import {config} from '../../../app/config/index';
 import {useSelector} from '../../../app/contexts/StoreContext';
 import {useWidgets} from '../../../app/contexts/WidgetsContext';
 import SearchForm from '../../../common/components/SearchForm';
 import SidebarPanelContent from '../../../common/components/SidebarPanelContent';
 import SidebarPanelHeader from '../../../common/components/SidebarPanelHeader';
+import {useSessionState} from '../../../core/hooks/useSessionState';
 import SearchResultsPanel from './SearchResultsPanel';
 import TabsPanel from './TabsPanel';
-
-const FRAGMENTS_DISPLAY_STYLE_KEY = 'FRAGMENTS_DISPLAY_STYLE_KEY';
 
 export const COLLECTION_IDS = {
 	fragments: 'fragments',
@@ -82,6 +89,7 @@ const normalizeWidget = (widget) => {
 			used: widget.used,
 		},
 		disabled: !widget.instanceable && widget.used,
+		highlighted: widget.highlighted,
 		icon: widget.instanceable ? 'square-hole-multi' : 'square-hole',
 		itemId: widget.portletId,
 		label: widget.title,
@@ -109,36 +117,52 @@ const normalizeCollections = (collection) => {
 	return normalizedElement;
 };
 
-const normalizeFragmentEntry = (fragmentEntry) => {
-	if (!fragmentEntry.fragmentEntryKey) {
-		return fragmentEntry;
-	}
-
-	return {
-		data: {
-			fragmentEntryKey: fragmentEntry.fragmentEntryKey,
-			groupId: fragmentEntry.groupId,
-			type: fragmentEntry.type,
-		},
-		icon: fragmentEntry.icon,
-		itemId: fragmentEntry.fragmentEntryKey,
-		label: fragmentEntry.name,
-		preview: fragmentEntry.imagePreviewURL,
-		type: LAYOUT_DATA_ITEM_TYPES.fragment,
-	};
-};
+const normalizeFragmentEntry = (fragmentEntry) => ({
+	data: {
+		fragmentEntryKey: fragmentEntry.fragmentEntryKey,
+		groupId: fragmentEntry.groupId,
+		type: fragmentEntry.type,
+	},
+	highlighted: fragmentEntry.highlighted,
+	icon: fragmentEntry.icon,
+	itemId: fragmentEntry.fragmentEntryKey,
+	label: fragmentEntry.name,
+	preview: fragmentEntry.imagePreviewURL,
+	type: fragmentEntry.itemType || LAYOUT_DATA_ITEM_TYPES.fragment,
+});
 
 export default function FragmentsSidebar() {
 	const fragments = useSelector((state) => state.fragments);
 	const widgets = useWidgets();
+	const wrapperElementRef = useRef(null);
 
-	const [activeTabId, setActiveTabId] = useState(COLLECTION_IDS.fragments);
-	const [displayStyle, setDisplayStyle] = useState(
-		window.sessionStorage.getItem(FRAGMENTS_DISPLAY_STYLE_KEY) ||
-			FRAGMENTS_DISPLAY_STYLES.LIST
+	const [
+		activeTabId,
+		setActiveTabId,
+	] = useSessionState(
+		`${config.portletNamespace}_fragments-sidebar_active-tab-id`,
+		COLLECTION_IDS.fragments,
+		{persistEnabled: Liferay.FeatureFlags['LPS-153452']}
+	);
+
+	const [displayStyle, setDisplayStyle] = useSessionState(
+		'FRAGMENTS_DISPLAY_STYLE_KEY',
+		FRAGMENTS_DISPLAY_STYLES.LIST
 	);
 
 	const [searchValue, setSearchValue] = useState('');
+
+	const [
+		scrollPosition,
+		setScrollPosition,
+	] = useSessionState(
+		`${config.portletNamespace}_fragments-sidebar_tab_${activeTabId}_scroll-position`,
+		0,
+		{persistEnabled: Liferay.FeatureFlags['LPS-153452']}
+	);
+
+	const scrollPositionRef = useRef(scrollPosition);
+	scrollPositionRef.current = scrollPosition;
 
 	const tabs = useMemo(
 		() => [
@@ -183,8 +207,43 @@ export default function FragmentsSidebar() {
 	const displayStyleButtonDisabled =
 		searchValue || activeTabId === COLLECTION_IDS.widgets;
 
+	useLayoutEffect(() => {
+		const wrapperElement = wrapperElementRef.current;
+		const initialScrollPosition = scrollPositionRef.current;
+
+		if (!wrapperElement || !initialScrollPosition) {
+			return;
+		}
+
+		wrapperElement.scrollBy({
+			behavior: 'auto',
+			left: 0,
+			top: initialScrollPosition,
+		});
+	}, []);
+
+	useEffect(() => {
+		const wrapperElement = wrapperElementRef.current;
+
+		if (!wrapperElement) {
+			return;
+		}
+
+		const handleScroll = debounce(() => {
+			setScrollPosition(wrapperElement.scrollTop);
+		}, 300);
+
+		wrapperElement.addEventListener('scroll', handleScroll, {
+			passive: true,
+		});
+
+		return () => {
+			wrapperElement.removeEventListener('scroll', handleScroll);
+		};
+	}, [setScrollPosition]);
+
 	return (
-		<>
+		<div className="h-100 overflow-auto" ref={wrapperElementRef}>
 			<SidebarPanelHeader>
 				{Liferay.Language.get('fragments-and-widgets')}
 			</SidebarPanelHeader>
@@ -203,16 +262,10 @@ export default function FragmentsSidebar() {
 						disabled={displayStyleButtonDisabled}
 						displayType="secondary"
 						onClick={() => {
-							const nextDisplayStyle =
+							setDisplayStyle(
 								displayStyle === FRAGMENTS_DISPLAY_STYLES.LIST
 									? FRAGMENTS_DISPLAY_STYLES.CARDS
-									: FRAGMENTS_DISPLAY_STYLES.LIST;
-
-							setDisplayStyle(nextDisplayStyle);
-
-							window.sessionStorage.setItem(
-								FRAGMENTS_DISPLAY_STYLE_KEY,
-								nextDisplayStyle
+									: FRAGMENTS_DISPLAY_STYLES.LIST
 							);
 						}}
 						small
@@ -242,6 +295,6 @@ export default function FragmentsSidebar() {
 					/>
 				)}
 			</SidebarPanelContent>
-		</>
+		</div>
 	);
 }

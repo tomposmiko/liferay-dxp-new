@@ -106,7 +106,7 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 		LayoutDisplayPageObjectProvider<?> layoutDisplayPageObjectProvider =
 			_getLayoutDisplayPageObjectProvider(journalArticle);
 
-		if (Validator.isNull(journalArticle.getLayoutUuid()) &&
+		if (Validator.isNull(_getLayoutUuid(journalArticle)) &&
 			(layoutDisplayPageObjectProvider != null) &&
 			AssetDisplayPageUtil.hasAssetDisplayPage(
 				groupId, layoutDisplayPageObjectProvider.getClassNameId(),
@@ -175,7 +175,9 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 		LayoutDisplayPageObjectProvider<?> layoutDisplayPageObjectProvider =
 			_getLayoutDisplayPageObjectProvider(journalArticle);
 
-		if (Validator.isNull(journalArticle.getLayoutUuid()) &&
+		String layoutUuid = _getLayoutUuid(journalArticle);
+
+		if (Validator.isNull(layoutUuid) &&
 			(layoutDisplayPageObjectProvider != null) &&
 			AssetDisplayPageUtil.hasAssetDisplayPage(
 				groupId, layoutDisplayPageObjectProvider.getClassNameId(),
@@ -188,7 +190,7 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 		}
 
 		Layout layout = _layoutLocalService.getLayoutByUuidAndGroupId(
-			journalArticle.getLayoutUuid(), groupId, privateLayout);
+			layoutUuid, groupId, privateLayout);
 
 		return new LayoutFriendlyURLComposite(layout, friendlyURL, false);
 	}
@@ -196,6 +198,28 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 	@Override
 	public String getURLSeparator() {
 		return JournalArticleConstants.CANONICAL_URL_SEPARATOR;
+	}
+
+	private AssetEntry _getAssetEntry(JournalArticle journalArticle) {
+		AssetRendererFactory<?> assetRendererFactory =
+			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
+				JournalArticle.class.getName());
+
+		return Optional.ofNullable(
+			_assetEntryLocalService.fetchEntry(
+				JournalArticle.class.getName(), journalArticle.getPrimaryKey())
+		).orElseGet(
+			() -> {
+				try {
+					return assetRendererFactory.getAssetEntry(
+						JournalArticle.class.getName(),
+						journalArticle.getResourcePrimKey());
+				}
+				catch (PortalException portalException) {
+					throw new RuntimeException(portalException);
+				}
+			}
+		);
 	}
 
 	private String _getBasicLayoutURL(
@@ -206,7 +230,7 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 		throws PortalException {
 
 		Layout layout = _layoutLocalService.getLayoutByUuidAndGroupId(
-			journalArticle.getLayoutUuid(), groupId, privateLayout);
+			_getLayoutUuid(journalArticle), groupId, privateLayout);
 
 		String layoutActualURL = _portal.getLayoutActualURL(layout, mainPath);
 
@@ -271,21 +295,7 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 
 		Locale locale = _portal.getLocale(httpServletRequest);
 
-		AssetEntry assetEntry = Optional.ofNullable(
-			_assetEntryLocalService.fetchEntry(
-				JournalArticle.class.getName(), journalArticle.getPrimaryKey())
-		).orElseGet(
-			() -> {
-				try {
-					return assetRendererFactory.getAssetEntry(
-						JournalArticle.class.getName(),
-						journalArticle.getResourcePrimKey());
-				}
-				catch (PortalException portalException) {
-					throw new RuntimeException(portalException);
-				}
-			}
-		);
+		AssetEntry assetEntry = _getAssetEntry(journalArticle);
 
 		actualParams.put(
 			namespace + "assetEntryId",
@@ -512,8 +522,7 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 	}
 
 	private LayoutDisplayPageObjectProvider<?>
-			_getLayoutDisplayPageObjectProvider(JournalArticle journalArticle)
-		throws PortalException {
+		_getLayoutDisplayPageObjectProvider(JournalArticle journalArticle) {
 
 		LayoutDisplayPageProvider<?> layoutDisplayPageProvider =
 			layoutDisplayPageProviderTracker.
@@ -526,6 +535,18 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 
 		return layoutDisplayPageProvider.getLayoutDisplayPageObjectProvider(
 			infoItemReference);
+	}
+
+	private String _getLayoutUuid(JournalArticle journalArticle) {
+		String layoutUuid = journalArticle.getLayoutUuid();
+
+		if (Validator.isNotNull(layoutUuid)) {
+			return layoutUuid;
+		}
+
+		AssetEntry assetEntry = _getAssetEntry(journalArticle);
+
+		return assetEntry.getLayoutUuid();
 	}
 
 	private String _getURLTitle(String friendlyURL) {
@@ -555,7 +576,7 @@ public class DefaultAssetDisplayPageFriendlyURLResolver
 		if ((numbers.size() == 2) && Validator.isDigit(numbers.get(0)) &&
 			Validator.isDigit(numbers.get(1))) {
 
-			return Double.valueOf(lastPath);
+			return GetterUtil.getDouble(lastPath);
 		}
 
 		return 0;

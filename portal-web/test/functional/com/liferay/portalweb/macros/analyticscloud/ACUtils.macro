@@ -604,6 +604,12 @@ definition {
 		}
 	}
 
+	macro executeJSInBrowserConsole {
+		var javaScript = "${javaScriptCode}";
+
+		var javaScriptItem = selenium.getEval("${javaScript}");
+	}
+
 	macro getEventPropertyValue {
 		var postDataText = ProxyUtil.getHarRecording("$..request..postData..text");
 
@@ -1084,6 +1090,13 @@ definition {
 
 			var i = StringUtil.valueOf("${i}");
 		}
+	}
+
+	macro waitForClearProperty {
+
+		// This pause is necessary as it takes time for the data to be cleared from the property. See LRAC-11595
+
+		Pause(locator1 = "10000");
 	}
 
 	macro waitForLoading {

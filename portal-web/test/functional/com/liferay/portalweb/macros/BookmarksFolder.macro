@@ -215,7 +215,7 @@ definition {
 			pageName = "${pageName}",
 			siteName = "${siteName}");
 
-		while (IsElementPresent.pauseIsElementPresent(locator1 = "Icon#BACK")) {
+		while (IsElementPresent(locator1 = "Icon#BACK")) {
 			Click(locator1 = "Icon#BACK");
 		}
 
@@ -273,9 +273,7 @@ definition {
 	macro moveToRecycleBinCP {
 		Navigator.openURL();
 
-		ProductMenu.gotoPortlet(
-			category = "Content & Data",
-			portlet = "Bookmarks");
+		Bookmark.openBookmarksAdmin(siteURLKey = "guest");
 
 		AssertTextEquals(
 			key_assetName = "${folderName}",
@@ -290,11 +288,7 @@ definition {
 	}
 
 	macro tearDownCP {
-		Navigator.openURL();
-
-		ProductMenu.gotoPortlet(
-			category = "Content & Data",
-			portlet = "Bookmarks");
+		Bookmark.openBookmarksAdmin(siteURLKey = "guest");
 
 		if (IsElementNotPresent(locator1 = "Message#EMPTY_INFO")) {
 			PortletEntry.selectAll();

@@ -55,7 +55,7 @@ import {
 import {ALL_SECTIONS_ID} from '../../utils/contants.es';
 import lang from '../../utils/lang.es';
 import {
-	dateToBriefInternationalHuman,
+	dateToInternationalHuman,
 	deleteCacheKey,
 	getContextLink,
 	getErrorObject,
@@ -380,12 +380,14 @@ export default withRouter(
 										<p className="c-mb-0 small text-secondary">
 											{`${Liferay.Language.get(
 												'asked'
-											)} ${dateToBriefInternationalHuman(
-												question.dateCreated
-											)} - ${Liferay.Language.get(
+											)} - ${dateToInternationalHuman(
+												question.dateCreated,
+												Liferay.ThemeDisplay.getBCP47LanguageId()
+											)} / ${Liferay.Language.get(
 												'active'
-											)} ${dateToBriefInternationalHuman(
-												question.dateModified
+											)} - ${dateToInternationalHuman(
+												question.dateModified,
+												Liferay.ThemeDisplay.getBCP47LanguageId()
 											)} - ${lang.sub(
 												Liferay.Language.get(
 													'viewed-x-times'
@@ -536,6 +538,7 @@ export default withRouter(
 													!question.locked &&
 													!!question.actions.replace
 												}
+												context={context}
 												deleteAnswer={deleteAnswer}
 												editable={!question.locked}
 												key={answer.id}

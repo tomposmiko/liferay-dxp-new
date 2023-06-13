@@ -40,12 +40,14 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.SessionClicks;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portlet.LiferayPortletUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -93,8 +95,8 @@ public class KBAdminNavigationDisplayContext {
 				portletDisplay.getId(), KBActionKeys.VIEW),
 			NavigationItemBuilder.setActive(
 				() -> {
-					if (!mvcPath.equals("/admin/view_suggestions.jsp") &&
-						!mvcPath.equals("/admin/view_templates.jsp")) {
+					if (!mvcPath.equals("/admin/view_kb_suggestions.jsp") &&
+						!mvcPath.equals("/admin/view_kb_templates.jsp")) {
 
 						return true;
 					}
@@ -117,7 +119,7 @@ public class KBAdminNavigationDisplayContext {
 				KBActionKeys.VIEW_KB_TEMPLATES),
 			NavigationItemBuilder.setActive(
 				() -> {
-					if (mvcPath.equals("/admin/view_templates.jsp")) {
+					if (mvcPath.equals("/admin/view_kb_templates.jsp")) {
 						return true;
 					}
 
@@ -127,7 +129,7 @@ public class KBAdminNavigationDisplayContext {
 				PortletURLBuilder.createRenderURL(
 					_liferayPortletResponse
 				).setMVCPath(
-					"/admin/view_templates.jsp"
+					"/admin/view_kb_templates.jsp"
 				).buildString()
 			).setLabel(
 				LanguageUtil.get(_httpServletRequest, "templates")
@@ -138,7 +140,7 @@ public class KBAdminNavigationDisplayContext {
 				_themeDisplay.getScopeGroupId(), KBActionKeys.VIEW_SUGGESTIONS),
 			NavigationItemBuilder.setActive(
 				() -> {
-					if (mvcPath.equals("/admin/view_suggestions.jsp")) {
+					if (mvcPath.equals("/admin/view_kb_suggestions.jsp")) {
 						return true;
 					}
 
@@ -148,7 +150,7 @@ public class KBAdminNavigationDisplayContext {
 				PortletURLBuilder.createRenderURL(
 					_liferayPortletResponse
 				).setMVCPath(
-					"/admin/view_suggestions.jsp"
+					"/admin/view_kb_suggestions.jsp"
 				).buildString()
 			).setLabel(
 				LanguageUtil.get(_httpServletRequest, "suggestions")
@@ -172,8 +174,8 @@ public class KBAdminNavigationDisplayContext {
 			boolean active = false;
 			JSONArray navigationItemsJSONArray = null;
 
-			if (!mvcPath.equals("/admin/view_suggestions.jsp") &&
-				!mvcPath.equals("/admin/view_templates.jsp")) {
+			if (!mvcPath.equals("/admin/view_kb_suggestions.jsp") &&
+				!mvcPath.equals("/admin/view_kb_templates.jsp")) {
 
 				active = true;
 				navigationItemsJSONArray = _getKBArticleNavigationJSONArray();
@@ -209,7 +211,7 @@ public class KBAdminNavigationDisplayContext {
 
 			boolean active = false;
 
-			if (mvcPath.equals("/admin/view_templates.jsp")) {
+			if (mvcPath.equals("/admin/view_kb_templates.jsp")) {
 				active = true;
 			}
 
@@ -221,7 +223,7 @@ public class KBAdminNavigationDisplayContext {
 					PortletURLBuilder.createRenderURL(
 						_liferayPortletResponse
 					).setMVCPath(
-						"/admin/view_templates.jsp"
+						"/admin/view_kb_templates.jsp"
 					).buildString()
 				).put(
 					"icon", "page-template"
@@ -239,7 +241,7 @@ public class KBAdminNavigationDisplayContext {
 
 			boolean active = false;
 
-			if (mvcPath.equals("/admin/view_suggestions.jsp")) {
+			if (mvcPath.equals("/admin/view_kb_suggestions.jsp")) {
 				active = true;
 			}
 
@@ -251,7 +253,7 @@ public class KBAdminNavigationDisplayContext {
 					PortletURLBuilder.createRenderURL(
 						_liferayPortletResponse
 					).setMVCPath(
-						"/admin/view_suggestions.jsp"
+						"/admin/view_kb_suggestions.jsp"
 					).buildString()
 				).put(
 					"icon", "message"
@@ -264,6 +266,15 @@ public class KBAdminNavigationDisplayContext {
 		}
 
 		return verticalNavigationItems;
+	}
+
+	public boolean isProductMenuOpen() {
+		String productMenuState = SessionClicks.get(
+			_httpServletRequest,
+			"com.liferay.product.navigation.product.menu.web_productMenuState",
+			"closed");
+
+		return Objects.equals(productMenuState, "open");
 	}
 
 	private JSONArray _getKBArticleNavigationJSONArray()
@@ -316,7 +327,7 @@ public class KBAdminNavigationDisplayContext {
 					PortletURLBuilder.createRenderURL(
 						_liferayPortletResponse
 					).setMVCPath(
-						"/admin/view_folders.jsp"
+						"/admin/view_kb_folders.jsp"
 					).setParameter(
 						"parentResourceClassNameId", kbFolder.getClassNameId()
 					).setParameter(

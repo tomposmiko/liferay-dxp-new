@@ -28,7 +28,14 @@ public class UpgradeSourceProcessorTest extends BaseSourceProcessorTestCase {
 
 	@Test
 	public void testGradleUpgradeReleaseDxpCheck() throws Exception {
-		test("GradleUpgradeReleaseDxpCheck.testgradle");
+		test("upgrade/GradleUpgradeReleaseDxpCheck.testgradle");
+	}
+
+	@Test
+	public void testPropertiesUpgradeLiferayPluginPackageFileCheck()
+		throws Exception {
+
+		test("upgrade/liferay-plugin-package.testproperties");
 	}
 
 	@Override

@@ -50,6 +50,7 @@ const languages = Liferay.Language.available;
 const languageLabels = Object.values(languages);
 
 export default function EditObjectField({
+	filterOperators,
 	forbiddenChars,
 	forbiddenLastChars,
 	forbiddenNames,
@@ -277,11 +278,41 @@ export default function EditObjectField({
 						{
 							filterBy: objectFieldName,
 							filterType,
-							json: {
-								[filterType as string]: value
-									? value
-									: dateJson,
+							json: dateJson,
+						},
+					];
+				}
+				else if (
+					objectFieldBusinessType === 'Picklist' ||
+					objectFieldName === 'status'
+				) {
+					let picklistJson:
+						| ExcludesFilterOperator
+						| IncludesFilterOperator;
+
+					if (filterType === 'excludes') {
+						picklistJson = {
+							not: {
+								in: valueList?.map(({value}) => value) as
+									| string[]
+									| number[],
 							},
+						};
+					}
+					else {
+						picklistJson = {
+							in: valueList?.map(({value}) => value) as
+								| string[]
+								| number[],
+						};
+					}
+
+					newFilterValues = [
+						...(filter.value as ObjectFieldFilterSetting[]),
+						{
+							filterBy: objectFieldName,
+							filterType,
+							json: picklistJson,
 						},
 					];
 				}
@@ -320,6 +351,26 @@ export default function EditObjectField({
 				});
 			}
 		}
+	};
+
+	const getPicklistFilterJSONValues = (
+		filterType: string,
+		parsedFilter: ObjectFieldFilterSetting
+	) => {
+		let picklistFilterValues: string[] | number[] = [];
+
+		if (filterType === 'includes') {
+			picklistFilterValues = (parsedFilter.json as IncludesFilterOperator)[
+				'in'
+			];
+		}
+		else {
+			picklistFilterValues = (parsedFilter.json as ExcludesFilterOperator)[
+				'not'
+			]['in'];
+		}
+
+		return picklistFilterValues;
 	};
 
 	useEffect(() => {
@@ -369,9 +420,9 @@ export default function EditObjectField({
 								value:
 									objectField.businessType === 'Integer' ||
 									objectField.businessType === 'LongInteger'
-										? // @ts-ignore
-
-										  parsedFilter.json[filterType]
+										? (parsedFilter.json as {
+												[key: string]: string;
+										  })[filterType]
 										: undefined,
 							};
 
@@ -379,11 +430,7 @@ export default function EditObjectField({
 								objectField.businessType === 'Date' &&
 								parsedFilter.filterType === 'range'
 							) {
-								const dateRangeFilterValues: ObjectFieldDateRangeFilterSettings =
-
-									// @ts-ignore
-
-									parsedFilter.json[filterType];
+								const dateRangeFilterValues = parsedFilter.json as ObjectFieldDateRangeFilterSettings;
 
 								const aggregationFilterDateRangeValues: LabelValueObject[] = [
 									{
@@ -405,11 +452,10 @@ export default function EditObjectField({
 							}
 
 							if (objectField.businessType === 'Picklist') {
-								const picklistFilterValues: string[] =
-
-									// @ts-ignore
-
-									parsedFilter.json[filterType];
+								const picklistFilterValues = getPicklistFilterJSONValues(
+									filterType,
+									parsedFilter
+								) as string[];
 
 								const picklistValueList: LabelValueObject[] = picklistFilterValues.map(
 									(picklistFilterValue) => {
@@ -430,11 +476,10 @@ export default function EditObjectField({
 							}
 
 							if (objectField.name === 'status') {
-								const statusFilterValues: number[] =
-
-									// @ts-ignore
-
-									parsedFilter.json[filterType];
+								const statusFilterValues = getPicklistFilterJSONValues(
+									filterType,
+									parsedFilter
+								) as number[];
 
 								const workflowStatusValueList = statusFilterValues.map(
 									(statusValue) => {
@@ -572,6 +617,7 @@ export default function EditObjectField({
 					currentFilters={[]}
 					editingFilter={editingFilter}
 					editingObjectFieldName={editingObjectFieldName}
+					filterOperators={filterOperators}
 					header={Liferay.Language.get('filter')}
 					objectFields={
 						objectFields?.filter((objectField) => {
@@ -905,6 +951,7 @@ interface IMaxLengthPropertiesProps {
 }
 
 interface IProps {
+	filterOperators: TFilterOperators;
 	forbiddenChars: string[];
 	forbiddenLastChars: string[];
 	forbiddenNames: string[];

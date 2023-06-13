@@ -33,6 +33,11 @@
 	<td>//div[contains(@class, 'alert-notifications')]</td>
 	<td></td>
 </tr>
+<tr>
+	<td>BUTTON_DONE_MODAL</td>
+	<td>//div[contains(@class, 'modal-content')]//button[contains(.,'Done')]</td>
+	<td></td>
+</tr>
 
 <!-- SOURCE_VIEW_PATHS -->
 
@@ -54,6 +59,11 @@
 <tr>
 	<td>XML_CODE_SPECIFIC_ELEMENT</td>
 	<td>//div[contains(@class,'CodeMirror-gutter-wrapper')]//..//pre[@class=' CodeMirror-line ']//span[contains(.,'${key_elementOption}')]//..//*[normalize-space(text())='${key_elementValue}']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>INFORMATION_DETAILS</td>
+	<td>//div[@class='info-group']//label[contains(text() ,'${key_fieldOption}')]/..//span[contains(text() ,'${key_fieldInformation}')]</td>
 	<td></td>
 </tr>
 
@@ -82,6 +92,16 @@
 <tr>
 	<td>MANAGE_TRANSLATIONS_MODAL</td>
 	<td>//div[contains(text() ,'${key_modalTitle}')]/../../../..//*[contains(@class,'modal-dialog')]//*[contains(@class,'modal-body')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LANGUAGE_MANAGE_TRANSLATIONS_BUTTON</td>
+	<td>//button[@class='dropdown-item']//span[@class='dropdown-item-indicator-start']//*[contains(@class,'lexicon-icon-${key_translationOptionSelected}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LANGUAGE_OPTION</td>
+	<td>//tr//td[contains(text(),'${key_language}')]</td>
 	<td></td>
 </tr>
 
@@ -248,7 +268,12 @@
 </tr>
 <tr>
 	<td>PROPERTIES_INPUT_BY_POSITION</td>
-	<td>//div[@class='panel'][div[@class='panel-group panel-group-flush']][${key_sectionOption}]//label[contains(., '${key_inputOption}')]/..//input | //div[@class='panel']/../../div[@class='panel-group panel-group-flush'][${key_sectionOption}]//label[contains(., '${key_inputOption}')]/..//input</td>
+	<td>//div[@class='panel']/../../div[@class='panel-group panel-group-flush'][${key_sectionOption}]//label[contains(., '${key_inputOption}')]/..//input</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PROPERTIES_INPUT_TIMERS_BY_POSITION</td>
+	<td>//div[@class='panel'][div[@class='panel-group panel-group-flush']][${key_sectionOption}]//label[contains(., '${key_inputOption}')]/..//input</td>
 	<td></td>
 </tr>
 <tr>
@@ -258,7 +283,12 @@
 </tr>
 <tr>
 	<td>PROPERTIES_SELECTORS_BY_POSITION</td>
-	<td>//div[@class='panel'][div[@class='panel-group panel-group-flush']][${key_sectionOption}]//label[contains(., '${key_selectorField}')]/..//select | //div[@class='panel']/../..//div[@class='panel-group panel-group-flush'][${key_sectionOption}]//label[contains(., '${key_selectorField}')]/..//select</td>
+	<td>//div[@class='panel']/../..//div[@class='panel-group panel-group-flush'][${key_sectionOption}]//label[contains(., '${key_selectorField}')]/..//select</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PROPERTIES_SELECTORS_TIMERS_BY_POSITION</td>
+	<td>//div[@class='panel'][div[@class='panel-group panel-group-flush']][${key_sectionOption}]//label[contains(., '${key_selectorField}')]/..//select</td>
 	<td></td>
 </tr>
 <tr>
@@ -278,7 +308,12 @@
 </tr>
 <tr>
 	<td>PROPERTIES_TEMPLATE_TEXTAREA_BY_POSITION</td>
-	<td>//div[@class='panel'][div[@class='panel-group panel-group-flush']][${key_sectionOption}]//label[contains(., 'Script')]/..//textarea | //div[@class='panel']/../..//div[@class='panel-group panel-group-flush'][${key_sectionOption}]//label[contains(., 'Template')]/..//textarea | //label[contains(., 'Script')]/..//textarea</td>
+	<td>//div[@class='panel']/../..//div[@class='panel-group panel-group-flush'][${key_sectionOption}]//label[contains(., 'Template')]/..//textarea | //label[contains(., 'Script')]/..//textarea</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PROPERTIES_TEMPLATE_TEXTAREA_TIMERS_BY_POSITION</td>
+	<td>//div[@class='panel'][div[@class='panel-group panel-group-flush']][${key_sectionOption}]//label[contains(., 'Script')]/..//textarea</td>
 	<td></td>
 </tr>
 <tr>

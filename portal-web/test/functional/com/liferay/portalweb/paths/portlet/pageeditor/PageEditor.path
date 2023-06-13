@@ -261,7 +261,7 @@
 </tr>
 <tr>
 	<td>NO_FRAGMENTS_MESSAGE</td>
-	<td>//div[contains(@class,'page-editor__no-fragments-state')][normalize-space()='Place fragments here.']</td>
+	<td>//div[contains(@class,'page-editor__no-fragments-state')][normalize-space()='Place fragments or widgets here.']</td>
 	<td></td>
 </tr>
 <tr>
@@ -467,8 +467,13 @@
 	<td></td>
 </tr>
 <tr>
+	<td>FRAGMENT_SIDEBAR_TAB_BUTTON_BY_INDEX</td>
+	<td>xpath=(//div[contains(@class,'page-editor__sidebar__buttons')]//button)[${index}][@*='${key_tabName}']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>FRAGMENT_SIDEBAR_TITLE</td>
-	<td>//div[contains(@class,'content--open')]//h1[contains(@class,'page-editor__sidebar__panel-header') and contains(.,'${key_sidebarButton}')]</td>
+	<td>//div[contains(@class,'content--open')]//div[contains(@class,'page-editor__sidebar__panel-header')][normalize-space()='${key_sidebarButton}']</td>
 	<td></td>
 </tr>
 
@@ -516,12 +521,12 @@
 </tr>
 <tr>
 	<td>FRAGMENT_SIDEBAR_COMMENT_LIST_TITLE</td>
-	<td>//h1[contains(@class,'page-editor__sidebar__panel-header')and contains(.,'Comments')]</td>
+	<td>//div[contains(@class,'page-editor__sidebar__panel-header')and contains(.,'Comments')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>FRAGMENT_SIDEBAR_COMMENT_SECTION_NAME</td>
-	<td>//h1[contains(@class,'page-editor__sidebar__panel-header')]//span[contains(.,'${key_fragmentName}')]</td>
+	<td>//div[contains(@class,'page-editor__sidebar__panel-header')]//span[contains(.,'${key_fragmentName}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -861,7 +866,7 @@
 
 <tr>
 	<td>MORE_LINK</td>
-	<td>//*[contains(@class,'page-editor__sidebar__panel-header') and contains(.,'Page Design Options')]/a[normalize-space(text())='More']</td>
+	<td>//*[contains(@class,'page-editor__sidebar__panel-header') and contains(.,'Page Design Options')]//a[normalize-space(text())='More']</td>
 	<td></td>
 </tr>
 
@@ -869,7 +874,7 @@
 
 <tr>
 	<td>CONFIGURATION_PANEL_CONFIGURATION</td>
-	<td>//div[contains(@class,'item-configuration')]</td>
+	<td>//div[contains(@class,'page-structure__item-configuration')]</td>
 	<td></td>
 </tr>
 <tr>

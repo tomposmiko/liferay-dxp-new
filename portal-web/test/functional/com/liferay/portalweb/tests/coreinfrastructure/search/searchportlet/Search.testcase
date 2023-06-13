@@ -1446,6 +1446,27 @@ definition {
 	}
 
 	@priority = "4"
+	test SearchByClickingMagnifyingGlassIcon {
+		property test.assert.warning.exceptions = "true";
+
+		SearchPortlets.searchEmbedded(
+			clickMagnifyingGlassIcon = "true",
+			searchTerm = "test");
+
+		SearchResultPortlet.viewSearchResults(
+			searchAssetTitle = "Test Test",
+			searchAssetType = "User");
+
+		SearchPortlets.searchWidget(
+			clickMagnifyingGlassIcon = "true",
+			searchTerm = "test");
+
+		SearchResultPortlet.viewSearchResults(
+			searchAssetTitle = "Test Test",
+			searchAssetType = "User");
+	}
+
+	@priority = "4"
 	test SearchCompanyScopedObject {
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 500",
@@ -2640,7 +2661,7 @@ definition {
 		IFrame.closeFrame();
 
 		AssetPublisherPortlet.configureAssetDisplayOrderPG(
-			fieldNameOrder = "content",
+			fieldNameOrder = "Content",
 			sortOrder = "Ascending");
 
 		IFrame.closeFrame();
