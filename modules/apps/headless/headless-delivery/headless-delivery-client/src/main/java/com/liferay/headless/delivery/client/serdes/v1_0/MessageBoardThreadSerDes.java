@@ -18,11 +18,10 @@ import com.liferay.headless.delivery.client.dto.v1_0.MessageBoardThread;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import java.util.Collection;
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -50,112 +49,136 @@ public class MessageBoardThreadSerDes {
 
 	public static String toJSON(MessageBoardThread messageBoardThread) {
 		if (messageBoardThread == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"aggregateRating\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (messageBoardThread.getAggregateRating() == null) {
-			sb.append("null");
+		if (messageBoardThread.getAggregateRating() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"aggregateRating\":");
+
+			sb.append(
+				AggregateRatingSerDes.toJSON(
+					messageBoardThread.getAggregateRating()));
 		}
-		else {
-			sb.append(messageBoardThread.getAggregateRating());
-		}
 
-		sb.append(", ");
+		if (messageBoardThread.getArticleBody() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"articleBody\": ");
+			sb.append("\"articleBody\":");
 
-		if (messageBoardThread.getArticleBody() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(messageBoardThread.getArticleBody());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (messageBoardThread.getCreator() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"creator\": ");
+			sb.append("\"creator\":");
 
-		if (messageBoardThread.getCreator() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(messageBoardThread.getCreator());
-		}
-
-		sb.append(", ");
-
-		sb.append("\"dateCreated\": ");
-
-		if (messageBoardThread.getDateCreated() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(messageBoardThread.getDateCreated());
+			sb.append(CreatorSerDes.toJSON(messageBoardThread.getCreator()));
 		}
 
-		sb.append(", ");
+		if (messageBoardThread.getDateCreated() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dateModified\": ");
+			sb.append("\"dateCreated\":");
 
-		if (messageBoardThread.getDateModified() == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(
+				liferayToJSONDateFormat.format(
+					messageBoardThread.getDateCreated()));
+
+			sb.append("\"");
 		}
-		else {
-			sb.append(messageBoardThread.getDateModified());
+
+		if (messageBoardThread.getDateModified() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"dateModified\":");
+
+			sb.append("\"");
+
+			sb.append(
+				liferayToJSONDateFormat.format(
+					messageBoardThread.getDateModified()));
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (messageBoardThread.getEncodingFormat() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"encodingFormat\": ");
+			sb.append("\"encodingFormat\":");
 
-		if (messageBoardThread.getEncodingFormat() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(messageBoardThread.getEncodingFormat());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (messageBoardThread.getHeadline() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"headline\": ");
+			sb.append("\"headline\":");
 
-		if (messageBoardThread.getHeadline() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(messageBoardThread.getHeadline());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (messageBoardThread.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\":");
 
-		if (messageBoardThread.getId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(messageBoardThread.getId());
 		}
 
-		sb.append(", ");
+		if (messageBoardThread.getKeywords() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"keywords\": ");
+			sb.append("\"keywords\":");
 
-		if (messageBoardThread.getKeywords() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < messageBoardThread.getKeywords().length; i++) {
 				sb.append("\"");
+
 				sb.append(messageBoardThread.getKeywords()[i]);
+
 				sb.append("\"");
 
 				if ((i + 1) < messageBoardThread.getKeywords().length) {
@@ -166,71 +189,71 @@ public class MessageBoardThreadSerDes {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (messageBoardThread.getNumberOfMessageBoardAttachments() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"numberOfMessageBoardAttachments\": ");
+			sb.append("\"numberOfMessageBoardAttachments\":");
 
-		if (messageBoardThread.getNumberOfMessageBoardAttachments() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(messageBoardThread.getNumberOfMessageBoardAttachments());
 		}
 
-		sb.append(", ");
+		if (messageBoardThread.getNumberOfMessageBoardMessages() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"numberOfMessageBoardMessages\": ");
+			sb.append("\"numberOfMessageBoardMessages\":");
 
-		if (messageBoardThread.getNumberOfMessageBoardMessages() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(messageBoardThread.getNumberOfMessageBoardMessages());
 		}
 
-		sb.append(", ");
+		if (messageBoardThread.getShowAsQuestion() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"showAsQuestion\": ");
+			sb.append("\"showAsQuestion\":");
 
-		if (messageBoardThread.getShowAsQuestion() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(messageBoardThread.getShowAsQuestion());
 		}
 
-		sb.append(", ");
+		if (messageBoardThread.getSiteId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"siteId\": ");
+			sb.append("\"siteId\":");
 
-		if (messageBoardThread.getSiteId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(messageBoardThread.getSiteId());
 		}
 
-		sb.append(", ");
+		if (messageBoardThread.getThreadType() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"threadType\": ");
+			sb.append("\"threadType\":");
 
-		if (messageBoardThread.getThreadType() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(messageBoardThread.getThreadType());
-		}
-
-		sb.append(", ");
-
-		sb.append("\"viewableBy\": ");
-
-		if (messageBoardThread.getViewableBy() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
+
+			sb.append(messageBoardThread.getThreadType());
+
+			sb.append("\"");
+		}
+
+		if (messageBoardThread.getViewableBy() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"viewableBy\":");
+
+			sb.append("\"");
+
 			sb.append(messageBoardThread.getViewableBy());
+
 			sb.append("\"");
 		}
 
@@ -239,41 +262,159 @@ public class MessageBoardThreadSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(
-		Collection<MessageBoardThread> messageBoardThreads) {
+	public static Map<String, String> toMap(
+		MessageBoardThread messageBoardThread) {
 
-		if (messageBoardThreads == null) {
-			return "[]";
+		if (messageBoardThread == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		for (MessageBoardThread messageBoardThread : messageBoardThreads) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(messageBoardThread));
+		if (messageBoardThread.getAggregateRating() == null) {
+			map.put("aggregateRating", null);
+		}
+		else {
+			map.put(
+				"aggregateRating",
+				AggregateRatingSerDes.toJSON(
+					messageBoardThread.getAggregateRating()));
 		}
 
-		sb.append("]");
+		if (messageBoardThread.getArticleBody() == null) {
+			map.put("articleBody", null);
+		}
+		else {
+			map.put(
+				"articleBody",
+				String.valueOf(messageBoardThread.getArticleBody()));
+		}
 
-		return sb.toString();
+		if (messageBoardThread.getCreator() == null) {
+			map.put("creator", null);
+		}
+		else {
+			map.put(
+				"creator",
+				CreatorSerDes.toJSON(messageBoardThread.getCreator()));
+		}
+
+		map.put(
+			"dateCreated",
+			liferayToJSONDateFormat.format(
+				messageBoardThread.getDateCreated()));
+
+		map.put(
+			"dateModified",
+			liferayToJSONDateFormat.format(
+				messageBoardThread.getDateModified()));
+
+		if (messageBoardThread.getEncodingFormat() == null) {
+			map.put("encodingFormat", null);
+		}
+		else {
+			map.put(
+				"encodingFormat",
+				String.valueOf(messageBoardThread.getEncodingFormat()));
+		}
+
+		if (messageBoardThread.getHeadline() == null) {
+			map.put("headline", null);
+		}
+		else {
+			map.put(
+				"headline", String.valueOf(messageBoardThread.getHeadline()));
+		}
+
+		if (messageBoardThread.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(messageBoardThread.getId()));
+		}
+
+		if (messageBoardThread.getKeywords() == null) {
+			map.put("keywords", null);
+		}
+		else {
+			map.put(
+				"keywords", String.valueOf(messageBoardThread.getKeywords()));
+		}
+
+		if (messageBoardThread.getNumberOfMessageBoardAttachments() == null) {
+			map.put("numberOfMessageBoardAttachments", null);
+		}
+		else {
+			map.put(
+				"numberOfMessageBoardAttachments",
+				String.valueOf(
+					messageBoardThread.getNumberOfMessageBoardAttachments()));
+		}
+
+		if (messageBoardThread.getNumberOfMessageBoardMessages() == null) {
+			map.put("numberOfMessageBoardMessages", null);
+		}
+		else {
+			map.put(
+				"numberOfMessageBoardMessages",
+				String.valueOf(
+					messageBoardThread.getNumberOfMessageBoardMessages()));
+		}
+
+		if (messageBoardThread.getShowAsQuestion() == null) {
+			map.put("showAsQuestion", null);
+		}
+		else {
+			map.put(
+				"showAsQuestion",
+				String.valueOf(messageBoardThread.getShowAsQuestion()));
+		}
+
+		if (messageBoardThread.getSiteId() == null) {
+			map.put("siteId", null);
+		}
+		else {
+			map.put("siteId", String.valueOf(messageBoardThread.getSiteId()));
+		}
+
+		if (messageBoardThread.getThreadType() == null) {
+			map.put("threadType", null);
+		}
+		else {
+			map.put(
+				"threadType",
+				String.valueOf(messageBoardThread.getThreadType()));
+		}
+
+		if (messageBoardThread.getViewableBy() == null) {
+			map.put("viewableBy", null);
+		}
+		else {
+			map.put(
+				"viewableBy",
+				String.valueOf(messageBoardThread.getViewableBy()));
+		}
+
+		return map;
 	}
 
 	private static class MessageBoardThreadJSONParser
 		extends BaseJSONParser<MessageBoardThread> {
 
+		@Override
 		protected MessageBoardThread createDTO() {
 			return new MessageBoardThread();
 		}
 
+		@Override
 		protected MessageBoardThread[] createDTOArray(int size) {
 			return new MessageBoardThread[size];
 		}
 
+		@Override
 		protected void setField(
 			MessageBoardThread messageBoardThread, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
@@ -300,13 +441,13 @@ public class MessageBoardThreadSerDes {
 			else if (Objects.equals(jsonParserFieldName, "dateCreated")) {
 				if (jsonParserFieldValue != null) {
 					messageBoardThread.setDateCreated(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dateModified")) {
 				if (jsonParserFieldValue != null) {
 					messageBoardThread.setDateModified(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "encodingFormat")) {
@@ -339,7 +480,7 @@ public class MessageBoardThreadSerDes {
 
 				if (jsonParserFieldValue != null) {
 					messageBoardThread.setNumberOfMessageBoardAttachments(
-						(Integer)jsonParserFieldValue);
+						Integer.valueOf((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(
@@ -347,7 +488,7 @@ public class MessageBoardThreadSerDes {
 
 				if (jsonParserFieldValue != null) {
 					messageBoardThread.setNumberOfMessageBoardMessages(
-						(Integer)jsonParserFieldValue);
+						Integer.valueOf((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "showAsQuestion")) {
@@ -378,18 +519,6 @@ public class MessageBoardThreadSerDes {
 			else {
 				throw new IllegalArgumentException(
 					"Unsupported field name " + jsonParserFieldName);
-			}
-		}
-
-		private Date _toDate(String string) {
-			try {
-				DateFormat dateFormat = new SimpleDateFormat(
-					"yyyy-MM-dd'T'HH:mm:ss'Z'");
-
-				return dateFormat.parse(string);
-			}
-			catch (ParseException pe) {
-				throw new IllegalArgumentException("Unable to parse " + string);
 			}
 		}
 

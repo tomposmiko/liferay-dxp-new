@@ -17,7 +17,8 @@ package com.liferay.headless.delivery.client.serdes.v1_0;
 import com.liferay.headless.delivery.client.dto.v1_0.ParentKnowledgeBaseFolder;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -49,31 +50,35 @@ public class ParentKnowledgeBaseFolderSerDes {
 		ParentKnowledgeBaseFolder parentKnowledgeBaseFolder) {
 
 		if (parentKnowledgeBaseFolder == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"folderId\": ");
+		if (parentKnowledgeBaseFolder.getFolderId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (parentKnowledgeBaseFolder.getFolderId() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"folderId\":");
+
 			sb.append(parentKnowledgeBaseFolder.getFolderId());
 		}
 
-		sb.append(", ");
+		if (parentKnowledgeBaseFolder.getFolderName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"folderName\": ");
+			sb.append("\"folderName\":");
 
-		if (parentKnowledgeBaseFolder.getFolderName() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(parentKnowledgeBaseFolder.getFolderName());
+
+			sb.append("\"");
 		}
 
 		sb.append("}");
@@ -81,43 +86,50 @@ public class ParentKnowledgeBaseFolderSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(
-		Collection<ParentKnowledgeBaseFolder> parentKnowledgeBaseFolders) {
+	public static Map<String, String> toMap(
+		ParentKnowledgeBaseFolder parentKnowledgeBaseFolder) {
 
-		if (parentKnowledgeBaseFolders == null) {
-			return "[]";
+		if (parentKnowledgeBaseFolder == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (ParentKnowledgeBaseFolder parentKnowledgeBaseFolder :
-				parentKnowledgeBaseFolders) {
-
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(parentKnowledgeBaseFolder));
+		if (parentKnowledgeBaseFolder.getFolderId() == null) {
+			map.put("folderId", null);
+		}
+		else {
+			map.put(
+				"folderId",
+				String.valueOf(parentKnowledgeBaseFolder.getFolderId()));
 		}
 
-		sb.append("]");
+		if (parentKnowledgeBaseFolder.getFolderName() == null) {
+			map.put("folderName", null);
+		}
+		else {
+			map.put(
+				"folderName",
+				String.valueOf(parentKnowledgeBaseFolder.getFolderName()));
+		}
 
-		return sb.toString();
+		return map;
 	}
 
 	private static class ParentKnowledgeBaseFolderJSONParser
 		extends BaseJSONParser<ParentKnowledgeBaseFolder> {
 
+		@Override
 		protected ParentKnowledgeBaseFolder createDTO() {
 			return new ParentKnowledgeBaseFolder();
 		}
 
+		@Override
 		protected ParentKnowledgeBaseFolder[] createDTOArray(int size) {
 			return new ParentKnowledgeBaseFolder[size];
 		}
 
+		@Override
 		protected void setField(
 			ParentKnowledgeBaseFolder parentKnowledgeBaseFolder,
 			String jsonParserFieldName, Object jsonParserFieldValue) {

@@ -81,6 +81,7 @@ public class StructuredContentFolder {
 
 	}
 
+	@Schema(description = "The creator of the StructuredContentFolder")
 	public Creator getCreator() {
 		return creator;
 	}
@@ -108,6 +109,7 @@ public class StructuredContentFolder {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator creator;
 
+	@Schema(description = "The creation date of the StructuredContentFolder.")
 	public Date getDateCreated() {
 		return dateCreated;
 	}
@@ -135,6 +137,9 @@ public class StructuredContentFolder {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
+	@Schema(
+		description = "The last time a field of the StructuredContentFolder changed."
+	)
 	public Date getDateModified() {
 		return dateModified;
 	}
@@ -162,6 +167,7 @@ public class StructuredContentFolder {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateModified;
 
+	@Schema(description = "The description of the StructuredContentFolder")
 	public String getDescription() {
 		return description;
 	}
@@ -189,6 +195,7 @@ public class StructuredContentFolder {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String description;
 
+	@Schema(description = "The identifier of the resource.")
 	public Long getId() {
 		return id;
 	}
@@ -214,6 +221,7 @@ public class StructuredContentFolder {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
+	@Schema(description = "The name of the StructuredContentFolder.")
 	public String getName() {
 		return name;
 	}
@@ -240,12 +248,15 @@ public class StructuredContentFolder {
 	@NotEmpty
 	protected String name;
 
-	public Number getNumberOfStructuredContentFolders() {
+	@Schema(
+		description = "The number of child StructuredContentFolders that belong to this resource."
+	)
+	public Integer getNumberOfStructuredContentFolders() {
 		return numberOfStructuredContentFolders;
 	}
 
 	public void setNumberOfStructuredContentFolders(
-		Number numberOfStructuredContentFolders) {
+		Integer numberOfStructuredContentFolders) {
 
 		this.numberOfStructuredContentFolders =
 			numberOfStructuredContentFolders;
@@ -253,7 +264,7 @@ public class StructuredContentFolder {
 
 	@JsonIgnore
 	public void setNumberOfStructuredContentFolders(
-		UnsafeSupplier<Number, Exception>
+		UnsafeSupplier<Integer, Exception>
 			numberOfStructuredContentFoldersUnsafeSupplier) {
 
 		try {
@@ -270,21 +281,24 @@ public class StructuredContentFolder {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected Number numberOfStructuredContentFolders;
+	protected Integer numberOfStructuredContentFolders;
 
-	public Number getNumberOfStructuredContents() {
+	@Schema(
+		description = "The number of child StructuredContents that belong to this resource."
+	)
+	public Integer getNumberOfStructuredContents() {
 		return numberOfStructuredContents;
 	}
 
 	public void setNumberOfStructuredContents(
-		Number numberOfStructuredContents) {
+		Integer numberOfStructuredContents) {
 
 		this.numberOfStructuredContents = numberOfStructuredContents;
 	}
 
 	@JsonIgnore
 	public void setNumberOfStructuredContents(
-		UnsafeSupplier<Number, Exception>
+		UnsafeSupplier<Integer, Exception>
 			numberOfStructuredContentsUnsafeSupplier) {
 
 		try {
@@ -301,8 +315,11 @@ public class StructuredContentFolder {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected Number numberOfStructuredContents;
+	protected Integer numberOfStructuredContents;
 
+	@Schema(
+		description = "The site identificator where this StructuredContentFolder is scoped."
+	)
 	public Long getSiteId() {
 		return siteId;
 	}
@@ -330,6 +347,9 @@ public class StructuredContentFolder {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long siteId;
 
+	@Schema(
+		description = "Write only property to specify the default permissions."
+	)
 	public ViewableBy getViewableBy() {
 		return viewableBy;
 	}
@@ -411,7 +431,9 @@ public class StructuredContentFolder {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(dateCreated);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -422,7 +444,9 @@ public class StructuredContentFolder {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(dateModified);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -433,7 +457,9 @@ public class StructuredContentFolder {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(description);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -455,7 +481,9 @@ public class StructuredContentFolder {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(name);
+			sb.append("\"");
 		}
 
 		sb.append(", ");

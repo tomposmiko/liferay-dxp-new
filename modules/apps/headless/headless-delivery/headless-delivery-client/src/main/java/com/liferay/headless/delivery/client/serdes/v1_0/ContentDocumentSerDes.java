@@ -17,7 +17,8 @@ package com.liferay.headless.delivery.client.serdes.v1_0;
 import com.liferay.headless.delivery.client.dto.v1_0.ContentDocument;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -45,86 +46,101 @@ public class ContentDocumentSerDes {
 
 	public static String toJSON(ContentDocument contentDocument) {
 		if (contentDocument == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"contentUrl\": ");
+		if (contentDocument.getContentUrl() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (contentDocument.getContentUrl() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"contentUrl\":");
+
+			sb.append("\"");
+
 			sb.append(contentDocument.getContentUrl());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (contentDocument.getDescription() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"description\": ");
+			sb.append("\"description\":");
 
-		if (contentDocument.getDescription() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(contentDocument.getDescription());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (contentDocument.getEncodingFormat() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"encodingFormat\": ");
+			sb.append("\"encodingFormat\":");
 
-		if (contentDocument.getEncodingFormat() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(contentDocument.getEncodingFormat());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (contentDocument.getFileExtension() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"fileExtension\": ");
+			sb.append("\"fileExtension\":");
 
-		if (contentDocument.getFileExtension() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(contentDocument.getFileExtension());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (contentDocument.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\":");
 
-		if (contentDocument.getId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(contentDocument.getId());
 		}
 
-		sb.append(", ");
+		if (contentDocument.getSizeInBytes() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"sizeInBytes\": ");
+			sb.append("\"sizeInBytes\":");
 
-		if (contentDocument.getSizeInBytes() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(contentDocument.getSizeInBytes());
 		}
 
-		sb.append(", ");
+		if (contentDocument.getTitle() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"title\": ");
+			sb.append("\"title\":");
 
-		if (contentDocument.getTitle() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(contentDocument.getTitle());
+
+			sb.append("\"");
 		}
 
 		sb.append("}");
@@ -132,39 +148,88 @@ public class ContentDocumentSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<ContentDocument> contentDocuments) {
-		if (contentDocuments == null) {
-			return "[]";
+	public static Map<String, String> toMap(ContentDocument contentDocument) {
+		if (contentDocument == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (ContentDocument contentDocument : contentDocuments) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(contentDocument));
+		if (contentDocument.getContentUrl() == null) {
+			map.put("contentUrl", null);
+		}
+		else {
+			map.put(
+				"contentUrl", String.valueOf(contentDocument.getContentUrl()));
 		}
 
-		sb.append("]");
+		if (contentDocument.getDescription() == null) {
+			map.put("description", null);
+		}
+		else {
+			map.put(
+				"description",
+				String.valueOf(contentDocument.getDescription()));
+		}
 
-		return sb.toString();
+		if (contentDocument.getEncodingFormat() == null) {
+			map.put("encodingFormat", null);
+		}
+		else {
+			map.put(
+				"encodingFormat",
+				String.valueOf(contentDocument.getEncodingFormat()));
+		}
+
+		if (contentDocument.getFileExtension() == null) {
+			map.put("fileExtension", null);
+		}
+		else {
+			map.put(
+				"fileExtension",
+				String.valueOf(contentDocument.getFileExtension()));
+		}
+
+		if (contentDocument.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(contentDocument.getId()));
+		}
+
+		if (contentDocument.getSizeInBytes() == null) {
+			map.put("sizeInBytes", null);
+		}
+		else {
+			map.put(
+				"sizeInBytes",
+				String.valueOf(contentDocument.getSizeInBytes()));
+		}
+
+		if (contentDocument.getTitle() == null) {
+			map.put("title", null);
+		}
+		else {
+			map.put("title", String.valueOf(contentDocument.getTitle()));
+		}
+
+		return map;
 	}
 
 	private static class ContentDocumentJSONParser
 		extends BaseJSONParser<ContentDocument> {
 
+		@Override
 		protected ContentDocument createDTO() {
 			return new ContentDocument();
 		}
 
+		@Override
 		protected ContentDocument[] createDTOArray(int size) {
 			return new ContentDocument[size];
 		}
 
+		@Override
 		protected void setField(
 			ContentDocument contentDocument, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
@@ -201,7 +266,7 @@ public class ContentDocumentSerDes {
 			else if (Objects.equals(jsonParserFieldName, "sizeInBytes")) {
 				if (jsonParserFieldValue != null) {
 					contentDocument.setSizeInBytes(
-						(Number)jsonParserFieldValue);
+						Long.valueOf((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "title")) {

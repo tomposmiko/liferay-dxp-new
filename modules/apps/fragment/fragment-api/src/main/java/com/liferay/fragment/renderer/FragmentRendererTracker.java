@@ -24,8 +24,10 @@ import java.util.List;
 @ProviderType
 public interface FragmentRendererTracker {
 
-	public FragmentRenderer getFragmentRenderer(String className);
+	public FragmentRenderer getFragmentRenderer(String key);
 
 	public List<FragmentRenderer> getFragmentRenderers();
+
+	public List<FragmentRenderer> getFragmentRenderers(int type);
 
 }

@@ -81,6 +81,9 @@ public class TaxonomyVocabulary {
 
 	}
 
+	@Schema(
+		description = "A list of assets that can be asociated with this TaxonomyVocabulary."
+	)
 	public AssetType[] getAssetTypes() {
 		return assetTypes;
 	}
@@ -108,6 +111,9 @@ public class TaxonomyVocabulary {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected AssetType[] assetTypes;
 
+	@Schema(
+		description = "A list of languages the content has a translation for."
+	)
 	public String[] getAvailableLanguages() {
 		return availableLanguages;
 	}
@@ -135,6 +141,7 @@ public class TaxonomyVocabulary {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String[] availableLanguages;
 
+	@Schema(description = "The creator of this TaxonomyVocabulary.")
 	public Creator getCreator() {
 		return creator;
 	}
@@ -162,6 +169,7 @@ public class TaxonomyVocabulary {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator creator;
 
+	@Schema(description = "The creation date of the Organization.")
 	public Date getDateCreated() {
 		return dateCreated;
 	}
@@ -189,6 +197,7 @@ public class TaxonomyVocabulary {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
+	@Schema(description = "The creation date of the Organization.")
 	public Date getDateModified() {
 		return dateModified;
 	}
@@ -216,6 +225,9 @@ public class TaxonomyVocabulary {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateModified;
 
+	@Schema(
+		description = "A text description describing the TaxonomyVocabulary."
+	)
 	public String getDescription() {
 		return description;
 	}
@@ -243,6 +255,7 @@ public class TaxonomyVocabulary {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String description;
 
+	@Schema(description = "The identifier of the resource.")
 	public Long getId() {
 		return id;
 	}
@@ -268,6 +281,7 @@ public class TaxonomyVocabulary {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
+	@Schema(description = "The name of the TaxonomyVocabulary.")
 	public String getName() {
 		return name;
 	}
@@ -294,19 +308,22 @@ public class TaxonomyVocabulary {
 	@NotEmpty
 	protected String name;
 
-	public Number getNumberOfTaxonomyCategories() {
+	@Schema(
+		description = "The number of TaxonomyCategories that directly depend on this resource."
+	)
+	public Integer getNumberOfTaxonomyCategories() {
 		return numberOfTaxonomyCategories;
 	}
 
 	public void setNumberOfTaxonomyCategories(
-		Number numberOfTaxonomyCategories) {
+		Integer numberOfTaxonomyCategories) {
 
 		this.numberOfTaxonomyCategories = numberOfTaxonomyCategories;
 	}
 
 	@JsonIgnore
 	public void setNumberOfTaxonomyCategories(
-		UnsafeSupplier<Number, Exception>
+		UnsafeSupplier<Integer, Exception>
 			numberOfTaxonomyCategoriesUnsafeSupplier) {
 
 		try {
@@ -323,8 +340,11 @@ public class TaxonomyVocabulary {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected Number numberOfTaxonomyCategories;
+	protected Integer numberOfTaxonomyCategories;
 
+	@Schema(
+		description = "The site identificator where this TaxonomyVocabulary is scoped."
+	)
 	public Long getSiteId() {
 		return siteId;
 	}
@@ -352,6 +372,9 @@ public class TaxonomyVocabulary {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long siteId;
 
+	@Schema(
+		description = "Write only property to specify the default permissions."
+	)
 	public ViewableBy getViewableBy() {
 		return viewableBy;
 	}
@@ -476,7 +499,9 @@ public class TaxonomyVocabulary {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(dateCreated);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -487,7 +512,9 @@ public class TaxonomyVocabulary {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(dateModified);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -498,7 +525,9 @@ public class TaxonomyVocabulary {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(description);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -520,7 +549,9 @@ public class TaxonomyVocabulary {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(name);
+			sb.append("\"");
 		}
 
 		sb.append(", ");

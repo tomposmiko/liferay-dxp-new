@@ -254,8 +254,6 @@ definition {
 
 		Content.addNewPG(assetType = "Basic Web Content");
 
-		IFrame.selectEditAssetFrame();
-
 		WebContent.addCP(
 			webContentContent = "WC WebContent Content",
 			webContentTitle = "WC WebContent Title"
@@ -579,6 +577,7 @@ definition {
 		WebContent.addStructuredPGViaWCD(
 			structureFieldName = "Text",
 			structureName = "WC Structure Name",
+			templateName = "WC Template Name",
 			textBoxFieldName = "TextBox",
 			webContentText = "WC WebContent Text",
 			webContentTextBox = "WC WebContent TextBox",
@@ -666,8 +665,6 @@ definition {
 		);
 
 		Content.addNewPG(assetType = "Basic Web Content");
-
-		IFrame.selectEditAssetFrame();
 
 		WebContent.addCP(
 			webContentContent = "WC WebContent Content",
@@ -1450,6 +1447,6 @@ definition {
 
 		WebContent.viewPageBreak();
 
-		WebContentDisplayPortlet.viewContentPageBreak(webContentContent = "Welcome");
+		WebContentDisplayPortlet.viewContentPageBreak(webContentContent = "Home");
 	}
 }

@@ -19,11 +19,10 @@ import com.liferay.headless.delivery.client.dto.v1_0.TaxonomyCategory;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import java.util.Collection;
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -52,125 +51,152 @@ public class KnowledgeBaseArticleSerDes {
 
 	public static String toJSON(KnowledgeBaseArticle knowledgeBaseArticle) {
 		if (knowledgeBaseArticle == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"aggregateRating\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (knowledgeBaseArticle.getAggregateRating() == null) {
-			sb.append("null");
+		if (knowledgeBaseArticle.getAggregateRating() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"aggregateRating\":");
+
+			sb.append(
+				AggregateRatingSerDes.toJSON(
+					knowledgeBaseArticle.getAggregateRating()));
 		}
-		else {
-			sb.append(knowledgeBaseArticle.getAggregateRating());
-		}
 
-		sb.append(", ");
+		if (knowledgeBaseArticle.getArticleBody() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"articleBody\": ");
+			sb.append("\"articleBody\":");
 
-		if (knowledgeBaseArticle.getArticleBody() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(knowledgeBaseArticle.getArticleBody());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (knowledgeBaseArticle.getCreator() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"creator\": ");
+			sb.append("\"creator\":");
 
-		if (knowledgeBaseArticle.getCreator() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(knowledgeBaseArticle.getCreator());
-		}
-
-		sb.append(", ");
-
-		sb.append("\"dateCreated\": ");
-
-		if (knowledgeBaseArticle.getDateCreated() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(knowledgeBaseArticle.getDateCreated());
+			sb.append(CreatorSerDes.toJSON(knowledgeBaseArticle.getCreator()));
 		}
 
-		sb.append(", ");
+		if (knowledgeBaseArticle.getDateCreated() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dateModified\": ");
+			sb.append("\"dateCreated\":");
 
-		if (knowledgeBaseArticle.getDateModified() == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(
+				liferayToJSONDateFormat.format(
+					knowledgeBaseArticle.getDateCreated()));
+
+			sb.append("\"");
 		}
-		else {
-			sb.append(knowledgeBaseArticle.getDateModified());
+
+		if (knowledgeBaseArticle.getDateModified() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"dateModified\":");
+
+			sb.append("\"");
+
+			sb.append(
+				liferayToJSONDateFormat.format(
+					knowledgeBaseArticle.getDateModified()));
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (knowledgeBaseArticle.getDescription() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"description\": ");
+			sb.append("\"description\":");
 
-		if (knowledgeBaseArticle.getDescription() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(knowledgeBaseArticle.getDescription());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (knowledgeBaseArticle.getEncodingFormat() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"encodingFormat\": ");
+			sb.append("\"encodingFormat\":");
 
-		if (knowledgeBaseArticle.getEncodingFormat() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(knowledgeBaseArticle.getEncodingFormat());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (knowledgeBaseArticle.getFriendlyUrlPath() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"friendlyUrlPath\": ");
+			sb.append("\"friendlyUrlPath\":");
 
-		if (knowledgeBaseArticle.getFriendlyUrlPath() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(knowledgeBaseArticle.getFriendlyUrlPath());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (knowledgeBaseArticle.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\":");
 
-		if (knowledgeBaseArticle.getId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(knowledgeBaseArticle.getId());
 		}
 
-		sb.append(", ");
+		if (knowledgeBaseArticle.getKeywords() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"keywords\": ");
+			sb.append("\"keywords\":");
 
-		if (knowledgeBaseArticle.getKeywords() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < knowledgeBaseArticle.getKeywords().length;
 				 i++) {
 
 				sb.append("\"");
+
 				sb.append(knowledgeBaseArticle.getKeywords()[i]);
+
 				sb.append("\"");
 
 				if ((i + 1) < knowledgeBaseArticle.getKeywords().length) {
@@ -181,75 +207,73 @@ public class KnowledgeBaseArticleSerDes {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (knowledgeBaseArticle.getNumberOfAttachments() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"numberOfAttachments\": ");
+			sb.append("\"numberOfAttachments\":");
 
-		if (knowledgeBaseArticle.getNumberOfAttachments() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(knowledgeBaseArticle.getNumberOfAttachments());
 		}
 
-		sb.append(", ");
+		if (knowledgeBaseArticle.getNumberOfKnowledgeBaseArticles() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"numberOfKnowledgeBaseArticles\": ");
+			sb.append("\"numberOfKnowledgeBaseArticles\":");
 
-		if (knowledgeBaseArticle.getNumberOfKnowledgeBaseArticles() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(knowledgeBaseArticle.getNumberOfKnowledgeBaseArticles());
 		}
 
-		sb.append(", ");
+		if (knowledgeBaseArticle.getParentKnowledgeBaseFolder() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"parentKnowledgeBaseFolder\": ");
+			sb.append("\"parentKnowledgeBaseFolder\":");
 
-		if (knowledgeBaseArticle.getParentKnowledgeBaseFolder() == null) {
-			sb.append("null");
+			sb.append(
+				ParentKnowledgeBaseFolderSerDes.toJSON(
+					knowledgeBaseArticle.getParentKnowledgeBaseFolder()));
 		}
-		else {
-			sb.append(knowledgeBaseArticle.getParentKnowledgeBaseFolder());
-		}
 
-		sb.append(", ");
+		if (knowledgeBaseArticle.getParentKnowledgeBaseFolderId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"parentKnowledgeBaseFolderId\": ");
+			sb.append("\"parentKnowledgeBaseFolderId\":");
 
-		if (knowledgeBaseArticle.getParentKnowledgeBaseFolderId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(knowledgeBaseArticle.getParentKnowledgeBaseFolderId());
 		}
 
-		sb.append(", ");
+		if (knowledgeBaseArticle.getSiteId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"siteId\": ");
+			sb.append("\"siteId\":");
 
-		if (knowledgeBaseArticle.getSiteId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(knowledgeBaseArticle.getSiteId());
 		}
 
-		sb.append(", ");
+		if (knowledgeBaseArticle.getTaxonomyCategories() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"taxonomyCategories\": ");
+			sb.append("\"taxonomyCategories\":");
 
-		if (knowledgeBaseArticle.getTaxonomyCategories() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0;
 				 i < knowledgeBaseArticle.getTaxonomyCategories().length; i++) {
 
-				sb.append(knowledgeBaseArticle.getTaxonomyCategories()[i]);
+				sb.append(
+					TaxonomyCategorySerDes.toJSON(
+						knowledgeBaseArticle.getTaxonomyCategories()[i]));
 
 				if ((i + 1) <
 						knowledgeBaseArticle.getTaxonomyCategories().length) {
@@ -261,14 +285,13 @@ public class KnowledgeBaseArticleSerDes {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (knowledgeBaseArticle.getTaxonomyCategoryIds() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"taxonomyCategoryIds\": ");
+			sb.append("\"taxonomyCategoryIds\":");
 
-		if (knowledgeBaseArticle.getTaxonomyCategoryIds() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0;
@@ -287,27 +310,31 @@ public class KnowledgeBaseArticleSerDes {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (knowledgeBaseArticle.getTitle() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"title\": ");
+			sb.append("\"title\":");
 
-		if (knowledgeBaseArticle.getTitle() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(knowledgeBaseArticle.getTitle());
-		}
-
-		sb.append(", ");
-
-		sb.append("\"viewableBy\": ");
-
-		if (knowledgeBaseArticle.getViewableBy() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
+
+			sb.append(knowledgeBaseArticle.getTitle());
+
+			sb.append("\"");
+		}
+
+		if (knowledgeBaseArticle.getViewableBy() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"viewableBy\":");
+
+			sb.append("\"");
+
 			sb.append(knowledgeBaseArticle.getViewableBy());
+
 			sb.append("\"");
 		}
 
@@ -316,43 +343,195 @@ public class KnowledgeBaseArticleSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(
-		Collection<KnowledgeBaseArticle> knowledgeBaseArticles) {
+	public static Map<String, String> toMap(
+		KnowledgeBaseArticle knowledgeBaseArticle) {
 
-		if (knowledgeBaseArticles == null) {
-			return "[]";
+		if (knowledgeBaseArticle == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		for (KnowledgeBaseArticle knowledgeBaseArticle :
-				knowledgeBaseArticles) {
-
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(knowledgeBaseArticle));
+		if (knowledgeBaseArticle.getAggregateRating() == null) {
+			map.put("aggregateRating", null);
+		}
+		else {
+			map.put(
+				"aggregateRating",
+				AggregateRatingSerDes.toJSON(
+					knowledgeBaseArticle.getAggregateRating()));
 		}
 
-		sb.append("]");
+		if (knowledgeBaseArticle.getArticleBody() == null) {
+			map.put("articleBody", null);
+		}
+		else {
+			map.put(
+				"articleBody",
+				String.valueOf(knowledgeBaseArticle.getArticleBody()));
+		}
 
-		return sb.toString();
+		if (knowledgeBaseArticle.getCreator() == null) {
+			map.put("creator", null);
+		}
+		else {
+			map.put(
+				"creator",
+				CreatorSerDes.toJSON(knowledgeBaseArticle.getCreator()));
+		}
+
+		map.put(
+			"dateCreated",
+			liferayToJSONDateFormat.format(
+				knowledgeBaseArticle.getDateCreated()));
+
+		map.put(
+			"dateModified",
+			liferayToJSONDateFormat.format(
+				knowledgeBaseArticle.getDateModified()));
+
+		if (knowledgeBaseArticle.getDescription() == null) {
+			map.put("description", null);
+		}
+		else {
+			map.put(
+				"description",
+				String.valueOf(knowledgeBaseArticle.getDescription()));
+		}
+
+		if (knowledgeBaseArticle.getEncodingFormat() == null) {
+			map.put("encodingFormat", null);
+		}
+		else {
+			map.put(
+				"encodingFormat",
+				String.valueOf(knowledgeBaseArticle.getEncodingFormat()));
+		}
+
+		if (knowledgeBaseArticle.getFriendlyUrlPath() == null) {
+			map.put("friendlyUrlPath", null);
+		}
+		else {
+			map.put(
+				"friendlyUrlPath",
+				String.valueOf(knowledgeBaseArticle.getFriendlyUrlPath()));
+		}
+
+		if (knowledgeBaseArticle.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(knowledgeBaseArticle.getId()));
+		}
+
+		if (knowledgeBaseArticle.getKeywords() == null) {
+			map.put("keywords", null);
+		}
+		else {
+			map.put(
+				"keywords", String.valueOf(knowledgeBaseArticle.getKeywords()));
+		}
+
+		if (knowledgeBaseArticle.getNumberOfAttachments() == null) {
+			map.put("numberOfAttachments", null);
+		}
+		else {
+			map.put(
+				"numberOfAttachments",
+				String.valueOf(knowledgeBaseArticle.getNumberOfAttachments()));
+		}
+
+		if (knowledgeBaseArticle.getNumberOfKnowledgeBaseArticles() == null) {
+			map.put("numberOfKnowledgeBaseArticles", null);
+		}
+		else {
+			map.put(
+				"numberOfKnowledgeBaseArticles",
+				String.valueOf(
+					knowledgeBaseArticle.getNumberOfKnowledgeBaseArticles()));
+		}
+
+		if (knowledgeBaseArticle.getParentKnowledgeBaseFolder() == null) {
+			map.put("parentKnowledgeBaseFolder", null);
+		}
+		else {
+			map.put(
+				"parentKnowledgeBaseFolder",
+				ParentKnowledgeBaseFolderSerDes.toJSON(
+					knowledgeBaseArticle.getParentKnowledgeBaseFolder()));
+		}
+
+		if (knowledgeBaseArticle.getParentKnowledgeBaseFolderId() == null) {
+			map.put("parentKnowledgeBaseFolderId", null);
+		}
+		else {
+			map.put(
+				"parentKnowledgeBaseFolderId",
+				String.valueOf(
+					knowledgeBaseArticle.getParentKnowledgeBaseFolderId()));
+		}
+
+		if (knowledgeBaseArticle.getSiteId() == null) {
+			map.put("siteId", null);
+		}
+		else {
+			map.put("siteId", String.valueOf(knowledgeBaseArticle.getSiteId()));
+		}
+
+		if (knowledgeBaseArticle.getTaxonomyCategories() == null) {
+			map.put("taxonomyCategories", null);
+		}
+		else {
+			map.put(
+				"taxonomyCategories",
+				String.valueOf(knowledgeBaseArticle.getTaxonomyCategories()));
+		}
+
+		if (knowledgeBaseArticle.getTaxonomyCategoryIds() == null) {
+			map.put("taxonomyCategoryIds", null);
+		}
+		else {
+			map.put(
+				"taxonomyCategoryIds",
+				String.valueOf(knowledgeBaseArticle.getTaxonomyCategoryIds()));
+		}
+
+		if (knowledgeBaseArticle.getTitle() == null) {
+			map.put("title", null);
+		}
+		else {
+			map.put("title", String.valueOf(knowledgeBaseArticle.getTitle()));
+		}
+
+		if (knowledgeBaseArticle.getViewableBy() == null) {
+			map.put("viewableBy", null);
+		}
+		else {
+			map.put(
+				"viewableBy",
+				String.valueOf(knowledgeBaseArticle.getViewableBy()));
+		}
+
+		return map;
 	}
 
 	private static class KnowledgeBaseArticleJSONParser
 		extends BaseJSONParser<KnowledgeBaseArticle> {
 
+		@Override
 		protected KnowledgeBaseArticle createDTO() {
 			return new KnowledgeBaseArticle();
 		}
 
+		@Override
 		protected KnowledgeBaseArticle[] createDTOArray(int size) {
 			return new KnowledgeBaseArticle[size];
 		}
 
+		@Override
 		protected void setField(
 			KnowledgeBaseArticle knowledgeBaseArticle,
 			String jsonParserFieldName, Object jsonParserFieldValue) {
@@ -379,13 +558,13 @@ public class KnowledgeBaseArticleSerDes {
 			else if (Objects.equals(jsonParserFieldName, "dateCreated")) {
 				if (jsonParserFieldValue != null) {
 					knowledgeBaseArticle.setDateCreated(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dateModified")) {
 				if (jsonParserFieldValue != null) {
 					knowledgeBaseArticle.setDateModified(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "description")) {
@@ -423,7 +602,7 @@ public class KnowledgeBaseArticleSerDes {
 
 				if (jsonParserFieldValue != null) {
 					knowledgeBaseArticle.setNumberOfAttachments(
-						(Number)jsonParserFieldValue);
+						Integer.valueOf((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(
@@ -431,7 +610,7 @@ public class KnowledgeBaseArticleSerDes {
 
 				if (jsonParserFieldValue != null) {
 					knowledgeBaseArticle.setNumberOfKnowledgeBaseArticles(
-						(Number)jsonParserFieldValue);
+						Integer.valueOf((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(
@@ -495,18 +674,6 @@ public class KnowledgeBaseArticleSerDes {
 			else {
 				throw new IllegalArgumentException(
 					"Unsupported field name " + jsonParserFieldName);
-			}
-		}
-
-		private Date _toDate(String string) {
-			try {
-				DateFormat dateFormat = new SimpleDateFormat(
-					"yyyy-MM-dd'T'HH:mm:ss'Z'");
-
-				return dateFormat.parse(string);
-			}
-			catch (ParseException pe) {
-				throw new IllegalArgumentException("Unable to parse " + string);
 			}
 		}
 

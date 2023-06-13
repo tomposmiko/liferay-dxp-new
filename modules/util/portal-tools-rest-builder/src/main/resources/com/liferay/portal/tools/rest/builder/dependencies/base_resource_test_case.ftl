@@ -1,17 +1,22 @@
 package ${configYAML.apiPackagePath}.resource.${escapedVersion}.test;
 
 <#list allSchemas?keys as schemaName>
-	import ${configYAML.apiPackagePath}.dto.${escapedVersion}.${schemaName};
+	import ${configYAML.apiPackagePath}.client.dto.${escapedVersion}.${schemaName};
+	import ${configYAML.apiPackagePath}.client.serdes.${escapedVersion}.${schemaName}SerDes;
 	import ${configYAML.apiPackagePath}.resource.${escapedVersion}.${schemaName}Resource;
 </#list>
+
+import ${configYAML.apiPackagePath}.client.pagination.Page;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -36,7 +41,6 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.multipart.BinaryFile;
 import com.liferay.portal.vulcan.multipart.MultipartBody;
-import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
@@ -51,10 +55,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -104,6 +110,61 @@ public abstract class Base${schemaName}ResourceTestCase {
 	public void tearDown() throws Exception {
 		GroupTestUtil.deleteGroup(irrelevantGroup);
 		GroupTestUtil.deleteGroup(testGroup);
+	}
+
+	@Test
+	public void testClientSerDesToDTO() throws Exception {
+		ObjectMapper objectMapper = new ObjectMapper() {
+			{
+				configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+				enable(SerializationFeature.INDENT_OUTPUT);
+				setDateFormat(new ISO8601DateFormat());
+				setFilterProvider(
+					new SimpleFilterProvider() {
+						{
+							addFilter("Liferay.Vulcan", SimpleBeanPropertyFilter.serializeAll());
+						}
+					});
+				setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+				setSerializationInclusion(JsonInclude.Include.NON_NULL);
+			}
+		};
+
+		${schemaName} ${schemaVarName}1 = random${schemaName}();
+
+		String json = objectMapper.writeValueAsString(${schemaVarName}1);
+
+		${schemaName} ${schemaVarName}2 = ${schemaName}SerDes.toDTO(json);
+
+		Assert.assertTrue(equals(${schemaVarName}1, ${schemaVarName}2));
+	}
+
+	@Test
+	public void testClientSerDesToJSON() throws Exception {
+		ObjectMapper objectMapper = new ObjectMapper() {
+			{
+				configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+				setDateFormat(new ISO8601DateFormat());
+				setFilterProvider(
+					new SimpleFilterProvider() {
+						{
+							addFilter(
+								"Liferay.Vulcan",
+								SimpleBeanPropertyFilter.serializeAll());
+						}
+					});
+				setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+				setSerializationInclusion(JsonInclude.Include.NON_NULL);
+			}
+		};
+
+		${schemaName} ${schemaVarName} = random${schemaName}();
+
+		String json1 = objectMapper.writeValueAsString(${schemaVarName});
+		String json2 = ${schemaName}SerDes.toJSON(${schemaVarName});
+
+		Assert.assertEquals(
+			objectMapper.readTree(json1), objectMapper.readTree(json2));
 	}
 
 	<#assign
@@ -259,11 +320,6 @@ public abstract class Base${schemaName}ResourceTestCase {
 						</#list>
 
 						${schemaName} ${schemaVarName}1 = random${schemaName}();
-						${schemaName} ${schemaVarName}2 = random${schemaName}();
-
-						for (EntityField entityField : entityFields) {
-							BeanUtils.setProperty(${schemaVarName}1, entityField.getName(), DateUtils.addMinutes(new Date(), -2));
-						}
 
 						${schemaVarName}1 = test${javaMethodSignature.methodName?cap_first}_add${schemaName}(
 
@@ -272,16 +328,6 @@ public abstract class Base${schemaName}ResourceTestCase {
 						</#list>
 
 						${schemaVarName}1);
-
-						Thread.sleep(1000);
-
-						${schemaVarName}2 = test${javaMethodSignature.methodName?cap_first}_add${schemaName}(
-
-						<#list javaMethodSignature.pathJavaMethodParameters as javaMethodParameter>
-							${javaMethodParameter.parameterName},
-						</#list>
-
-						${schemaVarName}2);
 
 						for (EntityField entityField : entityFields) {
 							Page<${schemaName}> page = invoke${javaMethodSignature.methodName?cap_first}(
@@ -292,7 +338,7 @@ public abstract class Base${schemaName}ResourceTestCase {
 								</#if>
 
 								<#if stringUtil.equals(javaMethodParameter.parameterName, "filter")>
-									getFilterString(entityField, "eq", ${schemaVarName}1)
+									getFilterString(entityField, "between", ${schemaVarName}1)
 								<#elseif stringUtil.equals(javaMethodParameter.parameterName, "pagination")>
 									Pagination.of(1, 2)
 								<#elseif freeMarkerTool.isPathParameter(javaMethodParameter, javaMethodSignature.operation)>
@@ -478,8 +524,6 @@ public abstract class Base${schemaName}ResourceTestCase {
 						</#list>
 
 						${schemaVarName}1);
-
-						Thread.sleep(1000);
 
 						${schemaVarName}2 = test${javaMethodSignature.methodName?cap_first}_add${schemaName}(
 
@@ -846,16 +890,16 @@ public abstract class Base${schemaName}ResourceTestCase {
 
 		<#assign
 			invokeArguments = arguments?replace("filter", "filterString")?replace("sorts", "sortString")
-			invokeParameters = parameters?replace("com.liferay.portal.kernel.search.filter.Filter filter", "String filterString")?replace("com.liferay.portal.kernel.search.Sort[] sorts", "String sortString")
+			invokeParameters = parameters?replace("com.liferay.portal.kernel.search.filter.Filter filter", "String filterString")?replace("com.liferay.portal.kernel.search.Sort[] sorts", "String sortString")?replace(".dto.", ".client.dto.")
 		/>
 
-		protected ${javaMethodSignature.returnType} invoke${javaMethodSignature.methodName?cap_first}(${invokeParameters}) throws Exception {
+		protected ${javaMethodSignature.returnType?replace(".dto.", ".client.dto.")?replace("com.liferay.portal.vulcan.pagination", "${configYAML.apiPackagePath}.client.pagination")} invoke${javaMethodSignature.methodName?cap_first}(${invokeParameters}) throws Exception {
 			Http.Options options = _createHttpOptions();
 
 			<#if freeMarkerTool.hasHTTPMethod(javaMethodSignature, "patch", "post", "put") && invokeArguments?ends_with("${schemaVarName}")>
-				options.setBody(inputObjectMapper.writeValueAsString(${schemaVarName}), ContentTypes.APPLICATION_JSON, StringPool.UTF8);
+				options.setBody(${schemaName}SerDes.toJSON(${schemaVarName}), ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 			<#elseif freeMarkerTool.hasHTTPMethod(javaMethodSignature, "patch", "post", "put") && invokeArguments?ends_with("multipartBody")>
-				options.addPart("${schemaVarName}", inputObjectMapper.writeValueAsString(multipartBody.getValues()));
+				options.addPart("${schemaVarName}", _toJSON(multipartBody.getValues()));
 
 				BinaryFile binaryFile = multipartBody.getBinaryFile("file");
 
@@ -907,25 +951,18 @@ public abstract class Base${schemaName}ResourceTestCase {
 				_log.debug("HTTP response: " + string);
 			}
 
-			<#if stringUtil.equals(javaMethodSignature.returnType, "boolean")>
-				try {
-					return outputObjectMapper.readValue(string, Boolean.class);
-				}
-				catch (Exception e) {
-					_log.error("Unable to process HTTP response: " + string, e);
-
-					throw e;
-				}
-			<#elseif javaMethodSignature.returnType?contains("Page<")>
-				return outputObjectMapper.readValue(string, new TypeReference<Page<${schemaName}>>() {});
+			<#if javaMethodSignature.returnType?contains("Page<")>
+				return Page.of(string, ${schemaName}SerDes::toDTO);
 			<#elseif javaMethodSignature.returnType?ends_with("String")>
 				return string;
 			<#elseif !stringUtil.equals(javaMethodSignature.returnType, "void")>
 				try {
-					return outputObjectMapper.readValue(string, ${javaMethodSignature.returnType}.class);
+					return ${javaMethodSignature.returnType?replace(".dto.", ".client.serdes.")}SerDes.toDTO(string);
 				}
 				catch (Exception e) {
-					_log.error("Unable to process HTTP response: " + string, e);
+					if (_log.isDebugEnabled()) {
+						_log.debug("Unable to process HTTP response: " + string, e);
+					}
 
 					throw e;
 				}
@@ -936,7 +973,7 @@ public abstract class Base${schemaName}ResourceTestCase {
 			Http.Options options = _createHttpOptions();
 
 			<#if freeMarkerTool.hasHTTPMethod(javaMethodSignature, "patch", "post", "put") && invokeArguments?ends_with(",${schemaVarName}")>
-				options.setBody(inputObjectMapper.writeValueAsString(${schemaVarName}), ContentTypes.APPLICATION_JSON, StringPool.UTF8);
+				options.setBody(${schemaName}SerDes.toJSON(${schemaVarName}), ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 			</#if>
 
 			<#if freeMarkerTool.hasHTTPMethod(javaMethodSignature, "delete")>
@@ -1163,7 +1200,28 @@ public abstract class Base${schemaName}ResourceTestCase {
 		<#list properties?keys as propertyName>
 			if (entityFieldName.equals("${propertyName}")) {
 				<#if stringUtil.equals(properties[propertyName], "Date")>
-					sb.append(_dateFormat.format(${schemaVarName}.get${propertyName?cap_first}()));
+					if (operator.equals("between")) {
+						sb = new StringBundler();
+
+						sb.append("(");
+						sb.append(entityFieldName);
+						sb.append(" gt ");
+						sb.append(_dateFormat.format(DateUtils.addSeconds(${schemaVarName}.get${propertyName?cap_first}(), -2)));
+						sb.append(" and ");
+						sb.append(entityFieldName);
+						sb.append(" lt ");
+						sb.append(_dateFormat.format(DateUtils.addSeconds(${schemaVarName}.get${propertyName?cap_first}(), 2)));
+						sb.append(")");
+					}
+					else {
+						sb.append(entityFieldName);
+
+						sb.append(" ");
+						sb.append(operator);
+						sb.append(" ");
+
+						sb.append(_dateFormat.format(${schemaVarName}.get${propertyName?cap_first}()));
+					}
 
 					return sb.toString();
 				<#elseif stringUtil.equals(properties[propertyName], "String")>
@@ -1219,86 +1277,11 @@ public abstract class Base${schemaName}ResourceTestCase {
 		}
 	</#if>
 
-	protected static final ObjectMapper inputObjectMapper = new ObjectMapper() {
-		{
-			setFilterProvider(
-				new SimpleFilterProvider() {
-					{
-						addFilter("Liferay.Vulcan", SimpleBeanPropertyFilter.serializeAll());
-					}
-				});
-			setSerializationInclusion(JsonInclude.Include.NON_NULL);
-		}
-	};
-	protected static final ObjectMapper outputObjectMapper = new ObjectMapper() {
-		{
-			addMixIn(${schemaName}.class, ${schemaName}Mixin.class);
-			setFilterProvider(
-				new SimpleFilterProvider() {
-					{
-						addFilter("Liferay.Vulcan", SimpleBeanPropertyFilter.serializeAll());
-					}
-				});
-		}
-	};
-
 	protected Group irrelevantGroup;
 	protected String testContentType = "application/json";
 	protected Group testGroup;
 	protected Locale testLocale;
 	protected String testUserNameAndPassword = "test@liferay.com:test";
-
-	protected static class ${schemaName}Mixin {
-		<#assign enumSchemas = freeMarkerTool.getDTOEnumSchemas(schema) />
-
-		<#list enumSchemas?keys as enumName>
-			public static enum ${enumName} {}
-		</#list>
-
-		<#list properties?keys as propertyName>
-			@JsonProperty
-			${properties[propertyName]} ${propertyName};
-		</#list>
-	}
-
-	protected static class Page<T> {
-
-		public Collection<T> getItems() {
-			return new ArrayList<>(items);
-		}
-
-		public long getLastPage() {
-			return lastPage;
-		}
-
-		public long getPage() {
-			return page;
-		}
-
-		public long getPageSize() {
-			return pageSize;
-		}
-
-		public long getTotalCount() {
-			return totalCount;
-		}
-
-		@JsonProperty
-		protected Collection<T> items;
-
-		@JsonProperty
-		protected long lastPage;
-
-		@JsonProperty
-		protected long page;
-
-		@JsonProperty
-		protected long pageSize;
-
-		@JsonProperty
-		protected long totalCount;
-
-	}
 
 	private Http.Options _createHttpOptions() {
 		Http.Options options = new Http.Options();
@@ -1313,6 +1296,41 @@ public abstract class Base${schemaName}ResourceTestCase {
 		options.addHeader("Content-Type", testContentType);
 
 		return options;
+	}
+
+	private String _toJSON(Map<String, String> map) {
+		if (map == null) {
+			return "null";
+		}
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("{");
+
+		Set<Map.Entry<String, String>> set = map.entrySet();
+
+		Iterator<Map.Entry<String, String>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, String> entry = iterator.next();
+
+			sb.append("\"" + entry.getKey() + "\": ");
+
+			if (entry.getValue() == null) {
+				sb.append("null");
+			}
+			else {
+				sb.append("\"" + entry.getValue() + "\"");
+			}
+
+			if (iterator.hasNext()) {
+				sb.append(", ");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private String _toPath(String template, Object... values) {

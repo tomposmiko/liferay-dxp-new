@@ -17,7 +17,8 @@ package com.liferay.headless.admin.taxonomy.client.serdes.v1_0;
 import com.liferay.headless.admin.taxonomy.client.dto.v1_0.AssetType;
 import com.liferay.headless.admin.taxonomy.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -43,42 +44,49 @@ public class AssetTypeSerDes {
 
 	public static String toJSON(AssetType assetType) {
 		if (assetType == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"required\": ");
+		if (assetType.getRequired() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (assetType.getRequired() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"required\":");
+
 			sb.append(assetType.getRequired());
 		}
 
-		sb.append(", ");
+		if (assetType.getSubtype() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"subtype\": ");
+			sb.append("\"subtype\":");
 
-		if (assetType.getSubtype() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(assetType.getSubtype());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (assetType.getType() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"type\": ");
+			sb.append("\"type\":");
 
-		if (assetType.getType() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(assetType.getType());
+
+			sb.append("\"");
 		}
 
 		sb.append("}");
@@ -86,38 +94,50 @@ public class AssetTypeSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<AssetType> assetTypes) {
-		if (assetTypes == null) {
-			return "[]";
+	public static Map<String, String> toMap(AssetType assetType) {
+		if (assetType == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (AssetType assetType : assetTypes) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(assetType));
+		if (assetType.getRequired() == null) {
+			map.put("required", null);
+		}
+		else {
+			map.put("required", String.valueOf(assetType.getRequired()));
 		}
 
-		sb.append("]");
+		if (assetType.getSubtype() == null) {
+			map.put("subtype", null);
+		}
+		else {
+			map.put("subtype", String.valueOf(assetType.getSubtype()));
+		}
 
-		return sb.toString();
+		if (assetType.getType() == null) {
+			map.put("type", null);
+		}
+		else {
+			map.put("type", String.valueOf(assetType.getType()));
+		}
+
+		return map;
 	}
 
 	private static class AssetTypeJSONParser extends BaseJSONParser<AssetType> {
 
+		@Override
 		protected AssetType createDTO() {
 			return new AssetType();
 		}
 
+		@Override
 		protected AssetType[] createDTOArray(int size) {
 			return new AssetType[size];
 		}
 
+		@Override
 		protected void setField(
 			AssetType assetType, String jsonParserFieldName,
 			Object jsonParserFieldValue) {

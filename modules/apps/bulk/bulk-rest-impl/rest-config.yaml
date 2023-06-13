@@ -5,4 +5,5 @@ application:
     className: "BulkRESTApplication"
     name: "Liferay.Bulk.REST"
 author: "Alejandro Tardín"
+clientDir: "../bulk-rest-client/src/main/java"
 testDir: "../bulk-rest-test/src/testIntegration/java"

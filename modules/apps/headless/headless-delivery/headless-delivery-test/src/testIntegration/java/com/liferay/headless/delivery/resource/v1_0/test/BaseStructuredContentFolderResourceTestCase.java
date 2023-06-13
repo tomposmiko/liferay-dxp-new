@@ -15,14 +15,16 @@
 package com.liferay.headless.delivery.resource.v1_0.test;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
-import com.liferay.headless.delivery.dto.v1_0.Creator;
-import com.liferay.headless.delivery.dto.v1_0.StructuredContentFolder;
+import com.liferay.headless.delivery.client.dto.v1_0.StructuredContentFolder;
+import com.liferay.headless.delivery.client.pagination.Page;
+import com.liferay.headless.delivery.client.serdes.v1_0.StructuredContentFolderSerDes;
 import com.liferay.headless.delivery.resource.v1_0.StructuredContentFolderResource;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -42,7 +44,6 @@ import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
@@ -57,10 +58,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -113,6 +116,68 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 	public void tearDown() throws Exception {
 		GroupTestUtil.deleteGroup(irrelevantGroup);
 		GroupTestUtil.deleteGroup(testGroup);
+	}
+
+	@Test
+	public void testClientSerDesToDTO() throws Exception {
+		ObjectMapper objectMapper = new ObjectMapper() {
+			{
+				configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+				enable(SerializationFeature.INDENT_OUTPUT);
+				setDateFormat(new ISO8601DateFormat());
+				setFilterProvider(
+					new SimpleFilterProvider() {
+						{
+							addFilter(
+								"Liferay.Vulcan",
+								SimpleBeanPropertyFilter.serializeAll());
+						}
+					});
+				setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+				setSerializationInclusion(JsonInclude.Include.NON_NULL);
+			}
+		};
+
+		StructuredContentFolder structuredContentFolder1 =
+			randomStructuredContentFolder();
+
+		String json = objectMapper.writeValueAsString(structuredContentFolder1);
+
+		StructuredContentFolder structuredContentFolder2 =
+			StructuredContentFolderSerDes.toDTO(json);
+
+		Assert.assertTrue(
+			equals(structuredContentFolder1, structuredContentFolder2));
+	}
+
+	@Test
+	public void testClientSerDesToJSON() throws Exception {
+		ObjectMapper objectMapper = new ObjectMapper() {
+			{
+				configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+				setDateFormat(new ISO8601DateFormat());
+				setFilterProvider(
+					new SimpleFilterProvider() {
+						{
+							addFilter(
+								"Liferay.Vulcan",
+								SimpleBeanPropertyFilter.serializeAll());
+						}
+					});
+				setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+				setSerializationInclusion(JsonInclude.Include.NON_NULL);
+			}
+		};
+
+		StructuredContentFolder structuredContentFolder =
+			randomStructuredContentFolder();
+
+		String json1 = objectMapper.writeValueAsString(structuredContentFolder);
+		String json2 = StructuredContentFolderSerDes.toJSON(
+			structuredContentFolder);
+
+		Assert.assertEquals(
+			objectMapper.readTree(json1), objectMapper.readTree(json2));
 	}
 
 	@Test
@@ -175,31 +240,17 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 
 		StructuredContentFolder structuredContentFolder1 =
 			randomStructuredContentFolder();
-		StructuredContentFolder structuredContentFolder2 =
-			randomStructuredContentFolder();
-
-		for (EntityField entityField : entityFields) {
-			BeanUtils.setProperty(
-				structuredContentFolder1, entityField.getName(),
-				DateUtils.addMinutes(new Date(), -2));
-		}
 
 		structuredContentFolder1 =
 			testGetSiteStructuredContentFoldersPage_addStructuredContentFolder(
 				siteId, structuredContentFolder1);
-
-		Thread.sleep(1000);
-
-		structuredContentFolder2 =
-			testGetSiteStructuredContentFoldersPage_addStructuredContentFolder(
-				siteId, structuredContentFolder2);
 
 		for (EntityField entityField : entityFields) {
 			Page<StructuredContentFolder> page =
 				invokeGetSiteStructuredContentFoldersPage(
 					siteId, null, null,
 					getFilterString(
-						entityField, "eq", structuredContentFolder1),
+						entityField, "between", structuredContentFolder1),
 					Pagination.of(1, 2), null);
 
 			assertEquals(
@@ -325,8 +376,6 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 		structuredContentFolder1 =
 			testGetSiteStructuredContentFoldersPage_addStructuredContentFolder(
 				siteId, structuredContentFolder1);
-
-		Thread.sleep(1000);
 
 		structuredContentFolder2 =
 			testGetSiteStructuredContentFoldersPage_addStructuredContentFolder(
@@ -461,10 +510,7 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 			_log.debug("HTTP response: " + string);
 		}
 
-		return outputObjectMapper.readValue(
-			string,
-			new TypeReference<Page<StructuredContentFolder>>() {
-			});
+		return Page.of(string, StructuredContentFolderSerDes::toDTO);
 	}
 
 	protected Http.Response invokeGetSiteStructuredContentFoldersPageResponse(
@@ -525,7 +571,7 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(structuredContentFolder),
+			StructuredContentFolderSerDes.toJSON(structuredContentFolder),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
@@ -543,11 +589,12 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(
-				string, StructuredContentFolder.class);
+			return StructuredContentFolderSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -560,7 +607,7 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(structuredContentFolder),
+			StructuredContentFolderSerDes.toJSON(structuredContentFolder),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
@@ -643,31 +690,17 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 
 		StructuredContentFolder structuredContentFolder1 =
 			randomStructuredContentFolder();
-		StructuredContentFolder structuredContentFolder2 =
-			randomStructuredContentFolder();
-
-		for (EntityField entityField : entityFields) {
-			BeanUtils.setProperty(
-				structuredContentFolder1, entityField.getName(),
-				DateUtils.addMinutes(new Date(), -2));
-		}
 
 		structuredContentFolder1 =
 			testGetStructuredContentFolderStructuredContentFoldersPage_addStructuredContentFolder(
 				parentStructuredContentFolderId, structuredContentFolder1);
-
-		Thread.sleep(1000);
-
-		structuredContentFolder2 =
-			testGetStructuredContentFolderStructuredContentFoldersPage_addStructuredContentFolder(
-				parentStructuredContentFolderId, structuredContentFolder2);
 
 		for (EntityField entityField : entityFields) {
 			Page<StructuredContentFolder> page =
 				invokeGetStructuredContentFolderStructuredContentFoldersPage(
 					parentStructuredContentFolderId, null,
 					getFilterString(
-						entityField, "eq", structuredContentFolder1),
+						entityField, "between", structuredContentFolder1),
 					Pagination.of(1, 2), null);
 
 			assertEquals(
@@ -803,8 +836,6 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 		structuredContentFolder1 =
 			testGetStructuredContentFolderStructuredContentFoldersPage_addStructuredContentFolder(
 				parentStructuredContentFolderId, structuredContentFolder1);
-
-		Thread.sleep(1000);
 
 		structuredContentFolder2 =
 			testGetStructuredContentFolderStructuredContentFoldersPage_addStructuredContentFolder(
@@ -946,10 +977,7 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 			_log.debug("HTTP response: " + string);
 		}
 
-		return outputObjectMapper.readValue(
-			string,
-			new TypeReference<Page<StructuredContentFolder>>() {
-			});
+		return Page.of(string, StructuredContentFolderSerDes::toDTO);
 	}
 
 	protected Http.Response
@@ -1017,7 +1045,7 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(structuredContentFolder),
+			StructuredContentFolderSerDes.toJSON(structuredContentFolder),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
@@ -1037,11 +1065,12 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(
-				string, StructuredContentFolder.class);
+			return StructuredContentFolderSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -1056,7 +1085,7 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(structuredContentFolder),
+			StructuredContentFolderSerDes.toJSON(structuredContentFolder),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
@@ -1184,11 +1213,12 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(
-				string, StructuredContentFolder.class);
+			return StructuredContentFolderSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -1259,7 +1289,7 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(structuredContentFolder),
+			StructuredContentFolderSerDes.toJSON(structuredContentFolder),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
@@ -1279,11 +1309,12 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(
-				string, StructuredContentFolder.class);
+			return StructuredContentFolderSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -1297,7 +1328,7 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(structuredContentFolder),
+			StructuredContentFolderSerDes.toJSON(structuredContentFolder),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
@@ -1355,7 +1386,7 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(structuredContentFolder),
+			StructuredContentFolderSerDes.toJSON(structuredContentFolder),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
@@ -1375,11 +1406,12 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(
-				string, StructuredContentFolder.class);
+			return StructuredContentFolderSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -1393,7 +1425,7 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(structuredContentFolder),
+			StructuredContentFolderSerDes.toJSON(structuredContentFolder),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
@@ -1777,15 +1809,71 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 		}
 
 		if (entityFieldName.equals("dateCreated")) {
-			sb.append(
-				_dateFormat.format(structuredContentFolder.getDateCreated()));
+			if (operator.equals("between")) {
+				sb = new StringBundler();
+
+				sb.append("(");
+				sb.append(entityFieldName);
+				sb.append(" gt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							structuredContentFolder.getDateCreated(), -2)));
+				sb.append(" and ");
+				sb.append(entityFieldName);
+				sb.append(" lt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							structuredContentFolder.getDateCreated(), 2)));
+				sb.append(")");
+			}
+			else {
+				sb.append(entityFieldName);
+
+				sb.append(" ");
+				sb.append(operator);
+				sb.append(" ");
+
+				sb.append(
+					_dateFormat.format(
+						structuredContentFolder.getDateCreated()));
+			}
 
 			return sb.toString();
 		}
 
 		if (entityFieldName.equals("dateModified")) {
-			sb.append(
-				_dateFormat.format(structuredContentFolder.getDateModified()));
+			if (operator.equals("between")) {
+				sb = new StringBundler();
+
+				sb.append("(");
+				sb.append(entityFieldName);
+				sb.append(" gt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							structuredContentFolder.getDateModified(), -2)));
+				sb.append(" and ");
+				sb.append(entityFieldName);
+				sb.append(" lt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							structuredContentFolder.getDateModified(), 2)));
+				sb.append(")");
+			}
+			else {
+				sb.append(entityFieldName);
+
+				sb.append(" ");
+				sb.append(operator);
+				sb.append(" ");
+
+				sb.append(
+					_dateFormat.format(
+						structuredContentFolder.getDateModified()));
+			}
 
 			return sb.toString();
 		}
@@ -1864,108 +1952,11 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 		return randomStructuredContentFolder();
 	}
 
-	protected static final ObjectMapper inputObjectMapper = new ObjectMapper() {
-		{
-			setFilterProvider(
-				new SimpleFilterProvider() {
-					{
-						addFilter(
-							"Liferay.Vulcan",
-							SimpleBeanPropertyFilter.serializeAll());
-					}
-				});
-			setSerializationInclusion(JsonInclude.Include.NON_NULL);
-		}
-	};
-	protected static final ObjectMapper outputObjectMapper =
-		new ObjectMapper() {
-			{
-				addMixIn(
-					StructuredContentFolder.class,
-					StructuredContentFolderMixin.class);
-				setFilterProvider(
-					new SimpleFilterProvider() {
-						{
-							addFilter(
-								"Liferay.Vulcan",
-								SimpleBeanPropertyFilter.serializeAll());
-						}
-					});
-			}
-		};
-
 	protected Group irrelevantGroup;
 	protected String testContentType = "application/json";
 	protected Group testGroup;
 	protected Locale testLocale;
 	protected String testUserNameAndPassword = "test@liferay.com:test";
-
-	protected static class StructuredContentFolderMixin {
-
-		public static enum ViewableBy {
-		}
-
-		@JsonProperty
-		Creator creator;
-		@JsonProperty
-		Date dateCreated;
-		@JsonProperty
-		Date dateModified;
-		@JsonProperty
-		String description;
-		@JsonProperty
-		Long id;
-		@JsonProperty
-		String name;
-		@JsonProperty
-		Number numberOfStructuredContentFolders;
-		@JsonProperty
-		Number numberOfStructuredContents;
-		@JsonProperty
-		Long siteId;
-		@JsonProperty
-		ViewableBy viewableBy;
-
-	}
-
-	protected static class Page<T> {
-
-		public Collection<T> getItems() {
-			return new ArrayList<>(items);
-		}
-
-		public long getLastPage() {
-			return lastPage;
-		}
-
-		public long getPage() {
-			return page;
-		}
-
-		public long getPageSize() {
-			return pageSize;
-		}
-
-		public long getTotalCount() {
-			return totalCount;
-		}
-
-		@JsonProperty
-		protected Collection<T> items;
-
-		@JsonProperty
-		protected long lastPage;
-
-		@JsonProperty
-		protected long page;
-
-		@JsonProperty
-		protected long pageSize;
-
-		@JsonProperty
-		protected long totalCount;
-
-	}
 
 	private Http.Options _createHttpOptions() {
 		Http.Options options = new Http.Options();
@@ -1983,6 +1974,41 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 		options.addHeader("Content-Type", testContentType);
 
 		return options;
+	}
+
+	private String _toJSON(Map<String, String> map) {
+		if (map == null) {
+			return "null";
+		}
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("{");
+
+		Set<Map.Entry<String, String>> set = map.entrySet();
+
+		Iterator<Map.Entry<String, String>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, String> entry = iterator.next();
+
+			sb.append("\"" + entry.getKey() + "\": ");
+
+			if (entry.getValue() == null) {
+				sb.append("null");
+			}
+			else {
+				sb.append("\"" + entry.getValue() + "\"");
+			}
+
+			if (iterator.hasNext()) {
+				sb.append(", ");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private String _toPath(String template, Object... values) {

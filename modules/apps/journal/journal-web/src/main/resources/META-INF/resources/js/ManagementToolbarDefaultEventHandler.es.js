@@ -11,7 +11,7 @@ class ManagementToolbarDefaultEventHandler extends DefaultEventHandler {
 			function(event) {
 				const selectAddMenuItemWindow = Liferay.Util.Window.getById(namespace + 'selectAddMenuItem');
 
-				selectAddMenuItemWindow.detachAll();
+				selectAddMenuItemWindow.set('destroyOnHide', false);
 
 				Liferay.fire(
 					'closeWindow',
@@ -56,7 +56,9 @@ class ManagementToolbarDefaultEventHandler extends DefaultEventHandler {
 				dialog: {
 					after: {
 						destroy: function(event) {
-							window.location.reload();
+							if (event.target.get('destroyOnHide')) {
+								window.location.reload();
+							}
 						}
 					},
 					destroyOnHide: true,

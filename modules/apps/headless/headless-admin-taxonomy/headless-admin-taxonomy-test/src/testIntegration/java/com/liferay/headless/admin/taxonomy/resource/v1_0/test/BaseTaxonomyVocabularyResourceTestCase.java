@@ -15,15 +15,16 @@
 package com.liferay.headless.admin.taxonomy.resource.v1_0.test;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
-import com.liferay.headless.admin.taxonomy.dto.v1_0.AssetType;
-import com.liferay.headless.admin.taxonomy.dto.v1_0.Creator;
-import com.liferay.headless.admin.taxonomy.dto.v1_0.TaxonomyVocabulary;
+import com.liferay.headless.admin.taxonomy.client.dto.v1_0.TaxonomyVocabulary;
+import com.liferay.headless.admin.taxonomy.client.pagination.Page;
+import com.liferay.headless.admin.taxonomy.client.serdes.v1_0.TaxonomyVocabularySerDes;
 import com.liferay.headless.admin.taxonomy.resource.v1_0.TaxonomyVocabularyResource;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -43,7 +44,6 @@ import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
@@ -58,10 +58,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -114,6 +116,64 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 	public void tearDown() throws Exception {
 		GroupTestUtil.deleteGroup(irrelevantGroup);
 		GroupTestUtil.deleteGroup(testGroup);
+	}
+
+	@Test
+	public void testClientSerDesToDTO() throws Exception {
+		ObjectMapper objectMapper = new ObjectMapper() {
+			{
+				configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+				enable(SerializationFeature.INDENT_OUTPUT);
+				setDateFormat(new ISO8601DateFormat());
+				setFilterProvider(
+					new SimpleFilterProvider() {
+						{
+							addFilter(
+								"Liferay.Vulcan",
+								SimpleBeanPropertyFilter.serializeAll());
+						}
+					});
+				setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+				setSerializationInclusion(JsonInclude.Include.NON_NULL);
+			}
+		};
+
+		TaxonomyVocabulary taxonomyVocabulary1 = randomTaxonomyVocabulary();
+
+		String json = objectMapper.writeValueAsString(taxonomyVocabulary1);
+
+		TaxonomyVocabulary taxonomyVocabulary2 = TaxonomyVocabularySerDes.toDTO(
+			json);
+
+		Assert.assertTrue(equals(taxonomyVocabulary1, taxonomyVocabulary2));
+	}
+
+	@Test
+	public void testClientSerDesToJSON() throws Exception {
+		ObjectMapper objectMapper = new ObjectMapper() {
+			{
+				configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+				setDateFormat(new ISO8601DateFormat());
+				setFilterProvider(
+					new SimpleFilterProvider() {
+						{
+							addFilter(
+								"Liferay.Vulcan",
+								SimpleBeanPropertyFilter.serializeAll());
+						}
+					});
+				setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+				setSerializationInclusion(JsonInclude.Include.NON_NULL);
+			}
+		};
+
+		TaxonomyVocabulary taxonomyVocabulary = randomTaxonomyVocabulary();
+
+		String json1 = objectMapper.writeValueAsString(taxonomyVocabulary);
+		String json2 = TaxonomyVocabularySerDes.toJSON(taxonomyVocabulary);
+
+		Assert.assertEquals(
+			objectMapper.readTree(json1), objectMapper.readTree(json2));
 	}
 
 	@Test
@@ -172,29 +232,17 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 		Long siteId = testGetSiteTaxonomyVocabulariesPage_getSiteId();
 
 		TaxonomyVocabulary taxonomyVocabulary1 = randomTaxonomyVocabulary();
-		TaxonomyVocabulary taxonomyVocabulary2 = randomTaxonomyVocabulary();
-
-		for (EntityField entityField : entityFields) {
-			BeanUtils.setProperty(
-				taxonomyVocabulary1, entityField.getName(),
-				DateUtils.addMinutes(new Date(), -2));
-		}
 
 		taxonomyVocabulary1 =
 			testGetSiteTaxonomyVocabulariesPage_addTaxonomyVocabulary(
 				siteId, taxonomyVocabulary1);
 
-		Thread.sleep(1000);
-
-		taxonomyVocabulary2 =
-			testGetSiteTaxonomyVocabulariesPage_addTaxonomyVocabulary(
-				siteId, taxonomyVocabulary2);
-
 		for (EntityField entityField : entityFields) {
 			Page<TaxonomyVocabulary> page =
 				invokeGetSiteTaxonomyVocabulariesPage(
 					siteId, null,
-					getFilterString(entityField, "eq", taxonomyVocabulary1),
+					getFilterString(
+						entityField, "between", taxonomyVocabulary1),
 					Pagination.of(1, 2), null);
 
 			assertEquals(
@@ -312,8 +360,6 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 		taxonomyVocabulary1 =
 			testGetSiteTaxonomyVocabulariesPage_addTaxonomyVocabulary(
 				siteId, taxonomyVocabulary1);
-
-		Thread.sleep(1000);
 
 		taxonomyVocabulary2 =
 			testGetSiteTaxonomyVocabulariesPage_addTaxonomyVocabulary(
@@ -440,10 +486,7 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 			_log.debug("HTTP response: " + string);
 		}
 
-		return outputObjectMapper.readValue(
-			string,
-			new TypeReference<Page<TaxonomyVocabulary>>() {
-			});
+		return Page.of(string, TaxonomyVocabularySerDes::toDTO);
 	}
 
 	protected Http.Response invokeGetSiteTaxonomyVocabulariesPageResponse(
@@ -503,7 +546,7 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(taxonomyVocabulary),
+			TaxonomyVocabularySerDes.toJSON(taxonomyVocabulary),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
@@ -521,11 +564,12 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(
-				string, TaxonomyVocabulary.class);
+			return TaxonomyVocabularySerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -538,7 +582,7 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(taxonomyVocabulary),
+			TaxonomyVocabularySerDes.toJSON(taxonomyVocabulary),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
@@ -660,11 +704,12 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(
-				string, TaxonomyVocabulary.class);
+			return TaxonomyVocabularySerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -729,7 +774,7 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(taxonomyVocabulary),
+			TaxonomyVocabularySerDes.toJSON(taxonomyVocabulary),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
@@ -749,11 +794,12 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(
-				string, TaxonomyVocabulary.class);
+			return TaxonomyVocabularySerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -766,7 +812,7 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(taxonomyVocabulary),
+			TaxonomyVocabularySerDes.toJSON(taxonomyVocabulary),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
@@ -820,7 +866,7 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(taxonomyVocabulary),
+			TaxonomyVocabularySerDes.toJSON(taxonomyVocabulary),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
@@ -840,11 +886,12 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(
-				string, TaxonomyVocabulary.class);
+			return TaxonomyVocabularySerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -857,7 +904,7 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(taxonomyVocabulary),
+			TaxonomyVocabularySerDes.toJSON(taxonomyVocabulary),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
@@ -1252,13 +1299,69 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 		}
 
 		if (entityFieldName.equals("dateCreated")) {
-			sb.append(_dateFormat.format(taxonomyVocabulary.getDateCreated()));
+			if (operator.equals("between")) {
+				sb = new StringBundler();
+
+				sb.append("(");
+				sb.append(entityFieldName);
+				sb.append(" gt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							taxonomyVocabulary.getDateCreated(), -2)));
+				sb.append(" and ");
+				sb.append(entityFieldName);
+				sb.append(" lt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							taxonomyVocabulary.getDateCreated(), 2)));
+				sb.append(")");
+			}
+			else {
+				sb.append(entityFieldName);
+
+				sb.append(" ");
+				sb.append(operator);
+				sb.append(" ");
+
+				sb.append(
+					_dateFormat.format(taxonomyVocabulary.getDateCreated()));
+			}
 
 			return sb.toString();
 		}
 
 		if (entityFieldName.equals("dateModified")) {
-			sb.append(_dateFormat.format(taxonomyVocabulary.getDateModified()));
+			if (operator.equals("between")) {
+				sb = new StringBundler();
+
+				sb.append("(");
+				sb.append(entityFieldName);
+				sb.append(" gt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							taxonomyVocabulary.getDateModified(), -2)));
+				sb.append(" and ");
+				sb.append(entityFieldName);
+				sb.append(" lt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							taxonomyVocabulary.getDateModified(), 2)));
+				sb.append(")");
+			}
+			else {
+				sb.append(entityFieldName);
+
+				sb.append(" ");
+				sb.append(operator);
+				sb.append(" ");
+
+				sb.append(
+					_dateFormat.format(taxonomyVocabulary.getDateModified()));
+			}
 
 			return sb.toString();
 		}
@@ -1330,109 +1433,11 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 		return randomTaxonomyVocabulary();
 	}
 
-	protected static final ObjectMapper inputObjectMapper = new ObjectMapper() {
-		{
-			setFilterProvider(
-				new SimpleFilterProvider() {
-					{
-						addFilter(
-							"Liferay.Vulcan",
-							SimpleBeanPropertyFilter.serializeAll());
-					}
-				});
-			setSerializationInclusion(JsonInclude.Include.NON_NULL);
-		}
-	};
-	protected static final ObjectMapper outputObjectMapper =
-		new ObjectMapper() {
-			{
-				addMixIn(
-					TaxonomyVocabulary.class, TaxonomyVocabularyMixin.class);
-				setFilterProvider(
-					new SimpleFilterProvider() {
-						{
-							addFilter(
-								"Liferay.Vulcan",
-								SimpleBeanPropertyFilter.serializeAll());
-						}
-					});
-			}
-		};
-
 	protected Group irrelevantGroup;
 	protected String testContentType = "application/json";
 	protected Group testGroup;
 	protected Locale testLocale;
 	protected String testUserNameAndPassword = "test@liferay.com:test";
-
-	protected static class TaxonomyVocabularyMixin {
-
-		public static enum ViewableBy {
-		}
-
-		@JsonProperty
-		AssetType[] assetTypes;
-		@JsonProperty
-		String[] availableLanguages;
-		@JsonProperty
-		Creator creator;
-		@JsonProperty
-		Date dateCreated;
-		@JsonProperty
-		Date dateModified;
-		@JsonProperty
-		String description;
-		@JsonProperty
-		Long id;
-		@JsonProperty
-		String name;
-		@JsonProperty
-		Number numberOfTaxonomyCategories;
-		@JsonProperty
-		Long siteId;
-		@JsonProperty
-		ViewableBy viewableBy;
-
-	}
-
-	protected static class Page<T> {
-
-		public Collection<T> getItems() {
-			return new ArrayList<>(items);
-		}
-
-		public long getLastPage() {
-			return lastPage;
-		}
-
-		public long getPage() {
-			return page;
-		}
-
-		public long getPageSize() {
-			return pageSize;
-		}
-
-		public long getTotalCount() {
-			return totalCount;
-		}
-
-		@JsonProperty
-		protected Collection<T> items;
-
-		@JsonProperty
-		protected long lastPage;
-
-		@JsonProperty
-		protected long page;
-
-		@JsonProperty
-		protected long pageSize;
-
-		@JsonProperty
-		protected long totalCount;
-
-	}
 
 	private Http.Options _createHttpOptions() {
 		Http.Options options = new Http.Options();
@@ -1450,6 +1455,41 @@ public abstract class BaseTaxonomyVocabularyResourceTestCase {
 		options.addHeader("Content-Type", testContentType);
 
 		return options;
+	}
+
+	private String _toJSON(Map<String, String> map) {
+		if (map == null) {
+			return "null";
+		}
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("{");
+
+		Set<Map.Entry<String, String>> set = map.entrySet();
+
+		Iterator<Map.Entry<String, String>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, String> entry = iterator.next();
+
+			sb.append("\"" + entry.getKey() + "\": ");
+
+			if (entry.getValue() == null) {
+				sb.append("null");
+			}
+			else {
+				sb.append("\"" + entry.getValue() + "\"");
+			}
+
+			if (iterator.hasNext()) {
+				sb.append(", ");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private String _toPath(String template, Object... values) {

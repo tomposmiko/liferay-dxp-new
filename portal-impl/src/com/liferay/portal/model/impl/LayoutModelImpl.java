@@ -193,25 +193,27 @@ public class LayoutModelImpl
 
 	public static final long HEADID_COLUMN_BITMASK = 64L;
 
-	public static final long ICONIMAGEID_COLUMN_BITMASK = 128L;
+	public static final long HIDDEN_COLUMN_BITMASK = 128L;
 
-	public static final long LAYOUTID_COLUMN_BITMASK = 256L;
+	public static final long ICONIMAGEID_COLUMN_BITMASK = 256L;
 
-	public static final long LAYOUTPROTOTYPEUUID_COLUMN_BITMASK = 512L;
+	public static final long LAYOUTID_COLUMN_BITMASK = 512L;
 
-	public static final long PARENTLAYOUTID_COLUMN_BITMASK = 1024L;
+	public static final long LAYOUTPROTOTYPEUUID_COLUMN_BITMASK = 1024L;
 
-	public static final long PARENTPLID_COLUMN_BITMASK = 2048L;
+	public static final long PARENTLAYOUTID_COLUMN_BITMASK = 2048L;
 
-	public static final long PRIORITY_COLUMN_BITMASK = 4096L;
+	public static final long PARENTPLID_COLUMN_BITMASK = 4096L;
 
-	public static final long PRIVATELAYOUT_COLUMN_BITMASK = 8192L;
+	public static final long PRIORITY_COLUMN_BITMASK = 8192L;
 
-	public static final long SOURCEPROTOTYPELAYOUTUUID_COLUMN_BITMASK = 16384L;
+	public static final long PRIVATELAYOUT_COLUMN_BITMASK = 16384L;
 
-	public static final long TYPE_COLUMN_BITMASK = 32768L;
+	public static final long SOURCEPROTOTYPELAYOUTUUID_COLUMN_BITMASK = 32768L;
 
-	public static final long UUID_COLUMN_BITMASK = 65536L;
+	public static final long TYPE_COLUMN_BITMASK = 65536L;
+
+	public static final long UUID_COLUMN_BITMASK = 131072L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -1525,7 +1527,19 @@ public class LayoutModelImpl
 
 	@Override
 	public void setHidden(boolean hidden) {
+		_columnBitmask |= HIDDEN_COLUMN_BITMASK;
+
+		if (!_setOriginalHidden) {
+			_setOriginalHidden = true;
+
+			_originalHidden = _hidden;
+		}
+
 		_hidden = hidden;
+	}
+
+	public boolean getOriginalHidden() {
+		return _originalHidden;
 	}
 
 	@JSON
@@ -2112,6 +2126,10 @@ public class LayoutModelImpl
 
 		layoutModelImpl._originalType = layoutModelImpl._type;
 
+		layoutModelImpl._originalHidden = layoutModelImpl._hidden;
+
+		layoutModelImpl._setOriginalHidden = false;
+
 		layoutModelImpl._originalFriendlyURL = layoutModelImpl._friendlyURL;
 
 		layoutModelImpl._originalIconImageId = layoutModelImpl._iconImageId;
@@ -2457,6 +2475,8 @@ public class LayoutModelImpl
 	private String _originalType;
 	private String _typeSettings;
 	private boolean _hidden;
+	private boolean _originalHidden;
+	private boolean _setOriginalHidden;
 	private boolean _system;
 	private String _friendlyURL;
 	private String _originalFriendlyURL;

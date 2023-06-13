@@ -4,7 +4,7 @@ import {containsFragmentEntryLinkId} from '../utils/LayoutDataList.es';
 import {EDITABLE_FRAGMENT_ENTRY_PROCESSOR} from '../components/fragment_entry_link/FragmentEntryLinkContent.es';
 import {FRAGMENT_ENTRY_LINK_TYPES, FRAGMENTS_EDITOR_ITEM_BORDERS, FRAGMENTS_EDITOR_ITEM_TYPES, FRAGMENTS_EDITOR_ROW_TYPES} from '../utils/constants';
 import {getColumn, getDropRowPosition, getFragmentColumn, getFragmentRowIndex} from '../utils/FragmentsEditorGetUtils.es';
-import {updatePageEditorLayoutData} from '../utils/FragmentsEditorFetchUtils.es';
+import {removeFragmentEntryLinks, updatePageEditorLayoutData} from '../utils/FragmentsEditorFetchUtils.es';
 
 /**
  * Adds a fragment at the corresponding container in the layout
@@ -355,80 +355,78 @@ function removeFragmentEntryLinkReducer(state, actionType, payload) {
 			if (actionType === REMOVE_FRAGMENT_ENTRY_LINK) {
 				const {fragmentEntryLinkId} = payload;
 
-				let nextData = setIn(
-					nextState.layoutData,
-					['structure'],
-					[...nextState.layoutData.structure]
-				);
-
-				const fragmentEntryLinkRow = nextData.structure[
+				const fragmentEntryLinkRow = nextState.layoutData.structure[
 					getFragmentRowIndex(
-						nextData.structure,
+						nextState.layoutData.structure,
 						fragmentEntryLinkId
 					)
 				];
 
-				let fragmentEntryLinkType = FRAGMENT_ENTRY_LINK_TYPES.component;
+				const fragmentEntryLinkType = fragmentEntryLinkRow.type === FRAGMENTS_EDITOR_ROW_TYPES.sectionRow ?
+					FRAGMENT_ENTRY_LINK_TYPES.section :
+					FRAGMENT_ENTRY_LINK_TYPES.component;
 
-				if (fragmentEntryLinkRow.type === FRAGMENTS_EDITOR_ROW_TYPES.sectionRow) {
-					fragmentEntryLinkType = FRAGMENT_ENTRY_LINK_TYPES.section;
-				}
-
-				nextData = _removeFragment(
-					nextData,
-					fragmentEntryLinkId,
-					fragmentEntryLinkType
+				nextState = setIn(
+					nextState,
+					['layoutData'],
+					_removeFragment(
+						nextState.layoutData,
+						fragmentEntryLinkId,
+						fragmentEntryLinkType
+					)
 				);
 
-				const _shouldNotRemove = containsFragmentEntryLinkId(
+				nextState = updateWidgets(
+					nextState,
+					payload.fragmentEntryLinkId
+				);
+
+				const _shouldRemoveFragmentEntryLink = !containsFragmentEntryLinkId(
 					nextState.layoutDataList,
 					fragmentEntryLinkId,
+					nextState.segmentsExperienceId || nextState.defaultSegmentsExperienceId
+				);
+
+				let updateLayoutDataPromise = updatePageEditorLayoutData(
+					nextState.layoutData,
 					nextState.segmentsExperienceId
 				);
 
-				if (_shouldNotRemove) {
-					updatePageEditorLayoutData(nextData, nextState.segmentsExperienceId).then(
-						() => {
-							nextState = setIn(nextState, ['layoutData'], nextData);
-							resolve(nextState);
-						}
+				if (_shouldRemoveFragmentEntryLink) {
+					nextState = updateIn(
+						nextState,
+						['fragmentEntryLinks'],
+						fragmentEntryLinks => {
+							const nextFragmentEntryLinks = Object.assign(
+								{},
+								fragmentEntryLinks
+							);
+
+							delete nextFragmentEntryLinks[fragmentEntryLinkId];
+
+							return nextFragmentEntryLinks;
+						},
+						{}
+					);
+
+					updateLayoutDataPromise = updateLayoutDataPromise.then(
+						() => removeFragmentEntryLinks(
+							nextState.layoutData,
+							[fragmentEntryLinkId],
+							nextState.segmentsExperienceId
+						)
 					);
 				}
-				else {
-					_removeFragmentEntryLink(
-						nextState.deleteFragmentEntryLinkURL,
-						nextState.portletNamespace,
-						nextState.classNameId,
-						nextState.classPK,
-						fragmentEntryLinkId,
-						nextData,
-						nextState.segmentsExperienceId
-					)
-						.then(
-							() => {
-								nextState = setIn(nextState, ['layoutData'], nextData);
-								nextState = updateWidgets(nextState, payload.fragmentEntryLinkId);
 
-								nextState.setIn(
-									nextState,
-									['fragmentEntryLinks'],
-									nextState.fragmentEntryLinks.filter(
-										_fragmentEntryLink => {
-											return _fragmentEntryLink.fragmentEntryLinkId !==
-											payload.fragmentEntryLinkId;
-										}
-									)
-								);
-
-								resolve(nextState);
-							}
-						)
-						.catch(
-							() => {
-								resolve(nextState);
-							}
-						);
-				}
+				updateLayoutDataPromise.then(
+					() => {
+						resolve(nextState);
+					}
+				).catch(
+					() => {
+						resolve(nextState);
+					}
+				);
 			}
 			else {
 				resolve(nextState);
@@ -778,9 +776,14 @@ function _getDropFragmentPosition(
 }
 
 /**
+ * Removes a given fragmentEntryLinkId from a given layoutData.
+ * It does not remove it from fragmentEntryLinks array.
+ *
+ * If the fragmentEntryLinkType is "section", it will remove the whole
+ * row (and columns) too.
+ *
  * @param {object} layoutData
  * @param {string} fragmentEntryLinkId
- * @return {Promise}
  * @param {string} [fragmentEntryLinkType=FRAGMENTS_EDITOR_ROW_TYPES.componentRow]
  * @return {object} Next layout data
  * @review
@@ -835,47 +838,6 @@ function _removeFragment(
 	}
 
 	return nextData;
-}
-
-/**
- * @param {string} deleteFragmentEntryLinkURL
- * @param {string} portletNamespace
- * @param {string} classNameId
- * @param {string} classPK
- * @param {string} fragmentEntryLinkId
- * @param {object} layoutData
- * @return {Promise}
- * @review
- */
-function _removeFragmentEntryLink(
-	deleteFragmentEntryLinkURL,
-	portletNamespace,
-	classNameId,
-	classPK,
-	fragmentEntryLinkId,
-	layoutData,
-	segmentsExperienceId
-) {
-	const formData = new FormData();
-
-	formData.append(`${portletNamespace}classNameId`, classNameId);
-	formData.append(`${portletNamespace}classPK`, classPK);
-	formData.append(`${portletNamespace}data`, JSON.stringify(layoutData));
-	formData.append(`${portletNamespace}segmentsExperienceId`, segmentsExperienceId);
-
-	formData.append(
-		`${portletNamespace}fragmentEntryLinkId`,
-		fragmentEntryLinkId
-	);
-
-	return fetch(
-		deleteFragmentEntryLinkURL,
-		{
-			body: formData,
-			credentials: 'include',
-			method: 'POST'
-		}
-	);
 }
 
 export {

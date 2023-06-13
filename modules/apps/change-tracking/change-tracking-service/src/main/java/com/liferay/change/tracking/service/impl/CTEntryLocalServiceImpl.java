@@ -19,6 +19,7 @@ import com.liferay.change.tracking.exception.DuplicateCTEntryException;
 import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.change.tracking.model.CTEntry;
 import com.liferay.change.tracking.service.base.CTEntryLocalServiceBaseImpl;
+import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -39,19 +40,18 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.search.document.Document;
-import com.liferay.portal.search.legacy.searcher.SearchRequestBuilderFactory;
 import com.liferay.portal.search.query.BooleanQuery;
 import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.search.query.Query;
 import com.liferay.portal.search.query.TermsQuery;
 import com.liferay.portal.search.searcher.SearchRequest;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
+import com.liferay.portal.search.searcher.SearchRequestBuilderFactory;
 import com.liferay.portal.search.searcher.SearchResponse;
 import com.liferay.portal.search.searcher.Searcher;
 import com.liferay.portal.search.sort.Sort;
 import com.liferay.portal.search.sort.SortOrder;
 import com.liferay.portal.search.sort.Sorts;
-import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -60,10 +60,17 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Brian Wing Shun Chan
  * @author Daniel Kocsis
  */
+@Component(
+	property = "model.class.name=com.liferay.change.tracking.model.CTEntry",
+	service = AopService.class
+)
 public class CTEntryLocalServiceImpl extends CTEntryLocalServiceBaseImpl {
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -292,8 +299,7 @@ public class CTEntryLocalServiceImpl extends CTEntryLocalServiceBaseImpl {
 
 		ctEntry = ctEntryPersistence.update(ctEntry);
 
-		ctCollectionLocalService.addCTEntryCTCollection(
-			ctEntry.getCtEntryId(), ctCollectionId);
+		ctCollectionPersistence.addCTEntry(ctCollectionId, ctEntry);
 
 		return ctEntry;
 	}
@@ -426,7 +432,7 @@ public class CTEntryLocalServiceImpl extends CTEntryLocalServiceBaseImpl {
 	}
 
 	private boolean _isProductionCTCollectionId(long ctCollectionId) {
-		CTCollection ctCollection = ctCollectionLocalService.fetchCTCollection(
+		CTCollection ctCollection = ctCollectionPersistence.fetchByPrimaryKey(
 			ctCollectionId);
 
 		if (ctCollection == null) {
@@ -440,8 +446,7 @@ public class CTEntryLocalServiceImpl extends CTEntryLocalServiceBaseImpl {
 		long companyId, Query query, QueryDefinition<CTEntry> queryDefinition) {
 
 		SearchRequestBuilder searchRequestBuilder =
-			_searchRequestBuilderFactory.getSearchRequestBuilder(
-				new SearchContext());
+			_searchRequestBuilderFactory.builder();
 
 		SearchRequest searchRequest = searchRequestBuilder.entryClassNames(
 			CTEntry.class.getName()
@@ -506,7 +511,7 @@ public class CTEntryLocalServiceImpl extends CTEntryLocalServiceBaseImpl {
 			throw new DuplicateCTEntryException();
 		}
 
-		ctCollectionLocalService.getCTCollection(ctCollectionId);
+		ctCollectionPersistence.findByPrimaryKey(ctCollectionId);
 
 		if ((changeType != CTConstants.CT_CHANGE_TYPE_ADDITION) &&
 			(changeType != CTConstants.CT_CHANGE_TYPE_DELETION) &&
@@ -519,22 +524,22 @@ public class CTEntryLocalServiceImpl extends CTEntryLocalServiceBaseImpl {
 	private static final Log _log = LogFactoryUtil.getLog(
 		CTEntryLocalServiceImpl.class);
 
-	@ServiceReference(type = IndexerRegistry.class)
+	@Reference
 	private IndexerRegistry _indexerRegistry;
 
-	@ServiceReference(type = Portal.class)
+	@Reference
 	private Portal _portal;
 
-	@ServiceReference(type = Queries.class)
+	@Reference
 	private Queries _queries;
 
-	@ServiceReference(type = Searcher.class)
+	@Reference
 	private Searcher _searcher;
 
-	@ServiceReference(type = SearchRequestBuilderFactory.class)
+	@Reference
 	private SearchRequestBuilderFactory _searchRequestBuilderFactory;
 
-	@ServiceReference(type = Sorts.class)
+	@Reference
 	private Sorts _sorts;
 
 }

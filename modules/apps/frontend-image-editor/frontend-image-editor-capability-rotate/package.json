@@ -7,8 +7,8 @@
 	},
 	"name": "frontend-image-editor-capability-rotate",
 	"scripts": {
-		"build": "liferay-npm-scripts build --soy --bundler",
-		"csf": "liferay-npm-scripts lint",
+		"build": "liferay-npm-scripts build",
+		"checkFormat": "liferay-npm-scripts lint",
 		"format": "liferay-npm-scripts format"
 	},
 	"version": "3.0.0"

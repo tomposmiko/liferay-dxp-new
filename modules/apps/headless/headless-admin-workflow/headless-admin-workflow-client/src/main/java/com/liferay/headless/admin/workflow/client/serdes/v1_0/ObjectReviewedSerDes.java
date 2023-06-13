@@ -17,7 +17,8 @@ package com.liferay.headless.admin.workflow.client.serdes.v1_0;
 import com.liferay.headless.admin.workflow.client.dto.v1_0.ObjectReviewed;
 import com.liferay.headless.admin.workflow.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -45,31 +46,35 @@ public class ObjectReviewedSerDes {
 
 	public static String toJSON(ObjectReviewed objectReviewed) {
 		if (objectReviewed == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"id\": ");
+		if (objectReviewed.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (objectReviewed.getId() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"id\":");
+
 			sb.append(objectReviewed.getId());
 		}
 
-		sb.append(", ");
+		if (objectReviewed.getResourceType() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"resourceType\": ");
+			sb.append("\"resourceType\":");
 
-		if (objectReviewed.getResourceType() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(objectReviewed.getResourceType());
+
+			sb.append("\"");
 		}
 
 		sb.append("}");
@@ -77,39 +82,46 @@ public class ObjectReviewedSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<ObjectReviewed> objectRevieweds) {
-		if (objectRevieweds == null) {
-			return "[]";
+	public static Map<String, String> toMap(ObjectReviewed objectReviewed) {
+		if (objectReviewed == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (ObjectReviewed objectReviewed : objectRevieweds) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(objectReviewed));
+		if (objectReviewed.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(objectReviewed.getId()));
 		}
 
-		sb.append("]");
+		if (objectReviewed.getResourceType() == null) {
+			map.put("resourceType", null);
+		}
+		else {
+			map.put(
+				"resourceType",
+				String.valueOf(objectReviewed.getResourceType()));
+		}
 
-		return sb.toString();
+		return map;
 	}
 
 	private static class ObjectReviewedJSONParser
 		extends BaseJSONParser<ObjectReviewed> {
 
+		@Override
 		protected ObjectReviewed createDTO() {
 			return new ObjectReviewed();
 		}
 
+		@Override
 		protected ObjectReviewed[] createDTOArray(int size) {
 			return new ObjectReviewed[size];
 		}
 
+		@Override
 		protected void setField(
 			ObjectReviewed objectReviewed, String jsonParserFieldName,
 			Object jsonParserFieldValue) {

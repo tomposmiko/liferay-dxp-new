@@ -17,7 +17,8 @@ package com.liferay.headless.admin.taxonomy.client.serdes.v1_0;
 import com.liferay.headless.admin.taxonomy.client.dto.v1_0.ParentTaxonomyCategory;
 import com.liferay.headless.admin.taxonomy.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -45,31 +46,35 @@ public class ParentTaxonomyCategorySerDes {
 
 	public static String toJSON(ParentTaxonomyCategory parentTaxonomyCategory) {
 		if (parentTaxonomyCategory == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"id\": ");
+		if (parentTaxonomyCategory.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (parentTaxonomyCategory.getId() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"id\":");
+
 			sb.append(parentTaxonomyCategory.getId());
 		}
 
-		sb.append(", ");
+		if (parentTaxonomyCategory.getName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\":");
 
-		if (parentTaxonomyCategory.getName() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(parentTaxonomyCategory.getName());
+
+			sb.append("\"");
 		}
 
 		sb.append("}");
@@ -77,43 +82,46 @@ public class ParentTaxonomyCategorySerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(
-		Collection<ParentTaxonomyCategory> parentTaxonomyCategories) {
+	public static Map<String, String> toMap(
+		ParentTaxonomyCategory parentTaxonomyCategory) {
 
-		if (parentTaxonomyCategories == null) {
-			return "[]";
+		if (parentTaxonomyCategory == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (ParentTaxonomyCategory parentTaxonomyCategory :
-				parentTaxonomyCategories) {
-
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(parentTaxonomyCategory));
+		if (parentTaxonomyCategory.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(parentTaxonomyCategory.getId()));
 		}
 
-		sb.append("]");
+		if (parentTaxonomyCategory.getName() == null) {
+			map.put("name", null);
+		}
+		else {
+			map.put("name", String.valueOf(parentTaxonomyCategory.getName()));
+		}
 
-		return sb.toString();
+		return map;
 	}
 
 	private static class ParentTaxonomyCategoryJSONParser
 		extends BaseJSONParser<ParentTaxonomyCategory> {
 
+		@Override
 		protected ParentTaxonomyCategory createDTO() {
 			return new ParentTaxonomyCategory();
 		}
 
+		@Override
 		protected ParentTaxonomyCategory[] createDTOArray(int size) {
 			return new ParentTaxonomyCategory[size];
 		}
 
+		@Override
 		protected void setField(
 			ParentTaxonomyCategory parentTaxonomyCategory,
 			String jsonParserFieldName, Object jsonParserFieldValue) {

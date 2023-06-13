@@ -94,7 +94,6 @@ import com.liferay.portal.struts.TilesUtil;
 import java.io.IOException;
 import java.io.InputStream;
 
-import java.net.InetAddress;
 import java.net.URL;
 
 import java.util.Collections;
@@ -944,16 +943,6 @@ public class TemplateContextHelper {
 			return _http.decodeURL(url);
 		}
 
-		/**
-		 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-		 *             #decodeURL(String)}
-		 */
-		@Deprecated
-		@Override
-		public String decodeURL(String url, boolean unescapeSpaces) {
-			return _http.decodeURL(url, unescapeSpaces);
-		}
-
 		@Override
 		public String encodeParameters(String url) {
 			return _http.encodeParameters(url);
@@ -1385,7 +1374,7 @@ public class TemplateContextHelper {
 				URL url = new URL(location);
 
 				if (InetAddressUtil.isLocalInetAddress(
-						InetAddress.getByName(url.getHost()))) {
+						InetAddressUtil.getInetAddressByName(url.getHost()))) {
 
 					return true;
 				}

@@ -15,18 +15,17 @@
 package com.liferay.headless.delivery.resource.v1_0.test;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
-import com.liferay.headless.delivery.dto.v1_0.AggregateRating;
-import com.liferay.headless.delivery.dto.v1_0.BlogPosting;
-import com.liferay.headless.delivery.dto.v1_0.Creator;
-import com.liferay.headless.delivery.dto.v1_0.Image;
-import com.liferay.headless.delivery.dto.v1_0.Rating;
-import com.liferay.headless.delivery.dto.v1_0.TaxonomyCategory;
+import com.liferay.headless.delivery.client.dto.v1_0.BlogPosting;
+import com.liferay.headless.delivery.client.dto.v1_0.Rating;
+import com.liferay.headless.delivery.client.pagination.Page;
+import com.liferay.headless.delivery.client.serdes.v1_0.BlogPostingSerDes;
 import com.liferay.headless.delivery.resource.v1_0.BlogPostingResource;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -46,7 +45,6 @@ import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
@@ -61,10 +59,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -117,6 +117,63 @@ public abstract class BaseBlogPostingResourceTestCase {
 	public void tearDown() throws Exception {
 		GroupTestUtil.deleteGroup(irrelevantGroup);
 		GroupTestUtil.deleteGroup(testGroup);
+	}
+
+	@Test
+	public void testClientSerDesToDTO() throws Exception {
+		ObjectMapper objectMapper = new ObjectMapper() {
+			{
+				configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+				enable(SerializationFeature.INDENT_OUTPUT);
+				setDateFormat(new ISO8601DateFormat());
+				setFilterProvider(
+					new SimpleFilterProvider() {
+						{
+							addFilter(
+								"Liferay.Vulcan",
+								SimpleBeanPropertyFilter.serializeAll());
+						}
+					});
+				setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+				setSerializationInclusion(JsonInclude.Include.NON_NULL);
+			}
+		};
+
+		BlogPosting blogPosting1 = randomBlogPosting();
+
+		String json = objectMapper.writeValueAsString(blogPosting1);
+
+		BlogPosting blogPosting2 = BlogPostingSerDes.toDTO(json);
+
+		Assert.assertTrue(equals(blogPosting1, blogPosting2));
+	}
+
+	@Test
+	public void testClientSerDesToJSON() throws Exception {
+		ObjectMapper objectMapper = new ObjectMapper() {
+			{
+				configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+				setDateFormat(new ISO8601DateFormat());
+				setFilterProvider(
+					new SimpleFilterProvider() {
+						{
+							addFilter(
+								"Liferay.Vulcan",
+								SimpleBeanPropertyFilter.serializeAll());
+						}
+					});
+				setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+				setSerializationInclusion(JsonInclude.Include.NON_NULL);
+			}
+		};
+
+		BlogPosting blogPosting = randomBlogPosting();
+
+		String json1 = objectMapper.writeValueAsString(blogPosting);
+		String json2 = BlogPostingSerDes.toJSON(blogPosting);
+
+		Assert.assertEquals(
+			objectMapper.readTree(json1), objectMapper.readTree(json2));
 	}
 
 	@Test
@@ -209,10 +266,12 @@ public abstract class BaseBlogPostingResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(string, BlogPosting.class);
+			return BlogPostingSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -270,7 +329,7 @@ public abstract class BaseBlogPostingResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(blogPosting),
+			BlogPostingSerDes.toJSON(blogPosting),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
@@ -288,10 +347,12 @@ public abstract class BaseBlogPostingResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(string, BlogPosting.class);
+			return BlogPostingSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -304,7 +365,7 @@ public abstract class BaseBlogPostingResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(blogPosting),
+			BlogPostingSerDes.toJSON(blogPosting),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
@@ -351,7 +412,7 @@ public abstract class BaseBlogPostingResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(blogPosting),
+			BlogPostingSerDes.toJSON(blogPosting),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
@@ -369,10 +430,12 @@ public abstract class BaseBlogPostingResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(string, BlogPosting.class);
+			return BlogPostingSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -385,7 +448,7 @@ public abstract class BaseBlogPostingResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(blogPosting),
+			BlogPostingSerDes.toJSON(blogPosting),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
@@ -485,10 +548,13 @@ public abstract class BaseBlogPostingResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(string, Rating.class);
+			return com.liferay.headless.delivery.client.serdes.v1_0.
+				RatingSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -539,10 +605,13 @@ public abstract class BaseBlogPostingResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(string, Rating.class);
+			return com.liferay.headless.delivery.client.serdes.v1_0.
+				RatingSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -595,10 +664,13 @@ public abstract class BaseBlogPostingResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(string, Rating.class);
+			return com.liferay.headless.delivery.client.serdes.v1_0.
+				RatingSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -677,25 +749,14 @@ public abstract class BaseBlogPostingResourceTestCase {
 		Long siteId = testGetSiteBlogPostingsPage_getSiteId();
 
 		BlogPosting blogPosting1 = randomBlogPosting();
-		BlogPosting blogPosting2 = randomBlogPosting();
-
-		for (EntityField entityField : entityFields) {
-			BeanUtils.setProperty(
-				blogPosting1, entityField.getName(),
-				DateUtils.addMinutes(new Date(), -2));
-		}
 
 		blogPosting1 = testGetSiteBlogPostingsPage_addBlogPosting(
 			siteId, blogPosting1);
 
-		Thread.sleep(1000);
-
-		blogPosting2 = testGetSiteBlogPostingsPage_addBlogPosting(
-			siteId, blogPosting2);
-
 		for (EntityField entityField : entityFields) {
 			Page<BlogPosting> page = invokeGetSiteBlogPostingsPage(
-				siteId, null, getFilterString(entityField, "eq", blogPosting1),
+				siteId, null,
+				getFilterString(entityField, "between", blogPosting1),
 				Pagination.of(1, 2), null);
 
 			assertEquals(
@@ -796,8 +857,6 @@ public abstract class BaseBlogPostingResourceTestCase {
 
 		blogPosting1 = testGetSiteBlogPostingsPage_addBlogPosting(
 			siteId, blogPosting1);
-
-		Thread.sleep(1000);
 
 		blogPosting2 = testGetSiteBlogPostingsPage_addBlogPosting(
 			siteId, blogPosting2);
@@ -909,10 +968,7 @@ public abstract class BaseBlogPostingResourceTestCase {
 			_log.debug("HTTP response: " + string);
 		}
 
-		return outputObjectMapper.readValue(
-			string,
-			new TypeReference<Page<BlogPosting>>() {
-			});
+		return Page.of(string, BlogPostingSerDes::toDTO);
 	}
 
 	protected Http.Response invokeGetSiteBlogPostingsPageResponse(
@@ -967,7 +1023,7 @@ public abstract class BaseBlogPostingResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(blogPosting),
+			BlogPostingSerDes.toJSON(blogPosting),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
@@ -984,10 +1040,12 @@ public abstract class BaseBlogPostingResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(string, BlogPosting.class);
+			return BlogPostingSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -1000,7 +1058,7 @@ public abstract class BaseBlogPostingResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(blogPosting),
+			BlogPostingSerDes.toJSON(blogPosting),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
@@ -1538,19 +1596,99 @@ public abstract class BaseBlogPostingResourceTestCase {
 		}
 
 		if (entityFieldName.equals("dateCreated")) {
-			sb.append(_dateFormat.format(blogPosting.getDateCreated()));
+			if (operator.equals("between")) {
+				sb = new StringBundler();
+
+				sb.append("(");
+				sb.append(entityFieldName);
+				sb.append(" gt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							blogPosting.getDateCreated(), -2)));
+				sb.append(" and ");
+				sb.append(entityFieldName);
+				sb.append(" lt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(blogPosting.getDateCreated(), 2)));
+				sb.append(")");
+			}
+			else {
+				sb.append(entityFieldName);
+
+				sb.append(" ");
+				sb.append(operator);
+				sb.append(" ");
+
+				sb.append(_dateFormat.format(blogPosting.getDateCreated()));
+			}
 
 			return sb.toString();
 		}
 
 		if (entityFieldName.equals("dateModified")) {
-			sb.append(_dateFormat.format(blogPosting.getDateModified()));
+			if (operator.equals("between")) {
+				sb = new StringBundler();
+
+				sb.append("(");
+				sb.append(entityFieldName);
+				sb.append(" gt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							blogPosting.getDateModified(), -2)));
+				sb.append(" and ");
+				sb.append(entityFieldName);
+				sb.append(" lt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							blogPosting.getDateModified(), 2)));
+				sb.append(")");
+			}
+			else {
+				sb.append(entityFieldName);
+
+				sb.append(" ");
+				sb.append(operator);
+				sb.append(" ");
+
+				sb.append(_dateFormat.format(blogPosting.getDateModified()));
+			}
 
 			return sb.toString();
 		}
 
 		if (entityFieldName.equals("datePublished")) {
-			sb.append(_dateFormat.format(blogPosting.getDatePublished()));
+			if (operator.equals("between")) {
+				sb = new StringBundler();
+
+				sb.append("(");
+				sb.append(entityFieldName);
+				sb.append(" gt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							blogPosting.getDatePublished(), -2)));
+				sb.append(" and ");
+				sb.append(entityFieldName);
+				sb.append(" lt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							blogPosting.getDatePublished(), 2)));
+				sb.append(")");
+			}
+			else {
+				sb.append(entityFieldName);
+
+				sb.append(" ");
+				sb.append(operator);
+				sb.append(" ");
+
+				sb.append(_dateFormat.format(blogPosting.getDatePublished()));
+			}
 
 			return sb.toString();
 		}
@@ -1661,124 +1799,11 @@ public abstract class BaseBlogPostingResourceTestCase {
 		return randomBlogPosting();
 	}
 
-	protected static final ObjectMapper inputObjectMapper = new ObjectMapper() {
-		{
-			setFilterProvider(
-				new SimpleFilterProvider() {
-					{
-						addFilter(
-							"Liferay.Vulcan",
-							SimpleBeanPropertyFilter.serializeAll());
-					}
-				});
-			setSerializationInclusion(JsonInclude.Include.NON_NULL);
-		}
-	};
-	protected static final ObjectMapper outputObjectMapper =
-		new ObjectMapper() {
-			{
-				addMixIn(BlogPosting.class, BlogPostingMixin.class);
-				setFilterProvider(
-					new SimpleFilterProvider() {
-						{
-							addFilter(
-								"Liferay.Vulcan",
-								SimpleBeanPropertyFilter.serializeAll());
-						}
-					});
-			}
-		};
-
 	protected Group irrelevantGroup;
 	protected String testContentType = "application/json";
 	protected Group testGroup;
 	protected Locale testLocale;
 	protected String testUserNameAndPassword = "test@liferay.com:test";
-
-	protected static class BlogPostingMixin {
-
-		public static enum ViewableBy {
-		}
-
-		@JsonProperty
-		AggregateRating aggregateRating;
-		@JsonProperty
-		String alternativeHeadline;
-		@JsonProperty
-		String articleBody;
-		@JsonProperty
-		Creator creator;
-		@JsonProperty
-		Date dateCreated;
-		@JsonProperty
-		Date dateModified;
-		@JsonProperty
-		Date datePublished;
-		@JsonProperty
-		String description;
-		@JsonProperty
-		String encodingFormat;
-		@JsonProperty
-		String friendlyUrlPath;
-		@JsonProperty
-		String headline;
-		@JsonProperty
-		Long id;
-		@JsonProperty
-		Image image;
-		@JsonProperty
-		String[] keywords;
-		@JsonProperty
-		Number numberOfComments;
-		@JsonProperty
-		Long siteId;
-		@JsonProperty
-		TaxonomyCategory[] taxonomyCategories;
-		@JsonProperty
-		Long[] taxonomyCategoryIds;
-		@JsonProperty
-		ViewableBy viewableBy;
-
-	}
-
-	protected static class Page<T> {
-
-		public Collection<T> getItems() {
-			return new ArrayList<>(items);
-		}
-
-		public long getLastPage() {
-			return lastPage;
-		}
-
-		public long getPage() {
-			return page;
-		}
-
-		public long getPageSize() {
-			return pageSize;
-		}
-
-		public long getTotalCount() {
-			return totalCount;
-		}
-
-		@JsonProperty
-		protected Collection<T> items;
-
-		@JsonProperty
-		protected long lastPage;
-
-		@JsonProperty
-		protected long page;
-
-		@JsonProperty
-		protected long pageSize;
-
-		@JsonProperty
-		protected long totalCount;
-
-	}
 
 	private Http.Options _createHttpOptions() {
 		Http.Options options = new Http.Options();
@@ -1796,6 +1821,41 @@ public abstract class BaseBlogPostingResourceTestCase {
 		options.addHeader("Content-Type", testContentType);
 
 		return options;
+	}
+
+	private String _toJSON(Map<String, String> map) {
+		if (map == null) {
+			return "null";
+		}
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("{");
+
+		Set<Map.Entry<String, String>> set = map.entrySet();
+
+		Iterator<Map.Entry<String, String>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, String> entry = iterator.next();
+
+			sb.append("\"" + entry.getKey() + "\": ");
+
+			if (entry.getValue() == null) {
+				sb.append("null");
+			}
+			else {
+				sb.append("\"" + entry.getValue() + "\"");
+			}
+
+			if (iterator.hasNext()) {
+				sb.append(", ");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private String _toPath(String template, Object... values) {

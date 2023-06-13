@@ -668,6 +668,29 @@ public class LayoutVersionPersistenceTest {
 	}
 
 	@Test
+	public void testCountByG_P_P_H() throws Exception {
+		_persistence.countByG_P_P_H(
+			RandomTestUtil.nextLong(), RandomTestUtil.randomBoolean(),
+			RandomTestUtil.nextLong(), RandomTestUtil.randomBoolean());
+
+		_persistence.countByG_P_P_H(
+			0L, RandomTestUtil.randomBoolean(), 0L,
+			RandomTestUtil.randomBoolean());
+	}
+
+	@Test
+	public void testCountByG_P_P_H_Version() throws Exception {
+		_persistence.countByG_P_P_H_Version(
+			RandomTestUtil.nextLong(), RandomTestUtil.randomBoolean(),
+			RandomTestUtil.nextLong(), RandomTestUtil.randomBoolean(),
+			RandomTestUtil.nextInt());
+
+		_persistence.countByG_P_P_H_Version(
+			0L, RandomTestUtil.randomBoolean(), 0L,
+			RandomTestUtil.randomBoolean(), 0);
+	}
+
+	@Test
 	public void testCountByG_P_P_LtP() throws Exception {
 		_persistence.countByG_P_P_LtP(
 			RandomTestUtil.nextLong(), RandomTestUtil.randomBoolean(),

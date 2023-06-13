@@ -152,7 +152,9 @@ public class Validation {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(errorMessage);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -163,7 +165,9 @@ public class Validation {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(expression);
+			sb.append("\"");
 		}
 
 		sb.append(", ");

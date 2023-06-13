@@ -17,7 +17,8 @@ package com.liferay.headless.admin.user.client.serdes.v1_0;
 import com.liferay.headless.admin.user.client.dto.v1_0.WebUrl;
 import com.liferay.headless.admin.user.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -43,42 +44,49 @@ public class WebUrlSerDes {
 
 	public static String toJSON(WebUrl webUrl) {
 		if (webUrl == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"id\": ");
+		if (webUrl.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (webUrl.getId() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"id\":");
+
 			sb.append(webUrl.getId());
 		}
 
-		sb.append(", ");
+		if (webUrl.getUrl() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"url\": ");
+			sb.append("\"url\":");
 
-		if (webUrl.getUrl() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(webUrl.getUrl());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (webUrl.getUrlType() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"urlType\": ");
+			sb.append("\"urlType\":");
 
-		if (webUrl.getUrlType() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(webUrl.getUrlType());
+
+			sb.append("\"");
 		}
 
 		sb.append("}");
@@ -86,38 +94,50 @@ public class WebUrlSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<WebUrl> webUrls) {
-		if (webUrls == null) {
-			return "[]";
+	public static Map<String, String> toMap(WebUrl webUrl) {
+		if (webUrl == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (WebUrl webUrl : webUrls) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(webUrl));
+		if (webUrl.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(webUrl.getId()));
 		}
 
-		sb.append("]");
+		if (webUrl.getUrl() == null) {
+			map.put("url", null);
+		}
+		else {
+			map.put("url", String.valueOf(webUrl.getUrl()));
+		}
 
-		return sb.toString();
+		if (webUrl.getUrlType() == null) {
+			map.put("urlType", null);
+		}
+		else {
+			map.put("urlType", String.valueOf(webUrl.getUrlType()));
+		}
+
+		return map;
 	}
 
 	private static class WebUrlJSONParser extends BaseJSONParser<WebUrl> {
 
+		@Override
 		protected WebUrl createDTO() {
 			return new WebUrl();
 		}
 
+		@Override
 		protected WebUrl[] createDTOArray(int size) {
 			return new WebUrl[size];
 		}
 
+		@Override
 		protected void setField(
 			WebUrl webUrl, String jsonParserFieldName,
 			Object jsonParserFieldValue) {

@@ -17,7 +17,8 @@ package com.liferay.headless.admin.taxonomy.client.serdes.v1_0;
 import com.liferay.headless.admin.taxonomy.client.dto.v1_0.ParentTaxonomyVocabulary;
 import com.liferay.headless.admin.taxonomy.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -47,31 +48,35 @@ public class ParentTaxonomyVocabularySerDes {
 		ParentTaxonomyVocabulary parentTaxonomyVocabulary) {
 
 		if (parentTaxonomyVocabulary == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"id\": ");
+		if (parentTaxonomyVocabulary.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (parentTaxonomyVocabulary.getId() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"id\":");
+
 			sb.append(parentTaxonomyVocabulary.getId());
 		}
 
-		sb.append(", ");
+		if (parentTaxonomyVocabulary.getName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\":");
 
-		if (parentTaxonomyVocabulary.getName() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(parentTaxonomyVocabulary.getName());
+
+			sb.append("\"");
 		}
 
 		sb.append("}");
@@ -79,43 +84,46 @@ public class ParentTaxonomyVocabularySerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(
-		Collection<ParentTaxonomyVocabulary> parentTaxonomyVocabularies) {
+	public static Map<String, String> toMap(
+		ParentTaxonomyVocabulary parentTaxonomyVocabulary) {
 
-		if (parentTaxonomyVocabularies == null) {
-			return "[]";
+		if (parentTaxonomyVocabulary == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (ParentTaxonomyVocabulary parentTaxonomyVocabulary :
-				parentTaxonomyVocabularies) {
-
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(parentTaxonomyVocabulary));
+		if (parentTaxonomyVocabulary.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(parentTaxonomyVocabulary.getId()));
 		}
 
-		sb.append("]");
+		if (parentTaxonomyVocabulary.getName() == null) {
+			map.put("name", null);
+		}
+		else {
+			map.put("name", String.valueOf(parentTaxonomyVocabulary.getName()));
+		}
 
-		return sb.toString();
+		return map;
 	}
 
 	private static class ParentTaxonomyVocabularyJSONParser
 		extends BaseJSONParser<ParentTaxonomyVocabulary> {
 
+		@Override
 		protected ParentTaxonomyVocabulary createDTO() {
 			return new ParentTaxonomyVocabulary();
 		}
 
+		@Override
 		protected ParentTaxonomyVocabulary[] createDTOArray(int size) {
 			return new ParentTaxonomyVocabulary[size];
 		}
 
+		@Override
 		protected void setField(
 			ParentTaxonomyVocabulary parentTaxonomyVocabulary,
 			String jsonParserFieldName, Object jsonParserFieldValue) {

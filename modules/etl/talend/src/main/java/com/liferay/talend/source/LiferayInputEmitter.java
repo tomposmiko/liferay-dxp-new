@@ -15,12 +15,17 @@
 package com.liferay.talend.source;
 
 import com.liferay.talend.configuration.LiferayInputMapperConfiguration;
-import com.liferay.talend.service.TalendService;
+import com.liferay.talend.service.ConnectionService;
 
 import java.io.Serializable;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+
+import javax.json.JsonObject;
 
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.input.Producer;
@@ -29,17 +34,18 @@ import org.talend.sdk.component.api.service.record.RecordBuilderFactory;
 
 /**
  * @author Zoltán Takács
+ * @author Igor Beslic
  */
 public class LiferayInputEmitter implements Serializable {
 
 	public LiferayInputEmitter(
+		final ConnectionService connectionService,
 		@Option("liferayInputMapperConfiguration") final
 			LiferayInputMapperConfiguration liferayInputMapperConfiguration,
-		final TalendService talendService,
 		final RecordBuilderFactory recordBuilderFactory) {
 
+		_connectionService = connectionService;
 		_liferayInputMapperConfiguration = liferayInputMapperConfiguration;
-		_talendService = talendService;
 		_recordBuilderFactory = recordBuilderFactory;
 	}
 
@@ -49,6 +55,15 @@ public class LiferayInputEmitter implements Serializable {
 
 	@Producer
 	public Record next() {
+		JsonObject data = _connectionService.getResponseJsonObject(
+			_liferayInputMapperConfiguration.getInputDataSet());
+
+		if (data != null) {
+			if (_logger.isLoggable(Level.FINE)) {
+				_logger.fine("Process data:" + data.toString());
+			}
+		}
+
 		return null;
 	}
 
@@ -56,9 +71,10 @@ public class LiferayInputEmitter implements Serializable {
 	public void release() {
 	}
 
+	private final ConnectionService _connectionService;
 	private final LiferayInputMapperConfiguration
 		_liferayInputMapperConfiguration;
+	private final Logger _logger = Logger.getLogger("LiferayInputEmitter");
 	private final RecordBuilderFactory _recordBuilderFactory;
-	private final TalendService _talendService;
 
 }

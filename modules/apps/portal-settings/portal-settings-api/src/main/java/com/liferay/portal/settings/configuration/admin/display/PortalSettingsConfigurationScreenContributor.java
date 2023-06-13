@@ -38,7 +38,9 @@ public interface PortalSettingsConfigurationScreenContributor {
 
 	public String getKey();
 
-	public String getName(Locale locale);
+	public default String getName(Locale locale) {
+		return getKey();
+	}
 
 	public String getSaveMVCActionCommandName();
 
@@ -52,6 +54,10 @@ public interface PortalSettingsConfigurationScreenContributor {
 		RenderRequest renderRequest, RenderResponse renderResponse) {
 
 		return null;
+	}
+
+	public default boolean isVisible() {
+		return true;
 	}
 
 	public default void setAttributes(

@@ -15,14 +15,16 @@
 package com.liferay.headless.delivery.resource.v1_0.test;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
-import com.liferay.headless.delivery.dto.v1_0.Creator;
-import com.liferay.headless.delivery.dto.v1_0.MessageBoardSection;
+import com.liferay.headless.delivery.client.dto.v1_0.MessageBoardSection;
+import com.liferay.headless.delivery.client.pagination.Page;
+import com.liferay.headless.delivery.client.serdes.v1_0.MessageBoardSectionSerDes;
 import com.liferay.headless.delivery.resource.v1_0.MessageBoardSectionResource;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -42,7 +44,6 @@ import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
@@ -57,10 +58,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -113,6 +116,64 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 	public void tearDown() throws Exception {
 		GroupTestUtil.deleteGroup(irrelevantGroup);
 		GroupTestUtil.deleteGroup(testGroup);
+	}
+
+	@Test
+	public void testClientSerDesToDTO() throws Exception {
+		ObjectMapper objectMapper = new ObjectMapper() {
+			{
+				configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+				enable(SerializationFeature.INDENT_OUTPUT);
+				setDateFormat(new ISO8601DateFormat());
+				setFilterProvider(
+					new SimpleFilterProvider() {
+						{
+							addFilter(
+								"Liferay.Vulcan",
+								SimpleBeanPropertyFilter.serializeAll());
+						}
+					});
+				setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+				setSerializationInclusion(JsonInclude.Include.NON_NULL);
+			}
+		};
+
+		MessageBoardSection messageBoardSection1 = randomMessageBoardSection();
+
+		String json = objectMapper.writeValueAsString(messageBoardSection1);
+
+		MessageBoardSection messageBoardSection2 =
+			MessageBoardSectionSerDes.toDTO(json);
+
+		Assert.assertTrue(equals(messageBoardSection1, messageBoardSection2));
+	}
+
+	@Test
+	public void testClientSerDesToJSON() throws Exception {
+		ObjectMapper objectMapper = new ObjectMapper() {
+			{
+				configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+				setDateFormat(new ISO8601DateFormat());
+				setFilterProvider(
+					new SimpleFilterProvider() {
+						{
+							addFilter(
+								"Liferay.Vulcan",
+								SimpleBeanPropertyFilter.serializeAll());
+						}
+					});
+				setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+				setSerializationInclusion(JsonInclude.Include.NON_NULL);
+			}
+		};
+
+		MessageBoardSection messageBoardSection = randomMessageBoardSection();
+
+		String json1 = objectMapper.writeValueAsString(messageBoardSection);
+		String json2 = MessageBoardSectionSerDes.toJSON(messageBoardSection);
+
+		Assert.assertEquals(
+			objectMapper.readTree(json1), objectMapper.readTree(json2));
 	}
 
 	@Test
@@ -222,11 +283,12 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(
-				string, MessageBoardSection.class);
+			return MessageBoardSectionSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -292,7 +354,7 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(messageBoardSection),
+			MessageBoardSectionSerDes.toJSON(messageBoardSection),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
@@ -312,11 +374,12 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(
-				string, MessageBoardSection.class);
+			return MessageBoardSectionSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -329,7 +392,7 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(messageBoardSection),
+			MessageBoardSectionSerDes.toJSON(messageBoardSection),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
@@ -384,7 +447,7 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(messageBoardSection),
+			MessageBoardSectionSerDes.toJSON(messageBoardSection),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
@@ -404,11 +467,12 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(
-				string, MessageBoardSection.class);
+			return MessageBoardSectionSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -421,7 +485,7 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(messageBoardSection),
+			MessageBoardSectionSerDes.toJSON(messageBoardSection),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
@@ -503,29 +567,17 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 			testGetMessageBoardSectionMessageBoardSectionsPage_getParentMessageBoardSectionId();
 
 		MessageBoardSection messageBoardSection1 = randomMessageBoardSection();
-		MessageBoardSection messageBoardSection2 = randomMessageBoardSection();
-
-		for (EntityField entityField : entityFields) {
-			BeanUtils.setProperty(
-				messageBoardSection1, entityField.getName(),
-				DateUtils.addMinutes(new Date(), -2));
-		}
 
 		messageBoardSection1 =
 			testGetMessageBoardSectionMessageBoardSectionsPage_addMessageBoardSection(
 				parentMessageBoardSectionId, messageBoardSection1);
 
-		Thread.sleep(1000);
-
-		messageBoardSection2 =
-			testGetMessageBoardSectionMessageBoardSectionsPage_addMessageBoardSection(
-				parentMessageBoardSectionId, messageBoardSection2);
-
 		for (EntityField entityField : entityFields) {
 			Page<MessageBoardSection> page =
 				invokeGetMessageBoardSectionMessageBoardSectionsPage(
 					parentMessageBoardSectionId, null,
-					getFilterString(entityField, "eq", messageBoardSection1),
+					getFilterString(
+						entityField, "between", messageBoardSection1),
 					Pagination.of(1, 2), null);
 
 			assertEquals(
@@ -651,8 +703,6 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 		messageBoardSection1 =
 			testGetMessageBoardSectionMessageBoardSectionsPage_addMessageBoardSection(
 				parentMessageBoardSectionId, messageBoardSection1);
-
-		Thread.sleep(1000);
 
 		messageBoardSection2 =
 			testGetMessageBoardSectionMessageBoardSectionsPage_addMessageBoardSection(
@@ -788,10 +838,7 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 			_log.debug("HTTP response: " + string);
 		}
 
-		return outputObjectMapper.readValue(
-			string,
-			new TypeReference<Page<MessageBoardSection>>() {
-			});
+		return Page.of(string, MessageBoardSectionSerDes::toDTO);
 	}
 
 	protected Http.Response
@@ -858,7 +905,7 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(messageBoardSection),
+			MessageBoardSectionSerDes.toJSON(messageBoardSection),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
@@ -878,11 +925,12 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(
-				string, MessageBoardSection.class);
+			return MessageBoardSectionSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -897,7 +945,7 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(messageBoardSection),
+			MessageBoardSectionSerDes.toJSON(messageBoardSection),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
@@ -972,29 +1020,17 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 		Long siteId = testGetSiteMessageBoardSectionsPage_getSiteId();
 
 		MessageBoardSection messageBoardSection1 = randomMessageBoardSection();
-		MessageBoardSection messageBoardSection2 = randomMessageBoardSection();
-
-		for (EntityField entityField : entityFields) {
-			BeanUtils.setProperty(
-				messageBoardSection1, entityField.getName(),
-				DateUtils.addMinutes(new Date(), -2));
-		}
 
 		messageBoardSection1 =
 			testGetSiteMessageBoardSectionsPage_addMessageBoardSection(
 				siteId, messageBoardSection1);
 
-		Thread.sleep(1000);
-
-		messageBoardSection2 =
-			testGetSiteMessageBoardSectionsPage_addMessageBoardSection(
-				siteId, messageBoardSection2);
-
 		for (EntityField entityField : entityFields) {
 			Page<MessageBoardSection> page =
 				invokeGetSiteMessageBoardSectionsPage(
 					siteId, null, null,
-					getFilterString(entityField, "eq", messageBoardSection1),
+					getFilterString(
+						entityField, "between", messageBoardSection1),
 					Pagination.of(1, 2), null);
 
 			assertEquals(
@@ -1113,8 +1149,6 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 		messageBoardSection1 =
 			testGetSiteMessageBoardSectionsPage_addMessageBoardSection(
 				siteId, messageBoardSection1);
-
-		Thread.sleep(1000);
 
 		messageBoardSection2 =
 			testGetSiteMessageBoardSectionsPage_addMessageBoardSection(
@@ -1241,10 +1275,7 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 			_log.debug("HTTP response: " + string);
 		}
 
-		return outputObjectMapper.readValue(
-			string,
-			new TypeReference<Page<MessageBoardSection>>() {
-			});
+		return Page.of(string, MessageBoardSectionSerDes::toDTO);
 	}
 
 	protected Http.Response invokeGetSiteMessageBoardSectionsPageResponse(
@@ -1304,7 +1335,7 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(messageBoardSection),
+			MessageBoardSectionSerDes.toJSON(messageBoardSection),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
@@ -1322,11 +1353,12 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(
-				string, MessageBoardSection.class);
+			return MessageBoardSectionSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -1339,7 +1371,7 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(messageBoardSection),
+			MessageBoardSectionSerDes.toJSON(messageBoardSection),
 			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
 
 		String location =
@@ -1709,14 +1741,69 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 		}
 
 		if (entityFieldName.equals("dateCreated")) {
-			sb.append(_dateFormat.format(messageBoardSection.getDateCreated()));
+			if (operator.equals("between")) {
+				sb = new StringBundler();
+
+				sb.append("(");
+				sb.append(entityFieldName);
+				sb.append(" gt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							messageBoardSection.getDateCreated(), -2)));
+				sb.append(" and ");
+				sb.append(entityFieldName);
+				sb.append(" lt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							messageBoardSection.getDateCreated(), 2)));
+				sb.append(")");
+			}
+			else {
+				sb.append(entityFieldName);
+
+				sb.append(" ");
+				sb.append(operator);
+				sb.append(" ");
+
+				sb.append(
+					_dateFormat.format(messageBoardSection.getDateCreated()));
+			}
 
 			return sb.toString();
 		}
 
 		if (entityFieldName.equals("dateModified")) {
-			sb.append(
-				_dateFormat.format(messageBoardSection.getDateModified()));
+			if (operator.equals("between")) {
+				sb = new StringBundler();
+
+				sb.append("(");
+				sb.append(entityFieldName);
+				sb.append(" gt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							messageBoardSection.getDateModified(), -2)));
+				sb.append(" and ");
+				sb.append(entityFieldName);
+				sb.append(" lt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							messageBoardSection.getDateModified(), 2)));
+				sb.append(")");
+			}
+			else {
+				sb.append(entityFieldName);
+
+				sb.append(" ");
+				sb.append(operator);
+				sb.append(" ");
+
+				sb.append(
+					_dateFormat.format(messageBoardSection.getDateModified()));
+			}
 
 			return sb.toString();
 		}
@@ -1793,107 +1880,11 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 		return randomMessageBoardSection();
 	}
 
-	protected static final ObjectMapper inputObjectMapper = new ObjectMapper() {
-		{
-			setFilterProvider(
-				new SimpleFilterProvider() {
-					{
-						addFilter(
-							"Liferay.Vulcan",
-							SimpleBeanPropertyFilter.serializeAll());
-					}
-				});
-			setSerializationInclusion(JsonInclude.Include.NON_NULL);
-		}
-	};
-	protected static final ObjectMapper outputObjectMapper =
-		new ObjectMapper() {
-			{
-				addMixIn(
-					MessageBoardSection.class, MessageBoardSectionMixin.class);
-				setFilterProvider(
-					new SimpleFilterProvider() {
-						{
-							addFilter(
-								"Liferay.Vulcan",
-								SimpleBeanPropertyFilter.serializeAll());
-						}
-					});
-			}
-		};
-
 	protected Group irrelevantGroup;
 	protected String testContentType = "application/json";
 	protected Group testGroup;
 	protected Locale testLocale;
 	protected String testUserNameAndPassword = "test@liferay.com:test";
-
-	protected static class MessageBoardSectionMixin {
-
-		public static enum ViewableBy {
-		}
-
-		@JsonProperty
-		Creator creator;
-		@JsonProperty
-		Date dateCreated;
-		@JsonProperty
-		Date dateModified;
-		@JsonProperty
-		String description;
-		@JsonProperty
-		Long id;
-		@JsonProperty
-		Integer numberOfMessageBoardSections;
-		@JsonProperty
-		Integer numberOfMessageBoardThreads;
-		@JsonProperty
-		Long siteId;
-		@JsonProperty
-		String title;
-		@JsonProperty
-		ViewableBy viewableBy;
-
-	}
-
-	protected static class Page<T> {
-
-		public Collection<T> getItems() {
-			return new ArrayList<>(items);
-		}
-
-		public long getLastPage() {
-			return lastPage;
-		}
-
-		public long getPage() {
-			return page;
-		}
-
-		public long getPageSize() {
-			return pageSize;
-		}
-
-		public long getTotalCount() {
-			return totalCount;
-		}
-
-		@JsonProperty
-		protected Collection<T> items;
-
-		@JsonProperty
-		protected long lastPage;
-
-		@JsonProperty
-		protected long page;
-
-		@JsonProperty
-		protected long pageSize;
-
-		@JsonProperty
-		protected long totalCount;
-
-	}
 
 	private Http.Options _createHttpOptions() {
 		Http.Options options = new Http.Options();
@@ -1911,6 +1902,41 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 		options.addHeader("Content-Type", testContentType);
 
 		return options;
+	}
+
+	private String _toJSON(Map<String, String> map) {
+		if (map == null) {
+			return "null";
+		}
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("{");
+
+		Set<Map.Entry<String, String>> set = map.entrySet();
+
+		Iterator<Map.Entry<String, String>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, String> entry = iterator.next();
+
+			sb.append("\"" + entry.getKey() + "\": ");
+
+			if (entry.getValue() == null) {
+				sb.append("null");
+			}
+			else {
+				sb.append("\"" + entry.getValue() + "\"");
+			}
+
+			if (iterator.hasNext()) {
+				sb.append(", ");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private String _toPath(String template, Object... values) {

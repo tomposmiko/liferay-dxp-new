@@ -226,7 +226,7 @@ definition {
 
 	@priority = "4"
 	test CannotViewSiteSettingsInUserPersonalSite {
-		ProductMenu.gotoPersonalSite();
+		Navigator.gotoPersonalSite();
 
 		ProductMenuHelper.expandPanel(panel = "Site Administration");
 
@@ -1464,8 +1464,6 @@ definition {
 			organizationSite = "Community Site",
 			orgName = "Organization Site Bravo"
 		);
-
-		PortalSettings.gotoPortalSettings();
 
 		PortalSettings.editConfigurationUsersDefaultUserAssociationsSitesCP(
 			siteName = "Site Name Alpha"

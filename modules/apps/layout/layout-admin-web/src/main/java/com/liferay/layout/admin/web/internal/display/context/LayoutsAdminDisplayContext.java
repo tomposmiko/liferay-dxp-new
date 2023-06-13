@@ -302,11 +302,25 @@ public class LayoutsAdminDisplayContext {
 		return configureLayoutURL.toString();
 	}
 
-	public String getCopyLayoutURL(Layout layout) {
+	public String getCopyLayoutRenderURL(Layout layout) throws Exception {
+		PortletURL copyLayoutRenderURL =
+			_liferayPortletResponse.createActionURL();
+
+		copyLayoutRenderURL.setParameter(
+			"mvcRenderCommandName", "/layout/add_layout");
+		copyLayoutRenderURL.setParameter(
+			"sourcePlid", String.valueOf(layout.getPlid()));
+		copyLayoutRenderURL.setWindowState(LiferayWindowState.POP_UP);
+
+		return copyLayoutRenderURL.toString();
+	}
+
+	public String getCopyLayoutURL(long sourcePlid) {
 		PortletURL copyLayoutURL = _liferayPortletResponse.createActionURL();
 
 		copyLayoutURL.setParameter(
 			ActionRequest.ACTION_NAME, "/layout/copy_layout");
+		copyLayoutURL.setParameter("sourcePlid", String.valueOf(sourcePlid));
 		copyLayoutURL.setParameter("groupId", String.valueOf(getGroupId()));
 		copyLayoutURL.setParameter(
 			"liveGroupId", String.valueOf(getLiveGroupId()));
@@ -314,8 +328,6 @@ public class LayoutsAdminDisplayContext {
 			"stagingGroupId", String.valueOf(getStagingGroupId()));
 		copyLayoutURL.setParameter(
 			"privateLayout", String.valueOf(isPrivateLayout()));
-		copyLayoutURL.setParameter(
-			"layoutId", String.valueOf(layout.getLayoutId()));
 
 		return copyLayoutURL.toString();
 	}
@@ -1398,7 +1410,7 @@ public class LayoutsAdminDisplayContext {
 		}
 
 		if (isShowCopyLayoutAction(layout)) {
-			jsonObject.put("copyLayoutURL", getCopyLayoutURL(layout));
+			jsonObject.put("copyLayoutURL", getCopyLayoutRenderURL(layout));
 		}
 
 		if (isShowDeleteAction(layout)) {

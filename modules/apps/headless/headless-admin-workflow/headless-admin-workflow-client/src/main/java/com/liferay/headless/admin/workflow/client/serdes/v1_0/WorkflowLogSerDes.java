@@ -18,11 +18,10 @@ import com.liferay.headless.admin.workflow.client.dto.v1_0.WorkflowLog;
 import com.liferay.headless.admin.workflow.client.json.BaseJSONParser;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import java.util.Collection;
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -50,119 +49,135 @@ public class WorkflowLogSerDes {
 
 	public static String toJSON(WorkflowLog workflowLog) {
 		if (workflowLog == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"auditPerson\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (workflowLog.getAuditPerson() == null) {
-			sb.append("null");
+		if (workflowLog.getAuditPerson() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"auditPerson\":");
+
+			sb.append(CreatorSerDes.toJSON(workflowLog.getAuditPerson()));
 		}
-		else {
-			sb.append(workflowLog.getAuditPerson());
-		}
 
-		sb.append(", ");
+		if (workflowLog.getCommentLog() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"commentLog\": ");
+			sb.append("\"commentLog\":");
 
-		if (workflowLog.getCommentLog() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(workflowLog.getCommentLog());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (workflowLog.getDateCreated() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dateCreated\": ");
+			sb.append("\"dateCreated\":");
 
-		if (workflowLog.getDateCreated() == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(
+				liferayToJSONDateFormat.format(workflowLog.getDateCreated()));
+
+			sb.append("\"");
 		}
-		else {
-			sb.append(workflowLog.getDateCreated());
-		}
 
-		sb.append(", ");
+		if (workflowLog.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\":");
 
-		if (workflowLog.getId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(workflowLog.getId());
 		}
 
-		sb.append(", ");
+		if (workflowLog.getPerson() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"person\": ");
+			sb.append("\"person\":");
 
-		if (workflowLog.getPerson() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(workflowLog.getPerson());
-		}
-
-		sb.append(", ");
-
-		sb.append("\"previousPerson\": ");
-
-		if (workflowLog.getPreviousPerson() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(workflowLog.getPreviousPerson());
+			sb.append(CreatorSerDes.toJSON(workflowLog.getPerson()));
 		}
 
-		sb.append(", ");
+		if (workflowLog.getPreviousPerson() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"previousState\": ");
+			sb.append("\"previousPerson\":");
 
-		if (workflowLog.getPreviousState() == null) {
-			sb.append("null");
+			sb.append(CreatorSerDes.toJSON(workflowLog.getPreviousPerson()));
 		}
-		else {
+
+		if (workflowLog.getPreviousState() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"previousState\":");
+
+			sb.append("\"");
+
 			sb.append(workflowLog.getPreviousState());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (workflowLog.getState() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"state\": ");
+			sb.append("\"state\":");
 
-		if (workflowLog.getState() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(workflowLog.getState());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (workflowLog.getTaskId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"taskId\": ");
+			sb.append("\"taskId\":");
 
-		if (workflowLog.getTaskId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(workflowLog.getTaskId());
 		}
 
-		sb.append(", ");
+		if (workflowLog.getType() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"type\": ");
+			sb.append("\"type\":");
 
-		if (workflowLog.getType() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(workflowLog.getType());
+
+			sb.append("\"");
 		}
 
 		sb.append("}");
@@ -170,39 +185,106 @@ public class WorkflowLogSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<WorkflowLog> workflowLogs) {
-		if (workflowLogs == null) {
-			return "[]";
+	public static Map<String, String> toMap(WorkflowLog workflowLog) {
+		if (workflowLog == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		for (WorkflowLog workflowLog : workflowLogs) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(workflowLog));
+		if (workflowLog.getAuditPerson() == null) {
+			map.put("auditPerson", null);
+		}
+		else {
+			map.put(
+				"auditPerson",
+				CreatorSerDes.toJSON(workflowLog.getAuditPerson()));
 		}
 
-		sb.append("]");
+		if (workflowLog.getCommentLog() == null) {
+			map.put("commentLog", null);
+		}
+		else {
+			map.put("commentLog", String.valueOf(workflowLog.getCommentLog()));
+		}
 
-		return sb.toString();
+		map.put(
+			"dateCreated",
+			liferayToJSONDateFormat.format(workflowLog.getDateCreated()));
+
+		if (workflowLog.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(workflowLog.getId()));
+		}
+
+		if (workflowLog.getPerson() == null) {
+			map.put("person", null);
+		}
+		else {
+			map.put("person", CreatorSerDes.toJSON(workflowLog.getPerson()));
+		}
+
+		if (workflowLog.getPreviousPerson() == null) {
+			map.put("previousPerson", null);
+		}
+		else {
+			map.put(
+				"previousPerson",
+				CreatorSerDes.toJSON(workflowLog.getPreviousPerson()));
+		}
+
+		if (workflowLog.getPreviousState() == null) {
+			map.put("previousState", null);
+		}
+		else {
+			map.put(
+				"previousState",
+				String.valueOf(workflowLog.getPreviousState()));
+		}
+
+		if (workflowLog.getState() == null) {
+			map.put("state", null);
+		}
+		else {
+			map.put("state", String.valueOf(workflowLog.getState()));
+		}
+
+		if (workflowLog.getTaskId() == null) {
+			map.put("taskId", null);
+		}
+		else {
+			map.put("taskId", String.valueOf(workflowLog.getTaskId()));
+		}
+
+		if (workflowLog.getType() == null) {
+			map.put("type", null);
+		}
+		else {
+			map.put("type", String.valueOf(workflowLog.getType()));
+		}
+
+		return map;
 	}
 
 	private static class WorkflowLogJSONParser
 		extends BaseJSONParser<WorkflowLog> {
 
+		@Override
 		protected WorkflowLog createDTO() {
 			return new WorkflowLog();
 		}
 
+		@Override
 		protected WorkflowLog[] createDTOArray(int size) {
 			return new WorkflowLog[size];
 		}
 
+		@Override
 		protected void setField(
 			WorkflowLog workflowLog, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
@@ -221,7 +303,7 @@ public class WorkflowLogSerDes {
 			else if (Objects.equals(jsonParserFieldName, "dateCreated")) {
 				if (jsonParserFieldValue != null) {
 					workflowLog.setDateCreated(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "id")) {
@@ -266,18 +348,6 @@ public class WorkflowLogSerDes {
 			else {
 				throw new IllegalArgumentException(
 					"Unsupported field name " + jsonParserFieldName);
-			}
-		}
-
-		private Date _toDate(String string) {
-			try {
-				DateFormat dateFormat = new SimpleDateFormat(
-					"yyyy-MM-dd'T'HH:mm:ss'Z'");
-
-				return dateFormat.parse(string);
-			}
-			catch (ParseException pe) {
-				throw new IllegalArgumentException("Unable to parse " + string);
 			}
 		}
 

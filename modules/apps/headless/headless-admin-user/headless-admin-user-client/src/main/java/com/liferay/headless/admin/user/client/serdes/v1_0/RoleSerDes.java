@@ -18,11 +18,10 @@ import com.liferay.headless.admin.user.client.dto.v1_0.Role;
 import com.liferay.headless.admin.user.client.json.BaseJSONParser;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import java.util.Collection;
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -48,24 +47,30 @@ public class RoleSerDes {
 
 	public static String toJSON(Role role) {
 		if (role == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"availableLanguages\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (role.getAvailableLanguages() == null) {
-			sb.append("null");
-		}
-		else {
+		if (role.getAvailableLanguages() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"availableLanguages\":");
+
 			sb.append("[");
 
 			for (int i = 0; i < role.getAvailableLanguages().length; i++) {
 				sb.append("\"");
+
 				sb.append(role.getAvailableLanguages()[i]);
+
 				sb.append("\"");
 
 				if ((i + 1) < role.getAvailableLanguages().length) {
@@ -76,81 +81,94 @@ public class RoleSerDes {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (role.getCreator() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"creator\": ");
+			sb.append("\"creator\":");
 
-		if (role.getCreator() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(role.getCreator());
-		}
-
-		sb.append(", ");
-
-		sb.append("\"dateCreated\": ");
-
-		if (role.getDateCreated() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(role.getDateCreated());
+			sb.append(CreatorSerDes.toJSON(role.getCreator()));
 		}
 
-		sb.append(", ");
+		if (role.getDateCreated() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dateModified\": ");
+			sb.append("\"dateCreated\":");
 
-		if (role.getDateModified() == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(liferayToJSONDateFormat.format(role.getDateCreated()));
+
+			sb.append("\"");
 		}
-		else {
-			sb.append(role.getDateModified());
+
+		if (role.getDateModified() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"dateModified\":");
+
+			sb.append("\"");
+
+			sb.append(liferayToJSONDateFormat.format(role.getDateModified()));
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (role.getDescription() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"description\": ");
+			sb.append("\"description\":");
 
-		if (role.getDescription() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(role.getDescription());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (role.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\":");
 
-		if (role.getId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(role.getId());
 		}
 
-		sb.append(", ");
+		if (role.getName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\":");
 
-		if (role.getName() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(role.getName());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (role.getRoleType() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"roleType\": ");
+			sb.append("\"roleType\":");
 
-		if (role.getRoleType() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(role.getRoleType());
+
+			sb.append("\"");
 		}
 
 		sb.append("}");
@@ -158,38 +176,84 @@ public class RoleSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<Role> roles) {
-		if (roles == null) {
-			return "[]";
+	public static Map<String, String> toMap(Role role) {
+		if (role == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		for (Role role : roles) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(role));
+		if (role.getAvailableLanguages() == null) {
+			map.put("availableLanguages", null);
+		}
+		else {
+			map.put(
+				"availableLanguages",
+				String.valueOf(role.getAvailableLanguages()));
 		}
 
-		sb.append("]");
+		if (role.getCreator() == null) {
+			map.put("creator", null);
+		}
+		else {
+			map.put("creator", CreatorSerDes.toJSON(role.getCreator()));
+		}
 
-		return sb.toString();
+		map.put(
+			"dateCreated",
+			liferayToJSONDateFormat.format(role.getDateCreated()));
+
+		map.put(
+			"dateModified",
+			liferayToJSONDateFormat.format(role.getDateModified()));
+
+		if (role.getDescription() == null) {
+			map.put("description", null);
+		}
+		else {
+			map.put("description", String.valueOf(role.getDescription()));
+		}
+
+		if (role.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(role.getId()));
+		}
+
+		if (role.getName() == null) {
+			map.put("name", null);
+		}
+		else {
+			map.put("name", String.valueOf(role.getName()));
+		}
+
+		if (role.getRoleType() == null) {
+			map.put("roleType", null);
+		}
+		else {
+			map.put("roleType", String.valueOf(role.getRoleType()));
+		}
+
+		return map;
 	}
 
 	private static class RoleJSONParser extends BaseJSONParser<Role> {
 
+		@Override
 		protected Role createDTO() {
 			return new Role();
 		}
 
+		@Override
 		protected Role[] createDTOArray(int size) {
 			return new Role[size];
 		}
 
+		@Override
 		protected void setField(
 			Role role, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
@@ -208,12 +272,12 @@ public class RoleSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "dateCreated")) {
 				if (jsonParserFieldValue != null) {
-					role.setDateCreated(_toDate((String)jsonParserFieldValue));
+					role.setDateCreated(toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dateModified")) {
 				if (jsonParserFieldValue != null) {
-					role.setDateModified(_toDate((String)jsonParserFieldValue));
+					role.setDateModified(toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "description")) {
@@ -239,18 +303,6 @@ public class RoleSerDes {
 			else {
 				throw new IllegalArgumentException(
 					"Unsupported field name " + jsonParserFieldName);
-			}
-		}
-
-		private Date _toDate(String string) {
-			try {
-				DateFormat dateFormat = new SimpleDateFormat(
-					"yyyy-MM-dd'T'HH:mm:ss'Z'");
-
-				return dateFormat.parse(string);
-			}
-			catch (ParseException pe) {
-				throw new IllegalArgumentException("Unable to parse " + string);
 			}
 		}
 

@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.template.soy.data.SoyDataFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -49,8 +50,24 @@ import org.apache.commons.lang.StringUtils;
 /**
  * @author Marcela Cunha
  */
-public class DocumentLibraryFieldType extends FieldType {
+public class DocumentLibraryFieldType extends BaseFieldType {
 
+	public DocumentLibraryFieldType(
+		DataDefinitionField dataDefinitionField, DLAppService dlAppService,
+		Html html, HttpServletRequest httpServletRequest,
+		HttpServletResponse httpServletResponse, Portal portal,
+		SoyDataFactory soyDataFactory) {
+
+		super(
+			dataDefinitionField, httpServletRequest, httpServletResponse,
+			soyDataFactory);
+
+		_dlAppService = dlAppService;
+		_html = html;
+		_portal = portal;
+	}
+
+	@Override
 	public DataDefinitionField deserialize(JSONObject jsonObject)
 		throws Exception {
 
@@ -77,58 +94,9 @@ public class DocumentLibraryFieldType extends FieldType {
 		return dataDefinitionField;
 	}
 
-	public void includeContext(
-		Map<String, Object> context, DataDefinitionField dataDefinitionField,
-		DLAppService dlAppService, Html html,
-		HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse, Portal portal,
-		boolean readOnly) {
-
-		super.includeContext(
-			context, dataDefinitionField, httpServletRequest,
-			httpServletResponse, readOnly);
-
-		if (!StringUtils.isEmpty(
-				CustomPropertyUtil.getString(
-					dataDefinitionField.getCustomProperties(), "value"))) {
-
-			JSONObject valueJSONObject = _toJSONObject(
-				CustomPropertyUtil.getString(
-					dataDefinitionField.getCustomProperties(), "value"));
-
-			if ((valueJSONObject != null) && (valueJSONObject.length() > 0)) {
-				FileEntry fileEntry = _getFileEntry(
-					dlAppService, valueJSONObject);
-
-				context.put(
-					"fileEntryTitle", _getFileEntryTitle(fileEntry, html));
-				context.put(
-					"fileEntryURL",
-					_getFileEntryURL(fileEntry, html, httpServletRequest));
-			}
-		}
-
-		context.put(
-			"groupId",
-			CustomPropertyUtil.getLong(
-				dataDefinitionField.getCustomProperties(), "groupId"));
-		context.put(
-			"itemSelectorAuthToken",
-			_getItemSelectorAuthToken(httpServletRequest, portal));
-		context.put(
-			"lexiconIconsPath", _getLexiconIconsPath(httpServletRequest));
-		context.put("strings", _getStrings(httpServletRequest, portal));
-		context.put(
-			"value",
-			JSONFactoryUtil.looseDeserialize(
-				CustomPropertyUtil.getString(
-					dataDefinitionField.getCustomProperties(), "value", "{}")));
-	}
-
-	public JSONObject toJSONObject(DataDefinitionField dataDefinitionField)
-		throws Exception {
-
-		JSONObject jsonObject = super.toJSONObject(dataDefinitionField);
+	@Override
+	public JSONObject toJSONObject() throws Exception {
+		JSONObject jsonObject = super.toJSONObject();
 
 		return jsonObject.put(
 			"groupId",
@@ -151,11 +119,41 @@ public class DocumentLibraryFieldType extends FieldType {
 		);
 	}
 
-	private FileEntry _getFileEntry(
-		DLAppService dlAppService, JSONObject valueJSONObject) {
+	@Override
+	protected void addContext(Map<String, Object> context) {
+		if (!StringUtils.isEmpty(
+				CustomPropertyUtil.getString(
+					dataDefinitionField.getCustomProperties(), "value"))) {
 
+			JSONObject valueJSONObject = _toJSONObject(
+				CustomPropertyUtil.getString(
+					dataDefinitionField.getCustomProperties(), "value"));
+
+			if ((valueJSONObject != null) && (valueJSONObject.length() > 0)) {
+				FileEntry fileEntry = _getFileEntry(valueJSONObject);
+
+				context.put("fileEntryTitle", _getFileEntryTitle(fileEntry));
+				context.put("fileEntryURL", _getFileEntryURL(fileEntry));
+			}
+		}
+
+		context.put(
+			"groupId",
+			CustomPropertyUtil.getLong(
+				dataDefinitionField.getCustomProperties(), "groupId"));
+		context.put("itemSelectorAuthToken", _getItemSelectorAuthToken());
+		context.put("lexiconIconsPath", _getLexiconIconsPath());
+		context.put("strings", _getStrings());
+		context.put(
+			"value",
+			JSONFactoryUtil.looseDeserialize(
+				CustomPropertyUtil.getString(
+					dataDefinitionField.getCustomProperties(), "value", "{}")));
+	}
+
+	private FileEntry _getFileEntry(JSONObject valueJSONObject) {
 		try {
-			return dlAppService.getFileEntryByUuidAndGroupId(
+			return _dlAppService.getFileEntryByUuidAndGroupId(
 				valueJSONObject.getString("uuid"),
 				valueJSONObject.getLong("groupId"));
 		}
@@ -166,17 +164,15 @@ public class DocumentLibraryFieldType extends FieldType {
 		}
 	}
 
-	private String _getFileEntryTitle(FileEntry fileEntry, Html html) {
+	private String _getFileEntryTitle(FileEntry fileEntry) {
 		if (fileEntry == null) {
 			return StringPool.BLANK;
 		}
 
-		return html.escape(fileEntry.getTitle());
+		return _html.escape(fileEntry.getTitle());
 	}
 
-	private String _getFileEntryURL(
-		FileEntry fileEntry, Html html, HttpServletRequest httpServletRequest) {
-
+	private String _getFileEntryURL(FileEntry fileEntry) {
 		if (fileEntry == null) {
 			return StringPool.BLANK;
 		}
@@ -195,16 +191,14 @@ public class DocumentLibraryFieldType extends FieldType {
 		sb.append(fileEntry.getFolderId());
 		sb.append(StringPool.SLASH);
 		sb.append(
-			URLCodec.encodeURL(html.unescape(fileEntry.getTitle()), true));
+			URLCodec.encodeURL(_html.unescape(fileEntry.getTitle()), true));
 		sb.append(StringPool.SLASH);
 		sb.append(fileEntry.getUuid());
 
-		return html.escape(sb.toString());
+		return _html.escape(sb.toString());
 	}
 
-	private String _getItemSelectorAuthToken(
-		HttpServletRequest httpServletRequest, Portal portal) {
-
+	private String _getItemSelectorAuthToken() {
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
@@ -216,7 +210,7 @@ public class DocumentLibraryFieldType extends FieldType {
 		try {
 			return AuthTokenUtil.getToken(
 				httpServletRequest,
-				portal.getControlPanelPlid(themeDisplay.getCompanyId()),
+				_portal.getControlPanelPlid(themeDisplay.getCompanyId()),
 				PortletKeys.ITEM_SELECTOR);
 		}
 		catch (PortalException pe) {
@@ -226,7 +220,7 @@ public class DocumentLibraryFieldType extends FieldType {
 		return StringPool.BLANK;
 	}
 
-	private String _getLexiconIconsPath(HttpServletRequest httpServletRequest) {
+	private String _getLexiconIconsPath() {
 		StringBundler sb = new StringBundler(3);
 
 		ThemeDisplay themeDisplay =
@@ -241,9 +235,7 @@ public class DocumentLibraryFieldType extends FieldType {
 		return sb.toString();
 	}
 
-	private Map<String, String> _getStrings(
-		HttpServletRequest httpServletRequest, Portal portal) {
-
+	private Map<String, String> _getStrings() {
 		Map<String, String> values = new HashMap<>();
 
 		ThemeDisplay themeDisplay =
@@ -253,7 +245,7 @@ public class DocumentLibraryFieldType extends FieldType {
 		ResourceBundle resourceBundle = new AggregateResourceBundle(
 			ResourceBundleUtil.getBundle(
 				"content.Language", themeDisplay.getLocale(), getClass()),
-			portal.getResourceBundle(themeDisplay.getLocale()));
+			_portal.getResourceBundle(themeDisplay.getLocale()));
 
 		values.put("select", LanguageUtil.get(resourceBundle, "select"));
 
@@ -275,5 +267,9 @@ public class DocumentLibraryFieldType extends FieldType {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		DocumentLibraryFieldType.class);
+
+	private final DLAppService _dlAppService;
+	private final Html _html;
+	private final Portal _portal;
 
 }

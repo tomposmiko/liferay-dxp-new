@@ -227,6 +227,14 @@ definition {
 		Site.addBlankCP(siteName = "Form Site");
 
 		ProductMenu.gotoPortlet(
+			category = "Site Builder",
+			panel = "Site Administration",
+			portlet = "Pages"
+		);
+
+		SitePages.addPublicPage(pageName = "Form Page");
+
+		ProductMenu.gotoPortlet(
 			category = "People",
 			panel = "Site Administration",
 			portlet = "Memberships"
@@ -282,7 +290,7 @@ definition {
 			userScreenName = "usersn"
 		);
 
-		ProductMenu.gotoSite(site = "Form Site");
+		Navigator.openSiteURL(siteName = "Form Site");
 
 		ProductMenu.gotoPortlet(
 			category = "Content &amp; Data",
@@ -767,11 +775,7 @@ definition {
 
 		Form.save();
 
-		ProductMenu.gotoPortlet(
-			category = "My Account",
-			panel = "User",
-			portlet = "Account Settings"
-		);
+		Navigator.gotoAccountSettings();
 
 		MyAccount.changeUserLanguage(
 			languageName = "español (España)",
@@ -2187,7 +2191,7 @@ definition {
 			fieldName = "TestingTitle"
 		);
 
-		FormFields.viewRadioValue(fieldName = "dataType", fieldValue = "integer");
+		FormFields.viewRadioValue(fieldName = "dataType", fieldValue = "Integer");
 
 		FormFields.changeFieldType(selectOption = "Multiple Selection");
 
@@ -2224,7 +2228,7 @@ definition {
 
 		Form.save();
 
-		FormsAdminNavigator.gotoEditField(fieldName = "TestingTitle");
+		FormsAdminNavigator.gotoEditField(fieldName = "Testing Title");
 
 		FormFields.viewTextLabel(
 			fieldLabel = "Testing Title",
@@ -2278,13 +2282,13 @@ definition {
 
 		FormsAdminNavigator.gotoEditFormByName();
 
-		FormsAdminNavigator.gotoEditField(fieldName = "TextField");
+		FormsAdminNavigator.gotoEditField(fieldName = "Text Field");
 
 		FormFields.changeFieldType(selectOption = "Single Selection");
 
 		Form.closeSidebar();
 
-		FormsAdminNavigator.gotoEditField(fieldName = "TestingTitle");
+		FormsAdminNavigator.gotoEditField(fieldName = "Testing Title");
 
 		FormFields.changeFieldType(selectOption = "Date");
 
@@ -4619,7 +4623,7 @@ definition {
 
 		Form.closeSidebar();
 
-		FormFields.viewSwitcher(fieldName = "Multiple Selection");
+		FormFields.viewSwitcher(fieldName = "Switcher 1");
 
 		FormFields.viewSwitcherLabelNotPresent(
 			fieldLabel = "Multiple Selection",

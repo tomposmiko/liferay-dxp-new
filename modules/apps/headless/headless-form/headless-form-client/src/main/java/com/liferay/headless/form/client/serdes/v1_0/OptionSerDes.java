@@ -17,7 +17,8 @@ package com.liferay.headless.form.client.serdes.v1_0;
 import com.liferay.headless.form.client.dto.v1_0.Option;
 import com.liferay.headless.form.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -43,42 +44,49 @@ public class OptionSerDes {
 
 	public static String toJSON(Option option) {
 		if (option == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"id\": ");
+		if (option.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (option.getId() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"id\":");
+
 			sb.append(option.getId());
 		}
 
-		sb.append(", ");
+		if (option.getLabel() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"label\": ");
+			sb.append("\"label\":");
 
-		if (option.getLabel() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(option.getLabel());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (option.getValue() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"value\": ");
+			sb.append("\"value\":");
 
-		if (option.getValue() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(option.getValue());
+
+			sb.append("\"");
 		}
 
 		sb.append("}");
@@ -86,38 +94,50 @@ public class OptionSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<Option> options) {
-		if (options == null) {
-			return "[]";
+	public static Map<String, String> toMap(Option option) {
+		if (option == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (Option option : options) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(option));
+		if (option.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(option.getId()));
 		}
 
-		sb.append("]");
+		if (option.getLabel() == null) {
+			map.put("label", null);
+		}
+		else {
+			map.put("label", String.valueOf(option.getLabel()));
+		}
 
-		return sb.toString();
+		if (option.getValue() == null) {
+			map.put("value", null);
+		}
+		else {
+			map.put("value", String.valueOf(option.getValue()));
+		}
+
+		return map;
 	}
 
 	private static class OptionJSONParser extends BaseJSONParser<Option> {
 
+		@Override
 		protected Option createDTO() {
 			return new Option();
 		}
 
+		@Override
 		protected Option[] createDTOArray(int size) {
 			return new Option[size];
 		}
 
+		@Override
 		protected void setField(
 			Option option, String jsonParserFieldName,
 			Object jsonParserFieldValue) {

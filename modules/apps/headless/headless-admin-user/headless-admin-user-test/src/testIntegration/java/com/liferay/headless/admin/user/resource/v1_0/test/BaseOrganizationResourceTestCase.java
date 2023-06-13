@@ -15,16 +15,16 @@
 package com.liferay.headless.admin.user.resource.v1_0.test;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
-import com.liferay.headless.admin.user.dto.v1_0.ContactInformation;
-import com.liferay.headless.admin.user.dto.v1_0.Location;
-import com.liferay.headless.admin.user.dto.v1_0.Organization;
-import com.liferay.headless.admin.user.dto.v1_0.Service;
+import com.liferay.headless.admin.user.client.dto.v1_0.Organization;
+import com.liferay.headless.admin.user.client.pagination.Page;
+import com.liferay.headless.admin.user.client.serdes.v1_0.OrganizationSerDes;
 import com.liferay.headless.admin.user.resource.v1_0.OrganizationResource;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.log.Log;
@@ -42,7 +42,6 @@ import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
@@ -57,10 +56,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -116,6 +117,63 @@ public abstract class BaseOrganizationResourceTestCase {
 	}
 
 	@Test
+	public void testClientSerDesToDTO() throws Exception {
+		ObjectMapper objectMapper = new ObjectMapper() {
+			{
+				configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+				enable(SerializationFeature.INDENT_OUTPUT);
+				setDateFormat(new ISO8601DateFormat());
+				setFilterProvider(
+					new SimpleFilterProvider() {
+						{
+							addFilter(
+								"Liferay.Vulcan",
+								SimpleBeanPropertyFilter.serializeAll());
+						}
+					});
+				setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+				setSerializationInclusion(JsonInclude.Include.NON_NULL);
+			}
+		};
+
+		Organization organization1 = randomOrganization();
+
+		String json = objectMapper.writeValueAsString(organization1);
+
+		Organization organization2 = OrganizationSerDes.toDTO(json);
+
+		Assert.assertTrue(equals(organization1, organization2));
+	}
+
+	@Test
+	public void testClientSerDesToJSON() throws Exception {
+		ObjectMapper objectMapper = new ObjectMapper() {
+			{
+				configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+				setDateFormat(new ISO8601DateFormat());
+				setFilterProvider(
+					new SimpleFilterProvider() {
+						{
+							addFilter(
+								"Liferay.Vulcan",
+								SimpleBeanPropertyFilter.serializeAll());
+						}
+					});
+				setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+				setSerializationInclusion(JsonInclude.Include.NON_NULL);
+			}
+		};
+
+		Organization organization = randomOrganization();
+
+		String json1 = objectMapper.writeValueAsString(organization);
+		String json2 = OrganizationSerDes.toJSON(organization);
+
+		Assert.assertEquals(
+			objectMapper.readTree(json1), objectMapper.readTree(json2));
+	}
+
+	@Test
 	public void testGetOrganizationsPage() throws Exception {
 		Organization organization1 = testGetOrganizationsPage_addOrganization(
 			randomOrganization());
@@ -146,23 +204,12 @@ public abstract class BaseOrganizationResourceTestCase {
 		}
 
 		Organization organization1 = randomOrganization();
-		Organization organization2 = randomOrganization();
-
-		for (EntityField entityField : entityFields) {
-			BeanUtils.setProperty(
-				organization1, entityField.getName(),
-				DateUtils.addMinutes(new Date(), -2));
-		}
 
 		organization1 = testGetOrganizationsPage_addOrganization(organization1);
 
-		Thread.sleep(1000);
-
-		organization2 = testGetOrganizationsPage_addOrganization(organization2);
-
 		for (EntityField entityField : entityFields) {
 			Page<Organization> page = invokeGetOrganizationsPage(
-				null, getFilterString(entityField, "eq", organization1),
+				null, getFilterString(entityField, "between", organization1),
 				Pagination.of(1, 2), null);
 
 			assertEquals(
@@ -261,8 +308,6 @@ public abstract class BaseOrganizationResourceTestCase {
 
 		organization1 = testGetOrganizationsPage_addOrganization(organization1);
 
-		Thread.sleep(1000);
-
 		organization2 = testGetOrganizationsPage_addOrganization(organization2);
 
 		for (EntityField entityField : entityFields) {
@@ -358,10 +403,7 @@ public abstract class BaseOrganizationResourceTestCase {
 			_log.debug("HTTP response: " + string);
 		}
 
-		return outputObjectMapper.readValue(
-			string,
-			new TypeReference<Page<Organization>>() {
-			});
+		return Page.of(string, OrganizationSerDes::toDTO);
 	}
 
 	protected Http.Response invokeGetOrganizationsPageResponse(
@@ -425,10 +467,12 @@ public abstract class BaseOrganizationResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(string, Organization.class);
+			return OrganizationSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -509,26 +553,14 @@ public abstract class BaseOrganizationResourceTestCase {
 			testGetOrganizationOrganizationsPage_getParentOrganizationId();
 
 		Organization organization1 = randomOrganization();
-		Organization organization2 = randomOrganization();
-
-		for (EntityField entityField : entityFields) {
-			BeanUtils.setProperty(
-				organization1, entityField.getName(),
-				DateUtils.addMinutes(new Date(), -2));
-		}
 
 		organization1 = testGetOrganizationOrganizationsPage_addOrganization(
 			parentOrganizationId, organization1);
 
-		Thread.sleep(1000);
-
-		organization2 = testGetOrganizationOrganizationsPage_addOrganization(
-			parentOrganizationId, organization2);
-
 		for (EntityField entityField : entityFields) {
 			Page<Organization> page = invokeGetOrganizationOrganizationsPage(
 				parentOrganizationId, null,
-				getFilterString(entityField, "eq", organization1),
+				getFilterString(entityField, "between", organization1),
 				Pagination.of(1, 2), null);
 
 			assertEquals(
@@ -646,8 +678,6 @@ public abstract class BaseOrganizationResourceTestCase {
 
 		organization1 = testGetOrganizationOrganizationsPage_addOrganization(
 			parentOrganizationId, organization1);
-
-		Thread.sleep(1000);
 
 		organization2 = testGetOrganizationOrganizationsPage_addOrganization(
 			parentOrganizationId, organization2);
@@ -773,10 +803,7 @@ public abstract class BaseOrganizationResourceTestCase {
 			_log.debug("HTTP response: " + string);
 		}
 
-		return outputObjectMapper.readValue(
-			string,
-			new TypeReference<Page<Organization>>() {
-			});
+		return Page.of(string, OrganizationSerDes::toDTO);
 	}
 
 	protected Http.Response invokeGetOrganizationOrganizationsPageResponse(
@@ -1195,13 +1222,67 @@ public abstract class BaseOrganizationResourceTestCase {
 		}
 
 		if (entityFieldName.equals("dateCreated")) {
-			sb.append(_dateFormat.format(organization.getDateCreated()));
+			if (operator.equals("between")) {
+				sb = new StringBundler();
+
+				sb.append("(");
+				sb.append(entityFieldName);
+				sb.append(" gt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							organization.getDateCreated(), -2)));
+				sb.append(" and ");
+				sb.append(entityFieldName);
+				sb.append(" lt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							organization.getDateCreated(), 2)));
+				sb.append(")");
+			}
+			else {
+				sb.append(entityFieldName);
+
+				sb.append(" ");
+				sb.append(operator);
+				sb.append(" ");
+
+				sb.append(_dateFormat.format(organization.getDateCreated()));
+			}
 
 			return sb.toString();
 		}
 
 		if (entityFieldName.equals("dateModified")) {
-			sb.append(_dateFormat.format(organization.getDateModified()));
+			if (operator.equals("between")) {
+				sb = new StringBundler();
+
+				sb.append("(");
+				sb.append(entityFieldName);
+				sb.append(" gt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							organization.getDateModified(), -2)));
+				sb.append(" and ");
+				sb.append(entityFieldName);
+				sb.append(" lt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							organization.getDateModified(), 2)));
+				sb.append(")");
+			}
+			else {
+				sb.append(entityFieldName);
+
+				sb.append(" ");
+				sb.append(operator);
+				sb.append(" ");
+
+				sb.append(_dateFormat.format(organization.getDateModified()));
+			}
 
 			return sb.toString();
 		}
@@ -1279,107 +1360,11 @@ public abstract class BaseOrganizationResourceTestCase {
 		return randomOrganization();
 	}
 
-	protected static final ObjectMapper inputObjectMapper = new ObjectMapper() {
-		{
-			setFilterProvider(
-				new SimpleFilterProvider() {
-					{
-						addFilter(
-							"Liferay.Vulcan",
-							SimpleBeanPropertyFilter.serializeAll());
-					}
-				});
-			setSerializationInclusion(JsonInclude.Include.NON_NULL);
-		}
-	};
-	protected static final ObjectMapper outputObjectMapper =
-		new ObjectMapper() {
-			{
-				addMixIn(Organization.class, OrganizationMixin.class);
-				setFilterProvider(
-					new SimpleFilterProvider() {
-						{
-							addFilter(
-								"Liferay.Vulcan",
-								SimpleBeanPropertyFilter.serializeAll());
-						}
-					});
-			}
-		};
-
 	protected Group irrelevantGroup;
 	protected String testContentType = "application/json";
 	protected Group testGroup;
 	protected Locale testLocale;
 	protected String testUserNameAndPassword = "test@liferay.com:test";
-
-	protected static class OrganizationMixin {
-
-		@JsonProperty
-		String comment;
-		@JsonProperty
-		ContactInformation contactInformation;
-		@JsonProperty
-		Date dateCreated;
-		@JsonProperty
-		Date dateModified;
-		@JsonProperty
-		Long id;
-		@JsonProperty
-		String image;
-		@JsonProperty
-		String[] keywords;
-		@JsonProperty
-		Location location;
-		@JsonProperty
-		String name;
-		@JsonProperty
-		Number numberOfOrganizations;
-		@JsonProperty
-		Organization parentOrganization;
-		@JsonProperty
-		Service[] services;
-
-	}
-
-	protected static class Page<T> {
-
-		public Collection<T> getItems() {
-			return new ArrayList<>(items);
-		}
-
-		public long getLastPage() {
-			return lastPage;
-		}
-
-		public long getPage() {
-			return page;
-		}
-
-		public long getPageSize() {
-			return pageSize;
-		}
-
-		public long getTotalCount() {
-			return totalCount;
-		}
-
-		@JsonProperty
-		protected Collection<T> items;
-
-		@JsonProperty
-		protected long lastPage;
-
-		@JsonProperty
-		protected long page;
-
-		@JsonProperty
-		protected long pageSize;
-
-		@JsonProperty
-		protected long totalCount;
-
-	}
 
 	private Http.Options _createHttpOptions() {
 		Http.Options options = new Http.Options();
@@ -1397,6 +1382,41 @@ public abstract class BaseOrganizationResourceTestCase {
 		options.addHeader("Content-Type", testContentType);
 
 		return options;
+	}
+
+	private String _toJSON(Map<String, String> map) {
+		if (map == null) {
+			return "null";
+		}
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("{");
+
+		Set<Map.Entry<String, String>> set = map.entrySet();
+
+		Iterator<Map.Entry<String, String>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, String> entry = iterator.next();
+
+			sb.append("\"" + entry.getKey() + "\": ");
+
+			if (entry.getValue() == null) {
+				sb.append("null");
+			}
+			else {
+				sb.append("\"" + entry.getValue() + "\"");
+			}
+
+			if (iterator.hasNext()) {
+				sb.append(", ");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private String _toPath(String template, Object... values) {

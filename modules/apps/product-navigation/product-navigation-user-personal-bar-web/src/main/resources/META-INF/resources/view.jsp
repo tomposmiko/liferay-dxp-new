@@ -50,10 +50,12 @@
 			<c:if test="<%= notificationsCount > 0 %>">
 
 				<%
-				PortletURL notificationsURL = PortletProviderUtil.getPortletURL(request, UserNotificationEvent.class.getName(), PortletProvider.Action.VIEW);
+				String notificaitonsPortletId = PortletProviderUtil.getPortletId(UserNotificationEvent.class.getName(), PortletProvider.Action.VIEW);
+
+				String notificationsURL = PersonalApplicationURLUtil.getPersonalApplicationURL(request, notificaitonsPortletId);
 				%>
 
-				<aui:a href="<%= (notificationsURL != null) ? notificationsURL.toString() : null %>">
+				<aui:a href="<%= (notificationsURL != null) ? notificationsURL : null %>">
 					<span class="badge badge-danger panel-notifications-count">
 						<span class="badge-item badge-item-expand"><%= notificationsCount %></span>
 					</span>

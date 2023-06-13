@@ -8,6 +8,74 @@ definition {
 		TestCase.setUpPortalInstance();
 	}
 
+	@priority = "5"
+	test DefaultPortalLandingPage {
+		property test.name.skip.portal.instance = "Login#DefaultPortalLandingPage";
+
+		User.firstLoginPG();
+
+		PortalSettings.gotoConfiguration(
+			configurationCategory = "Instance Configuration",
+			configurationName = "General",
+			configurationScope = "Virtual Instance Scope"
+		);
+
+		PortalSettings.editDefaultLandingPageCP(
+			defaultLandingPage = "/web/guest/landing"
+		);
+
+		ProductMenu.gotoPortlet(
+			category = "Sites",
+			panel = "Control Panel",
+			portlet = "Sites"
+		);
+
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
+
+		ProductMenu.gotoSite(site = "${siteName}");
+
+		ProductMenu.gotoPortlet(
+			category = "Site Builder",
+			panel = "Site Administration",
+			portlet = "Pages"
+		);
+
+		SitePages.addPublicPage(pageName = "landing");
+
+		User.logoutPG();
+
+		User.loginPG(password = "test", userEmailAddress = "test@liferay.com");
+
+		var portalURL = PropsUtil.get("portal.url");
+
+		AssertLocation(value1 = "${portalURL}/web/guest/landing");
+	}
+
+	@description = "This is a use case for LPS-39744."
+	@priority = "5"
+	test DefaultPortalLandingPageSetByProperty {
+		property custom.properties = "default.landing.page.path=/web/guest/landing";
+		property test.name.skip.portal.instance = "Login#DefaultPortalLandingPageSetByProperty";
+
+		User.firstLoginPG();
+
+		ProductMenu.gotoPortlet(
+			category = "Site Builder",
+			panel = "Site Administration",
+			portlet = "Pages"
+		);
+
+		SitePages.addPublicPage(pageName = "landing");
+
+		User.logoutPG();
+
+		User.loginPG(password = "test", userEmailAddress = "test@liferay.com");
+
+		var portalURL = PropsUtil.get("portal.url");
+
+		AssertLocation(value1 = "${portalURL}/web/guest/landing");
+	}
+
 	@priority = "4"
 	test FacebookSSOSmoke {
 		property dummy.socket.proxy.disabled = "true";
@@ -21,9 +89,11 @@ definition {
 
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
-		PortalSettings.gotoPortalSettings();
-
-		PortalSettingsNavigator.gotoFacebook();
+		PortalSettings.gotoConfiguration(
+			configurationCategory = "SSO",
+			configurationName = "Facebook Connect",
+			configurationScope = "Virtual Instance Scope"
+		);
 
 		PortalSettings.editConfigurationAuthenticationFacebook(
 			facebookApplicationID = "${facebookApplicationID}",
@@ -59,9 +129,11 @@ definition {
 
 		User.firstLoginPG();
 
-		PortalSettings.gotoPortalSettings();
-
-		PortalSettingsNavigator.gotoGoogle();
+		PortalSettings.gotoConfiguration(
+			configurationCategory = "SSO",
+			configurationName = "Google Authorization",
+			configurationScope = "Virtual Instance Scope"
+		);
 
 		PortalSettings.enableGoogleSSOCP(
 			googleClientID = "${googleClientID}",
@@ -90,7 +162,11 @@ definition {
 
 		User.firstLoginPG();
 
-		PortalSettings.gotoPortalSettings();
+		PortalSettings.gotoConfiguration(
+			configurationCategory = "Localization",
+			configurationName = "Languiage",
+			configurationScope = "Virtual Instance Scope"
+		);
 
 		PortalSettings.configureCurrentLanguagesCP(
 			currentPortalLanguages = "Spanish (Spain)"
@@ -128,9 +204,11 @@ definition {
 
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
-		PortalSettings.gotoPortalSettings();
-
-		PortalSettingsNavigator.gotoOpenIDConnect();
+		PortalSettings.gotoConfiguration(
+			configurationCategory = "SSO",
+			configurationName = "OpenID Connect",
+			configurationScope = "Virtual Instance Scope"
+		);
 
 		PortalSettings.enableOpenIDConnectCP();
 
@@ -164,9 +242,11 @@ definition {
 
 		User.firstLoginPG();
 
-		PortalSettings.gotoPortalSettings();
-
-		PortalSettingsNavigator.gotoOpenID();
+		PortalSettings.gotoConfiguration(
+			configurationCategory = "SSO",
+			configurationName = "OpenID",
+			configurationScope = "Virtual Instance Scope"
+		);
 
 		PortalSettings.enableOpenIDCP();
 
@@ -237,11 +317,13 @@ definition {
 
 		User.firstLoginPG();
 
-		PortalSettings.gotoPortalSettings();
-
 		Pause(locator1 = "30000");
 
-		PortalSettingsNavigator.gotoOpenSSO();
+		PortalSettings.gotoConfiguration(
+			configurationCategory = "SSO",
+			configurationName = "OpenSSO",
+			configurationScope = "Virtual Instance Scope"
+		);
 
 		PortalSettings.configureOpenSSO(
 			OpenSSOLoginURL = "http://test.able.com:8080/openam/UI/Login?goto=http://www.able.com:8080/c/portal/login",
@@ -249,7 +331,11 @@ definition {
 			OpenSSOServiceURL = "http://test.able.com:8080/openam"
 		);
 
-		PortalSettingsNavigator.gotoOpenSSO();
+		PortalSettings.gotoConfiguration(
+			configurationCategory = "SSO",
+			configurationName = "OpenSSO",
+			configurationScope = "Virtual Instance Scope"
+		);
 
 		PortalSettings.testOpenSSOConnection();
 
@@ -296,13 +382,9 @@ definition {
 	test ViewInstanceSettingsAuthentication {
 		User.firstLoginPG();
 
-		PortalSettings.gotoPortalSettings();
-
 		PortalSettings.viewAuthenticationGeneralCP();
 
 		PortalSettings.viewAuthenticationLDAPCP();
-
-		Navigator.gotoBack();
 
 		PortalSettings.viewAuthenticationOpenIDCP();
 

@@ -19,11 +19,10 @@ import com.liferay.headless.delivery.client.dto.v1_0.ContentStructureField;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import java.util.Collection;
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -52,26 +51,32 @@ public class ContentStructureSerDes {
 
 	public static String toJSON(ContentStructure contentStructure) {
 		if (contentStructure == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"availableLanguages\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (contentStructure.getAvailableLanguages() == null) {
-			sb.append("null");
-		}
-		else {
+		if (contentStructure.getAvailableLanguages() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"availableLanguages\":");
+
 			sb.append("[");
 
 			for (int i = 0; i < contentStructure.getAvailableLanguages().length;
 				 i++) {
 
 				sb.append("\"");
+
 				sb.append(contentStructure.getAvailableLanguages()[i]);
+
 				sb.append("\"");
 
 				if ((i + 1) < contentStructure.getAvailableLanguages().length) {
@@ -82,20 +87,21 @@ public class ContentStructureSerDes {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (contentStructure.getContentStructureFields() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"contentStructureFields\": ");
+			sb.append("\"contentStructureFields\":");
 
-		if (contentStructure.getContentStructureFields() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0;
 				 i < contentStructure.getContentStructureFields().length; i++) {
 
-				sb.append(contentStructure.getContentStructureFields()[i]);
+				sb.append(
+					ContentStructureFieldSerDes.toJSON(
+						contentStructure.getContentStructureFields()[i]));
 
 				if ((i + 1) <
 						contentStructure.getContentStructureFields().length) {
@@ -107,80 +113,93 @@ public class ContentStructureSerDes {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (contentStructure.getCreator() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"creator\": ");
+			sb.append("\"creator\":");
 
-		if (contentStructure.getCreator() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(contentStructure.getCreator());
-		}
-
-		sb.append(", ");
-
-		sb.append("\"dateCreated\": ");
-
-		if (contentStructure.getDateCreated() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(contentStructure.getDateCreated());
+			sb.append(CreatorSerDes.toJSON(contentStructure.getCreator()));
 		}
 
-		sb.append(", ");
+		if (contentStructure.getDateCreated() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dateModified\": ");
+			sb.append("\"dateCreated\":");
 
-		if (contentStructure.getDateModified() == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(
+				liferayToJSONDateFormat.format(
+					contentStructure.getDateCreated()));
+
+			sb.append("\"");
 		}
-		else {
-			sb.append(contentStructure.getDateModified());
+
+		if (contentStructure.getDateModified() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"dateModified\":");
+
+			sb.append("\"");
+
+			sb.append(
+				liferayToJSONDateFormat.format(
+					contentStructure.getDateModified()));
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (contentStructure.getDescription() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"description\": ");
+			sb.append("\"description\":");
 
-		if (contentStructure.getDescription() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(contentStructure.getDescription());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (contentStructure.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\":");
 
-		if (contentStructure.getId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(contentStructure.getId());
 		}
 
-		sb.append(", ");
+		if (contentStructure.getName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\":");
 
-		if (contentStructure.getName() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(contentStructure.getName());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (contentStructure.getSiteId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"siteId\": ");
+			sb.append("\"siteId\":");
 
-		if (contentStructure.getSiteId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(contentStructure.getSiteId());
 		}
 
@@ -189,41 +208,97 @@ public class ContentStructureSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(
-		Collection<ContentStructure> contentStructures) {
-
-		if (contentStructures == null) {
-			return "[]";
+	public static Map<String, String> toMap(ContentStructure contentStructure) {
+		if (contentStructure == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		for (ContentStructure contentStructure : contentStructures) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(contentStructure));
+		if (contentStructure.getAvailableLanguages() == null) {
+			map.put("availableLanguages", null);
+		}
+		else {
+			map.put(
+				"availableLanguages",
+				String.valueOf(contentStructure.getAvailableLanguages()));
 		}
 
-		sb.append("]");
+		if (contentStructure.getContentStructureFields() == null) {
+			map.put("contentStructureFields", null);
+		}
+		else {
+			map.put(
+				"contentStructureFields",
+				String.valueOf(contentStructure.getContentStructureFields()));
+		}
 
-		return sb.toString();
+		if (contentStructure.getCreator() == null) {
+			map.put("creator", null);
+		}
+		else {
+			map.put(
+				"creator", CreatorSerDes.toJSON(contentStructure.getCreator()));
+		}
+
+		map.put(
+			"dateCreated",
+			liferayToJSONDateFormat.format(contentStructure.getDateCreated()));
+
+		map.put(
+			"dateModified",
+			liferayToJSONDateFormat.format(contentStructure.getDateModified()));
+
+		if (contentStructure.getDescription() == null) {
+			map.put("description", null);
+		}
+		else {
+			map.put(
+				"description",
+				String.valueOf(contentStructure.getDescription()));
+		}
+
+		if (contentStructure.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(contentStructure.getId()));
+		}
+
+		if (contentStructure.getName() == null) {
+			map.put("name", null);
+		}
+		else {
+			map.put("name", String.valueOf(contentStructure.getName()));
+		}
+
+		if (contentStructure.getSiteId() == null) {
+			map.put("siteId", null);
+		}
+		else {
+			map.put("siteId", String.valueOf(contentStructure.getSiteId()));
+		}
+
+		return map;
 	}
 
 	private static class ContentStructureJSONParser
 		extends BaseJSONParser<ContentStructure> {
 
+		@Override
 		protected ContentStructure createDTO() {
 			return new ContentStructure();
 		}
 
+		@Override
 		protected ContentStructure[] createDTOArray(int size) {
 			return new ContentStructure[size];
 		}
 
+		@Override
 		protected void setField(
 			ContentStructure contentStructure, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
@@ -258,13 +333,13 @@ public class ContentStructureSerDes {
 			else if (Objects.equals(jsonParserFieldName, "dateCreated")) {
 				if (jsonParserFieldValue != null) {
 					contentStructure.setDateCreated(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dateModified")) {
 				if (jsonParserFieldValue != null) {
 					contentStructure.setDateModified(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "description")) {
@@ -293,18 +368,6 @@ public class ContentStructureSerDes {
 			else {
 				throw new IllegalArgumentException(
 					"Unsupported field name " + jsonParserFieldName);
-			}
-		}
-
-		private Date _toDate(String string) {
-			try {
-				DateFormat dateFormat = new SimpleDateFormat(
-					"yyyy-MM-dd'T'HH:mm:ss'Z'");
-
-				return dateFormat.parse(string);
-			}
-			catch (ParseException pe) {
-				throw new IllegalArgumentException("Unable to parse " + string);
 			}
 		}
 

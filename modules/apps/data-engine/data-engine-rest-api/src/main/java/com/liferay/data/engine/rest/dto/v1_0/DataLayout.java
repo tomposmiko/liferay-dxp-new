@@ -375,7 +375,9 @@ public class DataLayout {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(dateCreated);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -386,7 +388,9 @@ public class DataLayout {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(dateModified);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -397,7 +401,9 @@ public class DataLayout {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(defaultLanguageId);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -461,7 +467,9 @@ public class DataLayout {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(paginationMode);
+			sb.append("\"");
 		}
 
 		sb.append(", ");

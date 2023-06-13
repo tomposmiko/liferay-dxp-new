@@ -390,7 +390,9 @@ public class DataDefinition {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(dateCreated);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -401,7 +403,9 @@ public class DataDefinition {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(dateModified);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -476,7 +480,9 @@ public class DataDefinition {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(storageType);
+			sb.append("\"");
 		}
 
 		sb.append(", ");

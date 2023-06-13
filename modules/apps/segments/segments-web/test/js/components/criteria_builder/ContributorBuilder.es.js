@@ -146,11 +146,6 @@ const propertyGroups = [{
 		type: 'string'
 	},
 	{
-		label: 'Tree Path',
-		name: 'treePath',
-		type: 'string'
-	},
-	{
 		label: 'Type',
 		name: 'type',
 		type: 'string'
@@ -171,6 +166,7 @@ describe(
 				const {asFragment} = render(
 					<ContributorBuilder
 						editing={editing}
+						emptyContributors={false}
 						initialContributors={initialContributors}
 						propertyGroups={propertyGroups}
 						supportedConjunctions={SUPPORTED_CONJUNCTIONS}
@@ -193,6 +189,7 @@ describe(
 				const {asFragment} = render(
 					<ContributorBuilder
 						editing={editing}
+						emptyContributors={false}
 						initialContributors={initialContributors}
 						propertyGroups={propertyGroups}
 						supportedConjunctions={SUPPORTED_CONJUNCTIONS}

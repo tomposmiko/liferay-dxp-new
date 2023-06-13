@@ -17,7 +17,8 @@ package com.liferay.headless.form.client.serdes.v1_0;
 import com.liferay.headless.form.client.dto.v1_0.MediaForm;
 import com.liferay.headless.form.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -43,53 +44,63 @@ public class MediaFormSerDes {
 
 	public static String toJSON(MediaForm mediaForm) {
 		if (mediaForm == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"description\": ");
+		if (mediaForm.getDescription() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (mediaForm.getDescription() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"description\":");
+
+			sb.append("\"");
+
 			sb.append(mediaForm.getDescription());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (mediaForm.getFolderId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"folderId\": ");
+			sb.append("\"folderId\":");
 
-		if (mediaForm.getFolderId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(mediaForm.getFolderId());
 		}
 
-		sb.append(", ");
+		if (mediaForm.getName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\":");
 
-		if (mediaForm.getName() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(mediaForm.getName());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (mediaForm.getTitle() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"title\": ");
+			sb.append("\"title\":");
 
-		if (mediaForm.getTitle() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(mediaForm.getTitle());
+
+			sb.append("\"");
 		}
 
 		sb.append("}");
@@ -97,38 +108,57 @@ public class MediaFormSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<MediaForm> mediaForms) {
-		if (mediaForms == null) {
-			return "[]";
+	public static Map<String, String> toMap(MediaForm mediaForm) {
+		if (mediaForm == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (MediaForm mediaForm : mediaForms) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(mediaForm));
+		if (mediaForm.getDescription() == null) {
+			map.put("description", null);
+		}
+		else {
+			map.put("description", String.valueOf(mediaForm.getDescription()));
 		}
 
-		sb.append("]");
+		if (mediaForm.getFolderId() == null) {
+			map.put("folderId", null);
+		}
+		else {
+			map.put("folderId", String.valueOf(mediaForm.getFolderId()));
+		}
 
-		return sb.toString();
+		if (mediaForm.getName() == null) {
+			map.put("name", null);
+		}
+		else {
+			map.put("name", String.valueOf(mediaForm.getName()));
+		}
+
+		if (mediaForm.getTitle() == null) {
+			map.put("title", null);
+		}
+		else {
+			map.put("title", String.valueOf(mediaForm.getTitle()));
+		}
+
+		return map;
 	}
 
 	private static class MediaFormJSONParser extends BaseJSONParser<MediaForm> {
 
+		@Override
 		protected MediaForm createDTO() {
 			return new MediaForm();
 		}
 
+		@Override
 		protected MediaForm[] createDTOArray(int size) {
 			return new MediaForm[size];
 		}
 
+		@Override
 		protected void setField(
 			MediaForm mediaForm, String jsonParserFieldName,
 			Object jsonParserFieldValue) {

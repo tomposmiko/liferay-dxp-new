@@ -17,11 +17,11 @@ package com.liferay.bulk.rest.internal.graphql.mutation.v1_0;
 import com.liferay.bulk.rest.dto.v1_0.DocumentBulkSelection;
 import com.liferay.bulk.rest.dto.v1_0.Keyword;
 import com.liferay.bulk.rest.dto.v1_0.KeywordBulkSelection;
-import com.liferay.bulk.rest.dto.v1_0.MessageSelection;
+import com.liferay.bulk.rest.dto.v1_0.Selection;
 import com.liferay.bulk.rest.dto.v1_0.TaxonomyCategoryBulkSelection;
 import com.liferay.bulk.rest.dto.v1_0.TaxonomyVocabulary;
 import com.liferay.bulk.rest.resource.v1_0.KeywordResource;
-import com.liferay.bulk.rest.resource.v1_0.MessageSelectionResource;
+import com.liferay.bulk.rest.resource.v1_0.SelectionResource;
 import com.liferay.bulk.rest.resource.v1_0.TaxonomyCategoryResource;
 import com.liferay.bulk.rest.resource.v1_0.TaxonomyVocabularyResource;
 import com.liferay.petra.function.UnsafeConsumer;
@@ -37,8 +37,6 @@ import graphql.annotations.annotationTypes.GraphQLName;
 import java.util.Collection;
 
 import javax.annotation.Generated;
-
-import javax.ws.rs.core.Response;
 
 import org.osgi.service.component.ComponentServiceObjects;
 
@@ -57,12 +55,12 @@ public class Mutation {
 			keywordResourceComponentServiceObjects;
 	}
 
-	public static void setMessageSelectionResourceComponentServiceObjects(
-		ComponentServiceObjects<MessageSelectionResource>
-			messageSelectionResourceComponentServiceObjects) {
+	public static void setSelectionResourceComponentServiceObjects(
+		ComponentServiceObjects<SelectionResource>
+			selectionResourceComponentServiceObjects) {
 
-		_messageSelectionResourceComponentServiceObjects =
-			messageSelectionResourceComponentServiceObjects;
+		_selectionResourceComponentServiceObjects =
+			selectionResourceComponentServiceObjects;
 	}
 
 	public static void setTaxonomyCategoryResourceComponentServiceObjects(
@@ -82,12 +80,12 @@ public class Mutation {
 	}
 
 	@GraphQLInvokeDetached
-	public Response patchKeywordBatch(
+	public void patchKeywordBatch(
 			@GraphQLName("keywordBulkSelection") KeywordBulkSelection
 				keywordBulkSelection)
 		throws Exception {
 
-		return _applyComponentServiceObjects(
+		_applyVoidComponentServiceObjects(
 			_keywordResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			keywordResource -> keywordResource.patchKeywordBatch(
@@ -95,12 +93,12 @@ public class Mutation {
 	}
 
 	@GraphQLInvokeDetached
-	public Response putKeywordBatch(
+	public void putKeywordBatch(
 			@GraphQLName("keywordBulkSelection") KeywordBulkSelection
 				keywordBulkSelection)
 		throws Exception {
 
-		return _applyComponentServiceObjects(
+		_applyVoidComponentServiceObjects(
 			_keywordResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			keywordResource -> keywordResource.putKeywordBatch(
@@ -127,26 +125,25 @@ public class Mutation {
 
 	@GraphQLField
 	@GraphQLInvokeDetached
-	public MessageSelection postBulkSelection(
+	public Selection postBulkSelection(
 			@GraphQLName("documentBulkSelection") DocumentBulkSelection
 				documentBulkSelection)
 		throws Exception {
 
 		return _applyComponentServiceObjects(
-			_messageSelectionResourceComponentServiceObjects,
+			_selectionResourceComponentServiceObjects,
 			this::_populateResourceContext,
-			messageSelectionResource ->
-				messageSelectionResource.postBulkSelection(
-					documentBulkSelection));
+			selectionResource -> selectionResource.postBulkSelection(
+				documentBulkSelection));
 	}
 
 	@GraphQLInvokeDetached
-	public Response patchTaxonomyCategoryBatch(
+	public void patchTaxonomyCategoryBatch(
 			@GraphQLName("taxonomyCategoryBulkSelection")
 				TaxonomyCategoryBulkSelection taxonomyCategoryBulkSelection)
 		throws Exception {
 
-		return _applyComponentServiceObjects(
+		_applyVoidComponentServiceObjects(
 			_taxonomyCategoryResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			taxonomyCategoryResource ->
@@ -155,12 +152,12 @@ public class Mutation {
 	}
 
 	@GraphQLInvokeDetached
-	public Response putTaxonomyCategoryBatch(
+	public void putTaxonomyCategoryBatch(
 			@GraphQLName("taxonomyCategoryBulkSelection")
 				TaxonomyCategoryBulkSelection taxonomyCategoryBulkSelection)
 		throws Exception {
 
-		return _applyComponentServiceObjects(
+		_applyVoidComponentServiceObjects(
 			_taxonomyCategoryResourceComponentServiceObjects,
 			this::_populateResourceContext,
 			taxonomyCategoryResource ->
@@ -236,11 +233,10 @@ public class Mutation {
 				CompanyThreadLocal.getCompanyId()));
 	}
 
-	private void _populateResourceContext(
-			MessageSelectionResource messageSelectionResource)
+	private void _populateResourceContext(SelectionResource selectionResource)
 		throws Exception {
 
-		messageSelectionResource.setContextCompany(
+		selectionResource.setContextCompany(
 			CompanyLocalServiceUtil.getCompany(
 				CompanyThreadLocal.getCompanyId()));
 	}
@@ -265,8 +261,8 @@ public class Mutation {
 
 	private static ComponentServiceObjects<KeywordResource>
 		_keywordResourceComponentServiceObjects;
-	private static ComponentServiceObjects<MessageSelectionResource>
-		_messageSelectionResourceComponentServiceObjects;
+	private static ComponentServiceObjects<SelectionResource>
+		_selectionResourceComponentServiceObjects;
 	private static ComponentServiceObjects<TaxonomyCategoryResource>
 		_taxonomyCategoryResourceComponentServiceObjects;
 	private static ComponentServiceObjects<TaxonomyVocabularyResource>

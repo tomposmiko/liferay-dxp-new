@@ -15,13 +15,14 @@
 package com.liferay.headless.admin.user.client.serdes.v1_0;
 
 import com.liferay.headless.admin.user.client.dto.v1_0.ContactInformation;
-import com.liferay.headless.admin.user.client.dto.v1_0.Email;
+import com.liferay.headless.admin.user.client.dto.v1_0.EmailAddress;
 import com.liferay.headless.admin.user.client.dto.v1_0.Phone;
 import com.liferay.headless.admin.user.client.dto.v1_0.PostalAddress;
 import com.liferay.headless.admin.user.client.dto.v1_0.WebUrl;
 import com.liferay.headless.admin.user.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -50,25 +51,30 @@ public class ContactInformationSerDes {
 
 	public static String toJSON(ContactInformation contactInformation) {
 		if (contactInformation == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"emails\": ");
+		if (contactInformation.getEmailAddresses() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (contactInformation.getEmails() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"emailAddresses\":");
+
 			sb.append("[");
 
-			for (int i = 0; i < contactInformation.getEmails().length; i++) {
-				sb.append(contactInformation.getEmails()[i]);
+			for (int i = 0; i < contactInformation.getEmailAddresses().length;
+				 i++) {
 
-				if ((i + 1) < contactInformation.getEmails().length) {
+				sb.append(
+					EmailAddressSerDes.toJSON(
+						contactInformation.getEmailAddresses()[i]));
+
+				if ((i + 1) < contactInformation.getEmailAddresses().length) {
 					sb.append(", ");
 				}
 			}
@@ -76,53 +82,59 @@ public class ContactInformationSerDes {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (contactInformation.getFacebook() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"facebook\": ");
+			sb.append("\"facebook\":");
 
-		if (contactInformation.getFacebook() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(contactInformation.getFacebook());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (contactInformation.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\":");
 
-		if (contactInformation.getId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(contactInformation.getId());
 		}
 
-		sb.append(", ");
+		if (contactInformation.getJabber() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"jabber\": ");
+			sb.append("\"jabber\":");
 
-		if (contactInformation.getJabber() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(contactInformation.getJabber());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (contactInformation.getPostalAddresses() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"postalAddresses\": ");
+			sb.append("\"postalAddresses\":");
 
-		if (contactInformation.getPostalAddresses() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < contactInformation.getPostalAddresses().length;
 				 i++) {
 
-				sb.append(contactInformation.getPostalAddresses()[i]);
+				sb.append(
+					PostalAddressSerDes.toJSON(
+						contactInformation.getPostalAddresses()[i]));
 
 				if ((i + 1) < contactInformation.getPostalAddresses().length) {
 					sb.append(", ");
@@ -132,42 +144,48 @@ public class ContactInformationSerDes {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (contactInformation.getSkype() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"skype\": ");
+			sb.append("\"skype\":");
 
-		if (contactInformation.getSkype() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(contactInformation.getSkype());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (contactInformation.getSms() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"sms\": ");
+			sb.append("\"sms\":");
 
-		if (contactInformation.getSms() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(contactInformation.getSms());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (contactInformation.getTelephones() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"telephones\": ");
+			sb.append("\"telephones\":");
 
-		if (contactInformation.getTelephones() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < contactInformation.getTelephones().length;
 				 i++) {
 
-				sb.append(contactInformation.getTelephones()[i]);
+				sb.append(
+					PhoneSerDes.toJSON(contactInformation.getTelephones()[i]));
 
 				if ((i + 1) < contactInformation.getTelephones().length) {
 					sb.append(", ");
@@ -177,29 +195,32 @@ public class ContactInformationSerDes {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (contactInformation.getTwitter() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"twitter\": ");
+			sb.append("\"twitter\":");
 
-		if (contactInformation.getTwitter() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(contactInformation.getTwitter());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (contactInformation.getWebUrls() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"webUrls\": ");
+			sb.append("\"webUrls\":");
 
-		if (contactInformation.getWebUrls() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < contactInformation.getWebUrls().length; i++) {
-				sb.append(contactInformation.getWebUrls()[i]);
+				sb.append(
+					WebUrlSerDes.toJSON(contactInformation.getWebUrls()[i]));
 
 				if ((i + 1) < contactInformation.getWebUrls().length) {
 					sb.append(", ");
@@ -214,54 +235,122 @@ public class ContactInformationSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(
-		Collection<ContactInformation> contactInformations) {
+	public static Map<String, String> toMap(
+		ContactInformation contactInformation) {
 
-		if (contactInformations == null) {
-			return "[]";
+		if (contactInformation == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (ContactInformation contactInformation : contactInformations) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(contactInformation));
+		if (contactInformation.getEmailAddresses() == null) {
+			map.put("emailAddresses", null);
+		}
+		else {
+			map.put(
+				"emailAddresses",
+				String.valueOf(contactInformation.getEmailAddresses()));
 		}
 
-		sb.append("]");
+		if (contactInformation.getFacebook() == null) {
+			map.put("facebook", null);
+		}
+		else {
+			map.put(
+				"facebook", String.valueOf(contactInformation.getFacebook()));
+		}
 
-		return sb.toString();
+		if (contactInformation.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(contactInformation.getId()));
+		}
+
+		if (contactInformation.getJabber() == null) {
+			map.put("jabber", null);
+		}
+		else {
+			map.put("jabber", String.valueOf(contactInformation.getJabber()));
+		}
+
+		if (contactInformation.getPostalAddresses() == null) {
+			map.put("postalAddresses", null);
+		}
+		else {
+			map.put(
+				"postalAddresses",
+				String.valueOf(contactInformation.getPostalAddresses()));
+		}
+
+		if (contactInformation.getSkype() == null) {
+			map.put("skype", null);
+		}
+		else {
+			map.put("skype", String.valueOf(contactInformation.getSkype()));
+		}
+
+		if (contactInformation.getSms() == null) {
+			map.put("sms", null);
+		}
+		else {
+			map.put("sms", String.valueOf(contactInformation.getSms()));
+		}
+
+		if (contactInformation.getTelephones() == null) {
+			map.put("telephones", null);
+		}
+		else {
+			map.put(
+				"telephones",
+				String.valueOf(contactInformation.getTelephones()));
+		}
+
+		if (contactInformation.getTwitter() == null) {
+			map.put("twitter", null);
+		}
+		else {
+			map.put("twitter", String.valueOf(contactInformation.getTwitter()));
+		}
+
+		if (contactInformation.getWebUrls() == null) {
+			map.put("webUrls", null);
+		}
+		else {
+			map.put("webUrls", String.valueOf(contactInformation.getWebUrls()));
+		}
+
+		return map;
 	}
 
 	private static class ContactInformationJSONParser
 		extends BaseJSONParser<ContactInformation> {
 
+		@Override
 		protected ContactInformation createDTO() {
 			return new ContactInformation();
 		}
 
+		@Override
 		protected ContactInformation[] createDTOArray(int size) {
 			return new ContactInformation[size];
 		}
 
+		@Override
 		protected void setField(
 			ContactInformation contactInformation, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
 
-			if (Objects.equals(jsonParserFieldName, "emails")) {
+			if (Objects.equals(jsonParserFieldName, "emailAddresses")) {
 				if (jsonParserFieldValue != null) {
-					contactInformation.setEmails(
+					contactInformation.setEmailAddresses(
 						Stream.of(
 							toStrings((Object[])jsonParserFieldValue)
 						).map(
-							object -> EmailSerDes.toDTO((String)object)
+							object -> EmailAddressSerDes.toDTO((String)object)
 						).toArray(
-							size -> new Email[size]
+							size -> new EmailAddress[size]
 						));
 				}
 			}

@@ -15,7 +15,8 @@
 package com.liferay.headless.admin.user.resource.v1_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.headless.admin.user.dto.v1_0.UserAccount;
+import com.liferay.headless.admin.user.client.dto.v1_0.UserAccount;
+import com.liferay.headless.admin.user.client.pagination.Page;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.User;
@@ -85,7 +86,7 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 				additionalName = user.getMiddleName();
 				alternateName = user.getScreenName();
 				birthDate = user.getBirthday();
-				email = user.getEmailAddress();
+				emailAddress = user.getEmailAddress();
 				familyName = user.getFirstName();
 				givenName = user.getLastName();
 				id = user.getUserId();
@@ -151,7 +152,8 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 		Stream<EntityField> stream = entityFields.stream();
 
 		return stream.filter(
-			entityField -> !Objects.equals(entityField.getName(), "email")
+			entityField -> !Objects.equals(
+				entityField.getName(), "emailAddress")
 		).collect(
 			Collectors.toList()
 		);
@@ -161,7 +163,8 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 	protected UserAccount randomUserAccount() {
 		UserAccount userAccount = super.randomUserAccount();
 
-		userAccount.setEmail(userAccount.getEmail() + "@liferay.com");
+		userAccount.setEmailAddress(
+			userAccount.getEmailAddress() + "@liferay.com");
 
 		return userAccount;
 	}
@@ -227,7 +230,7 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 		User user = UserLocalServiceUtil.addUser(
 			UserConstants.USER_ID_DEFAULT, PortalUtil.getDefaultCompanyId(),
 			true, null, null, Validator.isNull(userAccount.getAlternateName()),
-			userAccount.getAlternateName(), userAccount.getEmail(), 0,
+			userAccount.getAlternateName(), userAccount.getEmailAddress(), 0,
 			StringPool.BLANK, LocaleUtil.getDefault(),
 			userAccount.getGivenName(), StringPool.BLANK,
 			userAccount.getFamilyName(), 0, 0, true, 1, 1, 1970,

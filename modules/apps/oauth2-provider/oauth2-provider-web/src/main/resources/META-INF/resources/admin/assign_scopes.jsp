@@ -22,14 +22,6 @@ String redirect = ParamUtil.getString(request, "redirect");
 OAuth2Application oAuth2Application = oAuth2AdminPortletDisplayContext.getOAuth2Application();
 
 AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayContext)oAuth2AdminPortletDisplayContext;
-
-List<String> assignedScopes = Collections.emptyList();
-
-if (oAuth2Application.getOAuth2ApplicationScopeAliasesId() > 0) {
-	OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases = OAuth2ApplicationScopeAliasesLocalServiceUtil.getOAuth2ApplicationScopeAliases(oAuth2Application.getOAuth2ApplicationScopeAliasesId());
-
-	assignedScopes = oAuth2ApplicationScopeAliases.getScopeAliasesList();
-}
 %>
 
 <div class="container-fluid container-fluid-max-xl container-view">
@@ -125,21 +117,21 @@ if (oAuth2Application.getOAuth2ApplicationScopeAliasesId() > 0) {
 
 					var scopeAliases = currentTarget.attr("data-slave").split(" ");
 
-					var globalAccordionPanel = document.querySelector('#<portlet:namespace />globalAccordion .panel');
-
-					if (globalAccordionPanel) {
-						globalAccordionPanel.classList.add('hide');
-					}
+					document.querySelectorAll('#<portlet:namespace />globalAccordion .panel').forEach(
+						function(globalAccordionPanel) {
+							globalAccordionPanel.classList.add('hide');
+						}
+					);
 
 					for (var i = 0; i < scopeAliases.length; i++) {
 						document.querySelectorAll('#<portlet:namespace />globalAccordion .panel[data-master]').forEach(
-							function(globalAccordianPanel) {
-								var masterScopeAliases = globalAccordianPanel.getAttribute("data-master");
+							function(globalAccordionPanel) {
+								var masterScopeAliases = globalAccordionPanel.getAttribute("data-master");
 
 								var array = masterScopeAliases.split(" ");
 
 								if (array.indexOf(scopeAliases[i]) >= 0) {
-									globalAccordianPanel.classList.remove('hide');
+									globalAccordionPanel.classList.remove('hide');
 								}
 							});
 					}
@@ -158,11 +150,11 @@ if (oAuth2Application.getOAuth2ApplicationScopeAliasesId() > 0) {
 						function() {
 							modal.hide();
 
-							var globalAccordionPanel = document.querySelector('#<portlet:namespace />globalAccordion .panel');
-
-							if (globalAccordionPanel) {
-								globalAccordionPanel.classList.remove('hide');
-							}
+							document.querySelectorAll('#<portlet:namespace />globalAccordion .panel').forEach(
+								function(globalAccordionPanel) {
+									globalAccordionPanel.classList.remove('hide');
+								}
+							);
 
 							var globalAccordion = document.getElementById('<portlet:namespace />globalAccordion');
 							var navGlobalScopes = document.getElementById('<portlet:namespace />navGlobalScopes');

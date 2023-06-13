@@ -17,7 +17,8 @@ package com.liferay.headless.delivery.client.serdes.v1_0;
 import com.liferay.headless.delivery.client.dto.v1_0.AggregateRating;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -45,52 +46,50 @@ public class AggregateRatingSerDes {
 
 	public static String toJSON(AggregateRating aggregateRating) {
 		if (aggregateRating == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"bestRating\": ");
+		if (aggregateRating.getBestRating() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (aggregateRating.getBestRating() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"bestRating\":");
+
 			sb.append(aggregateRating.getBestRating());
 		}
 
-		sb.append(", ");
+		if (aggregateRating.getRatingCount() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"ratingCount\": ");
+			sb.append("\"ratingCount\":");
 
-		if (aggregateRating.getRatingCount() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(aggregateRating.getRatingCount());
 		}
 
-		sb.append(", ");
+		if (aggregateRating.getRatingValue() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"ratingValue\": ");
+			sb.append("\"ratingValue\":");
 
-		if (aggregateRating.getRatingValue() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(aggregateRating.getRatingValue());
 		}
 
-		sb.append(", ");
+		if (aggregateRating.getWorstRating() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"worstRating\": ");
+			sb.append("\"worstRating\":");
 
-		if (aggregateRating.getWorstRating() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(aggregateRating.getWorstRating());
 		}
 
@@ -99,64 +98,90 @@ public class AggregateRatingSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<AggregateRating> aggregateRatings) {
-		if (aggregateRatings == null) {
-			return "[]";
+	public static Map<String, String> toMap(AggregateRating aggregateRating) {
+		if (aggregateRating == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (AggregateRating aggregateRating : aggregateRatings) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(aggregateRating));
+		if (aggregateRating.getBestRating() == null) {
+			map.put("bestRating", null);
+		}
+		else {
+			map.put(
+				"bestRating", String.valueOf(aggregateRating.getBestRating()));
 		}
 
-		sb.append("]");
+		if (aggregateRating.getRatingCount() == null) {
+			map.put("ratingCount", null);
+		}
+		else {
+			map.put(
+				"ratingCount",
+				String.valueOf(aggregateRating.getRatingCount()));
+		}
 
-		return sb.toString();
+		if (aggregateRating.getRatingValue() == null) {
+			map.put("ratingValue", null);
+		}
+		else {
+			map.put(
+				"ratingValue",
+				String.valueOf(aggregateRating.getRatingValue()));
+		}
+
+		if (aggregateRating.getWorstRating() == null) {
+			map.put("worstRating", null);
+		}
+		else {
+			map.put(
+				"worstRating",
+				String.valueOf(aggregateRating.getWorstRating()));
+		}
+
+		return map;
 	}
 
 	private static class AggregateRatingJSONParser
 		extends BaseJSONParser<AggregateRating> {
 
+		@Override
 		protected AggregateRating createDTO() {
 			return new AggregateRating();
 		}
 
+		@Override
 		protected AggregateRating[] createDTOArray(int size) {
 			return new AggregateRating[size];
 		}
 
+		@Override
 		protected void setField(
 			AggregateRating aggregateRating, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
 
 			if (Objects.equals(jsonParserFieldName, "bestRating")) {
 				if (jsonParserFieldValue != null) {
-					aggregateRating.setBestRating((Number)jsonParserFieldValue);
+					aggregateRating.setBestRating((Double)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "ratingCount")) {
 				if (jsonParserFieldValue != null) {
 					aggregateRating.setRatingCount(
-						(Number)jsonParserFieldValue);
+						Integer.valueOf((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "ratingValue")) {
 				if (jsonParserFieldValue != null) {
 					aggregateRating.setRatingValue(
-						(Number)jsonParserFieldValue);
+						(Double)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "worstRating")) {
 				if (jsonParserFieldValue != null) {
 					aggregateRating.setWorstRating(
-						(Number)jsonParserFieldValue);
+						(Double)jsonParserFieldValue);
 				}
 			}
 			else {

@@ -33,23 +33,25 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * @author Marcela Cunha
  */
-public class CaptchaFieldType extends FieldType {
+public class CaptchaFieldType extends BaseFieldType {
 
-	public void includeContext(
-		Map<String, Object> context, DataDefinitionField dataDefinitionField,
+	public CaptchaFieldType(
+		DataDefinitionField dataDefinitionField,
 		HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse, boolean readOnly,
+		HttpServletResponse httpServletResponse,
 		SoyDataFactory soyDataFactory) {
 
-		super.includeContext(
-			context, dataDefinitionField, httpServletRequest,
-			httpServletResponse, readOnly);
+		super(
+			dataDefinitionField, httpServletRequest, httpServletResponse,
+			soyDataFactory);
+	}
 
+	@Override
+	protected void addContext(Map<String, Object> context) {
 		String html = StringPool.BLANK;
 
 		try {
-			html = _renderCaptchaTag(
-				dataDefinitionField, httpServletRequest, httpServletResponse);
+			html = _renderCaptchaTag();
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -58,12 +60,7 @@ public class CaptchaFieldType extends FieldType {
 		context.put("html", soyDataFactory.createSoyHTMLData(html));
 	}
 
-	private String _renderCaptchaTag(
-			DataDefinitionField dataDefinitionField,
-			HttpServletRequest httpServletRequest,
-			HttpServletResponse httpServletResponse)
-		throws Exception {
-
+	private String _renderCaptchaTag() throws Exception {
 		UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
 
 		CaptchaTag captchaTag = new CaptchaTag() {

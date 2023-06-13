@@ -1,11 +1,11 @@
 import {CREATE_SEGMENTS_EXPERIENCE, DELETE_SEGMENTS_EXPERIENCE, EDIT_SEGMENTS_EXPERIENCE, SELECT_SEGMENTS_EXPERIENCE, UPDATE_SEGMENTS_EXPERIENCE_PRIORITY} from '../actions/actions.es';
 import {deepClone} from '../utils/FragmentsEditorGetUtils.es';
 import {setIn} from '../utils/FragmentsEditorUpdateUtils.es';
-import {updatePageEditorLayoutData} from '../utils/FragmentsEditorFetchUtils.es';
+import {removeExperience, updatePageEditorLayoutData} from '../utils/FragmentsEditorFetchUtils.es';
+import {getRowFragmentEntryLinkIds} from '../utils/FragmentsEditorGetUtils.es';
+import {containsFragmentEntryLinkId} from '../utils/LayoutDataList.es';
 
 const CREATE_SEGMENTS_EXPERIENCE_URL = '/segments.segmentsexperience/add-segments-experience';
-
-const DELETE_SEGMENTS_EXPERIENCE_URL = '/segments.segmentsexperience/delete-segments-experience';
 
 const EDIT_SEGMENTS_EXPERIENCE_URL = '/segments.segmentsexperience/update-segments-experience';
 
@@ -294,24 +294,40 @@ function deleteSegmentsExperienceReducer(state, actionType, payload) {
 				if (actionType === DELETE_SEGMENTS_EXPERIENCE) {
 					const {segmentsExperienceId} = payload;
 
-					Liferay.Service(
-						DELETE_SEGMENTS_EXPERIENCE_URL,
-						{
+					const fragmentEntryLinkIds = nextState.layoutData.structure.reduce(
+						(allFragmentEntryLinkIds, row) => [
+							...allFragmentEntryLinkIds,
+							...getRowFragmentEntryLinkIds(row)
+						],
+						[]
+					).filter(
+						fragmentEntryLinkId => !containsFragmentEntryLinkId(
+							nextState.layoutDataList,
+							fragmentEntryLinkId,
 							segmentsExperienceId
-						},
-						response => {
-							const priority = response.priority;
+						)
+					);
 
-							let availableSegmentsExperiences = Object.assign(
+					removeExperience(
+						segmentsExperienceId,
+						fragmentEntryLinkIds
+					).then(
+						() => {
+							const priority = nextState.availableSegmentsExperiences[segmentsExperienceId].priority;
+
+							const availableSegmentsExperiences = Object.assign(
 								{},
 								nextState.availableSegmentsExperiences
 							);
 
-							delete availableSegmentsExperiences[response.segmentsExperienceId];
-							const experienceIdToSelect = (segmentsExperienceId === nextState.segmentsExperienceId) ? nextState.defaultSegmentsExperienceId : nextState.segmentsExperienceId;
+							delete availableSegmentsExperiences[segmentsExperienceId];
 
-							Object.entries(availableSegmentsExperiences).forEach(
-								([key, experience]) => {
+							const experienceIdToSelect = segmentsExperienceId === nextState.segmentsExperienceId ?
+								nextState.defaultSegmentsExperienceId :
+								nextState.segmentsExperienceId;
+
+							Object.values(availableSegmentsExperiences).forEach(
+								experience => {
 									const segmentExperiencePriority = experience.priority;
 
 									if (segmentExperiencePriority > priority) {
@@ -319,8 +335,16 @@ function deleteSegmentsExperienceReducer(state, actionType, payload) {
 									}
 								}
 							);
-							nextState = _switchLayoutDataToDefault(nextState);
-							nextState = _removeLayoutDataItem(nextState, segmentsExperienceId);
+
+							nextState = _removeLayoutDataItem(
+								nextState,
+								segmentsExperienceId
+							);
+
+							nextState = _switchLayoutDataToDefault(
+								nextState
+							);
+
 							nextState = setIn(
 								nextState,
 								['availableSegmentsExperiences'],

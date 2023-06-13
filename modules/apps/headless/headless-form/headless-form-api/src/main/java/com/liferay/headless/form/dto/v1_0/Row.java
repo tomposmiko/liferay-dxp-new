@@ -163,7 +163,9 @@ public class Row {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(label);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -174,7 +176,9 @@ public class Row {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(value);
+			sb.append("\"");
 		}
 
 		sb.append("}");

@@ -13,6 +13,8 @@ import handleFieldClicked from './handlers/fieldClickedHandler.es';
 import handleFieldDeleted from './handlers/fieldDeletedHandler.es';
 import handleFieldDuplicated from './handlers/fieldDuplicatedHandler.es';
 import handleFieldEdited from './handlers/fieldEditedHandler.es';
+import handleFieldSetAdded from './handlers/fieldSetAddedHandler.es';
+import handleLanguageIdDeleted from './handlers/languageIdDeletedHandler.es';
 
 /**
  * LayoutProvider listens to your children's events to
@@ -204,7 +206,9 @@ class LayoutProvider extends Component {
 			fieldDuplicated: this._handleFieldDuplicated.bind(this),
 			fieldEdited: this._handleFieldEdited.bind(this),
 			fieldMoved: this._handleFieldMoved.bind(this),
+			fieldSetAdded: this._handleFieldSetAdded.bind(this),
 			focusedFieldUpdated: this._handleFocusedFieldUpdated.bind(this),
+			languageIdDeleted: this._handleLanguageIdDeleted.bind(this),
 			pageAdded: this._handlePageAdded.bind(this),
 			pageDeleted: this._handlePageDeleted.bind(this),
 			pageReset: this._handlePageReset.bind(this),
@@ -443,9 +447,9 @@ class LayoutProvider extends Component {
 	}
 
 	_handleFieldEdited(properties) {
-		const {editingLanguageId} = this.props;
+		const {defaultLanguageId, editingLanguageId} = this.props;
 
-		this.setState(handleFieldEdited(this.state, editingLanguageId, properties));
+		this.setState(handleFieldEdited(this.state, defaultLanguageId, editingLanguageId, properties));
 	}
 
 	_handleFieldMoved({addedToPlaceholder, target, source}) {
@@ -487,6 +491,10 @@ class LayoutProvider extends Component {
 		);
 	}
 
+	_handleFieldSetAdded(event) {
+		this.setState(handleFieldSetAdded(this.props, this.state, event));
+	}
+
 	_handleFocusedFieldUpdated(focusedField) {
 		const {columnIndex, pageIndex, rowIndex} = focusedField;
 		const {pages} = this.state;
@@ -505,6 +513,12 @@ class LayoutProvider extends Component {
 				)
 			}
 		);
+	}
+
+	_handleLanguageIdDeleted({locale}) {
+		const {focusedField, pages} = this.state;
+
+		this.setState(handleLanguageIdDeleted(focusedField, pages, locale));
 	}
 
 	_handlePageAdded() {

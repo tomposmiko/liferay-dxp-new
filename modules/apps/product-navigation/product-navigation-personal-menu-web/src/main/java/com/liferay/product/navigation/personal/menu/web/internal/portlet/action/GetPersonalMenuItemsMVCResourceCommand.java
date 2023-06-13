@@ -159,7 +159,7 @@ public class GetPersonalMenuItemsMVCResourceCommand
 		return jsonArray;
 	}
 
-	private JSONArray _getPersonalMenuEntriesAsJSONArray(
+	private JSONArray _getPersonalMenuEntriesJSONArray(
 			PortletRequest portletRequest,
 			List<PersonalMenuEntry> personalMenuEntries)
 		throws PortalException {
@@ -194,6 +194,7 @@ public class GetPersonalMenuItemsMVCResourceCommand
 				_log.error(pe, pe);
 			}
 
+			jsonObject.put("icon", personalMenuEntry.getIcon(portletRequest));
 			jsonObject.put(
 				"label", personalMenuEntry.getLabel(themeDisplay.getLocale()));
 
@@ -241,10 +242,15 @@ public class GetPersonalMenuItemsMVCResourceCommand
 		for (int i = 0; i < groupedPersonalMenuEntries.size(); i++) {
 			JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
-			jsonObject.put(
-				"items",
-				_getPersonalMenuEntriesAsJSONArray(
-					portletRequest, groupedPersonalMenuEntries.get(i)));
+			JSONArray personalMenuEntriesJSONArray =
+				_getPersonalMenuEntriesJSONArray(
+					portletRequest, groupedPersonalMenuEntries.get(i));
+
+			if (personalMenuEntriesJSONArray.length() == 0) {
+				continue;
+			}
+
+			jsonObject.put("items", personalMenuEntriesJSONArray);
 
 			if (i < (groupedPersonalMenuEntries.size() - 1)) {
 				jsonObject.put("separator", true);

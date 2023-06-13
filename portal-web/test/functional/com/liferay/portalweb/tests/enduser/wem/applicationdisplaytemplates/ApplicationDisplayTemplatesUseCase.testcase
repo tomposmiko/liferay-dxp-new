@@ -209,7 +209,8 @@ definition {
 		Navigator.gotoSitePage(pageName = "ADT Test Page", siteName = "Test Site Name");
 
 		AssetPublisherPortlet.configureDisplaySettings(
-			displaySettings = "Comments,Comment Ratings,Flags,Print,Ratings,Related Assets"
+			displaySettings = "Comments,Comment Ratings,Flags,Print,Ratings,Related Assets",
+			enableSocialBookmarkSites = "Facebook,LinkedIn,Twitter,AddThis,Delicious,Digg,Evernote,Reddit,Slashdot"
 		);
 
 		Navigator.gotoSitePage(pageName = "ADT Test Page", siteName = "Test Site Name");

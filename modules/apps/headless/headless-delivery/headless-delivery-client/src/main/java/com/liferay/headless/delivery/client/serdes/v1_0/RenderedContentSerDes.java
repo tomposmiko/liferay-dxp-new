@@ -17,7 +17,8 @@ package com.liferay.headless.delivery.client.serdes.v1_0;
 import com.liferay.headless.delivery.client.dto.v1_0.RenderedContent;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -45,31 +46,39 @@ public class RenderedContentSerDes {
 
 	public static String toJSON(RenderedContent renderedContent) {
 		if (renderedContent == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"renderedContentURL\": ");
+		if (renderedContent.getRenderedContentURL() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (renderedContent.getRenderedContentURL() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"renderedContentURL\":");
+
+			sb.append("\"");
+
 			sb.append(renderedContent.getRenderedContentURL());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (renderedContent.getTemplateName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"templateName\": ");
+			sb.append("\"templateName\":");
 
-		if (renderedContent.getTemplateName() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(renderedContent.getTemplateName());
+
+			sb.append("\"");
 		}
 
 		sb.append("}");
@@ -77,39 +86,48 @@ public class RenderedContentSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<RenderedContent> renderedContents) {
-		if (renderedContents == null) {
-			return "[]";
+	public static Map<String, String> toMap(RenderedContent renderedContent) {
+		if (renderedContent == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (RenderedContent renderedContent : renderedContents) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(renderedContent));
+		if (renderedContent.getRenderedContentURL() == null) {
+			map.put("renderedContentURL", null);
+		}
+		else {
+			map.put(
+				"renderedContentURL",
+				String.valueOf(renderedContent.getRenderedContentURL()));
 		}
 
-		sb.append("]");
+		if (renderedContent.getTemplateName() == null) {
+			map.put("templateName", null);
+		}
+		else {
+			map.put(
+				"templateName",
+				String.valueOf(renderedContent.getTemplateName()));
+		}
 
-		return sb.toString();
+		return map;
 	}
 
 	private static class RenderedContentJSONParser
 		extends BaseJSONParser<RenderedContent> {
 
+		@Override
 		protected RenderedContent createDTO() {
 			return new RenderedContent();
 		}
 
+		@Override
 		protected RenderedContent[] createDTOArray(int size) {
 			return new RenderedContent[size];
 		}
 
+		@Override
 		protected void setField(
 			RenderedContent renderedContent, String jsonParserFieldName,
 			Object jsonParserFieldValue) {

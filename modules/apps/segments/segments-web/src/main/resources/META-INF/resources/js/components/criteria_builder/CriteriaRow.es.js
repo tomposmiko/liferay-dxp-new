@@ -445,7 +445,6 @@ class CriteriaRow extends Component {
 
 							<ClayButton
 								borderless
-								className="duplicate-button"
 								iconName="paste"
 								monospaced
 								onClick={this._handleDuplicate}
@@ -453,7 +452,7 @@ class CriteriaRow extends Component {
 
 							<ClayButton
 								borderless
-								iconName="trash"
+								iconName="times-circle"
 								monospaced
 								onClick={this._handleDelete}
 							/>

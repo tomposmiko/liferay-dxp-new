@@ -23,7 +23,6 @@ import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.util.DLUtil;
 import com.liferay.document.library.util.DLURLHelper;
-import com.liferay.dynamic.data.mapping.exception.NoSuchTemplateException;
 import com.liferay.dynamic.data.mapping.exception.StructureDefinitionException;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
@@ -2281,8 +2280,11 @@ public class JournalArticleLocalServiceImpl
 			ThemeDisplay themeDisplay)
 		throws PortalException {
 
+		JournalArticle article = fetchDisplayArticle(groupId, articleId);
+
 		return getArticleContent(
-			groupId, articleId, viewMode, null, languageId, null, themeDisplay);
+			groupId, articleId, viewMode, article.getDDMTemplateKey(),
+			languageId, null, themeDisplay);
 	}
 
 	@Override
@@ -2464,9 +2466,11 @@ public class JournalArticleLocalServiceImpl
 			ThemeDisplay themeDisplay)
 		throws PortalException {
 
+		JournalArticle article = getDisplayArticle(groupId, articleId);
+
 		return getArticleDisplay(
-			groupId, articleId, null, viewMode, languageId, page,
-			portletRequestModel, themeDisplay);
+			groupId, articleId, article.getDDMTemplateKey(), viewMode,
+			languageId, page, portletRequestModel, themeDisplay);
 	}
 
 	/**
@@ -2556,8 +2560,11 @@ public class JournalArticleLocalServiceImpl
 			ThemeDisplay themeDisplay)
 		throws PortalException {
 
+		JournalArticle article = getDisplayArticle(groupId, articleId);
+
 		return getArticleDisplay(
-			groupId, articleId, null, viewMode, languageId, themeDisplay);
+			groupId, articleId, article.getDDMTemplateKey(), viewMode,
+			languageId, themeDisplay);
 	}
 
 	@Override
@@ -3866,8 +3873,9 @@ public class JournalArticleLocalServiceImpl
 
 		try {
 			getArticleDisplay(
-				article, null, Constants.VIEW, article.getDefaultLanguageId(),
-				0, portletRequestModel, themeDisplay, true);
+				article, article.getDDMTemplateKey(), Constants.VIEW,
+				article.getDefaultLanguageId(), 0, portletRequestModel,
+				themeDisplay, true);
 		}
 		catch (Exception e) {
 			return false;
@@ -7647,12 +7655,6 @@ public class JournalArticleLocalServiceImpl
 
 		tokens.put("structure_id", article.getDDMStructureKey());
 
-		String defaultDDMTemplateKey = article.getDDMTemplateKey();
-
-		if (Validator.isNull(ddmTemplateKey)) {
-			ddmTemplateKey = defaultDDMTemplateKey;
-		}
-
 		Document document = article.getDocument();
 
 		document = document.clone();
@@ -7728,14 +7730,12 @@ public class JournalArticleLocalServiceImpl
 			// one. If the specified template does not exist, use the default
 			// one. If the default one does not exist, throw an exception.
 
-			DDMTemplate ddmTemplate = null;
+			DDMTemplate ddmTemplate = ddmTemplateLocalService.fetchTemplate(
+				PortalUtil.getSiteGroupId(article.getGroupId()),
+				classNameLocalService.getClassNameId(DDMStructure.class),
+				ddmTemplateKey, true);
 
-			try {
-				ddmTemplate = ddmTemplateLocalService.getTemplate(
-					PortalUtil.getSiteGroupId(article.getGroupId()),
-					classNameLocalService.getClassNameId(DDMStructure.class),
-					ddmTemplateKey, true);
-
+			if (ddmTemplate != null) {
 				Group companyGroup = groupLocalService.getCompanyGroup(
 					article.getCompanyId());
 
@@ -7743,15 +7743,6 @@ public class JournalArticleLocalServiceImpl
 					tokens.put(
 						"company_group_id",
 						String.valueOf(companyGroup.getGroupId()));
-				}
-			}
-			catch (NoSuchTemplateException nste) {
-				if (!defaultDDMTemplateKey.equals(ddmTemplateKey)) {
-					ddmTemplate = ddmTemplateLocalService.fetchTemplate(
-						PortalUtil.getSiteGroupId(article.getGroupId()),
-						classNameLocalService.getClassNameId(
-							DDMStructure.class),
-						defaultDDMTemplateKey);
 				}
 			}
 
@@ -8149,7 +8140,7 @@ public class JournalArticleLocalServiceImpl
 				serviceContext.getLiferayPortletResponse());
 
 			JournalArticleDisplay articleDisplay = getArticleDisplay(
-				article, null, Constants.VIEW,
+				article, article.getDDMTemplateKey(), Constants.VIEW,
 				LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault()), 1,
 				portletRequestModel, serviceContext.getThemeDisplay());
 

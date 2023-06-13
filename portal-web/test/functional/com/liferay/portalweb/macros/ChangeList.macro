@@ -25,12 +25,7 @@ definition {
 			locator1 = "ChangeListSettings#CHANGE_LISTS_TOGGLE_SWITCH"
 		);
 
-		if (isSet(gotoOverview)) {
-			Click(locator1 = "ChangeListSettings#SAVE_AND_GO_TO_OVERVIEW_BUTTON");
-		}
-		else {
-			Click(locator1 = "Button#SAVE");
-		}
+		Click(locator1 = "Button#SAVE");
 
 		Alert.viewSuccessMessage();
 	}
@@ -65,6 +60,10 @@ definition {
 			locator1 = "ChangeList#OVERVIEW_PAGE_TITLE",
 			value1 = "History"
 		);
+
+		Pause(locator1 = "5000");
+
+		Refresh();
 
 		var key_changeListName = "${changeListName}";
 

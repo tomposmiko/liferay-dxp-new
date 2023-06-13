@@ -18,10 +18,8 @@ import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalServiceUtil;
-import com.liferay.dynamic.data.mapping.service.DDMTemplateServiceUtil;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.storage.Fields;
-import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.constants.JournalWebKeys;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalArticleConstants;
@@ -31,7 +29,6 @@ import com.liferay.journal.service.JournalFolderLocalServiceUtil;
 import com.liferay.journal.util.JournalConverter;
 import com.liferay.journal.web.internal.security.permission.resource.JournalArticlePermission;
 import com.liferay.journal.web.internal.security.permission.resource.JournalFolderPermission;
-import com.liferay.journal.web.util.JournalUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.bean.BeanParamUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -53,7 +50,6 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,7 +60,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
 import javax.portlet.RenderResponse;
 
@@ -264,14 +259,21 @@ public class JournalEditArticleDisplayContext {
 		return _ddmStructureKey;
 	}
 
-	public DDMTemplate getDDMTemplate() throws PortalException {
+	public DDMTemplate getDDMTemplate() {
 		long ddmTemplateId = ParamUtil.getLong(_request, "ddmTemplateId");
+
+		if (ddmTemplateId == -1) {
+			return null;
+		}
 
 		if (ddmTemplateId > 0) {
 			_ddmTemplate = DDMTemplateLocalServiceUtil.fetchDDMTemplate(
 				ddmTemplateId);
+
+			return _ddmTemplate;
 		}
-		else if (Validator.isNotNull(getDDMTemplateKey())) {
+
+		if (Validator.isNotNull(getDDMTemplateKey())) {
 			long groupId = ParamUtil.getLong(
 				_request, "groupId", _themeDisplay.getSiteGroupId());
 
@@ -282,25 +284,11 @@ public class JournalEditArticleDisplayContext {
 			_ddmTemplate = DDMTemplateLocalServiceUtil.fetchTemplate(
 				groupId, PortalUtil.getClassNameId(DDMStructure.class),
 				getDDMTemplateKey(), true);
+
+			return _ddmTemplate;
 		}
 
-		if (_ddmTemplate == null) {
-			DDMStructure ddmStructure = getDDMStructure();
-
-			List<DDMTemplate> ddmTemplates =
-				DDMTemplateServiceUtil.getTemplates(
-					_themeDisplay.getCompanyId(), ddmStructure.getGroupId(),
-					PortalUtil.getClassNameId(DDMStructure.class),
-					ddmStructure.getStructureId(),
-					PortalUtil.getClassNameId(JournalArticle.class), true,
-					WorkflowConstants.STATUS_APPROVED);
-
-			if (!ddmTemplates.isEmpty()) {
-				_ddmTemplate = ddmTemplates.get(0);
-			}
-		}
-
-		return _ddmTemplate;
+		return null;
 	}
 
 	public String getDDMTemplateKey() {
@@ -409,37 +397,6 @@ public class JournalEditArticleDisplayContext {
 		_portletResource = ParamUtil.getString(_request, "portletResource");
 
 		return _portletResource;
-	}
-
-	public String getPreviewContentURL() throws Exception {
-		PortletURL previewContentURL =
-			_liferayPortletResponse.createLiferayPortletURL(
-				JournalUtil.getPreviewPlid(_article, _themeDisplay),
-				JournalPortletKeys.JOURNAL, PortletRequest.RENDER_PHASE);
-
-		previewContentURL.setParameter(
-			"mvcPath", "/preview_article_content.jsp");
-
-		if (_article == null) {
-			return previewContentURL.toString();
-		}
-
-		previewContentURL.setParameter(
-			"groupId", String.valueOf(_article.getGroupId()));
-		previewContentURL.setParameter(
-			"articleId", String.valueOf(_article.getVersion()));
-
-		String ddmTemplateKey = _article.getDDMTemplateKey();
-
-		DDMTemplate ddmTemplate = getDDMTemplate();
-
-		if (ddmTemplate != null) {
-			ddmTemplateKey = ddmTemplate.getTemplateKey();
-		}
-
-		previewContentURL.setParameter("ddmTemplateKey", ddmTemplateKey);
-
-		return previewContentURL.toString();
 	}
 
 	public String getPublishButtonLabel() throws PortalException {

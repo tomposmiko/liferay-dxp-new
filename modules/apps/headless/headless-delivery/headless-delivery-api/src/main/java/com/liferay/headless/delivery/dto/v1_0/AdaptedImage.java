@@ -24,6 +24,8 @@ import com.liferay.petra.string.StringBundler;
 import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -40,6 +42,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "AdaptedImage")
 public class AdaptedImage {
 
+	@Schema(description = "An absolute URL to the image.")
 	public String getContentUrl() {
 		return contentUrl;
 	}
@@ -67,17 +70,18 @@ public class AdaptedImage {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String contentUrl;
 
-	public Number getHeight() {
+	@Schema(description = "The height of the image.")
+	public Integer getHeight() {
 		return height;
 	}
 
-	public void setHeight(Number height) {
+	public void setHeight(Integer height) {
 		this.height = height;
 	}
 
 	@JsonIgnore
 	public void setHeight(
-		UnsafeSupplier<Number, Exception> heightUnsafeSupplier) {
+		UnsafeSupplier<Integer, Exception> heightUnsafeSupplier) {
 
 		try {
 			height = heightUnsafeSupplier.get();
@@ -92,8 +96,9 @@ public class AdaptedImage {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Number height;
+	protected Integer height;
 
+	@Schema(description = "A descriptive name of this version.")
 	public String getResolutionName() {
 		return resolutionName;
 	}
@@ -121,17 +126,18 @@ public class AdaptedImage {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String resolutionName;
 
-	public Number getSizeInBytes() {
+	@Schema(description = "The size in bytes of the image.")
+	public Long getSizeInBytes() {
 		return sizeInBytes;
 	}
 
-	public void setSizeInBytes(Number sizeInBytes) {
+	public void setSizeInBytes(Long sizeInBytes) {
 		this.sizeInBytes = sizeInBytes;
 	}
 
 	@JsonIgnore
 	public void setSizeInBytes(
-		UnsafeSupplier<Number, Exception> sizeInBytesUnsafeSupplier) {
+		UnsafeSupplier<Long, Exception> sizeInBytesUnsafeSupplier) {
 
 		try {
 			sizeInBytes = sizeInBytesUnsafeSupplier.get();
@@ -146,19 +152,20 @@ public class AdaptedImage {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Number sizeInBytes;
+	protected Long sizeInBytes;
 
-	public Number getWidth() {
+	@Schema(description = "The width of the image.")
+	public Integer getWidth() {
 		return width;
 	}
 
-	public void setWidth(Number width) {
+	public void setWidth(Integer width) {
 		this.width = width;
 	}
 
 	@JsonIgnore
 	public void setWidth(
-		UnsafeSupplier<Number, Exception> widthUnsafeSupplier) {
+		UnsafeSupplier<Integer, Exception> widthUnsafeSupplier) {
 
 		try {
 			width = widthUnsafeSupplier.get();
@@ -173,7 +180,7 @@ public class AdaptedImage {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Number width;
+	protected Integer width;
 
 	@Override
 	public boolean equals(Object object) {
@@ -208,7 +215,9 @@ public class AdaptedImage {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(contentUrl);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -230,7 +239,9 @@ public class AdaptedImage {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(resolutionName);
+			sb.append("\"");
 		}
 
 		sb.append(", ");

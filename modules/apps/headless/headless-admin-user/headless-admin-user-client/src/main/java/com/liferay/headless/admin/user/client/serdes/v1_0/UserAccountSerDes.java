@@ -21,11 +21,10 @@ import com.liferay.headless.admin.user.client.dto.v1_0.UserAccount;
 import com.liferay.headless.admin.user.client.json.BaseJSONParser;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import java.util.Collection;
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -54,189 +53,237 @@ public class UserAccountSerDes {
 
 	public static String toJSON(UserAccount userAccount) {
 		if (userAccount == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"additionalName\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (userAccount.getAdditionalName() == null) {
-			sb.append("null");
-		}
-		else {
+		if (userAccount.getAdditionalName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"additionalName\":");
+
+			sb.append("\"");
+
 			sb.append(userAccount.getAdditionalName());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (userAccount.getAlternateName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"alternateName\": ");
+			sb.append("\"alternateName\":");
 
-		if (userAccount.getAlternateName() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(userAccount.getAlternateName());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (userAccount.getBirthDate() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"birthDate\": ");
+			sb.append("\"birthDate\":");
 
-		if (userAccount.getBirthDate() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(userAccount.getBirthDate());
-		}
+			sb.append("\"");
 
-		sb.append(", ");
+			sb.append(
+				liferayToJSONDateFormat.format(userAccount.getBirthDate()));
 
-		sb.append("\"contactInformation\": ");
-
-		if (userAccount.getContactInformation() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(userAccount.getContactInformation());
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (userAccount.getContactInformation() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dashboardURL\": ");
+			sb.append("\"contactInformation\":");
 
-		if (userAccount.getDashboardURL() == null) {
-			sb.append("null");
+			sb.append(
+				ContactInformationSerDes.toJSON(
+					userAccount.getContactInformation()));
 		}
-		else {
+
+		if (userAccount.getDashboardURL() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"dashboardURL\":");
+
+			sb.append("\"");
+
 			sb.append(userAccount.getDashboardURL());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (userAccount.getDateCreated() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dateCreated\": ");
+			sb.append("\"dateCreated\":");
 
-		if (userAccount.getDateCreated() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(userAccount.getDateCreated());
-		}
+			sb.append("\"");
 
-		sb.append(", ");
+			sb.append(
+				liferayToJSONDateFormat.format(userAccount.getDateCreated()));
 
-		sb.append("\"dateModified\": ");
-
-		if (userAccount.getDateModified() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(userAccount.getDateModified());
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (userAccount.getDateModified() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"email\": ");
+			sb.append("\"dateModified\":");
 
-		if (userAccount.getEmail() == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(
+				liferayToJSONDateFormat.format(userAccount.getDateModified()));
+
+			sb.append("\"");
 		}
-		else {
-			sb.append(userAccount.getEmail());
+
+		if (userAccount.getEmailAddress() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"emailAddress\":");
+
+			sb.append("\"");
+
+			sb.append(userAccount.getEmailAddress());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (userAccount.getFamilyName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"familyName\": ");
+			sb.append("\"familyName\":");
 
-		if (userAccount.getFamilyName() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(userAccount.getFamilyName());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (userAccount.getGivenName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"givenName\": ");
+			sb.append("\"givenName\":");
 
-		if (userAccount.getGivenName() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(userAccount.getGivenName());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (userAccount.getHonorificPrefix() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"honorificPrefix\": ");
+			sb.append("\"honorificPrefix\":");
 
-		if (userAccount.getHonorificPrefix() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(userAccount.getHonorificPrefix());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (userAccount.getHonorificSuffix() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"honorificSuffix\": ");
+			sb.append("\"honorificSuffix\":");
 
-		if (userAccount.getHonorificSuffix() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(userAccount.getHonorificSuffix());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (userAccount.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\":");
 
-		if (userAccount.getId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(userAccount.getId());
 		}
 
-		sb.append(", ");
+		if (userAccount.getImage() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"image\": ");
+			sb.append("\"image\":");
 
-		if (userAccount.getImage() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(userAccount.getImage());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (userAccount.getJobTitle() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"jobTitle\": ");
+			sb.append("\"jobTitle\":");
 
-		if (userAccount.getJobTitle() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(userAccount.getJobTitle());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (userAccount.getKeywords() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"keywords\": ");
+			sb.append("\"keywords\":");
 
-		if (userAccount.getKeywords() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < userAccount.getKeywords().length; i++) {
 				sb.append("\"");
+
 				sb.append(userAccount.getKeywords()[i]);
+
 				sb.append("\"");
 
 				if ((i + 1) < userAccount.getKeywords().length) {
@@ -247,31 +294,35 @@ public class UserAccountSerDes {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (userAccount.getName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\":");
 
-		if (userAccount.getName() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(userAccount.getName());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (userAccount.getOrganizationBriefs() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"organizationBriefs\": ");
+			sb.append("\"organizationBriefs\":");
 
-		if (userAccount.getOrganizationBriefs() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < userAccount.getOrganizationBriefs().length;
 				 i++) {
 
-				sb.append(userAccount.getOrganizationBriefs()[i]);
+				sb.append(
+					OrganizationBriefSerDes.toJSON(
+						userAccount.getOrganizationBriefs()[i]));
 
 				if ((i + 1) < userAccount.getOrganizationBriefs().length) {
 					sb.append(", ");
@@ -281,29 +332,32 @@ public class UserAccountSerDes {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (userAccount.getProfileURL() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"profileURL\": ");
+			sb.append("\"profileURL\":");
 
-		if (userAccount.getProfileURL() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(userAccount.getProfileURL());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (userAccount.getRoleBriefs() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"roleBriefs\": ");
+			sb.append("\"roleBriefs\":");
 
-		if (userAccount.getRoleBriefs() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < userAccount.getRoleBriefs().length; i++) {
-				sb.append(userAccount.getRoleBriefs()[i]);
+				sb.append(
+					RoleBriefSerDes.toJSON(userAccount.getRoleBriefs()[i]));
 
 				if ((i + 1) < userAccount.getRoleBriefs().length) {
 					sb.append(", ");
@@ -313,18 +367,18 @@ public class UserAccountSerDes {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (userAccount.getSiteBriefs() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"siteBriefs\": ");
+			sb.append("\"siteBriefs\":");
 
-		if (userAccount.getSiteBriefs() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < userAccount.getSiteBriefs().length; i++) {
-				sb.append(userAccount.getSiteBriefs()[i]);
+				sb.append(
+					SiteBriefSerDes.toJSON(userAccount.getSiteBriefs()[i]));
 
 				if ((i + 1) < userAccount.getSiteBriefs().length) {
 					sb.append(", ");
@@ -339,39 +393,186 @@ public class UserAccountSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<UserAccount> userAccounts) {
-		if (userAccounts == null) {
-			return "[]";
+	public static Map<String, String> toMap(UserAccount userAccount) {
+		if (userAccount == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		for (UserAccount userAccount : userAccounts) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(userAccount));
+		if (userAccount.getAdditionalName() == null) {
+			map.put("additionalName", null);
+		}
+		else {
+			map.put(
+				"additionalName",
+				String.valueOf(userAccount.getAdditionalName()));
 		}
 
-		sb.append("]");
+		if (userAccount.getAlternateName() == null) {
+			map.put("alternateName", null);
+		}
+		else {
+			map.put(
+				"alternateName",
+				String.valueOf(userAccount.getAlternateName()));
+		}
 
-		return sb.toString();
+		map.put(
+			"birthDate",
+			liferayToJSONDateFormat.format(userAccount.getBirthDate()));
+
+		if (userAccount.getContactInformation() == null) {
+			map.put("contactInformation", null);
+		}
+		else {
+			map.put(
+				"contactInformation",
+				ContactInformationSerDes.toJSON(
+					userAccount.getContactInformation()));
+		}
+
+		if (userAccount.getDashboardURL() == null) {
+			map.put("dashboardURL", null);
+		}
+		else {
+			map.put(
+				"dashboardURL", String.valueOf(userAccount.getDashboardURL()));
+		}
+
+		map.put(
+			"dateCreated",
+			liferayToJSONDateFormat.format(userAccount.getDateCreated()));
+
+		map.put(
+			"dateModified",
+			liferayToJSONDateFormat.format(userAccount.getDateModified()));
+
+		if (userAccount.getEmailAddress() == null) {
+			map.put("emailAddress", null);
+		}
+		else {
+			map.put(
+				"emailAddress", String.valueOf(userAccount.getEmailAddress()));
+		}
+
+		if (userAccount.getFamilyName() == null) {
+			map.put("familyName", null);
+		}
+		else {
+			map.put("familyName", String.valueOf(userAccount.getFamilyName()));
+		}
+
+		if (userAccount.getGivenName() == null) {
+			map.put("givenName", null);
+		}
+		else {
+			map.put("givenName", String.valueOf(userAccount.getGivenName()));
+		}
+
+		if (userAccount.getHonorificPrefix() == null) {
+			map.put("honorificPrefix", null);
+		}
+		else {
+			map.put(
+				"honorificPrefix",
+				String.valueOf(userAccount.getHonorificPrefix()));
+		}
+
+		if (userAccount.getHonorificSuffix() == null) {
+			map.put("honorificSuffix", null);
+		}
+		else {
+			map.put(
+				"honorificSuffix",
+				String.valueOf(userAccount.getHonorificSuffix()));
+		}
+
+		if (userAccount.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(userAccount.getId()));
+		}
+
+		if (userAccount.getImage() == null) {
+			map.put("image", null);
+		}
+		else {
+			map.put("image", String.valueOf(userAccount.getImage()));
+		}
+
+		if (userAccount.getJobTitle() == null) {
+			map.put("jobTitle", null);
+		}
+		else {
+			map.put("jobTitle", String.valueOf(userAccount.getJobTitle()));
+		}
+
+		if (userAccount.getKeywords() == null) {
+			map.put("keywords", null);
+		}
+		else {
+			map.put("keywords", String.valueOf(userAccount.getKeywords()));
+		}
+
+		if (userAccount.getName() == null) {
+			map.put("name", null);
+		}
+		else {
+			map.put("name", String.valueOf(userAccount.getName()));
+		}
+
+		if (userAccount.getOrganizationBriefs() == null) {
+			map.put("organizationBriefs", null);
+		}
+		else {
+			map.put(
+				"organizationBriefs",
+				String.valueOf(userAccount.getOrganizationBriefs()));
+		}
+
+		if (userAccount.getProfileURL() == null) {
+			map.put("profileURL", null);
+		}
+		else {
+			map.put("profileURL", String.valueOf(userAccount.getProfileURL()));
+		}
+
+		if (userAccount.getRoleBriefs() == null) {
+			map.put("roleBriefs", null);
+		}
+		else {
+			map.put("roleBriefs", String.valueOf(userAccount.getRoleBriefs()));
+		}
+
+		if (userAccount.getSiteBriefs() == null) {
+			map.put("siteBriefs", null);
+		}
+		else {
+			map.put("siteBriefs", String.valueOf(userAccount.getSiteBriefs()));
+		}
+
+		return map;
 	}
 
 	private static class UserAccountJSONParser
 		extends BaseJSONParser<UserAccount> {
 
+		@Override
 		protected UserAccount createDTO() {
 			return new UserAccount();
 		}
 
+		@Override
 		protected UserAccount[] createDTOArray(int size) {
 			return new UserAccount[size];
 		}
 
+		@Override
 		protected void setField(
 			UserAccount userAccount, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
@@ -389,7 +590,7 @@ public class UserAccountSerDes {
 			else if (Objects.equals(jsonParserFieldName, "birthDate")) {
 				if (jsonParserFieldValue != null) {
 					userAccount.setBirthDate(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(
@@ -409,18 +610,18 @@ public class UserAccountSerDes {
 			else if (Objects.equals(jsonParserFieldName, "dateCreated")) {
 				if (jsonParserFieldValue != null) {
 					userAccount.setDateCreated(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dateModified")) {
 				if (jsonParserFieldValue != null) {
 					userAccount.setDateModified(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
-			else if (Objects.equals(jsonParserFieldName, "email")) {
+			else if (Objects.equals(jsonParserFieldName, "emailAddress")) {
 				if (jsonParserFieldValue != null) {
-					userAccount.setEmail((String)jsonParserFieldValue);
+					userAccount.setEmailAddress((String)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "familyName")) {
@@ -519,18 +720,6 @@ public class UserAccountSerDes {
 			else {
 				throw new IllegalArgumentException(
 					"Unsupported field name " + jsonParserFieldName);
-			}
-		}
-
-		private Date _toDate(String string) {
-			try {
-				DateFormat dateFormat = new SimpleDateFormat(
-					"yyyy-MM-dd'T'HH:mm:ss'Z'");
-
-				return dateFormat.parse(string);
-			}
-			catch (ParseException pe) {
-				throw new IllegalArgumentException("Unable to parse " + string);
 			}
 		}
 

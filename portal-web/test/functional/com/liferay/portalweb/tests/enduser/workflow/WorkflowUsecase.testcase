@@ -1017,7 +1017,7 @@ definition {
 
 		LexiconEntry.gotoEllipsisMenuItem(menuItem = "Approve");
 
-		Workflow.confirmWorkflowAction();
+		Alert.viewSuccessMessage();
 
 		Navigator.gotoPage(pageName = "Blogs Page");
 

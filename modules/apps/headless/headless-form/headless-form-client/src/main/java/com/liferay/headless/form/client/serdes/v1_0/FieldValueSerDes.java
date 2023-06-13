@@ -17,7 +17,8 @@ package com.liferay.headless.form.client.serdes.v1_0;
 import com.liferay.headless.form.client.dto.v1_0.FieldValue;
 import com.liferay.headless.form.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -43,64 +44,69 @@ public class FieldValueSerDes {
 
 	public static String toJSON(FieldValue fieldValue) {
 		if (fieldValue == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"document\": ");
+		if (fieldValue.getDocument() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (fieldValue.getDocument() == null) {
-			sb.append("null");
+			sb.append("\"document\":");
+
+			sb.append(FormDocumentSerDes.toJSON(fieldValue.getDocument()));
 		}
-		else {
-			sb.append(fieldValue.getDocument());
-		}
 
-		sb.append(", ");
+		if (fieldValue.getDocumentId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"documentId\": ");
+			sb.append("\"documentId\":");
 
-		if (fieldValue.getDocumentId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(fieldValue.getDocumentId());
 		}
 
-		sb.append(", ");
+		if (fieldValue.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\":");
 
-		if (fieldValue.getId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(fieldValue.getId());
 		}
 
-		sb.append(", ");
+		if (fieldValue.getName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\":");
 
-		if (fieldValue.getName() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(fieldValue.getName());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (fieldValue.getValue() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"value\": ");
+			sb.append("\"value\":");
 
-		if (fieldValue.getValue() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(fieldValue.getValue());
+
+			sb.append("\"");
 		}
 
 		sb.append("}");
@@ -108,39 +114,67 @@ public class FieldValueSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<FieldValue> fieldValues) {
-		if (fieldValues == null) {
-			return "[]";
+	public static Map<String, String> toMap(FieldValue fieldValue) {
+		if (fieldValue == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (FieldValue fieldValue : fieldValues) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(fieldValue));
+		if (fieldValue.getDocument() == null) {
+			map.put("document", null);
+		}
+		else {
+			map.put(
+				"document",
+				FormDocumentSerDes.toJSON(fieldValue.getDocument()));
 		}
 
-		sb.append("]");
+		if (fieldValue.getDocumentId() == null) {
+			map.put("documentId", null);
+		}
+		else {
+			map.put("documentId", String.valueOf(fieldValue.getDocumentId()));
+		}
 
-		return sb.toString();
+		if (fieldValue.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(fieldValue.getId()));
+		}
+
+		if (fieldValue.getName() == null) {
+			map.put("name", null);
+		}
+		else {
+			map.put("name", String.valueOf(fieldValue.getName()));
+		}
+
+		if (fieldValue.getValue() == null) {
+			map.put("value", null);
+		}
+		else {
+			map.put("value", String.valueOf(fieldValue.getValue()));
+		}
+
+		return map;
 	}
 
 	private static class FieldValueJSONParser
 		extends BaseJSONParser<FieldValue> {
 
+		@Override
 		protected FieldValue createDTO() {
 			return new FieldValue();
 		}
 
+		@Override
 		protected FieldValue[] createDTOArray(int size) {
 			return new FieldValue[size];
 		}
 
+		@Override
 		protected void setField(
 			FieldValue fieldValue, String jsonParserFieldName,
 			Object jsonParserFieldValue) {

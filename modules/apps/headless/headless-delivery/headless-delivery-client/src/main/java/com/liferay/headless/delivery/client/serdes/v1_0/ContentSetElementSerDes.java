@@ -17,7 +17,8 @@ package com.liferay.headless.delivery.client.serdes.v1_0;
 import com.liferay.headless.delivery.client.dto.v1_0.ContentSetElement;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -45,53 +46,59 @@ public class ContentSetElementSerDes {
 
 	public static String toJSON(ContentSetElement contentSetElement) {
 		if (contentSetElement == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"content\": ");
+		if (contentSetElement.getContent() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (contentSetElement.getContent() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"content\":");
+
 			sb.append(contentSetElement.getContent());
 		}
 
-		sb.append(", ");
+		if (contentSetElement.getContentType() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"contentType\": ");
+			sb.append("\"contentType\":");
 
-		if (contentSetElement.getContentType() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(contentSetElement.getContentType());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (contentSetElement.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\":");
 
-		if (contentSetElement.getId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(contentSetElement.getId());
 		}
 
-		sb.append(", ");
+		if (contentSetElement.getTitle() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"title\": ");
+			sb.append("\"title\":");
 
-		if (contentSetElement.getTitle() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(contentSetElement.getTitle());
+
+			sb.append("\"");
 		}
 
 		sb.append("}");
@@ -99,41 +106,62 @@ public class ContentSetElementSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(
-		Collection<ContentSetElement> contentSetElements) {
+	public static Map<String, String> toMap(
+		ContentSetElement contentSetElement) {
 
-		if (contentSetElements == null) {
-			return "[]";
+		if (contentSetElement == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (ContentSetElement contentSetElement : contentSetElements) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(contentSetElement));
+		if (contentSetElement.getContent() == null) {
+			map.put("content", null);
+		}
+		else {
+			map.put("content", String.valueOf(contentSetElement.getContent()));
 		}
 
-		sb.append("]");
+		if (contentSetElement.getContentType() == null) {
+			map.put("contentType", null);
+		}
+		else {
+			map.put(
+				"contentType",
+				String.valueOf(contentSetElement.getContentType()));
+		}
 
-		return sb.toString();
+		if (contentSetElement.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(contentSetElement.getId()));
+		}
+
+		if (contentSetElement.getTitle() == null) {
+			map.put("title", null);
+		}
+		else {
+			map.put("title", String.valueOf(contentSetElement.getTitle()));
+		}
+
+		return map;
 	}
 
 	private static class ContentSetElementJSONParser
 		extends BaseJSONParser<ContentSetElement> {
 
+		@Override
 		protected ContentSetElement createDTO() {
 			return new ContentSetElement();
 		}
 
+		@Override
 		protected ContentSetElement[] createDTOArray(int size) {
 			return new ContentSetElement[size];
 		}
 
+		@Override
 		protected void setField(
 			ContentSetElement contentSetElement, String jsonParserFieldName,
 			Object jsonParserFieldValue) {

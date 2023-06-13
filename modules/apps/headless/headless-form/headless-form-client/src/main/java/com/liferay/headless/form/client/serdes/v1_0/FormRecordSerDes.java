@@ -19,11 +19,10 @@ import com.liferay.headless.form.client.dto.v1_0.FormRecord;
 import com.liferay.headless.form.client.json.BaseJSONParser;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import java.util.Collection;
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -50,78 +49,93 @@ public class FormRecordSerDes {
 
 	public static String toJSON(FormRecord formRecord) {
 		if (formRecord == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"creator\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (formRecord.getCreator() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(formRecord.getCreator());
-		}
+		if (formRecord.getCreator() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append(", ");
+			sb.append("\"creator\":");
 
-		sb.append("\"dateCreated\": ");
-
-		if (formRecord.getDateCreated() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(formRecord.getDateCreated());
+			sb.append(CreatorSerDes.toJSON(formRecord.getCreator()));
 		}
 
-		sb.append(", ");
+		if (formRecord.getDateCreated() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dateModified\": ");
+			sb.append("\"dateCreated\":");
 
-		if (formRecord.getDateModified() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(formRecord.getDateModified());
-		}
+			sb.append("\"");
 
-		sb.append(", ");
+			sb.append(
+				liferayToJSONDateFormat.format(formRecord.getDateCreated()));
 
-		sb.append("\"datePublished\": ");
-
-		if (formRecord.getDatePublished() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(formRecord.getDatePublished());
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (formRecord.getDateModified() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"draft\": ");
+			sb.append("\"dateModified\":");
 
-		if (formRecord.getDraft() == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(
+				liferayToJSONDateFormat.format(formRecord.getDateModified()));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (formRecord.getDatePublished() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"datePublished\":");
+
+			sb.append("\"");
+
+			sb.append(
+				liferayToJSONDateFormat.format(formRecord.getDatePublished()));
+
+			sb.append("\"");
+		}
+
+		if (formRecord.getDraft() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"draft\":");
+
 			sb.append(formRecord.getDraft());
 		}
 
-		sb.append(", ");
+		if (formRecord.getFieldValues() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"fieldValues\": ");
+			sb.append("\"fieldValues\":");
 
-		if (formRecord.getFieldValues() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < formRecord.getFieldValues().length; i++) {
-				sb.append(formRecord.getFieldValues()[i]);
+				sb.append(
+					FieldValueSerDes.toJSON(formRecord.getFieldValues()[i]));
 
 				if ((i + 1) < formRecord.getFieldValues().length) {
 					sb.append(", ");
@@ -131,36 +145,33 @@ public class FormRecordSerDes {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (formRecord.getForm() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"form\": ");
+			sb.append("\"form\":");
 
-		if (formRecord.getForm() == null) {
-			sb.append("null");
+			sb.append(FormSerDes.toJSON(formRecord.getForm()));
 		}
-		else {
-			sb.append(formRecord.getForm());
-		}
 
-		sb.append(", ");
+		if (formRecord.getFormId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"formId\": ");
+			sb.append("\"formId\":");
 
-		if (formRecord.getFormId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(formRecord.getFormId());
 		}
 
-		sb.append(", ");
+		if (formRecord.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\":");
 
-		if (formRecord.getId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(formRecord.getId());
 		}
 
@@ -169,39 +180,87 @@ public class FormRecordSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<FormRecord> formRecords) {
-		if (formRecords == null) {
-			return "[]";
+	public static Map<String, String> toMap(FormRecord formRecord) {
+		if (formRecord == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		for (FormRecord formRecord : formRecords) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(formRecord));
+		if (formRecord.getCreator() == null) {
+			map.put("creator", null);
+		}
+		else {
+			map.put("creator", CreatorSerDes.toJSON(formRecord.getCreator()));
 		}
 
-		sb.append("]");
+		map.put(
+			"dateCreated",
+			liferayToJSONDateFormat.format(formRecord.getDateCreated()));
 
-		return sb.toString();
+		map.put(
+			"dateModified",
+			liferayToJSONDateFormat.format(formRecord.getDateModified()));
+
+		map.put(
+			"datePublished",
+			liferayToJSONDateFormat.format(formRecord.getDatePublished()));
+
+		if (formRecord.getDraft() == null) {
+			map.put("draft", null);
+		}
+		else {
+			map.put("draft", String.valueOf(formRecord.getDraft()));
+		}
+
+		if (formRecord.getFieldValues() == null) {
+			map.put("fieldValues", null);
+		}
+		else {
+			map.put("fieldValues", String.valueOf(formRecord.getFieldValues()));
+		}
+
+		if (formRecord.getForm() == null) {
+			map.put("form", null);
+		}
+		else {
+			map.put("form", FormSerDes.toJSON(formRecord.getForm()));
+		}
+
+		if (formRecord.getFormId() == null) {
+			map.put("formId", null);
+		}
+		else {
+			map.put("formId", String.valueOf(formRecord.getFormId()));
+		}
+
+		if (formRecord.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(formRecord.getId()));
+		}
+
+		return map;
 	}
 
 	private static class FormRecordJSONParser
 		extends BaseJSONParser<FormRecord> {
 
+		@Override
 		protected FormRecord createDTO() {
 			return new FormRecord();
 		}
 
+		@Override
 		protected FormRecord[] createDTOArray(int size) {
 			return new FormRecord[size];
 		}
 
+		@Override
 		protected void setField(
 			FormRecord formRecord, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
@@ -215,19 +274,19 @@ public class FormRecordSerDes {
 			else if (Objects.equals(jsonParserFieldName, "dateCreated")) {
 				if (jsonParserFieldValue != null) {
 					formRecord.setDateCreated(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dateModified")) {
 				if (jsonParserFieldValue != null) {
 					formRecord.setDateModified(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "datePublished")) {
 				if (jsonParserFieldValue != null) {
 					formRecord.setDatePublished(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "draft")) {
@@ -268,18 +327,6 @@ public class FormRecordSerDes {
 			else {
 				throw new IllegalArgumentException(
 					"Unsupported field name " + jsonParserFieldName);
-			}
-		}
-
-		private Date _toDate(String string) {
-			try {
-				DateFormat dateFormat = new SimpleDateFormat(
-					"yyyy-MM-dd'T'HH:mm:ss'Z'");
-
-				return dateFormat.parse(string);
-			}
-			catch (ParseException pe) {
-				throw new IllegalArgumentException("Unable to parse " + string);
 			}
 		}
 

@@ -16,6 +16,7 @@ package com.liferay.layout.content.page.editor.web.internal.portlet.action;
 
 import com.liferay.asset.service.AssetEntryUsageLocalService;
 import com.liferay.fragment.model.FragmentEntryLink;
+import com.liferay.fragment.processor.PortletRegistry;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
@@ -31,19 +32,18 @@ import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
-import com.liferay.portal.kernel.service.PortletPreferencesLocalService;
+import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionConfig;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.segments.constants.SegmentsConstants;
-import com.liferay.segments.service.SegmentsExperienceLocalService;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import javax.portlet.ActionRequest;
@@ -103,16 +103,28 @@ public class DeleteFragmentEntryLinkMVCActionCommand
 				String instanceId = jsonObject.getString(
 					"instanceId", StringPool.BLANK);
 
-				_portletPreferencesLocalService.deletePortletPreferences(
-					PortletKeys.PREFS_OWNER_ID_DEFAULT,
-					PortletKeys.PREFS_OWNER_TYPE_LAYOUT, themeDisplay.getPlid(),
-					PortletIdCodec.encode(portletId, instanceId));
+				_portletLocalService.deletePortlet(
+					themeDisplay.getCompanyId(),
+					PortletIdCodec.encode(portletId, instanceId),
+					themeDisplay.getPlid());
 
 				_assetEntryUsageLocalService.deleteAssetEntryUsages(
 					_portal.getClassNameId(Portlet.class),
 					PortletIdCodec.encode(portletId, instanceId),
 					themeDisplay.getPlid());
 			}
+		}
+
+		List<String> portletIds =
+			_portletRegistry.getFragmentEntryLinkPortletIds(fragmentEntryLink);
+
+		for (String portletId : portletIds) {
+			_portletLocalService.deletePortlet(
+				themeDisplay.getCompanyId(), portletId, themeDisplay.getPlid());
+
+			_assetEntryUsageLocalService.deleteAssetEntryUsages(
+				_portal.getClassNameId(Portlet.class), portletId,
+				themeDisplay.getPlid());
 		}
 
 		_assetEntryUsageLocalService.deleteAssetEntryUsages(
@@ -174,10 +186,10 @@ public class DeleteFragmentEntryLinkMVCActionCommand
 	private Portal _portal;
 
 	@Reference
-	private PortletPreferencesLocalService _portletPreferencesLocalService;
+	private PortletLocalService _portletLocalService;
 
 	@Reference
-	private SegmentsExperienceLocalService _segmentsExperienceLocalService;
+	private PortletRegistry _portletRegistry;
 
 	private class DeleteFragmentEntryLinkCallable
 		implements Callable<FragmentEntryLink> {

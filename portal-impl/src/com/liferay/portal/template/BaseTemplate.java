@@ -15,10 +15,13 @@
 package com.liferay.portal.template;
 
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
 import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.template.TemplateException;
 import com.liferay.portal.kernel.template.TemplateResource;
+import com.liferay.portal.kernel.template.TemplateResourceCache;
+import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.Writer;
 
@@ -26,6 +29,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -35,15 +39,19 @@ import javax.servlet.http.HttpServletRequest;
 public abstract class BaseTemplate implements Template {
 
 	public BaseTemplate(
-		TemplateResource errorTemplateResource, Map<String, Object> context,
+		TemplateResource templateResource, Map<String, Object> context,
 		TemplateContextHelper templateContextHelper) {
+
+		if (templateResource == null) {
+			throw new IllegalArgumentException("Template resource is null");
+		}
 
 		if (templateContextHelper == null) {
 			throw new IllegalArgumentException(
 				"Template context helper is null");
 		}
 
-		this.errorTemplateResource = errorTemplateResource;
+		_templateResource = templateResource;
 
 		this.context = new HashMap<>();
 
@@ -86,22 +94,6 @@ public abstract class BaseTemplate implements Template {
 	}
 
 	@Override
-	public Object get(String key) {
-		if (key == null) {
-			return null;
-		}
-
-		return context.get(key);
-	}
-
-	@Override
-	public String[] getKeys() {
-		Set<String> keys = context.keySet();
-
-		return keys.toArray(new String[keys.size()]);
-	}
-
-	@Override
 	public boolean isEmpty() {
 		return context.isEmpty();
 	}
@@ -112,8 +104,66 @@ public abstract class BaseTemplate implements Template {
 	}
 
 	@Override
-	public void prepare(HttpServletRequest request) {
-		_templateContextHelper.prepare(this, request);
+	public void prepare(HttpServletRequest httpServletRequest) {
+		_templateContextHelper.prepare(this, httpServletRequest);
+	}
+
+	@Override
+	public void processTemplate(Writer writer) throws TemplateException {
+		try {
+			processTemplate(_templateResource, writer);
+		}
+		catch (Exception e) {
+			throw new TemplateException(
+				"Unable to process template " +
+					_templateResource.getTemplateId(),
+				e);
+		}
+	}
+
+	public void processTemplate(
+			Writer writer,
+			Supplier<TemplateResource> errorTemplateResourceSupplier)
+		throws TemplateException {
+
+		if (errorTemplateResourceSupplier == null) {
+			processTemplate(writer);
+
+			return;
+		}
+
+		Writer oldWriter = (Writer)get(TemplateConstants.WRITER);
+
+		try {
+			UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
+
+			put(TemplateConstants.WRITER, unsyncStringWriter);
+
+			processTemplate(_templateResource, unsyncStringWriter);
+
+			StringBundler sb = unsyncStringWriter.getStringBundler();
+
+			sb.writeTo(writer);
+		}
+		catch (Exception e) {
+			TemplateResource errorTemplateResource =
+				errorTemplateResourceSupplier.get();
+
+			if (errorTemplateResource == null) {
+				throw new TemplateException(
+					"Unable to process template " +
+						_templateResource.getTemplateId(),
+					e);
+			}
+
+			put(TemplateConstants.WRITER, writer);
+
+			handleException(
+				_templateResource, errorTemplateResource, e, writer);
+		}
+		finally {
+			put(TemplateConstants.WRITER, oldWriter);
+		}
 	}
 
 	@Override
@@ -145,6 +195,22 @@ public abstract class BaseTemplate implements Template {
 		return context.values();
 	}
 
+	protected void cacheTemplateResource(
+		TemplateResourceCache templateResourceCache,
+		TemplateResource templateResource) {
+
+		TemplateResource cachedTemplateResource =
+			templateResourceCache.getTemplateResource(
+				templateResource.getTemplateId());
+
+		if ((cachedTemplateResource == null) ||
+			!templateResource.equals(cachedTemplateResource)) {
+
+			templateResourceCache.put(
+				templateResource.getTemplateId(), templateResource);
+		}
+	}
+
 	protected String getTemplateResourceUUID(
 		TemplateResource templateResource) {
 
@@ -155,28 +221,19 @@ public abstract class BaseTemplate implements Template {
 		);
 	}
 
-	protected abstract void handleException(Exception exception, Writer writer)
+	protected abstract void handleException(
+			TemplateResource templateResource,
+			TemplateResource errorTemplateResource, Exception exception,
+			Writer writer)
 		throws TemplateException;
 
-	protected void write(Writer writer) throws TemplateException {
-		Writer oldWriter = (Writer)get(TemplateConstants.WRITER);
-
-		try {
-			doProcessTemplate(writer);
-		}
-		catch (Exception e) {
-			put(TemplateConstants.WRITER, writer);
-
-			handleException(e, writer);
-		}
-		finally {
-			put(TemplateConstants.WRITER, oldWriter);
-		}
-	}
+	protected abstract void processTemplate(
+			TemplateResource templateResource, Writer writer)
+		throws Exception;
 
 	protected Map<String, Object> context;
-	protected TemplateResource errorTemplateResource;
 
 	private final TemplateContextHelper _templateContextHelper;
+	private final TemplateResource _templateResource;
 
 }

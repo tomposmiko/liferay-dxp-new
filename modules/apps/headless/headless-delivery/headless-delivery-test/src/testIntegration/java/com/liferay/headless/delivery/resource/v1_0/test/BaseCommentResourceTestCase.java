@@ -15,14 +15,16 @@
 package com.liferay.headless.delivery.resource.v1_0.test;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
-import com.liferay.headless.delivery.dto.v1_0.Comment;
-import com.liferay.headless.delivery.dto.v1_0.Creator;
+import com.liferay.headless.delivery.client.dto.v1_0.Comment;
+import com.liferay.headless.delivery.client.pagination.Page;
+import com.liferay.headless.delivery.client.serdes.v1_0.CommentSerDes;
 import com.liferay.headless.delivery.resource.v1_0.CommentResource;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -42,7 +44,6 @@ import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
@@ -57,10 +58,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -116,6 +119,63 @@ public abstract class BaseCommentResourceTestCase {
 	}
 
 	@Test
+	public void testClientSerDesToDTO() throws Exception {
+		ObjectMapper objectMapper = new ObjectMapper() {
+			{
+				configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+				enable(SerializationFeature.INDENT_OUTPUT);
+				setDateFormat(new ISO8601DateFormat());
+				setFilterProvider(
+					new SimpleFilterProvider() {
+						{
+							addFilter(
+								"Liferay.Vulcan",
+								SimpleBeanPropertyFilter.serializeAll());
+						}
+					});
+				setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+				setSerializationInclusion(JsonInclude.Include.NON_NULL);
+			}
+		};
+
+		Comment comment1 = randomComment();
+
+		String json = objectMapper.writeValueAsString(comment1);
+
+		Comment comment2 = CommentSerDes.toDTO(json);
+
+		Assert.assertTrue(equals(comment1, comment2));
+	}
+
+	@Test
+	public void testClientSerDesToJSON() throws Exception {
+		ObjectMapper objectMapper = new ObjectMapper() {
+			{
+				configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+				setDateFormat(new ISO8601DateFormat());
+				setFilterProvider(
+					new SimpleFilterProvider() {
+						{
+							addFilter(
+								"Liferay.Vulcan",
+								SimpleBeanPropertyFilter.serializeAll());
+						}
+					});
+				setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+				setSerializationInclusion(JsonInclude.Include.NON_NULL);
+			}
+		};
+
+		Comment comment = randomComment();
+
+		String json1 = objectMapper.writeValueAsString(comment);
+		String json2 = CommentSerDes.toJSON(comment);
+
+		Assert.assertEquals(
+			objectMapper.readTree(json1), objectMapper.readTree(json2));
+	}
+
+	@Test
 	public void testGetBlogPostingCommentsPage() throws Exception {
 		Long blogPostingId = testGetBlogPostingCommentsPage_getBlogPostingId();
 		Long irrelevantBlogPostingId =
@@ -167,26 +227,14 @@ public abstract class BaseCommentResourceTestCase {
 		Long blogPostingId = testGetBlogPostingCommentsPage_getBlogPostingId();
 
 		Comment comment1 = randomComment();
-		Comment comment2 = randomComment();
-
-		for (EntityField entityField : entityFields) {
-			BeanUtils.setProperty(
-				comment1, entityField.getName(),
-				DateUtils.addMinutes(new Date(), -2));
-		}
 
 		comment1 = testGetBlogPostingCommentsPage_addComment(
 			blogPostingId, comment1);
 
-		Thread.sleep(1000);
-
-		comment2 = testGetBlogPostingCommentsPage_addComment(
-			blogPostingId, comment2);
-
 		for (EntityField entityField : entityFields) {
 			Page<Comment> page = invokeGetBlogPostingCommentsPage(
 				blogPostingId, null,
-				getFilterString(entityField, "eq", comment1),
+				getFilterString(entityField, "between", comment1),
 				Pagination.of(1, 2), null);
 
 			assertEquals(
@@ -292,8 +340,6 @@ public abstract class BaseCommentResourceTestCase {
 
 		comment1 = testGetBlogPostingCommentsPage_addComment(
 			blogPostingId, comment1);
-
-		Thread.sleep(1000);
 
 		comment2 = testGetBlogPostingCommentsPage_addComment(
 			blogPostingId, comment2);
@@ -412,10 +458,7 @@ public abstract class BaseCommentResourceTestCase {
 			_log.debug("HTTP response: " + string);
 		}
 
-		return outputObjectMapper.readValue(
-			string,
-			new TypeReference<Page<Comment>>() {
-			});
+		return Page.of(string, CommentSerDes::toDTO);
 	}
 
 	protected Http.Response invokeGetBlogPostingCommentsPageResponse(
@@ -471,8 +514,8 @@ public abstract class BaseCommentResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(comment),
-			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
+			CommentSerDes.toJSON(comment), ContentTypes.APPLICATION_JSON,
+			StringPool.UTF8);
 
 		String location =
 			_resourceURL +
@@ -490,10 +533,12 @@ public abstract class BaseCommentResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(string, Comment.class);
+			return CommentSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -506,8 +551,8 @@ public abstract class BaseCommentResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(comment),
-			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
+			CommentSerDes.toJSON(comment), ContentTypes.APPLICATION_JSON,
+			StringPool.UTF8);
 
 		String location =
 			_resourceURL +
@@ -601,10 +646,12 @@ public abstract class BaseCommentResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(string, Comment.class);
+			return CommentSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -654,8 +701,8 @@ public abstract class BaseCommentResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(comment),
-			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
+			CommentSerDes.toJSON(comment), ContentTypes.APPLICATION_JSON,
+			StringPool.UTF8);
 
 		String location =
 			_resourceURL + _toPath("/comments/{commentId}", commentId);
@@ -671,10 +718,12 @@ public abstract class BaseCommentResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(string, Comment.class);
+			return CommentSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -687,8 +736,8 @@ public abstract class BaseCommentResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(comment),
-			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
+			CommentSerDes.toJSON(comment), ContentTypes.APPLICATION_JSON,
+			StringPool.UTF8);
 
 		String location =
 			_resourceURL + _toPath("/comments/{commentId}", commentId);
@@ -754,26 +803,14 @@ public abstract class BaseCommentResourceTestCase {
 		Long parentCommentId = testGetCommentCommentsPage_getParentCommentId();
 
 		Comment comment1 = randomComment();
-		Comment comment2 = randomComment();
-
-		for (EntityField entityField : entityFields) {
-			BeanUtils.setProperty(
-				comment1, entityField.getName(),
-				DateUtils.addMinutes(new Date(), -2));
-		}
 
 		comment1 = testGetCommentCommentsPage_addComment(
 			parentCommentId, comment1);
 
-		Thread.sleep(1000);
-
-		comment2 = testGetCommentCommentsPage_addComment(
-			parentCommentId, comment2);
-
 		for (EntityField entityField : entityFields) {
 			Page<Comment> page = invokeGetCommentCommentsPage(
 				parentCommentId, null,
-				getFilterString(entityField, "eq", comment1),
+				getFilterString(entityField, "between", comment1),
 				Pagination.of(1, 2), null);
 
 			assertEquals(
@@ -875,8 +912,6 @@ public abstract class BaseCommentResourceTestCase {
 
 		comment1 = testGetCommentCommentsPage_addComment(
 			parentCommentId, comment1);
-
-		Thread.sleep(1000);
 
 		comment2 = testGetCommentCommentsPage_addComment(
 			parentCommentId, comment2);
@@ -993,10 +1028,7 @@ public abstract class BaseCommentResourceTestCase {
 			_log.debug("HTTP response: " + string);
 		}
 
-		return outputObjectMapper.readValue(
-			string,
-			new TypeReference<Page<Comment>>() {
-			});
+		return Page.of(string, CommentSerDes::toDTO);
 	}
 
 	protected Http.Response invokeGetCommentCommentsPageResponse(
@@ -1051,8 +1083,8 @@ public abstract class BaseCommentResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(comment),
-			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
+			CommentSerDes.toJSON(comment), ContentTypes.APPLICATION_JSON,
+			StringPool.UTF8);
 
 		String location =
 			_resourceURL +
@@ -1070,10 +1102,12 @@ public abstract class BaseCommentResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(string, Comment.class);
+			return CommentSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -1086,8 +1120,8 @@ public abstract class BaseCommentResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(comment),
-			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
+			CommentSerDes.toJSON(comment), ContentTypes.APPLICATION_JSON,
+			StringPool.UTF8);
 
 		String location =
 			_resourceURL +
@@ -1154,23 +1188,13 @@ public abstract class BaseCommentResourceTestCase {
 		Long documentId = testGetDocumentCommentsPage_getDocumentId();
 
 		Comment comment1 = randomComment();
-		Comment comment2 = randomComment();
-
-		for (EntityField entityField : entityFields) {
-			BeanUtils.setProperty(
-				comment1, entityField.getName(),
-				DateUtils.addMinutes(new Date(), -2));
-		}
 
 		comment1 = testGetDocumentCommentsPage_addComment(documentId, comment1);
 
-		Thread.sleep(1000);
-
-		comment2 = testGetDocumentCommentsPage_addComment(documentId, comment2);
-
 		for (EntityField entityField : entityFields) {
 			Page<Comment> page = invokeGetDocumentCommentsPage(
-				documentId, null, getFilterString(entityField, "eq", comment1),
+				documentId, null,
+				getFilterString(entityField, "between", comment1),
 				Pagination.of(1, 2), null);
 
 			assertEquals(
@@ -1270,8 +1294,6 @@ public abstract class BaseCommentResourceTestCase {
 		}
 
 		comment1 = testGetDocumentCommentsPage_addComment(documentId, comment1);
-
-		Thread.sleep(1000);
 
 		comment2 = testGetDocumentCommentsPage_addComment(documentId, comment2);
 
@@ -1384,10 +1406,7 @@ public abstract class BaseCommentResourceTestCase {
 			_log.debug("HTTP response: " + string);
 		}
 
-		return outputObjectMapper.readValue(
-			string,
-			new TypeReference<Page<Comment>>() {
-			});
+		return Page.of(string, CommentSerDes::toDTO);
 	}
 
 	protected Http.Response invokeGetDocumentCommentsPageResponse(
@@ -1441,8 +1460,8 @@ public abstract class BaseCommentResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(comment),
-			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
+			CommentSerDes.toJSON(comment), ContentTypes.APPLICATION_JSON,
+			StringPool.UTF8);
 
 		String location =
 			_resourceURL +
@@ -1459,10 +1478,12 @@ public abstract class BaseCommentResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(string, Comment.class);
+			return CommentSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -1475,8 +1496,8 @@ public abstract class BaseCommentResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(comment),
-			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
+			CommentSerDes.toJSON(comment), ContentTypes.APPLICATION_JSON,
+			StringPool.UTF8);
 
 		String location =
 			_resourceURL +
@@ -1546,26 +1567,14 @@ public abstract class BaseCommentResourceTestCase {
 			testGetStructuredContentCommentsPage_getStructuredContentId();
 
 		Comment comment1 = randomComment();
-		Comment comment2 = randomComment();
-
-		for (EntityField entityField : entityFields) {
-			BeanUtils.setProperty(
-				comment1, entityField.getName(),
-				DateUtils.addMinutes(new Date(), -2));
-		}
 
 		comment1 = testGetStructuredContentCommentsPage_addComment(
 			structuredContentId, comment1);
 
-		Thread.sleep(1000);
-
-		comment2 = testGetStructuredContentCommentsPage_addComment(
-			structuredContentId, comment2);
-
 		for (EntityField entityField : entityFields) {
 			Page<Comment> page = invokeGetStructuredContentCommentsPage(
 				structuredContentId, null,
-				getFilterString(entityField, "eq", comment1),
+				getFilterString(entityField, "between", comment1),
 				Pagination.of(1, 2), null);
 
 			assertEquals(
@@ -1674,8 +1683,6 @@ public abstract class BaseCommentResourceTestCase {
 
 		comment1 = testGetStructuredContentCommentsPage_addComment(
 			structuredContentId, comment1);
-
-		Thread.sleep(1000);
 
 		comment2 = testGetStructuredContentCommentsPage_addComment(
 			structuredContentId, comment2);
@@ -1797,10 +1804,7 @@ public abstract class BaseCommentResourceTestCase {
 			_log.debug("HTTP response: " + string);
 		}
 
-		return outputObjectMapper.readValue(
-			string,
-			new TypeReference<Page<Comment>>() {
-			});
+		return Page.of(string, CommentSerDes::toDTO);
 	}
 
 	protected Http.Response invokeGetStructuredContentCommentsPageResponse(
@@ -1859,8 +1863,8 @@ public abstract class BaseCommentResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(comment),
-			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
+			CommentSerDes.toJSON(comment), ContentTypes.APPLICATION_JSON,
+			StringPool.UTF8);
 
 		String location =
 			_resourceURL +
@@ -1879,10 +1883,12 @@ public abstract class BaseCommentResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(string, Comment.class);
+			return CommentSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -1895,8 +1901,8 @@ public abstract class BaseCommentResourceTestCase {
 		Http.Options options = _createHttpOptions();
 
 		options.setBody(
-			inputObjectMapper.writeValueAsString(comment),
-			ContentTypes.APPLICATION_JSON, StringPool.UTF8);
+			CommentSerDes.toJSON(comment), ContentTypes.APPLICATION_JSON,
+			StringPool.UTF8);
 
 		String location =
 			_resourceURL +
@@ -2158,13 +2164,63 @@ public abstract class BaseCommentResourceTestCase {
 		}
 
 		if (entityFieldName.equals("dateCreated")) {
-			sb.append(_dateFormat.format(comment.getDateCreated()));
+			if (operator.equals("between")) {
+				sb = new StringBundler();
+
+				sb.append("(");
+				sb.append(entityFieldName);
+				sb.append(" gt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(comment.getDateCreated(), -2)));
+				sb.append(" and ");
+				sb.append(entityFieldName);
+				sb.append(" lt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(comment.getDateCreated(), 2)));
+				sb.append(")");
+			}
+			else {
+				sb.append(entityFieldName);
+
+				sb.append(" ");
+				sb.append(operator);
+				sb.append(" ");
+
+				sb.append(_dateFormat.format(comment.getDateCreated()));
+			}
 
 			return sb.toString();
 		}
 
 		if (entityFieldName.equals("dateModified")) {
-			sb.append(_dateFormat.format(comment.getDateModified()));
+			if (operator.equals("between")) {
+				sb = new StringBundler();
+
+				sb.append("(");
+				sb.append(entityFieldName);
+				sb.append(" gt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(comment.getDateModified(), -2)));
+				sb.append(" and ");
+				sb.append(entityFieldName);
+				sb.append(" lt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(comment.getDateModified(), 2)));
+				sb.append(")");
+			}
+			else {
+				sb.append(entityFieldName);
+
+				sb.append(" ");
+				sb.append(operator);
+				sb.append(" ");
+
+				sb.append(_dateFormat.format(comment.getDateModified()));
+			}
 
 			return sb.toString();
 		}
@@ -2212,95 +2268,11 @@ public abstract class BaseCommentResourceTestCase {
 		return randomComment();
 	}
 
-	protected static final ObjectMapper inputObjectMapper = new ObjectMapper() {
-		{
-			setFilterProvider(
-				new SimpleFilterProvider() {
-					{
-						addFilter(
-							"Liferay.Vulcan",
-							SimpleBeanPropertyFilter.serializeAll());
-					}
-				});
-			setSerializationInclusion(JsonInclude.Include.NON_NULL);
-		}
-	};
-	protected static final ObjectMapper outputObjectMapper =
-		new ObjectMapper() {
-			{
-				addMixIn(Comment.class, CommentMixin.class);
-				setFilterProvider(
-					new SimpleFilterProvider() {
-						{
-							addFilter(
-								"Liferay.Vulcan",
-								SimpleBeanPropertyFilter.serializeAll());
-						}
-					});
-			}
-		};
-
 	protected Group irrelevantGroup;
 	protected String testContentType = "application/json";
 	protected Group testGroup;
 	protected Locale testLocale;
 	protected String testUserNameAndPassword = "test@liferay.com:test";
-
-	protected static class CommentMixin {
-
-		@JsonProperty
-		Creator creator;
-		@JsonProperty
-		Date dateCreated;
-		@JsonProperty
-		Date dateModified;
-		@JsonProperty
-		Long id;
-		@JsonProperty
-		Number numberOfComments;
-		@JsonProperty
-		String text;
-
-	}
-
-	protected static class Page<T> {
-
-		public Collection<T> getItems() {
-			return new ArrayList<>(items);
-		}
-
-		public long getLastPage() {
-			return lastPage;
-		}
-
-		public long getPage() {
-			return page;
-		}
-
-		public long getPageSize() {
-			return pageSize;
-		}
-
-		public long getTotalCount() {
-			return totalCount;
-		}
-
-		@JsonProperty
-		protected Collection<T> items;
-
-		@JsonProperty
-		protected long lastPage;
-
-		@JsonProperty
-		protected long page;
-
-		@JsonProperty
-		protected long pageSize;
-
-		@JsonProperty
-		protected long totalCount;
-
-	}
 
 	private Http.Options _createHttpOptions() {
 		Http.Options options = new Http.Options();
@@ -2318,6 +2290,41 @@ public abstract class BaseCommentResourceTestCase {
 		options.addHeader("Content-Type", testContentType);
 
 		return options;
+	}
+
+	private String _toJSON(Map<String, String> map) {
+		if (map == null) {
+			return "null";
+		}
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("{");
+
+		Set<Map.Entry<String, String>> set = map.entrySet();
+
+		Iterator<Map.Entry<String, String>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, String> entry = iterator.next();
+
+			sb.append("\"" + entry.getKey() + "\": ");
+
+			if (entry.getValue() == null) {
+				sb.append("null");
+			}
+			else {
+				sb.append("\"" + entry.getValue() + "\"");
+			}
+
+			if (iterator.hasNext()) {
+				sb.append(", ");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private String _toPath(String template, Object... values) {

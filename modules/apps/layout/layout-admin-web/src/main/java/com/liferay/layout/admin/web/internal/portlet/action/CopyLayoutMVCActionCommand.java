@@ -76,10 +76,10 @@ public class CopyLayoutMVCActionCommand extends BaseMVCActionCommand {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
+		long sourcePlid = ParamUtil.getLong(uploadPortletRequest, "sourcePlid");
 		long groupId = ParamUtil.getLong(actionRequest, "groupId");
 		boolean privateLayout = ParamUtil.getBoolean(
 			actionRequest, "privateLayout");
-		long layoutId = ParamUtil.getLong(uploadPortletRequest, "layoutId");
 		String name = ParamUtil.getString(actionRequest, "name");
 
 		Map<Locale, String> nameMap = new HashMap<>();
@@ -102,8 +102,7 @@ public class CopyLayoutMVCActionCommand extends BaseMVCActionCommand {
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
 		try {
-			Layout sourceLayout = _layoutLocalService.fetchLayout(
-				groupId, privateLayout, layoutId);
+			Layout sourceLayout = _layoutLocalService.fetchLayout(sourcePlid);
 
 			UnicodeProperties sourceTypeSettingsProperties =
 				sourceLayout.getTypeSettingsProperties();
@@ -121,11 +120,15 @@ public class CopyLayoutMVCActionCommand extends BaseMVCActionCommand {
 				_portal.getClassNameId(Layout.class), targetLayout.getPlid());
 
 			if (draftLayout != null) {
-				_layoutCopyHelper.copyLayout(sourceLayout, draftLayout);
+				targetLayout = draftLayout;
 			}
-			else {
-				_layoutCopyHelper.copyLayout(sourceLayout, targetLayout);
-			}
+
+			targetLayout = _layoutCopyHelper.copyLayout(
+				sourceLayout, targetLayout);
+
+			targetLayout.setNameMap(nameMap);
+
+			_layoutLocalService.updateLayout(targetLayout);
 
 			LiferayPortletResponse liferayPortletResponse =
 				_portal.getLiferayPortletResponse(actionResponse);

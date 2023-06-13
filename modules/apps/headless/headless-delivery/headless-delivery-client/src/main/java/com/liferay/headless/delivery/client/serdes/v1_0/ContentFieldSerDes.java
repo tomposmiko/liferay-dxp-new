@@ -17,7 +17,8 @@ package com.liferay.headless.delivery.client.serdes.v1_0;
 import com.liferay.headless.delivery.client.dto.v1_0.ContentField;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -46,67 +47,82 @@ public class ContentFieldSerDes {
 
 	public static String toJSON(ContentField contentField) {
 		if (contentField == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"dataType\": ");
+		if (contentField.getDataType() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (contentField.getDataType() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"dataType\":");
+
+			sb.append("\"");
+
 			sb.append(contentField.getDataType());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (contentField.getInputControl() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"inputControl\": ");
+			sb.append("\"inputControl\":");
 
-		if (contentField.getInputControl() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(contentField.getInputControl());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (contentField.getLabel() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"label\": ");
+			sb.append("\"label\":");
 
-		if (contentField.getLabel() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(contentField.getLabel());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (contentField.getName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\":");
 
-		if (contentField.getName() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(contentField.getName());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (contentField.getNestedFields() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"nestedFields\": ");
+			sb.append("\"nestedFields\":");
 
-		if (contentField.getNestedFields() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < contentField.getNestedFields().length; i++) {
-				sb.append(contentField.getNestedFields()[i]);
+				sb.append(
+					ContentFieldSerDes.toJSON(
+						contentField.getNestedFields()[i]));
 
 				if ((i + 1) < contentField.getNestedFields().length) {
 					sb.append(", ");
@@ -116,26 +132,24 @@ public class ContentFieldSerDes {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (contentField.getRepeatable() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"repeatable\": ");
+			sb.append("\"repeatable\":");
 
-		if (contentField.getRepeatable() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(contentField.getRepeatable());
 		}
 
-		sb.append(", ");
+		if (contentField.getValue() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"value\": ");
+			sb.append("\"value\":");
 
-		if (contentField.getValue() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(contentField.getValue());
+			sb.append(ValueSerDes.toJSON(contentField.getValue()));
 		}
 
 		sb.append("}");
@@ -143,39 +157,81 @@ public class ContentFieldSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<ContentField> contentFields) {
-		if (contentFields == null) {
-			return "[]";
+	public static Map<String, String> toMap(ContentField contentField) {
+		if (contentField == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (ContentField contentField : contentFields) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(contentField));
+		if (contentField.getDataType() == null) {
+			map.put("dataType", null);
+		}
+		else {
+			map.put("dataType", String.valueOf(contentField.getDataType()));
 		}
 
-		sb.append("]");
+		if (contentField.getInputControl() == null) {
+			map.put("inputControl", null);
+		}
+		else {
+			map.put(
+				"inputControl", String.valueOf(contentField.getInputControl()));
+		}
 
-		return sb.toString();
+		if (contentField.getLabel() == null) {
+			map.put("label", null);
+		}
+		else {
+			map.put("label", String.valueOf(contentField.getLabel()));
+		}
+
+		if (contentField.getName() == null) {
+			map.put("name", null);
+		}
+		else {
+			map.put("name", String.valueOf(contentField.getName()));
+		}
+
+		if (contentField.getNestedFields() == null) {
+			map.put("nestedFields", null);
+		}
+		else {
+			map.put(
+				"nestedFields", String.valueOf(contentField.getNestedFields()));
+		}
+
+		if (contentField.getRepeatable() == null) {
+			map.put("repeatable", null);
+		}
+		else {
+			map.put("repeatable", String.valueOf(contentField.getRepeatable()));
+		}
+
+		if (contentField.getValue() == null) {
+			map.put("value", null);
+		}
+		else {
+			map.put("value", ValueSerDes.toJSON(contentField.getValue()));
+		}
+
+		return map;
 	}
 
 	private static class ContentFieldJSONParser
 		extends BaseJSONParser<ContentField> {
 
+		@Override
 		protected ContentField createDTO() {
 			return new ContentField();
 		}
 
+		@Override
 		protected ContentField[] createDTOArray(int size) {
 			return new ContentField[size];
 		}
 
+		@Override
 		protected void setField(
 			ContentField contentField, String jsonParserFieldName,
 			Object jsonParserFieldValue) {

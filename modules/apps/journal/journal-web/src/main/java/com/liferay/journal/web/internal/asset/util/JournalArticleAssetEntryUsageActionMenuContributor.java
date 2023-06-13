@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -98,7 +99,6 @@ public class JournalArticleAssetEntryUsageActionMenuContributor
 							dropdownItem.setLabel(
 								LanguageUtil.get(
 									resourceBundle, "view-in-page"));
-							dropdownItem.setTarget("_blank");
 						});
 				}
 
@@ -121,7 +121,6 @@ public class JournalArticleAssetEntryUsageActionMenuContributor
 							dropdownItem.setLabel(
 								LanguageUtil.get(
 									resourceBundle, "preview-draft-in-page"));
-							dropdownItem.setTarget("_blank");
 						});
 				}
 
@@ -133,7 +132,6 @@ public class JournalArticleAssetEntryUsageActionMenuContributor
 							dropdownItem.setLabel(
 								LanguageUtil.get(
 									resourceBundle, "preview-pending-in-page"));
-							dropdownItem.setTarget("_blank");
 						});
 				}
 
@@ -146,7 +144,6 @@ public class JournalArticleAssetEntryUsageActionMenuContributor
 								LanguageUtil.get(
 									resourceBundle,
 									"preview-scheduled-in-page"));
-							dropdownItem.setTarget("_blank");
 						});
 				}
 			}
@@ -157,6 +154,9 @@ public class JournalArticleAssetEntryUsageActionMenuContributor
 		JournalArticle article, AssetEntryUsage assetEntryUsage,
 		HttpServletRequest request) {
 
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
 		PortletURL portletURL = PortletURLFactoryUtil.create(
 			request, assetEntryUsage.getContainerKey(),
 			assetEntryUsage.getPlid(), PortletRequest.RENDER_PHASE);
@@ -166,7 +166,11 @@ public class JournalArticleAssetEntryUsageActionMenuContributor
 				"previewArticleId", String.valueOf(article.getId()));
 		}
 
-		return portletURL.toString() + "#portlet_" +
+		String portletURLString = _http.setParameter(
+			portletURL.toString(), "p_l_back_url",
+			themeDisplay.getURLCurrent());
+
+		return portletURLString + "#portlet_" +
 			assetEntryUsage.getContainerKey();
 	}
 
@@ -175,6 +179,9 @@ public class JournalArticleAssetEntryUsageActionMenuContributor
 
 	@Reference
 	private AssetEntryLocalService _assetEntryLocalService;
+
+	@Reference
+	private Http _http;
 
 	@Reference
 	private JournalArticleLocalService _journalArticleLocalService;

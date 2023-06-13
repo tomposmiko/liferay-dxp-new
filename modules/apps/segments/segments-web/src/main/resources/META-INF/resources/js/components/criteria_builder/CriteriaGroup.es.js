@@ -59,6 +59,7 @@ class CriteriaGroup extends Component {
 		criteria: PropTypes.object,
 		dragging: PropTypes.bool,
 		editing: PropTypes.bool,
+		emptyContributors: PropTypes.bool,
 		entityName: PropTypes.string,
 		groupId: PropTypes.string,
 		index: PropTypes.number,
@@ -318,6 +319,7 @@ class CriteriaGroup extends Component {
 			criteria,
 			dragging,
 			editing,
+			emptyContributors,
 			groupId,
 			onMove,
 			propertyKey,
@@ -325,13 +327,16 @@ class CriteriaGroup extends Component {
 		} = this.props;
 
 		const classes = getCN(
-			'criteria-group-root',
+			{
+				'criteria-group-root': criteria
+			},
 			`criteria-group-item${root ? '-root' : ''}`,
 			`color--${propertyKey}`,
 			{
 				'dnd-drag': dragging
 			}
 		);
+		const singleRow = criteria && criteria.items && criteria.items.length === 1;
 
 		return connectDragPreview(
 			<div
@@ -339,6 +344,7 @@ class CriteriaGroup extends Component {
 			>
 				{this._isCriteriaEmpty() ?
 					<EmptyDropZone
+						emptyContributors={emptyContributors}
 						onCriterionAdd={this._handleCriterionAdd}
 						propertyKey={propertyKey}
 					/> :
@@ -352,7 +358,7 @@ class CriteriaGroup extends Component {
 							propertyKey={propertyKey}
 						/>
 
-						{editing && !root && connectDragSource(
+						{editing && singleRow && !root && connectDragSource(
 							<div className="criteria-group-drag-icon drag-icon">
 								<ClayIcon iconName="drag" />
 							</div>

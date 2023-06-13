@@ -152,7 +152,9 @@ public class SuccessPage {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(description);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -163,7 +165,9 @@ public class SuccessPage {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(headline);
+			sb.append("\"");
 		}
 
 		sb.append(", ");

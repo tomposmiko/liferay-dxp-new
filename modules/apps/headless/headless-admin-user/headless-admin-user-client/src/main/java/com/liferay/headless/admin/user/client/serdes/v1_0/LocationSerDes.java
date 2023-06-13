@@ -17,7 +17,8 @@ package com.liferay.headless.admin.user.client.serdes.v1_0;
 import com.liferay.headless.admin.user.client.dto.v1_0.Location;
 import com.liferay.headless.admin.user.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -43,41 +44,48 @@ public class LocationSerDes {
 
 	public static String toJSON(Location location) {
 		if (location == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"addressCountry\": ");
+		if (location.getAddressCountry() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (location.getAddressCountry() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"addressCountry\":");
+
+			sb.append("\"");
+
 			sb.append(location.getAddressCountry());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (location.getAddressRegion() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"addressRegion\": ");
+			sb.append("\"addressRegion\":");
 
-		if (location.getAddressRegion() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(location.getAddressRegion());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (location.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\":");
 
-		if (location.getId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(location.getId());
 		}
 
@@ -86,38 +94,52 @@ public class LocationSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<Location> locations) {
-		if (locations == null) {
-			return "[]";
+	public static Map<String, String> toMap(Location location) {
+		if (location == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (Location location : locations) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(location));
+		if (location.getAddressCountry() == null) {
+			map.put("addressCountry", null);
+		}
+		else {
+			map.put(
+				"addressCountry", String.valueOf(location.getAddressCountry()));
 		}
 
-		sb.append("]");
+		if (location.getAddressRegion() == null) {
+			map.put("addressRegion", null);
+		}
+		else {
+			map.put(
+				"addressRegion", String.valueOf(location.getAddressRegion()));
+		}
 
-		return sb.toString();
+		if (location.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(location.getId()));
+		}
+
+		return map;
 	}
 
 	private static class LocationJSONParser extends BaseJSONParser<Location> {
 
+		@Override
 		protected Location createDTO() {
 			return new Location();
 		}
 
+		@Override
 		protected Location[] createDTOArray(int size) {
 			return new Location[size];
 		}
 
+		@Override
 		protected void setField(
 			Location location, String jsonParserFieldName,
 			Object jsonParserFieldValue) {

@@ -607,16 +607,28 @@ public class LayoutPageTemplateEntryLocalServiceImpl
 		Map<Locale, String> titleMap = Collections.singletonMap(
 			LocaleUtil.getSiteDefault(), name);
 
-		Layout layout = layoutLocalService.getLayout(
+		Layout draftLayout = layoutLocalService.fetchLayout(
+			classNameLocalService.getClassNameId(Layout.class),
 			layoutPageTemplateEntry.getPlid());
 
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
+
+		if (serviceContext == null) {
+			serviceContext = new ServiceContext();
+		}
+
+		serviceContext.setAttribute(
+			"layout.instanceable.allowed", Boolean.TRUE);
+
 		layoutLocalService.updateLayout(
-			layout.getGroupId(), layout.isPrivateLayout(), layout.getLayoutId(),
-			layout.getParentLayoutId(), titleMap, titleMap,
-			layout.getDescriptionMap(), layout.getKeywordsMap(),
-			layout.getRobotsMap(), layout.getType(), layout.isHidden(),
-			layout.getFriendlyURLMap(), layout.getIconImage(), null,
-			ServiceContextThreadLocal.getServiceContext());
+			draftLayout.getGroupId(), draftLayout.isPrivateLayout(),
+			draftLayout.getLayoutId(), draftLayout.getParentLayoutId(),
+			titleMap, titleMap, draftLayout.getDescriptionMap(),
+			draftLayout.getKeywordsMap(), draftLayout.getRobotsMap(),
+			draftLayout.getType(), draftLayout.isHidden(),
+			draftLayout.getFriendlyURLMap(), draftLayout.getIconImage(), null,
+			serviceContext);
 
 		return layoutPageTemplateEntry;
 	}

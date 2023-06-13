@@ -18,7 +18,8 @@ import com.liferay.headless.delivery.client.dto.v1_0.ContentStructureField;
 import com.liferay.headless.delivery.client.dto.v1_0.Option;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -47,85 +48,96 @@ public class ContentStructureFieldSerDes {
 
 	public static String toJSON(ContentStructureField contentStructureField) {
 		if (contentStructureField == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"dataType\": ");
+		if (contentStructureField.getDataType() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (contentStructureField.getDataType() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"dataType\":");
+
+			sb.append("\"");
+
 			sb.append(contentStructureField.getDataType());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (contentStructureField.getInputControl() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"inputControl\": ");
+			sb.append("\"inputControl\":");
 
-		if (contentStructureField.getInputControl() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(contentStructureField.getInputControl());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (contentStructureField.getLabel() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"label\": ");
+			sb.append("\"label\":");
 
-		if (contentStructureField.getLabel() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(contentStructureField.getLabel());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (contentStructureField.getLocalizable() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"localizable\": ");
+			sb.append("\"localizable\":");
 
-		if (contentStructureField.getLocalizable() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(contentStructureField.getLocalizable());
 		}
 
-		sb.append(", ");
+		if (contentStructureField.getMultiple() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"multiple\": ");
+			sb.append("\"multiple\":");
 
-		if (contentStructureField.getMultiple() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(contentStructureField.getMultiple());
 		}
 
-		sb.append(", ");
+		if (contentStructureField.getName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\":");
 
-		if (contentStructureField.getName() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(contentStructureField.getName());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (contentStructureField.getNestedContentStructureFields() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"nestedContentStructureFields\": ");
+			sb.append("\"nestedContentStructureFields\":");
 
-		if (contentStructureField.getNestedContentStructureFields() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0;
@@ -134,7 +146,9 @@ public class ContentStructureFieldSerDes {
 				 i++) {
 
 				sb.append(
-					contentStructureField.getNestedContentStructureFields()[i]);
+					ContentStructureFieldSerDes.toJSON(
+						contentStructureField.getNestedContentStructureFields()
+							[i]));
 
 				if ((i + 1) < contentStructureField.
 						getNestedContentStructureFields().length) {
@@ -146,20 +160,20 @@ public class ContentStructureFieldSerDes {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (contentStructureField.getOptions() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"options\": ");
+			sb.append("\"options\":");
 
-		if (contentStructureField.getOptions() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < contentStructureField.getOptions().length;
 				 i++) {
 
-				sb.append(contentStructureField.getOptions()[i]);
+				sb.append(
+					OptionSerDes.toJSON(contentStructureField.getOptions()[i]));
 
 				if ((i + 1) < contentStructureField.getOptions().length) {
 					sb.append(", ");
@@ -169,47 +183,47 @@ public class ContentStructureFieldSerDes {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (contentStructureField.getPredefinedValue() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"predefinedValue\": ");
+			sb.append("\"predefinedValue\":");
 
-		if (contentStructureField.getPredefinedValue() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(contentStructureField.getPredefinedValue());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (contentStructureField.getRepeatable() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"repeatable\": ");
+			sb.append("\"repeatable\":");
 
-		if (contentStructureField.getRepeatable() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(contentStructureField.getRepeatable());
 		}
 
-		sb.append(", ");
+		if (contentStructureField.getRequired() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"required\": ");
+			sb.append("\"required\":");
 
-		if (contentStructureField.getRequired() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(contentStructureField.getRequired());
 		}
 
-		sb.append(", ");
+		if (contentStructureField.getShowLabel() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"showLabel\": ");
+			sb.append("\"showLabel\":");
 
-		if (contentStructureField.getShowLabel() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(contentStructureField.getShowLabel());
 		}
 
@@ -218,43 +232,136 @@ public class ContentStructureFieldSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(
-		Collection<ContentStructureField> contentStructureFields) {
+	public static Map<String, String> toMap(
+		ContentStructureField contentStructureField) {
 
-		if (contentStructureFields == null) {
-			return "[]";
+		if (contentStructureField == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (ContentStructureField contentStructureField :
-				contentStructureFields) {
-
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(contentStructureField));
+		if (contentStructureField.getDataType() == null) {
+			map.put("dataType", null);
+		}
+		else {
+			map.put(
+				"dataType",
+				String.valueOf(contentStructureField.getDataType()));
 		}
 
-		sb.append("]");
+		if (contentStructureField.getInputControl() == null) {
+			map.put("inputControl", null);
+		}
+		else {
+			map.put(
+				"inputControl",
+				String.valueOf(contentStructureField.getInputControl()));
+		}
 
-		return sb.toString();
+		if (contentStructureField.getLabel() == null) {
+			map.put("label", null);
+		}
+		else {
+			map.put("label", String.valueOf(contentStructureField.getLabel()));
+		}
+
+		if (contentStructureField.getLocalizable() == null) {
+			map.put("localizable", null);
+		}
+		else {
+			map.put(
+				"localizable",
+				String.valueOf(contentStructureField.getLocalizable()));
+		}
+
+		if (contentStructureField.getMultiple() == null) {
+			map.put("multiple", null);
+		}
+		else {
+			map.put(
+				"multiple",
+				String.valueOf(contentStructureField.getMultiple()));
+		}
+
+		if (contentStructureField.getName() == null) {
+			map.put("name", null);
+		}
+		else {
+			map.put("name", String.valueOf(contentStructureField.getName()));
+		}
+
+		if (contentStructureField.getNestedContentStructureFields() == null) {
+			map.put("nestedContentStructureFields", null);
+		}
+		else {
+			map.put(
+				"nestedContentStructureFields",
+				String.valueOf(
+					contentStructureField.getNestedContentStructureFields()));
+		}
+
+		if (contentStructureField.getOptions() == null) {
+			map.put("options", null);
+		}
+		else {
+			map.put(
+				"options", String.valueOf(contentStructureField.getOptions()));
+		}
+
+		if (contentStructureField.getPredefinedValue() == null) {
+			map.put("predefinedValue", null);
+		}
+		else {
+			map.put(
+				"predefinedValue",
+				String.valueOf(contentStructureField.getPredefinedValue()));
+		}
+
+		if (contentStructureField.getRepeatable() == null) {
+			map.put("repeatable", null);
+		}
+		else {
+			map.put(
+				"repeatable",
+				String.valueOf(contentStructureField.getRepeatable()));
+		}
+
+		if (contentStructureField.getRequired() == null) {
+			map.put("required", null);
+		}
+		else {
+			map.put(
+				"required",
+				String.valueOf(contentStructureField.getRequired()));
+		}
+
+		if (contentStructureField.getShowLabel() == null) {
+			map.put("showLabel", null);
+		}
+		else {
+			map.put(
+				"showLabel",
+				String.valueOf(contentStructureField.getShowLabel()));
+		}
+
+		return map;
 	}
 
 	private static class ContentStructureFieldJSONParser
 		extends BaseJSONParser<ContentStructureField> {
 
+		@Override
 		protected ContentStructureField createDTO() {
 			return new ContentStructureField();
 		}
 
+		@Override
 		protected ContentStructureField[] createDTOArray(int size) {
 			return new ContentStructureField[size];
 		}
 
+		@Override
 		protected void setField(
 			ContentStructureField contentStructureField,
 			String jsonParserFieldName, Object jsonParserFieldValue) {

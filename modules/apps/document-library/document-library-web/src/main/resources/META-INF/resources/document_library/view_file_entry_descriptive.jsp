@@ -70,17 +70,30 @@ rowURL.setParameter("redirect", HttpUtil.removeParameter(currentURL, liferayPort
 rowURL.setParameter("fileEntryId", String.valueOf(fileEntry.getFileEntryId()));
 %>
 
-<span class="text-default">
-	<liferay-ui:message arguments="<%= new String[] {HtmlUtil.escape(latestFileVersion.getUserName()), modifiedDateDescription} %>" key="x-modified-x-ago" />
-</span>
-
 <h2 class="h5">
 	<aui:a href="<%= rowURL.toString() %>">
 		<%= latestFileVersion.getTitle() %>
 	</aui:a>
 </h2>
 
-<span class="h5 text-default">
+<span>
+	<liferay-ui:message arguments="<%= new String[] {HtmlUtil.escape(latestFileVersion.getUserName()), modifiedDateDescription} %>" key="x-modified-x-ago" />
+</span>
+
+<c:if test="<%= latestFileVersion.getModel() instanceof DLFileVersion %>">
+
+	<%
+	DLFileVersion latestDLFileVersion = (DLFileVersion)latestFileVersion.getModel();
+
+	DLFileEntryType dlFileEntryType = latestDLFileVersion.getDLFileEntryType();
+	%>
+
+	<span>
+		<%= HtmlUtil.escape(dlFileEntryType.getName(locale)) %>
+	</span>
+</c:if>
+
+<span>
 	<aui:workflow-status showIcon="<%= false %>" showLabel="<%= false %>" status="<%= latestFileVersion.getStatus() %>" />
 
 	<c:choose>
@@ -96,16 +109,3 @@ rowURL.setParameter("fileEntryId", String.valueOf(fileEntry.getFileEntryId()));
 		</c:when>
 	</c:choose>
 </span>
-
-<c:if test="<%= latestFileVersion.getModel() instanceof DLFileVersion %>">
-
-	<%
-	DLFileVersion latestDLFileVersion = (DLFileVersion)latestFileVersion.getModel();
-
-	DLFileEntryType dlFileEntryType = latestDLFileVersion.getDLFileEntryType();
-	%>
-
-	<span class="h5 text-default">
-		<%= HtmlUtil.escape(dlFileEntryType.getName(locale)) %>
-	</span>
-</c:if>

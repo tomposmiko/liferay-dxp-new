@@ -17,7 +17,8 @@ package com.liferay.headless.delivery.client.serdes.v1_0;
 import com.liferay.headless.delivery.client.dto.v1_0.Image;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -43,41 +44,48 @@ public class ImageSerDes {
 
 	public static String toJSON(Image image) {
 		if (image == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"caption\": ");
+		if (image.getCaption() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (image.getCaption() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"caption\":");
+
+			sb.append("\"");
+
 			sb.append(image.getCaption());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (image.getContentUrl() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"contentUrl\": ");
+			sb.append("\"contentUrl\":");
 
-		if (image.getContentUrl() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(image.getContentUrl());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (image.getImageId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"imageId\": ");
+			sb.append("\"imageId\":");
 
-		if (image.getImageId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(image.getImageId());
 		}
 
@@ -86,38 +94,50 @@ public class ImageSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<Image> images) {
-		if (images == null) {
-			return "[]";
+	public static Map<String, String> toMap(Image image) {
+		if (image == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (Image image : images) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(image));
+		if (image.getCaption() == null) {
+			map.put("caption", null);
+		}
+		else {
+			map.put("caption", String.valueOf(image.getCaption()));
 		}
 
-		sb.append("]");
+		if (image.getContentUrl() == null) {
+			map.put("contentUrl", null);
+		}
+		else {
+			map.put("contentUrl", String.valueOf(image.getContentUrl()));
+		}
 
-		return sb.toString();
+		if (image.getImageId() == null) {
+			map.put("imageId", null);
+		}
+		else {
+			map.put("imageId", String.valueOf(image.getImageId()));
+		}
+
+		return map;
 	}
 
 	private static class ImageJSONParser extends BaseJSONParser<Image> {
 
+		@Override
 		protected Image createDTO() {
 			return new Image();
 		}
 
+		@Override
 		protected Image[] createDTOArray(int size) {
 			return new Image[size];
 		}
 
+		@Override
 		protected void setField(
 			Image image, String jsonParserFieldName,
 			Object jsonParserFieldValue) {

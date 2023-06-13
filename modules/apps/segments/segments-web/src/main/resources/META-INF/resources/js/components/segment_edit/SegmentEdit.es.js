@@ -47,6 +47,7 @@ class SegmentEdit extends Component {
 		redirect: PropTypes.string.isRequired,
 		requestMembersCountURL: PropTypes.string,
 		setValues: PropTypes.func,
+		showInEditMode: PropTypes.bool,
 		source: PropTypes.string,
 		validateForm: PropTypes.func,
 		values: PropTypes.object
@@ -61,7 +62,7 @@ class SegmentEdit extends Component {
 
 	state = {
 		changesUnsaved: false,
-		editing: false,
+		editing: this.props.showInEditMode,
 		membersCount: this.props.initialMembersCount,
 		membersCountLoading: false
 	};
@@ -164,10 +165,13 @@ class SegmentEdit extends Component {
 
 		const {editing} = this.state;
 
+		const emptyContributors = this._isQueryEmpty();
+
 		return (
 			(propertyGroups && contributors) ?
 				<ContributorBuilder
 					editing={editing}
+					emptyContributors={emptyContributors}
 					initialContributors={contributors}
 					onQueryChange={this._handleQueryChange}
 					propertyGroups={propertyGroups}
@@ -183,11 +187,11 @@ class SegmentEdit extends Component {
 		Liferay.Util.openWindow(
 			{
 				dialog: {
-					bodyContent: `<iframe frameborder="0" width="100%" height="100%" src="${url}"></iframe>`,
 					destroyOnHide: true
 				},
 				id: 'segment-members-dialog',
-				title: sub(Liferay.Language.get('x-members'), [this.props.values.name])
+				title: sub(Liferay.Language.get('x-members'), [this.props.values.name]),
+				uri: url
 			}
 		);
 	}

@@ -220,11 +220,13 @@ public class ${schemaName} <#if dtoParentClassName?has_content>extends ${dtoPare
 				sb.append("null");
 			}
 			else {
-				<#if properties[propertyName]?contains("[]")>
+				<#assign propertyType = properties[propertyName] />
+
+				<#if propertyType?contains("[]")>
 					sb.append("[");
 
 					for (int i = 0; i < ${propertyName}.length; i++) {
-						<#if stringUtil.equals(properties[propertyName], "Date[]") || stringUtil.equals(properties[propertyName], "String[]") || enumSchemas?keys?seq_contains(properties[propertyName])>
+						<#if stringUtil.equals(propertyType, "Date[]") || stringUtil.equals(propertyType, "String[]") || enumSchemas?keys?seq_contains(propertyType)>
 							sb.append("\"");
 							sb.append(${propertyName}[i]);
 							sb.append("\"");
@@ -239,7 +241,7 @@ public class ${schemaName} <#if dtoParentClassName?has_content>extends ${dtoPare
 
 					sb.append("]");
 				<#else>
-					<#if stringUtil.equals(properties[propertyName], "Date[]") || stringUtil.equals(properties[propertyName], "String[]") || enumSchemas?keys?seq_contains(properties[propertyName])>
+					<#if stringUtil.equals(propertyType, "Date") || stringUtil.equals(propertyType, "String") || enumSchemas?keys?seq_contains(propertyType)>
 						sb.append("\"");
 						sb.append(${propertyName});
 						sb.append("\"");

@@ -16,6 +16,7 @@ package com.liferay.document.library.google.drive.configuration;
 
 import aQute.bnd.annotation.metatype.Meta;
 
+import com.liferay.portal.configuration.metatype.annotations.ExtendedAttributeDefinition;
 import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
 
 /**
@@ -38,7 +39,14 @@ public interface DLGoogleDriveCompanyConfiguration {
 	 *
 	 * @return the client ID
 	 */
-	@Meta.AD(name = "client-id", required = false)
+	@ExtendedAttributeDefinition(
+		descriptionArguments = "https://console.developers.google.com/apis/credentials/oauthclient",
+		requiredInput = true
+	)
+	@Meta.AD(
+		description = "client-id-description", name = "client-id",
+		required = false
+	)
 	public String clientId();
 
 	/**
@@ -48,7 +56,30 @@ public interface DLGoogleDriveCompanyConfiguration {
 	 *
 	 * @return the client secret
 	 */
-	@Meta.AD(name = "client-secret", required = false)
+	@ExtendedAttributeDefinition(
+		descriptionArguments = "https://console.developers.google.com/apis/credentials/oauthclient",
+		requiredInput = true
+	)
+	@Meta.AD(
+		description = "client-secret-description", name = "client-secret",
+		required = false
+	)
 	public String clientSecret();
+
+	/**
+	 * Returns the API Key of the Google Drive Picker API
+	 * If <code>null</code> or empty, the Google Drive Shortcut integration
+	 * disables itself.
+	 *
+	 * @return the api key
+	 */
+	@ExtendedAttributeDefinition(
+		descriptionArguments = "https://console.developers.google.com/flows/enableapi?apiid=picker&credential=client_key"
+	)
+	@Meta.AD(
+		description = "picker-api-key-description", name = "picker-api-key",
+		required = false
+	)
+	public String pickerAPIKey();
 
 }

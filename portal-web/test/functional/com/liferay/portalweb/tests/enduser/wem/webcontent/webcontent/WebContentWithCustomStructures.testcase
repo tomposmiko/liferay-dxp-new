@@ -89,6 +89,7 @@ definition {
 
 		WebContent.addStructuredPGViaWCD(
 			structureName = "WC Structure Name",
+			templateName = "WC Template Name",
 			webContentTitle = "WC Title"
 		);
 
@@ -163,6 +164,7 @@ definition {
 
 		WebContent.addStructuredPGViaWCD(
 			structureName = "WC Structure Name",
+			templateName = "WC Template Name",
 			webContentTitle = "WC Title"
 		);
 
@@ -934,14 +936,9 @@ definition {
 			webContentTitle = "WC WebContent Title"
 		);
 
-		WebContentNavigator.gotoPreviewViaHeaderCP(
-			webContentTitle = "WC WebContent Title"
-		);
-
-		WebContent.preview(
+		WebContent.previewviatemplate(
 			fieldName = "Text",
-			webContentText = "WC WebContent Text",
-			webContentTitle = "WC WebContent Title"
+			webContentText = "WC WebContent Text"
 		);
 	}
 
@@ -1370,6 +1367,8 @@ definition {
 		WebContent.openWebContentAdmin(siteURLKey = "child-sitename");
 
 		NavItem.gotoTemplates();
+
+		LexiconEntry.changeDisplayStyle(displayStyle = "table");
 
 		WebContentTemplates.viewTableEntryCP(
 			templateDescription = "WC Template Description",

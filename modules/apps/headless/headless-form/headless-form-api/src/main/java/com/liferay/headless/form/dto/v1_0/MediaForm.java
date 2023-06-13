@@ -179,7 +179,9 @@ public class MediaForm {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(description);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -201,7 +203,9 @@ public class MediaForm {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(name);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -212,7 +216,9 @@ public class MediaForm {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(title);
+			sb.append("\"");
 		}
 
 		sb.append("}");

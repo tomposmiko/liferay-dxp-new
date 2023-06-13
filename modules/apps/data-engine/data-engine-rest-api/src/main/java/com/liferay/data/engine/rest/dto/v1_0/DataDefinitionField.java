@@ -383,7 +383,9 @@ public class DataDefinitionField {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(fieldType);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -448,7 +450,9 @@ public class DataDefinitionField {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(name);
+			sb.append("\"");
 		}
 
 		sb.append(", ");

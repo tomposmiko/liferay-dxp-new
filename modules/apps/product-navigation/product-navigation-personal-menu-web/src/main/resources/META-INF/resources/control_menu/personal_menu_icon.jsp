@@ -16,28 +16,44 @@
 
 <%@ include file="/init.jsp" %>
 
-<span class="user-avatar-link">
-	<liferay-util:buffer
-		var="userAvatar"
-	>
-		<span class="sticker">
-			<span class="inline-item">
+<li class="control-menu-nav-item">
+	<span class="user-avatar-link">
+		<liferay-util:buffer
+			var="userAvatar"
+		>
+			<span class="sticker">
 				<liferay-ui:user-portrait
-					cssClass="sticker"
 					user="<%= user %>"
 				/>
+
+				<c:if test="<%= themeDisplay.isImpersonated() %>">
+					<span class="sticker sticker-bottom-right sticker-circle sticker-outside sticker-sm sticker-user-icon">
+						<aui:icon image="user" markupView="lexicon" />
+					</span>
+				</c:if>
 			</span>
+		</liferay-util:buffer>
 
-			<c:if test="<%= themeDisplay.isImpersonated() %>">
-				<span class="sticker sticker-bottom-right sticker-circle sticker-outside sticker-sm sticker-user-icon">
-					<aui:icon image="user" markupView="lexicon" />
+		<liferay-product-navigation:personal-menu
+			expanded="<%= true %>"
+			label="<%= userAvatar %>"
+		/>
+
+		<%
+		int notificationsCount = GetterUtil.getInteger(request.getAttribute(PersonalMenuWebKeys.NOTIFICATIONS_COUNT));
+		%>
+
+		<c:if test="<%= notificationsCount > 0 %>">
+
+			<%
+			String notificationsURL = PersonalApplicationURLUtil.getPersonalApplicationURL(request, PortletProviderUtil.getPortletId(UserNotificationEvent.class.getName(), PortletProvider.Action.VIEW));
+			%>
+
+			<aui:a href="<%= (notificationsURL != null) ? notificationsURL.toString() : null %>">
+				<span class="badge badge-danger panel-notifications-count">
+					<span class="badge-item badge-item-expand"><%= notificationsCount %></span>
 				</span>
-			</c:if>
-		</span>
-	</liferay-util:buffer>
-
-	<liferay-product-navigation:personal-menu
-		expanded="<%= true %>"
-		label="<%= userAvatar %>"
-	/>
-</span>
+			</aui:a>
+		</c:if>
+	</span>
+</li>

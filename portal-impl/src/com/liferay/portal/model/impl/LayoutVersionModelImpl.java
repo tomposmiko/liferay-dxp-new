@@ -182,29 +182,31 @@ public class LayoutVersionModelImpl
 
 	public static final long GROUPID_COLUMN_BITMASK = 16L;
 
-	public static final long ICONIMAGEID_COLUMN_BITMASK = 32L;
+	public static final long HIDDEN_COLUMN_BITMASK = 32L;
 
-	public static final long LAYOUTID_COLUMN_BITMASK = 64L;
+	public static final long ICONIMAGEID_COLUMN_BITMASK = 64L;
 
-	public static final long LAYOUTPROTOTYPEUUID_COLUMN_BITMASK = 128L;
+	public static final long LAYOUTID_COLUMN_BITMASK = 128L;
 
-	public static final long PARENTLAYOUTID_COLUMN_BITMASK = 256L;
+	public static final long LAYOUTPROTOTYPEUUID_COLUMN_BITMASK = 256L;
 
-	public static final long PARENTPLID_COLUMN_BITMASK = 512L;
+	public static final long PARENTLAYOUTID_COLUMN_BITMASK = 512L;
 
-	public static final long PLID_COLUMN_BITMASK = 1024L;
+	public static final long PARENTPLID_COLUMN_BITMASK = 1024L;
 
-	public static final long PRIORITY_COLUMN_BITMASK = 2048L;
+	public static final long PLID_COLUMN_BITMASK = 2048L;
 
-	public static final long PRIVATELAYOUT_COLUMN_BITMASK = 4096L;
+	public static final long PRIORITY_COLUMN_BITMASK = 4096L;
 
-	public static final long SOURCEPROTOTYPELAYOUTUUID_COLUMN_BITMASK = 8192L;
+	public static final long PRIVATELAYOUT_COLUMN_BITMASK = 8192L;
 
-	public static final long TYPE_COLUMN_BITMASK = 16384L;
+	public static final long SOURCEPROTOTYPELAYOUTUUID_COLUMN_BITMASK = 16384L;
 
-	public static final long UUID_COLUMN_BITMASK = 32768L;
+	public static final long TYPE_COLUMN_BITMASK = 32768L;
 
-	public static final long VERSION_COLUMN_BITMASK = 65536L;
+	public static final long UUID_COLUMN_BITMASK = 65536L;
+
+	public static final long VERSION_COLUMN_BITMASK = 131072L;
 
 	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(
 		com.liferay.portal.util.PropsUtil.get(
@@ -1461,7 +1463,19 @@ public class LayoutVersionModelImpl
 
 	@Override
 	public void setHidden(boolean hidden) {
+		_columnBitmask |= HIDDEN_COLUMN_BITMASK;
+
+		if (!_setOriginalHidden) {
+			_setOriginalHidden = true;
+
+			_originalHidden = _hidden;
+		}
+
 		_hidden = hidden;
+	}
+
+	public boolean getOriginalHidden() {
+		return _originalHidden;
 	}
 
 	@Override
@@ -2024,6 +2038,10 @@ public class LayoutVersionModelImpl
 
 		layoutVersionModelImpl._originalType = layoutVersionModelImpl._type;
 
+		layoutVersionModelImpl._originalHidden = layoutVersionModelImpl._hidden;
+
+		layoutVersionModelImpl._setOriginalHidden = false;
+
 		layoutVersionModelImpl._originalFriendlyURL =
 			layoutVersionModelImpl._friendlyURL;
 
@@ -2373,6 +2391,8 @@ public class LayoutVersionModelImpl
 	private String _originalType;
 	private String _typeSettings;
 	private boolean _hidden;
+	private boolean _originalHidden;
+	private boolean _setOriginalHidden;
 	private boolean _system;
 	private String _friendlyURL;
 	private String _originalFriendlyURL;

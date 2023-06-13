@@ -26,6 +26,8 @@ import com.liferay.petra.string.StringBundler;
 import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -75,6 +77,7 @@ public class BlogPostingImage {
 
 	}
 
+	@Schema(description = "An absolute URL to the binary image.")
 	public String getContentUrl() {
 		return contentUrl;
 	}
@@ -102,6 +105,9 @@ public class BlogPostingImage {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String contentUrl;
 
+	@Schema(
+		description = "The content type of this image (application/png...)."
+	)
 	public String getEncodingFormat() {
 		return encodingFormat;
 	}
@@ -129,6 +135,7 @@ public class BlogPostingImage {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String encodingFormat;
 
+	@Schema(description = "The extension of the image.")
 	public String getFileExtension() {
 		return fileExtension;
 	}
@@ -156,6 +163,7 @@ public class BlogPostingImage {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String fileExtension;
 
+	@Schema(description = "The identifier of the resource.")
 	public Long getId() {
 		return id;
 	}
@@ -181,17 +189,18 @@ public class BlogPostingImage {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
-	public Number getSizeInBytes() {
+	@Schema(description = "The size in bytes of the image.")
+	public Long getSizeInBytes() {
 		return sizeInBytes;
 	}
 
-	public void setSizeInBytes(Number sizeInBytes) {
+	public void setSizeInBytes(Long sizeInBytes) {
 		this.sizeInBytes = sizeInBytes;
 	}
 
 	@JsonIgnore
 	public void setSizeInBytes(
-		UnsafeSupplier<Number, Exception> sizeInBytesUnsafeSupplier) {
+		UnsafeSupplier<Long, Exception> sizeInBytesUnsafeSupplier) {
 
 		try {
 			sizeInBytes = sizeInBytesUnsafeSupplier.get();
@@ -206,8 +215,9 @@ public class BlogPostingImage {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected Number sizeInBytes;
+	protected Long sizeInBytes;
 
+	@Schema(description = "The text describing the image.")
 	public String getTitle() {
 		return title;
 	}
@@ -235,6 +245,9 @@ public class BlogPostingImage {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String title;
 
+	@Schema(
+		description = "Write only property to specify the default permissions."
+	)
 	public ViewableBy getViewableBy() {
 		return viewableBy;
 	}
@@ -304,7 +317,9 @@ public class BlogPostingImage {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(contentUrl);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -315,7 +330,9 @@ public class BlogPostingImage {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(encodingFormat);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -326,7 +343,9 @@ public class BlogPostingImage {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(fileExtension);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -359,7 +378,9 @@ public class BlogPostingImage {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(title);
+			sb.append("\"");
 		}
 
 		sb.append(", ");

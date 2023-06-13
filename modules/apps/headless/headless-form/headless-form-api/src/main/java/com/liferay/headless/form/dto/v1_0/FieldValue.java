@@ -237,7 +237,9 @@ public class FieldValue {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(name);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -248,7 +250,9 @@ public class FieldValue {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(value);
+			sb.append("\"");
 		}
 
 		sb.append("}");

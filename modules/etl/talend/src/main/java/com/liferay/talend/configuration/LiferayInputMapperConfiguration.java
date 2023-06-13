@@ -14,14 +14,13 @@
 
 package com.liferay.talend.configuration;
 
-import com.liferay.talend.dataset.RestDataSet;
+import com.liferay.talend.dataset.InputDataSet;
 
 import java.io.Serializable;
 
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.configuration.ui.layout.GridLayout;
 import org.talend.sdk.component.api.configuration.ui.layout.GridLayouts;
-import org.talend.sdk.component.api.meta.Documentation;
 
 /**
  * @author Zoltán Takács
@@ -31,7 +30,7 @@ import org.talend.sdk.component.api.meta.Documentation;
 	{
 		@GridLayout(
 			names = GridLayout.FormType.MAIN,
-			value = @GridLayout.Row("_restDataSet")
+			value = @GridLayout.Row("_inputDataSet")
 		),
 		@GridLayout(
 			names = GridLayout.FormType.ADVANCED,
@@ -45,8 +44,8 @@ public class LiferayInputMapperConfiguration implements Serializable {
 		return _batchSize;
 	}
 
-	public RestDataSet getRestDataSet() {
-		return _restDataSet;
+	public InputDataSet getInputDataSet() {
+		return _inputDataSet;
 	}
 
 	public int getTimeout() {
@@ -59,10 +58,10 @@ public class LiferayInputMapperConfiguration implements Serializable {
 		return this;
 	}
 
-	public LiferayInputMapperConfiguration setRestDataSet(
-		RestDataSet restDataSet) {
+	public LiferayInputMapperConfiguration setInputDataSet(
+		InputDataSet inputDataSet) {
 
-		_restDataSet = restDataSet;
+		_inputDataSet = inputDataSet;
 
 		return this;
 	}
@@ -73,16 +72,13 @@ public class LiferayInputMapperConfiguration implements Serializable {
 		return this;
 	}
 
-	@Documentation("TODO Fill the documentation for this parameter")
 	@Option
-	private int _batchSize;
+	private int _batchSize = 100;
 
-	@Documentation("TODO Fill the documentation for this parameter")
 	@Option
-	private RestDataSet _restDataSet;
+	private InputDataSet _inputDataSet;
 
-	@Documentation("TODO Fill the documentation for this parameter")
 	@Option
-	private int _timeout;
+	private int _timeout = 60000;
 
 }

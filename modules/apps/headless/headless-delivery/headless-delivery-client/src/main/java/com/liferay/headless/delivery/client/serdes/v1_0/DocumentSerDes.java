@@ -20,11 +20,10 @@ import com.liferay.headless.delivery.client.dto.v1_0.TaxonomyCategory;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import java.util.Collection;
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -51,23 +50,28 @@ public class DocumentSerDes {
 
 	public static String toJSON(Document document) {
 		if (document == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"adaptedImages\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (document.getAdaptedImages() == null) {
-			sb.append("null");
-		}
-		else {
+		if (document.getAdaptedImages() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"adaptedImages\":");
+
 			sb.append("[");
 
 			for (int i = 0; i < document.getAdaptedImages().length; i++) {
-				sb.append(document.getAdaptedImages()[i]);
+				sb.append(
+					AdaptedImageSerDes.toJSON(document.getAdaptedImages()[i]));
 
 				if ((i + 1) < document.getAdaptedImages().length) {
 					sb.append(", ");
@@ -77,129 +81,147 @@ public class DocumentSerDes {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (document.getAggregateRating() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"aggregateRating\": ");
+			sb.append("\"aggregateRating\":");
 
-		if (document.getAggregateRating() == null) {
-			sb.append("null");
+			sb.append(
+				AggregateRatingSerDes.toJSON(document.getAggregateRating()));
 		}
-		else {
-			sb.append(document.getAggregateRating());
-		}
 
-		sb.append(", ");
+		if (document.getContentUrl() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"contentUrl\": ");
+			sb.append("\"contentUrl\":");
 
-		if (document.getContentUrl() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(document.getContentUrl());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (document.getCreator() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"creator\": ");
+			sb.append("\"creator\":");
 
-		if (document.getCreator() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(document.getCreator());
-		}
-
-		sb.append(", ");
-
-		sb.append("\"dateCreated\": ");
-
-		if (document.getDateCreated() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(document.getDateCreated());
+			sb.append(CreatorSerDes.toJSON(document.getCreator()));
 		}
 
-		sb.append(", ");
+		if (document.getDateCreated() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dateModified\": ");
+			sb.append("\"dateCreated\":");
 
-		if (document.getDateModified() == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(
+				liferayToJSONDateFormat.format(document.getDateCreated()));
+
+			sb.append("\"");
 		}
-		else {
-			sb.append(document.getDateModified());
+
+		if (document.getDateModified() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"dateModified\":");
+
+			sb.append("\"");
+
+			sb.append(
+				liferayToJSONDateFormat.format(document.getDateModified()));
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (document.getDescription() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"description\": ");
+			sb.append("\"description\":");
 
-		if (document.getDescription() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(document.getDescription());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (document.getDocumentFolderId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"documentFolderId\": ");
+			sb.append("\"documentFolderId\":");
 
-		if (document.getDocumentFolderId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(document.getDocumentFolderId());
 		}
 
-		sb.append(", ");
+		if (document.getEncodingFormat() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"encodingFormat\": ");
+			sb.append("\"encodingFormat\":");
 
-		if (document.getEncodingFormat() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(document.getEncodingFormat());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (document.getFileExtension() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"fileExtension\": ");
+			sb.append("\"fileExtension\":");
 
-		if (document.getFileExtension() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(document.getFileExtension());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (document.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\":");
 
-		if (document.getId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(document.getId());
 		}
 
-		sb.append(", ");
+		if (document.getKeywords() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"keywords\": ");
+			sb.append("\"keywords\":");
 
-		if (document.getKeywords() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < document.getKeywords().length; i++) {
 				sb.append("\"");
+
 				sb.append(document.getKeywords()[i]);
+
 				sb.append("\"");
 
 				if ((i + 1) < document.getKeywords().length) {
@@ -210,40 +232,39 @@ public class DocumentSerDes {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (document.getNumberOfComments() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"numberOfComments\": ");
+			sb.append("\"numberOfComments\":");
 
-		if (document.getNumberOfComments() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(document.getNumberOfComments());
 		}
 
-		sb.append(", ");
+		if (document.getSizeInBytes() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"sizeInBytes\": ");
+			sb.append("\"sizeInBytes\":");
 
-		if (document.getSizeInBytes() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(document.getSizeInBytes());
 		}
 
-		sb.append(", ");
+		if (document.getTaxonomyCategories() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"taxonomyCategories\": ");
+			sb.append("\"taxonomyCategories\":");
 
-		if (document.getTaxonomyCategories() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < document.getTaxonomyCategories().length; i++) {
-				sb.append(document.getTaxonomyCategories()[i]);
+				sb.append(
+					TaxonomyCategorySerDes.toJSON(
+						document.getTaxonomyCategories()[i]));
 
 				if ((i + 1) < document.getTaxonomyCategories().length) {
 					sb.append(", ");
@@ -253,14 +274,13 @@ public class DocumentSerDes {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (document.getTaxonomyCategoryIds() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"taxonomyCategoryIds\": ");
+			sb.append("\"taxonomyCategoryIds\":");
 
-		if (document.getTaxonomyCategoryIds() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < document.getTaxonomyCategoryIds().length; i++) {
@@ -274,27 +294,31 @@ public class DocumentSerDes {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (document.getTitle() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"title\": ");
+			sb.append("\"title\":");
 
-		if (document.getTitle() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(document.getTitle());
-		}
-
-		sb.append(", ");
-
-		sb.append("\"viewableBy\": ");
-
-		if (document.getViewableBy() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
+
+			sb.append(document.getTitle());
+
+			sb.append("\"");
+		}
+
+		if (document.getViewableBy() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"viewableBy\":");
+
+			sb.append("\"");
+
 			sb.append(document.getViewableBy());
+
 			sb.append("\"");
 		}
 
@@ -303,38 +327,165 @@ public class DocumentSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<Document> documents) {
-		if (documents == null) {
-			return "[]";
+	public static Map<String, String> toMap(Document document) {
+		if (document == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		for (Document document : documents) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(document));
+		if (document.getAdaptedImages() == null) {
+			map.put("adaptedImages", null);
+		}
+		else {
+			map.put(
+				"adaptedImages", String.valueOf(document.getAdaptedImages()));
 		}
 
-		sb.append("]");
+		if (document.getAggregateRating() == null) {
+			map.put("aggregateRating", null);
+		}
+		else {
+			map.put(
+				"aggregateRating",
+				AggregateRatingSerDes.toJSON(document.getAggregateRating()));
+		}
 
-		return sb.toString();
+		if (document.getContentUrl() == null) {
+			map.put("contentUrl", null);
+		}
+		else {
+			map.put("contentUrl", String.valueOf(document.getContentUrl()));
+		}
+
+		if (document.getCreator() == null) {
+			map.put("creator", null);
+		}
+		else {
+			map.put("creator", CreatorSerDes.toJSON(document.getCreator()));
+		}
+
+		map.put(
+			"dateCreated",
+			liferayToJSONDateFormat.format(document.getDateCreated()));
+
+		map.put(
+			"dateModified",
+			liferayToJSONDateFormat.format(document.getDateModified()));
+
+		if (document.getDescription() == null) {
+			map.put("description", null);
+		}
+		else {
+			map.put("description", String.valueOf(document.getDescription()));
+		}
+
+		if (document.getDocumentFolderId() == null) {
+			map.put("documentFolderId", null);
+		}
+		else {
+			map.put(
+				"documentFolderId",
+				String.valueOf(document.getDocumentFolderId()));
+		}
+
+		if (document.getEncodingFormat() == null) {
+			map.put("encodingFormat", null);
+		}
+		else {
+			map.put(
+				"encodingFormat", String.valueOf(document.getEncodingFormat()));
+		}
+
+		if (document.getFileExtension() == null) {
+			map.put("fileExtension", null);
+		}
+		else {
+			map.put(
+				"fileExtension", String.valueOf(document.getFileExtension()));
+		}
+
+		if (document.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(document.getId()));
+		}
+
+		if (document.getKeywords() == null) {
+			map.put("keywords", null);
+		}
+		else {
+			map.put("keywords", String.valueOf(document.getKeywords()));
+		}
+
+		if (document.getNumberOfComments() == null) {
+			map.put("numberOfComments", null);
+		}
+		else {
+			map.put(
+				"numberOfComments",
+				String.valueOf(document.getNumberOfComments()));
+		}
+
+		if (document.getSizeInBytes() == null) {
+			map.put("sizeInBytes", null);
+		}
+		else {
+			map.put("sizeInBytes", String.valueOf(document.getSizeInBytes()));
+		}
+
+		if (document.getTaxonomyCategories() == null) {
+			map.put("taxonomyCategories", null);
+		}
+		else {
+			map.put(
+				"taxonomyCategories",
+				String.valueOf(document.getTaxonomyCategories()));
+		}
+
+		if (document.getTaxonomyCategoryIds() == null) {
+			map.put("taxonomyCategoryIds", null);
+		}
+		else {
+			map.put(
+				"taxonomyCategoryIds",
+				String.valueOf(document.getTaxonomyCategoryIds()));
+		}
+
+		if (document.getTitle() == null) {
+			map.put("title", null);
+		}
+		else {
+			map.put("title", String.valueOf(document.getTitle()));
+		}
+
+		if (document.getViewableBy() == null) {
+			map.put("viewableBy", null);
+		}
+		else {
+			map.put("viewableBy", String.valueOf(document.getViewableBy()));
+		}
+
+		return map;
 	}
 
 	private static class DocumentJSONParser extends BaseJSONParser<Document> {
 
+		@Override
 		protected Document createDTO() {
 			return new Document();
 		}
 
+		@Override
 		protected Document[] createDTOArray(int size) {
 			return new Document[size];
 		}
 
+		@Override
 		protected void setField(
 			Document document, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
@@ -372,13 +523,13 @@ public class DocumentSerDes {
 			else if (Objects.equals(jsonParserFieldName, "dateCreated")) {
 				if (jsonParserFieldValue != null) {
 					document.setDateCreated(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dateModified")) {
 				if (jsonParserFieldValue != null) {
 					document.setDateModified(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "description")) {
@@ -415,12 +566,14 @@ public class DocumentSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "numberOfComments")) {
 				if (jsonParserFieldValue != null) {
-					document.setNumberOfComments((Number)jsonParserFieldValue);
+					document.setNumberOfComments(
+						Integer.valueOf((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "sizeInBytes")) {
 				if (jsonParserFieldValue != null) {
-					document.setSizeInBytes((Number)jsonParserFieldValue);
+					document.setSizeInBytes(
+						Long.valueOf((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(
@@ -461,18 +614,6 @@ public class DocumentSerDes {
 			else {
 				throw new IllegalArgumentException(
 					"Unsupported field name " + jsonParserFieldName);
-			}
-		}
-
-		private Date _toDate(String string) {
-			try {
-				DateFormat dateFormat = new SimpleDateFormat(
-					"yyyy-MM-dd'T'HH:mm:ss'Z'");
-
-				return dateFormat.parse(string);
-			}
-			catch (ParseException pe) {
-				throw new IllegalArgumentException("Unable to parse " + string);
 			}
 		}
 

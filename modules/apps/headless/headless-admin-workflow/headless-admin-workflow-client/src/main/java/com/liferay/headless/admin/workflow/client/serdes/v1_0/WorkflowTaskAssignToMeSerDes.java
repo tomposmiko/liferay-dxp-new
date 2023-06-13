@@ -18,11 +18,10 @@ import com.liferay.headless.admin.workflow.client.dto.v1_0.WorkflowTaskAssignToM
 import com.liferay.headless.admin.workflow.client.json.BaseJSONParser;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import java.util.Collection;
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -50,31 +49,44 @@ public class WorkflowTaskAssignToMeSerDes {
 
 	public static String toJSON(WorkflowTaskAssignToMe workflowTaskAssignToMe) {
 		if (workflowTaskAssignToMe == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"comment\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (workflowTaskAssignToMe.getComment() == null) {
-			sb.append("null");
-		}
-		else {
+		if (workflowTaskAssignToMe.getComment() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"comment\":");
+
+			sb.append("\"");
+
 			sb.append(workflowTaskAssignToMe.getComment());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (workflowTaskAssignToMe.getDueDate() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dueDate\": ");
+			sb.append("\"dueDate\":");
 
-		if (workflowTaskAssignToMe.getDueDate() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(workflowTaskAssignToMe.getDueDate());
+			sb.append("\"");
+
+			sb.append(
+				liferayToJSONDateFormat.format(
+					workflowTaskAssignToMe.getDueDate()));
+
+			sb.append("\"");
 		}
 
 		sb.append("}");
@@ -82,43 +94,48 @@ public class WorkflowTaskAssignToMeSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(
-		Collection<WorkflowTaskAssignToMe> workflowTaskAssignToMes) {
+	public static Map<String, String> toMap(
+		WorkflowTaskAssignToMe workflowTaskAssignToMe) {
 
-		if (workflowTaskAssignToMes == null) {
-			return "[]";
+		if (workflowTaskAssignToMe == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		for (WorkflowTaskAssignToMe workflowTaskAssignToMe :
-				workflowTaskAssignToMes) {
-
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(workflowTaskAssignToMe));
+		if (workflowTaskAssignToMe.getComment() == null) {
+			map.put("comment", null);
+		}
+		else {
+			map.put(
+				"comment", String.valueOf(workflowTaskAssignToMe.getComment()));
 		}
 
-		sb.append("]");
+		map.put(
+			"dueDate",
+			liferayToJSONDateFormat.format(
+				workflowTaskAssignToMe.getDueDate()));
 
-		return sb.toString();
+		return map;
 	}
 
 	private static class WorkflowTaskAssignToMeJSONParser
 		extends BaseJSONParser<WorkflowTaskAssignToMe> {
 
+		@Override
 		protected WorkflowTaskAssignToMe createDTO() {
 			return new WorkflowTaskAssignToMe();
 		}
 
+		@Override
 		protected WorkflowTaskAssignToMe[] createDTOArray(int size) {
 			return new WorkflowTaskAssignToMe[size];
 		}
 
+		@Override
 		protected void setField(
 			WorkflowTaskAssignToMe workflowTaskAssignToMe,
 			String jsonParserFieldName, Object jsonParserFieldValue) {
@@ -132,24 +149,12 @@ public class WorkflowTaskAssignToMeSerDes {
 			else if (Objects.equals(jsonParserFieldName, "dueDate")) {
 				if (jsonParserFieldValue != null) {
 					workflowTaskAssignToMe.setDueDate(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else {
 				throw new IllegalArgumentException(
 					"Unsupported field name " + jsonParserFieldName);
-			}
-		}
-
-		private Date _toDate(String string) {
-			try {
-				DateFormat dateFormat = new SimpleDateFormat(
-					"yyyy-MM-dd'T'HH:mm:ss'Z'");
-
-				return dateFormat.parse(string);
-			}
-			catch (ParseException pe) {
-				throw new IllegalArgumentException("Unable to parse " + string);
 			}
 		}
 

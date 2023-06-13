@@ -213,16 +213,17 @@ public class Organization {
 
 	protected String name;
 
-	public Number getNumberOfOrganizations() {
+	public Integer getNumberOfOrganizations() {
 		return numberOfOrganizations;
 	}
 
-	public void setNumberOfOrganizations(Number numberOfOrganizations) {
+	public void setNumberOfOrganizations(Integer numberOfOrganizations) {
 		this.numberOfOrganizations = numberOfOrganizations;
 	}
 
 	public void setNumberOfOrganizations(
-		UnsafeSupplier<Number, Exception> numberOfOrganizationsUnsafeSupplier) {
+		UnsafeSupplier<Integer, Exception>
+			numberOfOrganizationsUnsafeSupplier) {
 
 		try {
 			numberOfOrganizations = numberOfOrganizationsUnsafeSupplier.get();
@@ -232,7 +233,7 @@ public class Organization {
 		}
 	}
 
-	protected Number numberOfOrganizations;
+	protected Integer numberOfOrganizations;
 
 	public Organization getParentOrganization() {
 		return parentOrganization;

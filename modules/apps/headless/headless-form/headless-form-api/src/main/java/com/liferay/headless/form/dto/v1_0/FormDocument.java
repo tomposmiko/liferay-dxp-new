@@ -146,17 +146,17 @@ public class FormDocument {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long id;
 
-	public Number getSizeInBytes() {
+	public Long getSizeInBytes() {
 		return sizeInBytes;
 	}
 
-	public void setSizeInBytes(Number sizeInBytes) {
+	public void setSizeInBytes(Long sizeInBytes) {
 		this.sizeInBytes = sizeInBytes;
 	}
 
 	@JsonIgnore
 	public void setSizeInBytes(
-		UnsafeSupplier<Number, Exception> sizeInBytesUnsafeSupplier) {
+		UnsafeSupplier<Long, Exception> sizeInBytesUnsafeSupplier) {
 
 		try {
 			sizeInBytes = sizeInBytesUnsafeSupplier.get();
@@ -171,7 +171,7 @@ public class FormDocument {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Number sizeInBytes;
+	protected Long sizeInBytes;
 
 	public String getTitle() {
 		return title;
@@ -233,7 +233,9 @@ public class FormDocument {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(contentUrl);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -244,7 +246,9 @@ public class FormDocument {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(encodingFormat);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -255,7 +259,9 @@ public class FormDocument {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(fileExtension);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -288,7 +294,9 @@ public class FormDocument {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(title);
+			sb.append("\"");
 		}
 
 		sb.append("}");

@@ -341,7 +341,14 @@ public class JournalTransformer {
 				template.put("groupId", articleGroupId);
 				template.put("journalTemplatesPath", templatesPath);
 
-				mergeTemplate(template, unsyncStringWriter, propagateException);
+				if (propagateException) {
+					template.processTemplate(unsyncStringWriter);
+				}
+				else {
+					template.processTemplate(
+						unsyncStringWriter,
+						() -> getErrorTemplateResource(langType));
+				}
 			}
 			catch (Exception e) {
 				if (e instanceof DocumentException) {
@@ -459,11 +466,8 @@ public class JournalTransformer {
 			templateResource = new StringTemplateResource(templateId, script);
 		}
 
-		TemplateResource errorTemplateResource = getErrorTemplateResource(
-			langType);
-
 		return TemplateManagerUtil.getTemplate(
-			langType, templateResource, errorTemplateResource, _restricted);
+			langType, templateResource, _restricted);
 	}
 
 	protected String getTemplateId(
@@ -690,19 +694,6 @@ public class JournalTransformer {
 		}
 
 		return map;
-	}
-
-	protected void mergeTemplate(
-			Template template, UnsyncStringWriter unsyncStringWriter,
-			boolean propagateException)
-		throws Exception {
-
-		if (propagateException) {
-			template.doProcessTemplate(unsyncStringWriter);
-		}
-		else {
-			template.processTemplate(unsyncStringWriter);
-		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

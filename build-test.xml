@@ -477,7 +477,7 @@ jdbc.counter.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 				input="${test.batch.name}"
 				property="java.jdk.bundle.version"
 				regexp="-jdk([0-9]+)(_(adopt|open|oracle|redhat|zulu))?"
-				select="1.\1"
+				select="\1"
 			/>
 
 			<property name="java.jdk.bundle.version" value="${ant.java.version}" />
@@ -492,17 +492,7 @@ jdbc.counter.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 		<sequential>
 			<var name="java.jdk.home" unset="true" />
 
-			<local name="version" />
-
-			<propertyregex
-				defaultValue="@{version}"
-				input="@{version}"
-				property="version"
-				regexp="1\.([0-9]+)"
-				select="\1"
-			/>
-
-			<propertycopy from="java.jdk.home[${version}][@{architecture}][@{type}]" property="java.jdk.home" silent="true" />
+			<propertycopy from="java.jdk.home[@{version}][@{architecture}][@{type}]" property="java.jdk.home" silent="true" />
 
 			<property name="java.jdk.home" value="${java.home}" />
 
@@ -1274,6 +1264,8 @@ war.path=${app.server.portal.dir}/</echo>
 						</not>
 						<then>
 							<antcall inheritAll="false" target="setup-sdk" />
+
+							<antcall inheritAll="false" target="setup-yarn" />
 						</then>
 					</if>
 
@@ -10718,6 +10710,8 @@ jdbc.default.password=${database.mysql.password}</echo>
 			</not>
 			<then>
 				<antcall inheritAll="false" target="setup-sdk" />
+
+				<antcall inheritAll="false" target="setup-yarn" />
 			</then>
 		</if>
 

@@ -27,8 +27,6 @@ SharedAssetsViewDisplayContext sharedAssetsViewDisplayContext = (SharedAssetsVie
 
 SharingEntry sharingEntry = (SharingEntry)renderRequest.getAttribute(SharingEntry.class.getName());
 
-portletDisplay.setShowBackIcon(true);
-
 String redirect = ParamUtil.getString(request, "redirect");
 
 if (Validator.isNull(redirect)) {
@@ -37,29 +35,54 @@ if (Validator.isNull(redirect)) {
 	redirect = portletURL.toString();
 }
 
-portletDisplay.setURLBack(redirect);
+Group scopeGroup = themeDisplay.getScopeGroup();
+
+if (scopeGroup.equals(themeDisplay.getControlPanelGroup())) {
+	portletDisplay.setShowBackIcon(true);
+	portletDisplay.setURLBack(redirect);
+}
+else {
+	portletDisplay.setPortletDecorate(false);
+	portletDisplay.setShowBackIcon(false);
+}
 %>
 
-<div class="upper-tbar-container-fixed">
-	<div class="tbar upper-tbar">
-		<div class="container-fluid container-fluid-max-xl">
-			<ul class="tbar-nav">
-				<li class="tbar-item tbar-item-expand">
-					<div class="tbar-section text-left">
-						<h2 class="text-truncate-inline upper-tbar-title" title="<%= HtmlUtil.escapeAttribute(assetRenderer.getTitle(locale)) %>">
-							<span class="text-truncate"><%= HtmlUtil.escape(assetRenderer.getTitle(locale)) %></span>
-						</h2>
-					</div>
-				</li>
-				<li class="tbar-item">
-					<liferay-ui:menu
-						menu="<%= sharedAssetsViewDisplayContext.getSharingEntryMenu(sharingEntry) %>"
+<c:if test="<%= scopeGroup.equals(themeDisplay.getControlPanelGroup()) %>">
+	<div class="upper-tbar-container-fixed">
+</c:if>
+
+<div class="tbar upper-tbar">
+	<div class="container-fluid container-fluid-max-xl">
+		<ul class="tbar-nav">
+			<c:if test="<%= !scopeGroup.equals(themeDisplay.getControlPanelGroup()) %>">
+				<li class="d-none d-sm-flex tbar-item">
+					<clay:link
+						elementClasses="btn btn-monospaced btn-outline-borderless btn-outline-secondary btn-sm"
+						href="<%= redirect %>"
+						icon="angle-left"
 					/>
 				</li>
-			</ul>
-		</div>
+			</c:if>
+
+			<li class="tbar-item tbar-item-expand">
+				<div class="tbar-section text-left">
+					<h2 class="text-truncate-inline upper-tbar-title" title="<%= HtmlUtil.escapeAttribute(assetRenderer.getTitle(locale)) %>">
+						<span class="text-truncate"><%= HtmlUtil.escape(assetRenderer.getTitle(locale)) %></span>
+					</h2>
+				</div>
+			</li>
+			<li class="tbar-item">
+				<liferay-ui:menu
+					menu="<%= sharedAssetsViewDisplayContext.getSharingEntryMenu(sharingEntry) %>"
+				/>
+			</li>
+		</ul>
 	</div>
 </div>
+
+<c:if test="<%= scopeGroup.equals(themeDisplay.getControlPanelGroup()) %>">
+	</div>
+</c:if>
 
 <liferay-asset:asset-display
 	assetEntry="<%= assetEntry %>"

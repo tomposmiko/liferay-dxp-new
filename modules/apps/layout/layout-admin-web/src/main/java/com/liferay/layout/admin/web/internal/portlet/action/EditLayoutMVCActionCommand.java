@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortletKeys;
@@ -119,6 +120,14 @@ public class EditLayoutMVCActionCommand extends BaseMVCActionCommand {
 
 		Layout layout = _layoutLocalService.getLayout(
 			groupId, privateLayout, layoutId);
+
+		if (MapUtil.isEmpty(
+				MapUtil.filter(
+					friendlyURLMap,
+					entry -> Validator.isNotNull(entry.getValue())))) {
+
+			friendlyURLMap = layout.getFriendlyURLMap();
+		}
 
 		String currentType = layout.getType();
 

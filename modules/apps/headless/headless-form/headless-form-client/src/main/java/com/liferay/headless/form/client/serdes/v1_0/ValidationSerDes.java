@@ -17,7 +17,8 @@ package com.liferay.headless.form.client.serdes.v1_0;
 import com.liferay.headless.form.client.dto.v1_0.Validation;
 import com.liferay.headless.form.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -43,41 +44,48 @@ public class ValidationSerDes {
 
 	public static String toJSON(Validation validation) {
 		if (validation == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"errorMessage\": ");
+		if (validation.getErrorMessage() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (validation.getErrorMessage() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"errorMessage\":");
+
+			sb.append("\"");
+
 			sb.append(validation.getErrorMessage());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (validation.getExpression() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"expression\": ");
+			sb.append("\"expression\":");
 
-		if (validation.getExpression() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(validation.getExpression());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (validation.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\":");
 
-		if (validation.getId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(validation.getId());
 		}
 
@@ -86,39 +94,52 @@ public class ValidationSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<Validation> validations) {
-		if (validations == null) {
-			return "[]";
+	public static Map<String, String> toMap(Validation validation) {
+		if (validation == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (Validation validation : validations) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(validation));
+		if (validation.getErrorMessage() == null) {
+			map.put("errorMessage", null);
+		}
+		else {
+			map.put(
+				"errorMessage", String.valueOf(validation.getErrorMessage()));
 		}
 
-		sb.append("]");
+		if (validation.getExpression() == null) {
+			map.put("expression", null);
+		}
+		else {
+			map.put("expression", String.valueOf(validation.getExpression()));
+		}
 
-		return sb.toString();
+		if (validation.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(validation.getId()));
+		}
+
+		return map;
 	}
 
 	private static class ValidationJSONParser
 		extends BaseJSONParser<Validation> {
 
+		@Override
 		protected Validation createDTO() {
 			return new Validation();
 		}
 
+		@Override
 		protected Validation[] createDTOArray(int size) {
 			return new Validation[size];
 		}
 
+		@Override
 		protected void setField(
 			Validation validation, String jsonParserFieldName,
 			Object jsonParserFieldValue) {

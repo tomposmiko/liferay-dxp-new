@@ -61,18 +61,17 @@ public class AggregateTestRule implements TestRule {
 	private static final String[] _ORDERED_RULE_CLASS_NAMES = {
 		TimeoutTestRule.class.getName(), HeapDumpTestRule.class.getName(),
 		CodeCoverageAssertor.class.getName(), NewEnvTestRule.class.getName(),
-		"com.liferay.portal.test.rule.PortalExecutorManagerTestRule",
 		AssumeTestRule.class.getName(),
 		"com.liferay.portal.test.rule.LiferayIntegrationTestRule",
-		"com.liferay.portal.test.rule.HypersonicServerTestRule",
+		"com.liferay.portal.test.rule.HypersonicServerClassTestRule",
 		"com.liferay.portal.test.rule.PersistenceTestRule",
 		"com.liferay.portal.test.rule.TransactionalTestRule",
 		SynchronousDestinationTestRule.class.getName(),
 		"com.liferay.portal.test.rule.SynchronousMailTestRule",
 		"com.liferay.document.library.webdav.test." +
-			"WebDAVEnvironmentConfigTestRule",
-		"com.liferay.portal.test.rule.SyntheticBundleRule",
-		"com.liferay.portal.test.rule.PermissionCheckerTestRule"
+			"WebDAVEnvironmentConfigClassTestRule",
+		"com.liferay.portal.test.rule.SyntheticBundleClassTestRule",
+		"com.liferay.portal.test.rule.PermissionCheckerMethodTestRule"
 	};
 
 	private static final Comparator<TestRule> _testRuleComparator =

@@ -15,7 +15,7 @@
 package com.liferay.headless.delivery.resource.v1_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.headless.delivery.dto.v1_0.DocumentFolder;
+import com.liferay.headless.delivery.client.dto.v1_0.DocumentFolder;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
@@ -38,33 +38,14 @@ public class DocumentFolderResourceTest
 	}
 
 	@Override
-	protected DocumentFolder randomDocumentFolder() {
-		return new DocumentFolder() {
-			{
-				description = RandomTestUtil.randomString();
-				name = RandomTestUtil.randomString();
-				siteId = testGroup.getGroupId();
-			}
-		};
-	}
-
-	protected DocumentFolder randomPatchDocumentFolder() {
-		return new DocumentFolder() {
-			{
-				description = RandomTestUtil.randomString();
-				siteId = testGroup.getGroupId();
-			}
-		};
-	}
-
-	@Override
 	protected DocumentFolder testGetDocumentFolder_addDocumentFolder()
 		throws Exception {
 
 		DocumentFolder postDocumentFolder = invokePostSiteDocumentFolder(
 			testGroup.getGroupId(), randomDocumentFolder());
 
-		Assert.assertEquals(0, postDocumentFolder.getNumberOfDocuments());
+		Assert.assertEquals(
+			Integer.valueOf(0), postDocumentFolder.getNumberOfDocuments());
 
 		DLAppTestUtil.addFileEntryWithWorkflow(
 			UserLocalServiceUtil.getDefaultUserId(testGroup.getCompanyId()),
@@ -75,7 +56,8 @@ public class DocumentFolderResourceTest
 		DocumentFolder getDocumentFolder = invokeGetDocumentFolder(
 			postDocumentFolder.getId());
 
-		Assert.assertEquals(1, getDocumentFolder.getNumberOfDocuments());
+		Assert.assertEquals(
+			Integer.valueOf(1), getDocumentFolder.getNumberOfDocuments());
 
 		return postDocumentFolder;
 	}

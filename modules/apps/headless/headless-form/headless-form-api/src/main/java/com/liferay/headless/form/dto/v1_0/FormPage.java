@@ -201,7 +201,9 @@ public class FormPage {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(headline);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -223,7 +225,9 @@ public class FormPage {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(text);
+			sb.append("\"");
 		}
 
 		sb.append("}");

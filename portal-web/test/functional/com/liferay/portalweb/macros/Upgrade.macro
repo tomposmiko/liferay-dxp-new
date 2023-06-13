@@ -1033,8 +1033,7 @@ definition {
 
 		if (isSet(categoryName)) {
 			AssetPublisherPortlet.viewAssetMetadataPG(
-				categoryName = "${categoryName}",
-				vocabularyName = "Vocabulary Name"
+				categoryName = "${categoryName}"
 			);
 		}
 	}
@@ -1149,7 +1148,7 @@ definition {
 	}
 
 	macro viewNotifications {
-		Navigator.gotoPage(pageName = "Welcome");
+		Navigator.gotoPage(pageName = "Home");
 
 		Notifications.gotoNotifications();
 

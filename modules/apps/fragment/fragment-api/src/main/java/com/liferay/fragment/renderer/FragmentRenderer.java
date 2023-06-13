@@ -15,6 +15,7 @@
 package com.liferay.fragment.renderer;
 
 import com.liferay.fragment.constants.FragmentConstants;
+import com.liferay.petra.string.StringPool;
 
 import java.io.IOException;
 
@@ -29,6 +30,13 @@ public interface FragmentRenderer {
 	public String getCollectionKey(
 		FragmentRendererContext fragmentRendererContext);
 
+	public default String getImagePreviewURL(
+		FragmentRendererContext fragmentRendererContext,
+		HttpServletRequest httpServletRequest) {
+
+		return StringPool.BLANK;
+	}
+
 	public default String getKey() {
 		Class<?> clazz = getClass();
 
@@ -42,6 +50,10 @@ public interface FragmentRenderer {
 	}
 
 	public default boolean isAvailable(HttpServletRequest httpServletRequest) {
+		return true;
+	}
+
+	public default boolean isSelectable() {
 		return true;
 	}
 

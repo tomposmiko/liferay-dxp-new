@@ -17,7 +17,8 @@ package com.liferay.headless.delivery.client.serdes.v1_0;
 import com.liferay.headless.delivery.client.dto.v1_0.MessageBoardAttachment;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -45,75 +46,87 @@ public class MessageBoardAttachmentSerDes {
 
 	public static String toJSON(MessageBoardAttachment messageBoardAttachment) {
 		if (messageBoardAttachment == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"contentUrl\": ");
+		if (messageBoardAttachment.getContentUrl() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (messageBoardAttachment.getContentUrl() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"contentUrl\":");
+
+			sb.append("\"");
+
 			sb.append(messageBoardAttachment.getContentUrl());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (messageBoardAttachment.getEncodingFormat() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"encodingFormat\": ");
+			sb.append("\"encodingFormat\":");
 
-		if (messageBoardAttachment.getEncodingFormat() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(messageBoardAttachment.getEncodingFormat());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (messageBoardAttachment.getFileExtension() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"fileExtension\": ");
+			sb.append("\"fileExtension\":");
 
-		if (messageBoardAttachment.getFileExtension() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(messageBoardAttachment.getFileExtension());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (messageBoardAttachment.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\":");
 
-		if (messageBoardAttachment.getId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(messageBoardAttachment.getId());
 		}
 
-		sb.append(", ");
+		if (messageBoardAttachment.getSizeInBytes() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"sizeInBytes\": ");
+			sb.append("\"sizeInBytes\":");
 
-		if (messageBoardAttachment.getSizeInBytes() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(messageBoardAttachment.getSizeInBytes());
 		}
 
-		sb.append(", ");
+		if (messageBoardAttachment.getTitle() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"title\": ");
+			sb.append("\"title\":");
 
-		if (messageBoardAttachment.getTitle() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(messageBoardAttachment.getTitle());
+
+			sb.append("\"");
 		}
 
 		sb.append("}");
@@ -121,43 +134,82 @@ public class MessageBoardAttachmentSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(
-		Collection<MessageBoardAttachment> messageBoardAttachments) {
+	public static Map<String, String> toMap(
+		MessageBoardAttachment messageBoardAttachment) {
 
-		if (messageBoardAttachments == null) {
-			return "[]";
+		if (messageBoardAttachment == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (MessageBoardAttachment messageBoardAttachment :
-				messageBoardAttachments) {
-
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(messageBoardAttachment));
+		if (messageBoardAttachment.getContentUrl() == null) {
+			map.put("contentUrl", null);
+		}
+		else {
+			map.put(
+				"contentUrl",
+				String.valueOf(messageBoardAttachment.getContentUrl()));
 		}
 
-		sb.append("]");
+		if (messageBoardAttachment.getEncodingFormat() == null) {
+			map.put("encodingFormat", null);
+		}
+		else {
+			map.put(
+				"encodingFormat",
+				String.valueOf(messageBoardAttachment.getEncodingFormat()));
+		}
 
-		return sb.toString();
+		if (messageBoardAttachment.getFileExtension() == null) {
+			map.put("fileExtension", null);
+		}
+		else {
+			map.put(
+				"fileExtension",
+				String.valueOf(messageBoardAttachment.getFileExtension()));
+		}
+
+		if (messageBoardAttachment.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(messageBoardAttachment.getId()));
+		}
+
+		if (messageBoardAttachment.getSizeInBytes() == null) {
+			map.put("sizeInBytes", null);
+		}
+		else {
+			map.put(
+				"sizeInBytes",
+				String.valueOf(messageBoardAttachment.getSizeInBytes()));
+		}
+
+		if (messageBoardAttachment.getTitle() == null) {
+			map.put("title", null);
+		}
+		else {
+			map.put("title", String.valueOf(messageBoardAttachment.getTitle()));
+		}
+
+		return map;
 	}
 
 	private static class MessageBoardAttachmentJSONParser
 		extends BaseJSONParser<MessageBoardAttachment> {
 
+		@Override
 		protected MessageBoardAttachment createDTO() {
 			return new MessageBoardAttachment();
 		}
 
+		@Override
 		protected MessageBoardAttachment[] createDTOArray(int size) {
 			return new MessageBoardAttachment[size];
 		}
 
+		@Override
 		protected void setField(
 			MessageBoardAttachment messageBoardAttachment,
 			String jsonParserFieldName, Object jsonParserFieldValue) {
@@ -189,7 +241,7 @@ public class MessageBoardAttachmentSerDes {
 			else if (Objects.equals(jsonParserFieldName, "sizeInBytes")) {
 				if (jsonParserFieldValue != null) {
 					messageBoardAttachment.setSizeInBytes(
-						(Number)jsonParserFieldValue);
+						Long.valueOf((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "title")) {

@@ -922,7 +922,7 @@ definition {
 	}
 
 	macro gotoEntry {
-		LexiconCard.clickCard(
+		LexiconCard.clickCardTitle(
 			card = "${dmDocumentTitle}"
 		);
 	}
@@ -1237,7 +1237,9 @@ definition {
 
 		DMDocument.viewDocumentToolbarCmdPG();
 
-		//DMDocument.viewDocumentAuthorCmdPG(dmDocumentAuthor = "${dmDocumentAuthor}");
+		Click(locator1 = "Icon#INFO");
+
+		DMDocument.viewDocumentAuthorCmdPG(dmDocumentAuthor = "${dmDocumentAuthor}");
 
 		if (isSet(commentBody)) {
 			var key_entryComment = "${commentBody}";
@@ -1251,11 +1253,11 @@ definition {
 			DMDocument.viewDocumentNoCommentsCmdPG();
 		}
 
-		//DMDocument.viewDocumentVersionNumberCmdPG(
-		//	dmDocumentVersionNumber = "${dmDocumentVersionNumber}"
-		//);
+		DMDocument.viewDocumentVersionNumberCmdPG(
+			dmDocumentVersionNumber = "${dmDocumentVersionNumber}"
+		);
 
-		//DMDocument.viewDocumentDetailsCmdPG();
+		DMDocument.viewDocumentDetailsCmdPG();
 	}
 
 	macro viewCannotAddRepository {
@@ -1465,8 +1467,6 @@ definition {
 		AssertElementPresent(
 			locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_GET_URL_OR_WEBDAV_URL"
 		);
-
-		Click(locator1 = "DocumentsAndMediaDocument#DOCUMENT_DETAILS_DROPDOWN");
 
 		Panel.expandPanel(panel = "Automatically Extracted Metadata");
 	}

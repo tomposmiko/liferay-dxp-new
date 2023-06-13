@@ -17,7 +17,8 @@ package com.liferay.headless.admin.user.client.serdes.v1_0;
 import com.liferay.headless.admin.user.client.dto.v1_0.Phone;
 import com.liferay.headless.admin.user.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -43,63 +44,72 @@ public class PhoneSerDes {
 
 	public static String toJSON(Phone phone) {
 		if (phone == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"extension\": ");
+		if (phone.getExtension() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (phone.getExtension() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"extension\":");
+
+			sb.append("\"");
+
 			sb.append(phone.getExtension());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (phone.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\":");
 
-		if (phone.getId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(phone.getId());
 		}
 
-		sb.append(", ");
+		if (phone.getPhoneNumber() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"phoneNumber\": ");
+			sb.append("\"phoneNumber\":");
 
-		if (phone.getPhoneNumber() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(phone.getPhoneNumber());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (phone.getPhoneType() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"phoneType\": ");
+			sb.append("\"phoneType\":");
 
-		if (phone.getPhoneType() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(phone.getPhoneType());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (phone.getPrimary() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"primary\": ");
+			sb.append("\"primary\":");
 
-		if (phone.getPrimary() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(phone.getPrimary());
 		}
 
@@ -108,38 +118,64 @@ public class PhoneSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<Phone> phones) {
-		if (phones == null) {
-			return "[]";
+	public static Map<String, String> toMap(Phone phone) {
+		if (phone == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (Phone phone : phones) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(phone));
+		if (phone.getExtension() == null) {
+			map.put("extension", null);
+		}
+		else {
+			map.put("extension", String.valueOf(phone.getExtension()));
 		}
 
-		sb.append("]");
+		if (phone.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(phone.getId()));
+		}
 
-		return sb.toString();
+		if (phone.getPhoneNumber() == null) {
+			map.put("phoneNumber", null);
+		}
+		else {
+			map.put("phoneNumber", String.valueOf(phone.getPhoneNumber()));
+		}
+
+		if (phone.getPhoneType() == null) {
+			map.put("phoneType", null);
+		}
+		else {
+			map.put("phoneType", String.valueOf(phone.getPhoneType()));
+		}
+
+		if (phone.getPrimary() == null) {
+			map.put("primary", null);
+		}
+		else {
+			map.put("primary", String.valueOf(phone.getPrimary()));
+		}
+
+		return map;
 	}
 
 	private static class PhoneJSONParser extends BaseJSONParser<Phone> {
 
+		@Override
 		protected Phone createDTO() {
 			return new Phone();
 		}
 
+		@Override
 		protected Phone[] createDTOArray(int size) {
 			return new Phone[size];
 		}
 
+		@Override
 		protected void setField(
 			Phone phone, String jsonParserFieldName,
 			Object jsonParserFieldValue) {

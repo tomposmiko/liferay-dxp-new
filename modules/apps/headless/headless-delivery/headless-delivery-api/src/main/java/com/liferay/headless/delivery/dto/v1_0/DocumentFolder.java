@@ -81,6 +81,7 @@ public class DocumentFolder {
 
 	}
 
+	@Schema(description = "The creator of the DocumentFolder")
 	public Creator getCreator() {
 		return creator;
 	}
@@ -108,6 +109,7 @@ public class DocumentFolder {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator creator;
 
+	@Schema(description = "The creation date of the DocumentFolder.")
 	public Date getDateCreated() {
 		return dateCreated;
 	}
@@ -135,6 +137,9 @@ public class DocumentFolder {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
+	@Schema(
+		description = "The last time a field of the DocumentFolder changed."
+	)
 	public Date getDateModified() {
 		return dateModified;
 	}
@@ -162,6 +167,7 @@ public class DocumentFolder {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateModified;
 
+	@Schema(description = "The description of the DocumentFolder")
 	public String getDescription() {
 		return description;
 	}
@@ -189,6 +195,7 @@ public class DocumentFolder {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String description;
 
+	@Schema(description = "The identifier of the resource.")
 	public Long getId() {
 		return id;
 	}
@@ -214,6 +221,7 @@ public class DocumentFolder {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
+	@Schema(description = "The main title/name of the DocumentFolder")
 	public String getName() {
 		return name;
 	}
@@ -240,17 +248,20 @@ public class DocumentFolder {
 	@NotEmpty
 	protected String name;
 
-	public Number getNumberOfDocumentFolders() {
+	@Schema(
+		description = "The number of child DocumentFolders that depend on this resources."
+	)
+	public Integer getNumberOfDocumentFolders() {
 		return numberOfDocumentFolders;
 	}
 
-	public void setNumberOfDocumentFolders(Number numberOfDocumentFolders) {
+	public void setNumberOfDocumentFolders(Integer numberOfDocumentFolders) {
 		this.numberOfDocumentFolders = numberOfDocumentFolders;
 	}
 
 	@JsonIgnore
 	public void setNumberOfDocumentFolders(
-		UnsafeSupplier<Number, Exception>
+		UnsafeSupplier<Integer, Exception>
 			numberOfDocumentFoldersUnsafeSupplier) {
 
 		try {
@@ -267,19 +278,22 @@ public class DocumentFolder {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected Number numberOfDocumentFolders;
+	protected Integer numberOfDocumentFolders;
 
-	public Number getNumberOfDocuments() {
+	@Schema(
+		description = "The number of child Documents that depend on this resources."
+	)
+	public Integer getNumberOfDocuments() {
 		return numberOfDocuments;
 	}
 
-	public void setNumberOfDocuments(Number numberOfDocuments) {
+	public void setNumberOfDocuments(Integer numberOfDocuments) {
 		this.numberOfDocuments = numberOfDocuments;
 	}
 
 	@JsonIgnore
 	public void setNumberOfDocuments(
-		UnsafeSupplier<Number, Exception> numberOfDocumentsUnsafeSupplier) {
+		UnsafeSupplier<Integer, Exception> numberOfDocumentsUnsafeSupplier) {
 
 		try {
 			numberOfDocuments = numberOfDocumentsUnsafeSupplier.get();
@@ -294,8 +308,11 @@ public class DocumentFolder {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected Number numberOfDocuments;
+	protected Integer numberOfDocuments;
 
+	@Schema(
+		description = "The site identificator where this DocumentFolder is scoped."
+	)
 	public Long getSiteId() {
 		return siteId;
 	}
@@ -323,6 +340,9 @@ public class DocumentFolder {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long siteId;
 
+	@Schema(
+		description = "Write only property to specify the default permissions."
+	)
 	public ViewableBy getViewableBy() {
 		return viewableBy;
 	}
@@ -403,7 +423,9 @@ public class DocumentFolder {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(dateCreated);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -414,7 +436,9 @@ public class DocumentFolder {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(dateModified);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -425,7 +449,9 @@ public class DocumentFolder {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(description);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -447,7 +473,9 @@ public class DocumentFolder {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(name);
+			sb.append("\"");
 		}
 
 		sb.append(", ");

@@ -18,11 +18,10 @@ import com.liferay.headless.admin.user.client.dto.v1_0.Segment;
 import com.liferay.headless.admin.user.client.json.BaseJSONParser;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import java.util.Collection;
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -48,97 +47,115 @@ public class SegmentSerDes {
 
 	public static String toJSON(Segment segment) {
 		if (segment == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"active\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (segment.getActive() == null) {
-			sb.append("null");
-		}
-		else {
+		if (segment.getActive() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"active\":");
+
 			sb.append(segment.getActive());
 		}
 
-		sb.append(", ");
+		if (segment.getCriteria() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"criteria\": ");
+			sb.append("\"criteria\":");
 
-		if (segment.getCriteria() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(segment.getCriteria());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (segment.getDateCreated() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dateCreated\": ");
+			sb.append("\"dateCreated\":");
 
-		if (segment.getDateCreated() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(segment.getDateCreated());
-		}
+			sb.append("\"");
 
-		sb.append(", ");
+			sb.append(liferayToJSONDateFormat.format(segment.getDateCreated()));
 
-		sb.append("\"dateModified\": ");
-
-		if (segment.getDateModified() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(segment.getDateModified());
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (segment.getDateModified() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"dateModified\":");
 
-		if (segment.getId() == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(
+				liferayToJSONDateFormat.format(segment.getDateModified()));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (segment.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"id\":");
+
 			sb.append(segment.getId());
 		}
 
-		sb.append(", ");
+		if (segment.getName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\":");
 
-		if (segment.getName() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(segment.getName());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (segment.getSiteId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"siteId\": ");
+			sb.append("\"siteId\":");
 
-		if (segment.getSiteId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(segment.getSiteId());
 		}
 
-		sb.append(", ");
+		if (segment.getSource() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"source\": ");
+			sb.append("\"source\":");
 
-		if (segment.getSource() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(segment.getSource());
+
+			sb.append("\"");
 		}
 
 		sb.append("}");
@@ -146,38 +163,82 @@ public class SegmentSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<Segment> segments) {
-		if (segments == null) {
-			return "[]";
+	public static Map<String, String> toMap(Segment segment) {
+		if (segment == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		for (Segment segment : segments) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(segment));
+		if (segment.getActive() == null) {
+			map.put("active", null);
+		}
+		else {
+			map.put("active", String.valueOf(segment.getActive()));
 		}
 
-		sb.append("]");
+		if (segment.getCriteria() == null) {
+			map.put("criteria", null);
+		}
+		else {
+			map.put("criteria", String.valueOf(segment.getCriteria()));
+		}
 
-		return sb.toString();
+		map.put(
+			"dateCreated",
+			liferayToJSONDateFormat.format(segment.getDateCreated()));
+
+		map.put(
+			"dateModified",
+			liferayToJSONDateFormat.format(segment.getDateModified()));
+
+		if (segment.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(segment.getId()));
+		}
+
+		if (segment.getName() == null) {
+			map.put("name", null);
+		}
+		else {
+			map.put("name", String.valueOf(segment.getName()));
+		}
+
+		if (segment.getSiteId() == null) {
+			map.put("siteId", null);
+		}
+		else {
+			map.put("siteId", String.valueOf(segment.getSiteId()));
+		}
+
+		if (segment.getSource() == null) {
+			map.put("source", null);
+		}
+		else {
+			map.put("source", String.valueOf(segment.getSource()));
+		}
+
+		return map;
 	}
 
 	private static class SegmentJSONParser extends BaseJSONParser<Segment> {
 
+		@Override
 		protected Segment createDTO() {
 			return new Segment();
 		}
 
+		@Override
 		protected Segment[] createDTOArray(int size) {
 			return new Segment[size];
 		}
 
+		@Override
 		protected void setField(
 			Segment segment, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
@@ -195,13 +256,13 @@ public class SegmentSerDes {
 			else if (Objects.equals(jsonParserFieldName, "dateCreated")) {
 				if (jsonParserFieldValue != null) {
 					segment.setDateCreated(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dateModified")) {
 				if (jsonParserFieldValue != null) {
 					segment.setDateModified(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "id")) {
@@ -228,18 +289,6 @@ public class SegmentSerDes {
 			else {
 				throw new IllegalArgumentException(
 					"Unsupported field name " + jsonParserFieldName);
-			}
-		}
-
-		private Date _toDate(String string) {
-			try {
-				DateFormat dateFormat = new SimpleDateFormat(
-					"yyyy-MM-dd'T'HH:mm:ss'Z'");
-
-				return dateFormat.parse(string);
-			}
-			catch (ParseException pe) {
-				throw new IllegalArgumentException("Unable to parse " + string);
 			}
 		}
 

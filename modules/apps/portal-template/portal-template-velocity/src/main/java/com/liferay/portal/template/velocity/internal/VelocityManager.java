@@ -28,7 +28,7 @@ import com.liferay.portal.kernel.template.TemplateManager;
 import com.liferay.portal.kernel.template.TemplateResource;
 import com.liferay.portal.kernel.template.TemplateResourceLoader;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.template.BaseSingleTemplateManager;
+import com.liferay.portal.template.BaseTemplateManager;
 import com.liferay.portal.template.RestrictedTemplate;
 import com.liferay.portal.template.TemplateContextHelper;
 import com.liferay.portal.template.velocity.configuration.VelocityEngineConfiguration;
@@ -62,7 +62,7 @@ import org.osgi.service.component.annotations.Reference;
 	property = "language.type=" + TemplateConstants.LANG_TYPE_VM,
 	service = TemplateManager.class
 )
-public class VelocityManager extends BaseSingleTemplateManager {
+public class VelocityManager extends BaseTemplateManager {
 
 	@Override
 	public void addTaglibTheme(
@@ -273,14 +273,12 @@ public class VelocityManager extends BaseSingleTemplateManager {
 
 	@Override
 	protected Template doGetTemplate(
-		TemplateResource templateResource,
-		TemplateResource errorTemplateResource, boolean restricted,
+		TemplateResource templateResource, boolean restricted,
 		Map<String, Object> helperUtilities) {
 
 		Template template = new VelocityTemplate(
-			templateResource, errorTemplateResource, helperUtilities,
-			_velocityEngine, templateContextHelper,
-			_velocityTemplateResourceCache);
+			templateResource, helperUtilities, _velocityEngine,
+			templateContextHelper, _velocityTemplateResourceCache);
 
 		if (restricted) {
 			template = new RestrictedTemplate(

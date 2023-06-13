@@ -17,7 +17,8 @@ package com.liferay.headless.admin.user.client.serdes.v1_0;
 import com.liferay.headless.admin.user.client.dto.v1_0.SiteBrief;
 import com.liferay.headless.admin.user.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -43,31 +44,35 @@ public class SiteBriefSerDes {
 
 	public static String toJSON(SiteBrief siteBrief) {
 		if (siteBrief == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"id\": ");
+		if (siteBrief.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (siteBrief.getId() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"id\":");
+
 			sb.append(siteBrief.getId());
 		}
 
-		sb.append(", ");
+		if (siteBrief.getName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\":");
 
-		if (siteBrief.getName() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(siteBrief.getName());
+
+			sb.append("\"");
 		}
 
 		sb.append("}");
@@ -75,38 +80,43 @@ public class SiteBriefSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<SiteBrief> siteBriefs) {
-		if (siteBriefs == null) {
-			return "[]";
+	public static Map<String, String> toMap(SiteBrief siteBrief) {
+		if (siteBrief == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (SiteBrief siteBrief : siteBriefs) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(siteBrief));
+		if (siteBrief.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(siteBrief.getId()));
 		}
 
-		sb.append("]");
+		if (siteBrief.getName() == null) {
+			map.put("name", null);
+		}
+		else {
+			map.put("name", String.valueOf(siteBrief.getName()));
+		}
 
-		return sb.toString();
+		return map;
 	}
 
 	private static class SiteBriefJSONParser extends BaseJSONParser<SiteBrief> {
 
+		@Override
 		protected SiteBrief createDTO() {
 			return new SiteBrief();
 		}
 
+		@Override
 		protected SiteBrief[] createDTOArray(int size) {
 			return new SiteBrief[size];
 		}
 
+		@Override
 		protected void setField(
 			SiteBrief siteBrief, String jsonParserFieldName,
 			Object jsonParserFieldValue) {

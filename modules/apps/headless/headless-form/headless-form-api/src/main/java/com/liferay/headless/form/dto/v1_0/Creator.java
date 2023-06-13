@@ -258,7 +258,9 @@ public class Creator {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(additionalName);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -269,7 +271,9 @@ public class Creator {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(familyName);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -280,7 +284,9 @@ public class Creator {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(givenName);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -302,7 +308,9 @@ public class Creator {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(image);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -313,7 +321,9 @@ public class Creator {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(name);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -324,7 +334,9 @@ public class Creator {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(profileURL);
+			sb.append("\"");
 		}
 
 		sb.append("}");

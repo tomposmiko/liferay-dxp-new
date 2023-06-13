@@ -39,22 +39,50 @@ function _fetch(url, body = {}) {
 }
 
 /**
- * @param {string[]} fragmentEntryLinkIds
  * @param {string} segmentsExperienceId
+ * @param {Array<string>} [fragmentEntryLinkIds=[]]
  * @return {Promise<Response>}
  */
-function removeFragmentEntryLinks(fragmentEntryLinkIds, segmentsExperienceId) {
+function removeExperience(segmentsExperienceId, fragmentEntryLinkIds = []) {
 	const state = _store.getState();
 
-	return _fetch(
-		state.updateLayoutPageTemplateDataURL,
-		{
-			classNameId: state.classNameId,
-			classPK: state.classPK,
-			data: JSON.stringify(state.layoutData),
-			fragmentEntryLinkIds: JSON.stringify(fragmentEntryLinkIds),
-			segmentsExperienceId
-		}
+	const body = {
+		segmentsExperienceId
+	};
+
+	if (fragmentEntryLinkIds && fragmentEntryLinkIds.length) {
+		body.fragmentEntryLinkIds = JSON.stringify(fragmentEntryLinkIds);
+	}
+
+	return _fetch(state.deleteSegmentsExperienceURL, body);
+}
+
+/**
+ * @param {{}} layoutData
+ * @param {string[]} fragmentEntryLinkIds
+ * @param {string} segmentsExperienceId
+ * @return {Promise<Response[]>}
+ */
+function removeFragmentEntryLinks(
+	layoutData,
+	fragmentEntryLinkIds,
+	segmentsExperienceId
+) {
+	const state = _store.getState();
+
+	return Promise.all(
+		fragmentEntryLinkIds.map(
+			fragmentEntryLinkId => _fetch(
+				state.deleteFragmentEntryLinkURL,
+				{
+					classNameId: state.classNameId,
+					classPK: state.classPK,
+					data: JSON.stringify(layoutData),
+					fragmentEntryLinkId,
+					segmentsExperienceId
+				}
+			)
+		)
 	);
 }
 
@@ -86,6 +114,7 @@ function updatePageEditorLayoutData(layoutData, segmentsExperienceId) {
 }
 
 export {
+	removeExperience,
 	removeFragmentEntryLinks,
 	setStore,
 	updatePageEditorLayoutData

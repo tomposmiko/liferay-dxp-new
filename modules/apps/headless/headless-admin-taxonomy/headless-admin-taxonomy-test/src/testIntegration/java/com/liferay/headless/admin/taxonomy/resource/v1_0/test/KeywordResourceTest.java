@@ -15,7 +15,7 @@
 package com.liferay.headless.admin.taxonomy.resource.v1_0.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
-import com.liferay.headless.admin.taxonomy.dto.v1_0.Keyword;
+import com.liferay.headless.admin.taxonomy.client.dto.v1_0.Keyword;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import org.junit.runner.RunWith;

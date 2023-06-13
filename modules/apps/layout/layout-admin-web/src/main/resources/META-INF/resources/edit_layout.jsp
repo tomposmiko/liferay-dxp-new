@@ -125,6 +125,7 @@ renderResponse.setTitle(selLayout.getName(locale));
 			enctype="multipart/form-data"
 			method="post"
 			name="editLayoutFm"
+			onSubmit="event.preventDefault();"
 		>
 			<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 			<aui:input name="backURL" type="hidden" value="<%= backURL %>" />
@@ -138,7 +139,7 @@ renderResponse.setTitle(selLayout.getName(locale));
 			<aui:input name="type" type="hidden" value="<%= selLayout.getType() %>" />
 			<aui:input name="<%= PortletDataHandlerKeys.SELECTED_LAYOUTS %>" type="hidden" />
 
-			<c:if test="<%= layoutsAdminDisplayContext.isLayoutPageTemplateEntry() || layoutsAdminDisplayContext.isDraft() %>">
+			<c:if test="<%= layoutsAdminDisplayContext.isLayoutPageTemplateEntry() || ((Objects.equals(selLayout.getType(), LayoutConstants.TYPE_ASSET_DISPLAY) || Objects.equals(selLayout.getType(), LayoutConstants.TYPE_CONTENT)) && !layoutsAdminDisplayContext.isDraft()) %>">
 
 				<%
 				for (String languageId : group.getAvailableLanguageIds()) {
@@ -252,3 +253,19 @@ renderResponse.setTitle(selLayout.getName(locale));
 		</liferay-frontend:edit-form>
 	</c:otherwise>
 </c:choose>
+
+<aui:script>
+	var form = document.getElementById('<portlet:namespace />editLayoutFm');
+
+	form.addEventListener(
+		'submit',
+		function(event) {
+			var applyLayoutPrototype = document.getElementById('<portlet:namespace />applyLayoutPrototype');
+
+			if (!applyLayoutPrototype || (applyLayoutPrototype.value === 'false') || (applyLayoutPrototype && (applyLayoutPrototype.value === 'true') && confirm('<%= UnicodeLanguageUtil.get(request, "reactivating-inherited-changes-may-update-the-page-with-the-possible-changes-that-could-have-been-made-in-the-original-template") %>'))) {
+				submitForm(form);
+			}
+		}
+	);
+
+</aui:script>

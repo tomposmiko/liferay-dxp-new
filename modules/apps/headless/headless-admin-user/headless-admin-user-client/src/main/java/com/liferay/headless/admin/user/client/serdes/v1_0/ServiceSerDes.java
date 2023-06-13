@@ -18,7 +18,8 @@ import com.liferay.headless.admin.user.client.dto.v1_0.HoursAvailable;
 import com.liferay.headless.admin.user.client.dto.v1_0.Service;
 import com.liferay.headless.admin.user.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -45,23 +46,26 @@ public class ServiceSerDes {
 
 	public static String toJSON(Service service) {
 		if (service == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"hoursAvailable\": ");
+		if (service.getHoursAvailable() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (service.getHoursAvailable() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"hoursAvailable\":");
+
 			sb.append("[");
 
 			for (int i = 0; i < service.getHoursAvailable().length; i++) {
-				sb.append(service.getHoursAvailable()[i]);
+				sb.append(
+					HoursAvailableSerDes.toJSON(
+						service.getHoursAvailable()[i]));
 
 				if ((i + 1) < service.getHoursAvailable().length) {
 					sb.append(", ");
@@ -71,26 +75,28 @@ public class ServiceSerDes {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (service.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\":");
 
-		if (service.getId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(service.getId());
 		}
 
-		sb.append(", ");
+		if (service.getServiceType() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"serviceType\": ");
+			sb.append("\"serviceType\":");
 
-		if (service.getServiceType() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(service.getServiceType());
+
+			sb.append("\"");
 		}
 
 		sb.append("}");
@@ -98,38 +104,51 @@ public class ServiceSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<Service> services) {
-		if (services == null) {
-			return "[]";
+	public static Map<String, String> toMap(Service service) {
+		if (service == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (Service service : services) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(service));
+		if (service.getHoursAvailable() == null) {
+			map.put("hoursAvailable", null);
+		}
+		else {
+			map.put(
+				"hoursAvailable", String.valueOf(service.getHoursAvailable()));
 		}
 
-		sb.append("]");
+		if (service.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(service.getId()));
+		}
 
-		return sb.toString();
+		if (service.getServiceType() == null) {
+			map.put("serviceType", null);
+		}
+		else {
+			map.put("serviceType", String.valueOf(service.getServiceType()));
+		}
+
+		return map;
 	}
 
 	private static class ServiceJSONParser extends BaseJSONParser<Service> {
 
+		@Override
 		protected Service createDTO() {
 			return new Service();
 		}
 
+		@Override
 		protected Service[] createDTOArray(int size) {
 			return new Service[size];
 		}
 
+		@Override
 		protected void setField(
 			Service service, String jsonParserFieldName,
 			Object jsonParserFieldValue) {

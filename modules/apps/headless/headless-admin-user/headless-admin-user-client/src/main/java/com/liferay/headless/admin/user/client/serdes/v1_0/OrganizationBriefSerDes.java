@@ -17,7 +17,8 @@ package com.liferay.headless.admin.user.client.serdes.v1_0;
 import com.liferay.headless.admin.user.client.dto.v1_0.OrganizationBrief;
 import com.liferay.headless.admin.user.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -45,31 +46,35 @@ public class OrganizationBriefSerDes {
 
 	public static String toJSON(OrganizationBrief organizationBrief) {
 		if (organizationBrief == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"id\": ");
+		if (organizationBrief.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (organizationBrief.getId() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"id\":");
+
 			sb.append(organizationBrief.getId());
 		}
 
-		sb.append(", ");
+		if (organizationBrief.getName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\":");
 
-		if (organizationBrief.getName() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(organizationBrief.getName());
+
+			sb.append("\"");
 		}
 
 		sb.append("}");
@@ -77,41 +82,46 @@ public class OrganizationBriefSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(
-		Collection<OrganizationBrief> organizationBriefs) {
+	public static Map<String, String> toMap(
+		OrganizationBrief organizationBrief) {
 
-		if (organizationBriefs == null) {
-			return "[]";
+		if (organizationBrief == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (OrganizationBrief organizationBrief : organizationBriefs) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(organizationBrief));
+		if (organizationBrief.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(organizationBrief.getId()));
 		}
 
-		sb.append("]");
+		if (organizationBrief.getName() == null) {
+			map.put("name", null);
+		}
+		else {
+			map.put("name", String.valueOf(organizationBrief.getName()));
+		}
 
-		return sb.toString();
+		return map;
 	}
 
 	private static class OrganizationBriefJSONParser
 		extends BaseJSONParser<OrganizationBrief> {
 
+		@Override
 		protected OrganizationBrief createDTO() {
 			return new OrganizationBrief();
 		}
 
+		@Override
 		protected OrganizationBrief[] createDTOArray(int size) {
 			return new OrganizationBrief[size];
 		}
 
+		@Override
 		protected void setField(
 			OrganizationBrief organizationBrief, String jsonParserFieldName,
 			Object jsonParserFieldValue) {

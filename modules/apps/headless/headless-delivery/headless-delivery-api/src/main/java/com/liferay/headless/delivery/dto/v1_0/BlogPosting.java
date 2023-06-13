@@ -81,6 +81,9 @@ public class BlogPosting {
 
 	}
 
+	@Schema(
+		description = "The information of the ratings (average, number) associated to this resource."
+	)
 	public AggregateRating getAggregateRating() {
 		return aggregateRating;
 	}
@@ -109,6 +112,7 @@ public class BlogPosting {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected AggregateRating aggregateRating;
 
+	@Schema(description = "The subtitle of this BlogPosting.")
 	public String getAlternativeHeadline() {
 		return alternativeHeadline;
 	}
@@ -136,6 +140,7 @@ public class BlogPosting {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String alternativeHeadline;
 
+	@Schema(description = "The article content of this BlogPosting.")
 	public String getArticleBody() {
 		return articleBody;
 	}
@@ -164,6 +169,7 @@ public class BlogPosting {
 	@NotEmpty
 	protected String articleBody;
 
+	@Schema(description = "The creator of the BlogPosting")
 	public Creator getCreator() {
 		return creator;
 	}
@@ -191,6 +197,7 @@ public class BlogPosting {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator creator;
 
+	@Schema(description = "The creation date of the BlogPosting.")
 	public Date getDateCreated() {
 		return dateCreated;
 	}
@@ -218,6 +225,7 @@ public class BlogPosting {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
+	@Schema(description = "The last time a field of the BlogPosting changed.")
 	public Date getDateModified() {
 		return dateModified;
 	}
@@ -245,6 +253,7 @@ public class BlogPosting {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateModified;
 
+	@Schema(description = "The last date when the BlogPosting was published.")
 	public Date getDatePublished() {
 		return datePublished;
 	}
@@ -272,6 +281,7 @@ public class BlogPosting {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Date datePublished;
 
+	@Schema(description = "A description explaining this BlogPosting.")
 	public String getDescription() {
 		return description;
 	}
@@ -299,6 +309,7 @@ public class BlogPosting {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String description;
 
+	@Schema(description = "The media format of the content (html, bbcode...).")
 	public String getEncodingFormat() {
 		return encodingFormat;
 	}
@@ -326,6 +337,9 @@ public class BlogPosting {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String encodingFormat;
 
+	@Schema(
+		description = "A relative URL where this content will be accesible."
+	)
 	public String getFriendlyUrlPath() {
 		return friendlyUrlPath;
 	}
@@ -353,6 +367,7 @@ public class BlogPosting {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String friendlyUrlPath;
 
+	@Schema(description = "The main title of this BlogPosting.")
 	public String getHeadline() {
 		return headline;
 	}
@@ -381,6 +396,7 @@ public class BlogPosting {
 	@NotEmpty
 	protected String headline;
 
+	@Schema(description = "The identifier of the resource.")
 	public Long getId() {
 		return id;
 	}
@@ -406,6 +422,7 @@ public class BlogPosting {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
+	@Schema(description = "The cover image of the BlogPosting.")
 	public Image getImage() {
 		return image;
 	}
@@ -431,6 +448,7 @@ public class BlogPosting {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Image image;
 
+	@Schema(description = "A list of keywords describing the BlogPosting.")
 	public String[] getKeywords() {
 		return keywords;
 	}
@@ -458,17 +476,20 @@ public class BlogPosting {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String[] keywords;
 
-	public Number getNumberOfComments() {
+	@Schema(
+		description = "The number of comments this BlogPosting has received."
+	)
+	public Integer getNumberOfComments() {
 		return numberOfComments;
 	}
 
-	public void setNumberOfComments(Number numberOfComments) {
+	public void setNumberOfComments(Integer numberOfComments) {
 		this.numberOfComments = numberOfComments;
 	}
 
 	@JsonIgnore
 	public void setNumberOfComments(
-		UnsafeSupplier<Number, Exception> numberOfCommentsUnsafeSupplier) {
+		UnsafeSupplier<Integer, Exception> numberOfCommentsUnsafeSupplier) {
 
 		try {
 			numberOfComments = numberOfCommentsUnsafeSupplier.get();
@@ -483,8 +504,11 @@ public class BlogPosting {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected Number numberOfComments;
+	protected Integer numberOfComments;
 
+	@Schema(
+		description = "The site identificator where this BlogPosting is scoped."
+	)
 	public Long getSiteId() {
 		return siteId;
 	}
@@ -512,6 +536,7 @@ public class BlogPosting {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long siteId;
 
+	@Schema(description = "The categories asociated with this BlogPosting.")
 	public TaxonomyCategory[] getTaxonomyCategories() {
 		return taxonomyCategories;
 	}
@@ -540,6 +565,9 @@ public class BlogPosting {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected TaxonomyCategory[] taxonomyCategories;
 
+	@Schema(
+		description = "A write only field to add TaxonomyCategory to this resource."
+	)
 	public Long[] getTaxonomyCategoryIds() {
 		return taxonomyCategoryIds;
 	}
@@ -567,6 +595,9 @@ public class BlogPosting {
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	protected Long[] taxonomyCategoryIds;
 
+	@Schema(
+		description = "Write only property to specify the default permissions."
+	)
 	public ViewableBy getViewableBy() {
 		return viewableBy;
 	}
@@ -647,7 +678,9 @@ public class BlogPosting {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(alternativeHeadline);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -658,7 +691,9 @@ public class BlogPosting {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(articleBody);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -680,7 +715,9 @@ public class BlogPosting {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(dateCreated);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -691,7 +728,9 @@ public class BlogPosting {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(dateModified);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -702,7 +741,9 @@ public class BlogPosting {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(datePublished);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -713,7 +754,9 @@ public class BlogPosting {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(description);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -724,7 +767,9 @@ public class BlogPosting {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(encodingFormat);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -735,7 +780,9 @@ public class BlogPosting {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(friendlyUrlPath);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -746,7 +793,9 @@ public class BlogPosting {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(headline);
+			sb.append("\"");
 		}
 
 		sb.append(", ");

@@ -92,7 +92,7 @@ definition {
 	@priority = "5"
 	test StagingRemoteLiveBlogsWithWorkflow {
 		property custom.properties = "tunneling.servlet.shared.secret=1234567890123456${line.separator}auth.verifier.TunnelAuthVerifier.hosts.allowed=";
-		property test.name.skip.portal.instance = "Staging#StagingRemoteLiveBlogsWithWorkflow";
+		property test.name.skip.portal.instance = "RemoteStagingBlogs#StagingRemoteLiveBlogsWithWorkflow";
 
 		Staging.remoteStagingSetUp(siteName = "Site Name");
 
@@ -147,6 +147,7 @@ definition {
 		LexiconEntry.gotoEllipsisMenuItem(menuItem = "Assign to Me");
 
 		Workflow.confirmWorkflowAction();
+
 		UserBar.gotoDropdownItem(dropdownItem = "My Workflow Tasks");
 
 		Workflow.approveTaskByActions(

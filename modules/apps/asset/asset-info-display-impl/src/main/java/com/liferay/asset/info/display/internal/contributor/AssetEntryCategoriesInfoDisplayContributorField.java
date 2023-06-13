@@ -18,8 +18,10 @@ import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.info.display.contributor.InfoDisplayContributorField;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.util.Accessor;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -57,7 +59,31 @@ public class AssetEntryCategoriesInfoDisplayContributorField
 	@Override
 	public String getValue(AssetEntry assetEntry, Locale locale) {
 		return ListUtil.toString(
-			assetEntry.getCategories(), AssetCategory.NAME_ACCESSOR);
+			assetEntry.getCategories(),
+			new Accessor<AssetCategory, String>() {
+
+				@Override
+				public String get(AssetCategory assetCategory) {
+					String title = assetCategory.getTitle(locale);
+
+					if (Validator.isNull(title)) {
+						return assetCategory.getName();
+					}
+
+					return title;
+				}
+
+				@Override
+				public Class<String> getAttributeClass() {
+					return String.class;
+				}
+
+				@Override
+				public Class<AssetCategory> getTypeClass() {
+					return AssetCategory.class;
+				}
+
+			});
 	}
 
 }

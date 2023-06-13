@@ -1085,11 +1085,7 @@ definition {
 	macro editEmailViaMyAccount {
 		Navigator.openURL();
 
-		ProductMenu.gotoPortlet(
-			category = "My Account",
-			panel = "User",
-			portlet = "Account Settings"
-		);
+		Navigator.gotoAccountSettings();
 
 		Type(locator1 = "TextInput#EMAIL_ADDRESS", value1 = "${userEmailAddress}");
 
@@ -1473,15 +1469,14 @@ definition {
 
 		MenuItem.click(menuItem = "Impersonate User");
 
-		SelectWindow(locator1 = "title=Welcome - ${siteName}");
+		SelectWindow(locator1 = "title=Home - ${siteName}");
 
 		AssertElementPresent(locator1 = "UserBar#USER_AVATAR_IMAGE");
 
 		Click(locator1 = "UserBar#USER_AVATAR_IMAGE");
 
 		AssertElementPresent(
-			locator1 = "ProductMenu#PANEL_EXPANDED",
-			key_panel = "user"
+			locator1 = "UserBar#USER_AVATAR_DROPDOWN_PORTAL_OPEN"
 		);
 	}
 

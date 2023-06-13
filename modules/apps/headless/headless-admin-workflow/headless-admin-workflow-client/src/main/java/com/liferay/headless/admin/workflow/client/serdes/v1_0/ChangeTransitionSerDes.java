@@ -17,7 +17,8 @@ package com.liferay.headless.admin.workflow.client.serdes.v1_0;
 import com.liferay.headless.admin.workflow.client.dto.v1_0.ChangeTransition;
 import com.liferay.headless.admin.workflow.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -45,20 +46,25 @@ public class ChangeTransitionSerDes {
 
 	public static String toJSON(ChangeTransition changeTransition) {
 		if (changeTransition == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"transition\": ");
+		if (changeTransition.getTransition() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (changeTransition.getTransition() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"transition\":");
+
+			sb.append("\"");
+
 			sb.append(changeTransition.getTransition());
+
+			sb.append("\"");
 		}
 
 		sb.append("}");
@@ -66,41 +72,38 @@ public class ChangeTransitionSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(
-		Collection<ChangeTransition> changeTransitions) {
-
-		if (changeTransitions == null) {
-			return "[]";
+	public static Map<String, String> toMap(ChangeTransition changeTransition) {
+		if (changeTransition == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (ChangeTransition changeTransition : changeTransitions) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(changeTransition));
+		if (changeTransition.getTransition() == null) {
+			map.put("transition", null);
+		}
+		else {
+			map.put(
+				"transition", String.valueOf(changeTransition.getTransition()));
 		}
 
-		sb.append("]");
-
-		return sb.toString();
+		return map;
 	}
 
 	private static class ChangeTransitionJSONParser
 		extends BaseJSONParser<ChangeTransition> {
 
+		@Override
 		protected ChangeTransition createDTO() {
 			return new ChangeTransition();
 		}
 
+		@Override
 		protected ChangeTransition[] createDTOArray(int size) {
 			return new ChangeTransition[size];
 		}
 
+		@Override
 		protected void setField(
 			ChangeTransition changeTransition, String jsonParserFieldName,
 			Object jsonParserFieldValue) {

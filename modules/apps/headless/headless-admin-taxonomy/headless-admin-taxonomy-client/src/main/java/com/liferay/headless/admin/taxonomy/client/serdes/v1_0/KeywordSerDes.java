@@ -18,11 +18,10 @@ import com.liferay.headless.admin.taxonomy.client.dto.v1_0.Keyword;
 import com.liferay.headless.admin.taxonomy.client.json.BaseJSONParser;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import java.util.Collection;
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -48,85 +47,96 @@ public class KeywordSerDes {
 
 	public static String toJSON(Keyword keyword) {
 		if (keyword == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"creator\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (keyword.getCreator() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(keyword.getCreator());
-		}
+		if (keyword.getCreator() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append(", ");
+			sb.append("\"creator\":");
 
-		sb.append("\"dateCreated\": ");
-
-		if (keyword.getDateCreated() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(keyword.getDateCreated());
+			sb.append(CreatorSerDes.toJSON(keyword.getCreator()));
 		}
 
-		sb.append(", ");
+		if (keyword.getDateCreated() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dateModified\": ");
+			sb.append("\"dateCreated\":");
 
-		if (keyword.getDateModified() == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(liferayToJSONDateFormat.format(keyword.getDateCreated()));
+
+			sb.append("\"");
 		}
-		else {
-			sb.append(keyword.getDateModified());
+
+		if (keyword.getDateModified() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"dateModified\":");
+
+			sb.append("\"");
+
+			sb.append(
+				liferayToJSONDateFormat.format(keyword.getDateModified()));
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (keyword.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\":");
 
-		if (keyword.getId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(keyword.getId());
 		}
 
-		sb.append(", ");
+		if (keyword.getKeywordUsageCount() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"keywordUsageCount\": ");
+			sb.append("\"keywordUsageCount\":");
 
-		if (keyword.getKeywordUsageCount() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(keyword.getKeywordUsageCount());
 		}
 
-		sb.append(", ");
+		if (keyword.getName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\":");
 
-		if (keyword.getName() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(keyword.getName());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (keyword.getSiteId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"siteId\": ");
+			sb.append("\"siteId\":");
 
-		if (keyword.getSiteId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(keyword.getSiteId());
 		}
 
@@ -135,38 +145,77 @@ public class KeywordSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<Keyword> keywords) {
-		if (keywords == null) {
-			return "[]";
+	public static Map<String, String> toMap(Keyword keyword) {
+		if (keyword == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		for (Keyword keyword : keywords) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(keyword));
+		if (keyword.getCreator() == null) {
+			map.put("creator", null);
+		}
+		else {
+			map.put("creator", CreatorSerDes.toJSON(keyword.getCreator()));
 		}
 
-		sb.append("]");
+		map.put(
+			"dateCreated",
+			liferayToJSONDateFormat.format(keyword.getDateCreated()));
 
-		return sb.toString();
+		map.put(
+			"dateModified",
+			liferayToJSONDateFormat.format(keyword.getDateModified()));
+
+		if (keyword.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(keyword.getId()));
+		}
+
+		if (keyword.getKeywordUsageCount() == null) {
+			map.put("keywordUsageCount", null);
+		}
+		else {
+			map.put(
+				"keywordUsageCount",
+				String.valueOf(keyword.getKeywordUsageCount()));
+		}
+
+		if (keyword.getName() == null) {
+			map.put("name", null);
+		}
+		else {
+			map.put("name", String.valueOf(keyword.getName()));
+		}
+
+		if (keyword.getSiteId() == null) {
+			map.put("siteId", null);
+		}
+		else {
+			map.put("siteId", String.valueOf(keyword.getSiteId()));
+		}
+
+		return map;
 	}
 
 	private static class KeywordJSONParser extends BaseJSONParser<Keyword> {
 
+		@Override
 		protected Keyword createDTO() {
 			return new Keyword();
 		}
 
+		@Override
 		protected Keyword[] createDTOArray(int size) {
 			return new Keyword[size];
 		}
 
+		@Override
 		protected void setField(
 			Keyword keyword, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
@@ -180,13 +229,13 @@ public class KeywordSerDes {
 			else if (Objects.equals(jsonParserFieldName, "dateCreated")) {
 				if (jsonParserFieldValue != null) {
 					keyword.setDateCreated(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dateModified")) {
 				if (jsonParserFieldValue != null) {
 					keyword.setDateModified(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "id")) {
@@ -196,7 +245,8 @@ public class KeywordSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "keywordUsageCount")) {
 				if (jsonParserFieldValue != null) {
-					keyword.setKeywordUsageCount((Number)jsonParserFieldValue);
+					keyword.setKeywordUsageCount(
+						Integer.valueOf((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "name")) {
@@ -213,18 +263,6 @@ public class KeywordSerDes {
 			else {
 				throw new IllegalArgumentException(
 					"Unsupported field name " + jsonParserFieldName);
-			}
-		}
-
-		private Date _toDate(String string) {
-			try {
-				DateFormat dateFormat = new SimpleDateFormat(
-					"yyyy-MM-dd'T'HH:mm:ss'Z'");
-
-				return dateFormat.parse(string);
-			}
-			catch (ParseException pe) {
-				throw new IllegalArgumentException("Unable to parse " + string);
 			}
 		}
 

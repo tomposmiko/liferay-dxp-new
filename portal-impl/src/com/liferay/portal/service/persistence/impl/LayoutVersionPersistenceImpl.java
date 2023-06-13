@@ -22428,6 +22428,1333 @@ public class LayoutVersionPersistenceImpl
 	private static final String _FINDER_COLUMN_G_P_SPLU_VERSION_VERSION_2 =
 		"layoutVersion.version = ?";
 
+	private FinderPath _finderPathWithPaginationFindByG_P_P_H;
+	private FinderPath _finderPathWithoutPaginationFindByG_P_P_H;
+	private FinderPath _finderPathCountByG_P_P_H;
+
+	/**
+	 * Returns all the layout versions where groupId = &#63; and privateLayout = &#63; and parentLayoutId = &#63; and hidden = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param privateLayout the private layout
+	 * @param parentLayoutId the parent layout ID
+	 * @param hidden the hidden
+	 * @return the matching layout versions
+	 */
+	@Override
+	public List<LayoutVersion> findByG_P_P_H(
+		long groupId, boolean privateLayout, long parentLayoutId,
+		boolean hidden) {
+
+		return findByG_P_P_H(
+			groupId, privateLayout, parentLayoutId, hidden, QueryUtil.ALL_POS,
+			QueryUtil.ALL_POS, null);
+	}
+
+	/**
+	 * Returns a range of all the layout versions where groupId = &#63; and privateLayout = &#63; and parentLayoutId = &#63; and hidden = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param groupId the group ID
+	 * @param privateLayout the private layout
+	 * @param parentLayoutId the parent layout ID
+	 * @param hidden the hidden
+	 * @param start the lower bound of the range of layout versions
+	 * @param end the upper bound of the range of layout versions (not inclusive)
+	 * @return the range of matching layout versions
+	 */
+	@Override
+	public List<LayoutVersion> findByG_P_P_H(
+		long groupId, boolean privateLayout, long parentLayoutId,
+		boolean hidden, int start, int end) {
+
+		return findByG_P_P_H(
+			groupId, privateLayout, parentLayoutId, hidden, start, end, null);
+	}
+
+	/**
+	 * Returns an ordered range of all the layout versions where groupId = &#63; and privateLayout = &#63; and parentLayoutId = &#63; and hidden = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param groupId the group ID
+	 * @param privateLayout the private layout
+	 * @param parentLayoutId the parent layout ID
+	 * @param hidden the hidden
+	 * @param start the lower bound of the range of layout versions
+	 * @param end the upper bound of the range of layout versions (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching layout versions
+	 */
+	@Override
+	public List<LayoutVersion> findByG_P_P_H(
+		long groupId, boolean privateLayout, long parentLayoutId,
+		boolean hidden, int start, int end,
+		OrderByComparator<LayoutVersion> orderByComparator) {
+
+		return findByG_P_P_H(
+			groupId, privateLayout, parentLayoutId, hidden, start, end,
+			orderByComparator, true);
+	}
+
+	/**
+	 * Returns an ordered range of all the layout versions where groupId = &#63; and privateLayout = &#63; and parentLayoutId = &#63; and hidden = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param groupId the group ID
+	 * @param privateLayout the private layout
+	 * @param parentLayoutId the parent layout ID
+	 * @param hidden the hidden
+	 * @param start the lower bound of the range of layout versions
+	 * @param end the upper bound of the range of layout versions (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @return the ordered range of matching layout versions
+	 */
+	@Override
+	public List<LayoutVersion> findByG_P_P_H(
+		long groupId, boolean privateLayout, long parentLayoutId,
+		boolean hidden, int start, int end,
+		OrderByComparator<LayoutVersion> orderByComparator,
+		boolean retrieveFromCache) {
+
+		boolean pagination = true;
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
+
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+			(orderByComparator == null)) {
+
+			pagination = false;
+			finderPath = _finderPathWithoutPaginationFindByG_P_P_H;
+			finderArgs = new Object[] {
+				groupId, privateLayout, parentLayoutId, hidden
+			};
+		}
+		else {
+			finderPath = _finderPathWithPaginationFindByG_P_P_H;
+			finderArgs = new Object[] {
+				groupId, privateLayout, parentLayoutId, hidden, start, end,
+				orderByComparator
+			};
+		}
+
+		List<LayoutVersion> list = null;
+
+		if (retrieveFromCache) {
+			list = (List<LayoutVersion>)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
+
+			if ((list != null) && !list.isEmpty()) {
+				for (LayoutVersion layoutVersion : list) {
+					if ((groupId != layoutVersion.getGroupId()) ||
+						(privateLayout != layoutVersion.isPrivateLayout()) ||
+						(parentLayoutId != layoutVersion.getParentLayoutId()) ||
+						(hidden != layoutVersion.isHidden())) {
+
+						list = null;
+
+						break;
+					}
+				}
+			}
+		}
+
+		if (list == null) {
+			StringBundler query = null;
+
+			if (orderByComparator != null) {
+				query = new StringBundler(
+					6 + (orderByComparator.getOrderByFields().length * 2));
+			}
+			else {
+				query = new StringBundler(6);
+			}
+
+			query.append(_SQL_SELECT_LAYOUTVERSION_WHERE);
+
+			query.append(_FINDER_COLUMN_G_P_P_H_GROUPID_2);
+
+			query.append(_FINDER_COLUMN_G_P_P_H_PRIVATELAYOUT_2);
+
+			query.append(_FINDER_COLUMN_G_P_P_H_PARENTLAYOUTID_2);
+
+			query.append(_FINDER_COLUMN_G_P_P_H_HIDDEN_2);
+
+			if (orderByComparator != null) {
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+			}
+			else if (pagination) {
+				query.append(LayoutVersionModelImpl.ORDER_BY_JPQL);
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(groupId);
+
+				qPos.add(privateLayout);
+
+				qPos.add(parentLayoutId);
+
+				qPos.add(hidden);
+
+				if (!pagination) {
+					list = (List<LayoutVersion>)QueryUtil.list(
+						q, getDialect(), start, end, false);
+
+					Collections.sort(list);
+
+					list = Collections.unmodifiableList(list);
+				}
+				else {
+					list = (List<LayoutVersion>)QueryUtil.list(
+						q, getDialect(), start, end);
+				}
+
+				cacheResult(list);
+
+				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(finderPath, finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return list;
+	}
+
+	/**
+	 * Returns the first layout version in the ordered set where groupId = &#63; and privateLayout = &#63; and parentLayoutId = &#63; and hidden = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param privateLayout the private layout
+	 * @param parentLayoutId the parent layout ID
+	 * @param hidden the hidden
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching layout version
+	 * @throws NoSuchLayoutVersionException if a matching layout version could not be found
+	 */
+	@Override
+	public LayoutVersion findByG_P_P_H_First(
+			long groupId, boolean privateLayout, long parentLayoutId,
+			boolean hidden, OrderByComparator<LayoutVersion> orderByComparator)
+		throws NoSuchLayoutVersionException {
+
+		LayoutVersion layoutVersion = fetchByG_P_P_H_First(
+			groupId, privateLayout, parentLayoutId, hidden, orderByComparator);
+
+		if (layoutVersion != null) {
+			return layoutVersion;
+		}
+
+		StringBundler msg = new StringBundler(10);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("groupId=");
+		msg.append(groupId);
+
+		msg.append(", privateLayout=");
+		msg.append(privateLayout);
+
+		msg.append(", parentLayoutId=");
+		msg.append(parentLayoutId);
+
+		msg.append(", hidden=");
+		msg.append(hidden);
+
+		msg.append("}");
+
+		throw new NoSuchLayoutVersionException(msg.toString());
+	}
+
+	/**
+	 * Returns the first layout version in the ordered set where groupId = &#63; and privateLayout = &#63; and parentLayoutId = &#63; and hidden = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param privateLayout the private layout
+	 * @param parentLayoutId the parent layout ID
+	 * @param hidden the hidden
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching layout version, or <code>null</code> if a matching layout version could not be found
+	 */
+	@Override
+	public LayoutVersion fetchByG_P_P_H_First(
+		long groupId, boolean privateLayout, long parentLayoutId,
+		boolean hidden, OrderByComparator<LayoutVersion> orderByComparator) {
+
+		List<LayoutVersion> list = findByG_P_P_H(
+			groupId, privateLayout, parentLayoutId, hidden, 0, 1,
+			orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the last layout version in the ordered set where groupId = &#63; and privateLayout = &#63; and parentLayoutId = &#63; and hidden = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param privateLayout the private layout
+	 * @param parentLayoutId the parent layout ID
+	 * @param hidden the hidden
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching layout version
+	 * @throws NoSuchLayoutVersionException if a matching layout version could not be found
+	 */
+	@Override
+	public LayoutVersion findByG_P_P_H_Last(
+			long groupId, boolean privateLayout, long parentLayoutId,
+			boolean hidden, OrderByComparator<LayoutVersion> orderByComparator)
+		throws NoSuchLayoutVersionException {
+
+		LayoutVersion layoutVersion = fetchByG_P_P_H_Last(
+			groupId, privateLayout, parentLayoutId, hidden, orderByComparator);
+
+		if (layoutVersion != null) {
+			return layoutVersion;
+		}
+
+		StringBundler msg = new StringBundler(10);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("groupId=");
+		msg.append(groupId);
+
+		msg.append(", privateLayout=");
+		msg.append(privateLayout);
+
+		msg.append(", parentLayoutId=");
+		msg.append(parentLayoutId);
+
+		msg.append(", hidden=");
+		msg.append(hidden);
+
+		msg.append("}");
+
+		throw new NoSuchLayoutVersionException(msg.toString());
+	}
+
+	/**
+	 * Returns the last layout version in the ordered set where groupId = &#63; and privateLayout = &#63; and parentLayoutId = &#63; and hidden = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param privateLayout the private layout
+	 * @param parentLayoutId the parent layout ID
+	 * @param hidden the hidden
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching layout version, or <code>null</code> if a matching layout version could not be found
+	 */
+	@Override
+	public LayoutVersion fetchByG_P_P_H_Last(
+		long groupId, boolean privateLayout, long parentLayoutId,
+		boolean hidden, OrderByComparator<LayoutVersion> orderByComparator) {
+
+		int count = countByG_P_P_H(
+			groupId, privateLayout, parentLayoutId, hidden);
+
+		if (count == 0) {
+			return null;
+		}
+
+		List<LayoutVersion> list = findByG_P_P_H(
+			groupId, privateLayout, parentLayoutId, hidden, count - 1, count,
+			orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the layout versions before and after the current layout version in the ordered set where groupId = &#63; and privateLayout = &#63; and parentLayoutId = &#63; and hidden = &#63;.
+	 *
+	 * @param layoutVersionId the primary key of the current layout version
+	 * @param groupId the group ID
+	 * @param privateLayout the private layout
+	 * @param parentLayoutId the parent layout ID
+	 * @param hidden the hidden
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next layout version
+	 * @throws NoSuchLayoutVersionException if a layout version with the primary key could not be found
+	 */
+	@Override
+	public LayoutVersion[] findByG_P_P_H_PrevAndNext(
+			long layoutVersionId, long groupId, boolean privateLayout,
+			long parentLayoutId, boolean hidden,
+			OrderByComparator<LayoutVersion> orderByComparator)
+		throws NoSuchLayoutVersionException {
+
+		LayoutVersion layoutVersion = findByPrimaryKey(layoutVersionId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			LayoutVersion[] array = new LayoutVersionImpl[3];
+
+			array[0] = getByG_P_P_H_PrevAndNext(
+				session, layoutVersion, groupId, privateLayout, parentLayoutId,
+				hidden, orderByComparator, true);
+
+			array[1] = layoutVersion;
+
+			array[2] = getByG_P_P_H_PrevAndNext(
+				session, layoutVersion, groupId, privateLayout, parentLayoutId,
+				hidden, orderByComparator, false);
+
+			return array;
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	protected LayoutVersion getByG_P_P_H_PrevAndNext(
+		Session session, LayoutVersion layoutVersion, long groupId,
+		boolean privateLayout, long parentLayoutId, boolean hidden,
+		OrderByComparator<LayoutVersion> orderByComparator, boolean previous) {
+
+		StringBundler query = null;
+
+		if (orderByComparator != null) {
+			query = new StringBundler(
+				7 + (orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
+		}
+		else {
+			query = new StringBundler(6);
+		}
+
+		query.append(_SQL_SELECT_LAYOUTVERSION_WHERE);
+
+		query.append(_FINDER_COLUMN_G_P_P_H_GROUPID_2);
+
+		query.append(_FINDER_COLUMN_G_P_P_H_PRIVATELAYOUT_2);
+
+		query.append(_FINDER_COLUMN_G_P_P_H_PARENTLAYOUTID_2);
+
+		query.append(_FINDER_COLUMN_G_P_P_H_HIDDEN_2);
+
+		if (orderByComparator != null) {
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
+
+			if (orderByConditionFields.length > 0) {
+				query.append(WHERE_AND);
+			}
+
+			for (int i = 0; i < orderByConditionFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByConditionFields[i]);
+
+				if ((i + 1) < orderByConditionFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN_HAS_NEXT);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN);
+					}
+				}
+			}
+
+			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
+
+			for (int i = 0; i < orderByFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByFields[i]);
+
+				if ((i + 1) < orderByFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC_HAS_NEXT);
+					}
+					else {
+						query.append(ORDER_BY_DESC_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC);
+					}
+					else {
+						query.append(ORDER_BY_DESC);
+					}
+				}
+			}
+		}
+		else {
+			query.append(LayoutVersionModelImpl.ORDER_BY_JPQL);
+		}
+
+		String sql = query.toString();
+
+		Query q = session.createQuery(sql);
+
+		q.setFirstResult(0);
+		q.setMaxResults(2);
+
+		QueryPos qPos = QueryPos.getInstance(q);
+
+		qPos.add(groupId);
+
+		qPos.add(privateLayout);
+
+		qPos.add(parentLayoutId);
+
+		qPos.add(hidden);
+
+		if (orderByComparator != null) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutVersion)) {
+
+				qPos.add(orderByConditionValue);
+			}
+		}
+
+		List<LayoutVersion> list = q.list();
+
+		if (list.size() == 2) {
+			return list.get(1);
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
+	 * Removes all the layout versions where groupId = &#63; and privateLayout = &#63; and parentLayoutId = &#63; and hidden = &#63; from the database.
+	 *
+	 * @param groupId the group ID
+	 * @param privateLayout the private layout
+	 * @param parentLayoutId the parent layout ID
+	 * @param hidden the hidden
+	 */
+	@Override
+	public void removeByG_P_P_H(
+		long groupId, boolean privateLayout, long parentLayoutId,
+		boolean hidden) {
+
+		for (LayoutVersion layoutVersion :
+				findByG_P_P_H(
+					groupId, privateLayout, parentLayoutId, hidden,
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
+			remove(layoutVersion);
+		}
+	}
+
+	/**
+	 * Returns the number of layout versions where groupId = &#63; and privateLayout = &#63; and parentLayoutId = &#63; and hidden = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param privateLayout the private layout
+	 * @param parentLayoutId the parent layout ID
+	 * @param hidden the hidden
+	 * @return the number of matching layout versions
+	 */
+	@Override
+	public int countByG_P_P_H(
+		long groupId, boolean privateLayout, long parentLayoutId,
+		boolean hidden) {
+
+		FinderPath finderPath = _finderPathCountByG_P_P_H;
+
+		Object[] finderArgs = new Object[] {
+			groupId, privateLayout, parentLayoutId, hidden
+		};
+
+		Long count = (Long)FinderCacheUtil.getResult(
+			finderPath, finderArgs, this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(5);
+
+			query.append(_SQL_COUNT_LAYOUTVERSION_WHERE);
+
+			query.append(_FINDER_COLUMN_G_P_P_H_GROUPID_2);
+
+			query.append(_FINDER_COLUMN_G_P_P_H_PRIVATELAYOUT_2);
+
+			query.append(_FINDER_COLUMN_G_P_P_H_PARENTLAYOUTID_2);
+
+			query.append(_FINDER_COLUMN_G_P_P_H_HIDDEN_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(groupId);
+
+				qPos.add(privateLayout);
+
+				qPos.add(parentLayoutId);
+
+				qPos.add(hidden);
+
+				count = (Long)q.uniqueResult();
+
+				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(finderPath, finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	private static final String _FINDER_COLUMN_G_P_P_H_GROUPID_2 =
+		"layoutVersion.groupId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_P_P_H_PRIVATELAYOUT_2 =
+		"layoutVersion.privateLayout = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_P_P_H_PARENTLAYOUTID_2 =
+		"layoutVersion.parentLayoutId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_P_P_H_HIDDEN_2 =
+		"layoutVersion.hidden = ?";
+
+	private FinderPath _finderPathWithPaginationFindByG_P_P_H_Version;
+	private FinderPath _finderPathWithoutPaginationFindByG_P_P_H_Version;
+	private FinderPath _finderPathCountByG_P_P_H_Version;
+
+	/**
+	 * Returns all the layout versions where groupId = &#63; and privateLayout = &#63; and parentLayoutId = &#63; and hidden = &#63; and version = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param privateLayout the private layout
+	 * @param parentLayoutId the parent layout ID
+	 * @param hidden the hidden
+	 * @param version the version
+	 * @return the matching layout versions
+	 */
+	@Override
+	public List<LayoutVersion> findByG_P_P_H_Version(
+		long groupId, boolean privateLayout, long parentLayoutId,
+		boolean hidden, int version) {
+
+		return findByG_P_P_H_Version(
+			groupId, privateLayout, parentLayoutId, hidden, version,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+	}
+
+	/**
+	 * Returns a range of all the layout versions where groupId = &#63; and privateLayout = &#63; and parentLayoutId = &#63; and hidden = &#63; and version = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param groupId the group ID
+	 * @param privateLayout the private layout
+	 * @param parentLayoutId the parent layout ID
+	 * @param hidden the hidden
+	 * @param version the version
+	 * @param start the lower bound of the range of layout versions
+	 * @param end the upper bound of the range of layout versions (not inclusive)
+	 * @return the range of matching layout versions
+	 */
+	@Override
+	public List<LayoutVersion> findByG_P_P_H_Version(
+		long groupId, boolean privateLayout, long parentLayoutId,
+		boolean hidden, int version, int start, int end) {
+
+		return findByG_P_P_H_Version(
+			groupId, privateLayout, parentLayoutId, hidden, version, start, end,
+			null);
+	}
+
+	/**
+	 * Returns an ordered range of all the layout versions where groupId = &#63; and privateLayout = &#63; and parentLayoutId = &#63; and hidden = &#63; and version = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param groupId the group ID
+	 * @param privateLayout the private layout
+	 * @param parentLayoutId the parent layout ID
+	 * @param hidden the hidden
+	 * @param version the version
+	 * @param start the lower bound of the range of layout versions
+	 * @param end the upper bound of the range of layout versions (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching layout versions
+	 */
+	@Override
+	public List<LayoutVersion> findByG_P_P_H_Version(
+		long groupId, boolean privateLayout, long parentLayoutId,
+		boolean hidden, int version, int start, int end,
+		OrderByComparator<LayoutVersion> orderByComparator) {
+
+		return findByG_P_P_H_Version(
+			groupId, privateLayout, parentLayoutId, hidden, version, start, end,
+			orderByComparator, true);
+	}
+
+	/**
+	 * Returns an ordered range of all the layout versions where groupId = &#63; and privateLayout = &#63; and parentLayoutId = &#63; and hidden = &#63; and version = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent and pagination is required (<code>start</code> and <code>end</code> are not <code>QueryUtil#ALL_POS</code>), then the query will include the default ORDER BY logic from <code>LayoutVersionModelImpl</code>. If both <code>orderByComparator</code> and pagination are absent, for performance reasons, the query will not have an ORDER BY clause and the returned result set will be sorted on by the primary key in an ascending order.
+	 * </p>
+	 *
+	 * @param groupId the group ID
+	 * @param privateLayout the private layout
+	 * @param parentLayoutId the parent layout ID
+	 * @param hidden the hidden
+	 * @param version the version
+	 * @param start the lower bound of the range of layout versions
+	 * @param end the upper bound of the range of layout versions (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param retrieveFromCache whether to retrieve from the finder cache
+	 * @return the ordered range of matching layout versions
+	 */
+	@Override
+	public List<LayoutVersion> findByG_P_P_H_Version(
+		long groupId, boolean privateLayout, long parentLayoutId,
+		boolean hidden, int version, int start, int end,
+		OrderByComparator<LayoutVersion> orderByComparator,
+		boolean retrieveFromCache) {
+
+		boolean pagination = true;
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
+
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+			(orderByComparator == null)) {
+
+			pagination = false;
+			finderPath = _finderPathWithoutPaginationFindByG_P_P_H_Version;
+			finderArgs = new Object[] {
+				groupId, privateLayout, parentLayoutId, hidden, version
+			};
+		}
+		else {
+			finderPath = _finderPathWithPaginationFindByG_P_P_H_Version;
+			finderArgs = new Object[] {
+				groupId, privateLayout, parentLayoutId, hidden, version, start,
+				end, orderByComparator
+			};
+		}
+
+		List<LayoutVersion> list = null;
+
+		if (retrieveFromCache) {
+			list = (List<LayoutVersion>)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
+
+			if ((list != null) && !list.isEmpty()) {
+				for (LayoutVersion layoutVersion : list) {
+					if ((groupId != layoutVersion.getGroupId()) ||
+						(privateLayout != layoutVersion.isPrivateLayout()) ||
+						(parentLayoutId != layoutVersion.getParentLayoutId()) ||
+						(hidden != layoutVersion.isHidden()) ||
+						(version != layoutVersion.getVersion())) {
+
+						list = null;
+
+						break;
+					}
+				}
+			}
+		}
+
+		if (list == null) {
+			StringBundler query = null;
+
+			if (orderByComparator != null) {
+				query = new StringBundler(
+					7 + (orderByComparator.getOrderByFields().length * 2));
+			}
+			else {
+				query = new StringBundler(7);
+			}
+
+			query.append(_SQL_SELECT_LAYOUTVERSION_WHERE);
+
+			query.append(_FINDER_COLUMN_G_P_P_H_VERSION_GROUPID_2);
+
+			query.append(_FINDER_COLUMN_G_P_P_H_VERSION_PRIVATELAYOUT_2);
+
+			query.append(_FINDER_COLUMN_G_P_P_H_VERSION_PARENTLAYOUTID_2);
+
+			query.append(_FINDER_COLUMN_G_P_P_H_VERSION_HIDDEN_2);
+
+			query.append(_FINDER_COLUMN_G_P_P_H_VERSION_VERSION_2);
+
+			if (orderByComparator != null) {
+				appendOrderByComparator(
+					query, _ORDER_BY_ENTITY_ALIAS, orderByComparator);
+			}
+			else if (pagination) {
+				query.append(LayoutVersionModelImpl.ORDER_BY_JPQL);
+			}
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(groupId);
+
+				qPos.add(privateLayout);
+
+				qPos.add(parentLayoutId);
+
+				qPos.add(hidden);
+
+				qPos.add(version);
+
+				if (!pagination) {
+					list = (List<LayoutVersion>)QueryUtil.list(
+						q, getDialect(), start, end, false);
+
+					Collections.sort(list);
+
+					list = Collections.unmodifiableList(list);
+				}
+				else {
+					list = (List<LayoutVersion>)QueryUtil.list(
+						q, getDialect(), start, end);
+				}
+
+				cacheResult(list);
+
+				FinderCacheUtil.putResult(finderPath, finderArgs, list);
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(finderPath, finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return list;
+	}
+
+	/**
+	 * Returns the first layout version in the ordered set where groupId = &#63; and privateLayout = &#63; and parentLayoutId = &#63; and hidden = &#63; and version = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param privateLayout the private layout
+	 * @param parentLayoutId the parent layout ID
+	 * @param hidden the hidden
+	 * @param version the version
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching layout version
+	 * @throws NoSuchLayoutVersionException if a matching layout version could not be found
+	 */
+	@Override
+	public LayoutVersion findByG_P_P_H_Version_First(
+			long groupId, boolean privateLayout, long parentLayoutId,
+			boolean hidden, int version,
+			OrderByComparator<LayoutVersion> orderByComparator)
+		throws NoSuchLayoutVersionException {
+
+		LayoutVersion layoutVersion = fetchByG_P_P_H_Version_First(
+			groupId, privateLayout, parentLayoutId, hidden, version,
+			orderByComparator);
+
+		if (layoutVersion != null) {
+			return layoutVersion;
+		}
+
+		StringBundler msg = new StringBundler(12);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("groupId=");
+		msg.append(groupId);
+
+		msg.append(", privateLayout=");
+		msg.append(privateLayout);
+
+		msg.append(", parentLayoutId=");
+		msg.append(parentLayoutId);
+
+		msg.append(", hidden=");
+		msg.append(hidden);
+
+		msg.append(", version=");
+		msg.append(version);
+
+		msg.append("}");
+
+		throw new NoSuchLayoutVersionException(msg.toString());
+	}
+
+	/**
+	 * Returns the first layout version in the ordered set where groupId = &#63; and privateLayout = &#63; and parentLayoutId = &#63; and hidden = &#63; and version = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param privateLayout the private layout
+	 * @param parentLayoutId the parent layout ID
+	 * @param hidden the hidden
+	 * @param version the version
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching layout version, or <code>null</code> if a matching layout version could not be found
+	 */
+	@Override
+	public LayoutVersion fetchByG_P_P_H_Version_First(
+		long groupId, boolean privateLayout, long parentLayoutId,
+		boolean hidden, int version,
+		OrderByComparator<LayoutVersion> orderByComparator) {
+
+		List<LayoutVersion> list = findByG_P_P_H_Version(
+			groupId, privateLayout, parentLayoutId, hidden, version, 0, 1,
+			orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the last layout version in the ordered set where groupId = &#63; and privateLayout = &#63; and parentLayoutId = &#63; and hidden = &#63; and version = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param privateLayout the private layout
+	 * @param parentLayoutId the parent layout ID
+	 * @param hidden the hidden
+	 * @param version the version
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching layout version
+	 * @throws NoSuchLayoutVersionException if a matching layout version could not be found
+	 */
+	@Override
+	public LayoutVersion findByG_P_P_H_Version_Last(
+			long groupId, boolean privateLayout, long parentLayoutId,
+			boolean hidden, int version,
+			OrderByComparator<LayoutVersion> orderByComparator)
+		throws NoSuchLayoutVersionException {
+
+		LayoutVersion layoutVersion = fetchByG_P_P_H_Version_Last(
+			groupId, privateLayout, parentLayoutId, hidden, version,
+			orderByComparator);
+
+		if (layoutVersion != null) {
+			return layoutVersion;
+		}
+
+		StringBundler msg = new StringBundler(12);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("groupId=");
+		msg.append(groupId);
+
+		msg.append(", privateLayout=");
+		msg.append(privateLayout);
+
+		msg.append(", parentLayoutId=");
+		msg.append(parentLayoutId);
+
+		msg.append(", hidden=");
+		msg.append(hidden);
+
+		msg.append(", version=");
+		msg.append(version);
+
+		msg.append("}");
+
+		throw new NoSuchLayoutVersionException(msg.toString());
+	}
+
+	/**
+	 * Returns the last layout version in the ordered set where groupId = &#63; and privateLayout = &#63; and parentLayoutId = &#63; and hidden = &#63; and version = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param privateLayout the private layout
+	 * @param parentLayoutId the parent layout ID
+	 * @param hidden the hidden
+	 * @param version the version
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching layout version, or <code>null</code> if a matching layout version could not be found
+	 */
+	@Override
+	public LayoutVersion fetchByG_P_P_H_Version_Last(
+		long groupId, boolean privateLayout, long parentLayoutId,
+		boolean hidden, int version,
+		OrderByComparator<LayoutVersion> orderByComparator) {
+
+		int count = countByG_P_P_H_Version(
+			groupId, privateLayout, parentLayoutId, hidden, version);
+
+		if (count == 0) {
+			return null;
+		}
+
+		List<LayoutVersion> list = findByG_P_P_H_Version(
+			groupId, privateLayout, parentLayoutId, hidden, version, count - 1,
+			count, orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the layout versions before and after the current layout version in the ordered set where groupId = &#63; and privateLayout = &#63; and parentLayoutId = &#63; and hidden = &#63; and version = &#63;.
+	 *
+	 * @param layoutVersionId the primary key of the current layout version
+	 * @param groupId the group ID
+	 * @param privateLayout the private layout
+	 * @param parentLayoutId the parent layout ID
+	 * @param hidden the hidden
+	 * @param version the version
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next layout version
+	 * @throws NoSuchLayoutVersionException if a layout version with the primary key could not be found
+	 */
+	@Override
+	public LayoutVersion[] findByG_P_P_H_Version_PrevAndNext(
+			long layoutVersionId, long groupId, boolean privateLayout,
+			long parentLayoutId, boolean hidden, int version,
+			OrderByComparator<LayoutVersion> orderByComparator)
+		throws NoSuchLayoutVersionException {
+
+		LayoutVersion layoutVersion = findByPrimaryKey(layoutVersionId);
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			LayoutVersion[] array = new LayoutVersionImpl[3];
+
+			array[0] = getByG_P_P_H_Version_PrevAndNext(
+				session, layoutVersion, groupId, privateLayout, parentLayoutId,
+				hidden, version, orderByComparator, true);
+
+			array[1] = layoutVersion;
+
+			array[2] = getByG_P_P_H_Version_PrevAndNext(
+				session, layoutVersion, groupId, privateLayout, parentLayoutId,
+				hidden, version, orderByComparator, false);
+
+			return array;
+		}
+		catch (Exception e) {
+			throw processException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	protected LayoutVersion getByG_P_P_H_Version_PrevAndNext(
+		Session session, LayoutVersion layoutVersion, long groupId,
+		boolean privateLayout, long parentLayoutId, boolean hidden, int version,
+		OrderByComparator<LayoutVersion> orderByComparator, boolean previous) {
+
+		StringBundler query = null;
+
+		if (orderByComparator != null) {
+			query = new StringBundler(
+				8 + (orderByComparator.getOrderByConditionFields().length * 3) +
+					(orderByComparator.getOrderByFields().length * 3));
+		}
+		else {
+			query = new StringBundler(7);
+		}
+
+		query.append(_SQL_SELECT_LAYOUTVERSION_WHERE);
+
+		query.append(_FINDER_COLUMN_G_P_P_H_VERSION_GROUPID_2);
+
+		query.append(_FINDER_COLUMN_G_P_P_H_VERSION_PRIVATELAYOUT_2);
+
+		query.append(_FINDER_COLUMN_G_P_P_H_VERSION_PARENTLAYOUTID_2);
+
+		query.append(_FINDER_COLUMN_G_P_P_H_VERSION_HIDDEN_2);
+
+		query.append(_FINDER_COLUMN_G_P_P_H_VERSION_VERSION_2);
+
+		if (orderByComparator != null) {
+			String[] orderByConditionFields =
+				orderByComparator.getOrderByConditionFields();
+
+			if (orderByConditionFields.length > 0) {
+				query.append(WHERE_AND);
+			}
+
+			for (int i = 0; i < orderByConditionFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByConditionFields[i]);
+
+				if ((i + 1) < orderByConditionFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN_HAS_NEXT);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(WHERE_GREATER_THAN);
+					}
+					else {
+						query.append(WHERE_LESSER_THAN);
+					}
+				}
+			}
+
+			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
+
+			for (int i = 0; i < orderByFields.length; i++) {
+				query.append(_ORDER_BY_ENTITY_ALIAS);
+				query.append(orderByFields[i]);
+
+				if ((i + 1) < orderByFields.length) {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC_HAS_NEXT);
+					}
+					else {
+						query.append(ORDER_BY_DESC_HAS_NEXT);
+					}
+				}
+				else {
+					if (orderByComparator.isAscending() ^ previous) {
+						query.append(ORDER_BY_ASC);
+					}
+					else {
+						query.append(ORDER_BY_DESC);
+					}
+				}
+			}
+		}
+		else {
+			query.append(LayoutVersionModelImpl.ORDER_BY_JPQL);
+		}
+
+		String sql = query.toString();
+
+		Query q = session.createQuery(sql);
+
+		q.setFirstResult(0);
+		q.setMaxResults(2);
+
+		QueryPos qPos = QueryPos.getInstance(q);
+
+		qPos.add(groupId);
+
+		qPos.add(privateLayout);
+
+		qPos.add(parentLayoutId);
+
+		qPos.add(hidden);
+
+		qPos.add(version);
+
+		if (orderByComparator != null) {
+			for (Object orderByConditionValue :
+					orderByComparator.getOrderByConditionValues(
+						layoutVersion)) {
+
+				qPos.add(orderByConditionValue);
+			}
+		}
+
+		List<LayoutVersion> list = q.list();
+
+		if (list.size() == 2) {
+			return list.get(1);
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
+	 * Removes all the layout versions where groupId = &#63; and privateLayout = &#63; and parentLayoutId = &#63; and hidden = &#63; and version = &#63; from the database.
+	 *
+	 * @param groupId the group ID
+	 * @param privateLayout the private layout
+	 * @param parentLayoutId the parent layout ID
+	 * @param hidden the hidden
+	 * @param version the version
+	 */
+	@Override
+	public void removeByG_P_P_H_Version(
+		long groupId, boolean privateLayout, long parentLayoutId,
+		boolean hidden, int version) {
+
+		for (LayoutVersion layoutVersion :
+				findByG_P_P_H_Version(
+					groupId, privateLayout, parentLayoutId, hidden, version,
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS, null)) {
+
+			remove(layoutVersion);
+		}
+	}
+
+	/**
+	 * Returns the number of layout versions where groupId = &#63; and privateLayout = &#63; and parentLayoutId = &#63; and hidden = &#63; and version = &#63;.
+	 *
+	 * @param groupId the group ID
+	 * @param privateLayout the private layout
+	 * @param parentLayoutId the parent layout ID
+	 * @param hidden the hidden
+	 * @param version the version
+	 * @return the number of matching layout versions
+	 */
+	@Override
+	public int countByG_P_P_H_Version(
+		long groupId, boolean privateLayout, long parentLayoutId,
+		boolean hidden, int version) {
+
+		FinderPath finderPath = _finderPathCountByG_P_P_H_Version;
+
+		Object[] finderArgs = new Object[] {
+			groupId, privateLayout, parentLayoutId, hidden, version
+		};
+
+		Long count = (Long)FinderCacheUtil.getResult(
+			finderPath, finderArgs, this);
+
+		if (count == null) {
+			StringBundler query = new StringBundler(6);
+
+			query.append(_SQL_COUNT_LAYOUTVERSION_WHERE);
+
+			query.append(_FINDER_COLUMN_G_P_P_H_VERSION_GROUPID_2);
+
+			query.append(_FINDER_COLUMN_G_P_P_H_VERSION_PRIVATELAYOUT_2);
+
+			query.append(_FINDER_COLUMN_G_P_P_H_VERSION_PARENTLAYOUTID_2);
+
+			query.append(_FINDER_COLUMN_G_P_P_H_VERSION_HIDDEN_2);
+
+			query.append(_FINDER_COLUMN_G_P_P_H_VERSION_VERSION_2);
+
+			String sql = query.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query q = session.createQuery(sql);
+
+				QueryPos qPos = QueryPos.getInstance(q);
+
+				qPos.add(groupId);
+
+				qPos.add(privateLayout);
+
+				qPos.add(parentLayoutId);
+
+				qPos.add(hidden);
+
+				qPos.add(version);
+
+				count = (Long)q.uniqueResult();
+
+				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+			}
+			catch (Exception e) {
+				FinderCacheUtil.removeResult(finderPath, finderArgs);
+
+				throw processException(e);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	private static final String _FINDER_COLUMN_G_P_P_H_VERSION_GROUPID_2 =
+		"layoutVersion.groupId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_P_P_H_VERSION_PRIVATELAYOUT_2 =
+		"layoutVersion.privateLayout = ? AND ";
+
+	private static final String
+		_FINDER_COLUMN_G_P_P_H_VERSION_PARENTLAYOUTID_2 =
+			"layoutVersion.parentLayoutId = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_P_P_H_VERSION_HIDDEN_2 =
+		"layoutVersion.hidden = ? AND ";
+
+	private static final String _FINDER_COLUMN_G_P_P_H_VERSION_VERSION_2 =
+		"layoutVersion.version = ?";
+
 	private FinderPath _finderPathWithPaginationFindByG_P_P_LtP;
 	private FinderPath _finderPathWithoutPaginationFindByG_P_P_LtP;
 	private FinderPath _finderPathCountByG_P_P_LtP;
@@ -24568,6 +25895,30 @@ public class LayoutVersionPersistenceImpl
 				layoutVersionModelImpl.getGroupId(),
 				layoutVersionModelImpl.isPrivateLayout(),
 				layoutVersionModelImpl.getParentLayoutId(),
+				layoutVersionModelImpl.isHidden()
+			};
+
+			FinderCacheUtil.removeResult(_finderPathCountByG_P_P_H, args);
+			FinderCacheUtil.removeResult(
+				_finderPathWithoutPaginationFindByG_P_P_H, args);
+
+			args = new Object[] {
+				layoutVersionModelImpl.getGroupId(),
+				layoutVersionModelImpl.isPrivateLayout(),
+				layoutVersionModelImpl.getParentLayoutId(),
+				layoutVersionModelImpl.isHidden(),
+				layoutVersionModelImpl.getVersion()
+			};
+
+			FinderCacheUtil.removeResult(
+				_finderPathCountByG_P_P_H_Version, args);
+			FinderCacheUtil.removeResult(
+				_finderPathWithoutPaginationFindByG_P_P_H_Version, args);
+
+			args = new Object[] {
+				layoutVersionModelImpl.getGroupId(),
+				layoutVersionModelImpl.isPrivateLayout(),
+				layoutVersionModelImpl.getParentLayoutId(),
 				layoutVersionModelImpl.getPriority()
 			};
 
@@ -25482,6 +26833,64 @@ public class LayoutVersionPersistenceImpl
 					_finderPathCountByG_P_SPLU_Version, args);
 				FinderCacheUtil.removeResult(
 					_finderPathWithoutPaginationFindByG_P_SPLU_Version, args);
+			}
+
+			if ((layoutVersionModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByG_P_P_H.
+					 getColumnBitmask()) != 0) {
+
+				Object[] args = new Object[] {
+					layoutVersionModelImpl.getOriginalGroupId(),
+					layoutVersionModelImpl.getOriginalPrivateLayout(),
+					layoutVersionModelImpl.getOriginalParentLayoutId(),
+					layoutVersionModelImpl.getOriginalHidden()
+				};
+
+				FinderCacheUtil.removeResult(_finderPathCountByG_P_P_H, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByG_P_P_H, args);
+
+				args = new Object[] {
+					layoutVersionModelImpl.getGroupId(),
+					layoutVersionModelImpl.isPrivateLayout(),
+					layoutVersionModelImpl.getParentLayoutId(),
+					layoutVersionModelImpl.isHidden()
+				};
+
+				FinderCacheUtil.removeResult(_finderPathCountByG_P_P_H, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByG_P_P_H, args);
+			}
+
+			if ((layoutVersionModelImpl.getColumnBitmask() &
+				 _finderPathWithoutPaginationFindByG_P_P_H_Version.
+					 getColumnBitmask()) != 0) {
+
+				Object[] args = new Object[] {
+					layoutVersionModelImpl.getOriginalGroupId(),
+					layoutVersionModelImpl.getOriginalPrivateLayout(),
+					layoutVersionModelImpl.getOriginalParentLayoutId(),
+					layoutVersionModelImpl.getOriginalHidden(),
+					layoutVersionModelImpl.getOriginalVersion()
+				};
+
+				FinderCacheUtil.removeResult(
+					_finderPathCountByG_P_P_H_Version, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByG_P_P_H_Version, args);
+
+				args = new Object[] {
+					layoutVersionModelImpl.getGroupId(),
+					layoutVersionModelImpl.isPrivateLayout(),
+					layoutVersionModelImpl.getParentLayoutId(),
+					layoutVersionModelImpl.isHidden(),
+					layoutVersionModelImpl.getVersion()
+				};
+
+				FinderCacheUtil.removeResult(
+					_finderPathCountByG_P_P_H_Version, args);
+				FinderCacheUtil.removeResult(
+					_finderPathWithoutPaginationFindByG_P_P_H_Version, args);
 			}
 
 			if ((layoutVersionModelImpl.getColumnBitmask() &
@@ -26994,6 +28403,80 @@ public class LayoutVersionPersistenceImpl
 			new String[] {
 				Long.class.getName(), Boolean.class.getName(),
 				String.class.getName(), Integer.class.getName()
+			});
+
+		_finderPathWithPaginationFindByG_P_P_H = new FinderPath(
+			LayoutVersionModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutVersionModelImpl.FINDER_CACHE_ENABLED,
+			LayoutVersionImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
+			"findByG_P_P_H",
+			new String[] {
+				Long.class.getName(), Boolean.class.getName(),
+				Long.class.getName(), Boolean.class.getName(),
+				Integer.class.getName(), Integer.class.getName(),
+				OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByG_P_P_H = new FinderPath(
+			LayoutVersionModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutVersionModelImpl.FINDER_CACHE_ENABLED,
+			LayoutVersionImpl.class, FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
+			"findByG_P_P_H",
+			new String[] {
+				Long.class.getName(), Boolean.class.getName(),
+				Long.class.getName(), Boolean.class.getName()
+			},
+			LayoutVersionModelImpl.GROUPID_COLUMN_BITMASK |
+			LayoutVersionModelImpl.PRIVATELAYOUT_COLUMN_BITMASK |
+			LayoutVersionModelImpl.PARENTLAYOUTID_COLUMN_BITMASK |
+			LayoutVersionModelImpl.HIDDEN_COLUMN_BITMASK |
+			LayoutVersionModelImpl.VERSION_COLUMN_BITMASK);
+
+		_finderPathCountByG_P_P_H = new FinderPath(
+			LayoutVersionModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutVersionModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_P_P_H",
+			new String[] {
+				Long.class.getName(), Boolean.class.getName(),
+				Long.class.getName(), Boolean.class.getName()
+			});
+
+		_finderPathWithPaginationFindByG_P_P_H_Version = new FinderPath(
+			LayoutVersionModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutVersionModelImpl.FINDER_CACHE_ENABLED,
+			LayoutVersionImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
+			"findByG_P_P_H_Version",
+			new String[] {
+				Long.class.getName(), Boolean.class.getName(),
+				Long.class.getName(), Boolean.class.getName(),
+				Integer.class.getName(), Integer.class.getName(),
+				Integer.class.getName(), OrderByComparator.class.getName()
+			});
+
+		_finderPathWithoutPaginationFindByG_P_P_H_Version = new FinderPath(
+			LayoutVersionModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutVersionModelImpl.FINDER_CACHE_ENABLED,
+			LayoutVersionImpl.class, FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
+			"findByG_P_P_H_Version",
+			new String[] {
+				Long.class.getName(), Boolean.class.getName(),
+				Long.class.getName(), Boolean.class.getName(),
+				Integer.class.getName()
+			},
+			LayoutVersionModelImpl.GROUPID_COLUMN_BITMASK |
+			LayoutVersionModelImpl.PRIVATELAYOUT_COLUMN_BITMASK |
+			LayoutVersionModelImpl.PARENTLAYOUTID_COLUMN_BITMASK |
+			LayoutVersionModelImpl.HIDDEN_COLUMN_BITMASK |
+			LayoutVersionModelImpl.VERSION_COLUMN_BITMASK);
+
+		_finderPathCountByG_P_P_H_Version = new FinderPath(
+			LayoutVersionModelImpl.ENTITY_CACHE_ENABLED,
+			LayoutVersionModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_P_P_H_Version",
+			new String[] {
+				Long.class.getName(), Boolean.class.getName(),
+				Long.class.getName(), Boolean.class.getName(),
+				Integer.class.getName()
 			});
 
 		_finderPathWithPaginationFindByG_P_P_LtP = new FinderPath(

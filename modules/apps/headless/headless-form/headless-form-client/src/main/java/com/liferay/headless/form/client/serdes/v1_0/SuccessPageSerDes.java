@@ -17,7 +17,8 @@ package com.liferay.headless.form.client.serdes.v1_0;
 import com.liferay.headless.form.client.dto.v1_0.SuccessPage;
 import com.liferay.headless.form.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -45,41 +46,48 @@ public class SuccessPageSerDes {
 
 	public static String toJSON(SuccessPage successPage) {
 		if (successPage == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"description\": ");
+		if (successPage.getDescription() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (successPage.getDescription() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"description\":");
+
+			sb.append("\"");
+
 			sb.append(successPage.getDescription());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (successPage.getHeadline() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"headline\": ");
+			sb.append("\"headline\":");
 
-		if (successPage.getHeadline() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(successPage.getHeadline());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (successPage.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\":");
 
-		if (successPage.getId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(successPage.getId());
 		}
 
@@ -88,39 +96,52 @@ public class SuccessPageSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<SuccessPage> successPages) {
-		if (successPages == null) {
-			return "[]";
+	public static Map<String, String> toMap(SuccessPage successPage) {
+		if (successPage == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (SuccessPage successPage : successPages) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(successPage));
+		if (successPage.getDescription() == null) {
+			map.put("description", null);
+		}
+		else {
+			map.put(
+				"description", String.valueOf(successPage.getDescription()));
 		}
 
-		sb.append("]");
+		if (successPage.getHeadline() == null) {
+			map.put("headline", null);
+		}
+		else {
+			map.put("headline", String.valueOf(successPage.getHeadline()));
+		}
 
-		return sb.toString();
+		if (successPage.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(successPage.getId()));
+		}
+
+		return map;
 	}
 
 	private static class SuccessPageJSONParser
 		extends BaseJSONParser<SuccessPage> {
 
+		@Override
 		protected SuccessPage createDTO() {
 			return new SuccessPage();
 		}
 
+		@Override
 		protected SuccessPage[] createDTOArray(int size) {
 			return new SuccessPage[size];
 		}
 
+		@Override
 		protected void setField(
 			SuccessPage successPage, String jsonParserFieldName,
 			Object jsonParserFieldValue) {

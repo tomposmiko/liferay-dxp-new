@@ -54,7 +54,7 @@ definition {
 
 		Navigator.gotoPage(pageName = "IFrame Page");
 
-		SelectFrame(locator1 = "IFrame#IFRAME_PORTLET");
+		SelectFrame.selectFrameNoLoading(locator1 = "IFrame#IFRAME_PORTLET");
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "Embedded#EMBEDDED_TEXT_UPDATED",
@@ -93,12 +93,12 @@ definition {
 
 		SitePages.configurePage(
 			columnName = "2 Columns (50/50)",
-			pageName = "Welcome",
+			pageName = "Home",
 			privacy = "Public Pages",
 			sitePageType = "Widget Page"
 		);
 
-		Navigator.gotoPage(pageName = "Welcome");
+		Navigator.gotoPage(pageName = "Home");
 
 		Content.addPG(assetTitle = "DHS Title", webContentContent = "DHS Content");
 

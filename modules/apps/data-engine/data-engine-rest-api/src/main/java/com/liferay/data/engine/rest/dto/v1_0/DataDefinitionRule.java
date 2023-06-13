@@ -229,7 +229,9 @@ public class DataDefinitionRule {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(name);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -240,7 +242,9 @@ public class DataDefinitionRule {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(ruleType);
+			sb.append("\"");
 		}
 
 		sb.append("}");

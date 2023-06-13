@@ -18,11 +18,10 @@ import com.liferay.headless.delivery.client.dto.v1_0.KnowledgeBaseFolder;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import java.util.Collection;
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -50,142 +49,159 @@ public class KnowledgeBaseFolderSerDes {
 
 	public static String toJSON(KnowledgeBaseFolder knowledgeBaseFolder) {
 		if (knowledgeBaseFolder == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"creator\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (knowledgeBaseFolder.getCreator() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(knowledgeBaseFolder.getCreator());
-		}
+		if (knowledgeBaseFolder.getCreator() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append(", ");
+			sb.append("\"creator\":");
 
-		sb.append("\"dateCreated\": ");
-
-		if (knowledgeBaseFolder.getDateCreated() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(knowledgeBaseFolder.getDateCreated());
+			sb.append(CreatorSerDes.toJSON(knowledgeBaseFolder.getCreator()));
 		}
 
-		sb.append(", ");
+		if (knowledgeBaseFolder.getDateCreated() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dateModified\": ");
+			sb.append("\"dateCreated\":");
 
-		if (knowledgeBaseFolder.getDateModified() == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(
+				liferayToJSONDateFormat.format(
+					knowledgeBaseFolder.getDateCreated()));
+
+			sb.append("\"");
 		}
-		else {
-			sb.append(knowledgeBaseFolder.getDateModified());
+
+		if (knowledgeBaseFolder.getDateModified() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"dateModified\":");
+
+			sb.append("\"");
+
+			sb.append(
+				liferayToJSONDateFormat.format(
+					knowledgeBaseFolder.getDateModified()));
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (knowledgeBaseFolder.getDescription() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"description\": ");
+			sb.append("\"description\":");
 
-		if (knowledgeBaseFolder.getDescription() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(knowledgeBaseFolder.getDescription());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (knowledgeBaseFolder.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\":");
 
-		if (knowledgeBaseFolder.getId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(knowledgeBaseFolder.getId());
 		}
 
-		sb.append(", ");
+		if (knowledgeBaseFolder.getName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\":");
 
-		if (knowledgeBaseFolder.getName() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(knowledgeBaseFolder.getName());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (knowledgeBaseFolder.getNumberOfKnowledgeBaseArticles() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"numberOfKnowledgeBaseArticles\": ");
+			sb.append("\"numberOfKnowledgeBaseArticles\":");
 
-		if (knowledgeBaseFolder.getNumberOfKnowledgeBaseArticles() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(knowledgeBaseFolder.getNumberOfKnowledgeBaseArticles());
 		}
 
-		sb.append(", ");
+		if (knowledgeBaseFolder.getNumberOfKnowledgeBaseFolders() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"numberOfKnowledgeBaseFolders\": ");
+			sb.append("\"numberOfKnowledgeBaseFolders\":");
 
-		if (knowledgeBaseFolder.getNumberOfKnowledgeBaseFolders() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(knowledgeBaseFolder.getNumberOfKnowledgeBaseFolders());
 		}
 
-		sb.append(", ");
+		if (knowledgeBaseFolder.getParentKnowledgeBaseFolder() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"parentKnowledgeBaseFolder\": ");
+			sb.append("\"parentKnowledgeBaseFolder\":");
 
-		if (knowledgeBaseFolder.getParentKnowledgeBaseFolder() == null) {
-			sb.append("null");
+			sb.append(
+				ParentKnowledgeBaseFolderSerDes.toJSON(
+					knowledgeBaseFolder.getParentKnowledgeBaseFolder()));
 		}
-		else {
-			sb.append(knowledgeBaseFolder.getParentKnowledgeBaseFolder());
-		}
 
-		sb.append(", ");
+		if (knowledgeBaseFolder.getParentKnowledgeBaseFolderId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"parentKnowledgeBaseFolderId\": ");
+			sb.append("\"parentKnowledgeBaseFolderId\":");
 
-		if (knowledgeBaseFolder.getParentKnowledgeBaseFolderId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(knowledgeBaseFolder.getParentKnowledgeBaseFolderId());
 		}
 
-		sb.append(", ");
+		if (knowledgeBaseFolder.getSiteId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"siteId\": ");
+			sb.append("\"siteId\":");
 
-		if (knowledgeBaseFolder.getSiteId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(knowledgeBaseFolder.getSiteId());
 		}
 
-		sb.append(", ");
+		if (knowledgeBaseFolder.getViewableBy() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"viewableBy\": ");
+			sb.append("\"viewableBy\":");
 
-		if (knowledgeBaseFolder.getViewableBy() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
+
 			sb.append(knowledgeBaseFolder.getViewableBy());
+
 			sb.append("\"");
 		}
 
@@ -194,41 +210,133 @@ public class KnowledgeBaseFolderSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(
-		Collection<KnowledgeBaseFolder> knowledgeBaseFolders) {
+	public static Map<String, String> toMap(
+		KnowledgeBaseFolder knowledgeBaseFolder) {
 
-		if (knowledgeBaseFolders == null) {
-			return "[]";
+		if (knowledgeBaseFolder == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		for (KnowledgeBaseFolder knowledgeBaseFolder : knowledgeBaseFolders) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(knowledgeBaseFolder));
+		if (knowledgeBaseFolder.getCreator() == null) {
+			map.put("creator", null);
+		}
+		else {
+			map.put(
+				"creator",
+				CreatorSerDes.toJSON(knowledgeBaseFolder.getCreator()));
 		}
 
-		sb.append("]");
+		map.put(
+			"dateCreated",
+			liferayToJSONDateFormat.format(
+				knowledgeBaseFolder.getDateCreated()));
 
-		return sb.toString();
+		map.put(
+			"dateModified",
+			liferayToJSONDateFormat.format(
+				knowledgeBaseFolder.getDateModified()));
+
+		if (knowledgeBaseFolder.getDescription() == null) {
+			map.put("description", null);
+		}
+		else {
+			map.put(
+				"description",
+				String.valueOf(knowledgeBaseFolder.getDescription()));
+		}
+
+		if (knowledgeBaseFolder.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(knowledgeBaseFolder.getId()));
+		}
+
+		if (knowledgeBaseFolder.getName() == null) {
+			map.put("name", null);
+		}
+		else {
+			map.put("name", String.valueOf(knowledgeBaseFolder.getName()));
+		}
+
+		if (knowledgeBaseFolder.getNumberOfKnowledgeBaseArticles() == null) {
+			map.put("numberOfKnowledgeBaseArticles", null);
+		}
+		else {
+			map.put(
+				"numberOfKnowledgeBaseArticles",
+				String.valueOf(
+					knowledgeBaseFolder.getNumberOfKnowledgeBaseArticles()));
+		}
+
+		if (knowledgeBaseFolder.getNumberOfKnowledgeBaseFolders() == null) {
+			map.put("numberOfKnowledgeBaseFolders", null);
+		}
+		else {
+			map.put(
+				"numberOfKnowledgeBaseFolders",
+				String.valueOf(
+					knowledgeBaseFolder.getNumberOfKnowledgeBaseFolders()));
+		}
+
+		if (knowledgeBaseFolder.getParentKnowledgeBaseFolder() == null) {
+			map.put("parentKnowledgeBaseFolder", null);
+		}
+		else {
+			map.put(
+				"parentKnowledgeBaseFolder",
+				ParentKnowledgeBaseFolderSerDes.toJSON(
+					knowledgeBaseFolder.getParentKnowledgeBaseFolder()));
+		}
+
+		if (knowledgeBaseFolder.getParentKnowledgeBaseFolderId() == null) {
+			map.put("parentKnowledgeBaseFolderId", null);
+		}
+		else {
+			map.put(
+				"parentKnowledgeBaseFolderId",
+				String.valueOf(
+					knowledgeBaseFolder.getParentKnowledgeBaseFolderId()));
+		}
+
+		if (knowledgeBaseFolder.getSiteId() == null) {
+			map.put("siteId", null);
+		}
+		else {
+			map.put("siteId", String.valueOf(knowledgeBaseFolder.getSiteId()));
+		}
+
+		if (knowledgeBaseFolder.getViewableBy() == null) {
+			map.put("viewableBy", null);
+		}
+		else {
+			map.put(
+				"viewableBy",
+				String.valueOf(knowledgeBaseFolder.getViewableBy()));
+		}
+
+		return map;
 	}
 
 	private static class KnowledgeBaseFolderJSONParser
 		extends BaseJSONParser<KnowledgeBaseFolder> {
 
+		@Override
 		protected KnowledgeBaseFolder createDTO() {
 			return new KnowledgeBaseFolder();
 		}
 
+		@Override
 		protected KnowledgeBaseFolder[] createDTOArray(int size) {
 			return new KnowledgeBaseFolder[size];
 		}
 
+		@Override
 		protected void setField(
 			KnowledgeBaseFolder knowledgeBaseFolder, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
@@ -242,13 +350,13 @@ public class KnowledgeBaseFolderSerDes {
 			else if (Objects.equals(jsonParserFieldName, "dateCreated")) {
 				if (jsonParserFieldValue != null) {
 					knowledgeBaseFolder.setDateCreated(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dateModified")) {
 				if (jsonParserFieldValue != null) {
 					knowledgeBaseFolder.setDateModified(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "description")) {
@@ -273,7 +381,7 @@ public class KnowledgeBaseFolderSerDes {
 
 				if (jsonParserFieldValue != null) {
 					knowledgeBaseFolder.setNumberOfKnowledgeBaseArticles(
-						(Number)jsonParserFieldValue);
+						Integer.valueOf((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(
@@ -281,7 +389,7 @@ public class KnowledgeBaseFolderSerDes {
 
 				if (jsonParserFieldValue != null) {
 					knowledgeBaseFolder.setNumberOfKnowledgeBaseFolders(
-						(Number)jsonParserFieldValue);
+						Integer.valueOf((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(
@@ -317,18 +425,6 @@ public class KnowledgeBaseFolderSerDes {
 			else {
 				throw new IllegalArgumentException(
 					"Unsupported field name " + jsonParserFieldName);
-			}
-		}
-
-		private Date _toDate(String string) {
-			try {
-				DateFormat dateFormat = new SimpleDateFormat(
-					"yyyy-MM-dd'T'HH:mm:ss'Z'");
-
-				return dateFormat.parse(string);
-			}
-			catch (ParseException pe) {
-				throw new IllegalArgumentException("Unable to parse " + string);
 			}
 		}
 

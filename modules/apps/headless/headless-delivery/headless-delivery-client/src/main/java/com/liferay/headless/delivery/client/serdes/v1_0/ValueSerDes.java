@@ -17,7 +17,8 @@ package com.liferay.headless.delivery.client.serdes.v1_0;
 import com.liferay.headless.delivery.client.dto.v1_0.Value;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -43,75 +44,81 @@ public class ValueSerDes {
 
 	public static String toJSON(Value value) {
 		if (value == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"data\": ");
+		if (value.getData() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (value.getData() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"data\":");
+
+			sb.append("\"");
+
 			sb.append(value.getData());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (value.getDocument() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"document\": ");
+			sb.append("\"document\":");
 
-		if (value.getDocument() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(value.getDocument());
-		}
-
-		sb.append(", ");
-
-		sb.append("\"geo\": ");
-
-		if (value.getGeo() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(value.getGeo());
+			sb.append(ContentDocumentSerDes.toJSON(value.getDocument()));
 		}
 
-		sb.append(", ");
+		if (value.getGeo() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"image\": ");
+			sb.append("\"geo\":");
 
-		if (value.getImage() == null) {
-			sb.append("null");
+			sb.append(GeoSerDes.toJSON(value.getGeo()));
 		}
-		else {
-			sb.append(value.getImage());
+
+		if (value.getImage() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"image\":");
+
+			sb.append(ContentDocumentSerDes.toJSON(value.getImage()));
 		}
 
-		sb.append(", ");
+		if (value.getLink() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"link\": ");
+			sb.append("\"link\":");
 
-		if (value.getLink() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(value.getLink());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (value.getStructuredContentLink() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"structuredContentLink\": ");
+			sb.append("\"structuredContentLink\":");
 
-		if (value.getStructuredContentLink() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(value.getStructuredContentLink());
+			sb.append(
+				StructuredContentLinkSerDes.toJSON(
+					value.getStructuredContentLink()));
 		}
 
 		sb.append("}");
@@ -119,38 +126,75 @@ public class ValueSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<Value> values) {
-		if (values == null) {
-			return "[]";
+	public static Map<String, String> toMap(Value value) {
+		if (value == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (Value value : values) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(value));
+		if (value.getData() == null) {
+			map.put("data", null);
+		}
+		else {
+			map.put("data", String.valueOf(value.getData()));
 		}
 
-		sb.append("]");
+		if (value.getDocument() == null) {
+			map.put("document", null);
+		}
+		else {
+			map.put(
+				"document", ContentDocumentSerDes.toJSON(value.getDocument()));
+		}
 
-		return sb.toString();
+		if (value.getGeo() == null) {
+			map.put("geo", null);
+		}
+		else {
+			map.put("geo", GeoSerDes.toJSON(value.getGeo()));
+		}
+
+		if (value.getImage() == null) {
+			map.put("image", null);
+		}
+		else {
+			map.put("image", ContentDocumentSerDes.toJSON(value.getImage()));
+		}
+
+		if (value.getLink() == null) {
+			map.put("link", null);
+		}
+		else {
+			map.put("link", String.valueOf(value.getLink()));
+		}
+
+		if (value.getStructuredContentLink() == null) {
+			map.put("structuredContentLink", null);
+		}
+		else {
+			map.put(
+				"structuredContentLink",
+				StructuredContentLinkSerDes.toJSON(
+					value.getStructuredContentLink()));
+		}
+
+		return map;
 	}
 
 	private static class ValueJSONParser extends BaseJSONParser<Value> {
 
+		@Override
 		protected Value createDTO() {
 			return new Value();
 		}
 
+		@Override
 		protected Value[] createDTOArray(int size) {
 			return new Value[size];
 		}
 
+		@Override
 		protected void setField(
 			Value value, String jsonParserFieldName,
 			Object jsonParserFieldValue) {

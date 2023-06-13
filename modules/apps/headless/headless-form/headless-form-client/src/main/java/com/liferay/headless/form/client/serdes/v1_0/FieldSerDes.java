@@ -18,7 +18,8 @@ import com.liferay.headless.form.client.dto.v1_0.Field;
 import com.liferay.headless.form.client.dto.v1_0.Option;
 import com.liferay.headless.form.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -45,177 +46,188 @@ public class FieldSerDes {
 
 	public static String toJSON(Field field) {
 		if (field == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"autocomplete\": ");
+		if (field.getAutocomplete() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (field.getAutocomplete() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"autocomplete\":");
+
 			sb.append(field.getAutocomplete());
 		}
 
-		sb.append(", ");
+		if (field.getDataSourceType() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dataSourceType\": ");
+			sb.append("\"dataSourceType\":");
 
-		if (field.getDataSourceType() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(field.getDataSourceType());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (field.getDataType() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dataType\": ");
+			sb.append("\"dataType\":");
 
-		if (field.getDataType() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(field.getDataType());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (field.getDisplayStyle() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"displayStyle\": ");
+			sb.append("\"displayStyle\":");
 
-		if (field.getDisplayStyle() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(field.getDisplayStyle());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (field.getGrid() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"grid\": ");
+			sb.append("\"grid\":");
 
-		if (field.getGrid() == null) {
-			sb.append("null");
+			sb.append(GridSerDes.toJSON(field.getGrid()));
 		}
-		else {
-			sb.append(field.getGrid());
-		}
 
-		sb.append(", ");
+		if (field.getHasFormRules() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"hasFormRules\": ");
+			sb.append("\"hasFormRules\":");
 
-		if (field.getHasFormRules() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(field.getHasFormRules());
 		}
 
-		sb.append(", ");
+		if (field.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\":");
 
-		if (field.getId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(field.getId());
 		}
 
-		sb.append(", ");
+		if (field.getImmutable() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"immutable\": ");
+			sb.append("\"immutable\":");
 
-		if (field.getImmutable() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(field.getImmutable());
 		}
 
-		sb.append(", ");
+		if (field.getInline() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"inline\": ");
+			sb.append("\"inline\":");
 
-		if (field.getInline() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(field.getInline());
 		}
 
-		sb.append(", ");
+		if (field.getInputControl() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"inputControl\": ");
+			sb.append("\"inputControl\":");
 
-		if (field.getInputControl() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(field.getInputControl());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (field.getLabel() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"label\": ");
+			sb.append("\"label\":");
 
-		if (field.getLabel() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(field.getLabel());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (field.getLocalizable() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"localizable\": ");
+			sb.append("\"localizable\":");
 
-		if (field.getLocalizable() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(field.getLocalizable());
 		}
 
-		sb.append(", ");
+		if (field.getMultiple() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"multiple\": ");
+			sb.append("\"multiple\":");
 
-		if (field.getMultiple() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(field.getMultiple());
 		}
 
-		sb.append(", ");
+		if (field.getName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\":");
 
-		if (field.getName() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(field.getName());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (field.getOptions() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"options\": ");
+			sb.append("\"options\":");
 
-		if (field.getOptions() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < field.getOptions().length; i++) {
-				sb.append(field.getOptions()[i]);
+				sb.append(OptionSerDes.toJSON(field.getOptions()[i]));
 
 				if ((i + 1) < field.getOptions().length) {
 					sb.append(", ");
@@ -225,125 +237,134 @@ public class FieldSerDes {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (field.getPlaceholder() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"placeholder\": ");
+			sb.append("\"placeholder\":");
 
-		if (field.getPlaceholder() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(field.getPlaceholder());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (field.getPredefinedValue() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"predefinedValue\": ");
+			sb.append("\"predefinedValue\":");
 
-		if (field.getPredefinedValue() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(field.getPredefinedValue());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (field.getReadOnly() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"readOnly\": ");
+			sb.append("\"readOnly\":");
 
-		if (field.getReadOnly() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(field.getReadOnly());
 		}
 
-		sb.append(", ");
+		if (field.getRepeatable() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"repeatable\": ");
+			sb.append("\"repeatable\":");
 
-		if (field.getRepeatable() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(field.getRepeatable());
 		}
 
-		sb.append(", ");
+		if (field.getRequired() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"required\": ");
+			sb.append("\"required\":");
 
-		if (field.getRequired() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(field.getRequired());
 		}
 
-		sb.append(", ");
+		if (field.getShowAsSwitcher() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"showAsSwitcher\": ");
+			sb.append("\"showAsSwitcher\":");
 
-		if (field.getShowAsSwitcher() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(field.getShowAsSwitcher());
 		}
 
-		sb.append(", ");
+		if (field.getShowLabel() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"showLabel\": ");
+			sb.append("\"showLabel\":");
 
-		if (field.getShowLabel() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(field.getShowLabel());
 		}
 
-		sb.append(", ");
+		if (field.getStyle() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"style\": ");
+			sb.append("\"style\":");
 
-		if (field.getStyle() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(field.getStyle());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (field.getText() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"text\": ");
+			sb.append("\"text\":");
 
-		if (field.getText() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(field.getText());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (field.getTooltip() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"tooltip\": ");
+			sb.append("\"tooltip\":");
 
-		if (field.getTooltip() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(field.getTooltip());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (field.getValidation() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"validation\": ");
+			sb.append("\"validation\":");
 
-		if (field.getValidation() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(field.getValidation());
+			sb.append(ValidationSerDes.toJSON(field.getValidation()));
 		}
 
 		sb.append("}");
@@ -351,38 +372,215 @@ public class FieldSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<Field> fields) {
-		if (fields == null) {
-			return "[]";
+	public static Map<String, String> toMap(Field field) {
+		if (field == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (Field field : fields) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(field));
+		if (field.getAutocomplete() == null) {
+			map.put("autocomplete", null);
+		}
+		else {
+			map.put("autocomplete", String.valueOf(field.getAutocomplete()));
 		}
 
-		sb.append("]");
+		if (field.getDataSourceType() == null) {
+			map.put("dataSourceType", null);
+		}
+		else {
+			map.put(
+				"dataSourceType", String.valueOf(field.getDataSourceType()));
+		}
 
-		return sb.toString();
+		if (field.getDataType() == null) {
+			map.put("dataType", null);
+		}
+		else {
+			map.put("dataType", String.valueOf(field.getDataType()));
+		}
+
+		if (field.getDisplayStyle() == null) {
+			map.put("displayStyle", null);
+		}
+		else {
+			map.put("displayStyle", String.valueOf(field.getDisplayStyle()));
+		}
+
+		if (field.getGrid() == null) {
+			map.put("grid", null);
+		}
+		else {
+			map.put("grid", GridSerDes.toJSON(field.getGrid()));
+		}
+
+		if (field.getHasFormRules() == null) {
+			map.put("hasFormRules", null);
+		}
+		else {
+			map.put("hasFormRules", String.valueOf(field.getHasFormRules()));
+		}
+
+		if (field.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(field.getId()));
+		}
+
+		if (field.getImmutable() == null) {
+			map.put("immutable", null);
+		}
+		else {
+			map.put("immutable", String.valueOf(field.getImmutable()));
+		}
+
+		if (field.getInline() == null) {
+			map.put("inline", null);
+		}
+		else {
+			map.put("inline", String.valueOf(field.getInline()));
+		}
+
+		if (field.getInputControl() == null) {
+			map.put("inputControl", null);
+		}
+		else {
+			map.put("inputControl", String.valueOf(field.getInputControl()));
+		}
+
+		if (field.getLabel() == null) {
+			map.put("label", null);
+		}
+		else {
+			map.put("label", String.valueOf(field.getLabel()));
+		}
+
+		if (field.getLocalizable() == null) {
+			map.put("localizable", null);
+		}
+		else {
+			map.put("localizable", String.valueOf(field.getLocalizable()));
+		}
+
+		if (field.getMultiple() == null) {
+			map.put("multiple", null);
+		}
+		else {
+			map.put("multiple", String.valueOf(field.getMultiple()));
+		}
+
+		if (field.getName() == null) {
+			map.put("name", null);
+		}
+		else {
+			map.put("name", String.valueOf(field.getName()));
+		}
+
+		if (field.getOptions() == null) {
+			map.put("options", null);
+		}
+		else {
+			map.put("options", String.valueOf(field.getOptions()));
+		}
+
+		if (field.getPlaceholder() == null) {
+			map.put("placeholder", null);
+		}
+		else {
+			map.put("placeholder", String.valueOf(field.getPlaceholder()));
+		}
+
+		if (field.getPredefinedValue() == null) {
+			map.put("predefinedValue", null);
+		}
+		else {
+			map.put(
+				"predefinedValue", String.valueOf(field.getPredefinedValue()));
+		}
+
+		if (field.getReadOnly() == null) {
+			map.put("readOnly", null);
+		}
+		else {
+			map.put("readOnly", String.valueOf(field.getReadOnly()));
+		}
+
+		if (field.getRepeatable() == null) {
+			map.put("repeatable", null);
+		}
+		else {
+			map.put("repeatable", String.valueOf(field.getRepeatable()));
+		}
+
+		if (field.getRequired() == null) {
+			map.put("required", null);
+		}
+		else {
+			map.put("required", String.valueOf(field.getRequired()));
+		}
+
+		if (field.getShowAsSwitcher() == null) {
+			map.put("showAsSwitcher", null);
+		}
+		else {
+			map.put(
+				"showAsSwitcher", String.valueOf(field.getShowAsSwitcher()));
+		}
+
+		if (field.getShowLabel() == null) {
+			map.put("showLabel", null);
+		}
+		else {
+			map.put("showLabel", String.valueOf(field.getShowLabel()));
+		}
+
+		if (field.getStyle() == null) {
+			map.put("style", null);
+		}
+		else {
+			map.put("style", String.valueOf(field.getStyle()));
+		}
+
+		if (field.getText() == null) {
+			map.put("text", null);
+		}
+		else {
+			map.put("text", String.valueOf(field.getText()));
+		}
+
+		if (field.getTooltip() == null) {
+			map.put("tooltip", null);
+		}
+		else {
+			map.put("tooltip", String.valueOf(field.getTooltip()));
+		}
+
+		if (field.getValidation() == null) {
+			map.put("validation", null);
+		}
+		else {
+			map.put(
+				"validation", ValidationSerDes.toJSON(field.getValidation()));
+		}
+
+		return map;
 	}
 
 	private static class FieldJSONParser extends BaseJSONParser<Field> {
 
+		@Override
 		protected Field createDTO() {
 			return new Field();
 		}
 
+		@Override
 		protected Field[] createDTOArray(int size) {
 			return new Field[size];
 		}
 
+		@Override
 		protected void setField(
 			Field field, String jsonParserFieldName,
 			Object jsonParserFieldValue) {

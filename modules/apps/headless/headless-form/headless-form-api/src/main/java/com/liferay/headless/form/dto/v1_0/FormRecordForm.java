@@ -138,7 +138,9 @@ public class FormRecordForm {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(fieldValues);
+			sb.append("\"");
 		}
 
 		sb.append("}");

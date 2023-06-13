@@ -81,6 +81,7 @@ public class KnowledgeBaseFolder {
 
 	}
 
+	@Schema(description = "The creator of the KnowledgeBaseFolder.")
 	public Creator getCreator() {
 		return creator;
 	}
@@ -108,6 +109,7 @@ public class KnowledgeBaseFolder {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator creator;
 
+	@Schema(description = "The creation date of the KnowledgeBaseFolder.")
 	public Date getDateCreated() {
 		return dateCreated;
 	}
@@ -135,6 +137,9 @@ public class KnowledgeBaseFolder {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
+	@Schema(
+		description = "The last time a field of the KnowledgeBaseFolder changed."
+	)
 	public Date getDateModified() {
 		return dateModified;
 	}
@@ -162,6 +167,7 @@ public class KnowledgeBaseFolder {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateModified;
 
+	@Schema(description = "The description of the KnowledgeBaseFolder.")
 	public String getDescription() {
 		return description;
 	}
@@ -189,6 +195,7 @@ public class KnowledgeBaseFolder {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String description;
 
+	@Schema(description = "The identifier of the resource.")
 	public Long getId() {
 		return id;
 	}
@@ -214,6 +221,7 @@ public class KnowledgeBaseFolder {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
+	@Schema(description = "The main title/name of this resource.")
 	public String getName() {
 		return name;
 	}
@@ -240,19 +248,22 @@ public class KnowledgeBaseFolder {
 	@NotEmpty
 	protected String name;
 
-	public Number getNumberOfKnowledgeBaseArticles() {
+	@Schema(
+		description = "The number of child KnowledgeBaseArticles asociated with this resource."
+	)
+	public Integer getNumberOfKnowledgeBaseArticles() {
 		return numberOfKnowledgeBaseArticles;
 	}
 
 	public void setNumberOfKnowledgeBaseArticles(
-		Number numberOfKnowledgeBaseArticles) {
+		Integer numberOfKnowledgeBaseArticles) {
 
 		this.numberOfKnowledgeBaseArticles = numberOfKnowledgeBaseArticles;
 	}
 
 	@JsonIgnore
 	public void setNumberOfKnowledgeBaseArticles(
-		UnsafeSupplier<Number, Exception>
+		UnsafeSupplier<Integer, Exception>
 			numberOfKnowledgeBaseArticlesUnsafeSupplier) {
 
 		try {
@@ -269,21 +280,24 @@ public class KnowledgeBaseFolder {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected Number numberOfKnowledgeBaseArticles;
+	protected Integer numberOfKnowledgeBaseArticles;
 
-	public Number getNumberOfKnowledgeBaseFolders() {
+	@Schema(
+		description = "The number of child KnowledgeBaseFolders asociated with this resource."
+	)
+	public Integer getNumberOfKnowledgeBaseFolders() {
 		return numberOfKnowledgeBaseFolders;
 	}
 
 	public void setNumberOfKnowledgeBaseFolders(
-		Number numberOfKnowledgeBaseFolders) {
+		Integer numberOfKnowledgeBaseFolders) {
 
 		this.numberOfKnowledgeBaseFolders = numberOfKnowledgeBaseFolders;
 	}
 
 	@JsonIgnore
 	public void setNumberOfKnowledgeBaseFolders(
-		UnsafeSupplier<Number, Exception>
+		UnsafeSupplier<Integer, Exception>
 			numberOfKnowledgeBaseFoldersUnsafeSupplier) {
 
 		try {
@@ -300,8 +314,11 @@ public class KnowledgeBaseFolder {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected Number numberOfKnowledgeBaseFolders;
+	protected Integer numberOfKnowledgeBaseFolders;
 
+	@Schema(
+		description = "The parent KnowledgeBaseFolder of this article, if any."
+	)
 	public ParentKnowledgeBaseFolder getParentKnowledgeBaseFolder() {
 		return parentKnowledgeBaseFolder;
 	}
@@ -333,6 +350,9 @@ public class KnowledgeBaseFolder {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected ParentKnowledgeBaseFolder parentKnowledgeBaseFolder;
 
+	@Schema(
+		description = "The parent KnowledgeBaseFolder identifier of this article, if any."
+	)
 	public Long getParentKnowledgeBaseFolderId() {
 		return parentKnowledgeBaseFolderId;
 	}
@@ -364,6 +384,9 @@ public class KnowledgeBaseFolder {
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	protected Long parentKnowledgeBaseFolderId;
 
+	@Schema(
+		description = "The site identificator where this KnowledgeBaseFolder is scoped."
+	)
 	public Long getSiteId() {
 		return siteId;
 	}
@@ -391,6 +414,9 @@ public class KnowledgeBaseFolder {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long siteId;
 
+	@Schema(
+		description = "Write only property to specify the default permissions."
+	)
 	public ViewableBy getViewableBy() {
 		return viewableBy;
 	}
@@ -471,7 +497,9 @@ public class KnowledgeBaseFolder {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(dateCreated);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -482,7 +510,9 @@ public class KnowledgeBaseFolder {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(dateModified);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -493,7 +523,9 @@ public class KnowledgeBaseFolder {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(description);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -515,7 +547,9 @@ public class KnowledgeBaseFolder {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(name);
+			sb.append("\"");
 		}
 
 		sb.append(", ");

@@ -29,7 +29,7 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalServiceUtil;
-import com.liferay.journal.web.asset.JournalArticleAssetRenderer;
+import com.liferay.journal.web.asset.model.JournalArticleAssetRenderer;
 import com.liferay.journal.web.configuration.JournalWebConfiguration;
 import com.liferay.journal.web.internal.portlet.JournalPortlet;
 import com.liferay.journal.web.internal.security.permission.resource.JournalArticlePermission;
@@ -530,7 +530,8 @@ public class JournalArticleActionDropdownItemsProvider {
 
 			sb.append(
 				_assetDisplayPageFriendlyURLProvider.getFriendlyURL(
-					assetEntry, _themeDisplay));
+					assetEntry.getClassName(), assetEntry.getClassPK(),
+					_themeDisplay));
 			sb.append(StringPool.SLASH);
 			sb.append(_article.getId());
 

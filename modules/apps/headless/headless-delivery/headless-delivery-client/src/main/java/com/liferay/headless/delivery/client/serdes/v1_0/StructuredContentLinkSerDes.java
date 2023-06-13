@@ -17,7 +17,8 @@ package com.liferay.headless.delivery.client.serdes.v1_0;
 import com.liferay.headless.delivery.client.dto.v1_0.StructuredContentLink;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -45,31 +46,35 @@ public class StructuredContentLinkSerDes {
 
 	public static String toJSON(StructuredContentLink structuredContentLink) {
 		if (structuredContentLink == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"id\": ");
+		if (structuredContentLink.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (structuredContentLink.getId() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"id\":");
+
 			sb.append(structuredContentLink.getId());
 		}
 
-		sb.append(", ");
+		if (structuredContentLink.getTitle() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"title\": ");
+			sb.append("\"title\":");
 
-		if (structuredContentLink.getTitle() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(structuredContentLink.getTitle());
+
+			sb.append("\"");
 		}
 
 		sb.append("}");
@@ -77,43 +82,46 @@ public class StructuredContentLinkSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(
-		Collection<StructuredContentLink> structuredContentLinks) {
+	public static Map<String, String> toMap(
+		StructuredContentLink structuredContentLink) {
 
-		if (structuredContentLinks == null) {
-			return "[]";
+		if (structuredContentLink == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (StructuredContentLink structuredContentLink :
-				structuredContentLinks) {
-
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(structuredContentLink));
+		if (structuredContentLink.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(structuredContentLink.getId()));
 		}
 
-		sb.append("]");
+		if (structuredContentLink.getTitle() == null) {
+			map.put("title", null);
+		}
+		else {
+			map.put("title", String.valueOf(structuredContentLink.getTitle()));
+		}
 
-		return sb.toString();
+		return map;
 	}
 
 	private static class StructuredContentLinkJSONParser
 		extends BaseJSONParser<StructuredContentLink> {
 
+		@Override
 		protected StructuredContentLink createDTO() {
 			return new StructuredContentLink();
 		}
 
+		@Override
 		protected StructuredContentLink[] createDTOArray(int size) {
 			return new StructuredContentLink[size];
 		}
 
+		@Override
 		protected void setField(
 			StructuredContentLink structuredContentLink,
 			String jsonParserFieldName, Object jsonParserFieldValue) {

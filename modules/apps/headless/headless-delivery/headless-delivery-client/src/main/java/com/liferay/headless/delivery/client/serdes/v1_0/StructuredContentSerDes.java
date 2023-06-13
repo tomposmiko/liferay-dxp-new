@@ -21,11 +21,10 @@ import com.liferay.headless.delivery.client.dto.v1_0.TaxonomyCategory;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import java.util.Collection;
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -54,37 +53,44 @@ public class StructuredContentSerDes {
 
 	public static String toJSON(StructuredContent structuredContent) {
 		if (structuredContent == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"aggregateRating\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (structuredContent.getAggregateRating() == null) {
-			sb.append("null");
+		if (structuredContent.getAggregateRating() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"aggregateRating\":");
+
+			sb.append(
+				AggregateRatingSerDes.toJSON(
+					structuredContent.getAggregateRating()));
 		}
-		else {
-			sb.append(structuredContent.getAggregateRating());
-		}
 
-		sb.append(", ");
+		if (structuredContent.getAvailableLanguages() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"availableLanguages\": ");
+			sb.append("\"availableLanguages\":");
 
-		if (structuredContent.getAvailableLanguages() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0;
 				 i < structuredContent.getAvailableLanguages().length; i++) {
 
 				sb.append("\"");
+
 				sb.append(structuredContent.getAvailableLanguages()[i]);
+
 				sb.append("\"");
 
 				if ((i + 1) <
@@ -97,20 +103,21 @@ public class StructuredContentSerDes {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (structuredContent.getContentFields() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"contentFields\": ");
+			sb.append("\"contentFields\":");
 
-		if (structuredContent.getContentFields() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < structuredContent.getContentFields().length;
 				 i++) {
 
-				sb.append(structuredContent.getContentFields()[i]);
+				sb.append(
+					ContentFieldSerDes.toJSON(
+						structuredContent.getContentFields()[i]));
 
 				if ((i + 1) < structuredContent.getContentFields().length) {
 					sb.append(", ");
@@ -120,118 +127,140 @@ public class StructuredContentSerDes {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (structuredContent.getContentStructureId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"contentStructureId\": ");
+			sb.append("\"contentStructureId\":");
 
-		if (structuredContent.getContentStructureId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(structuredContent.getContentStructureId());
 		}
 
-		sb.append(", ");
+		if (structuredContent.getCreator() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"creator\": ");
+			sb.append("\"creator\":");
 
-		if (structuredContent.getCreator() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(structuredContent.getCreator());
-		}
-
-		sb.append(", ");
-
-		sb.append("\"dateCreated\": ");
-
-		if (structuredContent.getDateCreated() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(structuredContent.getDateCreated());
+			sb.append(CreatorSerDes.toJSON(structuredContent.getCreator()));
 		}
 
-		sb.append(", ");
+		if (structuredContent.getDateCreated() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dateModified\": ");
+			sb.append("\"dateCreated\":");
 
-		if (structuredContent.getDateModified() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(structuredContent.getDateModified());
-		}
+			sb.append("\"");
 
-		sb.append(", ");
+			sb.append(
+				liferayToJSONDateFormat.format(
+					structuredContent.getDateCreated()));
 
-		sb.append("\"datePublished\": ");
-
-		if (structuredContent.getDatePublished() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(structuredContent.getDatePublished());
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (structuredContent.getDateModified() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"description\": ");
+			sb.append("\"dateModified\":");
 
-		if (structuredContent.getDescription() == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(
+				liferayToJSONDateFormat.format(
+					structuredContent.getDateModified()));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (structuredContent.getDatePublished() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"datePublished\":");
+
+			sb.append("\"");
+
+			sb.append(
+				liferayToJSONDateFormat.format(
+					structuredContent.getDatePublished()));
+
+			sb.append("\"");
+		}
+
+		if (structuredContent.getDescription() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"description\":");
+
+			sb.append("\"");
+
 			sb.append(structuredContent.getDescription());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (structuredContent.getFriendlyUrlPath() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"friendlyUrlPath\": ");
+			sb.append("\"friendlyUrlPath\":");
 
-		if (structuredContent.getFriendlyUrlPath() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(structuredContent.getFriendlyUrlPath());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (structuredContent.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\":");
 
-		if (structuredContent.getId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(structuredContent.getId());
 		}
 
-		sb.append(", ");
+		if (structuredContent.getKey() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"key\": ");
+			sb.append("\"key\":");
 
-		if (structuredContent.getKey() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(structuredContent.getKey());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (structuredContent.getKeywords() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"keywords\": ");
+			sb.append("\"keywords\":");
 
-		if (structuredContent.getKeywords() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < structuredContent.getKeywords().length; i++) {
 				sb.append("\"");
+
 				sb.append(structuredContent.getKeywords()[i]);
+
 				sb.append("\"");
 
 				if ((i + 1) < structuredContent.getKeywords().length) {
@@ -242,31 +271,31 @@ public class StructuredContentSerDes {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (structuredContent.getNumberOfComments() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"numberOfComments\": ");
+			sb.append("\"numberOfComments\":");
 
-		if (structuredContent.getNumberOfComments() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(structuredContent.getNumberOfComments());
 		}
 
-		sb.append(", ");
+		if (structuredContent.getRenderedContents() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"renderedContents\": ");
+			sb.append("\"renderedContents\":");
 
-		if (structuredContent.getRenderedContents() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < structuredContent.getRenderedContents().length;
 				 i++) {
 
-				sb.append(structuredContent.getRenderedContents()[i]);
+				sb.append(
+					RenderedContentSerDes.toJSON(
+						structuredContent.getRenderedContents()[i]));
 
 				if ((i + 1) < structuredContent.getRenderedContents().length) {
 					sb.append(", ");
@@ -276,31 +305,31 @@ public class StructuredContentSerDes {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (structuredContent.getSiteId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"siteId\": ");
+			sb.append("\"siteId\":");
 
-		if (structuredContent.getSiteId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(structuredContent.getSiteId());
 		}
 
-		sb.append(", ");
+		if (structuredContent.getTaxonomyCategories() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"taxonomyCategories\": ");
+			sb.append("\"taxonomyCategories\":");
 
-		if (structuredContent.getTaxonomyCategories() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0;
 				 i < structuredContent.getTaxonomyCategories().length; i++) {
 
-				sb.append(structuredContent.getTaxonomyCategories()[i]);
+				sb.append(
+					TaxonomyCategorySerDes.toJSON(
+						structuredContent.getTaxonomyCategories()[i]));
 
 				if ((i + 1) <
 						structuredContent.getTaxonomyCategories().length) {
@@ -312,14 +341,13 @@ public class StructuredContentSerDes {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (structuredContent.getTaxonomyCategoryIds() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"taxonomyCategoryIds\": ");
+			sb.append("\"taxonomyCategoryIds\":");
 
-		if (structuredContent.getTaxonomyCategoryIds() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0;
@@ -337,38 +365,45 @@ public class StructuredContentSerDes {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (structuredContent.getTitle() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"title\": ");
+			sb.append("\"title\":");
 
-		if (structuredContent.getTitle() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(structuredContent.getTitle());
-		}
-
-		sb.append(", ");
-
-		sb.append("\"uuid\": ");
-
-		if (structuredContent.getUuid() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(structuredContent.getUuid());
-		}
-
-		sb.append(", ");
-
-		sb.append("\"viewableBy\": ");
-
-		if (structuredContent.getViewableBy() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
+
+			sb.append(structuredContent.getTitle());
+
+			sb.append("\"");
+		}
+
+		if (structuredContent.getUuid() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"uuid\":");
+
+			sb.append("\"");
+
+			sb.append(structuredContent.getUuid());
+
+			sb.append("\"");
+		}
+
+		if (structuredContent.getViewableBy() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"viewableBy\":");
+
+			sb.append("\"");
+
 			sb.append(structuredContent.getViewableBy());
+
 			sb.append("\"");
 		}
 
@@ -377,41 +412,201 @@ public class StructuredContentSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(
-		Collection<StructuredContent> structuredContents) {
+	public static Map<String, String> toMap(
+		StructuredContent structuredContent) {
 
-		if (structuredContents == null) {
-			return "[]";
+		if (structuredContent == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		for (StructuredContent structuredContent : structuredContents) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(structuredContent));
+		if (structuredContent.getAggregateRating() == null) {
+			map.put("aggregateRating", null);
+		}
+		else {
+			map.put(
+				"aggregateRating",
+				AggregateRatingSerDes.toJSON(
+					structuredContent.getAggregateRating()));
 		}
 
-		sb.append("]");
+		if (structuredContent.getAvailableLanguages() == null) {
+			map.put("availableLanguages", null);
+		}
+		else {
+			map.put(
+				"availableLanguages",
+				String.valueOf(structuredContent.getAvailableLanguages()));
+		}
 
-		return sb.toString();
+		if (structuredContent.getContentFields() == null) {
+			map.put("contentFields", null);
+		}
+		else {
+			map.put(
+				"contentFields",
+				String.valueOf(structuredContent.getContentFields()));
+		}
+
+		if (structuredContent.getContentStructureId() == null) {
+			map.put("contentStructureId", null);
+		}
+		else {
+			map.put(
+				"contentStructureId",
+				String.valueOf(structuredContent.getContentStructureId()));
+		}
+
+		if (structuredContent.getCreator() == null) {
+			map.put("creator", null);
+		}
+		else {
+			map.put(
+				"creator",
+				CreatorSerDes.toJSON(structuredContent.getCreator()));
+		}
+
+		map.put(
+			"dateCreated",
+			liferayToJSONDateFormat.format(structuredContent.getDateCreated()));
+
+		map.put(
+			"dateModified",
+			liferayToJSONDateFormat.format(
+				structuredContent.getDateModified()));
+
+		map.put(
+			"datePublished",
+			liferayToJSONDateFormat.format(
+				structuredContent.getDatePublished()));
+
+		if (structuredContent.getDescription() == null) {
+			map.put("description", null);
+		}
+		else {
+			map.put(
+				"description",
+				String.valueOf(structuredContent.getDescription()));
+		}
+
+		if (structuredContent.getFriendlyUrlPath() == null) {
+			map.put("friendlyUrlPath", null);
+		}
+		else {
+			map.put(
+				"friendlyUrlPath",
+				String.valueOf(structuredContent.getFriendlyUrlPath()));
+		}
+
+		if (structuredContent.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(structuredContent.getId()));
+		}
+
+		if (structuredContent.getKey() == null) {
+			map.put("key", null);
+		}
+		else {
+			map.put("key", String.valueOf(structuredContent.getKey()));
+		}
+
+		if (structuredContent.getKeywords() == null) {
+			map.put("keywords", null);
+		}
+		else {
+			map.put(
+				"keywords", String.valueOf(structuredContent.getKeywords()));
+		}
+
+		if (structuredContent.getNumberOfComments() == null) {
+			map.put("numberOfComments", null);
+		}
+		else {
+			map.put(
+				"numberOfComments",
+				String.valueOf(structuredContent.getNumberOfComments()));
+		}
+
+		if (structuredContent.getRenderedContents() == null) {
+			map.put("renderedContents", null);
+		}
+		else {
+			map.put(
+				"renderedContents",
+				String.valueOf(structuredContent.getRenderedContents()));
+		}
+
+		if (structuredContent.getSiteId() == null) {
+			map.put("siteId", null);
+		}
+		else {
+			map.put("siteId", String.valueOf(structuredContent.getSiteId()));
+		}
+
+		if (structuredContent.getTaxonomyCategories() == null) {
+			map.put("taxonomyCategories", null);
+		}
+		else {
+			map.put(
+				"taxonomyCategories",
+				String.valueOf(structuredContent.getTaxonomyCategories()));
+		}
+
+		if (structuredContent.getTaxonomyCategoryIds() == null) {
+			map.put("taxonomyCategoryIds", null);
+		}
+		else {
+			map.put(
+				"taxonomyCategoryIds",
+				String.valueOf(structuredContent.getTaxonomyCategoryIds()));
+		}
+
+		if (structuredContent.getTitle() == null) {
+			map.put("title", null);
+		}
+		else {
+			map.put("title", String.valueOf(structuredContent.getTitle()));
+		}
+
+		if (structuredContent.getUuid() == null) {
+			map.put("uuid", null);
+		}
+		else {
+			map.put("uuid", String.valueOf(structuredContent.getUuid()));
+		}
+
+		if (structuredContent.getViewableBy() == null) {
+			map.put("viewableBy", null);
+		}
+		else {
+			map.put(
+				"viewableBy",
+				String.valueOf(structuredContent.getViewableBy()));
+		}
+
+		return map;
 	}
 
 	private static class StructuredContentJSONParser
 		extends BaseJSONParser<StructuredContent> {
 
+		@Override
 		protected StructuredContent createDTO() {
 			return new StructuredContent();
 		}
 
+		@Override
 		protected StructuredContent[] createDTOArray(int size) {
 			return new StructuredContent[size];
 		}
 
+		@Override
 		protected void setField(
 			StructuredContent structuredContent, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
@@ -460,19 +655,19 @@ public class StructuredContentSerDes {
 			else if (Objects.equals(jsonParserFieldName, "dateCreated")) {
 				if (jsonParserFieldValue != null) {
 					structuredContent.setDateCreated(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dateModified")) {
 				if (jsonParserFieldValue != null) {
 					structuredContent.setDateModified(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "datePublished")) {
 				if (jsonParserFieldValue != null) {
 					structuredContent.setDatePublished(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "description")) {
@@ -507,7 +702,7 @@ public class StructuredContentSerDes {
 			else if (Objects.equals(jsonParserFieldName, "numberOfComments")) {
 				if (jsonParserFieldValue != null) {
 					structuredContent.setNumberOfComments(
-						(Number)jsonParserFieldValue);
+						Integer.valueOf((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "renderedContents")) {
@@ -572,18 +767,6 @@ public class StructuredContentSerDes {
 			else {
 				throw new IllegalArgumentException(
 					"Unsupported field name " + jsonParserFieldName);
-			}
-		}
-
-		private Date _toDate(String string) {
-			try {
-				DateFormat dateFormat = new SimpleDateFormat(
-					"yyyy-MM-dd'T'HH:mm:ss'Z'");
-
-				return dateFormat.parse(string);
-			}
-			catch (ParseException pe) {
-				throw new IllegalArgumentException("Unable to parse " + string);
 			}
 		}
 

@@ -17,7 +17,8 @@ package com.liferay.headless.admin.workflow.client.serdes.v1_0;
 import com.liferay.headless.admin.workflow.client.dto.v1_0.Creator;
 import com.liferay.headless.admin.workflow.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -43,86 +44,105 @@ public class CreatorSerDes {
 
 	public static String toJSON(Creator creator) {
 		if (creator == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"additionalName\": ");
+		if (creator.getAdditionalName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (creator.getAdditionalName() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"additionalName\":");
+
+			sb.append("\"");
+
 			sb.append(creator.getAdditionalName());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (creator.getFamilyName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"familyName\": ");
+			sb.append("\"familyName\":");
 
-		if (creator.getFamilyName() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(creator.getFamilyName());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (creator.getGivenName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"givenName\": ");
+			sb.append("\"givenName\":");
 
-		if (creator.getGivenName() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(creator.getGivenName());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (creator.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\":");
 
-		if (creator.getId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(creator.getId());
 		}
 
-		sb.append(", ");
+		if (creator.getImage() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"image\": ");
+			sb.append("\"image\":");
 
-		if (creator.getImage() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(creator.getImage());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (creator.getName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\":");
 
-		if (creator.getName() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(creator.getName());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (creator.getProfileURL() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"profileURL\": ");
+			sb.append("\"profileURL\":");
 
-		if (creator.getProfileURL() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(creator.getProfileURL());
+
+			sb.append("\"");
 		}
 
 		sb.append("}");
@@ -130,38 +150,79 @@ public class CreatorSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<Creator> creators) {
-		if (creators == null) {
-			return "[]";
+	public static Map<String, String> toMap(Creator creator) {
+		if (creator == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (Creator creator : creators) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(creator));
+		if (creator.getAdditionalName() == null) {
+			map.put("additionalName", null);
+		}
+		else {
+			map.put(
+				"additionalName", String.valueOf(creator.getAdditionalName()));
 		}
 
-		sb.append("]");
+		if (creator.getFamilyName() == null) {
+			map.put("familyName", null);
+		}
+		else {
+			map.put("familyName", String.valueOf(creator.getFamilyName()));
+		}
 
-		return sb.toString();
+		if (creator.getGivenName() == null) {
+			map.put("givenName", null);
+		}
+		else {
+			map.put("givenName", String.valueOf(creator.getGivenName()));
+		}
+
+		if (creator.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(creator.getId()));
+		}
+
+		if (creator.getImage() == null) {
+			map.put("image", null);
+		}
+		else {
+			map.put("image", String.valueOf(creator.getImage()));
+		}
+
+		if (creator.getName() == null) {
+			map.put("name", null);
+		}
+		else {
+			map.put("name", String.valueOf(creator.getName()));
+		}
+
+		if (creator.getProfileURL() == null) {
+			map.put("profileURL", null);
+		}
+		else {
+			map.put("profileURL", String.valueOf(creator.getProfileURL()));
+		}
+
+		return map;
 	}
 
 	private static class CreatorJSONParser extends BaseJSONParser<Creator> {
 
+		@Override
 		protected Creator createDTO() {
 			return new Creator();
 		}
 
+		@Override
 		protected Creator[] createDTOArray(int size) {
 			return new Creator[size];
 		}
 
+		@Override
 		protected void setField(
 			Creator creator, String jsonParserFieldName,
 			Object jsonParserFieldValue) {

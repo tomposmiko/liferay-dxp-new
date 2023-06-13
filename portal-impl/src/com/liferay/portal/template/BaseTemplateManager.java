@@ -14,7 +14,9 @@
 
 package com.liferay.portal.template;
 
+import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.template.TemplateManager;
+import com.liferay.portal.kernel.template.TemplateResource;
 import com.liferay.portal.kernel.template.TemplateResourceLoader;
 
 import java.util.Map;
@@ -93,6 +95,14 @@ public abstract class BaseTemplateManager implements TemplateManager {
 		return new String[0];
 	}
 
+	@Override
+	public Template getTemplate(
+		TemplateResource templateResource, boolean restricted) {
+
+		return doGetTemplate(
+			templateResource, restricted, getHelperUtilities(restricted));
+	}
+
 	public void setTemplateContextHelper(
 		TemplateContextHelper templateContextHelper) {
 
@@ -104,6 +114,10 @@ public abstract class BaseTemplateManager implements TemplateManager {
 
 		this.templateResourceLoader = templateResourceLoader;
 	}
+
+	protected abstract Template doGetTemplate(
+		TemplateResource templateResource, boolean restricted,
+		Map<String, Object> helperUtilities);
 
 	protected Map<String, Object> getHelperUtilities(boolean restricted) {
 		return templateContextHelper.getHelperUtilities(

@@ -327,7 +327,9 @@ public class FormRecord {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(dateCreated);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -338,7 +340,9 @@ public class FormRecord {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(dateModified);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -349,7 +353,9 @@ public class FormRecord {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(datePublished);
+			sb.append("\"");
 		}
 
 		sb.append(", ");

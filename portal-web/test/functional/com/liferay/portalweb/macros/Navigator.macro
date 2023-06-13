@@ -58,6 +58,14 @@ definition {
 		return "${currentURL}";
 	}
 
+	macro gotoAccountSettings {
+		Click(locator1 = "UserBar#USER_AVATAR_IMAGE");
+
+		var key_dropdownItem = "Account Settings";
+
+		Click(locator1 = "UserBar#USER_AVATAR_DROPDOWN_ITEM");
+	}
+
 	macro gotoBack {
 		Click(locator1 = "Icon#BACK");
 	}
@@ -113,6 +121,14 @@ definition {
 		AssertElementPresent(locator1 = "NavUnderline#ACTIVE_NAV_UNDERLINE_LINK");
 	}
 
+	macro gotoNotifications {
+		Click(locator1 = "UserBar#USER_AVATAR_IMAGE");
+
+		var key_dropdownItem = "Notifications";
+
+		Click(locator1 = "UserBar#USER_AVATAR_DROPDOWN_ITEM");
+	}
+
 	@summary = "Navigate to the page named '${pageName}'"
 	macro gotoPage {
 		Navigator.openURL(baseURL = "${baseURL}");
@@ -120,6 +136,14 @@ definition {
 		Pause(locator1 = "3000");
 
 		Navigator._gotoPage(pageName = "${pageName}");
+	}
+
+	macro gotoPersonalSite {
+		Click(locator1 = "UserBar#USER_AVATAR_IMAGE");
+
+		var key_dropdownItem = "My Sites";
+
+		Click(locator1 = "UserBar#USER_AVATAR_DROPDOWN_ITEM");
 	}
 
 	macro gotoPrivateSitePage {

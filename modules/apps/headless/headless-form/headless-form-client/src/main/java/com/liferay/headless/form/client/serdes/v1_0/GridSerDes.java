@@ -19,7 +19,8 @@ import com.liferay.headless.form.client.dto.v1_0.Grid;
 import com.liferay.headless.form.client.dto.v1_0.Row;
 import com.liferay.headless.form.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -46,23 +47,24 @@ public class GridSerDes {
 
 	public static String toJSON(Grid grid) {
 		if (grid == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"columns\": ");
+		if (grid.getColumns() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (grid.getColumns() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"columns\":");
+
 			sb.append("[");
 
 			for (int i = 0; i < grid.getColumns().length; i++) {
-				sb.append(grid.getColumns()[i]);
+				sb.append(ColumnSerDes.toJSON(grid.getColumns()[i]));
 
 				if ((i + 1) < grid.getColumns().length) {
 					sb.append(", ");
@@ -72,29 +74,27 @@ public class GridSerDes {
 			sb.append("]");
 		}
 
-		sb.append(", ");
+		if (grid.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\":");
 
-		if (grid.getId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(grid.getId());
 		}
 
-		sb.append(", ");
+		if (grid.getRows() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"rows\": ");
+			sb.append("\"rows\":");
 
-		if (grid.getRows() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < grid.getRows().length; i++) {
-				sb.append(grid.getRows()[i]);
+				sb.append(RowSerDes.toJSON(grid.getRows()[i]));
 
 				if ((i + 1) < grid.getRows().length) {
 					sb.append(", ");
@@ -109,38 +109,50 @@ public class GridSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<Grid> grids) {
-		if (grids == null) {
-			return "[]";
+	public static Map<String, String> toMap(Grid grid) {
+		if (grid == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (Grid grid : grids) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(grid));
+		if (grid.getColumns() == null) {
+			map.put("columns", null);
+		}
+		else {
+			map.put("columns", String.valueOf(grid.getColumns()));
 		}
 
-		sb.append("]");
+		if (grid.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(grid.getId()));
+		}
 
-		return sb.toString();
+		if (grid.getRows() == null) {
+			map.put("rows", null);
+		}
+		else {
+			map.put("rows", String.valueOf(grid.getRows()));
+		}
+
+		return map;
 	}
 
 	private static class GridJSONParser extends BaseJSONParser<Grid> {
 
+		@Override
 		protected Grid createDTO() {
 			return new Grid();
 		}
 
+		@Override
 		protected Grid[] createDTOArray(int size) {
 			return new Grid[size];
 		}
 
+		@Override
 		protected void setField(
 			Grid grid, String jsonParserFieldName,
 			Object jsonParserFieldValue) {

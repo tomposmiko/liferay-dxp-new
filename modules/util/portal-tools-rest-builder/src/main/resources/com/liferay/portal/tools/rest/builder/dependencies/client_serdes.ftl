@@ -9,11 +9,11 @@ import ${configYAML.apiPackagePath}.client.json.BaseJSONParser;
 import java.math.BigDecimal;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -41,7 +41,7 @@ public class ${schemaName}SerDes {
 
 	public static String toJSON(${schemaName} ${schemaVarName}) {
 		if (${schemaVarName} == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
@@ -54,41 +54,68 @@ public class ${schemaName}SerDes {
 		/>
 
 		<#list properties?keys as propertyName>
-			<#if !propertyName?is_first>
-				sb.append(", ");
+			<#assign propertyType = properties[propertyName] />
+
+			<#if stringUtil.equals(propertyType, "Date") || stringUtil.equals(propertyType, "Date[]")>
+				DateFormat liferayToJSONDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+				<#break>
 			</#if>
+		</#list>
 
-			sb.append("\"${propertyName}\": ");
+		<#list properties?keys as propertyName>
+			<#assign propertyType = properties[propertyName] />
 
-			if (${schemaVarName}.get${propertyName?cap_first}() == null) {
-				sb.append("null");
-			}
-			else {
-				<#if properties[propertyName]?contains("[]")>
-					sb.append("[");
+			if (${schemaVarName}.get${propertyName?cap_first}() != null) {
+				if (sb.length() > 1) {
+					sb.append(", ");
+				}
 
-					for (int i = 0; i < ${schemaVarName}.get${propertyName?cap_first}().length; i++) {
-						<#if stringUtil.equals(properties[propertyName], "Date[]") || stringUtil.equals(properties[propertyName], "String[]") || enumSchemas?keys?seq_contains(properties[propertyName])>
+				sb.append("\"${propertyName}\":");
+
+				<#if allSchemas[propertyType]??>
+					sb.append(${propertyType}SerDes.toJSON(${schemaVarName}.get${propertyName?cap_first}()));
+				<#else>
+					<#if propertyType?contains("[]")>
+						sb.append("[");
+
+						for (int i = 0; i < ${schemaVarName}.get${propertyName?cap_first}().length; i++) {
+							<#if stringUtil.equals(propertyType, "Date[]") || stringUtil.equals(propertyType, "String[]") || enumSchemas?keys?seq_contains(propertyType)>
+								sb.append("\"");
+
+								<#if stringUtil.equals(propertyType, "Date[]")>
+									sb.append(liferayToJSONDateFormat.format(${schemaVarName}.get${propertyName?cap_first}()[i]));
+								<#else>
+									sb.append(${schemaVarName}.get${propertyName?cap_first}()[i]);
+								</#if>
+
+								sb.append("\"");
+							<#elseif allSchemas[propertyType?remove_ending("[]")]??>
+								sb.append(${propertyType?remove_ending("[]")}SerDes.toJSON(${schemaVarName}.get${propertyName?cap_first}()[i]));
+							<#else>
+								sb.append(${schemaVarName}.get${propertyName?cap_first}()[i]);
+							</#if>
+
+							if ((i + 1) < ${schemaVarName}.get${propertyName?cap_first}().length) {
+								sb.append(", ");
+							}
+						}
+
+						sb.append("]");
+					<#else>
+						<#if stringUtil.equals(propertyType, "Date") || stringUtil.equals(propertyType, "String") || enumSchemas?keys?seq_contains(propertyType)>
 							sb.append("\"");
-							sb.append(${schemaVarName}.get${propertyName?cap_first}()[i]);
+
+							<#if stringUtil.equals(propertyType, "Date")>
+								sb.append(liferayToJSONDateFormat.format(${schemaVarName}.get${propertyName?cap_first}()));
+							<#else>
+								sb.append(${schemaVarName}.get${propertyName?cap_first}());
+							</#if>
+
 							sb.append("\"");
 						<#else>
-							sb.append(${schemaVarName}.get${propertyName?cap_first}()[i]);
+							sb.append(${schemaVarName}.get${propertyName?cap_first}());
 						</#if>
-
-						if ((i + 1) < ${schemaVarName}.get${propertyName?cap_first}().length) {
-							sb.append(", ");
-						}
-					}
-
-					sb.append("]");
-				<#else>
-					<#if stringUtil.equals(properties[propertyName], "Date[]") || stringUtil.equals(properties[propertyName], "String[]") || enumSchemas?keys?seq_contains(properties[propertyName])>
-						sb.append("\"");
-						sb.append(${schemaVarName}.get${propertyName?cap_first}());
-						sb.append("\"");
-					<#else>
-						sb.append(${schemaVarName}.get${propertyName?cap_first}());
 					</#if>
 				</#if>
 			}
@@ -99,38 +126,65 @@ public class ${schemaName}SerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<${schemaName}> ${schemaVarNames}) {
-		if (${schemaVarNames} == null) {
-			return "[]";
+	public static Map<String, String> toMap(${schemaName} ${schemaVarName}) {
+		if (${schemaVarName} == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
+		<#assign
+			properties = freeMarkerTool.getDTOProperties(configYAML, openAPIYAML, schema)
+		/>
 
-		for (${schemaName} ${schemaVarName} : ${schemaVarNames}) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
+		<#list properties?keys as propertyName>
+			<#assign propertyType = properties[propertyName] />
 
-			sb.append(toJSON(${schemaVarName}));
-		}
+			<#if stringUtil.equals(propertyType, "Date") || stringUtil.equals(propertyType, "Date[]")>
+				DateFormat liferayToJSONDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		sb.append("]");
+				<#break>
+			</#if>
+		</#list>
 
-		return sb.toString();
+		<#list properties?keys as propertyName>
+			<#assign propertyType = properties[propertyName] />
+
+			<#if allSchemas[propertyType]??>
+				if (${schemaVarName}.get${propertyName?cap_first}() == null) {
+					map.put("${propertyName}", null);
+				}
+				else {
+					map.put("${propertyName}", ${propertyType}SerDes.toJSON(${schemaVarName}.get${propertyName?cap_first}()));
+				}
+			<#elseif stringUtil.equals(propertyType, "Date")>
+				map.put("${propertyName}", liferayToJSONDateFormat.format(${schemaVarName}.get${propertyName?cap_first}()));
+			<#else>
+				if (${schemaVarName}.get${propertyName?cap_first}() == null) {
+					map.put("${propertyName}", null);
+				}
+				else {
+					map.put("${propertyName}", String.valueOf(${schemaVarName}.get${propertyName?cap_first}()));
+				}
+			</#if>
+		</#list>
+
+		return map;
 	}
 
 	private static class ${schemaName}JSONParser extends BaseJSONParser<${schemaName}> {
 
+		@Override
 		protected ${schemaName} createDTO() {
 			return new ${schemaName}();
 		}
 
+		@Override
 		protected ${schemaName}[] createDTOArray(int size) {
 			return new ${schemaName}[size];
 		}
 
+		@Override
 		protected void setField(${schemaName} ${schemaVarName}, String jsonParserFieldName, Object jsonParserFieldValue) {
 			<#list properties?keys as propertyName>
 				<#if !propertyName?is_first>
@@ -141,20 +195,24 @@ public class ${schemaName}SerDes {
 					if (jsonParserFieldValue != null) {
 						${schemaVarName}.set${propertyName?cap_first}(
 
-						<#assign
-							propertyType = properties[propertyName]
-						/>
+						<#assign propertyType = properties[propertyName] />
 
 						<#if stringUtil.equals(propertyType, "Date")>
-							_toDate((String)jsonParserFieldValue)
+							toDate((String)jsonParserFieldValue)
 						<#elseif stringUtil.equals(propertyType, "Date[]")>
 							toDates((Object[])jsonParserFieldValue)
+						<#elseif stringUtil.equals(propertyType, "Integer")>
+							Integer.valueOf((String)jsonParserFieldValue)
 						<#elseif stringUtil.equals(propertyType, "Integer[]")>
 							toIntegers((Object[])jsonParserFieldValue)
 						<#elseif stringUtil.equals(propertyType, "Long")>
 							Long.valueOf((String)jsonParserFieldValue)
 						<#elseif stringUtil.equals(propertyType, "Long[]")>
 							toLongs((Object[])jsonParserFieldValue)
+						<#elseif stringUtil.equals(propertyType, "Number")>
+							Integer.valueOf((String)jsonParserFieldValue)
+						<#elseif stringUtil.equals(propertyType, "Number[]")>
+							toIntegers((Object[])jsonParserFieldValue)
 						<#elseif stringUtil.equals(propertyType, "String[]")>
 							toStrings((Object[])jsonParserFieldValue)
 						<#elseif allSchemas?keys?seq_contains(propertyType)>
@@ -182,27 +240,6 @@ public class ${schemaName}SerDes {
 				throw new IllegalArgumentException("Unsupported field name " + jsonParserFieldName);
 			}
 		}
-
-		<#list properties?keys as propertyName>
-			<#assign
-				propertyType = properties[propertyName]
-			/>
-
-			<#if stringUtil.equals(propertyType, "Date")>
-				private Date _toDate(String string) {
-					try {
-						DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-
-						return dateFormat.parse(string);
-					}
-					catch (ParseException pe) {
-						throw new IllegalArgumentException("Unable to parse " + string);
-					}
-				}
-
-				<#break>
-			</#if>
-		</#list>
 	}
 
 }

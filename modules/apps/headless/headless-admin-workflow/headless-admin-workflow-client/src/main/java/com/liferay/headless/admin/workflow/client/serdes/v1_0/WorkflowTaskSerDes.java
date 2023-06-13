@@ -18,11 +18,10 @@ import com.liferay.headless.admin.workflow.client.dto.v1_0.WorkflowTask;
 import com.liferay.headless.admin.workflow.client.json.BaseJSONParser;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import java.util.Collection;
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -50,123 +49,149 @@ public class WorkflowTaskSerDes {
 
 	public static String toJSON(WorkflowTask workflowTask) {
 		if (workflowTask == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"completed\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (workflowTask.getCompleted() == null) {
-			sb.append("null");
-		}
-		else {
+		if (workflowTask.getCompleted() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"completed\":");
+
 			sb.append(workflowTask.getCompleted());
 		}
 
-		sb.append(", ");
+		if (workflowTask.getDateCompleted() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dateCompleted\": ");
+			sb.append("\"dateCompleted\":");
 
-		if (workflowTask.getDateCompleted() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(workflowTask.getDateCompleted());
-		}
+			sb.append("\"");
 
-		sb.append(", ");
+			sb.append(
+				liferayToJSONDateFormat.format(
+					workflowTask.getDateCompleted()));
 
-		sb.append("\"dateCreated\": ");
-
-		if (workflowTask.getDateCreated() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(workflowTask.getDateCreated());
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (workflowTask.getDateCreated() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"definitionName\": ");
+			sb.append("\"dateCreated\":");
 
-		if (workflowTask.getDefinitionName() == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(
+				liferayToJSONDateFormat.format(workflowTask.getDateCreated()));
+
+			sb.append("\"");
 		}
-		else {
+
+		if (workflowTask.getDefinitionName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"definitionName\":");
+
+			sb.append("\"");
+
 			sb.append(workflowTask.getDefinitionName());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (workflowTask.getDescription() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"description\": ");
+			sb.append("\"description\":");
 
-		if (workflowTask.getDescription() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(workflowTask.getDescription());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (workflowTask.getDueDate() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dueDate\": ");
+			sb.append("\"dueDate\":");
 
-		if (workflowTask.getDueDate() == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(
+				liferayToJSONDateFormat.format(workflowTask.getDueDate()));
+
+			sb.append("\"");
 		}
-		else {
-			sb.append(workflowTask.getDueDate());
-		}
 
-		sb.append(", ");
+		if (workflowTask.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\":");
 
-		if (workflowTask.getId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(workflowTask.getId());
 		}
 
-		sb.append(", ");
+		if (workflowTask.getName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\":");
 
-		if (workflowTask.getName() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(workflowTask.getName());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (workflowTask.getObjectReviewed() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"objectReviewed\": ");
+			sb.append("\"objectReviewed\":");
 
-		if (workflowTask.getObjectReviewed() == null) {
-			sb.append("null");
+			sb.append(
+				ObjectReviewedSerDes.toJSON(workflowTask.getObjectReviewed()));
 		}
-		else {
-			sb.append(workflowTask.getObjectReviewed());
-		}
 
-		sb.append(", ");
+		if (workflowTask.getTransitions() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"transitions\": ");
+			sb.append("\"transitions\":");
 
-		if (workflowTask.getTransitions() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("[");
 
 			for (int i = 0; i < workflowTask.getTransitions().length; i++) {
 				sb.append("\"");
+
 				sb.append(workflowTask.getTransitions()[i]);
+
 				sb.append("\"");
 
 				if ((i + 1) < workflowTask.getTransitions().length) {
@@ -182,39 +207,100 @@ public class WorkflowTaskSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<WorkflowTask> workflowTasks) {
-		if (workflowTasks == null) {
-			return "[]";
+	public static Map<String, String> toMap(WorkflowTask workflowTask) {
+		if (workflowTask == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		for (WorkflowTask workflowTask : workflowTasks) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(workflowTask));
+		if (workflowTask.getCompleted() == null) {
+			map.put("completed", null);
+		}
+		else {
+			map.put("completed", String.valueOf(workflowTask.getCompleted()));
 		}
 
-		sb.append("]");
+		map.put(
+			"dateCompleted",
+			liferayToJSONDateFormat.format(workflowTask.getDateCompleted()));
 
-		return sb.toString();
+		map.put(
+			"dateCreated",
+			liferayToJSONDateFormat.format(workflowTask.getDateCreated()));
+
+		if (workflowTask.getDefinitionName() == null) {
+			map.put("definitionName", null);
+		}
+		else {
+			map.put(
+				"definitionName",
+				String.valueOf(workflowTask.getDefinitionName()));
+		}
+
+		if (workflowTask.getDescription() == null) {
+			map.put("description", null);
+		}
+		else {
+			map.put(
+				"description", String.valueOf(workflowTask.getDescription()));
+		}
+
+		map.put(
+			"dueDate",
+			liferayToJSONDateFormat.format(workflowTask.getDueDate()));
+
+		if (workflowTask.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(workflowTask.getId()));
+		}
+
+		if (workflowTask.getName() == null) {
+			map.put("name", null);
+		}
+		else {
+			map.put("name", String.valueOf(workflowTask.getName()));
+		}
+
+		if (workflowTask.getObjectReviewed() == null) {
+			map.put("objectReviewed", null);
+		}
+		else {
+			map.put(
+				"objectReviewed",
+				ObjectReviewedSerDes.toJSON(workflowTask.getObjectReviewed()));
+		}
+
+		if (workflowTask.getTransitions() == null) {
+			map.put("transitions", null);
+		}
+		else {
+			map.put(
+				"transitions", String.valueOf(workflowTask.getTransitions()));
+		}
+
+		return map;
 	}
 
 	private static class WorkflowTaskJSONParser
 		extends BaseJSONParser<WorkflowTask> {
 
+		@Override
 		protected WorkflowTask createDTO() {
 			return new WorkflowTask();
 		}
 
+		@Override
 		protected WorkflowTask[] createDTOArray(int size) {
 			return new WorkflowTask[size];
 		}
 
+		@Override
 		protected void setField(
 			WorkflowTask workflowTask, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
@@ -227,13 +313,13 @@ public class WorkflowTaskSerDes {
 			else if (Objects.equals(jsonParserFieldName, "dateCompleted")) {
 				if (jsonParserFieldValue != null) {
 					workflowTask.setDateCompleted(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dateCreated")) {
 				if (jsonParserFieldValue != null) {
 					workflowTask.setDateCreated(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "definitionName")) {
@@ -250,7 +336,7 @@ public class WorkflowTaskSerDes {
 			else if (Objects.equals(jsonParserFieldName, "dueDate")) {
 				if (jsonParserFieldValue != null) {
 					workflowTask.setDueDate(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "id")) {
@@ -280,18 +366,6 @@ public class WorkflowTaskSerDes {
 			else {
 				throw new IllegalArgumentException(
 					"Unsupported field name " + jsonParserFieldName);
-			}
-		}
-
-		private Date _toDate(String string) {
-			try {
-				DateFormat dateFormat = new SimpleDateFormat(
-					"yyyy-MM-dd'T'HH:mm:ss'Z'");
-
-				return dateFormat.parse(string);
-			}
-			catch (ParseException pe) {
-				throw new IllegalArgumentException("Unable to parse " + string);
 			}
 		}
 

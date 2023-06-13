@@ -17,7 +17,8 @@ package com.liferay.headless.admin.user.client.serdes.v1_0;
 import com.liferay.headless.admin.user.client.dto.v1_0.RoleBrief;
 import com.liferay.headless.admin.user.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -43,31 +44,35 @@ public class RoleBriefSerDes {
 
 	public static String toJSON(RoleBrief roleBrief) {
 		if (roleBrief == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"id\": ");
+		if (roleBrief.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (roleBrief.getId() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"id\":");
+
 			sb.append(roleBrief.getId());
 		}
 
-		sb.append(", ");
+		if (roleBrief.getName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\":");
 
-		if (roleBrief.getName() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(roleBrief.getName());
+
+			sb.append("\"");
 		}
 
 		sb.append("}");
@@ -75,38 +80,43 @@ public class RoleBriefSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<RoleBrief> roleBriefs) {
-		if (roleBriefs == null) {
-			return "[]";
+	public static Map<String, String> toMap(RoleBrief roleBrief) {
+		if (roleBrief == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (RoleBrief roleBrief : roleBriefs) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(roleBrief));
+		if (roleBrief.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(roleBrief.getId()));
 		}
 
-		sb.append("]");
+		if (roleBrief.getName() == null) {
+			map.put("name", null);
+		}
+		else {
+			map.put("name", String.valueOf(roleBrief.getName()));
+		}
 
-		return sb.toString();
+		return map;
 	}
 
 	private static class RoleBriefJSONParser extends BaseJSONParser<RoleBrief> {
 
+		@Override
 		protected RoleBrief createDTO() {
 			return new RoleBrief();
 		}
 
+		@Override
 		protected RoleBrief[] createDTOArray(int size) {
 			return new RoleBrief[size];
 		}
 
+		@Override
 		protected void setField(
 			RoleBrief roleBrief, String jsonParserFieldName,
 			Object jsonParserFieldValue) {

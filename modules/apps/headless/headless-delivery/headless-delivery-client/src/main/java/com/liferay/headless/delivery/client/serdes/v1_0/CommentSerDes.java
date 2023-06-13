@@ -18,11 +18,10 @@ import com.liferay.headless.delivery.client.dto.v1_0.Comment;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import java.util.Collection;
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -48,75 +47,87 @@ public class CommentSerDes {
 
 	public static String toJSON(Comment comment) {
 		if (comment == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"creator\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (comment.getCreator() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(comment.getCreator());
-		}
+		if (comment.getCreator() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append(", ");
+			sb.append("\"creator\":");
 
-		sb.append("\"dateCreated\": ");
-
-		if (comment.getDateCreated() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(comment.getDateCreated());
+			sb.append(CreatorSerDes.toJSON(comment.getCreator()));
 		}
 
-		sb.append(", ");
+		if (comment.getDateCreated() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dateModified\": ");
+			sb.append("\"dateCreated\":");
 
-		if (comment.getDateModified() == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(liferayToJSONDateFormat.format(comment.getDateCreated()));
+
+			sb.append("\"");
 		}
-		else {
-			sb.append(comment.getDateModified());
+
+		if (comment.getDateModified() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"dateModified\":");
+
+			sb.append("\"");
+
+			sb.append(
+				liferayToJSONDateFormat.format(comment.getDateModified()));
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (comment.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\":");
 
-		if (comment.getId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(comment.getId());
 		}
 
-		sb.append(", ");
+		if (comment.getNumberOfComments() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"numberOfComments\": ");
+			sb.append("\"numberOfComments\":");
 
-		if (comment.getNumberOfComments() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(comment.getNumberOfComments());
 		}
 
-		sb.append(", ");
+		if (comment.getText() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"text\": ");
+			sb.append("\"text\":");
 
-		if (comment.getText() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(comment.getText());
+
+			sb.append("\"");
 		}
 
 		sb.append("}");
@@ -124,38 +135,70 @@ public class CommentSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<Comment> comments) {
-		if (comments == null) {
-			return "[]";
+	public static Map<String, String> toMap(Comment comment) {
+		if (comment == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		for (Comment comment : comments) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(comment));
+		if (comment.getCreator() == null) {
+			map.put("creator", null);
+		}
+		else {
+			map.put("creator", CreatorSerDes.toJSON(comment.getCreator()));
 		}
 
-		sb.append("]");
+		map.put(
+			"dateCreated",
+			liferayToJSONDateFormat.format(comment.getDateCreated()));
 
-		return sb.toString();
+		map.put(
+			"dateModified",
+			liferayToJSONDateFormat.format(comment.getDateModified()));
+
+		if (comment.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(comment.getId()));
+		}
+
+		if (comment.getNumberOfComments() == null) {
+			map.put("numberOfComments", null);
+		}
+		else {
+			map.put(
+				"numberOfComments",
+				String.valueOf(comment.getNumberOfComments()));
+		}
+
+		if (comment.getText() == null) {
+			map.put("text", null);
+		}
+		else {
+			map.put("text", String.valueOf(comment.getText()));
+		}
+
+		return map;
 	}
 
 	private static class CommentJSONParser extends BaseJSONParser<Comment> {
 
+		@Override
 		protected Comment createDTO() {
 			return new Comment();
 		}
 
+		@Override
 		protected Comment[] createDTOArray(int size) {
 			return new Comment[size];
 		}
 
+		@Override
 		protected void setField(
 			Comment comment, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
@@ -169,13 +212,13 @@ public class CommentSerDes {
 			else if (Objects.equals(jsonParserFieldName, "dateCreated")) {
 				if (jsonParserFieldValue != null) {
 					comment.setDateCreated(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dateModified")) {
 				if (jsonParserFieldValue != null) {
 					comment.setDateModified(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "id")) {
@@ -185,7 +228,8 @@ public class CommentSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "numberOfComments")) {
 				if (jsonParserFieldValue != null) {
-					comment.setNumberOfComments((Number)jsonParserFieldValue);
+					comment.setNumberOfComments(
+						Integer.valueOf((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "text")) {
@@ -196,18 +240,6 @@ public class CommentSerDes {
 			else {
 				throw new IllegalArgumentException(
 					"Unsupported field name " + jsonParserFieldName);
-			}
-		}
-
-		private Date _toDate(String string) {
-			try {
-				DateFormat dateFormat = new SimpleDateFormat(
-					"yyyy-MM-dd'T'HH:mm:ss'Z'");
-
-				return dateFormat.parse(string);
-			}
-			catch (ParseException pe) {
-				throw new IllegalArgumentException("Unable to parse " + string);
 			}
 		}
 

@@ -20,6 +20,7 @@ import com.liferay.data.engine.rest.internal.field.type.v1_0.util.CustomProperty
 import com.liferay.data.engine.rest.internal.field.type.v1_0.util.DataFieldOptionUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.template.soy.data.SoyDataFactory;
 
 import java.util.Map;
 
@@ -29,8 +30,20 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * @author Marcela Cunha
  */
-public class CheckboxMultipleFieldType extends FieldType {
+public class CheckboxMultipleFieldType extends BaseFieldType {
 
+	public CheckboxMultipleFieldType(
+		DataDefinitionField dataDefinitionField,
+		HttpServletRequest httpServletRequest,
+		HttpServletResponse httpServletResponse,
+		SoyDataFactory soyDataFactory) {
+
+		super(
+			dataDefinitionField, httpServletRequest, httpServletResponse,
+			soyDataFactory);
+	}
+
+	@Override
 	public DataDefinitionField deserialize(JSONObject jsonObject)
 		throws Exception {
 
@@ -56,15 +69,33 @@ public class CheckboxMultipleFieldType extends FieldType {
 		return dataDefinitionField;
 	}
 
-	public void includeContext(
-		Map<String, Object> context, DataDefinitionField dataDefinitionField,
-		HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse, boolean readOnly) {
+	@Override
+	public JSONObject toJSONObject() throws Exception {
+		JSONObject jsonObject = super.toJSONObject();
 
-		super.includeContext(
-			context, dataDefinitionField, httpServletRequest,
-			httpServletResponse, readOnly);
+		return jsonObject.put(
+			"inline",
+			CustomPropertyUtil.getBoolean(
+				dataDefinitionField.getCustomProperties(), "inline", false)
+		).put(
+			"options",
+			DataFieldOptionUtil.toJSONObject(
+				CustomPropertyUtil.getDataFieldOptions(
+					dataDefinitionField.getCustomProperties(), "options"))
+		).put(
+			"predefinedValue",
+			LocalizedValueUtil.toJSONObject(
+				dataDefinitionField.getDefaultValue())
+		).put(
+			"showAsSwitcher",
+			CustomPropertyUtil.getBoolean(
+				dataDefinitionField.getCustomProperties(), "showAsSwitcher",
+				false)
+		);
+	}
 
+	@Override
+	protected void addContext(Map<String, Object> context) {
 		context.put(
 			"inline",
 			CustomPropertyUtil.getBoolean(
@@ -89,32 +120,6 @@ public class CheckboxMultipleFieldType extends FieldType {
 			"value",
 			CustomPropertyUtil.getString(
 				dataDefinitionField.getCustomProperties(), "value", "[]"));
-	}
-
-	public JSONObject toJSONObject(DataDefinitionField dataDefinitionField)
-		throws Exception {
-
-		JSONObject jsonObject = super.toJSONObject(dataDefinitionField);
-
-		return jsonObject.put(
-			"inline",
-			CustomPropertyUtil.getBoolean(
-				dataDefinitionField.getCustomProperties(), "inline", false)
-		).put(
-			"options",
-			DataFieldOptionUtil.toJSONObject(
-				CustomPropertyUtil.getDataFieldOptions(
-					dataDefinitionField.getCustomProperties(), "options"))
-		).put(
-			"predefinedValue",
-			LocalizedValueUtil.toJSONObject(
-				dataDefinitionField.getDefaultValue())
-		).put(
-			"showAsSwitcher",
-			CustomPropertyUtil.getBoolean(
-				dataDefinitionField.getCustomProperties(), "showAsSwitcher",
-				false)
-		);
 	}
 
 }

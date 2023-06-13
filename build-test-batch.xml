@@ -662,6 +662,8 @@ mariadb.executable=${mariadb.executable}]]></echo>
 
 			<antcall inheritAll="false" target="setup-sdk" />
 
+			<antcall inheritAll="false" target="setup-yarn" />
+
 			<if>
 				<and>
 					<equals arg1="@{app.server.type}" arg2="jboss" />
@@ -884,6 +886,8 @@ app.server.type=@{app.server.type}]]></echo>
 			<antcall inheritAll="false" target="setup-libs" />
 
 			<antcall inheritAll="false" target="setup-sdk" />
+
+			<antcall inheritAll="false" target="setup-yarn" />
 
 			<untar
 				compression="gzip"
@@ -1393,9 +1397,17 @@ app.server.type=@{app.server.type}]]></echo>
 						<test-action>
 							<print-test-class-group test.class.group.index="${axis.variable}" />
 
+							<get-java-jdk-bundle-version test.batch.name="${test.batch.name}" />
+
+							<get-java-jdk-bundle-type test.batch.name="${test.batch.name}" />
+
+							<get-java-jdk-home type="${java.jdk.bundle.type}" version="${java.jdk.bundle.version}" />
+
 							<ant dir="portal-impl" inheritAll="false" target="test-class-group">
 								<property name="database.type" value="@{database.type}" />
 								<property name="junit.code.coverage" value="${test.batch.code.coverage}" />
+								<property name="junit.jvm.override" value="${java.jdk.home}/bin/java" />
+								<property name="junit.jvm.override.version" value="${java.jdk.bundle.version}" />
 								<property name="test.class.group.index" value="${axis.variable}" />
 								<property name="test.type" value="integration" />
 							</ant>
@@ -3732,11 +3744,23 @@ log.sanitizer.enabled=false</echo>
 		<run-integration-test database.type="db2" />
 	</target>
 
+	<target name="integration-db2111-jdk11_open">
+		<run-integration-test database.type="db2" />
+	</target>
+
 	<target name="integration-hypersonic20-jdk8">
 		<run-integration-test database.type="hypersonic" />
 	</target>
 
+	<target name="integration-hypersonic20-jdk11_open">
+		<run-integration-test database.type="hypersonic" />
+	</target>
+
 	<target name="integration-mariadb102-jdk8">
+		<run-integration-test database.type="mariadb" />
+	</target>
+
+	<target name="integration-mariadb102-jdk11_open">
 		<run-integration-test database.type="mariadb" />
 	</target>
 
@@ -3748,7 +3772,15 @@ log.sanitizer.enabled=false</echo>
 		<run-integration-test database.type="mysql" database.version="5.7" />
 	</target>
 
+	<target name="integration-mysql57-jdk11_open">
+		<run-integration-test database.type="mysql" database.version="5.7" />
+	</target>
+
 	<target name="integration-oracle122-jdk8">
+		<run-integration-test database.type="oracle" />
+	</target>
+
+	<target name="integration-oracle122-jdk11_open">
 		<run-integration-test database.type="oracle" />
 	</target>
 
@@ -3756,7 +3788,15 @@ log.sanitizer.enabled=false</echo>
 		<run-integration-test database.type="postgresql" />
 	</target>
 
+	<target name="integration-postgresql10-jdk11_open">
+		<run-integration-test database.type="postgresql" />
+	</target>
+
 	<target name="integration-sybase160-jdk8">
+		<run-integration-test database.type="sybase" />
+	</target>
+
+	<target name="integration-sybase160-jdk11_open">
 		<run-integration-test database.type="sybase" />
 	</target>
 
@@ -4840,6 +4880,8 @@ ${output.content}</echo>
 
 		<antcall inheritAll="false" target="setup-sdk" />
 
+		<antcall inheritAll="false" target="setup-yarn" />
+
 		<record action="start" name="${project.dir}/sass-compiler-log" />
 
 		<gradle-execute dir="modules" task="buildCSS">
@@ -4908,13 +4950,13 @@ ${output.content}</echo>
 			</test-action>
 
 			<test-set-up>
-				<echo>tar --extract --file=liferay-portal-source.tar.gz modules/core/portal-bootstrap/build/system.packages.extra.mf --gzip --to-stdout --verbose > modules/core/portal-bootstrap/system.packages.extra.mf</echo>
+				<echo>tar --extract --file=liferay-portal-source.tar.gz modules/core/portal-bootstrap/build/system.packages.extra.mf --gzip --verbose
+tar --extract --file=liferay-portal-source.tar.gz modules/core/portal-bootstrap/lib/biz.aQute.bndlib.jar --gzip --verbose</echo>
 
 				<execute>
 					<![CDATA[
-						mkdir -p modules/core/portal-bootstrap
-
-						tar --extract --file=liferay-portal-source.tar.gz modules/core/portal-bootstrap/build/system.packages.extra.mf --gzip --to-stdout --verbose > modules/core/portal-bootstrap/system.packages.extra.mf
+						tar --extract --file=liferay-portal-source.tar.gz modules/core/portal-bootstrap/build/system.packages.extra.mf --gzip --verbose
+						tar --extract --file=liferay-portal-source.tar.gz modules/core/portal-bootstrap/lib/biz.aQute.bndlib.jar --gzip --verbose
 					]]>
 				</execute>
 
@@ -5101,6 +5143,8 @@ information. Make sure to commit in all build services results.
 					</then>
 					<else>
 						<antcall target="setup-sdk" />
+
+						<antcall target="setup-yarn" />
 					</else>
 				</if>
 

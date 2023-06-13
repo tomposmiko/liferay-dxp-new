@@ -125,7 +125,9 @@ public class LocalizedValue {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(key);
+			sb.append("\"");
 		}
 
 		sb.append(", ");

@@ -15,17 +15,16 @@
 package com.liferay.headless.admin.user.resource.v1_0.test;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
-import com.liferay.headless.admin.user.dto.v1_0.ContactInformation;
-import com.liferay.headless.admin.user.dto.v1_0.OrganizationBrief;
-import com.liferay.headless.admin.user.dto.v1_0.RoleBrief;
-import com.liferay.headless.admin.user.dto.v1_0.SiteBrief;
-import com.liferay.headless.admin.user.dto.v1_0.UserAccount;
+import com.liferay.headless.admin.user.client.dto.v1_0.UserAccount;
+import com.liferay.headless.admin.user.client.pagination.Page;
+import com.liferay.headless.admin.user.client.serdes.v1_0.UserAccountSerDes;
 import com.liferay.headless.admin.user.resource.v1_0.UserAccountResource;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.log.Log;
@@ -43,7 +42,6 @@ import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
@@ -58,10 +56,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -117,6 +117,63 @@ public abstract class BaseUserAccountResourceTestCase {
 	}
 
 	@Test
+	public void testClientSerDesToDTO() throws Exception {
+		ObjectMapper objectMapper = new ObjectMapper() {
+			{
+				configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+				enable(SerializationFeature.INDENT_OUTPUT);
+				setDateFormat(new ISO8601DateFormat());
+				setFilterProvider(
+					new SimpleFilterProvider() {
+						{
+							addFilter(
+								"Liferay.Vulcan",
+								SimpleBeanPropertyFilter.serializeAll());
+						}
+					});
+				setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+				setSerializationInclusion(JsonInclude.Include.NON_NULL);
+			}
+		};
+
+		UserAccount userAccount1 = randomUserAccount();
+
+		String json = objectMapper.writeValueAsString(userAccount1);
+
+		UserAccount userAccount2 = UserAccountSerDes.toDTO(json);
+
+		Assert.assertTrue(equals(userAccount1, userAccount2));
+	}
+
+	@Test
+	public void testClientSerDesToJSON() throws Exception {
+		ObjectMapper objectMapper = new ObjectMapper() {
+			{
+				configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+				setDateFormat(new ISO8601DateFormat());
+				setFilterProvider(
+					new SimpleFilterProvider() {
+						{
+							addFilter(
+								"Liferay.Vulcan",
+								SimpleBeanPropertyFilter.serializeAll());
+						}
+					});
+				setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+				setSerializationInclusion(JsonInclude.Include.NON_NULL);
+			}
+		};
+
+		UserAccount userAccount = randomUserAccount();
+
+		String json1 = objectMapper.writeValueAsString(userAccount);
+		String json2 = UserAccountSerDes.toJSON(userAccount);
+
+		Assert.assertEquals(
+			objectMapper.readTree(json1), objectMapper.readTree(json2));
+	}
+
+	@Test
 	public void testGetMyUserAccount() throws Exception {
 		UserAccount postUserAccount = testGetMyUserAccount_addUserAccount();
 
@@ -147,10 +204,12 @@ public abstract class BaseUserAccountResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(string, UserAccount.class);
+			return UserAccountSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -226,26 +285,14 @@ public abstract class BaseUserAccountResourceTestCase {
 			testGetOrganizationUserAccountsPage_getOrganizationId();
 
 		UserAccount userAccount1 = randomUserAccount();
-		UserAccount userAccount2 = randomUserAccount();
-
-		for (EntityField entityField : entityFields) {
-			BeanUtils.setProperty(
-				userAccount1, entityField.getName(),
-				DateUtils.addMinutes(new Date(), -2));
-		}
 
 		userAccount1 = testGetOrganizationUserAccountsPage_addUserAccount(
 			organizationId, userAccount1);
 
-		Thread.sleep(1000);
-
-		userAccount2 = testGetOrganizationUserAccountsPage_addUserAccount(
-			organizationId, userAccount2);
-
 		for (EntityField entityField : entityFields) {
 			Page<UserAccount> page = invokeGetOrganizationUserAccountsPage(
 				organizationId, null,
-				getFilterString(entityField, "eq", userAccount1),
+				getFilterString(entityField, "between", userAccount1),
 				Pagination.of(1, 2), null);
 
 			assertEquals(
@@ -359,8 +406,6 @@ public abstract class BaseUserAccountResourceTestCase {
 
 		userAccount1 = testGetOrganizationUserAccountsPage_addUserAccount(
 			organizationId, userAccount1);
-
-		Thread.sleep(1000);
 
 		userAccount2 = testGetOrganizationUserAccountsPage_addUserAccount(
 			organizationId, userAccount2);
@@ -483,10 +528,7 @@ public abstract class BaseUserAccountResourceTestCase {
 			_log.debug("HTTP response: " + string);
 		}
 
-		return outputObjectMapper.readValue(
-			string,
-			new TypeReference<Page<UserAccount>>() {
-			});
+		return Page.of(string, UserAccountSerDes::toDTO);
 	}
 
 	protected Http.Response invokeGetOrganizationUserAccountsPageResponse(
@@ -549,23 +591,12 @@ public abstract class BaseUserAccountResourceTestCase {
 		}
 
 		UserAccount userAccount1 = randomUserAccount();
-		UserAccount userAccount2 = randomUserAccount();
-
-		for (EntityField entityField : entityFields) {
-			BeanUtils.setProperty(
-				userAccount1, entityField.getName(),
-				DateUtils.addMinutes(new Date(), -2));
-		}
 
 		userAccount1 = testGetUserAccountsPage_addUserAccount(userAccount1);
 
-		Thread.sleep(1000);
-
-		userAccount2 = testGetUserAccountsPage_addUserAccount(userAccount2);
-
 		for (EntityField entityField : entityFields) {
 			Page<UserAccount> page = invokeGetUserAccountsPage(
-				null, getFilterString(entityField, "eq", userAccount1),
+				null, getFilterString(entityField, "between", userAccount1),
 				Pagination.of(1, 2), null);
 
 			assertEquals(
@@ -659,8 +690,6 @@ public abstract class BaseUserAccountResourceTestCase {
 		}
 
 		userAccount1 = testGetUserAccountsPage_addUserAccount(userAccount1);
-
-		Thread.sleep(1000);
 
 		userAccount2 = testGetUserAccountsPage_addUserAccount(userAccount2);
 
@@ -757,10 +786,7 @@ public abstract class BaseUserAccountResourceTestCase {
 			_log.debug("HTTP response: " + string);
 		}
 
-		return outputObjectMapper.readValue(
-			string,
-			new TypeReference<Page<UserAccount>>() {
-			});
+		return Page.of(string, UserAccountSerDes::toDTO);
 	}
 
 	protected Http.Response invokeGetUserAccountsPageResponse(
@@ -822,10 +848,12 @@ public abstract class BaseUserAccountResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(string, UserAccount.class);
+			return UserAccountSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -902,26 +930,14 @@ public abstract class BaseUserAccountResourceTestCase {
 		Long webSiteId = testGetWebSiteUserAccountsPage_getWebSiteId();
 
 		UserAccount userAccount1 = randomUserAccount();
-		UserAccount userAccount2 = randomUserAccount();
-
-		for (EntityField entityField : entityFields) {
-			BeanUtils.setProperty(
-				userAccount1, entityField.getName(),
-				DateUtils.addMinutes(new Date(), -2));
-		}
 
 		userAccount1 = testGetWebSiteUserAccountsPage_addUserAccount(
 			webSiteId, userAccount1);
 
-		Thread.sleep(1000);
-
-		userAccount2 = testGetWebSiteUserAccountsPage_addUserAccount(
-			webSiteId, userAccount2);
-
 		for (EntityField entityField : entityFields) {
 			Page<UserAccount> page = invokeGetWebSiteUserAccountsPage(
 				webSiteId, null,
-				getFilterString(entityField, "eq", userAccount1),
+				getFilterString(entityField, "between", userAccount1),
 				Pagination.of(1, 2), null);
 
 			assertEquals(
@@ -1032,8 +1048,6 @@ public abstract class BaseUserAccountResourceTestCase {
 
 		userAccount1 = testGetWebSiteUserAccountsPage_addUserAccount(
 			webSiteId, userAccount1);
-
-		Thread.sleep(1000);
 
 		userAccount2 = testGetWebSiteUserAccountsPage_addUserAccount(
 			webSiteId, userAccount2);
@@ -1152,10 +1166,7 @@ public abstract class BaseUserAccountResourceTestCase {
 			_log.debug("HTTP response: " + string);
 		}
 
-		return outputObjectMapper.readValue(
-			string,
-			new TypeReference<Page<UserAccount>>() {
-			});
+		return Page.of(string, UserAccountSerDes::toDTO);
 	}
 
 	protected Http.Response invokeGetWebSiteUserAccountsPageResponse(
@@ -1294,8 +1305,8 @@ public abstract class BaseUserAccountResourceTestCase {
 				continue;
 			}
 
-			if (Objects.equals("email", additionalAssertFieldName)) {
-				if (userAccount.getEmail() == null) {
+			if (Objects.equals("emailAddress", additionalAssertFieldName)) {
+				if (userAccount.getEmailAddress() == null) {
 					valid = false;
 				}
 
@@ -1518,9 +1529,10 @@ public abstract class BaseUserAccountResourceTestCase {
 				continue;
 			}
 
-			if (Objects.equals("email", additionalAssertFieldName)) {
+			if (Objects.equals("emailAddress", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
-						userAccount1.getEmail(), userAccount2.getEmail())) {
+						userAccount1.getEmailAddress(),
+						userAccount2.getEmailAddress())) {
 
 					return false;
 				}
@@ -1740,7 +1752,32 @@ public abstract class BaseUserAccountResourceTestCase {
 		}
 
 		if (entityFieldName.equals("birthDate")) {
-			sb.append(_dateFormat.format(userAccount.getBirthDate()));
+			if (operator.equals("between")) {
+				sb = new StringBundler();
+
+				sb.append("(");
+				sb.append(entityFieldName);
+				sb.append(" gt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(userAccount.getBirthDate(), -2)));
+				sb.append(" and ");
+				sb.append(entityFieldName);
+				sb.append(" lt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(userAccount.getBirthDate(), 2)));
+				sb.append(")");
+			}
+			else {
+				sb.append(entityFieldName);
+
+				sb.append(" ");
+				sb.append(operator);
+				sb.append(" ");
+
+				sb.append(_dateFormat.format(userAccount.getBirthDate()));
+			}
 
 			return sb.toString();
 		}
@@ -1759,20 +1796,73 @@ public abstract class BaseUserAccountResourceTestCase {
 		}
 
 		if (entityFieldName.equals("dateCreated")) {
-			sb.append(_dateFormat.format(userAccount.getDateCreated()));
+			if (operator.equals("between")) {
+				sb = new StringBundler();
+
+				sb.append("(");
+				sb.append(entityFieldName);
+				sb.append(" gt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							userAccount.getDateCreated(), -2)));
+				sb.append(" and ");
+				sb.append(entityFieldName);
+				sb.append(" lt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(userAccount.getDateCreated(), 2)));
+				sb.append(")");
+			}
+			else {
+				sb.append(entityFieldName);
+
+				sb.append(" ");
+				sb.append(operator);
+				sb.append(" ");
+
+				sb.append(_dateFormat.format(userAccount.getDateCreated()));
+			}
 
 			return sb.toString();
 		}
 
 		if (entityFieldName.equals("dateModified")) {
-			sb.append(_dateFormat.format(userAccount.getDateModified()));
+			if (operator.equals("between")) {
+				sb = new StringBundler();
+
+				sb.append("(");
+				sb.append(entityFieldName);
+				sb.append(" gt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							userAccount.getDateModified(), -2)));
+				sb.append(" and ");
+				sb.append(entityFieldName);
+				sb.append(" lt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(
+							userAccount.getDateModified(), 2)));
+				sb.append(")");
+			}
+			else {
+				sb.append(entityFieldName);
+
+				sb.append(" ");
+				sb.append(operator);
+				sb.append(" ");
+
+				sb.append(_dateFormat.format(userAccount.getDateModified()));
+			}
 
 			return sb.toString();
 		}
 
-		if (entityFieldName.equals("email")) {
+		if (entityFieldName.equals("emailAddress")) {
 			sb.append("'");
-			sb.append(String.valueOf(userAccount.getEmail()));
+			sb.append(String.valueOf(userAccount.getEmailAddress()));
 			sb.append("'");
 
 			return sb.toString();
@@ -1880,7 +1970,7 @@ public abstract class BaseUserAccountResourceTestCase {
 				dashboardURL = RandomTestUtil.randomString();
 				dateCreated = RandomTestUtil.nextDate();
 				dateModified = RandomTestUtil.nextDate();
-				email = RandomTestUtil.randomString();
+				emailAddress = RandomTestUtil.randomString();
 				familyName = RandomTestUtil.randomString();
 				givenName = RandomTestUtil.randomString();
 				honorificPrefix = RandomTestUtil.randomString();
@@ -1904,125 +1994,11 @@ public abstract class BaseUserAccountResourceTestCase {
 		return randomUserAccount();
 	}
 
-	protected static final ObjectMapper inputObjectMapper = new ObjectMapper() {
-		{
-			setFilterProvider(
-				new SimpleFilterProvider() {
-					{
-						addFilter(
-							"Liferay.Vulcan",
-							SimpleBeanPropertyFilter.serializeAll());
-					}
-				});
-			setSerializationInclusion(JsonInclude.Include.NON_NULL);
-		}
-	};
-	protected static final ObjectMapper outputObjectMapper =
-		new ObjectMapper() {
-			{
-				addMixIn(UserAccount.class, UserAccountMixin.class);
-				setFilterProvider(
-					new SimpleFilterProvider() {
-						{
-							addFilter(
-								"Liferay.Vulcan",
-								SimpleBeanPropertyFilter.serializeAll());
-						}
-					});
-			}
-		};
-
 	protected Group irrelevantGroup;
 	protected String testContentType = "application/json";
 	protected Group testGroup;
 	protected Locale testLocale;
 	protected String testUserNameAndPassword = "test@liferay.com:test";
-
-	protected static class UserAccountMixin {
-
-		@JsonProperty
-		String additionalName;
-		@JsonProperty
-		String alternateName;
-		@JsonProperty
-		Date birthDate;
-		@JsonProperty
-		ContactInformation contactInformation;
-		@JsonProperty
-		String dashboardURL;
-		@JsonProperty
-		Date dateCreated;
-		@JsonProperty
-		Date dateModified;
-		@JsonProperty
-		String email;
-		@JsonProperty
-		String familyName;
-		@JsonProperty
-		String givenName;
-		@JsonProperty
-		String honorificPrefix;
-		@JsonProperty
-		String honorificSuffix;
-		@JsonProperty
-		Long id;
-		@JsonProperty
-		String image;
-		@JsonProperty
-		String jobTitle;
-		@JsonProperty
-		String[] keywords;
-		@JsonProperty
-		String name;
-		@JsonProperty
-		OrganizationBrief[] organizationBriefs;
-		@JsonProperty
-		String profileURL;
-		@JsonProperty
-		RoleBrief[] roleBriefs;
-		@JsonProperty
-		SiteBrief[] siteBriefs;
-
-	}
-
-	protected static class Page<T> {
-
-		public Collection<T> getItems() {
-			return new ArrayList<>(items);
-		}
-
-		public long getLastPage() {
-			return lastPage;
-		}
-
-		public long getPage() {
-			return page;
-		}
-
-		public long getPageSize() {
-			return pageSize;
-		}
-
-		public long getTotalCount() {
-			return totalCount;
-		}
-
-		@JsonProperty
-		protected Collection<T> items;
-
-		@JsonProperty
-		protected long lastPage;
-
-		@JsonProperty
-		protected long page;
-
-		@JsonProperty
-		protected long pageSize;
-
-		@JsonProperty
-		protected long totalCount;
-
-	}
 
 	private Http.Options _createHttpOptions() {
 		Http.Options options = new Http.Options();
@@ -2040,6 +2016,41 @@ public abstract class BaseUserAccountResourceTestCase {
 		options.addHeader("Content-Type", testContentType);
 
 		return options;
+	}
+
+	private String _toJSON(Map<String, String> map) {
+		if (map == null) {
+			return "null";
+		}
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("{");
+
+		Set<Map.Entry<String, String>> set = map.entrySet();
+
+		Iterator<Map.Entry<String, String>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, String> entry = iterator.next();
+
+			sb.append("\"" + entry.getKey() + "\": ");
+
+			if (entry.getValue() == null) {
+				sb.append("null");
+			}
+			else {
+				sb.append("\"" + entry.getValue() + "\"");
+			}
+
+			if (iterator.hasNext()) {
+				sb.append(", ");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private String _toPath(String template, Object... values) {

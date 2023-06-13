@@ -36,7 +36,11 @@ definition {
 	@description = "This is a use case for LPS-72088."
 	@priority = "5"
 	test ActivateStagingAfterChangingInstanceLanguageToSpanish {
-		PortalSettings.gotoPortalSettings();
+		PortalSettings.gotoConfiguration(
+			configurationCategory = "Localization",
+			configurationName = "Language",
+			configurationScope = "Virtual Instance Scope"
+		);
 
 		PortalSettings.configureCurrentLanguagesCP(
 			defaultPortalLanguage = "Spanish (Spain)"
@@ -100,6 +104,64 @@ definition {
 		Staging.activateStagingCP(
 			pageVersioningEnabled = "true",
 			siteName = "Site Name"
+		);
+	}
+
+	@description = "This is a use case for LPS-92039 and LPS-92636."
+	@priority = "3"
+	test CreateWidgetTemplateWhenNotStagedADT {
+		Navigator.openSiteURL(siteName = "Site Name");
+
+		ProductMenu.gotoPortlet(
+			category = "Site Builder",
+			panel = "Site Administration",
+			portlet = "Widget Templates"
+		);
+
+		AssertVisible(locator1 = "Button#PLUS");
+
+		ProductMenu.gotoPortlet(
+			category = "Publishing",
+			panel = "Site Administration",
+			portlet = "Staging"
+		);
+
+		Staging.activateStagingCP(siteName = "Site Name", uncheckContent = "Widget Templates");
+
+		Navigator.gotoSitePage(pageName = "Staging Test Page", siteName = "Site Name");
+
+		ProductMenu.gotoPortlet(
+			category = "Site Builder",
+			panel = "Site Administration",
+			portlet = "Widget Templates"
+		);
+
+		ApplicationDisplayTemplates.addADTWithFieldEntryCP(
+			fieldName = "Asset Entry",
+			portletName = "Asset Publisher"
+		);
+
+		AssertTextEquals(
+			locator1 = "ApplicationDisplayTemplates#ADT_TABLE_NAME_1",
+			value1 = "Asset Publisher Test ADT"
+		);
+
+		Navigator.openSiteURL(siteName = "Site Name");
+
+		ProductMenu.gotoPortlet(
+			category = "Site Builder",
+			panel = "Site Administration",
+			portlet = "Widget Templates"
+		);
+
+		ApplicationDisplayTemplates.addADTWithFieldEntryCP(
+			fieldName = "Blog Entries",
+			portletName = "Blogs"
+		);
+
+		AssertTextEquals(
+			locator1 = "ApplicationDisplayTemplates#ADT_TABLE_NAME_2",
+			value1 = "Blogs Test ADT"
 		);
 	}
 
@@ -1139,7 +1201,7 @@ definition {
 			siteName = "Site Name"
 		);
 
-		AssertTextEquals(
+		AssertTextEquals.assertPartialText(
 			locator1 = "WCD#WEB_CONTENT_CONTENT",
 			value1 = "Web Content Content 1"
 		);
@@ -1172,7 +1234,7 @@ definition {
 
 		Navigator.gotoSitePage(pageName = "Staging Test Page", siteName = "Site Name");
 
-		AssertTextEquals(
+		AssertTextEquals.assertPartialText(
 			locator1 = "WCD#WEB_CONTENT_CONTENT",
 			value1 = "Web Content Content 1"
 		);
@@ -1216,7 +1278,7 @@ definition {
 
 		Navigator.gotoSitePage(pageName = "Staging Test Page 2", siteName = "Site Name");
 
-		AssertTextEquals(
+		AssertTextEquals.assertPartialText(
 			locator1 = "WCD#WEB_CONTENT_CONTENT",
 			value1 = "Web Content Content 2"
 		);

@@ -223,18 +223,18 @@ public class TaxonomyVocabulary {
 
 	protected String name;
 
-	public Number getNumberOfTaxonomyCategories() {
+	public Integer getNumberOfTaxonomyCategories() {
 		return numberOfTaxonomyCategories;
 	}
 
 	public void setNumberOfTaxonomyCategories(
-		Number numberOfTaxonomyCategories) {
+		Integer numberOfTaxonomyCategories) {
 
 		this.numberOfTaxonomyCategories = numberOfTaxonomyCategories;
 	}
 
 	public void setNumberOfTaxonomyCategories(
-		UnsafeSupplier<Number, Exception>
+		UnsafeSupplier<Integer, Exception>
 			numberOfTaxonomyCategoriesUnsafeSupplier) {
 
 		try {
@@ -246,7 +246,7 @@ public class TaxonomyVocabulary {
 		}
 	}
 
-	protected Number numberOfTaxonomyCategories;
+	protected Integer numberOfTaxonomyCategories;
 
 	public Long getSiteId() {
 		return siteId;

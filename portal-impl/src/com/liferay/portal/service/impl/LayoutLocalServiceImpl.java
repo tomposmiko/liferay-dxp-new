@@ -14,8 +14,6 @@
 
 package com.liferay.portal.service.impl;
 
-import com.liferay.exportimport.kernel.lar.MissingReferences;
-import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
 import com.liferay.exportimport.kernel.staging.MergeLayoutPrototypesThreadLocal;
 import com.liferay.layouts.admin.kernel.model.LayoutTypePortletConstants;
 import com.liferay.petra.lang.CentralizedThreadLocal;
@@ -64,6 +62,7 @@ import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.version.VersionServiceListener;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.systemevent.SystemEventHierarchyEntry;
 import com.liferay.portal.kernel.systemevent.SystemEventHierarchyEntryThreadLocal;
@@ -86,9 +85,6 @@ import com.liferay.portal.service.base.LayoutLocalServiceBaseImpl;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.sites.kernel.util.Sites;
 import com.liferay.sites.kernel.util.SitesUtil;
-
-import java.io.File;
-import java.io.InputStream;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -319,24 +315,8 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		if (Validator.isNotNull(layoutPrototypeUuid) &&
 			!layoutPrototypeLinkEnabled) {
 
-			LayoutPrototype layoutPrototype =
-				layoutPrototypeLocalService.
-					getLayoutPrototypeByUuidAndCompanyId(
-						layoutPrototypeUuid, layout.getCompanyId());
-
-			try {
-				SitesUtil.applyLayoutPrototype(
-					layoutPrototype, layout, layoutPrototypeLinkEnabled);
-			}
-			catch (PortalException pe) {
-				throw pe;
-			}
-			catch (SystemException se) {
-				throw se;
-			}
-			catch (Exception e) {
-				throw new SystemException(e);
-			}
+			_applyLayoutPrototype(
+				layoutPrototypeUuid, layout, layoutPrototypeLinkEnabled);
 		}
 
 		// Resources
@@ -710,6 +690,23 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		layoutPersistence.update(layout);
 	}
 
+	@Override
+	public Layout checkout(Layout layout, int version) throws PortalException {
+		throw new UnsupportedOperationException();
+	}
+
+	@Indexable(type = IndexableType.DELETE)
+	@Override
+	public Layout delete(Layout layout) throws PortalException {
+		return layoutPersistence.remove(layout);
+	}
+
+	@Indexable(type = IndexableType.DELETE)
+	@Override
+	public Layout deleteDraft(Layout layout) throws PortalException {
+		return layoutPersistence.remove(layout);
+	}
+
 	/**
 	 * Deletes the layout, its child layouts, and its associated resources.
 	 *
@@ -976,316 +973,6 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		counterLocalService.reset(getCounterName(groupId, privateLayout));
 	}
 
-	/**
-	 * Exports layouts with the layout IDs and criteria as a byte array.
-	 *
-	 * @param      groupId the primary key of the group
-	 * @param      privateLayout whether the layout is private to the group
-	 * @param      layoutIds the layout IDs of the layouts to be exported
-	 * @param      parameterMap the mapping of parameters indicating which
-	 *             information to export. For information on the keys used in
-	 *             the map see {@link
-	 *             com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys}.
-	 * @param      startDate the export's start date
-	 * @param      endDate the export's end date
-	 * @return     the layouts as a byte array
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public byte[] exportLayouts(
-			long groupId, boolean privateLayout, long[] layoutIds,
-			Map<String, String[]> parameterMap, Date startDate, Date endDate)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * Exports all layouts that match the criteria as a byte array.
-	 *
-	 * @param      groupId the primary key of the group
-	 * @param      privateLayout whether the layout is private to the group
-	 * @param      parameterMap the mapping of parameters indicating which
-	 *             information to export. For information on the keys used in
-	 *             the map see {@link
-	 *             com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys}.
-	 * @param      startDate the export's start date
-	 * @param      endDate the export's end date
-	 * @return     the layout as a byte array
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public byte[] exportLayouts(
-			long groupId, boolean privateLayout,
-			Map<String, String[]> parameterMap, Date startDate, Date endDate)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             com.liferay.exportimport.kernel.service.ExportImportLocalService#exportLayoutsAsFile(
-	 *             ExportImportConfiguration)}
-	 */
-	@Deprecated
-	@Override
-	public File exportLayoutsAsFile(
-			ExportImportConfiguration exportImportConfiguration)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * Exports the layouts that match the layout IDs and criteria as a file.
-	 *
-	 * @param      groupId the primary key of the group
-	 * @param      privateLayout whether the layout is private to the group
-	 * @param      layoutIds the layout IDs of the layouts to be exported
-	 *             (optionally <code>null</code>)
-	 * @param      parameterMap the mapping of parameters indicating which
-	 *             information to export. For information on the keys used in
-	 *             the map see {@link
-	 *             com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys}.
-	 * @param      startDate the export's start date
-	 * @param      endDate the export's end date
-	 * @return     the layouts as a File
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public File exportLayoutsAsFile(
-			long groupId, boolean privateLayout, long[] layoutIds,
-			Map<String, String[]> parameterMap, Date startDate, Date endDate)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             com.liferay.exportimport.kernel.service.ExportImportLocalService#exportLayoutsAsFileInBackground(
-	 *             long, ExportImportConfiguration)}
-	 */
-	@Deprecated
-	@Override
-	public long exportLayoutsAsFileInBackground(
-			long userId, ExportImportConfiguration exportImportConfiguration)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             com.liferay.exportimport.kernel.service.ExportImportLocalService#exportLayoutsAsFileInBackground(
-	 *             long, long)}
-	 */
-	@Deprecated
-	@Override
-	public long exportLayoutsAsFileInBackground(
-			long userId, long exportImportConfigurationId)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public long exportLayoutsAsFileInBackground(
-			long userId, String taskName, long groupId, boolean privateLayout,
-			long[] layoutIds, Map<String, String[]> parameterMap,
-			Date startDate, Date endDate)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public long exportLayoutsAsFileInBackground(
-			long userId, String taskName, long groupId, boolean privateLayout,
-			long[] layoutIds, Map<String, String[]> parameterMap,
-			Date startDate, Date endDate, String fileName)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * Exports the portlet information (categories, permissions, ... etc.) as a
-	 * byte array.
-	 *
-	 * @param      plid the primary key of the layout
-	 * @param      groupId the primary key of the group
-	 * @param      portletId the primary key of the portlet
-	 * @param      parameterMap the mapping of parameters indicating which
-	 *             information to export. For information on the keys used in
-	 *             the map see {@link
-	 *             com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys}.
-	 * @param      startDate the export's start date
-	 * @param      endDate the export's end date
-	 * @return     the portlet information as a byte array
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public byte[] exportPortletInfo(
-			long plid, long groupId, String portletId,
-			Map<String, String[]> parameterMap, Date startDate, Date endDate)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public byte[] exportPortletInfo(
-			long companyId, String portletId,
-			Map<String, String[]> parameterMap, Date startDate, Date endDate)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             com.liferay.exportimport.kernel.service.ExportImportLocalService#exportPortletInfoAsFile(
-	 *             ExportImportConfiguration)}}
-	 */
-	@Deprecated
-	@Override
-	public File exportPortletInfoAsFile(
-			ExportImportConfiguration exportImportConfiguration)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * Exports the portlet information (categories, permissions, ... etc.) as a
-	 * file.
-	 *
-	 * @param      plid the primary key of the layout
-	 * @param      groupId the primary key of the group
-	 * @param      portletId the primary key of the portlet
-	 * @param      parameterMap the mapping of parameters indicating which
-	 *             information to export. For information on the keys used in
-	 *             the map see {@link
-	 *             com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys}.
-	 * @param      startDate the export's start date
-	 * @param      endDate the export's end date
-	 * @return     the portlet information as a file
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public File exportPortletInfoAsFile(
-			long plid, long groupId, String portletId,
-			Map<String, String[]> parameterMap, Date startDate, Date endDate)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public File exportPortletInfoAsFile(
-			long companyId, String portletId,
-			Map<String, String[]> parameterMap, Date startDate, Date endDate)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             com.liferay.exportimport.kernel.service.ExportImportLocalService#exportPortletInfoAsFileInBackground(
-	 *             long, ExportImportConfiguration)}}
-	 */
-	@Deprecated
-	@Override
-	public long exportPortletInfoAsFileInBackground(
-			long userId, ExportImportConfiguration exportImportConfiguration)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             com.liferay.exportimport.kernel.service.ExportImportLocalService#exportPortletInfoAsFileInBackground(
-	 *             long, long)}}
-	 */
-	@Deprecated
-	@Override
-	public long exportPortletInfoAsFileInBackground(
-			long userId, long exportImportConfigurationId)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public long exportPortletInfoAsFileInBackground(
-			long userId, String taskName, long plid, long groupId,
-			String portletId, Map<String, String[]> parameterMap,
-			Date startDate, Date endDate, String fileName)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public long exportPortletInfoAsFileInBackground(
-			long userId, String taskName, String portletId,
-			Map<String, String[]> parameterMap, Date startDate, Date endDate,
-			String fileName)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
 	@Override
 	public Layout fetchDefaultLayout(long groupId, boolean privateLayout) {
 		if (groupId > 0) {
@@ -1301,12 +988,37 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	}
 
 	@Override
+	public Layout fetchDraft(Layout layout) {
+		return layout;
+	}
+
+	@Override
+	public Layout fetchDraft(long primaryKey) {
+		return layoutPersistence.fetchByPrimaryKey(primaryKey);
+	}
+
+	@Override
 	public Layout fetchFirstLayout(
 		long groupId, boolean privateLayout, long parentLayoutId) {
 
 		return layoutPersistence.fetchByG_P_P_Head_First(
 			groupId, privateLayout, parentLayoutId, true,
 			new LayoutPriorityComparator());
+	}
+
+	@Override
+	public Layout fetchFirstLayout(
+		long groupId, boolean privateLayout, long parentLayoutId,
+		boolean hidden) {
+
+		return layoutPersistence.fetchByG_P_P_H_Head_First(
+			groupId, privateLayout, parentLayoutId, hidden, true,
+			new LayoutPriorityComparator());
+	}
+
+	@Override
+	public LayoutVersion fetchLatestVersion(Layout layout) {
+		return null;
 	}
 
 	@Override
@@ -1366,6 +1078,16 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	@Override
 	public LayoutVersion fetchLayoutVersion(long layoutVersionId) {
 		return layoutVersionPersistence.fetchByPrimaryKey(layoutVersionId);
+	}
+
+	@Override
+	public Layout fetchPublished(Layout layout) {
+		return layout;
+	}
+
+	@Override
+	public Layout fetchPublished(long primaryKey) {
+		return layoutPersistence.fetchByPrimaryKey(primaryKey);
 	}
 
 	/**
@@ -1442,6 +1164,16 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		}
 
 		return LayoutConstants.DEFAULT_PLID;
+	}
+
+	@Override
+	public Layout getDraft(Layout layout) throws PortalException {
+		return layout;
+	}
+
+	@Override
+	public Layout getDraft(long primaryKey) throws PortalException {
+		return layoutPersistence.findByPrimaryKey(primaryKey);
 	}
 
 	/**
@@ -2345,6 +2077,18 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		return layouts;
 	}
 
+	@Override
+	public LayoutVersion getVersion(Layout layout, int version)
+		throws PortalException {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public List<LayoutVersion> getVersions(Layout layout) {
+		return Collections.emptyList();
+	}
+
 	/**
 	 * Returns <code>true</code> if there is a matching layout with the UUID,
 	 * group, and privacy.
@@ -2534,394 +2278,16 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			layoutSetPrototype, layoutUuid);
 	}
 
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             com.liferay.exportimport.kernel.service.ExportImportLocalService#importLayouts(
-	 *             ExportImportConfiguration, File)}}
-	 */
-	@Deprecated
 	@Override
-	public void importLayouts(
-			ExportImportConfiguration exportImportConfiguration, File file)
-		throws PortalException {
+	public Layout publishDraft(Layout layout) throws PortalException {
+		layout.setHeadId(-layout.getPrimaryKey());
 
-		throw new UnsupportedOperationException();
+		return layoutPersistence.update(layout);
 	}
 
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             com.liferay.exportimport.kernel.service.ExportImportLocalService#importLayouts(
-	 *             ExportImportConfiguration, InputStream)}}
-	 */
-	@Deprecated
 	@Override
-	public void importLayouts(
-			ExportImportConfiguration exportImportConfiguration, InputStream is)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * Imports the layouts from the byte array.
-	 *
-	 * @param      userId the primary key of the user
-	 * @param      groupId the primary key of the group
-	 * @param      privateLayout whether the layout is private to the group
-	 * @param      parameterMap the mapping of parameters indicating which
-	 *             information will be imported. For information on the keys
-	 *             used in the map see {@link
-	 *             com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys}.
-	 * @param      bytes the byte array with the data
-	 * @throws     PortalException
-	 * @see        com.liferay.exportimport.kernel.lar.LayoutImporter
-	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public void importLayouts(
-			long userId, long groupId, boolean privateLayout,
-			Map<String, String[]> parameterMap, byte[] bytes)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * Imports the layouts from the file.
-	 *
-	 * @param      userId the primary key of the user
-	 * @param      groupId the primary key of the group
-	 * @param      privateLayout whether the layout is private to the group
-	 * @param      parameterMap the mapping of parameters indicating which
-	 *             information will be imported. For information on the keys
-	 *             used in the map see {@link
-	 *             com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys}.
-	 * @param      file the LAR file with the data
-	 * @throws     PortalException
-	 * @see        com.liferay.exportimport.kernel.lar.LayoutImporter
-	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public void importLayouts(
-			long userId, long groupId, boolean privateLayout,
-			Map<String, String[]> parameterMap, File file)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * Imports the layouts from the input stream.
-	 *
-	 * @param      userId the primary key of the user
-	 * @param      groupId the primary key of the group
-	 * @param      privateLayout whether the layout is private to the group
-	 * @param      parameterMap the mapping of parameters indicating which
-	 *             information will be imported. For information on the keys
-	 *             used in the map see {@link
-	 *             com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys}.
-	 * @param      is the input stream
-	 * @throws     PortalException
-	 * @see        com.liferay.exportimport.kernel.lar.LayoutImporter
-	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public void importLayouts(
-			long userId, long groupId, boolean privateLayout,
-			Map<String, String[]> parameterMap, InputStream is)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             com.liferay.exportimport.kernel.service.ExportImportLocalService#importLayoutsDataDeletions(
-	 *             ExportImportConfiguration, File)}
-	 */
-	@Deprecated
-	@Override
-	public void importLayoutsDataDeletions(
-			ExportImportConfiguration exportImportConfiguration, File file)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             com.liferay.exportimport.kernel.service.ExportImportLocalService#importLayoutsInBackground(
-	 *             long, ExportImportConfiguration, File)}
-	 */
-	@Deprecated
-	@Override
-	public long importLayoutsInBackground(
-			long userId, ExportImportConfiguration exportImportConfiguration,
-			File file)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             com.liferay.exportimport.kernel.service.ExportImportLocalService#importLayoutsInBackground(
-	 *             long, long, File)}
-	 */
-	@Deprecated
-	@Override
-	public long importLayoutsInBackground(
-			long userId, long exportImportConfigurationId, File file)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public long importLayoutsInBackground(
-			long userId, String taskName, long groupId, boolean privateLayout,
-			Map<String, String[]> parameterMap, File file)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public long importLayoutsInBackground(
-			long userId, String taskName, long groupId, boolean privateLayout,
-			Map<String, String[]> parameterMap, InputStream is)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             com.liferay.exportimport.kernel.service.ExportImportLocalService#importPortletDataDeletions(
-	 *             ExportImportConfiguration, File)}
-	 */
-	@Deprecated
-	@Override
-	public void importPortletDataDeletions(
-			ExportImportConfiguration exportImportConfiguration, File file)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             com.liferay.exportimport.kernel.service.ExportImportLocalService#importPortletInfo(
-	 *             ExportImportConfiguration, File)}
-	 */
-	@Deprecated
-	@Override
-	public void importPortletInfo(
-			ExportImportConfiguration exportImportConfiguration, File file)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             com.liferay.exportimport.kernel.service.ExportImportLocalService#importPortletInfo(
-	 *             ExportImportConfiguration, InputStream)}
-	 */
-	@Deprecated
-	@Override
-	public void importPortletInfo(
-			ExportImportConfiguration exportImportConfiguration, InputStream is)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * Imports the portlet information (categories, permissions, ... etc.) from
-	 * the file.
-	 *
-	 * @param      userId the primary key of the user
-	 * @param      plid the primary key of the target layout
-	 * @param      groupId the primary key of the target group
-	 * @param      portletId the primary key of the portlet
-	 * @param      parameterMap the mapping of parameters indicating which
-	 *             information will be imported. For information on the keys
-	 *             used in the map see {@link
-	 *             com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys}.
-	 * @param      file the LAR file with the data
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public void importPortletInfo(
-			long userId, long plid, long groupId, String portletId,
-			Map<String, String[]> parameterMap, File file)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * Imports the portlet information (categories, permissions, ... etc.) from
-	 * the input stream.
-	 *
-	 * @param      userId the primary key of the user
-	 * @param      plid the primary key of the layout
-	 * @param      groupId the primary key of the group
-	 * @param      portletId the primary key of the portlet
-	 * @param      parameterMap the mapping of parameters indicating which
-	 *             information will be imported. For information on the keys
-	 *             used in the map see {@link
-	 *             com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys}.
-	 * @param      is the input stream
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public void importPortletInfo(
-			long userId, long plid, long groupId, String portletId,
-			Map<String, String[]> parameterMap, InputStream is)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public void importPortletInfo(
-			long userId, String portletId, Map<String, String[]> parameterMap,
-			File file)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public void importPortletInfo(
-			long userId, String portletId, Map<String, String[]> parameterMap,
-			InputStream is)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             com.liferay.exportimport.kernel.service.ExportImportLocalService#importPortletInfoInBackground(
-	 *             long, ExportImportConfiguration, File)}
-	 */
-	@Deprecated
-	@Override
-	public long importPortletInfoInBackground(
-			long userId, ExportImportConfiguration exportImportConfiguration,
-			File file)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             com.liferay.exportimport.kernel.service.ExportImportLocalService#importPortletInfoInBackground(
-	 *             long, long, File)}
-	 */
-	@Deprecated
-	@Override
-	public long importPortletInfoInBackground(
-			long userId, long exportImportConfigurationId, File file)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public long importPortletInfoInBackground(
-			long userId, String taskName, long plid, long groupId,
-			String portletId, Map<String, String[]> parameterMap, File file)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public long importPortletInfoInBackground(
-			long userId, String taskName, long plid, long groupId,
-			String portletId, Map<String, String[]> parameterMap,
-			InputStream is)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public long importPortletInfoInBackground(
-			long userId, String taskName, String portletId,
-			Map<String, String[]> parameterMap, File file)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public long importPortletInfoInBackground(
-			long userId, String taskName, String portletId,
-			Map<String, String[]> parameterMap, InputStream is)
-		throws PortalException {
+	public void registerListener(
+		VersionServiceListener<Layout, LayoutVersion> versionServiceListener) {
 
 		throw new UnsupportedOperationException();
 	}
@@ -2999,6 +2365,13 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	}
 
 	@Override
+	public void unregisterListener(
+		VersionServiceListener<Layout, LayoutVersion> versionServiceListener) {
+
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public void updateAsset(
 			long userId, Layout layout, long[] assetCategoryIds,
 			String[] assetTagNames)
@@ -3011,6 +2384,11 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			null, null, null, null, ContentTypes.TEXT_HTML,
 			layout.getName(LocaleUtil.getDefault()), null, null, null, null, 0,
 			0, null);
+	}
+
+	@Override
+	public Layout updateDraft(Layout layout) throws PortalException {
+		return layoutPersistence.update(layout);
 	}
 
 	/**
@@ -3055,29 +2433,6 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		}
 
 		return layoutLocalService.updateLayout(layout);
-	}
-
-	/**
-	 * Updates the friendly URL of the layout.
-	 *
-	 * @param      plid the primary key of the layout
-	 * @param      friendlyURL the friendly URL to be assigned
-	 * @param      languageId the primary key of the language
-	 * @return     the updated layout
-	 * @throws     PortalException if a portal exception occurred
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             #updateFriendlyURL(long, long, String, String)}
-	 */
-	@Deprecated
-	@Override
-	public Layout updateFriendlyURL(
-			long plid, String friendlyURL, String languageId)
-		throws PortalException {
-
-		Layout layout = layoutPersistence.findByPrimaryKey(plid);
-
-		return updateFriendlyURL(
-			layout.getUserId(), plid, friendlyURL, languageId);
 	}
 
 	@Override
@@ -3278,11 +2633,23 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		if (Validator.isNotNull(layoutPrototypeUuid)) {
 			draftLayout.setLayoutPrototypeUuid(layoutPrototypeUuid);
 
+			boolean applyLayoutPrototype = ParamUtil.getBoolean(
+				serviceContext, "applyLayoutPrototype");
+
 			boolean layoutPrototypeLinkEnabled = ParamUtil.getBoolean(
 				serviceContext, "layoutPrototypeLinkEnabled");
 
 			draftLayout.setLayoutPrototypeLinkEnabled(
 				layoutPrototypeLinkEnabled);
+
+			if (applyLayoutPrototype) {
+				serviceContext.setAttribute(
+					"applyLayoutPrototype", Boolean.FALSE);
+
+				_applyLayoutPrototype(
+					layoutPrototypeUuid, draftLayout,
+					layoutPrototypeLinkEnabled);
+			}
 		}
 
 		draftLayout.setExpandoBridgeAttributes(serviceContext);
@@ -3789,124 +3156,6 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		return updatePriority(layout, priority);
 	}
 
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             com.liferay.exportimport.kernel.service.ExportImportLocalService#validateImportLayoutsFile(
-	 *             ExportImportConfiguration, File)}
-	 */
-	@Deprecated
-	@Override
-	public MissingReferences validateImportLayoutsFile(
-			ExportImportConfiguration exportImportConfiguration, File file)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             com.liferay.exportimport.kernel.service.ExportImportLocalService#validateImportLayoutsFile(
-	 *             ExportImportConfiguration, InputStream)}
-	 */
-	@Deprecated
-	@Override
-	public MissingReferences validateImportLayoutsFile(
-			ExportImportConfiguration exportImportConfiguration,
-			InputStream inputStream)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public MissingReferences validateImportLayoutsFile(
-			long userId, long groupId, boolean privateLayout,
-			Map<String, String[]> parameterMap, File file)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public MissingReferences validateImportLayoutsFile(
-			long userId, long groupId, boolean privateLayout,
-			Map<String, String[]> parameterMap, InputStream inputStream)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             com.liferay.exportimport.kernel.service.ExportImportLocalService#validateImportPortletInfo(
-	 *             ExportImportConfiguration, File)}
-	 */
-	@Deprecated
-	@Override
-	public MissingReferences validateImportPortletInfo(
-			ExportImportConfiguration exportImportConfiguration, File file)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             com.liferay.exportimport.kernel.service.ExportImportLocalService#validateImportPortletInfo(
-	 *             ExportImportConfiguration, InputStream)}
-	 */
-	@Deprecated
-	@Override
-	public MissingReferences validateImportPortletInfo(
-			ExportImportConfiguration exportImportConfiguration,
-			InputStream inputStream)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public MissingReferences validateImportPortletInfo(
-			long userId, long plid, long groupId, String portletId,
-			Map<String, String[]> parameterMap, File file)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @throws     PortalException
-	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public MissingReferences validateImportPortletInfo(
-			long userId, long plid, long groupId, String portletId,
-			Map<String, String[]> parameterMap, InputStream inputStream)
-		throws PortalException {
-
-		throw new UnsupportedOperationException();
-	}
-
 	protected void validateTypeSettingsProperties(
 			Layout layout, UnicodeProperties typeSettingsProperties)
 		throws PortalException {
@@ -4043,6 +3292,30 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		}
 
 		return layouts;
+	}
+
+	private void _applyLayoutPrototype(
+			String layoutPrototypeUuid, Layout layout,
+			boolean layoutPrototypeLinkEnabled)
+		throws PortalException {
+
+		LayoutPrototype layoutPrototype =
+			layoutPrototypeLocalService.getLayoutPrototypeByUuidAndCompanyId(
+				layoutPrototypeUuid, layout.getCompanyId());
+
+		try {
+			SitesUtil.applyLayoutPrototype(
+				layoutPrototype, layout, layoutPrototypeLinkEnabled);
+		}
+		catch (PortalException pe) {
+			throw pe;
+		}
+		catch (SystemException se) {
+			throw se;
+		}
+		catch (Exception e) {
+			throw new SystemException(e);
+		}
 	}
 
 	private SearchContext _buildSearchContext(

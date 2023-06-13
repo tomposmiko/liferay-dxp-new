@@ -100,7 +100,9 @@ public class ChangeTransition {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(transition);
+			sb.append("\"");
 		}
 
 		sb.append("}");

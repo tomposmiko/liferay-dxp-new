@@ -132,18 +132,22 @@ public abstract class BaseJSONParser<T> {
 	protected abstract void setField(
 		T dto, String jsonParserFieldName, Object jsonParserFieldValue);
 
+	protected Date toDate(String string) {
+		try {
+			return _dateFormat.parse(string);
+		}
+		catch (ParseException pe) {
+			throw new IllegalArgumentException(
+				"Unable to parse date from " + string, pe);
+		}
+	}
+
 	protected Date[] toDates(Object[] objects) {
 		return Stream.of(
 			objects
 		).map(
 			object -> {
-				try {
-					return _dateFormat.parse((String)object);
-				}
-				catch (ParseException pe) {
-					throw new IllegalArgumentException(
-						"Unable to parse date from " + object, pe);
-				}
+				return toDate((String)object);
 			}
 		).toArray(
 			size -> new Date[size]
@@ -155,12 +159,7 @@ public abstract class BaseJSONParser<T> {
 			objects
 		).map(
 			object -> {
-				try {
-					return Integer.parseInt(object.toString());
-				}
-				catch (NumberFormatException nfe) {
-					throw new RuntimeException(nfe);
-				}
+				return Integer.valueOf(object.toString());
 			}
 		).toArray(
 			size -> new Integer[size]
@@ -172,16 +171,15 @@ public abstract class BaseJSONParser<T> {
 			objects
 		).map(
 			object -> {
-				try {
-					return Long.parseLong(object.toString());
-				}
-				catch (NumberFormatException nfe) {
-					throw new RuntimeException(nfe);
-				}
+				return Long.valueOf(object.toString());
 			}
 		).toArray(
 			size -> new Long[size]
 		);
+	}
+
+	protected String toString(Date date) {
+		return _dateFormat.format(date);
 	}
 
 	protected String[] toStrings(Object[] objects) {
@@ -206,15 +204,15 @@ public abstract class BaseJSONParser<T> {
 		if (!_json.startsWith(prefix)) {
 			throw new IllegalArgumentException(
 				String.format(
-					"Expected starts with '%s', but found '%s'", prefix,
-					_json.charAt(0)));
+					"Expected starts with '%s', but found '%s' in '%s'", prefix,
+					_json.charAt(0), _json));
 		}
 
 		if (!_json.endsWith(sufix)) {
 			throw new IllegalArgumentException(
 				String.format(
-					"Expected ends with '%s', but found '%s'", sufix,
-					_json.charAt(_json.length() - 1)));
+					"Expected ends with '%s', but found '%s' in '%s'", sufix,
+					_json.charAt(_json.length() - 1), _json));
 		}
 	}
 

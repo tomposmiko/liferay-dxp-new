@@ -683,7 +683,7 @@ definition {
 
 		var kbAricleFriendlyURL = selenium.getAttribute("//div[@class='kbarticle-navigation']/ul/li/a[contains(.,'Knowledge Base Article2 Title')]@href");
 
-		Navigator.gotoPage(pageName = "Welcome");
+		Navigator.gotoPage(pageName = "Home");
 
 		Navigator.openSpecificURL(url = "${kbAricleFriendlyURL}");
 
@@ -781,7 +781,7 @@ definition {
 
 		var kbAricleFriendlyURL = selenium.getAttribute("//div[@class='kbarticle-navigation']/ul/li/a[contains(.,'Knowledge Base Article2 Title')]@href");
 
-		Navigator.gotoPage(pageName = "Welcome");
+		Navigator.gotoPage(pageName = "Home");
 
 		Navigator.openSpecificURL(url = "${kbAricleFriendlyURL}");
 
@@ -864,9 +864,11 @@ definition {
 			kbArticleTitle = "Knowledge Base Article Title"
 		);
 
-		PortalSettings.gotoPortalSettings();
-
-		Navigator.gotoNavTab(navTab = "Social");
+		PortalSettings.gotoConfiguration(
+			configurationCategory = "Community Tools",
+			configurationName = "Ratings",
+			configurationScope = "Virtual Instance Scope"
+		);
 
 		Select(locator1 = "Select#KNOWLEDGE_BASE_RATING", value1 = "Stars");
 
@@ -1027,9 +1029,11 @@ definition {
 			rateUp = "true"
 		);
 
-		PortalSettings.gotoPortalSettings();
-
-		Navigator.gotoNavTab(navTab = "Social");
+		PortalSettings.gotoConfiguration(
+			configurationCategory = "Community Tools",
+			configurationName = "Ratings",
+			configurationScope = "Virtual Instance Scope"
+		);
 
 		Select(locator1 = "Select#KNOWLEDGE_BASE_RATING", value1 = "Stars");
 
@@ -1043,9 +1047,11 @@ definition {
 
 		KBArticle.viewArticle5StarRatingPG();
 
-		PortalSettings.gotoPortalSettings();
-
-		Navigator.gotoNavTab(navTab = "Social");
+		PortalSettings.gotoConfiguration(
+			configurationCategory = "Community Tools",
+			configurationName = "Ratings",
+			configurationScope = "Virtual Instance Scope"
+		);
 
 		Select(locator1 = "Select#KNOWLEDGE_BASE_RATING", value1 = "Thumbs");
 

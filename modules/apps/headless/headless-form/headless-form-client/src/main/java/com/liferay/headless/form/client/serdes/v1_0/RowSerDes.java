@@ -17,7 +17,8 @@ package com.liferay.headless.form.client.serdes.v1_0;
 import com.liferay.headless.form.client.dto.v1_0.Row;
 import com.liferay.headless.form.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -43,42 +44,49 @@ public class RowSerDes {
 
 	public static String toJSON(Row row) {
 		if (row == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"id\": ");
+		if (row.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (row.getId() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"id\":");
+
 			sb.append(row.getId());
 		}
 
-		sb.append(", ");
+		if (row.getLabel() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"label\": ");
+			sb.append("\"label\":");
 
-		if (row.getLabel() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(row.getLabel());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (row.getValue() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"value\": ");
+			sb.append("\"value\":");
 
-		if (row.getValue() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(row.getValue());
+
+			sb.append("\"");
 		}
 
 		sb.append("}");
@@ -86,38 +94,50 @@ public class RowSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<Row> rows) {
-		if (rows == null) {
-			return "[]";
+	public static Map<String, String> toMap(Row row) {
+		if (row == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (Row row : rows) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(row));
+		if (row.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(row.getId()));
 		}
 
-		sb.append("]");
+		if (row.getLabel() == null) {
+			map.put("label", null);
+		}
+		else {
+			map.put("label", String.valueOf(row.getLabel()));
+		}
 
-		return sb.toString();
+		if (row.getValue() == null) {
+			map.put("value", null);
+		}
+		else {
+			map.put("value", String.valueOf(row.getValue()));
+		}
+
+		return map;
 	}
 
 	private static class RowJSONParser extends BaseJSONParser<Row> {
 
+		@Override
 		protected Row createDTO() {
 			return new Row();
 		}
 
+		@Override
 		protected Row[] createDTOArray(int size) {
 			return new Row[size];
 		}
 
+		@Override
 		protected void setField(
 			Row row, String jsonParserFieldName, Object jsonParserFieldValue) {
 

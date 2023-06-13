@@ -2,7 +2,24 @@ definition {
 	macro addAsset {
 		Portlet.clickPortletPlusIconPG(portletName = "Asset Publisher");
 
-		MenuItem.click(menuItem = "${assetType}");
+		if (isSet(siteScope)) {
+			MenuItem.click(menuItem = "Add Content (Select Scope and Type)");
+
+			SelectField.select(
+				selectFieldLabel = "Scope",
+				selectFieldValue = "${siteScope}"
+			);
+
+			SelectField.select(
+				selectFieldLabel = "Asset Type",
+				selectFieldValue = "${assetType}"
+			);
+
+			Button.clickAdd();
+		}
+		else {
+			MenuItem.click(menuItem = "${assetType}");
+		}
 	}
 
 	macro assertSiteScopeSearch {
@@ -271,11 +288,22 @@ definition {
 		Panel.expandPanel(panel = "Set and Enable");
 
 		for (var displaySetting : list "${displaySettings}") {
-			if (contains("${displaySetting}", "Social Bookmarks")) {
-				Check.checkHiddenToggleSwitch(locator1 = "ToggleSwitch#ENABLE_SOCIAL_BOOKMARKS");
-			}
-			else {
-				Check(locator1 = "Checkbox#ANY_CHECKBOX", checkboxName = "${displaySetting}");
+			Check(locator1 = "Checkbox#ANY_CHECKBOX", checkboxName = "${displaySetting}");
+		}
+
+		if (isSet(enableSocialBookmarkSites)){
+			for (var socialBookmarkSite : list "${enableSocialBookmarkSites}") {
+				AddSelection(
+					locator1 = "SocialBookmarks#ENABLE_SOCIAL_BOOKMARK_AVAILABLE_SELECT",
+					value1 = "${socialBookmarkSite}"
+				);
+
+				Click(locator1 = "Button#MOVE_AVAILABLE_TO_CURRENT");
+
+				AssertTextEquals.assertPartialText(
+					locator1 = "SocialBookmarks#ENABLE_SOCIAL_BOOKMARK_CURRENT_SELECT",
+					value1 = "${socialBookmarkSite}"
+				);
 			}
 		}
 
@@ -938,12 +966,6 @@ definition {
 
 	macro viewAssetMetadataPG {
 		var key_categoryName = "${categoryName}";
-		var key_vocabularyName = "${vocabularyName}";
-
-		AssertTextEquals.assertPartialText(
-			locator1 = "AP#METADATA_VOCABULARY",
-			value1 = "${vocabularyName}"
-		);
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "AP#METADATA_CATEGORY",

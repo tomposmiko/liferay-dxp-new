@@ -20,7 +20,11 @@ import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.change.tracking.model.CTEntry;
 import com.liferay.change.tracking.model.CTEntryAggregate;
 import com.liferay.change.tracking.model.CTProcess;
+import com.liferay.change.tracking.service.CTEntryAggregateLocalService;
+import com.liferay.change.tracking.service.CTEntryLocalService;
+import com.liferay.change.tracking.service.CTProcessLocalService;
 import com.liferay.change.tracking.service.base.CTCollectionLocalServiceBaseImpl;
+import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
@@ -35,10 +39,17 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import java.util.Date;
 import java.util.List;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Brian Wing Shun Chan
  * @author Daniel Kocsis
  */
+@Component(
+	property = "model.class.name=com.liferay.change.tracking.model.CTCollection",
+	service = AopService.class
+)
 public class CTCollectionLocalServiceImpl
 	extends CTCollectionLocalServiceBaseImpl {
 
@@ -89,7 +100,7 @@ public class CTCollectionLocalServiceImpl
 	public CTCollection deleteCTCollection(CTCollection ctCollection)
 		throws PortalException {
 
-		List<CTEntry> ctEntries = ctCollectionPersistence.getCTEntries(
+		List<CTEntry> ctEntries = ctEntryPersistence.getCTCollectionCTEntries(
 			ctCollection.getCtCollectionId());
 
 		for (CTEntry ctEntry : ctEntries) {
@@ -100,11 +111,11 @@ public class CTCollectionLocalServiceImpl
 				continue;
 			}
 
-			ctEntryLocalService.deleteCTEntry(ctEntry);
+			_ctEntryLocalService.deleteCTEntry(ctEntry);
 		}
 
 		List<CTEntryAggregate> ctEntryAggregates =
-			ctCollectionPersistence.getCTEntryAggregates(
+			ctEntryAggregatePersistence.getCTCollectionCTEntryAggregates(
 				ctCollection.getCtCollectionId());
 
 		for (CTEntryAggregate ctEntryAggregate : ctEntryAggregates) {
@@ -116,15 +127,15 @@ public class CTCollectionLocalServiceImpl
 				continue;
 			}
 
-			ctEntryAggregateLocalService.deleteCTEntryAggregate(
+			_ctEntryAggregateLocalService.deleteCTEntryAggregate(
 				ctEntryAggregate);
 		}
 
-		List<CTProcess> ctProcesses = ctProcessLocalService.getCTProcesses(
+		List<CTProcess> ctProcesses = ctProcessPersistence.findByCollectionId(
 			ctCollection.getCtCollectionId());
 
 		for (CTProcess ctProcess : ctProcesses) {
-			ctProcessLocalService.deleteCTProcess(ctProcess);
+			_ctProcessLocalService.deleteCTProcess(ctProcess);
 		}
 
 		ctCollectionPersistence.remove(ctCollection);
@@ -216,5 +227,14 @@ public class CTCollectionLocalServiceImpl
 			throw new CTCollectionNameException("Name is too long");
 		}
 	}
+
+	@Reference
+	private CTEntryAggregateLocalService _ctEntryAggregateLocalService;
+
+	@Reference
+	private CTEntryLocalService _ctEntryLocalService;
+
+	@Reference
+	private CTProcessLocalService _ctProcessLocalService;
 
 }

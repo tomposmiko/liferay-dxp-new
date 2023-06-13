@@ -17,7 +17,8 @@ package com.liferay.headless.delivery.client.serdes.v1_0;
 import com.liferay.headless.delivery.client.dto.v1_0.Geo;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -43,30 +44,30 @@ public class GeoSerDes {
 
 	public static String toJSON(Geo geo) {
 		if (geo == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"latitude\": ");
+		if (geo.getLatitude() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (geo.getLatitude() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"latitude\":");
+
 			sb.append(geo.getLatitude());
 		}
 
-		sb.append(", ");
+		if (geo.getLongitude() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"longitude\": ");
+			sb.append("\"longitude\":");
 
-		if (geo.getLongitude() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(geo.getLongitude());
 		}
 
@@ -75,49 +76,54 @@ public class GeoSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<Geo> geos) {
-		if (geos == null) {
-			return "[]";
+	public static Map<String, String> toMap(Geo geo) {
+		if (geo == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (Geo geo : geos) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(geo));
+		if (geo.getLatitude() == null) {
+			map.put("latitude", null);
+		}
+		else {
+			map.put("latitude", String.valueOf(geo.getLatitude()));
 		}
 
-		sb.append("]");
+		if (geo.getLongitude() == null) {
+			map.put("longitude", null);
+		}
+		else {
+			map.put("longitude", String.valueOf(geo.getLongitude()));
+		}
 
-		return sb.toString();
+		return map;
 	}
 
 	private static class GeoJSONParser extends BaseJSONParser<Geo> {
 
+		@Override
 		protected Geo createDTO() {
 			return new Geo();
 		}
 
+		@Override
 		protected Geo[] createDTOArray(int size) {
 			return new Geo[size];
 		}
 
+		@Override
 		protected void setField(
 			Geo geo, String jsonParserFieldName, Object jsonParserFieldValue) {
 
 			if (Objects.equals(jsonParserFieldName, "latitude")) {
 				if (jsonParserFieldValue != null) {
-					geo.setLatitude((Number)jsonParserFieldValue);
+					geo.setLatitude((Double)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "longitude")) {
 				if (jsonParserFieldValue != null) {
-					geo.setLongitude((Number)jsonParserFieldValue);
+					geo.setLongitude((Double)jsonParserFieldValue);
 				}
 			}
 			else {

@@ -18,11 +18,10 @@ import com.liferay.headless.delivery.client.dto.v1_0.MessageBoardSection;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import java.util.Collection;
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -50,120 +49,137 @@ public class MessageBoardSectionSerDes {
 
 	public static String toJSON(MessageBoardSection messageBoardSection) {
 		if (messageBoardSection == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"creator\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (messageBoardSection.getCreator() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(messageBoardSection.getCreator());
-		}
+		if (messageBoardSection.getCreator() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append(", ");
+			sb.append("\"creator\":");
 
-		sb.append("\"dateCreated\": ");
-
-		if (messageBoardSection.getDateCreated() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(messageBoardSection.getDateCreated());
+			sb.append(CreatorSerDes.toJSON(messageBoardSection.getCreator()));
 		}
 
-		sb.append(", ");
+		if (messageBoardSection.getDateCreated() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dateModified\": ");
+			sb.append("\"dateCreated\":");
 
-		if (messageBoardSection.getDateModified() == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(
+				liferayToJSONDateFormat.format(
+					messageBoardSection.getDateCreated()));
+
+			sb.append("\"");
 		}
-		else {
-			sb.append(messageBoardSection.getDateModified());
+
+		if (messageBoardSection.getDateModified() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"dateModified\":");
+
+			sb.append("\"");
+
+			sb.append(
+				liferayToJSONDateFormat.format(
+					messageBoardSection.getDateModified()));
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (messageBoardSection.getDescription() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"description\": ");
+			sb.append("\"description\":");
 
-		if (messageBoardSection.getDescription() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(messageBoardSection.getDescription());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (messageBoardSection.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\":");
 
-		if (messageBoardSection.getId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(messageBoardSection.getId());
 		}
 
-		sb.append(", ");
+		if (messageBoardSection.getNumberOfMessageBoardSections() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"numberOfMessageBoardSections\": ");
+			sb.append("\"numberOfMessageBoardSections\":");
 
-		if (messageBoardSection.getNumberOfMessageBoardSections() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(messageBoardSection.getNumberOfMessageBoardSections());
 		}
 
-		sb.append(", ");
+		if (messageBoardSection.getNumberOfMessageBoardThreads() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"numberOfMessageBoardThreads\": ");
+			sb.append("\"numberOfMessageBoardThreads\":");
 
-		if (messageBoardSection.getNumberOfMessageBoardThreads() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(messageBoardSection.getNumberOfMessageBoardThreads());
 		}
 
-		sb.append(", ");
+		if (messageBoardSection.getSiteId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"siteId\": ");
+			sb.append("\"siteId\":");
 
-		if (messageBoardSection.getSiteId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(messageBoardSection.getSiteId());
 		}
 
-		sb.append(", ");
+		if (messageBoardSection.getTitle() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"title\": ");
+			sb.append("\"title\":");
 
-		if (messageBoardSection.getTitle() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(messageBoardSection.getTitle());
-		}
-
-		sb.append(", ");
-
-		sb.append("\"viewableBy\": ");
-
-		if (messageBoardSection.getViewableBy() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append("\"");
+
+			sb.append(messageBoardSection.getTitle());
+
+			sb.append("\"");
+		}
+
+		if (messageBoardSection.getViewableBy() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"viewableBy\":");
+
+			sb.append("\"");
+
 			sb.append(messageBoardSection.getViewableBy());
+
 			sb.append("\"");
 		}
 
@@ -172,41 +188,113 @@ public class MessageBoardSectionSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(
-		Collection<MessageBoardSection> messageBoardSections) {
+	public static Map<String, String> toMap(
+		MessageBoardSection messageBoardSection) {
 
-		if (messageBoardSections == null) {
-			return "[]";
+		if (messageBoardSection == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		for (MessageBoardSection messageBoardSection : messageBoardSections) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(messageBoardSection));
+		if (messageBoardSection.getCreator() == null) {
+			map.put("creator", null);
+		}
+		else {
+			map.put(
+				"creator",
+				CreatorSerDes.toJSON(messageBoardSection.getCreator()));
 		}
 
-		sb.append("]");
+		map.put(
+			"dateCreated",
+			liferayToJSONDateFormat.format(
+				messageBoardSection.getDateCreated()));
 
-		return sb.toString();
+		map.put(
+			"dateModified",
+			liferayToJSONDateFormat.format(
+				messageBoardSection.getDateModified()));
+
+		if (messageBoardSection.getDescription() == null) {
+			map.put("description", null);
+		}
+		else {
+			map.put(
+				"description",
+				String.valueOf(messageBoardSection.getDescription()));
+		}
+
+		if (messageBoardSection.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(messageBoardSection.getId()));
+		}
+
+		if (messageBoardSection.getNumberOfMessageBoardSections() == null) {
+			map.put("numberOfMessageBoardSections", null);
+		}
+		else {
+			map.put(
+				"numberOfMessageBoardSections",
+				String.valueOf(
+					messageBoardSection.getNumberOfMessageBoardSections()));
+		}
+
+		if (messageBoardSection.getNumberOfMessageBoardThreads() == null) {
+			map.put("numberOfMessageBoardThreads", null);
+		}
+		else {
+			map.put(
+				"numberOfMessageBoardThreads",
+				String.valueOf(
+					messageBoardSection.getNumberOfMessageBoardThreads()));
+		}
+
+		if (messageBoardSection.getSiteId() == null) {
+			map.put("siteId", null);
+		}
+		else {
+			map.put("siteId", String.valueOf(messageBoardSection.getSiteId()));
+		}
+
+		if (messageBoardSection.getTitle() == null) {
+			map.put("title", null);
+		}
+		else {
+			map.put("title", String.valueOf(messageBoardSection.getTitle()));
+		}
+
+		if (messageBoardSection.getViewableBy() == null) {
+			map.put("viewableBy", null);
+		}
+		else {
+			map.put(
+				"viewableBy",
+				String.valueOf(messageBoardSection.getViewableBy()));
+		}
+
+		return map;
 	}
 
 	private static class MessageBoardSectionJSONParser
 		extends BaseJSONParser<MessageBoardSection> {
 
+		@Override
 		protected MessageBoardSection createDTO() {
 			return new MessageBoardSection();
 		}
 
+		@Override
 		protected MessageBoardSection[] createDTOArray(int size) {
 			return new MessageBoardSection[size];
 		}
 
+		@Override
 		protected void setField(
 			MessageBoardSection messageBoardSection, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
@@ -220,13 +308,13 @@ public class MessageBoardSectionSerDes {
 			else if (Objects.equals(jsonParserFieldName, "dateCreated")) {
 				if (jsonParserFieldValue != null) {
 					messageBoardSection.setDateCreated(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dateModified")) {
 				if (jsonParserFieldValue != null) {
 					messageBoardSection.setDateModified(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "description")) {
@@ -246,7 +334,7 @@ public class MessageBoardSectionSerDes {
 
 				if (jsonParserFieldValue != null) {
 					messageBoardSection.setNumberOfMessageBoardSections(
-						(Integer)jsonParserFieldValue);
+						Integer.valueOf((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(
@@ -254,7 +342,7 @@ public class MessageBoardSectionSerDes {
 
 				if (jsonParserFieldValue != null) {
 					messageBoardSection.setNumberOfMessageBoardThreads(
-						(Integer)jsonParserFieldValue);
+						Integer.valueOf((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "siteId")) {
@@ -278,18 +366,6 @@ public class MessageBoardSectionSerDes {
 			else {
 				throw new IllegalArgumentException(
 					"Unsupported field name " + jsonParserFieldName);
-			}
-		}
-
-		private Date _toDate(String string) {
-			try {
-				DateFormat dateFormat = new SimpleDateFormat(
-					"yyyy-MM-dd'T'HH:mm:ss'Z'");
-
-				return dateFormat.parse(string);
-			}
-			catch (ParseException pe) {
-				throw new IllegalArgumentException("Unable to parse " + string);
 			}
 		}
 

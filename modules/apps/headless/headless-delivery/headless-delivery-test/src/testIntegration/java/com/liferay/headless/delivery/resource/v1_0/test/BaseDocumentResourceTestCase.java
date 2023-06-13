@@ -15,18 +15,17 @@
 package com.liferay.headless.delivery.resource.v1_0.test;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
-import com.liferay.headless.delivery.dto.v1_0.AdaptedImage;
-import com.liferay.headless.delivery.dto.v1_0.AggregateRating;
-import com.liferay.headless.delivery.dto.v1_0.Creator;
-import com.liferay.headless.delivery.dto.v1_0.Document;
-import com.liferay.headless.delivery.dto.v1_0.Rating;
-import com.liferay.headless.delivery.dto.v1_0.TaxonomyCategory;
+import com.liferay.headless.delivery.client.dto.v1_0.Document;
+import com.liferay.headless.delivery.client.dto.v1_0.Rating;
+import com.liferay.headless.delivery.client.pagination.Page;
+import com.liferay.headless.delivery.client.serdes.v1_0.DocumentSerDes;
 import com.liferay.headless.delivery.resource.v1_0.DocumentResource;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.log.Log;
@@ -47,7 +46,6 @@ import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.multipart.BinaryFile;
 import com.liferay.portal.vulcan.multipart.MultipartBody;
-import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
@@ -62,10 +60,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -118,6 +118,63 @@ public abstract class BaseDocumentResourceTestCase {
 	public void tearDown() throws Exception {
 		GroupTestUtil.deleteGroup(irrelevantGroup);
 		GroupTestUtil.deleteGroup(testGroup);
+	}
+
+	@Test
+	public void testClientSerDesToDTO() throws Exception {
+		ObjectMapper objectMapper = new ObjectMapper() {
+			{
+				configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+				enable(SerializationFeature.INDENT_OUTPUT);
+				setDateFormat(new ISO8601DateFormat());
+				setFilterProvider(
+					new SimpleFilterProvider() {
+						{
+							addFilter(
+								"Liferay.Vulcan",
+								SimpleBeanPropertyFilter.serializeAll());
+						}
+					});
+				setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+				setSerializationInclusion(JsonInclude.Include.NON_NULL);
+			}
+		};
+
+		Document document1 = randomDocument();
+
+		String json = objectMapper.writeValueAsString(document1);
+
+		Document document2 = DocumentSerDes.toDTO(json);
+
+		Assert.assertTrue(equals(document1, document2));
+	}
+
+	@Test
+	public void testClientSerDesToJSON() throws Exception {
+		ObjectMapper objectMapper = new ObjectMapper() {
+			{
+				configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+				setDateFormat(new ISO8601DateFormat());
+				setFilterProvider(
+					new SimpleFilterProvider() {
+						{
+							addFilter(
+								"Liferay.Vulcan",
+								SimpleBeanPropertyFilter.serializeAll());
+						}
+					});
+				setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+				setSerializationInclusion(JsonInclude.Include.NON_NULL);
+			}
+		};
+
+		Document document = randomDocument();
+
+		String json1 = objectMapper.writeValueAsString(document);
+		String json2 = DocumentSerDes.toJSON(document);
+
+		Assert.assertEquals(
+			objectMapper.readTree(json1), objectMapper.readTree(json2));
 	}
 
 	@Test
@@ -176,26 +233,14 @@ public abstract class BaseDocumentResourceTestCase {
 			testGetDocumentFolderDocumentsPage_getDocumentFolderId();
 
 		Document document1 = randomDocument();
-		Document document2 = randomDocument();
-
-		for (EntityField entityField : entityFields) {
-			BeanUtils.setProperty(
-				document1, entityField.getName(),
-				DateUtils.addMinutes(new Date(), -2));
-		}
 
 		document1 = testGetDocumentFolderDocumentsPage_addDocument(
 			documentFolderId, document1);
 
-		Thread.sleep(1000);
-
-		document2 = testGetDocumentFolderDocumentsPage_addDocument(
-			documentFolderId, document2);
-
 		for (EntityField entityField : entityFields) {
 			Page<Document> page = invokeGetDocumentFolderDocumentsPage(
 				documentFolderId, null,
-				getFilterString(entityField, "eq", document1),
+				getFilterString(entityField, "between", document1),
 				Pagination.of(1, 2), null);
 
 			assertEquals(
@@ -304,8 +349,6 @@ public abstract class BaseDocumentResourceTestCase {
 
 		document1 = testGetDocumentFolderDocumentsPage_addDocument(
 			documentFolderId, document1);
-
-		Thread.sleep(1000);
 
 		document2 = testGetDocumentFolderDocumentsPage_addDocument(
 			documentFolderId, document2);
@@ -428,10 +471,7 @@ public abstract class BaseDocumentResourceTestCase {
 			_log.debug("HTTP response: " + string);
 		}
 
-		return outputObjectMapper.readValue(
-			string,
-			new TypeReference<Page<Document>>() {
-			});
+		return Page.of(string, DocumentSerDes::toDTO);
 	}
 
 	protected Http.Response invokeGetDocumentFolderDocumentsPageResponse(
@@ -483,9 +523,7 @@ public abstract class BaseDocumentResourceTestCase {
 
 		Http.Options options = _createHttpOptions();
 
-		options.addPart(
-			"document",
-			inputObjectMapper.writeValueAsString(multipartBody.getValues()));
+		options.addPart("document", _toJSON(multipartBody.getValues()));
 
 		BinaryFile binaryFile = multipartBody.getBinaryFile("file");
 
@@ -511,10 +549,12 @@ public abstract class BaseDocumentResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(string, Document.class);
+			return DocumentSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -619,10 +659,12 @@ public abstract class BaseDocumentResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(string, Document.class);
+			return DocumentSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -659,9 +701,7 @@ public abstract class BaseDocumentResourceTestCase {
 
 		Http.Options options = _createHttpOptions();
 
-		options.addPart(
-			"document",
-			inputObjectMapper.writeValueAsString(multipartBody.getValues()));
+		options.addPart("document", _toJSON(multipartBody.getValues()));
 
 		BinaryFile binaryFile = multipartBody.getBinaryFile("file");
 
@@ -684,10 +724,12 @@ public abstract class BaseDocumentResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(string, Document.class);
+			return DocumentSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -727,9 +769,7 @@ public abstract class BaseDocumentResourceTestCase {
 
 		Http.Options options = _createHttpOptions();
 
-		options.addPart(
-			"document",
-			inputObjectMapper.writeValueAsString(multipartBody.getValues()));
+		options.addPart("document", _toJSON(multipartBody.getValues()));
 
 		BinaryFile binaryFile = multipartBody.getBinaryFile("file");
 
@@ -752,10 +792,12 @@ public abstract class BaseDocumentResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(string, Document.class);
+			return DocumentSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -859,10 +901,13 @@ public abstract class BaseDocumentResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(string, Rating.class);
+			return com.liferay.headless.delivery.client.serdes.v1_0.
+				RatingSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -909,10 +954,13 @@ public abstract class BaseDocumentResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(string, Rating.class);
+			return com.liferay.headless.delivery.client.serdes.v1_0.
+				RatingSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -962,10 +1010,13 @@ public abstract class BaseDocumentResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(string, Rating.class);
+			return com.liferay.headless.delivery.client.serdes.v1_0.
+				RatingSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -1041,24 +1092,13 @@ public abstract class BaseDocumentResourceTestCase {
 		Long siteId = testGetSiteDocumentsPage_getSiteId();
 
 		Document document1 = randomDocument();
-		Document document2 = randomDocument();
-
-		for (EntityField entityField : entityFields) {
-			BeanUtils.setProperty(
-				document1, entityField.getName(),
-				DateUtils.addMinutes(new Date(), -2));
-		}
 
 		document1 = testGetSiteDocumentsPage_addDocument(siteId, document1);
-
-		Thread.sleep(1000);
-
-		document2 = testGetSiteDocumentsPage_addDocument(siteId, document2);
 
 		for (EntityField entityField : entityFields) {
 			Page<Document> page = invokeGetSiteDocumentsPage(
 				siteId, null, null,
-				getFilterString(entityField, "eq", document1),
+				getFilterString(entityField, "between", document1),
 				Pagination.of(1, 2), null);
 
 			assertEquals(
@@ -1159,8 +1199,6 @@ public abstract class BaseDocumentResourceTestCase {
 		}
 
 		document1 = testGetSiteDocumentsPage_addDocument(siteId, document1);
-
-		Thread.sleep(1000);
 
 		document2 = testGetSiteDocumentsPage_addDocument(siteId, document2);
 
@@ -1269,10 +1307,7 @@ public abstract class BaseDocumentResourceTestCase {
 			_log.debug("HTTP response: " + string);
 		}
 
-		return outputObjectMapper.readValue(
-			string,
-			new TypeReference<Page<Document>>() {
-			});
+		return Page.of(string, DocumentSerDes::toDTO);
 	}
 
 	protected Http.Response invokeGetSiteDocumentsPageResponse(
@@ -1319,9 +1354,7 @@ public abstract class BaseDocumentResourceTestCase {
 
 		Http.Options options = _createHttpOptions();
 
-		options.addPart(
-			"document",
-			inputObjectMapper.writeValueAsString(multipartBody.getValues()));
+		options.addPart("document", _toJSON(multipartBody.getValues()));
 
 		BinaryFile binaryFile = multipartBody.getBinaryFile("file");
 
@@ -1344,10 +1377,12 @@ public abstract class BaseDocumentResourceTestCase {
 		}
 
 		try {
-			return outputObjectMapper.readValue(string, Document.class);
+			return DocumentSerDes.toDTO(string);
 		}
 		catch (Exception e) {
-			_log.error("Unable to process HTTP response: " + string, e);
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to process HTTP response: " + string, e);
+			}
 
 			throw e;
 		}
@@ -1868,13 +1903,63 @@ public abstract class BaseDocumentResourceTestCase {
 		}
 
 		if (entityFieldName.equals("dateCreated")) {
-			sb.append(_dateFormat.format(document.getDateCreated()));
+			if (operator.equals("between")) {
+				sb = new StringBundler();
+
+				sb.append("(");
+				sb.append(entityFieldName);
+				sb.append(" gt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(document.getDateCreated(), -2)));
+				sb.append(" and ");
+				sb.append(entityFieldName);
+				sb.append(" lt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(document.getDateCreated(), 2)));
+				sb.append(")");
+			}
+			else {
+				sb.append(entityFieldName);
+
+				sb.append(" ");
+				sb.append(operator);
+				sb.append(" ");
+
+				sb.append(_dateFormat.format(document.getDateCreated()));
+			}
 
 			return sb.toString();
 		}
 
 		if (entityFieldName.equals("dateModified")) {
-			sb.append(_dateFormat.format(document.getDateModified()));
+			if (operator.equals("between")) {
+				sb = new StringBundler();
+
+				sb.append("(");
+				sb.append(entityFieldName);
+				sb.append(" gt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(document.getDateModified(), -2)));
+				sb.append(" and ");
+				sb.append(entityFieldName);
+				sb.append(" lt ");
+				sb.append(
+					_dateFormat.format(
+						DateUtils.addSeconds(document.getDateModified(), 2)));
+				sb.append(")");
+			}
+			else {
+				sb.append(entityFieldName);
+
+				sb.append(" ");
+				sb.append(operator);
+				sb.append(" ");
+
+				sb.append(_dateFormat.format(document.getDateModified()));
+			}
 
 			return sb.toString();
 		}
@@ -1966,6 +2051,7 @@ public abstract class BaseDocumentResourceTestCase {
 				encodingFormat = RandomTestUtil.randomString();
 				fileExtension = RandomTestUtil.randomString();
 				id = RandomTestUtil.randomLong();
+				sizeInBytes = RandomTestUtil.randomLong();
 				title = RandomTestUtil.randomString();
 			}
 		};
@@ -1986,122 +2072,11 @@ public abstract class BaseDocumentResourceTestCase {
 			"This method needs to be implemented");
 	}
 
-	protected static final ObjectMapper inputObjectMapper = new ObjectMapper() {
-		{
-			setFilterProvider(
-				new SimpleFilterProvider() {
-					{
-						addFilter(
-							"Liferay.Vulcan",
-							SimpleBeanPropertyFilter.serializeAll());
-					}
-				});
-			setSerializationInclusion(JsonInclude.Include.NON_NULL);
-		}
-	};
-	protected static final ObjectMapper outputObjectMapper =
-		new ObjectMapper() {
-			{
-				addMixIn(Document.class, DocumentMixin.class);
-				setFilterProvider(
-					new SimpleFilterProvider() {
-						{
-							addFilter(
-								"Liferay.Vulcan",
-								SimpleBeanPropertyFilter.serializeAll());
-						}
-					});
-			}
-		};
-
 	protected Group irrelevantGroup;
 	protected String testContentType = "application/json";
 	protected Group testGroup;
 	protected Locale testLocale;
 	protected String testUserNameAndPassword = "test@liferay.com:test";
-
-	protected static class DocumentMixin {
-
-		public static enum ViewableBy {
-		}
-
-		@JsonProperty
-		AdaptedImage[] adaptedImages;
-		@JsonProperty
-		AggregateRating aggregateRating;
-		@JsonProperty
-		String contentUrl;
-		@JsonProperty
-		Creator creator;
-		@JsonProperty
-		Date dateCreated;
-		@JsonProperty
-		Date dateModified;
-		@JsonProperty
-		String description;
-		@JsonProperty
-		Long documentFolderId;
-		@JsonProperty
-		String encodingFormat;
-		@JsonProperty
-		String fileExtension;
-		@JsonProperty
-		Long id;
-		@JsonProperty
-		String[] keywords;
-		@JsonProperty
-		Number numberOfComments;
-		@JsonProperty
-		Number sizeInBytes;
-		@JsonProperty
-		TaxonomyCategory[] taxonomyCategories;
-		@JsonProperty
-		Long[] taxonomyCategoryIds;
-		@JsonProperty
-		String title;
-		@JsonProperty
-		ViewableBy viewableBy;
-
-	}
-
-	protected static class Page<T> {
-
-		public Collection<T> getItems() {
-			return new ArrayList<>(items);
-		}
-
-		public long getLastPage() {
-			return lastPage;
-		}
-
-		public long getPage() {
-			return page;
-		}
-
-		public long getPageSize() {
-			return pageSize;
-		}
-
-		public long getTotalCount() {
-			return totalCount;
-		}
-
-		@JsonProperty
-		protected Collection<T> items;
-
-		@JsonProperty
-		protected long lastPage;
-
-		@JsonProperty
-		protected long page;
-
-		@JsonProperty
-		protected long pageSize;
-
-		@JsonProperty
-		protected long totalCount;
-
-	}
 
 	private Http.Options _createHttpOptions() {
 		Http.Options options = new Http.Options();
@@ -2119,6 +2094,41 @@ public abstract class BaseDocumentResourceTestCase {
 		options.addHeader("Content-Type", testContentType);
 
 		return options;
+	}
+
+	private String _toJSON(Map<String, String> map) {
+		if (map == null) {
+			return "null";
+		}
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("{");
+
+		Set<Map.Entry<String, String>> set = map.entrySet();
+
+		Iterator<Map.Entry<String, String>> iterator = set.iterator();
+
+		while (iterator.hasNext()) {
+			Map.Entry<String, String> entry = iterator.next();
+
+			sb.append("\"" + entry.getKey() + "\": ");
+
+			if (entry.getValue() == null) {
+				sb.append("null");
+			}
+			else {
+				sb.append("\"" + entry.getValue() + "\"");
+			}
+
+			if (iterator.hasNext()) {
+				sb.append(", ");
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
 	}
 
 	private String _toPath(String template, Object... values) {

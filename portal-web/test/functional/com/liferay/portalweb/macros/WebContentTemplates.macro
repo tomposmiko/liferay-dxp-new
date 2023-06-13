@@ -115,7 +115,7 @@ definition {
 			templateLanguage = "${templateLanguage}",
 			templateName = "${templateName}",
 			templateScript = "${templateScript}",
-			templateSmallImageURL = "${templateSmallImageURL}"
+			imageSourceURL = "${imageSourceURL}"
 		);
 
 		DDLDataDefinition.save();
@@ -184,27 +184,6 @@ definition {
 		);
 	}
 
-	@summary = "Input a small image with the url '${templateSmallImageURL}'"
-	macro inputSmallImage {
-		if (isSet(templateSmallImageURL)) {
-			if (IsElementNotPresent(locator1 = "DDMEditTemplate#DETAILS_SMALL_IMAGE_URL")) {
-				Check(locator1 = "DDMEditTemplate#DETAILS_SMALL_IMAGE");
-			}
-			else {
-				Click(locator1 = "DDMEditTemplate#DETAILS_SMALL_IMAGE");
-
-				Check(locator1 = "DDMEditTemplate#DETAILS_SMALL_IMAGE");
-			}
-		}
-
-		Check(locator1 = "DDMEditTemplate#DETAILS_SMALL_IMAGE_URL");
-
-		Type(
-			locator1 = "DDMEditTemplate#DETAILS_SMALL_IMAGE_URL_INPUT",
-			value1 = "${templateSmallImageURL}"
-		);
-	}
-
 	@summary = "Input most basic fields inside a template"
 	macro inputTemplateAddScreenFields {
 		if (isSet(templateName)) {
@@ -223,21 +202,25 @@ definition {
 			templateLanguage = "${templateLanguage}"
 		);
 
-		if (isSet(templateSmallImageURL)) {
-			WebContentTemplates.inputSmallImage(
-				templateSmallImageURL = "${templateSmallImageURL}"
+		if (isSet(imageSourceURL)) {
+			WebContent.addFeaturedImageFromURL(
+				imageSourceURL = "${imageSourceURL}"
 			);
 		}
 
 		WebContentTemplates._inputScript(templateScript = "${templateScript}");
 
-		WebContentTemplates._addFields(templateFieldNames = "${templateFieldNames}");
+		if (("${templateLanguage}" == "ftl") || ("${templateLanguage}" =="vm")) {
+			WebContentTemplates._addFields(templateFieldNames = "${templateFieldNames}");
+		}
 
 		WebContentTemplates._inputTemplateFile(templateFile = "${templateFile}");
 	}
 
 	@summary = "Add localization for the template name"
 	macro localizeTemplateName {
+		LexiconEntry.changeDisplayStyle(displayStyle = "table");
+
 		var key_ddlTemplateName = "${templateName}";
 
 		WebContentNavigator.gotoViewTemplate(templateName = "${templateName}");
@@ -257,7 +240,10 @@ definition {
 
 	@summary = "Modify template"
 	macro modifyTemplate {
-		LexiconEntry.gotoEllipsisMenuItem(menuItem = "Edit");
+		LexiconCard.clickEllipsisItem(
+			card = "${templatePreviousName}",
+			item = "Edit"
+		);
 
 		WebContentTemplates.inputTemplateAddScreenFields(
 			templateDescription = "${templateDescription}",
@@ -266,7 +252,7 @@ definition {
 			templateLanguage = "${templateLanguage}",
 			templateName = "${templateName}",
 			templateScript = "${templateScript}",
-			templateSmallImageURL = "${templateSmallImageURL}"
+			imageSourceURL = "${imageSourceURL}"
 		);
 
 		DDLDataDefinition.save();
@@ -420,6 +406,8 @@ definition {
 			);
 		}
 		else {
+			var key_ddlTemplateDescription = "${templateDescription}";
+
 			AssertTextEquals(
 				locator1 = "DDMSelectTemplate#TEMPLATE_TABLE_DESCRIPTION",
 				value1 = "${templateDescription}"

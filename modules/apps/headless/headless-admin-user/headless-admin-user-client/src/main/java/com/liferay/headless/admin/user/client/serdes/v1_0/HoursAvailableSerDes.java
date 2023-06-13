@@ -17,7 +17,8 @@ package com.liferay.headless.admin.user.client.serdes.v1_0;
 import com.liferay.headless.admin.user.client.dto.v1_0.HoursAvailable;
 import com.liferay.headless.admin.user.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -45,53 +46,63 @@ public class HoursAvailableSerDes {
 
 	public static String toJSON(HoursAvailable hoursAvailable) {
 		if (hoursAvailable == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"closes\": ");
+		if (hoursAvailable.getCloses() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (hoursAvailable.getCloses() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"closes\":");
+
+			sb.append("\"");
+
 			sb.append(hoursAvailable.getCloses());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (hoursAvailable.getDayOfWeek() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dayOfWeek\": ");
+			sb.append("\"dayOfWeek\":");
 
-		if (hoursAvailable.getDayOfWeek() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(hoursAvailable.getDayOfWeek());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (hoursAvailable.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\":");
 
-		if (hoursAvailable.getId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(hoursAvailable.getId());
 		}
 
-		sb.append(", ");
+		if (hoursAvailable.getOpens() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"opens\": ");
+			sb.append("\"opens\":");
 
-		if (hoursAvailable.getOpens() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(hoursAvailable.getOpens());
+
+			sb.append("\"");
 		}
 
 		sb.append("}");
@@ -99,39 +110,58 @@ public class HoursAvailableSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<HoursAvailable> hoursAvailables) {
-		if (hoursAvailables == null) {
-			return "[]";
+	public static Map<String, String> toMap(HoursAvailable hoursAvailable) {
+		if (hoursAvailable == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (HoursAvailable hoursAvailable : hoursAvailables) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(hoursAvailable));
+		if (hoursAvailable.getCloses() == null) {
+			map.put("closes", null);
+		}
+		else {
+			map.put("closes", String.valueOf(hoursAvailable.getCloses()));
 		}
 
-		sb.append("]");
+		if (hoursAvailable.getDayOfWeek() == null) {
+			map.put("dayOfWeek", null);
+		}
+		else {
+			map.put("dayOfWeek", String.valueOf(hoursAvailable.getDayOfWeek()));
+		}
 
-		return sb.toString();
+		if (hoursAvailable.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(hoursAvailable.getId()));
+		}
+
+		if (hoursAvailable.getOpens() == null) {
+			map.put("opens", null);
+		}
+		else {
+			map.put("opens", String.valueOf(hoursAvailable.getOpens()));
+		}
+
+		return map;
 	}
 
 	private static class HoursAvailableJSONParser
 		extends BaseJSONParser<HoursAvailable> {
 
+		@Override
 		protected HoursAvailable createDTO() {
 			return new HoursAvailable();
 		}
 
+		@Override
 		protected HoursAvailable[] createDTOArray(int size) {
 			return new HoursAvailable[size];
 		}
 
+		@Override
 		protected void setField(
 			HoursAvailable hoursAvailable, String jsonParserFieldName,
 			Object jsonParserFieldValue) {

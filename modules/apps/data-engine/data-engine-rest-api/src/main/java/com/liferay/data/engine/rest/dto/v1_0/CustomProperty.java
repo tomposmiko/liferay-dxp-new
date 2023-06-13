@@ -125,7 +125,9 @@ public class CustomProperty {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(key);
+			sb.append("\"");
 		}
 
 		sb.append(", ");

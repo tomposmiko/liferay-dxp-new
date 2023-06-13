@@ -17,7 +17,8 @@ package com.liferay.headless.admin.user.client.serdes.v1_0;
 import com.liferay.headless.admin.user.client.dto.v1_0.SegmentUser;
 import com.liferay.headless.admin.user.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -45,42 +46,49 @@ public class SegmentUserSerDes {
 
 	public static String toJSON(SegmentUser segmentUser) {
 		if (segmentUser == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"email\": ");
+		if (segmentUser.getEmailAddress() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (segmentUser.getEmail() == null) {
-			sb.append("null");
+			sb.append("\"emailAddress\":");
+
+			sb.append("\"");
+
+			sb.append(segmentUser.getEmailAddress());
+
+			sb.append("\"");
 		}
-		else {
-			sb.append(segmentUser.getEmail());
-		}
 
-		sb.append(", ");
+		if (segmentUser.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\":");
 
-		if (segmentUser.getId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(segmentUser.getId());
 		}
 
-		sb.append(", ");
+		if (segmentUser.getName() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"name\": ");
+			sb.append("\"name\":");
 
-		if (segmentUser.getName() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(segmentUser.getName());
+
+			sb.append("\"");
 		}
 
 		sb.append("}");
@@ -88,46 +96,59 @@ public class SegmentUserSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<SegmentUser> segmentUsers) {
-		if (segmentUsers == null) {
-			return "[]";
+	public static Map<String, String> toMap(SegmentUser segmentUser) {
+		if (segmentUser == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (SegmentUser segmentUser : segmentUsers) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(segmentUser));
+		if (segmentUser.getEmailAddress() == null) {
+			map.put("emailAddress", null);
+		}
+		else {
+			map.put(
+				"emailAddress", String.valueOf(segmentUser.getEmailAddress()));
 		}
 
-		sb.append("]");
+		if (segmentUser.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(segmentUser.getId()));
+		}
 
-		return sb.toString();
+		if (segmentUser.getName() == null) {
+			map.put("name", null);
+		}
+		else {
+			map.put("name", String.valueOf(segmentUser.getName()));
+		}
+
+		return map;
 	}
 
 	private static class SegmentUserJSONParser
 		extends BaseJSONParser<SegmentUser> {
 
+		@Override
 		protected SegmentUser createDTO() {
 			return new SegmentUser();
 		}
 
+		@Override
 		protected SegmentUser[] createDTOArray(int size) {
 			return new SegmentUser[size];
 		}
 
+		@Override
 		protected void setField(
 			SegmentUser segmentUser, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
 
-			if (Objects.equals(jsonParserFieldName, "email")) {
+			if (Objects.equals(jsonParserFieldName, "emailAddress")) {
 				if (jsonParserFieldValue != null) {
-					segmentUser.setEmail((String)jsonParserFieldValue);
+					segmentUser.setEmailAddress((String)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "id")) {

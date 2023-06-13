@@ -24,6 +24,8 @@ import com.liferay.petra.string.StringBundler;
 import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -40,20 +42,21 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "SegmentUser")
 public class SegmentUser {
 
-	public String getEmail() {
-		return email;
+	@Schema(description = "The email address of the segment user")
+	public String getEmailAddress() {
+		return emailAddress;
 	}
 
-	public void setEmail(String email) {
-		this.email = email;
+	public void setEmailAddress(String emailAddress) {
+		this.emailAddress = emailAddress;
 	}
 
 	@JsonIgnore
-	public void setEmail(
-		UnsafeSupplier<String, Exception> emailUnsafeSupplier) {
+	public void setEmailAddress(
+		UnsafeSupplier<String, Exception> emailAddressUnsafeSupplier) {
 
 		try {
-			email = emailUnsafeSupplier.get();
+			emailAddress = emailAddressUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -65,8 +68,9 @@ public class SegmentUser {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected String email;
+	protected String emailAddress;
 
+	@Schema(description = "The internal ID of the segment user")
 	public Long getId() {
 		return id;
 	}
@@ -92,6 +96,7 @@ public class SegmentUser {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
+	@Schema(description = "The full name of the segment user")
 	public String getName() {
 		return name;
 	}
@@ -144,13 +149,15 @@ public class SegmentUser {
 
 		sb.append("{");
 
-		sb.append("\"email\": ");
+		sb.append("\"emailAddress\": ");
 
-		if (email == null) {
+		if (emailAddress == null) {
 			sb.append("null");
 		}
 		else {
-			sb.append(email);
+			sb.append("\"");
+			sb.append(emailAddress);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -172,7 +179,9 @@ public class SegmentUser {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(name);
+			sb.append("\"");
 		}
 
 		sb.append("}");

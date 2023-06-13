@@ -43,6 +43,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "UserAccount")
 public class UserAccount {
 
+	@Schema(description = "An additional name, can be used for a middle name.")
 	public String getAdditionalName() {
 		return additionalName;
 	}
@@ -70,6 +71,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String additionalName;
 
+	@Schema(description = "An alias or screen name for the UserAcount.")
 	public String getAlternateName() {
 		return alternateName;
 	}
@@ -97,6 +99,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String alternateName;
 
+	@Schema(description = "The date of birth, in ISO 8601 format.")
 	public Date getBirthDate() {
 		return birthDate;
 	}
@@ -153,6 +156,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected ContactInformation contactInformation;
 
+	@Schema(description = "A relative URL to the dashboard of the UserAccount.")
 	public String getDashboardURL() {
 		return dashboardURL;
 	}
@@ -180,6 +184,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String dashboardURL;
 
+	@Schema(description = "The creation date of the UserAccount.")
 	public Date getDateCreated() {
 		return dateCreated;
 	}
@@ -207,6 +212,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
+	@Schema(description = "The last time a field of the UserAccount changed.")
 	public Date getDateModified() {
 		return dateModified;
 	}
@@ -234,20 +240,21 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateModified;
 
-	public String getEmail() {
-		return email;
+	@Schema(description = "The main email address of the UserAccount.")
+	public String getEmailAddress() {
+		return emailAddress;
 	}
 
-	public void setEmail(String email) {
-		this.email = email;
+	public void setEmailAddress(String emailAddress) {
+		this.emailAddress = emailAddress;
 	}
 
 	@JsonIgnore
-	public void setEmail(
-		UnsafeSupplier<String, Exception> emailUnsafeSupplier) {
+	public void setEmailAddress(
+		UnsafeSupplier<String, Exception> emailAddressUnsafeSupplier) {
 
 		try {
-			email = emailUnsafeSupplier.get();
+			emailAddress = emailAddressUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -259,8 +266,9 @@ public class UserAccount {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected String email;
+	protected String emailAddress;
 
+	@Schema(description = "In the US, the surname of the UserAccount.")
 	public String getFamilyName() {
 		return familyName;
 	}
@@ -288,6 +296,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String familyName;
 
+	@Schema(description = "In the US, the first name of the UserAccount.")
 	public String getGivenName() {
 		return givenName;
 	}
@@ -315,6 +324,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String givenName;
 
+	@Schema(description = "The UserAccount title (dr, mr, mrs, ms...)")
 	public String getHonorificPrefix() {
 		return honorificPrefix;
 	}
@@ -342,6 +352,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String honorificPrefix;
 
+	@Schema(description = "The UserAccount honorific suffix (ii, jr, phd...)")
 	public String getHonorificSuffix() {
 		return honorificSuffix;
 	}
@@ -369,6 +380,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String honorificSuffix;
 
+	@Schema(description = "The identifier of the resource.")
 	public Long getId() {
 		return id;
 	}
@@ -394,6 +406,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
+	@Schema(description = "A relative URL to profile image.")
 	public String getImage() {
 		return image;
 	}
@@ -421,6 +434,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String image;
 
+	@Schema(description = "The UserAccount job title.")
 	public String getJobTitle() {
 		return jobTitle;
 	}
@@ -448,6 +462,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String jobTitle;
 
+	@Schema(description = "A list of keywords describing the UserAccount.")
 	public String[] getKeywords() {
 		return keywords;
 	}
@@ -475,6 +490,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String[] keywords;
 
+	@Schema(description = "The full name of the UserAccount.")
 	public String getName() {
 		return name;
 	}
@@ -500,6 +516,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String name;
 
+	@Schema(description = "A list of Organizations the UserAccount belongs to.")
 	public OrganizationBrief[] getOrganizationBriefs() {
 		return organizationBriefs;
 	}
@@ -528,6 +545,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected OrganizationBrief[] organizationBriefs;
 
+	@Schema(description = "A relative URL to the profile of the UserAccount.")
 	public String getProfileURL() {
 		return profileURL;
 	}
@@ -555,6 +573,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String profileURL;
 
+	@Schema(description = "A list of Roles the UserAccount has.")
 	public RoleBrief[] getRoleBriefs() {
 		return roleBriefs;
 	}
@@ -582,6 +601,7 @@ public class UserAccount {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected RoleBrief[] roleBriefs;
 
+	@Schema(description = "A list of sites the UserAccount belongs to.")
 	public SiteBrief[] getSiteBriefs() {
 		return siteBriefs;
 	}
@@ -642,7 +662,9 @@ public class UserAccount {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(additionalName);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -653,7 +675,9 @@ public class UserAccount {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(alternateName);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -664,7 +688,9 @@ public class UserAccount {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(birthDate);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -686,7 +712,9 @@ public class UserAccount {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(dashboardURL);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -697,7 +725,9 @@ public class UserAccount {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(dateCreated);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -708,18 +738,22 @@ public class UserAccount {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(dateModified);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
 
-		sb.append("\"email\": ");
+		sb.append("\"emailAddress\": ");
 
-		if (email == null) {
+		if (emailAddress == null) {
 			sb.append("null");
 		}
 		else {
-			sb.append(email);
+			sb.append("\"");
+			sb.append(emailAddress);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -730,7 +764,9 @@ public class UserAccount {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(familyName);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -741,7 +777,9 @@ public class UserAccount {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(givenName);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -752,7 +790,9 @@ public class UserAccount {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(honorificPrefix);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -763,7 +803,9 @@ public class UserAccount {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(honorificSuffix);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -785,7 +827,9 @@ public class UserAccount {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(image);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -796,7 +840,9 @@ public class UserAccount {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(jobTitle);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -830,7 +876,9 @@ public class UserAccount {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(name);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -862,7 +910,9 @@ public class UserAccount {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(profileURL);
+			sb.append("\"");
 		}
 
 		sb.append(", ");

@@ -17,7 +17,8 @@ package com.liferay.headless.form.client.serdes.v1_0;
 import com.liferay.headless.form.client.dto.v1_0.FormRecordForm;
 import com.liferay.headless.form.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -45,31 +46,35 @@ public class FormRecordFormSerDes {
 
 	public static String toJSON(FormRecordForm formRecordForm) {
 		if (formRecordForm == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"draft\": ");
+		if (formRecordForm.getDraft() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (formRecordForm.getDraft() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"draft\":");
+
 			sb.append(formRecordForm.getDraft());
 		}
 
-		sb.append(", ");
+		if (formRecordForm.getFieldValues() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"fieldValues\": ");
+			sb.append("\"fieldValues\":");
 
-		if (formRecordForm.getFieldValues() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(formRecordForm.getFieldValues());
+
+			sb.append("\"");
 		}
 
 		sb.append("}");
@@ -77,39 +82,45 @@ public class FormRecordFormSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<FormRecordForm> formRecordForms) {
-		if (formRecordForms == null) {
-			return "[]";
+	public static Map<String, String> toMap(FormRecordForm formRecordForm) {
+		if (formRecordForm == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (FormRecordForm formRecordForm : formRecordForms) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(formRecordForm));
+		if (formRecordForm.getDraft() == null) {
+			map.put("draft", null);
+		}
+		else {
+			map.put("draft", String.valueOf(formRecordForm.getDraft()));
 		}
 
-		sb.append("]");
+		if (formRecordForm.getFieldValues() == null) {
+			map.put("fieldValues", null);
+		}
+		else {
+			map.put(
+				"fieldValues", String.valueOf(formRecordForm.getFieldValues()));
+		}
 
-		return sb.toString();
+		return map;
 	}
 
 	private static class FormRecordFormJSONParser
 		extends BaseJSONParser<FormRecordForm> {
 
+		@Override
 		protected FormRecordForm createDTO() {
 			return new FormRecordForm();
 		}
 
+		@Override
 		protected FormRecordForm[] createDTOArray(int size) {
 			return new FormRecordForm[size];
 		}
 
+		@Override
 		protected void setField(
 			FormRecordForm formRecordForm, String jsonParserFieldName,
 			Object jsonParserFieldValue) {

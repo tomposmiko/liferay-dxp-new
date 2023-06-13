@@ -16,6 +16,7 @@ package com.liferay.layout.content.page.editor.web.internal.display.context;
 
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
+import com.liferay.fragment.constants.FragmentActionKeys;
 import com.liferay.fragment.constants.FragmentConstants;
 import com.liferay.fragment.constants.FragmentEntryLinkConstants;
 import com.liferay.fragment.contributor.FragmentCollectionContributor;
@@ -24,7 +25,9 @@ import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.renderer.DefaultFragmentRendererContext;
+import com.liferay.fragment.renderer.FragmentRenderer;
 import com.liferay.fragment.renderer.FragmentRendererController;
+import com.liferay.fragment.renderer.FragmentRendererTracker;
 import com.liferay.fragment.service.FragmentCollectionServiceUtil;
 import com.liferay.fragment.service.FragmentEntryLinkLocalServiceUtil;
 import com.liferay.fragment.service.FragmentEntryServiceUtil;
@@ -144,6 +147,9 @@ public class ContentPageEditorDisplayContext {
 			(FragmentCollectionContributorTracker)request.getAttribute(
 				ContentPageEditorWebKeys.
 					FRAGMENT_COLLECTION_CONTRIBUTOR_TRACKER);
+		_fragmentRendererTracker =
+			(FragmentRendererTracker)request.getAttribute(
+				FragmentActionKeys.FRAGMENT_RENDERER_TRACKER);
 		_itemSelector = (ItemSelector)request.getAttribute(
 			ContentPageEditorWebKeys.ITEM_SELECTOR);
 	}
@@ -545,7 +551,8 @@ public class ContentPageEditorDisplayContext {
 	}
 
 	private SoyContext _getFragmentEntrySoyContext(
-		FragmentEntry fragmentEntry, String content) {
+		FragmentEntryLink fragmentEntryLink, FragmentEntry fragmentEntry,
+		String content) {
 
 		if (fragmentEntry != null) {
 			SoyContext soyContext = SoyContextFactoryUtil.createSoyContext();
@@ -557,6 +564,23 @@ public class ContentPageEditorDisplayContext {
 			);
 
 			return soyContext;
+		}
+
+		String rendererKey = fragmentEntryLink.getRendererKey();
+
+		if (Validator.isNotNull(rendererKey)) {
+			SoyContext soyContext = _getSoyContextContributedFragment(
+				rendererKey);
+
+			if (!soyContext.isEmpty()) {
+				return soyContext;
+			}
+
+			soyContext = _getSoyContextDynamicFragment(fragmentEntryLink);
+
+			if (!soyContext.isEmpty()) {
+				return soyContext;
+			}
 		}
 
 		SoyContext soyContext = SoyContextFactoryUtil.createSoyContext();
@@ -845,6 +869,27 @@ public class ContentPageEditorDisplayContext {
 		return _redirect;
 	}
 
+	private SoyContext _getSoyContextContributedFragment(String rendererKey) {
+		SoyContext soyContext = SoyContextFactoryUtil.createSoyContext();
+
+		Map<String, FragmentEntry> fragmentCollectionContributorEntries =
+			_fragmentCollectionContributorTracker.
+				getFragmentCollectionContributorEntries();
+
+		FragmentEntry contributedFragmentEntry =
+			fragmentCollectionContributorEntries.get(rendererKey);
+
+		if (contributedFragmentEntry != null) {
+			soyContext.put(
+				"fragmentEntryId", 0
+			).put(
+				"name", contributedFragmentEntry.getName()
+			);
+		}
+
+		return soyContext;
+	}
+
 	private List<SoyContext> _getSoyContextContributedFragmentCollections(
 		int type) {
 
@@ -882,6 +927,77 @@ public class ContentPageEditorDisplayContext {
 		return soyContexts;
 	}
 
+	private SoyContext _getSoyContextDynamicFragment(
+		FragmentEntryLink fragmentEntryLink) {
+
+		SoyContext soyContext = SoyContextFactoryUtil.createSoyContext();
+
+		FragmentRenderer fragmentRenderer =
+			_fragmentRendererTracker.getFragmentRenderer(
+				fragmentEntryLink.getRendererKey());
+
+		if (fragmentRenderer != null) {
+			DefaultFragmentRendererContext fragmentRendererContext =
+				new DefaultFragmentRendererContext(fragmentEntryLink);
+
+			fragmentRendererContext.setLocale(themeDisplay.getLocale());
+
+			soyContext.put(
+				"fragmentEntryId", 0
+			).put(
+				"name", fragmentRenderer.getLabel(fragmentRendererContext)
+			);
+		}
+
+		return soyContext;
+	}
+
+	private SoyContext _getSoyContextDynamicFragments(int type) {
+		SoyContext soyContext = SoyContextFactoryUtil.createSoyContext();
+
+		List<SoyContext> soyContextDynamicFragments = new ArrayList<>();
+
+		List<FragmentRenderer> fragmentRenderers =
+			_fragmentRendererTracker.getFragmentRenderers(type);
+
+		for (FragmentRenderer fragmentRenderer : fragmentRenderers) {
+			if (!fragmentRenderer.isSelectable()) {
+				continue;
+			}
+
+			SoyContext soyContextDynamicFragment =
+				SoyContextFactoryUtil.createSoyContext();
+
+			soyContextDynamicFragment.put(
+				"fragmentEntryKey", fragmentRenderer.getKey()
+			).put(
+				"imagePreviewURL",
+				fragmentRenderer.getImagePreviewURL(null, request)
+			).put(
+				"name", fragmentRenderer.getLabel(null)
+			);
+
+			soyContextDynamicFragments.add(soyContextDynamicFragment);
+		}
+
+		if (soyContextDynamicFragments.isEmpty()) {
+			return soyContext;
+		}
+
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			"content.Language", themeDisplay.getLocale(), getClass());
+
+		soyContext.put(
+			"fragmentCollectionId", "dynamic-collection"
+		).put(
+			"fragmentEntries", soyContextDynamicFragments
+		).put(
+			"name", LanguageUtil.get(resourceBundle, "dynamic-collection")
+		);
+
+		return soyContext;
+	}
+
 	private List<SoyContext> _getSoyContextFragmentCollections(int type) {
 		List<SoyContext> soyContexts =
 			_getSoyContextContributedFragmentCollections(type);
@@ -912,6 +1028,13 @@ public class ContentPageEditorDisplayContext {
 			);
 
 			soyContexts.add(soyContext);
+		}
+
+		SoyContext soyContextDynamicFragments = _getSoyContextDynamicFragments(
+			type);
+
+		if (!soyContextDynamicFragments.isEmpty()) {
+			soyContexts.add(_getSoyContextDynamicFragments(type));
 		}
 
 		return soyContexts;
@@ -984,7 +1107,8 @@ public class ContentPageEditorDisplayContext {
 					"fragmentEntryLinkId",
 					String.valueOf(fragmentEntryLink.getFragmentEntryLinkId())
 				).putAll(
-					_getFragmentEntrySoyContext(fragmentEntry, content)
+					_getFragmentEntrySoyContext(
+						fragmentEntryLink, fragmentEntry, content)
 				);
 
 				soyContexts.put(
@@ -1111,6 +1235,7 @@ public class ContentPageEditorDisplayContext {
 	private final FragmentCollectionContributorTracker
 		_fragmentCollectionContributorTracker;
 	private final FragmentRendererController _fragmentRendererController;
+	private final FragmentRendererTracker _fragmentRendererTracker;
 	private Long _groupId;
 	private ItemSelectorCriterion _imageItemSelectorCriterion;
 	private final ItemSelector _itemSelector;

@@ -18,11 +18,10 @@ import com.liferay.headless.admin.workflow.client.dto.v1_0.WorkflowTaskAssignToU
 import com.liferay.headless.admin.workflow.client.json.BaseJSONParser;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import java.util.Collection;
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -52,42 +51,54 @@ public class WorkflowTaskAssignToUserSerDes {
 		WorkflowTaskAssignToUser workflowTaskAssignToUser) {
 
 		if (workflowTaskAssignToUser == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"assigneeId\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (workflowTaskAssignToUser.getAssigneeId() == null) {
-			sb.append("null");
-		}
-		else {
+		if (workflowTaskAssignToUser.getAssigneeId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"assigneeId\":");
+
 			sb.append(workflowTaskAssignToUser.getAssigneeId());
 		}
 
-		sb.append(", ");
+		if (workflowTaskAssignToUser.getComment() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"comment\": ");
+			sb.append("\"comment\":");
 
-		if (workflowTaskAssignToUser.getComment() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(workflowTaskAssignToUser.getComment());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (workflowTaskAssignToUser.getDueDate() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dueDate\": ");
+			sb.append("\"dueDate\":");
 
-		if (workflowTaskAssignToUser.getDueDate() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(workflowTaskAssignToUser.getDueDate());
+			sb.append("\"");
+
+			sb.append(
+				liferayToJSONDateFormat.format(
+					workflowTaskAssignToUser.getDueDate()));
+
+			sb.append("\"");
 		}
 
 		sb.append("}");
@@ -95,43 +106,58 @@ public class WorkflowTaskAssignToUserSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(
-		Collection<WorkflowTaskAssignToUser> workflowTaskAssignToUsers) {
+	public static Map<String, String> toMap(
+		WorkflowTaskAssignToUser workflowTaskAssignToUser) {
 
-		if (workflowTaskAssignToUsers == null) {
-			return "[]";
+		if (workflowTaskAssignToUser == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		for (WorkflowTaskAssignToUser workflowTaskAssignToUser :
-				workflowTaskAssignToUsers) {
-
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(workflowTaskAssignToUser));
+		if (workflowTaskAssignToUser.getAssigneeId() == null) {
+			map.put("assigneeId", null);
+		}
+		else {
+			map.put(
+				"assigneeId",
+				String.valueOf(workflowTaskAssignToUser.getAssigneeId()));
 		}
 
-		sb.append("]");
+		if (workflowTaskAssignToUser.getComment() == null) {
+			map.put("comment", null);
+		}
+		else {
+			map.put(
+				"comment",
+				String.valueOf(workflowTaskAssignToUser.getComment()));
+		}
 
-		return sb.toString();
+		map.put(
+			"dueDate",
+			liferayToJSONDateFormat.format(
+				workflowTaskAssignToUser.getDueDate()));
+
+		return map;
 	}
 
 	private static class WorkflowTaskAssignToUserJSONParser
 		extends BaseJSONParser<WorkflowTaskAssignToUser> {
 
+		@Override
 		protected WorkflowTaskAssignToUser createDTO() {
 			return new WorkflowTaskAssignToUser();
 		}
 
+		@Override
 		protected WorkflowTaskAssignToUser[] createDTOArray(int size) {
 			return new WorkflowTaskAssignToUser[size];
 		}
 
+		@Override
 		protected void setField(
 			WorkflowTaskAssignToUser workflowTaskAssignToUser,
 			String jsonParserFieldName, Object jsonParserFieldValue) {
@@ -151,24 +177,12 @@ public class WorkflowTaskAssignToUserSerDes {
 			else if (Objects.equals(jsonParserFieldName, "dueDate")) {
 				if (jsonParserFieldValue != null) {
 					workflowTaskAssignToUser.setDueDate(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else {
 				throw new IllegalArgumentException(
 					"Unsupported field name " + jsonParserFieldName);
-			}
-		}
-
-		private Date _toDate(String string) {
-			try {
-				DateFormat dateFormat = new SimpleDateFormat(
-					"yyyy-MM-dd'T'HH:mm:ss'Z'");
-
-				return dateFormat.parse(string);
-			}
-			catch (ParseException pe) {
-				throw new IllegalArgumentException("Unable to parse " + string);
 			}
 		}
 

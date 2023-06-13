@@ -18,11 +18,10 @@ import com.liferay.headless.delivery.client.dto.v1_0.Rating;
 import com.liferay.headless.delivery.client.json.BaseJSONParser;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import java.util.Collection;
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -48,85 +47,91 @@ public class RatingSerDes {
 
 	public static String toJSON(Rating rating) {
 		if (rating == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"bestRating\": ");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		if (rating.getBestRating() == null) {
-			sb.append("null");
-		}
-		else {
+		if (rating.getBestRating() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"bestRating\":");
+
 			sb.append(rating.getBestRating());
 		}
 
-		sb.append(", ");
+		if (rating.getCreator() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"creator\": ");
+			sb.append("\"creator\":");
 
-		if (rating.getCreator() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(rating.getCreator());
-		}
-
-		sb.append(", ");
-
-		sb.append("\"dateCreated\": ");
-
-		if (rating.getDateCreated() == null) {
-			sb.append("null");
-		}
-		else {
-			sb.append(rating.getDateCreated());
+			sb.append(CreatorSerDes.toJSON(rating.getCreator()));
 		}
 
-		sb.append(", ");
+		if (rating.getDateCreated() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"dateModified\": ");
+			sb.append("\"dateCreated\":");
 
-		if (rating.getDateModified() == null) {
-			sb.append("null");
+			sb.append("\"");
+
+			sb.append(liferayToJSONDateFormat.format(rating.getDateCreated()));
+
+			sb.append("\"");
 		}
-		else {
-			sb.append(rating.getDateModified());
+
+		if (rating.getDateModified() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"dateModified\":");
+
+			sb.append("\"");
+
+			sb.append(liferayToJSONDateFormat.format(rating.getDateModified()));
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (rating.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"id\": ");
+			sb.append("\"id\":");
 
-		if (rating.getId() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(rating.getId());
 		}
 
-		sb.append(", ");
+		if (rating.getRatingValue() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"ratingValue\": ");
+			sb.append("\"ratingValue\":");
 
-		if (rating.getRatingValue() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(rating.getRatingValue());
 		}
 
-		sb.append(", ");
+		if (rating.getWorstRating() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"worstRating\": ");
+			sb.append("\"worstRating\":");
 
-		if (rating.getWorstRating() == null) {
-			sb.append("null");
-		}
-		else {
 			sb.append(rating.getWorstRating());
 		}
 
@@ -135,45 +140,82 @@ public class RatingSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<Rating> ratings) {
-		if (ratings == null) {
-			return "[]";
+	public static Map<String, String> toMap(Rating rating) {
+		if (rating == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
+		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
+			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-		for (Rating rating : ratings) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(rating));
+		if (rating.getBestRating() == null) {
+			map.put("bestRating", null);
+		}
+		else {
+			map.put("bestRating", String.valueOf(rating.getBestRating()));
 		}
 
-		sb.append("]");
+		if (rating.getCreator() == null) {
+			map.put("creator", null);
+		}
+		else {
+			map.put("creator", CreatorSerDes.toJSON(rating.getCreator()));
+		}
 
-		return sb.toString();
+		map.put(
+			"dateCreated",
+			liferayToJSONDateFormat.format(rating.getDateCreated()));
+
+		map.put(
+			"dateModified",
+			liferayToJSONDateFormat.format(rating.getDateModified()));
+
+		if (rating.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(rating.getId()));
+		}
+
+		if (rating.getRatingValue() == null) {
+			map.put("ratingValue", null);
+		}
+		else {
+			map.put("ratingValue", String.valueOf(rating.getRatingValue()));
+		}
+
+		if (rating.getWorstRating() == null) {
+			map.put("worstRating", null);
+		}
+		else {
+			map.put("worstRating", String.valueOf(rating.getWorstRating()));
+		}
+
+		return map;
 	}
 
 	private static class RatingJSONParser extends BaseJSONParser<Rating> {
 
+		@Override
 		protected Rating createDTO() {
 			return new Rating();
 		}
 
+		@Override
 		protected Rating[] createDTOArray(int size) {
 			return new Rating[size];
 		}
 
+		@Override
 		protected void setField(
 			Rating rating, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
 
 			if (Objects.equals(jsonParserFieldName, "bestRating")) {
 				if (jsonParserFieldValue != null) {
-					rating.setBestRating((Number)jsonParserFieldValue);
+					rating.setBestRating((Double)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "creator")) {
@@ -184,14 +226,13 @@ public class RatingSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "dateCreated")) {
 				if (jsonParserFieldValue != null) {
-					rating.setDateCreated(
-						_toDate((String)jsonParserFieldValue));
+					rating.setDateCreated(toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "dateModified")) {
 				if (jsonParserFieldValue != null) {
 					rating.setDateModified(
-						_toDate((String)jsonParserFieldValue));
+						toDate((String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "id")) {
@@ -201,29 +242,17 @@ public class RatingSerDes {
 			}
 			else if (Objects.equals(jsonParserFieldName, "ratingValue")) {
 				if (jsonParserFieldValue != null) {
-					rating.setRatingValue((Number)jsonParserFieldValue);
+					rating.setRatingValue((Double)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "worstRating")) {
 				if (jsonParserFieldValue != null) {
-					rating.setWorstRating((Number)jsonParserFieldValue);
+					rating.setWorstRating((Double)jsonParserFieldValue);
 				}
 			}
 			else {
 				throw new IllegalArgumentException(
 					"Unsupported field name " + jsonParserFieldName);
-			}
-		}
-
-		private Date _toDate(String string) {
-			try {
-				DateFormat dateFormat = new SimpleDateFormat(
-					"yyyy-MM-dd'T'HH:mm:ss'Z'");
-
-				return dateFormat.parse(string);
-			}
-			catch (ParseException pe) {
-				throw new IllegalArgumentException("Unable to parse " + string);
 			}
 		}
 

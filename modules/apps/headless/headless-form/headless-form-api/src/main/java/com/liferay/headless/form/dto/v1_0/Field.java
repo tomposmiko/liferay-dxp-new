@@ -783,7 +783,9 @@ public class Field {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(dataSourceType);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -794,7 +796,9 @@ public class Field {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(dataType);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -805,7 +809,9 @@ public class Field {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(displayStyle);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -871,7 +877,9 @@ public class Field {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(inputControl);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -882,7 +890,9 @@ public class Field {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(label);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -915,7 +925,9 @@ public class Field {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(name);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -947,7 +959,9 @@ public class Field {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(placeholder);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -958,7 +972,9 @@ public class Field {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(predefinedValue);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -1024,7 +1040,9 @@ public class Field {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(style);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -1035,7 +1053,9 @@ public class Field {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(text);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -1046,7 +1066,9 @@ public class Field {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(tooltip);
+			sb.append("\"");
 		}
 
 		sb.append(", ");

@@ -17,7 +17,8 @@ package com.liferay.headless.form.client.serdes.v1_0;
 import com.liferay.headless.form.client.dto.v1_0.Column;
 import com.liferay.headless.form.client.json.BaseJSONParser;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -43,42 +44,49 @@ public class ColumnSerDes {
 
 	public static String toJSON(Column column) {
 		if (column == null) {
-			return "{}";
+			return "null";
 		}
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("{");
 
-		sb.append("\"id\": ");
+		if (column.getId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		if (column.getId() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"id\":");
+
 			sb.append(column.getId());
 		}
 
-		sb.append(", ");
+		if (column.getLabel() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"label\": ");
+			sb.append("\"label\":");
 
-		if (column.getLabel() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(column.getLabel());
+
+			sb.append("\"");
 		}
 
-		sb.append(", ");
+		if (column.getValue() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
 
-		sb.append("\"value\": ");
+			sb.append("\"value\":");
 
-		if (column.getValue() == null) {
-			sb.append("null");
-		}
-		else {
+			sb.append("\"");
+
 			sb.append(column.getValue());
+
+			sb.append("\"");
 		}
 
 		sb.append("}");
@@ -86,38 +94,50 @@ public class ColumnSerDes {
 		return sb.toString();
 	}
 
-	public static String toJSON(Collection<Column> columns) {
-		if (columns == null) {
-			return "[]";
+	public static Map<String, String> toMap(Column column) {
+		if (column == null) {
+			return null;
 		}
 
-		StringBuilder sb = new StringBuilder();
+		Map<String, String> map = new HashMap<>();
 
-		sb.append("[");
-
-		for (Column column : columns) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append(toJSON(column));
+		if (column.getId() == null) {
+			map.put("id", null);
+		}
+		else {
+			map.put("id", String.valueOf(column.getId()));
 		}
 
-		sb.append("]");
+		if (column.getLabel() == null) {
+			map.put("label", null);
+		}
+		else {
+			map.put("label", String.valueOf(column.getLabel()));
+		}
 
-		return sb.toString();
+		if (column.getValue() == null) {
+			map.put("value", null);
+		}
+		else {
+			map.put("value", String.valueOf(column.getValue()));
+		}
+
+		return map;
 	}
 
 	private static class ColumnJSONParser extends BaseJSONParser<Column> {
 
+		@Override
 		protected Column createDTO() {
 			return new Column();
 		}
 
+		@Override
 		protected Column[] createDTOArray(int size) {
 			return new Column[size];
 		}
 
+		@Override
 		protected void setField(
 			Column column, String jsonParserFieldName,
 			Object jsonParserFieldValue) {

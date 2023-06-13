@@ -7,8 +7,8 @@
 	},
 	"name": "document-library-preview-audio",
 	"scripts": {
-		"build": "liferay-npm-scripts build --soy --bundler",
-		"csf": "liferay-npm-scripts lint",
+		"build": "liferay-npm-scripts build",
+		"checkFormat": "liferay-npm-scripts lint",
 		"format": "liferay-npm-scripts format"
 	},
 	"version": "1.0.0"

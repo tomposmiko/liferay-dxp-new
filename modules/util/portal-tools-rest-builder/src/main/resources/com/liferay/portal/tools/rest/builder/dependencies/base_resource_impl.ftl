@@ -70,6 +70,7 @@ public abstract class Base${schemaName}ResourceImpl implements ${schemaName}Reso
 				Response.ResponseBuilder responseBuilder = Response.ok();
 
 				return responseBuilder.build();
+			<#elseif stringUtil.equals(javaMethodSignature.returnType, "void")>
 			<#elseif javaMethodSignature.returnType?contains("Page<")>
 				return Page.of(Collections.emptyList());
 			<#elseif freeMarkerTool.hasHTTPMethod(javaMethodSignature, "patch") && !javaMethodSignature.operation.requestBody.content?keys?seq_contains("multipart/form-data")>
@@ -90,7 +91,7 @@ public abstract class Base${schemaName}ResourceImpl implements ${schemaName}Reso
 				preparePatch(${schemaVarName}, existing${schemaName});
 
 				return put${schemaName}(${firstJavaMethodParameter.parameterName}, existing${schemaName});
-			<#elseif !stringUtil.equals(javaMethodSignature.returnType, "void")>
+			<#else>
 				return new ${javaMethodSignature.returnType}();
 			</#if>
 		}

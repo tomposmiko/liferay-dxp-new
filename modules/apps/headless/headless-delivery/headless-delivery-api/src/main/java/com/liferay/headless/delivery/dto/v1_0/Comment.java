@@ -24,6 +24,8 @@ import com.liferay.petra.string.StringBundler;
 import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.Date;
 import java.util.Objects;
 
@@ -41,6 +43,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "Comment")
 public class Comment {
 
+	@Schema(description = "The creator of the Comment")
 	public Creator getCreator() {
 		return creator;
 	}
@@ -68,6 +71,7 @@ public class Comment {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator creator;
 
+	@Schema(description = "The creation date of the Comment.")
 	public Date getDateCreated() {
 		return dateCreated;
 	}
@@ -95,6 +99,7 @@ public class Comment {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
+	@Schema(description = "The last time a field of the Comment changed.")
 	public Date getDateModified() {
 		return dateModified;
 	}
@@ -122,6 +127,7 @@ public class Comment {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateModified;
 
+	@Schema(description = "The identifier of the resource.")
 	public Long getId() {
 		return id;
 	}
@@ -147,17 +153,20 @@ public class Comment {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
-	public Number getNumberOfComments() {
+	@Schema(
+		description = "The number of child comments associated with this Comment."
+	)
+	public Integer getNumberOfComments() {
 		return numberOfComments;
 	}
 
-	public void setNumberOfComments(Number numberOfComments) {
+	public void setNumberOfComments(Integer numberOfComments) {
 		this.numberOfComments = numberOfComments;
 	}
 
 	@JsonIgnore
 	public void setNumberOfComments(
-		UnsafeSupplier<Number, Exception> numberOfCommentsUnsafeSupplier) {
+		UnsafeSupplier<Integer, Exception> numberOfCommentsUnsafeSupplier) {
 
 		try {
 			numberOfComments = numberOfCommentsUnsafeSupplier.get();
@@ -172,8 +181,9 @@ public class Comment {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected Number numberOfComments;
+	protected Integer numberOfComments;
 
+	@Schema(description = "The content of the Comment.")
 	public String getText() {
 		return text;
 	}
@@ -243,7 +253,9 @@ public class Comment {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(dateCreated);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -254,7 +266,9 @@ public class Comment {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(dateModified);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -287,7 +301,9 @@ public class Comment {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(text);
+			sb.append("\"");
 		}
 
 		sb.append("}");

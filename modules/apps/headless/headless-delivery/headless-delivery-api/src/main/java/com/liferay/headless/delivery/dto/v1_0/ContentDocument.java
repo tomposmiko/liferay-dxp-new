@@ -24,6 +24,8 @@ import com.liferay.petra.string.StringBundler;
 import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.util.Objects;
 
 import javax.annotation.Generated;
@@ -40,6 +42,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "ContentDocument")
 public class ContentDocument {
 
+	@Schema(description = "An absolute URL to the binary file.")
 	public String getContentUrl() {
 		return contentUrl;
 	}
@@ -67,6 +70,7 @@ public class ContentDocument {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String contentUrl;
 
+	@Schema(description = "The description of the file.")
 	public String getDescription() {
 		return description;
 	}
@@ -94,6 +98,9 @@ public class ContentDocument {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String description;
 
+	@Schema(
+		description = "The content type (application/pdf) of the binary file."
+	)
 	public String getEncodingFormat() {
 		return encodingFormat;
 	}
@@ -121,6 +128,7 @@ public class ContentDocument {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String encodingFormat;
 
+	@Schema(description = "The file extension.")
 	public String getFileExtension() {
 		return fileExtension;
 	}
@@ -148,6 +156,7 @@ public class ContentDocument {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String fileExtension;
 
+	@Schema(description = "The identifier of the resource.")
 	public Long getId() {
 		return id;
 	}
@@ -173,17 +182,18 @@ public class ContentDocument {
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long id;
 
-	public Number getSizeInBytes() {
+	@Schema(description = "The size in bytes of the ContentDocument.")
+	public Long getSizeInBytes() {
 		return sizeInBytes;
 	}
 
-	public void setSizeInBytes(Number sizeInBytes) {
+	public void setSizeInBytes(Long sizeInBytes) {
 		this.sizeInBytes = sizeInBytes;
 	}
 
 	@JsonIgnore
 	public void setSizeInBytes(
-		UnsafeSupplier<Number, Exception> sizeInBytesUnsafeSupplier) {
+		UnsafeSupplier<Long, Exception> sizeInBytesUnsafeSupplier) {
 
 		try {
 			sizeInBytes = sizeInBytesUnsafeSupplier.get();
@@ -198,8 +208,9 @@ public class ContentDocument {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected Number sizeInBytes;
+	protected Long sizeInBytes;
 
+	@Schema(description = "The text describing the ContentDocument.")
 	public String getTitle() {
 		return title;
 	}
@@ -260,7 +271,9 @@ public class ContentDocument {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(contentUrl);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -271,7 +284,9 @@ public class ContentDocument {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(description);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -282,7 +297,9 @@ public class ContentDocument {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(encodingFormat);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -293,7 +310,9 @@ public class ContentDocument {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(fileExtension);
+			sb.append("\"");
 		}
 
 		sb.append(", ");
@@ -326,7 +345,9 @@ public class ContentDocument {
 			sb.append("null");
 		}
 		else {
+			sb.append("\"");
 			sb.append(title);
+			sb.append("\"");
 		}
 
 		sb.append("}");
