@@ -28,7 +28,6 @@ import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
 import com.liferay.petra.io.unsync.UnsyncStringWriter;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.petra.string.StringUtil;
 import com.liferay.portal.kernel.cache.MultiVMPool;
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -241,16 +240,13 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 		FragmentEntryLink fragmentEntryLink = _getFragmentEntryLink(
 			fragmentRendererContext);
 
-		StringBundler cacheKeySB = new StringBundler(5);
+		StringBundler portalCacheKeySB = new StringBundler(5);
 
-		cacheKeySB.append(fragmentEntryLink.getFragmentEntryLinkId());
-		cacheKeySB.append(StringPool.DASH);
-		cacheKeySB.append(fragmentRendererContext.getLocale());
-		cacheKeySB.append(StringPool.DASH);
-		cacheKeySB.append(
-			StringUtil.merge(
-				fragmentRendererContext.getSegmentsEntryIds(),
-				StringPool.SEMICOLON));
+		portalCacheKeySB.append(fragmentEntryLink.getFragmentEntryLinkId());
+		portalCacheKeySB.append(StringPool.DASH);
+		portalCacheKeySB.append(fragmentRendererContext.getLocale());
+		portalCacheKeySB.append(StringPool.DASH);
+		portalCacheKeySB.append(fragmentEntryLink.getSegmentsExperienceId());
 
 		String content = StringPool.BLANK;
 
@@ -261,7 +257,7 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 			fragmentRendererContext.isUseCachedContent() &&
 			_isCacheable(fragmentEntryLink)) {
 
-			content = portalCache.get(cacheKeySB.toString());
+			content = portalCache.get(portalCacheKeySB.toString());
 
 			if (Validator.isNotNull(content)) {
 				return content;
@@ -343,7 +339,7 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 				FragmentEntryLinkConstants.VIEW) &&
 			_isCacheable(fragmentEntryLink)) {
 
-			portalCache.put(cacheKeySB.toString(), content);
+			portalCache.put(portalCacheKeySB.toString(), content);
 		}
 
 		return content;
