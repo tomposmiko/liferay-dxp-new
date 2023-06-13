@@ -24,12 +24,12 @@ import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
-import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerTracker;
+import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
 import com.liferay.object.scope.ObjectScopeProvider;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
-import com.liferay.object.system.SystemObjectDefinitionMetadataTracker;
+import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -84,7 +84,7 @@ public class AddObjectEntryObjectActionExecutorImpl
 		User user = _userLocalService.getUser(userId);
 
 		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerTracker.getObjectEntryManager(
+			_objectEntryManagerRegistry.getObjectEntryManager(
 				targetObjectDefinition.getStorageType());
 
 		ObjectEntry objectEntry = objectEntryManager.addObjectEntry(
@@ -205,7 +205,7 @@ public class AddObjectEntryObjectActionExecutorImpl
 
 		Map<String, Object> variables = ObjectActionVariablesUtil.toVariables(
 			_dtoConverterRegistry, objectDefinition, payloadJSONObject,
-			_systemObjectDefinitionMetadataTracker);
+			_systemObjectDefinitionMetadataRegistry);
 
 		JSONArray jsonArray = _jsonFactory.createJSONArray(
 			parametersUnicodeProperties.get("predefinedValues"));
@@ -245,7 +245,7 @@ public class AddObjectEntryObjectActionExecutorImpl
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 
 	@Reference
-	private ObjectEntryManagerTracker _objectEntryManagerTracker;
+	private ObjectEntryManagerRegistry _objectEntryManagerRegistry;
 
 	@Reference
 	private ObjectRelationshipLocalService _objectRelationshipLocalService;
@@ -254,8 +254,8 @@ public class AddObjectEntryObjectActionExecutorImpl
 	private ObjectScopeProviderRegistry _objectScopeProviderRegistry;
 
 	@Reference
-	private SystemObjectDefinitionMetadataTracker
-		_systemObjectDefinitionMetadataTracker;
+	private SystemObjectDefinitionMetadataRegistry
+		_systemObjectDefinitionMetadataRegistry;
 
 	@Reference
 	private UserLocalService _userLocalService;

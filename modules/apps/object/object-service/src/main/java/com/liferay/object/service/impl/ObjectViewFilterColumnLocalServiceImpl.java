@@ -18,7 +18,7 @@ import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.exception.ObjectViewFilterColumnException;
 import com.liferay.object.field.filter.parser.ObjectFieldFilterContext;
 import com.liferay.object.field.filter.parser.ObjectFieldFilterContributor;
-import com.liferay.object.field.filter.parser.ObjectFieldFilterContributorTracker;
+import com.liferay.object.field.filter.parser.ObjectFieldFilterContributorRegistry;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectView;
 import com.liferay.object.model.ObjectViewFilterColumn;
@@ -30,10 +30,7 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Collections;
@@ -138,19 +135,6 @@ public class ObjectViewFilterColumnLocalServiceImpl
 						"\" is not filterable"));
 			}
 
-			if (!GetterUtil.getBoolean(
-					PropsUtil.get("feature.flag.LPS-152650")) &&
-				StringUtil.equals(
-					objectField.getBusinessType(),
-					ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP)) {
-
-				throw new ObjectViewFilterColumnException(
-					StringBundler.concat(
-						"Object field name \"",
-						objectViewFilterColumn.getObjectFieldName(),
-						"\" is not filterable"));
-			}
-
 			if (Validator.isNull(objectViewFilterColumn.getFilterType()) &&
 				Validator.isNull(objectViewFilterColumn.getJSON())) {
 
@@ -170,7 +154,7 @@ public class ObjectViewFilterColumnLocalServiceImpl
 			}
 
 			ObjectFieldFilterContributor objectFieldFilterContributor =
-				_objectFieldFilterContributorTracker.
+				_objectFieldFilterContributorRegistry.
 					getObjectFieldFilterContributor(
 						new ObjectFieldFilterContext(
 							null, objectField.getObjectDefinitionId(),
@@ -191,8 +175,8 @@ public class ObjectViewFilterColumnLocalServiceImpl
 			SetUtil.fromArray("status", "createDate", "modifiedDate"));
 
 	@Reference
-	private ObjectFieldFilterContributorTracker
-		_objectFieldFilterContributorTracker;
+	private ObjectFieldFilterContributorRegistry
+		_objectFieldFilterContributorRegistry;
 
 	@Reference
 	private ObjectFieldPersistence _objectFieldPersistence;

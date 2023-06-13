@@ -26,6 +26,7 @@ import com.liferay.list.type.model.ListTypeEntry;
 import com.liferay.list.type.service.ListTypeDefinitionLocalService;
 import com.liferay.list.type.service.ListTypeEntryLocalService;
 import com.liferay.object.constants.ObjectDefinitionConstants;
+import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectFilterConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.field.builder.AggregationObjectFieldBuilder;
@@ -38,6 +39,7 @@ import com.liferay.object.field.builder.PicklistObjectFieldBuilder;
 import com.liferay.object.field.builder.PrecisionDecimalObjectFieldBuilder;
 import com.liferay.object.field.builder.RichTextObjectFieldBuilder;
 import com.liferay.object.field.builder.TextObjectFieldBuilder;
+import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectFieldSetting;
@@ -82,12 +84,10 @@ import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
-import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
@@ -155,11 +155,6 @@ public class DefaultObjectEntryManagerImplTest {
 			PermissionCheckerFactoryUtil.create(_user));
 
 		PrincipalThreadLocal.setName(_user.getUserId());
-
-		PropsUtil.addProperties(
-			UnicodePropertiesBuilder.setProperty(
-				"feature.flag.LPS-152650", "true"
-			).build());
 	}
 
 	@AfterClass
@@ -167,11 +162,6 @@ public class DefaultObjectEntryManagerImplTest {
 		PermissionThreadLocal.setPermissionChecker(_originalPermissionChecker);
 
 		PrincipalThreadLocal.setName(_originalName);
-
-		PropsUtil.addProperties(
-			UnicodePropertiesBuilder.setProperty(
-				"feature.flag.LPS-152650", "false"
-			).build());
 	}
 
 	@Before
@@ -192,7 +182,7 @@ public class DefaultObjectEntryManagerImplTest {
 
 		_listTypeDefinition =
 			_listTypeDefinitionLocalService.addListTypeDefinition(
-				_user.getUserId(),
+				null, _user.getUserId(),
 				Collections.singletonMap(
 					LocaleUtil.US, RandomTestUtil.randomString()));
 
@@ -310,6 +300,14 @@ public class DefaultObjectEntryManagerImplTest {
 			"MIN", "longIntegerObjectFieldName", objectRelationship.getName());
 		_addAggregationObjectField(
 			"SUM", "decimalObjectFieldName", objectRelationship.getName());
+
+		ObjectField objectField = _objectFieldLocalService.getObjectField(
+			objectRelationship.getObjectFieldId2());
+
+		_objectRelationshipERCFieldName = ObjectFieldSettingUtil.getValue(
+			ObjectFieldSettingConstants.NAME_OBJECT_RELATIONSHIP_ERC_FIELD_NAME,
+			objectField);
+		_objectRelationshipFieldName = objectField.getName();
 	}
 
 	@Test
@@ -319,6 +317,8 @@ public class DefaultObjectEntryManagerImplTest {
 			new ObjectEntry() {
 				{
 					properties = HashMapBuilder.<String, Object>put(
+						"externalReferenceCode", "newExternalReferenceCode"
+					).put(
 						"textObjectFieldName", RandomTestUtil.randomString()
 					).build();
 				}
@@ -330,6 +330,8 @@ public class DefaultObjectEntryManagerImplTest {
 		ObjectEntry childObjectEntry1 = new ObjectEntry() {
 			{
 				properties = HashMapBuilder.<String, Object>put(
+					_objectRelationshipERCFieldName, "newExternalReferenceCode"
+				).put(
 					"attachmentObjectFieldName",
 					_getAttachmentObjectFieldValue()
 				).put(
@@ -345,10 +347,6 @@ public class DefaultObjectEntryManagerImplTest {
 				).put(
 					"precisionDecimalObjectFieldName",
 					new BigDecimal(0.1234567891234567, MathContext.DECIMAL64)
-				).put(
-					"r_oneToManyRelationshipName_" +
-						_objectDefinition1.getPKObjectFieldName(),
-					parentObjectEntry1.getId()
 				).put(
 					"richTextObjectFieldName",
 					StringBundler.concat(
@@ -396,19 +394,18 @@ public class DefaultObjectEntryManagerImplTest {
 			new ObjectEntry() {
 				{
 					properties = HashMapBuilder.<String, Object>put(
+						_objectRelationshipERCFieldName,
+						"newExternalReferenceCode"
+					).put(
 						"dateObjectFieldName", "2020-01-02"
 					).put(
 						"decimalObjectFieldName", 15.7
 					).put(
-						"picklistObjectFieldName", _addListTypeEntry()
-					).put(
-						"r_oneToManyRelationshipName_" +
-							_objectDefinition1.getPKObjectFieldName(),
-						parentObjectEntry1.getId()
-					).put(
 						"integerObjectFieldName", 15
 					).put(
 						"longIntegerObjectFieldName", 100L
+					).put(
+						"picklistObjectFieldName", _addListTypeEntry()
 					).put(
 						"precisionDecimalObjectFieldName",
 						new BigDecimal(
@@ -531,9 +528,6 @@ public class DefaultObjectEntryManagerImplTest {
 	public void testGetObjectEntries() throws Exception {
 		_testGetObjectEntries(Collections.emptyMap());
 
-		String oneToManyRelationshipFieldName =
-			"r_oneToManyRelationshipName_" +
-				_objectDefinition1.getPKObjectFieldName();
 		String picklistObjectFieldValue1 = _addListTypeEntry();
 
 		ObjectEntry parentObjectEntry1 = _objectEntryManager.addObjectEntry(
@@ -552,8 +546,7 @@ public class DefaultObjectEntryManagerImplTest {
 			new ObjectEntry() {
 				{
 					properties = HashMapBuilder.<String, Object>put(
-						oneToManyRelationshipFieldName,
-						parentObjectEntry1.getId()
+						_objectRelationshipFieldName, parentObjectEntry1.getId()
 					).put(
 						"picklistObjectFieldName", picklistObjectFieldValue1
 					).put(
@@ -581,8 +574,7 @@ public class DefaultObjectEntryManagerImplTest {
 			new ObjectEntry() {
 				{
 					properties = HashMapBuilder.<String, Object>put(
-						oneToManyRelationshipFieldName,
-						parentObjectEntry2.getId()
+						_objectRelationshipFieldName, parentObjectEntry2.getId()
 					).put(
 						"picklistObjectFieldName", picklistObjectFieldValue2
 					).put(
@@ -592,22 +584,44 @@ public class DefaultObjectEntryManagerImplTest {
 			},
 			ObjectDefinitionConstants.SCOPE_COMPANY);
 
+		// Equals expression
+
 		_testGetObjectEntries(
 			HashMapBuilder.put(
 				"filter",
-				_buildRangeExpression(
-					childObjectEntry1.getDateCreated(), new Date(),
-					"dateCreated")
+				_buildEqualsExpressionFilterString(
+					"picklistObjectFieldName", picklistObjectFieldValue1)
+			).put(
+				"search", "aa"
 			).build(),
-			childObjectEntry1, childObjectEntry2);
+			childObjectEntry1);
 		_testGetObjectEntries(
 			HashMapBuilder.put(
 				"filter",
-				_buildRangeExpression(
-					childObjectEntry1.getDateModified(), new Date(),
-					"dateModified")
+				_buildEqualsExpressionFilterString(
+					"picklistObjectFieldName", picklistObjectFieldValue2)
+			).put(
+				"search", "aa"
 			).build(),
-			childObjectEntry1, childObjectEntry2);
+			childObjectEntry2);
+		_testGetObjectEntries(
+			HashMapBuilder.put(
+				"filter",
+				_buildEqualsExpressionFilterString(
+					_objectRelationshipERCFieldName,
+					parentObjectEntry1.getExternalReferenceCode())
+			).build(),
+			childObjectEntry1);
+		_testGetObjectEntries(
+			HashMapBuilder.put(
+				"filter",
+				_buildEqualsExpressionFilterString(
+					_objectRelationshipERCFieldName,
+					parentObjectEntry2.getExternalReferenceCode())
+			).build(),
+			childObjectEntry2);
+
+		// In expression
 
 		_testGetObjectEntries(
 			HashMapBuilder.put(
@@ -640,6 +654,43 @@ public class DefaultObjectEntryManagerImplTest {
 		_testGetObjectEntries(
 			HashMapBuilder.put(
 				"filter",
+				_buildInExpressionFilterString(
+					_objectRelationshipERCFieldName, true,
+					parentObjectEntry1.getExternalReferenceCode())
+			).build(),
+			childObjectEntry1);
+		_testGetObjectEntries(
+			HashMapBuilder.put(
+				"filter",
+				_buildInExpressionFilterString(
+					_objectRelationshipERCFieldName, false,
+					parentObjectEntry1.getExternalReferenceCode())
+			).build(),
+			childObjectEntry2);
+		_testGetObjectEntries(
+			HashMapBuilder.put(
+				"filter",
+				_buildInExpressionFilterString(
+					_objectRelationshipFieldName.substring(
+						_objectRelationshipFieldName.lastIndexOf("_") + 1),
+					true, parentObjectEntry1.getId())
+			).build(),
+			childObjectEntry1);
+		_testGetObjectEntries(
+			HashMapBuilder.put(
+				"filter",
+				_buildInExpressionFilterString(
+					_objectRelationshipFieldName.substring(
+						_objectRelationshipFieldName.lastIndexOf("_") + 1),
+					false, parentObjectEntry1.getId())
+			).build(),
+			childObjectEntry2);
+
+		// Lambda expression
+
+		_testGetObjectEntries(
+			HashMapBuilder.put(
+				"filter",
 				_buildLambdaExpressionFilterString(
 					"status", true, WorkflowConstants.STATUS_APPROVED)
 			).build(),
@@ -650,42 +701,26 @@ public class DefaultObjectEntryManagerImplTest {
 				_buildLambdaExpressionFilterString(
 					"status", false, WorkflowConstants.STATUS_APPROVED)
 			).build());
+
+		// Range expression
+
 		_testGetObjectEntries(
 			HashMapBuilder.put(
 				"filter",
-				_buildInExpressionFilterString(
-					oneToManyRelationshipFieldName.substring(
-						oneToManyRelationshipFieldName.lastIndexOf("_") + 1),
-					true, parentObjectEntry1.getId())
+				_buildRangeExpression(
+					childObjectEntry1.getDateCreated(), new Date(),
+					"dateCreated")
 			).build(),
-			childObjectEntry1);
+			childObjectEntry1, childObjectEntry2);
 		_testGetObjectEntries(
 			HashMapBuilder.put(
 				"filter",
-				_buildInExpressionFilterString(
-					oneToManyRelationshipFieldName.substring(
-						oneToManyRelationshipFieldName.lastIndexOf("_") + 1),
-					false, parentObjectEntry1.getId())
+				_buildRangeExpression(
+					childObjectEntry1.getDateModified(), new Date(),
+					"dateModified")
 			).build(),
-			childObjectEntry2);
-		_testGetObjectEntries(
-			HashMapBuilder.put(
-				"filter",
-				_buildEqualsExpressionFilterString(
-					"picklistObjectFieldName", picklistObjectFieldValue1)
-			).put(
-				"search", "aa"
-			).build(),
-			childObjectEntry1);
-		_testGetObjectEntries(
-			HashMapBuilder.put(
-				"filter",
-				_buildEqualsExpressionFilterString(
-					"picklistObjectFieldName", picklistObjectFieldValue2)
-			).put(
-				"search", "aa"
-			).build(),
-			childObjectEntry2);
+			childObjectEntry1, childObjectEntry2);
+
 		_testGetObjectEntries(
 			HashMapBuilder.put(
 				"search", String.valueOf(childObjectEntry1.getId())
@@ -841,6 +876,11 @@ public class DefaultObjectEntryManagerImplTest {
 
 		Map<String, Object> actualObjectEntryProperties =
 			actualObjectEntry.getProperties();
+
+		Assert.assertFalse(
+			actualObjectEntryProperties.containsKey(
+				_objectRelationshipFieldName));
+
 		Map<String, Object> expectedObjectEntryProperties =
 			expectedObjectEntry.getProperties();
 
@@ -930,8 +970,7 @@ public class DefaultObjectEntryManagerImplTest {
 			}
 			else if (Objects.equals(
 						expectedEntry.getKey(),
-						"r_oneToManyRelationshipName_" +
-							_objectDefinition1.getPKObjectFieldName())) {
+						_objectRelationshipERCFieldName)) {
 
 				Assert.assertEquals(
 					expectedEntry.getValue(),
@@ -939,11 +978,13 @@ public class DefaultObjectEntryManagerImplTest {
 
 				_assertEquals(
 					_objectEntryManager.getObjectEntry(
-						_simpleDTOConverterContext, _objectDefinition1,
-						GetterUtil.getLong(expectedEntry.getValue())),
+						_simpleDTOConverterContext,
+						GetterUtil.getString(expectedEntry.getValue()),
+						_objectDefinition1.getCompanyId(), _objectDefinition1,
+						null),
 					(ObjectEntry)actualObjectEntryProperties.get(
 						StringUtil.replaceLast(
-							String.valueOf(expectedEntry.getKey()), "Id",
+							_objectRelationshipFieldName, "Id",
 							StringPool.BLANK)));
 			}
 			else {
@@ -1180,6 +1221,9 @@ public class DefaultObjectEntryManagerImplTest {
 
 	@Inject
 	private ObjectFilterLocalService _objectFilterLocalService;
+
+	private String _objectRelationshipERCFieldName;
+	private String _objectRelationshipFieldName;
 
 	@Inject
 	private ObjectRelationshipLocalService _objectRelationshipLocalService;

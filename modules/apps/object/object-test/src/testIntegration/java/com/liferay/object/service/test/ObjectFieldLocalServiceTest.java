@@ -32,6 +32,7 @@ import com.liferay.object.exception.ObjectFieldSettingNameException;
 import com.liferay.object.exception.ObjectFieldSettingValueException;
 import com.liferay.object.exception.RequiredObjectFieldException;
 import com.liferay.object.field.builder.ObjectFieldBuilder;
+import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
@@ -45,7 +46,6 @@ import com.liferay.object.service.ObjectFieldSettingLocalServiceUtil;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.test.util.ObjectDefinitionTestUtil;
 import com.liferay.object.util.LocalizedMapUtil;
-import com.liferay.object.util.ObjectFieldUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.db.DBInspector;
@@ -66,8 +66,10 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
+import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.util.PropsUtil;
 
 import java.io.Serializable;
 
@@ -79,6 +81,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -100,9 +103,16 @@ public class ObjectFieldLocalServiceTest {
 
 	@Before
 	public void setUp() throws Exception {
+		PropsUtil.addProperties(
+			UnicodePropertiesBuilder.setProperty(
+				"feature.flag.LPS-164278", "true"
+			).setProperty(
+				"feature.flag.LPS-158776", "true"
+			).build());
+
 		_listTypeDefinition =
 			_listTypeDefinitionLocalService.addListTypeDefinition(
-				TestPropsValues.getUserId(),
+				null, TestPropsValues.getUserId(),
 				LocalizedMapUtil.getLocalizedMap(
 					RandomTestUtil.randomString()));
 
@@ -112,6 +122,16 @@ public class ObjectFieldLocalServiceTest {
 			TestPropsValues.getUserId(),
 			_listTypeDefinition.getListTypeDefinitionId(), _listTypeEntryKey,
 			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()));
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		PropsUtil.addProperties(
+			UnicodePropertiesBuilder.setProperty(
+				"feature.flag.LPS-164278", "false"
+			).setProperty(
+				"feature.flag.LPS-158776", "false"
+			).build());
 	}
 
 	@Test
@@ -144,7 +164,16 @@ public class ObjectFieldLocalServiceTest {
 			}
 		}
 
-		ObjectFieldBuilder objectFieldBuilder = new ObjectFieldBuilder();
+		_testAddCustomObjectField(
+			"List type definition ID is 0",
+			new ObjectFieldBuilder(
+			).businessType(
+				ObjectFieldConstants.BUSINESS_TYPE_MULTISELECT_PICKLIST
+			).labelMap(
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).name(
+				"a" + RandomTestUtil.randomString()
+			).build());
 
 		String defaultValue = RandomTestUtil.randomString();
 
@@ -153,12 +182,13 @@ public class ObjectFieldLocalServiceTest {
 				"Default value \"", defaultValue, "\" is not a list entry in ",
 				"list definition ",
 				_listTypeDefinition.getListTypeDefinitionId()),
-			objectFieldBuilder.businessType(
+			new ObjectFieldBuilder(
+			).businessType(
 				ObjectFieldConstants.BUSINESS_TYPE_PICKLIST
-			).listTypeDefinitionId(
-				_listTypeDefinition.getListTypeDefinitionId()
 			).defaultValue(
 				defaultValue
+			).listTypeDefinitionId(
+				_listTypeDefinition.getListTypeDefinitionId()
 			).build());
 
 		_testAddCustomObjectField(
@@ -166,7 +196,8 @@ public class ObjectFieldLocalServiceTest {
 				"Object field can only have a default type when the business ",
 				"type is \"", ObjectFieldConstants.BUSINESS_TYPE_PICKLIST,
 				"\""),
-			objectFieldBuilder.businessType(
+			new ObjectFieldBuilder(
+			).businessType(
 				ObjectFieldConstants.BUSINESS_TYPE_TEXT
 			).dbType(
 				ObjectFieldConstants.DB_TYPE_STRING
@@ -183,15 +214,29 @@ public class ObjectFieldLocalServiceTest {
 		_testAddCustomObjectField(
 			"Object field default value can only be set when the picklist is " +
 				"a state",
-			objectFieldBuilder.businessType(
+			new ObjectFieldBuilder(
+			).businessType(
 				ObjectFieldConstants.BUSINESS_TYPE_PICKLIST
 			).defaultValue(
 				_listTypeEntryKey
+			).listTypeDefinitionId(
+				_listTypeDefinition.getListTypeDefinitionId()
 			).build());
 
 		_testAddCustomObjectField(
 			"Object field must be required when the state is true",
-			objectFieldBuilder.state(
+			new ObjectFieldBuilder(
+			).businessType(
+				ObjectFieldConstants.BUSINESS_TYPE_PICKLIST
+			).defaultValue(
+				_listTypeEntryKey
+			).labelMap(
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString())
+			).listTypeDefinitionId(
+				_listTypeDefinition.getListTypeDefinitionId()
+			).name(
+				"a" + RandomTestUtil.randomString()
+			).state(
 				true
 			).build());
 	}
@@ -226,7 +271,6 @@ public class ObjectFieldLocalServiceTest {
 			ObjectFieldConstants.BUSINESS_TYPE_LARGE_FILE,
 			ObjectFieldConstants.BUSINESS_TYPE_LONG_INTEGER,
 			ObjectFieldConstants.BUSINESS_TYPE_LONG_TEXT,
-			ObjectFieldConstants.BUSINESS_TYPE_PICKLIST,
 			ObjectFieldConstants.BUSINESS_TYPE_PRECISION_DECIMAL,
 			ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP,
 			ObjectFieldConstants.BUSINESS_TYPE_RICH_TEXT,

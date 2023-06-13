@@ -23,11 +23,11 @@ import com.liferay.list.type.service.ListTypeDefinitionLocalService;
 import com.liferay.list.type.service.ListTypeEntryLocalService;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
+import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.util.LocalizedMapUtil;
-import com.liferay.object.util.ObjectFieldUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
@@ -91,7 +91,7 @@ public class ListTypeDefinitionLocalServiceTest {
 
 		try {
 			_listTypeDefinitionLocalService.addListTypeDefinition(
-				TestPropsValues.getUserId(),
+				null, TestPropsValues.getUserId(),
 				Collections.singletonMap(LocaleUtil.US, ""));
 
 			Assert.fail();
@@ -109,7 +109,7 @@ public class ListTypeDefinitionLocalServiceTest {
 	public void testDeleteListTypeDefinition() throws Exception {
 		ListTypeDefinition listTypeDefinition =
 			_listTypeDefinitionLocalService.addListTypeDefinition(
-				TestPropsValues.getUserId(),
+				null, TestPropsValues.getUserId(),
 				Collections.singletonMap(
 					LocaleUtil.US, RandomTestUtil.randomString()));
 
@@ -196,7 +196,7 @@ public class ListTypeDefinitionLocalServiceTest {
 
 	private ListTypeDefinition _addListTypeDefinition() throws Exception {
 		return _listTypeDefinitionLocalService.addListTypeDefinition(
-			TestPropsValues.getUserId(),
+			null, TestPropsValues.getUserId(),
 			Collections.singletonMap(
 				LocaleUtil.US, RandomTestUtil.randomString()));
 	}

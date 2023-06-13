@@ -15,12 +15,12 @@
 package com.liferay.analytics.reports.web.internal.portlet.action;
 
 import com.liferay.analytics.reports.info.item.AnalyticsReportsInfoItem;
-import com.liferay.analytics.reports.info.item.AnalyticsReportsInfoItemTracker;
+import com.liferay.analytics.reports.info.item.AnalyticsReportsInfoItemRegistry;
 import com.liferay.analytics.reports.info.item.ClassNameClassPKInfoItemIdentifier;
 import com.liferay.analytics.reports.info.item.provider.AnalyticsReportsInfoItemObjectProvider;
 import com.liferay.analytics.reports.web.internal.constants.AnalyticsReportsPortletKeys;
 import com.liferay.analytics.reports.web.internal.data.provider.AnalyticsReportsDataProvider;
-import com.liferay.analytics.reports.web.internal.info.item.provider.AnalyticsReportsInfoItemObjectProviderTracker;
+import com.liferay.analytics.reports.web.internal.info.item.provider.AnalyticsReportsInfoItemObjectProviderRegistry;
 import com.liferay.analytics.reports.web.internal.model.TimeRange;
 import com.liferay.analytics.reports.web.internal.model.TimeSpan;
 import com.liferay.analytics.reports.web.internal.util.AnalyticsReportsUtil;
@@ -111,7 +111,7 @@ public class GetDataMVCResourceCommand extends BaseMVCResourceCommand {
 				httpServletRequest);
 
 			Object analyticsReportsInfoItemObject = Optional.ofNullable(
-				_analyticsReportsInfoItemObjectProviderTracker.
+				_analyticsReportsInfoItemObjectProviderRegistry.
 					getAnalyticsReportsInfoItemObjectProvider(
 						infoItemReference.getClassName())
 			).map(
@@ -126,7 +126,7 @@ public class GetDataMVCResourceCommand extends BaseMVCResourceCommand {
 
 			AnalyticsReportsInfoItem<Object> analyticsReportsInfoItem =
 				(AnalyticsReportsInfoItem<Object>)
-					_analyticsReportsInfoItemTracker.
+					_analyticsReportsInfoItemRegistry.
 						getAnalyticsReportsInfoItem(
 							infoItemReference.getClassName());
 
@@ -611,11 +611,11 @@ public class GetDataMVCResourceCommand extends BaseMVCResourceCommand {
 		_analyticsReportsInfoItemObjectProvider;
 
 	@Reference
-	private AnalyticsReportsInfoItemObjectProviderTracker
-		_analyticsReportsInfoItemObjectProviderTracker;
+	private AnalyticsReportsInfoItemObjectProviderRegistry
+		_analyticsReportsInfoItemObjectProviderRegistry;
 
 	@Reference
-	private AnalyticsReportsInfoItemTracker _analyticsReportsInfoItemTracker;
+	private AnalyticsReportsInfoItemRegistry _analyticsReportsInfoItemRegistry;
 
 	@Reference
 	private Http _http;

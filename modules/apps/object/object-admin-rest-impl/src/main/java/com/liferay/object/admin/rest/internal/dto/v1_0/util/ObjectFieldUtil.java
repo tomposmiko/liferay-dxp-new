@@ -46,7 +46,7 @@ import java.util.Objects;
  */
 public class ObjectFieldUtil {
 
-	public static void addListTypeDefinition(
+	public static long addListTypeDefinition(
 			long companyId,
 			ListTypeDefinitionLocalService listTypeDefinitionLocalService,
 			ListTypeEntryLocalService listTypeEntryLocalService,
@@ -57,7 +57,7 @@ public class ObjectFieldUtil {
 			Validator.isNull(
 				objectField.getListTypeDefinitionExternalReferenceCode())) {
 
-			return;
+			return 0;
 		}
 
 		ListTypeDefinition listTypeDefinition =
@@ -78,6 +78,8 @@ public class ObjectFieldUtil {
 				listTypeDefinition, listTypeEntryLocalService, objectField,
 				userId);
 		}
+
+		return listTypeDefinition.getListTypeDefinitionId();
 	}
 
 	public static String getDBType(String dbType, String type) {
@@ -153,10 +155,13 @@ public class ObjectFieldUtil {
 
 		serviceBuilderObjectField.setExternalReferenceCode(
 			objectField.getExternalReferenceCode());
-		serviceBuilderObjectField.setListTypeDefinitionId(
-			getListTypeDefinitionId(
-				serviceBuilderObjectField.getCompanyId(),
-				listTypeDefinitionLocalService, objectField));
+
+		long listTypeDefinitionId = getListTypeDefinitionId(
+			serviceBuilderObjectField.getCompanyId(),
+			listTypeDefinitionLocalService, objectField);
+
+		serviceBuilderObjectField.setListTypeDefinitionId(listTypeDefinitionId);
+
 		serviceBuilderObjectField.setBusinessType(
 			objectField.getBusinessTypeAsString());
 		serviceBuilderObjectField.setDBType(
@@ -184,7 +189,8 @@ public class ObjectFieldUtil {
 				objectFieldSetting ->
 					ObjectFieldSettingUtil.toObjectFieldSetting(
 						objectField.getBusinessTypeAsString(),
-						objectFieldSetting, objectFieldSettingLocalService,
+						listTypeDefinitionId, objectFieldSetting,
+						objectFieldSettingLocalService,
 						objectFilterLocalService)));
 		serviceBuilderObjectField.setRequired(
 			GetterUtil.getBoolean(objectField.getRequired()));

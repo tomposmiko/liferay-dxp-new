@@ -51,7 +51,7 @@ import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.ObjectViewLocalService;
 import com.liferay.object.service.ObjectViewService;
 import com.liferay.object.system.SystemObjectDefinitionMetadata;
-import com.liferay.object.system.SystemObjectDefinitionMetadataTracker;
+import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
 import com.liferay.object.util.LocalizedMapUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -348,13 +348,14 @@ public class ObjectDefinitionResourceImpl
 				_objectFieldLocalService.getObjectFields(objectDefinitionId));
 
 		for (ObjectField objectField : objectDefinition.getObjectFields()) {
+			long listTypeDefinitionId = ObjectFieldUtil.getListTypeDefinitionId(
+				serviceBuilderObjectDefinition.getCompanyId(),
+				_listTypeDefinitionLocalService, objectField);
+
 			_objectFieldLocalService.updateObjectField(
 				objectField.getExternalReferenceCode(),
 				GetterUtil.getLong(objectField.getId()),
-				contextUser.getUserId(),
-				ObjectFieldUtil.getListTypeDefinitionId(
-					serviceBuilderObjectDefinition.getCompanyId(),
-					_listTypeDefinitionLocalService, objectField),
+				contextUser.getUserId(), listTypeDefinitionId,
 				objectDefinitionId, objectField.getBusinessTypeAsString(), null,
 				null, objectField.getDBTypeAsString(),
 				objectField.getDefaultValue(), objectField.getIndexed(),
@@ -370,7 +371,8 @@ public class ObjectDefinitionResourceImpl
 					objectFieldSetting ->
 						ObjectFieldSettingUtil.toObjectFieldSetting(
 							objectField.getBusinessTypeAsString(),
-							objectFieldSetting, _objectFieldSettingLocalService,
+							listTypeDefinitionId, objectFieldSetting,
+							_objectFieldSettingLocalService,
 							_objectFilterLocalService)));
 
 			serviceBuilderObjectFields.removeIf(
@@ -547,7 +549,7 @@ public class ObjectDefinitionResourceImpl
 
 		if (objectDefinition.isSystem()) {
 			SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
-				_systemObjectDefinitionMetadataTracker.
+				_systemObjectDefinitionMetadataRegistry.
 					getSystemObjectDefinitionMetadata(
 						objectDefinition.getName());
 
@@ -680,13 +682,7 @@ public class ObjectDefinitionResourceImpl
 				pluralLabel = LocalizedMapUtil.getLanguageIdMap(
 					objectDefinition.getPluralLabelMap());
 				portlet = objectDefinition.getPortlet();
-
-				if (GetterUtil.getBoolean(
-						PropsUtil.get("feature.flag.LPS-152650"))) {
-
-					restContextPath = finalRESTContextPath;
-				}
-
+				restContextPath = finalRESTContextPath;
 				scope = objectDefinition.getScope();
 				status = new Status() {
 					{
@@ -791,7 +787,7 @@ public class ObjectDefinitionResourceImpl
 	private ObjectViewService _objectViewService;
 
 	@Reference
-	private SystemObjectDefinitionMetadataTracker
-		_systemObjectDefinitionMetadataTracker;
+	private SystemObjectDefinitionMetadataRegistry
+		_systemObjectDefinitionMetadataRegistry;
 
 }

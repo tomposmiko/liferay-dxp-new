@@ -35,11 +35,14 @@ import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectFieldValidationConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
+import com.liferay.object.exception.NoSuchObjectEntryException;
 import com.liferay.object.exception.NoSuchObjectFieldException;
 import com.liferay.object.exception.ObjectDefinitionScopeException;
 import com.liferay.object.exception.ObjectEntryValuesException;
+import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
+import com.liferay.object.internal.action.util.ObjectActionThreadLocal;
 import com.liferay.object.internal.filter.parser.ObjectFilterParser;
-import com.liferay.object.internal.filter.parser.ObjectFilterParserServiceTracker;
+import com.liferay.object.internal.filter.parser.ObjectFilterParserServiceRegistry;
 import com.liferay.object.internal.petra.sql.dsl.DynamicObjectDefinitionTable;
 import com.liferay.object.internal.petra.sql.dsl.DynamicObjectRelationshipMappingTable;
 import com.liferay.object.model.ObjectDefinition;
@@ -51,6 +54,7 @@ import com.liferay.object.model.ObjectFilter;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.related.models.ObjectRelatedModelsProvider;
 import com.liferay.object.related.models.ObjectRelatedModelsProviderRegistry;
+import com.liferay.object.relationship.util.ObjectRelationshipUtil;
 import com.liferay.object.rest.petra.sql.dsl.expression.FilterPredicateFactory;
 import com.liferay.object.scope.ObjectScopeProvider;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
@@ -62,9 +66,7 @@ import com.liferay.object.service.persistence.ObjectFieldPersistence;
 import com.liferay.object.service.persistence.ObjectFieldSettingPersistence;
 import com.liferay.object.service.persistence.ObjectRelationshipPersistence;
 import com.liferay.object.system.SystemObjectDefinitionMetadata;
-import com.liferay.object.system.SystemObjectDefinitionMetadataTracker;
-import com.liferay.object.util.ObjectFieldSettingValueUtil;
-import com.liferay.object.util.ObjectRelationshipUtil;
+import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.lang.CentralizedThreadLocal;
 import com.liferay.petra.sql.dsl.Column;
@@ -90,13 +92,16 @@ import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.db.DBType;
 import com.liferay.portal.kernel.dao.jdbc.CurrentConnection;
+import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderPath;
+import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -133,9 +138,9 @@ import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Localization;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TempFileEntryUtil;
@@ -234,9 +239,7 @@ public class ObjectEntryLocalServiceImpl
 
 		ObjectEntry objectEntry = objectEntryPersistence.create(objectEntryId);
 
-		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-164801"))) {
-			_setExternalReferenceCode(objectEntry, values);
-		}
+		_setExternalReferenceCode(objectEntry, values);
 
 		objectEntry.setGroupId(groupId);
 		objectEntry.setCompanyId(user.getCompanyId());
@@ -264,6 +267,8 @@ public class ObjectEntryLocalServiceImpl
 		_startWorkflowInstance(userId, objectEntry, serviceContext);
 
 		_reindex(objectEntry);
+
+		ObjectActionThreadLocal.clearObjectActionIds();
 
 		return objectEntry;
 	}
@@ -586,10 +591,8 @@ public class ObjectEntryLocalServiceImpl
 
 		values.remove(objectDefinition.getPKObjectFieldName());
 
-		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-164801"))) {
-			_addObjectRelationshipERCFieldValue(
-				objectDefinition.getObjectDefinitionId(), values);
-		}
+		_addObjectRelationshipERCFieldValue(
+			objectDefinition.getObjectDefinitionId(), values);
 
 		return values;
 	}
@@ -677,6 +680,37 @@ public class ObjectEntryLocalServiceImpl
 
 		return objectEntryPersistence.findByERC_G_C(
 			externalReferenceCode, groupId, companyId);
+	}
+
+	@Override
+	public long getObjectEntryId(
+			String externalReferenceCode, long companyId,
+			long objectDefinitionId)
+		throws PortalException {
+
+		// TODO Temporary workaround to avoid two insert statements when adding
+		// an object entry
+
+		DynamicQuery dynamicQuery = dynamicQuery();
+
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
+				"externalReferenceCode", externalReferenceCode));
+		dynamicQuery.add(RestrictionsFactoryUtil.eq("companyId", companyId));
+		dynamicQuery.add(
+			RestrictionsFactoryUtil.eq(
+				"objectDefinitionId", objectDefinitionId));
+
+		List<Long> objectEntryIds = objectEntryPersistence.findWithDynamicQuery(
+			dynamicQuery.setProjection(
+				ProjectionFactoryUtil.property("objectEntryId")));
+
+		if (ListUtil.isEmpty(objectEntryIds)) {
+			throw new NoSuchObjectEntryException(
+				externalReferenceCode, objectDefinitionId);
+		}
+
+		return objectEntryIds.get(0);
 	}
 
 	public List<ObjectEntry> getOneToManyObjectEntries(
@@ -827,7 +861,7 @@ public class ObjectEntryLocalServiceImpl
 			_persistedModelLocalServiceRegistry.getPersistedModelLocalService(
 				objectDefinition.getClassName());
 
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+		JSONObject jsonObject = _jsonFactory.createJSONObject(
 			String.valueOf(
 				persistedModelLocalService.getPersistedModel(primaryKey)));
 
@@ -883,10 +917,8 @@ public class ObjectEntryLocalServiceImpl
 		Map<String, Serializable> values = _getValues(
 			rows.get(0), selectExpressions);
 
-		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-164801"))) {
-			_addObjectRelationshipERCFieldValue(
-				objectEntry.getObjectDefinitionId(), values);
-		}
+		_addObjectRelationshipERCFieldValue(
+			objectEntry.getObjectDefinitionId(), values);
 
 		return _putFormulaObjectFieldValues(
 			objectEntry.getObjectDefinitionId(), values);
@@ -1332,8 +1364,7 @@ public class ObjectEntryLocalServiceImpl
 	}
 
 	private void _addObjectRelationshipERCFieldValue(
-			long objectDefinitionId, Map<String, Serializable> values)
-		throws PortalException {
+		long objectDefinitionId, Map<String, Serializable> values) {
 
 		for (ObjectField objectField :
 				_objectFieldLocalService.getObjectFields(
@@ -1362,27 +1393,38 @@ public class ObjectEntryLocalServiceImpl
 					objectRelationship.getObjectDefinitionId1());
 
 			String objectRelationshipERCFieldName =
-				ObjectFieldSettingValueUtil.getObjectFieldSettingValue(
-					objectField,
+				ObjectFieldSettingUtil.getValue(
 					ObjectFieldSettingConstants.
-						NAME_OBJECT_RELATIONSHIP_ERC_FIELD_NAME);
+						NAME_OBJECT_RELATIONSHIP_ERC_FIELD_NAME,
+					objectField);
 
 			if (objectDefinition.isSystem()) {
 				SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
-					_systemObjectDefinitionMetadataTracker.
+					_systemObjectDefinitionMetadataRegistry.
 						getSystemObjectDefinitionMetadata(
 							objectDefinition.getName());
 
-				values.put(
-					objectRelationshipERCFieldName,
-					systemObjectDefinitionMetadata.getExternalReferenceCode(
-						primaryKey));
+				try {
+					values.put(
+						objectRelationshipERCFieldName,
+						systemObjectDefinitionMetadata.getExternalReferenceCode(
+							primaryKey));
+				}
+				catch (PortalException portalException) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(portalException);
+					}
+				}
 
 				continue;
 			}
 
-			ObjectEntry objectEntry = objectEntryPersistence.findByPrimaryKey(
+			ObjectEntry objectEntry = objectEntryPersistence.fetchByPrimaryKey(
 				primaryKey);
+
+			if (objectEntry == null) {
+				continue;
+			}
 
 			values.put(
 				objectRelationshipERCFieldName,
@@ -1523,7 +1565,8 @@ public class ObjectEntryLocalServiceImpl
 			if (Objects.equals(
 					objectField.getBusinessType(),
 					ObjectFieldConstants.BUSINESS_TYPE_PICKLIST) &&
-				!values.containsKey(objectField.getName())) {
+				!values.containsKey(objectField.getName()) &&
+				Validator.isNotNull(objectField.getDefaultValue())) {
 
 				values.put(
 					objectField.getName(), objectField.getDefaultValue());
@@ -2221,8 +2264,8 @@ public class ObjectEntryLocalServiceImpl
 				(List<ObjectFilter>)objectFieldSettingsValues.get("filters"),
 				objectFilter -> {
 					ObjectFilterParser objectFilterParser =
-						_objectFilterParserServiceTracker.getObjectFilterParser(
-							objectFilter.getFilterType());
+						_objectFilterParserServiceRegistry.
+							getObjectFilterParser(objectFilter.getFilterType());
 
 					return objectFilterParser.parse(objectFilter);
 				});
@@ -2327,7 +2370,7 @@ public class ObjectEntryLocalServiceImpl
 
 	private String _getValue(String valueString) {
 		try {
-			JSONArray jsonArray = JSONFactoryUtil.createJSONArray(valueString);
+			JSONArray jsonArray = _jsonFactory.createJSONArray(valueString);
 
 			return GetterUtil.getString(jsonArray.get(0));
 		}
@@ -3356,6 +3399,9 @@ public class ObjectEntryLocalServiceImpl
 	private InlineSQLHelper _inlineSQLHelper;
 
 	@Reference
+	private JSONFactory _jsonFactory;
+
+	@Reference
 	private ListTypeEntryLocalService _listTypeEntryLocalService;
 
 	@Reference
@@ -3379,7 +3425,8 @@ public class ObjectEntryLocalServiceImpl
 	private ObjectFieldSettingPersistence _objectFieldSettingPersistence;
 
 	@Reference
-	private ObjectFilterParserServiceTracker _objectFilterParserServiceTracker;
+	private ObjectFilterParserServiceRegistry
+		_objectFilterParserServiceRegistry;
 
 	@Reference
 	private ObjectRelatedModelsProviderRegistry
@@ -3411,8 +3458,8 @@ public class ObjectEntryLocalServiceImpl
 	private Sorts _sorts;
 
 	@Reference
-	private SystemObjectDefinitionMetadataTracker
-		_systemObjectDefinitionMetadataTracker;
+	private SystemObjectDefinitionMetadataRegistry
+		_systemObjectDefinitionMetadataRegistry;
 
 	@Reference
 	private UserLocalService _userLocalService;

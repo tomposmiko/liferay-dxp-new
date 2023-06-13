@@ -24,10 +24,18 @@ interface NotificationTemplate {
 	name: string;
 	objectDefinitionId: number | null;
 	recipientType: RecipientType;
+	recipients: Recipients[];
 	subject: LocalizedValue<string>;
 	to: LocalizedValue<string>;
 	type: NotificationTemplateType;
 }
+declare type Recipients = {
+	bcc: string;
+	cc: string;
+	from: string;
+	fromName: LocalizedValue<string>;
+	to: LocalizedValue<string>;
+};
 declare type ObjectRelationshipType = 'manyToMany' | 'oneToMany' | 'oneToOne';
 declare type RecipientType = 'role' | 'term' | 'user';
 declare type NotificationTemplateType = 'email' | 'userNotification';
@@ -88,6 +96,9 @@ export declare function getAllObjectDefinitions(): Promise<ObjectDefinition[]>;
 export declare function getObjectDefinitions(
 	parameters?: string
 ): Promise<ObjectDefinition[]>;
+export declare function getObjectField(
+	objectFieldId: number
+): Promise<ObjectField>;
 export declare function getObjectFields(
 	objectDefinitionId: number
 ): Promise<ObjectField[]>;

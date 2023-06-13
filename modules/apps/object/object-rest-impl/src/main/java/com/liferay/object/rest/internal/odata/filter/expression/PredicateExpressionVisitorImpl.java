@@ -16,7 +16,7 @@ package com.liferay.object.rest.internal.odata.filter.expression;
 
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
-import com.liferay.object.field.business.type.ObjectFieldBusinessTypeTracker;
+import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.petra.function.transform.TransformUtil;
@@ -31,7 +31,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
@@ -64,12 +63,12 @@ public class PredicateExpressionVisitorImpl
 
 	public PredicateExpressionVisitorImpl(
 		EntityModel entityModel, long objectDefinitionId,
-		ObjectFieldBusinessTypeTracker objectFieldBusinessTypeTracker,
+		ObjectFieldBusinessTypeRegistry objectFieldBusinessTypeRegistry,
 		ObjectFieldLocalService objectFieldLocalService) {
 
 		this(
 			entityModel, new HashMap<>(), objectDefinitionId,
-			objectFieldBusinessTypeTracker, objectFieldLocalService);
+			objectFieldBusinessTypeRegistry, objectFieldLocalService);
 	}
 
 	@Override
@@ -99,7 +98,7 @@ public class PredicateExpressionVisitorImpl
 				Collections.singletonMap(
 					lambdaFunctionExpression.getVariableName(),
 					collectionPropertyExpression.getName()),
-				_objectDefinitionId, _objectFieldBusinessTypeTracker,
+				_objectDefinitionId, _objectFieldBusinessTypeRegistry,
 				_objectFieldLocalService));
 	}
 
@@ -163,7 +162,7 @@ public class PredicateExpressionVisitorImpl
 					LiteralExpression.Type.INTEGER,
 					literalExpression.getType())) {
 
-			return GetterUtil.getInteger(literalExpression.getText());
+			return GetterUtil.getLong(literalExpression.getText());
 		}
 		else if (Objects.equals(
 					LiteralExpression.Type.NULL, literalExpression.getType())) {
@@ -252,14 +251,14 @@ public class PredicateExpressionVisitorImpl
 		EntityModel entityModel,
 		Map<String, String> lambdaVariableExpressionFieldNames,
 		long objectDefinitionId,
-		ObjectFieldBusinessTypeTracker objectFieldBusinessTypeTracker,
+		ObjectFieldBusinessTypeRegistry objectFieldBusinessTypeRegistry,
 		ObjectFieldLocalService objectFieldLocalService) {
 
 		_entityModel = entityModel;
 		_lambdaVariableExpressionFieldNames =
 			lambdaVariableExpressionFieldNames;
 		_objectDefinitionId = objectDefinitionId;
-		_objectFieldBusinessTypeTracker = objectFieldBusinessTypeTracker;
+		_objectFieldBusinessTypeRegistry = objectFieldBusinessTypeRegistry;
 		_objectFieldLocalService = objectFieldLocalService;
 	}
 
@@ -343,10 +342,6 @@ public class PredicateExpressionVisitorImpl
 	}
 
 	private Object _getValue(Object left, Object right) {
-		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-164801"))) {
-			return right;
-		}
-
 		EntityField entityField = _getEntityField(left);
 
 		String entityFieldFilterableName = entityField.getFilterableName(null);
@@ -361,7 +356,7 @@ public class PredicateExpressionVisitorImpl
 				_objectDefinitionId, entityFieldFilterableName);
 
 			ObjectFieldBusinessType objectFieldBusinessType =
-				_objectFieldBusinessTypeTracker.getObjectFieldBusinessType(
+				_objectFieldBusinessTypeRegistry.getObjectFieldBusinessType(
 					objectField.getBusinessType());
 
 			Object value = objectFieldBusinessType.getValue(
@@ -395,8 +390,8 @@ public class PredicateExpressionVisitorImpl
 	private final EntityModel _entityModel;
 	private Map<String, String> _lambdaVariableExpressionFieldNames;
 	private final long _objectDefinitionId;
-	private final ObjectFieldBusinessTypeTracker
-		_objectFieldBusinessTypeTracker;
+	private final ObjectFieldBusinessTypeRegistry
+		_objectFieldBusinessTypeRegistry;
 	private final ObjectFieldLocalService _objectFieldLocalService;
 
 }

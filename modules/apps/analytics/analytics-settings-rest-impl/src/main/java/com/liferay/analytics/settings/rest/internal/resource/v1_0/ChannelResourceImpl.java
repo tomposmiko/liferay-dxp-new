@@ -34,7 +34,6 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
-import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 
@@ -66,14 +65,18 @@ public class ChannelResourceImpl extends BaseChannelResourceImpl {
 				_analyticsCloudClient.getAnalyticsChannelsPage(
 					contextCompany.getCompanyId(), keywords,
 					pagination.getPage() - 1, pagination.getPageSize(), sorts);
+		AnalyticsConfiguration analyticsConfiguration =
+			_analyticsSettingsManager.getAnalyticsConfiguration(
+				contextCompany.getCompanyId());
 
 		return Page.of(
 			transform(
 				analyticsChannelsPage.getItems(),
 				analyticsChannel -> _channelDTOConverter.toDTO(
-					new DefaultDTOConverterContext(
-						false, null, dtoConverterRegistry, null,
-						contextUser.getLocale(), null, contextUser),
+					new ChannelDTOConverterContext(
+						analyticsChannel.getId(),
+						contextAcceptLanguage.getPreferredLocale(),
+						analyticsConfiguration.commerceSyncEnabledChannelIds()),
 					analyticsChannel)),
 			pagination, analyticsChannelsPage.getTotalCount());
 	}
@@ -195,7 +198,15 @@ public class ChannelResourceImpl extends BaseChannelResourceImpl {
 
 	@Override
 	public Channel postChannel(Channel channel) throws Exception {
+		AnalyticsConfiguration analyticsConfiguration =
+			_analyticsSettingsManager.getAnalyticsConfiguration(
+				contextCompany.getCompanyId());
+
 		return _channelDTOConverter.toDTO(
+			new ChannelDTOConverterContext(
+				channel.getChannelId(),
+				contextAcceptLanguage.getPreferredLocale(),
+				analyticsConfiguration.commerceSyncEnabledChannelIds()),
 			_analyticsCloudClient.addAnalyticsChannel(
 				contextCompany.getCompanyId(), channel.getName()));
 	}

@@ -14,7 +14,7 @@
 
 package com.liferay.object.internal.action.executor;
 
-import com.liferay.notification.context.NotificationContext;
+import com.liferay.notification.context.NotificationContextBuilder;
 import com.liferay.notification.model.NotificationTemplate;
 import com.liferay.notification.service.NotificationTemplateLocalService;
 import com.liferay.notification.type.NotificationType;
@@ -24,7 +24,7 @@ import com.liferay.object.constants.ObjectActionExecutorConstants;
 import com.liferay.object.internal.action.util.ObjectActionVariablesUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectDefinitionLocalService;
-import com.liferay.object.system.SystemObjectDefinitionMetadataTracker;
+import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
@@ -57,27 +57,33 @@ public class NotificationTemplateObjectActionExecutorImpl
 			_notificationTypeServiceTracker.getNotificationType(
 				notificationTemplate.getType());
 
-		NotificationContext notificationContext = new NotificationContext();
+		NotificationContextBuilder notificationContextBuilder =
+			new NotificationContextBuilder();
 
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.fetchObjectDefinition(
 				payloadJSONObject.getLong("objectDefinitionId"));
 
-		notificationContext.setClassName(objectDefinition.getClassName());
-
 		Map<String, Object> termValues = ObjectActionVariablesUtil.toVariables(
 			_dtoConverterRegistry, objectDefinition, payloadJSONObject,
-			_systemObjectDefinitionMetadataTracker);
+			_systemObjectDefinitionMetadataRegistry);
 
-		notificationContext.setClassPK(
-			GetterUtil.getLong(termValues.get("id")));
-
-		notificationContext.setNotificationTemplateId(
-			notificationTemplate.getNotificationTemplateId());
-		notificationContext.setTermValues(termValues);
-		notificationContext.setUserId(userId);
-
-		notificationType.sendNotification(notificationContext);
+		notificationType.sendNotification(
+			notificationContextBuilder.className(
+				objectDefinition.getClassName()
+			).classPK(
+				GetterUtil.getLong(termValues.get("id"))
+			).externalReferenceCode(
+				GetterUtil.getString(termValues.get("externalReferenceCode"))
+			).notificationTemplate(
+				notificationTemplate
+			).termValues(
+				termValues
+			).userId(
+				userId
+			).portletId(
+				objectDefinition.getPortletId()
+			).build());
 	}
 
 	@Override
@@ -98,7 +104,7 @@ public class NotificationTemplateObjectActionExecutorImpl
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 
 	@Reference
-	private SystemObjectDefinitionMetadataTracker
-		_systemObjectDefinitionMetadataTracker;
+	private SystemObjectDefinitionMetadataRegistry
+		_systemObjectDefinitionMetadataRegistry;
 
 }

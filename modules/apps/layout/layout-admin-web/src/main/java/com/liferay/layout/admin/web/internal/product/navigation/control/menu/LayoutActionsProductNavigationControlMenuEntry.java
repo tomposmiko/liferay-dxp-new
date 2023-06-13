@@ -101,8 +101,9 @@ public class LayoutActionsProductNavigationControlMenuEntry
 		String layoutMode = ParamUtil.getString(
 			httpServletRequest, "p_l_mode", Constants.VIEW);
 
-		if (!layoutMode.equals(Constants.EDIT) || layout.isTypeControlPanel() ||
-			isEmbeddedPersonalApplicationLayout(layout) ||
+		if (!layoutMode.equals(Constants.EDIT) ||
+			layout.isEmbeddedPersonalApplication() ||
+			layout.isTypeControlPanel() ||
 			!(themeDisplay.isShowLayoutTemplatesIcon() ||
 			  themeDisplay.isShowPageSettingsIcon())) {
 

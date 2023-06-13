@@ -33,10 +33,19 @@ interface NotificationTemplate {
 	name: string;
 	objectDefinitionId: number | null;
 	recipientType: RecipientType;
+	recipients: Recipients[];
 	subject: LocalizedValue<string>;
 	to: LocalizedValue<string>;
 	type: NotificationTemplateType;
 }
+
+type Recipients = {
+	bcc: string;
+	cc: string;
+	from: string;
+	fromName: LocalizedValue<string>;
+	to: LocalizedValue<string>;
+};
 
 type ObjectRelationshipType = 'manyToMany' | 'oneToMany' | 'oneToOne';
 
@@ -159,6 +168,12 @@ export async function getObjectDefinitions(parameters?: string) {
 		`/o/object-admin/v1.0/object-definitions?${stringToURLParameterFormat(
 			parameters
 		)}`
+	);
+}
+
+export async function getObjectField(objectFieldId: number) {
+	return await fetchJSON<ObjectField>(
+		`/o/object-admin/v1.0/object-fields/${objectFieldId}`
 	);
 }
 

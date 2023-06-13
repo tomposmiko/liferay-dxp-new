@@ -13,7 +13,7 @@
  */
 
 import {cleanup, fireEvent, render, waitFor} from '@testing-library/react';
-import {fetch} from 'frontend-js-web';
+import {fetch, navigate} from 'frontend-js-web';
 import React from 'react';
 
 import '@testing-library/jest-dom/extend-expect';
@@ -30,6 +30,7 @@ jest.mock('frontend-js-web', () => ({
 							icon: 'time',
 							label: 'Expire',
 							name: 'expire',
+							type: 'SUBMIT_FORM',
 							url: 'http://localhost:8080/expire-url',
 						},
 					],
@@ -45,6 +46,7 @@ jest.mock('frontend-js-web', () => ({
 							icon: 'time',
 							label: 'Expire',
 							name: 'expire',
+							type: 'SUBMIT_FORM',
 							url: 'http://localhost:8080/expire-url',
 						},
 					],
@@ -70,7 +72,14 @@ jest.mock('frontend-js-web', () => ({
 							icon: 'view',
 							label: 'View',
 							name: 'view',
+							type: 'BLANK',
 							url: 'http://localhost:8080/view-url',
+						},
+						{
+							label: 'Compare to...',
+							name: 'compare-versions',
+							type: 'NAVIGATE',
+							url: 'http://localhost:8080/navigate-url',
 						},
 					],
 					changeLog: 'Another log text',
@@ -85,25 +94,29 @@ jest.mock('frontend-js-web', () => ({
 		}),
 		ok: true,
 	}),
+	navigate: jest.fn(),
 	sub: jest.fn(),
 }));
 
+window.open = jest.fn();
 window.submitForm = jest.fn();
 
 const fetchItemVersionsURL =
 	'http://localhost:8080/fetch-manage-collaborators-button-url';
 
-const _getComponent = () => {
+const _getComponent = (props = {}) => {
 	return (
 		<VersionsContent
+			active={false}
 			getItemVersionsURL={fetchItemVersionsURL}
 			languageTag="en"
 			onError={() => {}}
+			{...props}
 		/>
 	);
 };
 
-Liferay.FeatureFlags['LPS-162924'] = true;
+window.Liferay.FeatureFlags['LPS-162924'] = true;
 
 describe('Versions Content component', () => {
 	afterEach(() => {
@@ -118,7 +131,7 @@ describe('Versions Content component', () => {
 			expect(fetch).not.toHaveBeenCalledWith(fetchItemVersionsURL);
 		});
 
-		rerender(_getComponent());
+		rerender(_getComponent({active: true}));
 
 		await waitFor(() => {
 			expect(fetch).toHaveBeenCalledWith(fetchItemVersionsURL);
@@ -126,8 +139,7 @@ describe('Versions Content component', () => {
 	});
 
 	it('displays the versions list', async () => {
-		const {getByText, rerender} = render(_getComponent());
-		rerender(_getComponent());
+		const {getByText} = render(_getComponent({active: true}));
 
 		await waitFor(() => {
 			expect(getByText('2.1', {exact: false})).toBeInTheDocument();
@@ -138,9 +150,7 @@ describe('Versions Content component', () => {
 	});
 
 	it('displays View more link if viewVersionsURL is provided', async () => {
-		const {container, rerender} = render(_getComponent());
-
-		rerender(_getComponent());
+		const {container} = render(_getComponent({active: true}));
 
 		await waitFor(() => {
 			const link = container.querySelector(
@@ -160,9 +170,7 @@ describe('Versions Content component', () => {
 			sub: jest.fn(),
 		}));
 
-		const {container, rerender} = render(_getComponent());
-
-		rerender(_getComponent());
+		const {container} = render(_getComponent({active: true}));
 
 		await waitFor(() => {
 			const link = container.querySelectorAll('a.btn-secondary');
@@ -178,15 +186,21 @@ describe('Versions actions', () => {
 	});
 
 	it('are rendered within each version', async () => {
-		const {getAllByText, getAllByTitle, rerender} = render(_getComponent());
-		rerender(_getComponent());
+		const {getAllByText, getAllByTitle} = render(
+			_getComponent({active: true})
+		);
 
 		await waitFor(() => {
 			const expireActionButtons: HTMLElement[] = getAllByText('Expire');
+			const viewActionButtons: HTMLElement[] = getAllByText('View');
+			const compareActionButtons: HTMLElement[] = getAllByText(
+				'Compare to...'
+			);
 
 			expect(getAllByTitle('actions').length).toBe(3);
 			expect(expireActionButtons.length).toBe(2);
-			expect(getAllByText('View').length).toBe(1);
+			expect(viewActionButtons.length).toBe(1);
+			expect(compareActionButtons.length).toBe(1);
 
 			const firstExpireButton: HTMLButtonElement = expireActionButtons[0].closest(
 				'button'
@@ -204,6 +218,44 @@ describe('Versions actions', () => {
 				undefined,
 				'http://localhost:8080/expire-url'
 			);
+
+			const viewButton: HTMLButtonElement = viewActionButtons[0].closest(
+				'button'
+			)!;
+
+			fireEvent(
+				viewButton,
+				new MouseEvent('click', {
+					bubbles: true,
+					cancelable: true,
+				})
+			);
+
+			expect(window.open).toHaveBeenCalledWith(
+				'http://localhost:8080/view-url',
+				'_blank',
+				'noopener'
+			);
+
+			const compareButton: HTMLButtonElement = compareActionButtons[0].closest(
+				'button'
+			)!;
+
+			fireEvent(
+				compareButton,
+				new MouseEvent('click', {
+					bubbles: true,
+					cancelable: true,
+				})
+			);
+
+			expect(navigate).toHaveBeenCalled();
 		});
 	});
 });
+
+declare global {
+	interface Window {
+		Liferay: any;
+	}
+}

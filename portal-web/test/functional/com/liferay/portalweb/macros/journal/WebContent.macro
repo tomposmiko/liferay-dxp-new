@@ -147,6 +147,7 @@ definition {
 		RelatedAssets.selectAsset(
 			assetTitle = "${assetTitle}",
 			assetType = "${assetType}",
+			otherSite = "${otherSite}",
 			scopeSite = "${scopeSite}");
 
 		SelectFrame(value1 = "relative=top");
@@ -473,7 +474,7 @@ definition {
 				locator1 = "WCEditWebContent#COLOR_PICKER");
 
 			Click(
-				key_colorSwatchItem = "${webContentColor}",
+				key_colorSwatchItem = "#${webContentColor}",
 				locator1 = "Button#COLOR_SWATCH_ITEM");
 		}
 
@@ -2342,7 +2343,7 @@ definition {
 	}
 
 	macro viewPublicationTimelineEntry {
-		Click(locator1 = "WCEditWebContent#HISTORY_TAB");
+		Click(locator1 = "WCEditWebContent#TIMELINE_TAB");
 
 		AssertElementPresent(
 			key_index = "${index}",

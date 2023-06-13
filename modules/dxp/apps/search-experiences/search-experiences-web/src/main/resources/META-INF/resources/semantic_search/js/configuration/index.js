@@ -15,7 +15,7 @@ import React from 'react';
 
 import {sub} from '../../../sxp_blueprint_admin/js/utils/language';
 import Input from './Input';
-import TestConnectionButton from './TestConnectionButton';
+import TestConfigurationButton from './TestConfigurationButton';
 import {SENTENCE_TRANSFORM_PROVIDER_TYPES} from './constants';
 
 /**
@@ -79,6 +79,85 @@ export default function ({
 	const _handleFormikValidate = (values) => {
 		const errors = {};
 
+		// Validate "Asset Entry Class Names" field.
+
+		if (!values.assetEntryClassNames?.length) {
+			errors.assetEntryClassNames = sub(
+				Liferay.Language.get('the-x-field-is-required'),
+				[Liferay.Language.get('asset-entry-class-names')]
+			);
+		}
+
+		// Validate "Cache Timeout" field.
+
+		if (values.cacheTimeout === '') {
+			errors.cacheTimeout = Liferay.Language.get(
+				'this-field-is-required'
+			);
+		}
+		else {
+			if (values.cacheTimeout < 0) {
+				errors.cacheTimeout = sub(
+					Liferay.Language.get(
+						'please-enter-a-value-greater-than-or-equal-to-x'
+					),
+					['0']
+				);
+			}
+		}
+
+		// Validate "Hugging Face Access Token" field.
+
+		if (values.huggingFaceAccessToken === '') {
+			errors.huggingFaceAccessToken = Liferay.Language.get(
+				'this-field-is-required'
+			);
+		}
+
+		// Validate "Language IDs" field.
+
+		if (!values.languageIds?.length) {
+			errors.languageIds = sub(
+				Liferay.Language.get('the-x-field-is-required'),
+				[Liferay.Language.get('language-ids')]
+			);
+		}
+
+		// Validate "Max Character Count" field.
+
+		if (!values.maxCharacterCount === '') {
+			errors.maxCharacterCount = Liferay.Language.get(
+				'this-field-is-required'
+			);
+		}
+		else {
+			if (values.maxCharacterCount < 50) {
+				errors.maxCharacterCount = sub(
+					Liferay.Language.get(
+						'please-enter-a-value-greater-than-or-equal-to-x'
+					),
+					['50']
+				);
+			}
+
+			if (values.maxCharacterCount > 10000) {
+				errors.maxCharacterCount = sub(
+					Liferay.Language.get(
+						'please-enter-a-value-less-than-or-equal-to-x'
+					),
+					['10000']
+				);
+			}
+		}
+
+		// Validate "Model" field.
+
+		if (values.model === '') {
+			errors.model = Liferay.Language.get('this-field-is-required');
+		}
+
+		// Validate "Model Timeout" field.
+
 		if (
 			values.modelTimeout === '' &&
 			values.sentenceTransformProvider ===
@@ -108,61 +187,6 @@ export default function ({
 			}
 		}
 
-		if (!values.maxCharacterCount === '') {
-			errors.maxCharacterCount = Liferay.Language.get(
-				'this-field-is-required'
-			);
-		}
-		else {
-			if (values.maxCharacterCount < 50) {
-				errors.maxCharacterCount = sub(
-					Liferay.Language.get(
-						'please-enter-a-value-greater-than-or-equal-to-x'
-					),
-					['50']
-				);
-			}
-
-			if (values.maxCharacterCount > 10000) {
-				errors.maxCharacterCount = sub(
-					Liferay.Language.get(
-						'please-enter-a-value-less-than-or-equal-to-x'
-					),
-					['10000']
-				);
-			}
-		}
-
-		if (!values.assetEntryClassNames?.length) {
-			errors.assetEntryClassNames = sub(
-				Liferay.Language.get('the-x-field-is-required'),
-				[Liferay.Language.get('asset-entry-class-names')]
-			);
-		}
-
-		if (!values.languageIds?.length) {
-			errors.languageIds = sub(
-				Liferay.Language.get('the-x-field-is-required'),
-				[Liferay.Language.get('language-ids')]
-			);
-		}
-
-		if (values.cacheTimeout === '') {
-			errors.cacheTimeout = Liferay.Language.get(
-				'this-field-is-required'
-			);
-		}
-		else {
-			if (values.cacheTimeout < 0) {
-				errors.cacheTimeout = sub(
-					Liferay.Language.get(
-						'please-enter-a-value-greater-than-or-equal-to-x'
-					),
-					['0']
-				);
-			}
-		}
-
 		return errors;
 	};
 
@@ -185,16 +209,16 @@ export default function ({
 		validate: _handleFormikValidate,
 	});
 
-	const _handleBlur = (name) => () => {
+	const _handleCheckboxChange = (name) => (event) => {
+		formik.setFieldValue(name, event.target.checked);
+	};
+
+	const _handleInputBlur = (name) => () => {
 		formik.setFieldTouched(name);
 	};
 
-	const _handleChange = (name) => (val) => {
+	const _handleInputChange = (name) => (val) => {
 		formik.setFieldValue(name, val);
-	};
-
-	const _handleCheckboxChange = (name) => (event) => {
-		formik.setFieldValue(name, event.target.checked);
 	};
 
 	return (
@@ -228,8 +252,8 @@ export default function ({
 					)}
 					label={Liferay.Language.get('sentence-transform-provider')}
 					name={`${namespace}sentenceTransformProvider`}
-					onBlur={_handleBlur('sentenceTransformProvider')}
-					onChange={_handleChange('sentenceTransformProvider')}
+					onBlur={_handleInputBlur('sentenceTransformProvider')}
+					onChange={_handleInputChange('sentenceTransformProvider')}
 					type="select"
 					value={formik.values.sentenceTransformProvider}
 				/>
@@ -243,8 +267,8 @@ export default function ({
 						)}
 						label={Liferay.Language.get('txtai-host-address')}
 						name={`${namespace}txtaiHostAddress`}
-						onBlur={_handleBlur('txtaiHostAddress')}
-						onChange={_handleChange('txtaiHostAddress')}
+						onBlur={_handleInputBlur('txtaiHostAddress')}
+						onChange={_handleInputChange('txtaiHostAddress')}
 						value={formik.values.txtaiHostAddress}
 					/>
 				)}
@@ -258,8 +282,12 @@ export default function ({
 								'hugging-face-access-token'
 							)}
 							name={`${namespace}huggingFaceAccessToken`}
-							onBlur={_handleBlur('huggingFaceAccessToken')}
-							onChange={_handleChange('huggingFaceAccessToken')}
+							onBlur={_handleInputBlur('huggingFaceAccessToken')}
+							onChange={_handleInputChange(
+								'huggingFaceAccessToken'
+							)}
+							required
+							touched={formik.touched.huggingFaceAccessToken}
 							value={formik.values.huggingFaceAccessToken}
 						/>
 
@@ -273,8 +301,9 @@ export default function ({
 							)}
 							label={Liferay.Language.get('model')}
 							name={`${namespace}model`}
-							onBlur={_handleBlur('model')}
-							onChange={_handleChange('model')}
+							onBlur={_handleInputBlur('model')}
+							onChange={_handleInputChange('model')}
+							required
 							touched={formik.touched.model}
 							type="model"
 							value={formik.values.model}
@@ -287,10 +316,10 @@ export default function ({
 							)}
 							label={Liferay.Language.get('model-timeout')}
 							name={`${namespace}modelTimeout`}
-							onBlur={_handleBlur('modelTimeout')}
-							onChange={_handleChange('modelTimeout')}
+							onBlur={_handleInputBlur('modelTimeout')}
+							onChange={_handleInputChange('modelTimeout')}
 							options={{max: 60, min: 0}}
-							required={true}
+							required
 							touched={formik.touched.modelTimeout}
 							type="number"
 							value={formik.values.modelTimeout}
@@ -327,14 +356,17 @@ export default function ({
 					)}
 					label={Liferay.Language.get('embedding-vector-dimensions')}
 					name={`${namespace}embeddingVectorDimensions`}
-					onBlur={_handleBlur('embeddingVectorDimensions')}
-					onChange={_handleChange('embeddingVectorDimensions')}
+					onBlur={_handleInputBlur('embeddingVectorDimensions')}
+					onChange={_handleInputChange('embeddingVectorDimensions')}
 					type="select"
 					value={formik.values.embeddingVectorDimensions}
 				/>
 
-				<TestConnectionButton
+				<TestConfigurationButton
 					assetEntryClassNames={formik.values.assetEntryClassNames}
+					availableSentenceTransformProviders={
+						availableSentenceTransformProviders
+					}
 					cacheTimeout={formik.values.cacheTimeout}
 					embeddingVectorDimensions={
 						formik.values.embeddingVectorDimensions
@@ -372,10 +404,10 @@ export default function ({
 					)}
 					label={Liferay.Language.get('max-character-count')}
 					name={`${namespace}maxCharacterCount`}
-					onBlur={_handleBlur('maxCharacterCount')}
-					onChange={_handleChange('maxCharacterCount')}
+					onBlur={_handleInputBlur('maxCharacterCount')}
+					onChange={_handleInputChange('maxCharacterCount')}
 					options={{max: 10000, min: 50}}
-					required={true}
+					required
 					touched={formik.touched.maxCharacterCount}
 					type="number"
 					value={formik.values.maxCharacterCount}
@@ -391,8 +423,8 @@ export default function ({
 					)}
 					label={Liferay.Language.get('text-truncation-strategy')}
 					name={`${namespace}textTruncationStrategy`}
-					onBlur={_handleBlur('textTruncationStrategy')}
-					onChange={_handleChange('textTruncationStrategy')}
+					onBlur={_handleInputBlur('textTruncationStrategy')}
+					onChange={_handleInputChange('textTruncationStrategy')}
 					type="select"
 					value={formik.values.textTruncationStrategy}
 				/>
@@ -407,9 +439,9 @@ export default function ({
 					)}
 					label={Liferay.Language.get('asset-entry-class-names')}
 					name={`${namespace}assetEntryClassNames`}
-					onBlur={_handleBlur('assetEntryClassNames')}
-					onChange={_handleChange('assetEntryClassNames')}
-					required={true}
+					onBlur={_handleInputBlur('assetEntryClassNames')}
+					onChange={_handleInputChange('assetEntryClassNames')}
+					required
 					touched={formik.touched.assetEntryClassNames}
 					type="multiple"
 					value={formik.values.assetEntryClassNames}
@@ -425,9 +457,9 @@ export default function ({
 					)}
 					label={Liferay.Language.get('language-ids')}
 					name={`${namespace}languageIds`}
-					onBlur={_handleBlur('languageIds')}
-					onChange={_handleChange('languageIds')}
-					required={true}
+					onBlur={_handleInputBlur('languageIds')}
+					onChange={_handleInputChange('languageIds')}
+					required
 					touched={formik.touched.languageIds}
 					type="multiple"
 					value={formik.values.languageIds}
@@ -441,10 +473,10 @@ export default function ({
 				)}
 				label={Liferay.Language.get('cache-timeout')}
 				name={`${namespace}cacheTimeout`}
-				onBlur={_handleBlur('cacheTimeout')}
-				onChange={_handleChange('cacheTimeout')}
+				onBlur={_handleInputBlur('cacheTimeout')}
+				onChange={_handleInputChange('cacheTimeout')}
 				options={{min: 0}}
-				required={true}
+				required
 				touched={formik.touched.cacheTimeout}
 				type="number"
 				value={formik.values.cacheTimeout}

@@ -114,11 +114,15 @@ definition {
 
 		if (isSet(permissionsList)) {
 			for (var permissionDefinitionKey : list "${permissionsList}") {
-				Check(locator1 = "Permissions#${permissionDefinitionKey}");
+				ScrollWebElementIntoView(locator1 = "Permissions#${permissionDefinitionKey}");
+
+				Check.checkNotVisible(locator1 = "Permissions#${permissionDefinitionKey}");
 			}
 		}
 		else {
-			Check(locator1 = "Permissions#${permissionDefinitionKey}");
+			ScrollWebElementIntoView(locator1 = "Permissions#${permissionDefinitionKey}");
+
+			Check.checkNotVisible(locator1 = "Permissions#${permissionDefinitionKey}");
 		}
 
 		Button.clickSave();
@@ -127,7 +131,7 @@ definition {
 			locator1 = "Message#SUCCESS",
 			value1 = "Your request completed successfully.");
 
-		AssertChecked(locator1 = "Permissions#${permissionDefinitionKey}");
+		AssertChecked.assertCheckedNotVisible(locator1 = "Permissions#${permissionDefinitionKey}");
 	}
 
 	macro editPermissionCmdCP {
@@ -438,7 +442,11 @@ definition {
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
-		Uncheck(locator1 = "Permissions#${permissionDefinitionKey}");
+		ScrollWebElementIntoView(locator1 = "Permissions#${permissionDefinitionKey}");
+
+		takeScreenshot();
+
+		Uncheck.uncheckNotVisible(locator1 = "Permissions#${permissionDefinitionKey}");
 
 		Button.clickSave();
 
@@ -446,7 +454,7 @@ definition {
 			locator1 = "Message#SUCCESS",
 			value1 = "Your request completed successfully.");
 
-		AssertNotChecked(locator1 = "Permissions#${permissionDefinitionKey}");
+		AssertNotChecked.assertNotCheckedNotVisible(locator1 = "Permissions#${permissionDefinitionKey}");
 	}
 
 	macro tearDownCP {
@@ -551,10 +559,10 @@ definition {
 		var key_roleTitle = StringUtil.lowerCase("${key_roleTitle}");
 
 		if ("${permissionFlagged}" == "true") {
-			AssertChecked(locator1 = "Permissions#${permissionDefinitionKey}");
+			AssertChecked.assertCheckedNotVisible(locator1 = "Permissions#${permissionDefinitionKey}");
 		}
 		else if ("${permissionFlagged}" == "false") {
-			AssertNotChecked(locator1 = "Permissions#${permissionDefinitionKey}");
+			AssertNotChecked.assertNotCheckedNotVisible(locator1 = "Permissions#${permissionDefinitionKey}");
 		}
 	}
 

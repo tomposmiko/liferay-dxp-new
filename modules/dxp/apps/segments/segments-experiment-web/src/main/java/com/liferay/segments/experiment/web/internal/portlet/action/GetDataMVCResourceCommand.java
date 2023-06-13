@@ -18,7 +18,7 @@ import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortlet
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.Language;
@@ -67,7 +67,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.segments.experiment.web.internal.configuration.SegmentsExperimentConfiguration",
-	configurationPolicy = ConfigurationPolicy.OPTIONAL, immediate = true,
+	configurationPolicy = ConfigurationPolicy.OPTIONAL,
 	property = {
 		"javax.portlet.name=" + SegmentsPortletKeys.SEGMENTS_EXPERIMENT,
 		"mvc.command.name=/segments_experiment/get_data"
@@ -338,7 +338,7 @@ public class GetDataMVCResourceCommand extends BaseMVCResourceCommand {
 			"initialSegmentsVariants",
 			() -> {
 				JSONArray segmentsExperimentRelsJSONArray =
-					JSONFactoryUtil.createJSONArray();
+					_jsonFactory.createJSONArray();
 
 				SegmentsExperiment segmentsExperiment =
 					_fetchSegmentsExperiment(layout, segmentsExperienceId);
@@ -439,6 +439,9 @@ public class GetDataMVCResourceCommand extends BaseMVCResourceCommand {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		GetDataMVCResourceCommand.class);
+
+	@Reference
+	private JSONFactory _jsonFactory;
 
 	@Reference
 	private Language _language;

@@ -26,7 +26,7 @@ import com.liferay.object.rest.internal.jaxrs.exception.mapper.RequiredObjectRel
 import com.liferay.object.rest.internal.resource.v1_0.BaseObjectEntryResourceImpl;
 import com.liferay.object.rest.internal.resource.v1_0.ObjectEntryResourceFactoryImpl;
 import com.liferay.object.rest.internal.resource.v1_0.ObjectEntryResourceImpl;
-import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerTracker;
+import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
 import com.liferay.object.rest.petra.sql.dsl.expression.FilterPredicateFactory;
 import com.liferay.object.rest.resource.v1_0.ObjectEntryResource;
 import com.liferay.object.scope.ObjectScopeProvider;
@@ -37,7 +37,7 @@ import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.ObjectRelationshipService;
 import com.liferay.object.system.SystemObjectDefinitionMetadata;
-import com.liferay.object.system.SystemObjectDefinitionMetadataTracker;
+import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.filter.Filter;
@@ -94,7 +94,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 
 		if (objectDefinition.isSystem()) {
 			_initSystemObjectDefinition(
-				_systemObjectDefinitionMetadataTracker.
+				_systemObjectDefinitionMetadataRegistry.
 					getSystemObjectDefinitionMetadata(
 						objectDefinition.getName()));
 
@@ -129,7 +129,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 				GraphQLDTOContributor.class,
 				ObjectDefinitionGraphQLDTOContributor.of(
 					_filterPredicateFactory, objectDefinition,
-					_objectEntryManagerTracker.getObjectEntryManager(
+					_objectEntryManagerRegistry.getObjectEntryManager(
 						objectDefinition.getStorageType()),
 					_objectFieldLocalService, _objectRelationshipLocalService,
 					objectScopeProvider),
@@ -202,10 +202,10 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 	private ObjectEntryResourceImpl _createObjectEntryResourceImpl() {
 		return new ObjectEntryResourceImpl(
 			_filterPredicateFactory, _objectDefinitionLocalService,
-			_objectEntryLocalService, _objectEntryManagerTracker,
+			_objectEntryLocalService, _objectEntryManagerRegistry,
 			_objectFieldLocalService, _objectRelationshipService,
 			_objectScopeProviderRegistry,
-			_systemObjectDefinitionMetadataTracker);
+			_systemObjectDefinitionMetadataRegistry);
 	}
 
 	private void _excludeScopedMethods(
@@ -494,7 +494,7 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 	private ObjectEntryLocalService _objectEntryLocalService;
 
 	@Reference
-	private ObjectEntryManagerTracker _objectEntryManagerTracker;
+	private ObjectEntryManagerRegistry _objectEntryManagerRegistry;
 
 	@Reference
 	private ObjectFieldLocalService _objectFieldLocalService;
@@ -532,8 +532,8 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 	private SortParserProvider _sortParserProvider;
 
 	@Reference
-	private SystemObjectDefinitionMetadataTracker
-		_systemObjectDefinitionMetadataTracker;
+	private SystemObjectDefinitionMetadataRegistry
+		_systemObjectDefinitionMetadataRegistry;
 
 	@Reference
 	private UserLocalService _userLocalService;

@@ -518,8 +518,9 @@ const NameLabel = React.forwardRef(
 						onChange={(event) => {
 							setName(event.target.value);
 						}}
-						onFocus={() => {
+						onFocus={(event) => {
 							inputRef.current.setSelectionRange(0, name.length);
+							event.stopPropagation();
 						}}
 						onKeyDown={(event) => {
 							if (event.key === 'Enter') {

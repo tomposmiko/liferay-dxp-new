@@ -15,6 +15,7 @@
 package com.liferay.portal.db.index;
 
 import com.liferay.portal.db.DBResourceUtil;
+import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
@@ -30,7 +31,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleEvent;
+import org.osgi.util.tracker.BundleTracker;
+import org.osgi.util.tracker.BundleTrackerCustomizer;
 
 /**
  * @author Ricardo Couso
@@ -40,7 +43,53 @@ public class IndexUpdaterUtil {
 	public static void updateAllIndexes() {
 		updatePortalIndexes();
 
-		updateModulesIndexes(true);
+		BundleTracker<Void> bundleTracker = new BundleTracker<>(
+			SystemBundleUtil.getBundleContext(), ~Bundle.UNINSTALLED,
+			new BundleTrackerCustomizer<Void>() {
+
+				@Override
+				public Void addingBundle(
+					Bundle bundle, BundleEvent bundleEvent) {
+
+					if (BundleUtil.isLiferayServiceBundle(bundle)) {
+						try {
+							updateIndexes(bundle);
+						}
+						catch (Exception exception) {
+							_log.error(exception);
+						}
+					}
+
+					return null;
+				}
+
+				@Override
+				public void modifiedBundle(
+					Bundle bundle, BundleEvent bundleEvent, Void tracked) {
+				}
+
+				@Override
+				public void removedBundle(
+					Bundle bundle, BundleEvent bundleEvent, Void tracked) {
+				}
+
+			});
+
+		DefaultNoticeableFuture<Void> defaultNoticeableFuture =
+			new DefaultNoticeableFuture<>(bundleTracker::open, null);
+
+		defaultNoticeableFuture.addFutureListener(
+			future -> bundleTracker.close());
+
+		Thread bundleTrackerOpenerThread = new Thread(
+			defaultNoticeableFuture,
+			IndexUpdaterUtil.class.getName() + "-BundleTrackerOpener");
+
+		bundleTrackerOpenerThread.setDaemon(true);
+
+		bundleTrackerOpenerThread.start();
+
+		DependencyManagerSyncUtil.registerSyncFuture(defaultNoticeableFuture);
 	}
 
 	public static void updateIndexes(Bundle bundle) throws Exception {
@@ -68,21 +117,6 @@ public class IndexUpdaterUtil {
 
 					db.updateIndexes(connection, tablesSQL, indexesSQL, true);
 				}
-			});
-	}
-
-	public static void updateModulesIndexes(boolean onStartup) {
-		if (!onStartup) {
-			_updateModulesIndexes();
-
-			return;
-		}
-
-		DependencyManagerSyncUtil.registerSyncCallable(
-			() -> {
-				_updateModulesIndexes();
-
-				return null;
 			});
 	}
 
@@ -116,21 +150,6 @@ public class IndexUpdaterUtil {
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(exception);
-			}
-		}
-	}
-
-	private static void _updateModulesIndexes() {
-		BundleContext bundleContext = SystemBundleUtil.getBundleContext();
-
-		for (Bundle bundle : bundleContext.getBundles()) {
-			if (BundleUtil.isLiferayServiceBundle(bundle)) {
-				try {
-					updateIndexes(bundle);
-				}
-				catch (Exception exception) {
-					_log.error(exception);
-				}
 			}
 		}
 	}

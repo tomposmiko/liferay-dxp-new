@@ -46,7 +46,7 @@ import com.liferay.dynamic.data.mapping.service.DDMFormInstanceService;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionLocalService;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.storage.DDMStorageAdapter;
-import com.liferay.dynamic.data.mapping.storage.DDMStorageAdapterTracker;
+import com.liferay.dynamic.data.mapping.storage.DDMStorageAdapterRegistry;
 import com.liferay.dynamic.data.mapping.util.DDMFormValuesMerger;
 import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolver;
 import com.liferay.object.model.ObjectField;
@@ -56,6 +56,8 @@ import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.cookies.CookiesManagerUtil;
+import com.liferay.portal.kernel.cookies.constants.CookiesConstants;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
@@ -80,7 +82,6 @@ import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.AggregateResourceBundle;
 import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.kernel.util.CookieKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HtmlUtil;
@@ -128,7 +129,7 @@ public class DDMFormDisplayContext {
 		DDMFormValuesFactory ddmFormValuesFactory,
 		DDMFormValuesMerger ddmFormValuesMerger,
 		DDMFormWebConfiguration ddmFormWebConfiguration,
-		DDMStorageAdapterTracker ddmStorageAdapterTracker,
+		DDMStorageAdapterRegistry ddmStorageAdapterRegistry,
 		GroupLocalService groupLocalService, JSONFactory jsonFactory,
 		NPMResolver npmResolver,
 		ObjectFieldLocalService objectFieldLocalService,
@@ -151,7 +152,7 @@ public class DDMFormDisplayContext {
 		_ddmFormValuesFactory = ddmFormValuesFactory;
 		_ddmFormValuesMerger = ddmFormValuesMerger;
 		_ddmFormWebConfiguration = ddmFormWebConfiguration;
-		_ddmStorageAdapterTracker = ddmStorageAdapterTracker;
+		_ddmStorageAdapterRegistry = ddmStorageAdapterRegistry;
 		_groupLocalService = groupLocalService;
 		_jsonFactory = jsonFactory;
 		_npmResolver = npmResolver;
@@ -601,7 +602,7 @@ public class DDMFormDisplayContext {
 	public boolean hasValidStorageType(DDMFormInstance ddmFormInstance) {
 		try {
 			DDMStorageAdapter ddmStorageAdapter =
-				_ddmStorageAdapterTracker.getDDMStorageAdapter(
+				_ddmStorageAdapterRegistry.getDDMStorageAdapter(
 					ddmFormInstance.getStorageType());
 
 			if (ddmStorageAdapter != null) {
@@ -749,8 +750,8 @@ public class DDMFormDisplayContext {
 	}
 
 	public boolean isRememberMe() {
-		String rememberMe = CookieKeys.getCookie(
-			_getHttpServletRequest(), CookieKeys.REMEMBER_ME);
+		String rememberMe = CookiesManagerUtil.getCookieValue(
+			CookiesConstants.NAME_REMEMBER_ME, _getHttpServletRequest());
 
 		if ((rememberMe != null) && rememberMe.equals("true")) {
 			return true;
@@ -1230,7 +1231,7 @@ public class DDMFormDisplayContext {
 	private final DDMFormValuesFactory _ddmFormValuesFactory;
 	private final DDMFormValuesMerger _ddmFormValuesMerger;
 	private final DDMFormWebConfiguration _ddmFormWebConfiguration;
-	private final DDMStorageAdapterTracker _ddmStorageAdapterTracker;
+	private final DDMStorageAdapterRegistry _ddmStorageAdapterRegistry;
 	private final GroupLocalService _groupLocalService;
 	private Boolean _hasAddFormInstanceRecordPermission;
 	private Boolean _hasViewPermission;

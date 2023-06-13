@@ -138,9 +138,9 @@ public class PermissionsPortletConfigurationIcon
 				if (PortletPermissionUtil.contains(
 						themeDisplay.getPermissionChecker(), layout, portletId,
 						ActionKeys.PERMISSIONS) &&
+					!layout.isEmbeddedPersonalApplication() &&
 					!layout.isLayoutPrototypeLinkActive() &&
-					!layout.isTypeControlPanel() &&
-					!isEmbeddedPersonalApplicationLayout(layout)) {
+					!layout.isTypeControlPanel()) {
 
 					return true;
 				}
