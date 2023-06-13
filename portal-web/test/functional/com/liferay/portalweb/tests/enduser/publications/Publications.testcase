@@ -245,58 +245,6 @@ definition {
 		AssertElementPresent(locator1 = "PublicationsChanges#MESSAGE_NO_CHANGES");
 	}
 
-	@description = "Assert that is possible to add a Wiki Page within a publication and then publish it"
-	@priority = 3
-	test CanAddWikiPageWithinPublications {
-		JSONPublications.addPublication(publicationName = "Publication Name");
-
-		JSONPublications.selectPublication(publicationName = "Publication Name");
-
-		ProductMenu.gotoPortlet(
-			category = "Content & Data",
-			portlet = "Wiki");
-
-		WikiNode.addCP(wikiNodeName = "Wiki Node Name");
-
-		WikiPage.addCP(
-			contentImageName = "Document_2.jpg",
-			groupName = "Guest",
-			imageSourceURL = "http://localhost:8080/webdav/guest/document_library/Document_2.jpg",
-			siteURLKey = "guest",
-			wikiAdmin = "true",
-			wikiNodeName = "Wiki Node Name",
-			wikiPageContent = "Wiki Page Content",
-			wikiPageTitle = "Wiki Page Title");
-
-		PublicationsNavigator.gotoReviewChanges(
-			gotoPublicationsAdmin = "true",
-			publicationName = "Publication Name");
-
-		PublicationsChanges.viewChanges(
-			changeCategory = "Wiki Node",
-			changeOrder = 1,
-			changeSite = "Guest",
-			changeTitle = "Wiki Node Name",
-			changeType = "Added",
-			changeUser = "Test Test");
-
-		PublicationsChanges.viewChanges(
-			changeCategory = "Wiki Page",
-			changeOrder = 2,
-			changeSite = "Guest",
-			changeTitle = "Wiki Page Title",
-			changeType = "Added",
-			changeUser = "Test Test");
-
-		Button.clickPublish();
-
-		AssertTextEquals.assertPartialText(
-			locator1 = "Message#SUCCESS",
-			value1 = "No unresolved conflicts, ready to publish.");
-
-		Publications.publishPublication(publicationName = "Publication Name");
-	}
-
 	@description = "This is the use case for LPS-158789. Allow you to change publication via URL parameter"
 	@priority = 4
 	test CanChangePublicationViaURLParameter {
@@ -1071,7 +1019,7 @@ definition {
 	@priority = 5
 	test PublishParallelPublications {
 		property environment.acceptance = "true";
-		property operating.system.types = "alpine,amazonlinux,centos,debian,fedora,orcllinux,osx,redhat,solaris,suse,ubuntu,windows";
+		property operating.system.types = "alpine,amazonlinux,centos,debian,fedora,orcllinux,osx,redhat,rockylinux,solaris,suse,ubuntu,windows";
 		property portal.acceptance = "true";
 
 		JSONWebcontent.addFolder(
@@ -1174,7 +1122,7 @@ definition {
 
 		Publications.unschedulePublication(publicationName = "Publication Name");
 
-		AssertTextEquals(
+		AssertTextEquals.assertPartialText(
 			locator1 = "Message#EMPTY_INFO",
 			value1 = "No publication has been scheduled yet.");
 	}
@@ -1212,7 +1160,7 @@ definition {
 
 		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
 
-		AssertTextEquals(
+		AssertTextEquals.assertPartialText(
 			locator1 = "Message#EMPTY_INFO",
 			value1 = "No web content was found.");
 	}

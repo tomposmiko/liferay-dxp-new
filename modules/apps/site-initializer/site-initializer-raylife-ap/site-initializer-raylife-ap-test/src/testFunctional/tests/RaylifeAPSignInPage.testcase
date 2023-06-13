@@ -21,9 +21,9 @@ definition {
 		task ("Create a new Raylife AP Site") {
 			Site.openSitesAdmin();
 
-			TeamExtranet.addSiteTemplateCP(
-				siteName = ${testSiteName},
-				siteTemplateName = "Raylife AP");
+			Raylife.createRaylifeSite(siteName = "Raylife D2C");
+
+			Raylife.createRaylifeSite(siteName = "Raylife AP");
 		}
 	}
 
@@ -43,6 +43,10 @@ definition {
 	@description = "LPS-151795 - Verify if user can enter a valid email address"
 	@priority = 5
 	test CanSignIn {
+		property test.name.skip.portal.instance = "RaylifeAPSignInPage#CanSignIn";
+
+		// Skip portal instance due to LRQA-79129. Unskip after it is resolved
+
 		task ("Go to Raylife AP and exit Raylife AP") {
 			ApplicationsMenu.gotoSite(site = ${testSiteName});
 
@@ -67,6 +71,10 @@ definition {
 	@description = "LPS-151792 - Verify if message 'Please enter a valid email address.' appers when email is not valid"
 	@priority = 5
 	test CanViewMessageEmailNotValid {
+		property test.name.skip.portal.instance = "RaylifeAPSignInPage#CanViewMessageEmailNotValid";
+
+		// Skip portal instance due to LRQA-79129. Unskip after it is resolved
+
 		task ("Go to Raylife AP and exit Raylife AP") {
 			ApplicationsMenu.gotoSite(site = ${testSiteName});
 
@@ -82,7 +90,7 @@ definition {
 				emailAddress = "test",
 				password = "test");
 
-			AssertElementPresent(locator1 = "RaylifeAP#EMAIL_INVALID_MESSAGE");
+			RaylifeAP.assertFieldRequiredMessage(field = "Please enter a valid email address.");
 
 			User.firstLoginPG();
 		}
@@ -91,6 +99,10 @@ definition {
 	@description = "LPS-151790 - Check that the message 'This field is required' appears when the e-mail field is required"
 	@priority = 5
 	test CanViewMessageFieldEmailRequired {
+		property test.name.skip.portal.instance = "RaylifeAPSignInPage#CanViewMessageFieldEmailRequired";
+
+		// Skip portal instance due to LRQA-79129. Unskip after it is resolved
+
 		task ("Go to Raylife AP and exit Raylife AP") {
 			ApplicationsMenu.gotoSite(site = ${testSiteName});
 
@@ -106,7 +118,7 @@ definition {
 				emailAddress = "",
 				password = "test");
 
-			RaylifeAP.assertFieldRequiredMessage(field = "Please enter a valid email address.");
+			RaylifeAP.assertFieldRequiredMessage(field = "The Login field is required.");
 
 			User.firstLoginPG();
 		}
@@ -115,6 +127,10 @@ definition {
 	@description = "LPS-151791 - Check that the message 'This field is required' appears when the password field is required"
 	@priority = 5
 	test CanViewMessageFieldPasswordRequired {
+		property test.name.skip.portal.instance = "RaylifeAPSignInPage#CanViewMessageFieldPasswordRequired";
+
+		// Skip portal instance due to LRQA-79129. Unskip after it is resolved
+
 		task ("Go to Raylife AP and exit Raylife AP") {
 			ApplicationsMenu.gotoSite(site = ${testSiteName});
 

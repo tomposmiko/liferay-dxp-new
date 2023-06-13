@@ -181,6 +181,23 @@ public class Mutation {
 	}
 
 	@GraphQLField
+	public ListTypeEntry
+			createListTypeDefinitionByExternalReferenceCodeListTypeEntry(
+				@GraphQLName("externalReferenceCode") String
+					externalReferenceCode,
+				@GraphQLName("listTypeEntry") ListTypeEntry listTypeEntry)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_listTypeEntryResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			listTypeEntryResource ->
+				listTypeEntryResource.
+					postListTypeDefinitionByExternalReferenceCodeListTypeEntry(
+						externalReferenceCode, listTypeEntry));
+	}
+
+	@GraphQLField
 	public ListTypeEntry createListTypeDefinitionListTypeEntry(
 			@GraphQLName("listTypeDefinitionId") Long listTypeDefinitionId,
 			@GraphQLName("listTypeEntry") ListTypeEntry listTypeEntry)
@@ -262,20 +279,6 @@ public class Mutation {
 			listTypeEntryResource ->
 				listTypeEntryResource.putListTypeEntryBatch(
 					callbackURL, object));
-	}
-
-	@GraphQLField
-	public ListTypeEntry updateListTypeEntryByExternalReferenceCode(
-			@GraphQLName("externalReferenceCode") String externalReferenceCode,
-			@GraphQLName("listTypeEntry") ListTypeEntry listTypeEntry)
-		throws Exception {
-
-		return _applyComponentServiceObjects(
-			_listTypeEntryResourceComponentServiceObjects,
-			this::_populateResourceContext,
-			listTypeEntryResource ->
-				listTypeEntryResource.putListTypeEntryByExternalReferenceCode(
-					externalReferenceCode, listTypeEntry));
 	}
 
 	private <T, R, E1 extends Throwable, E2 extends Throwable> R

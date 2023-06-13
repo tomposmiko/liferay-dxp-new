@@ -22,10 +22,6 @@ definition {
 
 	@summary = "Change MDF status"
 	macro changeMDFStatus {
-		Click(
-			key_MDFName = ${campaignName},
-			locator1 = "PRMMDFRequest#REQUEST_ID");
-
 		ClickNoError(
 			buttonId = ${key_statusButton},
 			locator1 = "PRMMDFRequest#STATUS_BUTTON");
@@ -92,12 +88,10 @@ definition {
 				value1 = ${campaignName});
 		}
 
-		if (isSet(campaignDescription)) {
-			Type(
-				key_fieldName = "overallCampaignDescription",
-				locator1 = "PRMMDFRequest#TEXT_FIELD",
-				value1 = ${campaignDescription});
-		}
+		Type(
+			key_fieldName = "overallCampaignDescription",
+			locator1 = "PRMMDFRequest#TEXT_FIELD",
+			value1 = ${campaignDescription});
 
 		if (isSet(goalsOptions)) {
 			for (var goalsList : list ${goalsOptions}) {
@@ -119,7 +113,7 @@ definition {
 
 		if (isSet(additionalOptions)) {
 			for (var optionsList : list ${additionalOptions}) {
-				Click.clickAtNotVisible(
+				Click.pauseClickAt(
 					key_buttonText = ${optionsList},
 					key_fieldName = "additionalOption",
 					locator1 = "PRMMDFRequest#INPUT_BUTTON");
@@ -145,6 +139,13 @@ definition {
 		}
 
 		return ${nextDayDate};
+	}
+
+	@summary = "Go to MDF"
+	macro goToMDF {
+		Click(
+			key_MDFName = ${campaignName},
+			locator1 = "PRMMDFRequest#REQUEST_ID");
 	}
 
 	@summary = "Fill the date fields on Activity Form"
@@ -282,6 +283,111 @@ definition {
 		var key_errorMessage = ${errorMessage};
 
 		AssertElementPresent(locator1 = "PRMMDFRequest#ERROR_MESSAGE");
+	}
+
+	@summary = "Verify that a content is present in the MDF file"
+	macro viewExportedMDF {
+		for (var campaignName : list ${campaignNameList}) {
+			var directoryPath = PropsUtil.get("output.dir.name");
+
+			var fileContent = FileUtil.read("${directoryPath}/MDF Requests.csv");
+
+			if (!(contains(${fileContent}, ${campaignName}))) {
+				echo(${fileContent});
+
+				fail("MDF '${campaignName}' doesn't exist");
+			}
+			else {
+				echo("MDF '${campaignName}' exists");
+			}
+		}
+	}
+
+	@summary = "Verify the fills done by the user on the Campaign Information"
+	macro viewMDFActivityDetails {
+		Click(
+			key_textButton = "Activity Name 1",
+			locator1 = "PRMMDFRequest#TEXT_BUTTON");
+
+		AssertElementPresent(
+			key_fieldName = "Activity name",
+			key_nameValue = ${activityName},
+			locator1 = "PRMMDFRequest#DETAIL_FIELD");
+
+		AssertElementPresent(
+			key_fieldName = "Type of Activity",
+			key_nameValue = ${typeOfActivity},
+			locator1 = "PRMMDFRequest#DETAIL_FIELD");
+
+		AssertElementPresent(
+			key_fieldName = "Tactic",
+			key_nameValue = ${tactic},
+			locator1 = "PRMMDFRequest#DETAIL_FIELD");
+
+		AssertElementPresent(
+			key_fieldName = "Marketing activity",
+			key_nameValue = ${activityDescription},
+			locator1 = "PRMMDFRequest#DETAIL_FIELD");
+
+		AssertTextEquals.assertPartialText(
+			key_fieldName = "Start Date",
+			key_nameValue = ${startDate},
+			locator1 = "PRMMDFRequest#DETAIL_FIELD",
+			value1 = ${startDate});
+
+		AssertTextEquals.assertPartialText(
+			key_fieldName = "End Date",
+			key_nameValue = ${endDate},
+			locator1 = "PRMMDFRequest#DETAIL_FIELD",
+			value1 = ${endDate});
+
+		AssertElementPresent(
+			key_fieldName = ${expense},
+			key_nameValue = ${budget},
+			locator1 = "PRMMDFRequest#DETAIL_FIELD");
+
+		AssertElementPresent(
+			key_fieldName = "Is a lead list an outcome of this activity?",
+			key_nameValue = ${leadList},
+			locator1 = "PRMMDFRequest#DETAIL_FIELD");
+	}
+
+	@summary = "Verify the activity fills made by the user after submited"
+	macro viewMDFCompanyDetails {
+		AssertElementPresent(
+			key_fieldName = "Company Name",
+			key_nameValue = ${accountName},
+			locator1 = "PRMMDFRequest#DETAIL_FIELD");
+
+		AssertElementPresent(
+			key_fieldName = "Region",
+			key_nameValue = ${countryName},
+			locator1 = "PRMMDFRequest#DETAIL_FIELD");
+
+		AssertElementPresent(
+			key_fieldName = "Name of the overall campaign",
+			key_nameValue = ${campaignName},
+			locator1 = "PRMMDFRequest#DETAIL_FIELD");
+
+		AssertElementPresent(
+			key_fieldName = "Short description of the overall campaign",
+			key_nameValue = "Campaign Description",
+			locator1 = "PRMMDFRequest#DETAIL_FIELD");
+
+		AssertElementPresent(
+			key_fieldName = "Liferay business/sales goals",
+			key_nameValue = ${goalsOptions},
+			locator1 = "PRMMDFRequest#DETAIL_FIELD");
+
+		AssertElementPresent(
+			key_fieldName = "Target Market(s)",
+			key_nameValue = ${targetMarketOptions},
+			locator1 = "PRMMDFRequest#DETAIL_FIELD");
+
+		AssertElementPresent(
+			key_fieldName = "Target Audience/Role",
+			key_nameValue = ${targetRolesOptions},
+			locator1 = "PRMMDFRequest#DETAIL_FIELD");
 	}
 
 }

@@ -530,7 +530,7 @@ definition {
 			value1 = "\RETURN");
 
 		if (${searchNoResults} == "true") {
-			AssertTextEquals(
+			AssertTextEquals.assertPartialText(
 				locator1 = "Message#EMPTY_INFO",
 				value1 = "No users were found.");
 
@@ -593,7 +593,7 @@ definition {
 			value1 = "\RETURN");
 
 		if (${searchNoResults} == "true") {
-			AssertTextEquals(
+			AssertTextEquals.assertPartialText(
 				locator1 = "Message#EMPTY_INFO",
 				value1 = "No users were found.");
 
@@ -656,7 +656,7 @@ definition {
 			value1 = "\RETURN");
 
 		if (${searchNoResults} == "true") {
-			AssertTextEquals(
+			AssertTextEquals.assertPartialText(
 				locator1 = "Message#EMPTY_INFO",
 				value1 = "No users were found.");
 
@@ -719,7 +719,7 @@ definition {
 			value1 = "\RETURN");
 
 		if (${searchNoResults} == "true") {
-			AssertTextEquals(
+			AssertTextEquals.assertPartialText(
 				locator1 = "Message#EMPTY_INFO",
 				value1 = "No users were found.");
 
@@ -986,7 +986,7 @@ definition {
 
 			Search.searchCP(searchTerm = "user1*");
 
-			AssertTextPresent(
+			AssertTextEquals.assertPartialText(
 				locator1 = "Message#EMPTY_INFO",
 				value1 = "No users were found.");
 		}
@@ -1009,7 +1009,7 @@ definition {
 
 			Search.searchCP(searchTerm = ${fullName});
 
-			AssertTextEquals(
+			AssertTextEquals.assertPartialText(
 				locator1 = "Message#EMPTY_INFO",
 				value1 = "No users were found.");
 		}
@@ -1300,7 +1300,11 @@ definition {
 	}
 
 	macro deleteProfileImage {
-		Button.click(button = "Delete");
+		var key_text = "Delete";
+
+		if (!(IsElementPresent(locator1 = "CustomerPortalSite#ANY_DISABLED_BUTTON"))) {
+			Button.click(button = "Delete");
+		}
 
 		AssertVisible(
 			key_imageName = "user_portrait",
@@ -2574,8 +2578,8 @@ definition {
 		var key_regularRoleName = ${regularRoleName};
 
 		Click(
-			locator1 = "UsersAndOrganizationsEditUser#ROLES_REGULAR_ROLES_REMOVE_ROLE",
-			value1 = ${regularRoleName});
+			key_entryName = ${regularRoleName},
+			locator1 = "LexiconTable#TABLE_ENTRY_DELETE");
 
 		PortletEntry.save();
 
@@ -2742,21 +2746,21 @@ definition {
 		if (${userEmailAddressVariation} == "At") {
 			Search.searchCP(searchTerm = ${userEmailAddress});
 
-			AssertTextEquals(
+			AssertTextEquals.assertPartialText(
 				locator1 = "Message#EMPTY_INFO",
 				value1 = "No users were found.");
 		}
 		else if (${userEmailAddressVariation} == "Period") {
 			Search.searchCP(searchTerm = ${userEmailAddress});
 
-			AssertTextEquals(
+			AssertTextEquals.assertPartialText(
 				locator1 = "Message#EMPTY_INFO",
 				value1 = "No users were found.");
 		}
 		else if (${userScreenNameVariation} == "Invalid") {
 			Search.searchCP(searchTerm = ${userScreenName});
 
-			AssertTextEquals(
+			AssertTextEquals.assertPartialText(
 				locator1 = "Message#EMPTY_INFO",
 				value1 = "No users were found.");
 		}
@@ -2907,7 +2911,7 @@ definition {
 	}
 
 	macro viewNoUsersFoundCP {
-		AssertTextEquals(
+		AssertTextEquals.assertPartialText(
 			locator1 = "Message#EMPTY_INFO",
 			value1 = "No users were found.");
 	}

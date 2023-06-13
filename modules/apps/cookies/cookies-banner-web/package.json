@@ -1,7 +1,6 @@
 {
 	"dependencies": {
 		"frontend-js-web": "*",
-		"moment": "2.29.4",
 		"react-transition-group": "4.4.1"
 	},
 	"main": "js/index.js",
@@ -11,5 +10,5 @@
 		"checkFormat": "liferay-npm-scripts check",
 		"format": "liferay-npm-scripts fix"
 	},
-	"version": "1.0.3"
+	"version": "1.0.4"
 }

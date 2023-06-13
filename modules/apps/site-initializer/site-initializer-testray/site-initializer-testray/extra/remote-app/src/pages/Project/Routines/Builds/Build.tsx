@@ -18,6 +18,7 @@ import {useParams} from 'react-router-dom';
 import Avatar from '../../../../components/Avatar';
 import AssignToMe from '../../../../components/Avatar/AssigneToMe';
 import Code from '../../../../components/Code';
+import JiraLink from '../../../../components/JiraLink';
 import Container from '../../../../components/Layout/Container';
 import ListViewRest from '../../../../components/ListView';
 import StatusBadge from '../../../../components/StatusBadge';
@@ -29,6 +30,7 @@ import i18n from '../../../../i18n';
 import {
 	PickList,
 	TestrayCaseResult,
+	TestrayCaseResultIssue,
 	testrayCaseResultImpl,
 } from '../../../../services/rest';
 import useBuildTestActions from './useBuildTestActions';
@@ -36,6 +38,7 @@ import useBuildTestActions from './useBuildTestActions';
 const Build = () => {
 	const {buildId} = useParams();
 	const {updateItemFromList} = useMutate();
+
 	const {actions, form} = useBuildTestActions();
 	const {
 		compareRuns: {runId},
@@ -59,6 +62,9 @@ const Build = () => {
 	return (
 		<Container className="mt-4">
 			<ListViewRest
+				initialContext={{
+					columns: {environment: false},
+				}}
 				managementToolbarProps={{
 					filterSchema: 'buildResults',
 					title: i18n.translate('tests'),
@@ -69,12 +75,28 @@ const Build = () => {
 					columns: [
 						{
 							clickable: true,
+							key: 'caseType',
+							render: (
+								_,
+								{case: testrayCase}: TestrayCaseResult
+							) => testrayCase?.caseType?.name,
+							value: i18n.translate('case-type'),
+						},
+						{
+							clickable: true,
 							key: 'priority',
 							render: (
 								_,
 								{case: testrayCase}: TestrayCaseResult
 							) => testrayCase?.priority,
 							value: i18n.translate('priority'),
+						},
+						{
+							clickable: true,
+							key: 'team',
+							render: (_, testrayCaseResult: TestrayCaseResult) =>
+								testrayCaseResult.case?.component?.team?.name,
+							value: i18n.translate('team'),
 						},
 						{
 							key: 'component',
@@ -103,6 +125,14 @@ const Build = () => {
 							value: i18n.translate('run'),
 						},
 						{
+							clickable: true,
+							key: 'environment',
+							render: (_, item: TestrayCaseResult) =>
+								item?.run?.name,
+							value: i18n.translate('environment'),
+							width: '250',
+						},
+						{
 							key: 'user',
 							render: (
 								_: any,
@@ -114,10 +144,9 @@ const Build = () => {
 										<Avatar
 											className="text-capitalize"
 											displayName
-											name={`${caseResult.user.emailAddress
-												.split('@')[0]
-												.replace('.', ' ')}`}
+											name={caseResult.user.name}
 											size="sm"
+											url={caseResult.user.image}
 										/>
 									);
 								}
@@ -143,7 +172,9 @@ const Build = () => {
 									/>
 								);
 							},
+							truncate: false,
 							value: i18n.translate('assignee'),
+							width: '200',
 						},
 						{
 							key: 'dueStatus',
@@ -158,6 +189,13 @@ const Build = () => {
 						},
 						{
 							key: 'issues',
+							render: (issues: TestrayCaseResultIssue[]) =>
+								issues.map((caseResultIssue, index) => (
+									<JiraLink
+										issue={caseResultIssue}
+										key={index}
+									/>
+								)),
 							value: i18n.translate('issues'),
 						},
 						{

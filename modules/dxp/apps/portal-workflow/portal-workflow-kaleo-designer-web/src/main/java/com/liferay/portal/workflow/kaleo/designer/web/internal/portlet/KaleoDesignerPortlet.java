@@ -45,6 +45,7 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Localization;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -63,12 +64,11 @@ import com.liferay.portal.workflow.kaleo.service.KaleoDefinitionVersionLocalServ
 
 import java.io.IOException;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -162,7 +162,15 @@ public class KaleoDesignerPortlet extends MVCPortlet {
 				_serveRoles(resourceRequest, resourceResponse);
 			}
 			else if (resourceID.equals("scriptLanguages")) {
-				_serveScriptLanguages(resourceRequest, resourceResponse);
+				writeJSON(
+					resourceRequest, resourceResponse,
+					JSONUtil.toJSONArray(
+						ListUtil.sort(
+							new ArrayList<>(
+								ScriptingUtil.getSupportedLanguages())),
+						language -> JSONUtil.put(
+							"scriptLanguage", StringUtil.toLowerCase(language)),
+						_log));
 			}
 			else if (resourceID.equals("users")) {
 				_serveUsers(resourceRequest, resourceResponse);
@@ -352,35 +360,6 @@ public class KaleoDesignerPortlet extends MVCPortlet {
 				).put(
 					"roleId", role.getRoleId()
 				));
-		}
-
-		writeJSON(resourceRequest, resourceResponse, jsonArray);
-	}
-
-	private void _serveScriptLanguages(
-			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
-		throws Exception {
-
-		Set<String> supportedScriptLanguages =
-			ScriptingUtil.getSupportedLanguages();
-
-		Stream<String> supportedScriptLanguagesStream =
-			supportedScriptLanguages.stream();
-
-		List<Object> sortedSupportedScriptLanguages =
-			supportedScriptLanguagesStream.sorted(
-			).collect(
-				Collectors.toList()
-			);
-
-		JSONArray jsonArray = _jsonFactory.createJSONArray();
-
-		for (Object supportedScriptLanguage : sortedSupportedScriptLanguages) {
-			jsonArray.put(
-				JSONUtil.put(
-					"scriptLanguage",
-					StringUtil.toLowerCase(
-						supportedScriptLanguage.toString())));
 		}
 
 		writeJSON(resourceRequest, resourceResponse, jsonArray);

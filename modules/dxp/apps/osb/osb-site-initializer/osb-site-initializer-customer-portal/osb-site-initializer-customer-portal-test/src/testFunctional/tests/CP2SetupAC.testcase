@@ -167,7 +167,7 @@ definition {
 	}
 
 	@description = "Automation ID: LPS-150657 | Test Summary: Verify if the user enters a wrong value in 'Workspace Name', an error message is displayed"
-	@priority
+	@priority = 3
 	test CanViewTheErrorMessageInTheWorkspaceNameField {
 		task ("And I enter Setup AC") {
 			CustomerPortal.clickOnFinishActivationButton();
@@ -206,10 +206,13 @@ definition {
 		}
 
 		task ("Delete the entries and objects created") {
-			CP2AnalyticsCloudSetup.clearAndDeleteCloudEntries(
-				entry = "ERC-003",
+			CP2Utils.clearCloudEntries(
 				position = 3,
 				status = "In-Progress");
+
+			CP2Utils.deleteSpecificObjectEntry(
+				email = "test@liferay.com",
+				portlet = "Analytics Cloud Workspaces");
 
 			CP2Utils.deleteSpecificObjectEntry(
 				email = "test@liferay.com",

@@ -2317,7 +2317,7 @@ definition {
 
 		ObjectAdmin.goToFieldsDetails(label = "Text");
 
-		ObjectField.assertNameDisabled();
+		AssertElementPresent(locator1 = "ObjectField#NAME_FIELD_DISABLED");
 	}
 
 	@description = "LPS-135635 - Verify it is not possible to update the Type of a Field after the Object is published"
@@ -2346,7 +2346,7 @@ definition {
 
 		ObjectAdmin.goToFieldsDetails(label = "Text");
 
-		ObjectField.assertTypeDisabled();
+		AssertElementPresent(locator1 = "ObjectField#TYPE_FIELD_DISABLED");
 	}
 
 	@description = "LPS-135635 - Verify it is not possible to update the Object name after it is published"
@@ -3340,7 +3340,7 @@ definition {
 
 		ObjectAdmin.goToFieldsDetails(label = "Custom Field");
 
-		ObjectField.assertMandatory();
+		AssertChecked.assertCheckedNotVisible(locator1 = "ObjectField#MANDATORY_TOGGLE");
 	}
 
 	@description = "LPS-139005 - Verify that is possible to submit entries in a form with an Object that was reactivated"
@@ -3511,7 +3511,9 @@ definition {
 
 		ObjectAdmin.goToFieldsDetails(label = "Text Update");
 
-		ObjectField.assertLabel(content = "Text Update");
+		AssertTextEquals(
+			locator1 = "ObjectField#LABEL_LOCALIZED",
+			value1 = "Text Update");
 	}
 
 	@description = "LPS-135635 - Verify it is possible to update the Label of a Field before the Object is published"
@@ -3546,7 +3548,9 @@ definition {
 
 		ObjectAdmin.goToFieldsDetails(label = "Text Update");
 
-		ObjectField.assertLabel(content = "Text Update");
+		AssertTextEquals(
+			locator1 = "ObjectField#LABEL_LOCALIZED",
+			value1 = "Text Update");
 	}
 
 	@description = "LPS-135635 - Verify it is possible to update the Mandatory of a Field before the Object is published"
@@ -3612,7 +3616,9 @@ definition {
 
 		ObjectAdmin.goToFieldsDetails(label = "Text");
 
-		ObjectField.assertName(fieldName = "customObjectFieldUpdate");
+		AssertTextEquals(
+			locator1 = "ObjectField#NAME_FIELD",
+			value1 = "customObjectFieldUpdate");
 	}
 
 	@description = "LPS-135635 - Verify it is possible to update the Searchable section before the Object is published"
@@ -3645,7 +3651,9 @@ definition {
 
 		ObjectAdmin.goToFieldsDetails(label = "Text");
 
-		ObjectField.assertSearchableLanguage(selected = "English (United States)");
+		AssertElementPresent(
+			locator1 = "ObjectField#SEARCHABLE_LANGUAGE_SELECT",
+			selected = "English (United States)");
 	}
 
 	@description = "LPS-135635 - Verify it is possible to update the Type of a Field before the Object is published"
@@ -6312,7 +6320,9 @@ definition {
 
 		ObjectAdmin.clickFieldsSearchableSectionRadioOption(radioOption = "Text");
 
-		ObjectField.assertSearchableLanguage(selected = "English (United States)");
+		AssertElementPresent(
+			locator1 = "ObjectField#SEARCHABLE_LANGUAGE_SELECT",
+			selected = "English (United States)");
 	}
 
 	@description = "LPS-137741 - Verify that Objects created on a Virtual Instance are not displayed on the Object Admin of the Main Instance and vice versa"

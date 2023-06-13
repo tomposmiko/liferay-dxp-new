@@ -1098,8 +1098,7 @@ definition {
 				locator1 = "PageEditor#FRAGMENTS_AND_WIDGETS_TAB_FRAGMENT",
 				locator2 = "PageEditor#ANY_FRAGMENT_DROP_TARGET");
 		}
-
-		if (isSet(targetFragmentName) && !(isSet(collectionName))) {
+		else if (isSet(targetFragmentName)) {
 			DragAndDrop.javaScriptDragAndDropToBottom(
 				index = ${index},
 				key_targetFragmentName = ${targetFragmentName},
@@ -1917,9 +1916,16 @@ definition {
 				text = ${selectedName});
 
 			if (isSet(filterCollection)) {
-				PageEditor.gotoEllipsisMenuItemInItemSelector(
-					fieldLabel = "Collection",
-					menuItem = "Prefilter Collection");
+				if (contains(${selectedName}, "Items")) {
+					PageEditor.gotoEllipsisMenuItemInItemSelector(
+						fieldLabel = "Collection",
+						menuItem = "Filter Collection");
+				}
+				else {
+					PageEditor.gotoEllipsisMenuItemInItemSelector(
+						fieldLabel = "Collection",
+						menuItem = "Prefilter Collection");
+				}
 
 				if (isSet(clearFilter)) {
 					Click(
@@ -1943,6 +1949,10 @@ definition {
 							checkboxName = ${itemType},
 							locator1 = "Checkbox#ANY_CHECKBOX");
 					}
+
+					Click(
+						key_fieldLabel = "Item Type",
+						locator1 = "Dropdown#DROPDOWN_TOGGLE_BUTTON_WITH_LABEL");
 				}
 
 				if (isSet(tagNameList)) {
@@ -1979,7 +1989,12 @@ definition {
 						value1 = ${option});
 				}
 
-				Button.clickApply();
+				if (contains(${selectedName}, "Items")) {
+					Button.clickSave();
+				}
+				else {
+					Button.clickApply();
+				}
 			}
 		}
 		else if (!(isSet(deviceType)) || (${deviceType} == "Desktop")) {
@@ -2484,7 +2499,7 @@ definition {
 			SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
 			if (isSet(documentandmedia)) {
-				NavItem.click(navItem = "Documents and Media");
+				MenuBar.click(menuBar = "Documents and Media");
 
 				LexiconCard.clickCard(card = ${imageFileName});
 
@@ -2500,7 +2515,7 @@ definition {
 			}
 
 			if (isSet(blogs)) {
-				NavItem.click(navItem = "Blogs");
+				MenuBar.click(menuBar = "Blogs");
 
 				LexiconCard.clickCard(card = ${entryTitle});
 
@@ -2519,7 +2534,7 @@ definition {
 			}
 
 			if (isSet(categories)) {
-				NavItem.click(navItem = "Categories");
+				MenuBar.click(menuBar = "Categories");
 
 				Portlet.expandTree();
 
@@ -2537,6 +2552,8 @@ definition {
 			}
 
 			if (isSet(knowledgeBase)) {
+				MenuBar.click(menuBar = "Knowledge Base Articles");
+
 				Click(
 					key_kbArticleTitle = ${entryTitle},
 					locator1 = "KnowledgeBaseSelectParent#SELECTOR_FIELD");
@@ -2556,7 +2573,7 @@ definition {
 			}
 
 			if (isSet(webcontent)) {
-				NavItem.click(navItem = "Web Content");
+				MenuBar.click(menuBar = "Web Content");
 
 				if (isSet(depotName)) {
 					var key_contentName = ${webContentTitle};
@@ -3105,6 +3122,19 @@ definition {
 			PageEditor.waitForAutoSave();
 		}
 
+		if (isSet(numberOfLines)) {
+			Type(
+				key_text = "Number of Lines",
+				locator1 = "TextInput#ANY",
+				value1 = ${numberOfLines});
+
+			Click(
+				key_sidebarButton = "Browser",
+				locator1 = "PageEditor#FRAGMENT_SIDEBAR_TITLE");
+
+			PageEditor.waitForAutoSave();
+		}
+
 		if (isSet(placeholder)) {
 			Type(
 				key_text = "Placeholder",
@@ -3114,6 +3144,21 @@ definition {
 			Click(
 				key_sidebarButton = "Browser",
 				locator1 = "PageEditor#FRAGMENT_SIDEBAR_TITLE");
+
+			PageEditor.waitForAutoSave();
+		}
+
+		if (${showCharactersCount} == "false") {
+			Uncheck.uncheckToggleSwitch(
+				key_toggleSwitchLabel = "Show Characters Count",
+				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
+
+			PageEditor.waitForAutoSave();
+		}
+		else if (${showCharactersCount} == "true") {
+			Check.checkToggleSwitch(
+				key_toggleSwitchLabel = "Show Characters Count",
+				locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
 
 			PageEditor.waitForAutoSave();
 		}
@@ -5559,6 +5604,14 @@ return	Array.from(getWebElement("(//div[@aria-label='${fragmentName}'])[${index}
 			var position = 1;
 		}
 
+		if (isSet(charactersCount)) {
+			AssertTextEquals(
+				index = ${position},
+				locator1 = "Fragment#INPUT_LENGTH_INFO",
+				type = ${type},
+				value1 = ${charactersCount});
+		}
+
 		if (${showLabel} == "true") {
 			AssertTextEquals(
 				fieldLabel = ${label},
@@ -5589,13 +5642,32 @@ return	Array.from(getWebElement("(//div[@aria-label='${fragmentName}'])[${index}
 				type = ${type});
 		}
 
-		if (isSet(placeholder)) {
+		if (isSet(numberOfLines)) {
 			AssertAttributeValue(
-				attribute1 = "placeholder",
+				attribute1 = "rows",
 				index = ${position},
-				locator1 = "Fragment#INPUT_FIELD",
+				locator1 = "Fragment#TEXTAREA_FIELD",
 				type = ${type},
-				value1 = ${placeholder});
+				value1 = ${numberOfLines});
+		}
+
+		if (isSet(placeholder)) {
+			if (${type} == "textarea") {
+				AssertAttributeValue(
+					attribute1 = "placeholder",
+					index = ${position},
+					locator1 = "Fragment#TEXTAREA_FIELD",
+					type = ${type},
+					value1 = ${placeholder});
+			}
+			else {
+				AssertAttributeValue(
+					attribute1 = "placeholder",
+					index = ${position},
+					locator1 = "Fragment#INPUT_FIELD",
+					type = ${type},
+					value1 = ${placeholder});
+			}
 		}
 
 		if (isSet(markAsRequired)) {

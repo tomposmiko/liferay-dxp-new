@@ -176,6 +176,20 @@ definition {
 		return ${relationshipId};
 	}
 
+	macro _curlObjectEntriesRelationship {
+		Variables.assertDefined(parameterList = "${en_US_plural_label},${objectEntry1},${objectEntry2},${relationshipName}");
+
+		var portalURL = JSONCompany.getPortalURL();
+		var en_US_plural_label_lowercase = StringUtil.lowerCase(${en_US_plural_label});
+
+		var curl = '''
+			${portalURL}/o/c/${en_US_plural_label_lowercase}/${objectEntry1}/${relationshipName}/${objectEntry2} \
+				-u test@liferay.com:test
+		''';
+
+		return ${curl};
+	}
+
 	macro _deleteEmployee {
 		Variables.assertDefined(parameterList = ${employeeId});
 
@@ -449,22 +463,6 @@ definition {
 		return ${json};
 	}
 
-	macro _relateObjectEntries {
-		Variables.assertDefined(parameterList = "${en_US_plural_label},${objectEntry1},${objectEntry2},${relationshipName}");
-
-		var portalURL = JSONCompany.getPortalURL();
-		var en_US_plural_label_lowercase = StringUtil.lowerCase(${en_US_plural_label});
-
-		var curl = '''
-			${portalURL}/o/c/${en_US_plural_label_lowercase}/${objectEntry1}/${relationshipName}/${objectEntry2} \
-				-u test@liferay.com:test
-		''';
-
-		var response = JSONCurlUtil.put(${curl});
-
-		return ${response};
-	}
-
 	macro _updateEmployee {
 		Variables.assertDefined(parameterList = "${employeeId},${firstname},${managerId}");
 
@@ -651,6 +649,16 @@ definition {
 		TestUtils.assertEquals(
 			actual = ${actual},
 			expected = ${expectedValue});
+	}
+
+	macro breakRelationshipBetweenEntries {
+		var curl = ObjectDefinitionAPI._curlObjectEntriesRelationship(
+			en_US_plural_label = ${en_US_plural_label},
+			objectEntry1 = ${objectEntry1},
+			objectEntry2 = ${objectEntry2},
+			relationshipName = ${relationshipName});
+
+		JSONCurlUtil.delete(${curl});
 	}
 
 	macro createAndPublishObjectDefinition {
@@ -859,11 +867,13 @@ definition {
 	}
 
 	macro relateObjectEntries {
-		var response = ObjectDefinitionAPI._relateObjectEntries(
+		var curl = ObjectDefinitionAPI._curlObjectEntriesRelationship(
 			en_US_plural_label = ${en_US_plural_label},
 			objectEntry1 = ${objectEntry1},
 			objectEntry2 = ${objectEntry2},
 			relationshipName = ${relationshipName});
+
+		var response = JSONCurlUtil.put(${curl});
 
 		return ${response};
 	}

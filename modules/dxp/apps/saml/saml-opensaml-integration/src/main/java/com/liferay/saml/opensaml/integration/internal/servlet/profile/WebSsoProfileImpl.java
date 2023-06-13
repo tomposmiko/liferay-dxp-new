@@ -509,10 +509,6 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 		SPSSODescriptor spSSODescriptor =
 			(SPSSODescriptor)samlSelfMetadataContext.getRoleDescriptor();
 
-		AssertionConsumerService assertionConsumerService =
-			SamlUtil.getAssertionConsumerServiceForBinding(
-				spSSODescriptor, SAMLConstants.SAML2_POST_BINDING_URI);
-
 		SAMLPeerEntityContext samlPeerEntityContext =
 			messageContext.getSubcontext(SAMLPeerEntityContext.class);
 
@@ -534,7 +530,9 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 		nameIDPolicy.setFormat(metadataManager.getNameIdFormat(entityId));
 
 		AuthnRequest authnRequest = OpenSamlUtil.buildAuthnRequest(
-			samlSelfEntityContext.getEntityId(), assertionConsumerService,
+			samlSelfEntityContext.getEntityId(),
+			SamlUtil.getAssertionConsumerServiceForBinding(
+				spSSODescriptor, SAMLConstants.SAML2_POST_BINDING_URI),
 			singleSignOnService, nameIDPolicy);
 
 		if (samlSpIdpConnection.isForceAuthn() ||
@@ -629,9 +627,7 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 	}
 
 	protected Subject getSuccessSubject(
-		SamlSsoRequestContext samlSsoRequestContext,
-		AssertionConsumerService assertionConsumerService, NameID nameID,
-		SubjectConfirmationData subjectConfirmationData) {
+		NameID nameID, SubjectConfirmationData subjectConfirmationData) {
 
 		SubjectConfirmation subjectConfirmation =
 			OpenSamlUtil.buildSubjectConfirmation();
@@ -1263,9 +1259,7 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 			OpenSamlUtil.buildIssuer(samlSelfEntityContext.getEntityId()));
 
 		assertion.setSubject(
-			getSuccessSubject(
-				samlSsoRequestContext, assertionConsumerService, nameID,
-				subjectConfirmationData));
+			getSuccessSubject(nameID, subjectConfirmationData));
 		assertion.setVersion(SAMLVersion.VERSION_20);
 
 		List<AuthnStatement> authnStatements = assertion.getAuthnStatements();
@@ -1465,9 +1459,15 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 			if ((authnRequest != null) && authnRequest.isPassive() &&
 				(user == null)) {
 
+				SamlProviderConfiguration samlProviderConfiguration =
+					samlProviderConfigurationHelper.
+						getSamlProviderConfiguration();
+
 				_sendFailureResponse(
-					samlSsoRequestContext, StatusCode.NO_PASSIVE,
-					httpServletResponse);
+					samlProviderConfiguration.
+						authnRequestSigningAllowsDynamicACSURL(),
+					httpServletResponse, samlSsoRequestContext,
+					StatusCode.NO_PASSIVE);
 
 				return;
 			}
@@ -1521,7 +1521,12 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 				forceAuthn);
 		}
 		else {
+			SamlProviderConfiguration samlProviderConfiguration =
+				samlProviderConfigurationHelper.getSamlProviderConfiguration();
+
 			_sendSuccessResponse(
+				samlProviderConfiguration.
+					authnRequestSigningAllowsDynamicACSURL(),
 				httpServletRequest, httpServletResponse, samlSsoRequestContext);
 
 			HttpSession httpSession = httpServletRequest.getSession(false);
@@ -1749,8 +1754,8 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 	}
 
 	private void _sendFailureResponse(
-			SamlSsoRequestContext samlSsoRequestContext, String statusURI,
-			HttpServletResponse httpServletResponse)
+			boolean dynamicACSURL, HttpServletResponse httpServletResponse,
+			SamlSsoRequestContext samlSsoRequestContext, String statusURI)
 		throws Exception {
 
 		MessageContext<?> messageContext =
@@ -1761,7 +1766,8 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 
 		AssertionConsumerService assertionConsumerService =
 			SamlUtil.resolverAssertionConsumerService(
-				messageContext, samlBinding.getCommunicationProfileId());
+				messageContext, samlBinding.getCommunicationProfileId(),
+				dynamicACSURL);
 
 		SAMLPeerEntityContext samlPeerEntityContext =
 			messageContext.getSubcontext(SAMLPeerEntityContext.class);
@@ -1822,7 +1828,7 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 	}
 
 	private void _sendSuccessResponse(
-			HttpServletRequest httpServletRequest,
+			boolean dynamicACSURL, HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse,
 			SamlSsoRequestContext samlSsoRequestContext)
 		throws Exception {
@@ -1835,7 +1841,8 @@ public class WebSsoProfileImpl extends BaseProfile implements WebSsoProfile {
 
 		AssertionConsumerService assertionConsumerService =
 			SamlUtil.resolverAssertionConsumerService(
-				messageContext, samlBinding.getCommunicationProfileId());
+				messageContext, samlBinding.getCommunicationProfileId(),
+				dynamicACSURL);
 
 		NameID nameID = _getSuccessNameId(samlSsoRequestContext);
 

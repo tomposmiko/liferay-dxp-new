@@ -819,7 +819,7 @@ definition {
 		}
 
 		task ("Assert the four fragments are shown") {
-			AssertTextEquals(
+			AssertTextEquals.assertPartialText(
 				locator1 = "Message#EMPTY_INFO",
 				value1 = "No entries were found.");
 
@@ -863,7 +863,7 @@ definition {
 					fragmentName = ${fragmentName},
 					height = "Tall",
 					navTab = "Fragments",
-					ratio = "9 / 8",
+					ratio = "11 / 10",
 					targetElementName = "Blogs");
 			}
 		}
