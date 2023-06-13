@@ -13,18 +13,20 @@
  */
 
 import ClayIcon from '@clayui/icon';
-import {useParams} from 'react-router-dom';
+import {useNavigate, useParams} from 'react-router-dom';
 
 import Container from '../../../components/Layout/Container';
 import ListView from '../../../components/ListView/ListView';
 import {getRequirements} from '../../../graphql/queries';
 import i18n from '../../../i18n';
+import {searchUtil} from '../../../util/search';
 import RequirementsModal from './RequirementModal';
 import useRequirementActions from './useRequirementActions';
 
 const Requirements = () => {
 	const {actions, formModal} = useRequirementActions();
 	const {projectId} = useParams();
+	const navigate = useNavigate();
 
 	return (
 		<>
@@ -32,8 +34,7 @@ const Requirements = () => {
 				<ListView
 					forceRefetch={formModal.forceRefetch}
 					managementToolbarProps={{
-						addButton: () => formModal.modal.open(),
-						visible: true,
+						addButton: () => navigate('create'),
 					}}
 					query={getRequirements}
 					tableProps={{
@@ -89,7 +90,9 @@ const Requirements = () => {
 						navigateTo: ({id}) => id?.toString(),
 					}}
 					transformData={(data) => data?.requirements}
-					variables={{filter: `projectId eq ${projectId}`}}
+					variables={{
+						filter: searchUtil.eq('projectId', projectId as string),
+					}}
 				/>
 			</Container>
 

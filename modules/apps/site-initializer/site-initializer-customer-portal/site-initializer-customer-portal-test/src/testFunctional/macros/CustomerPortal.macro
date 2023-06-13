@@ -233,6 +233,14 @@ definition {
 			title = "${title}");
 	}
 
+	macro enterOnSubscription {
+		Click(
+			cardName = "Non-Production",
+			locator1 = "CustomerPortalSite#CARD_NAME");
+
+		Click(locator1 = "CustomerPortalSite#CLOSE_MODAL_CARD");
+	}
+
 	macro loginOktaToUpdateCP {
 		var userEmailAddress = "garrettz@mbopartners.com.broken";
 		var userPassword = "q4F63ZEH3njnnA34S761";
@@ -291,6 +299,8 @@ definition {
 		AssertClick(
 			locator1 = "Button#SUBMIT",
 			value1 = "Save");
+
+		Refresh();
 
 		WaitForElementNotPresent(locator1 = "IFrame#MODAL_BODY");
 
@@ -470,6 +480,28 @@ definition {
 
 	macro viewSubcriptionsPage {
 		AssertElementPresent(locator1 = "CustomerPortalSite#SUBCRIPTIONS_PROJECT_INSIDE_PAGE");
+	}
+
+	macro viewTableValue {
+		AssertTextEquals(
+			locator1 = "CustomerPortalSite#TABLE_VALUE",
+			value = "11/30/2022 - 03/30/2025",
+			value1 = "11/30/2022 - 03/30/2025");
+
+		AssertTextEquals(
+			locator1 = "CustomerPortalSite#TABLE_VALUE",
+			value = "1",
+			value1 = "1");
+
+		AssertTextEquals(
+			locator1 = "CustomerPortalSite#TABLE_HEAD",
+			title = "Instance Size",
+			value1 = "Instance Size");
+
+		AssertTextEquals(
+			locator1 = "CustomerPortalSite#TABLE_STATUS",
+			status = "Future",
+			value1 = "Future");
 	}
 
 }

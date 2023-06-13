@@ -16,7 +16,6 @@ import i18n from '../../../../common/I18n';
 import {FORMAT_DATE} from '../../../../common/utils/constants/slaCardDate';
 import {SLA_CARD_NAMES} from '../../../../common/utils/constants/slaCardNames';
 import getDateCustomFormat from '../../utils/getDateCustomFormat';
-import getKebabCase from '../../utils/getKebabCase';
 import SlaCardLayout from './Layout';
 
 const SlaCard = ({project}) => {
@@ -137,12 +136,8 @@ const SlaCard = ({project}) => {
 									key={sla.title}
 									slaDateEnd={sla.dateEnd}
 									slaDateStart={sla.dateStart}
-									slaLabel={i18n.translate(
-										getKebabCase(sla.label)
-									)}
-									slaSelected={i18n.translate(
-										getKebabCase(slaSelected)
-									)}
+									slaLabel={sla.label}
+									slaSelected={slaSelected}
 									slaTitle={sla.title}
 								/>
 							))}

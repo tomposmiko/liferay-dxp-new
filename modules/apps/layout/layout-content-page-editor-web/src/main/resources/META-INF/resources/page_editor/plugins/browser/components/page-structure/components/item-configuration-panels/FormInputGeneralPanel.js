@@ -13,10 +13,13 @@
  */
 
 import ClayLoadingIndicator from '@clayui/loading-indicator';
+import classNames from 'classnames';
 import React, {useMemo} from 'react';
 
 import {ALLOWED_INPUT_TYPES} from '../../../../../../app/config/constants/allowedInputTypes';
+import {FRAGMENT_ENTRY_TYPES} from '../../../../../../app/config/constants/fragmentEntryTypes';
 import {FREEMARKER_FRAGMENT_ENTRY_PROCESSOR} from '../../../../../../app/config/constants/freemarkerFragmentEntryProcessor';
+import {LAYOUT_DATA_ITEM_TYPES} from '../../../../../../app/config/constants/layoutDataItemTypes';
 import {
 	useDispatch,
 	useSelector,
@@ -28,8 +31,10 @@ import selectFragmentEntryLink from '../../../../../../app/selectors/selectFragm
 import selectLanguageId from '../../../../../../app/selectors/selectLanguageId';
 import selectSegmentsExperienceId from '../../../../../../app/selectors/selectSegmentsExperienceId';
 import FormService from '../../../../../../app/services/FormService';
+import InfoItemService from '../../../../../../app/services/InfoItemService';
 import updateEditableValues from '../../../../../../app/thunks/updateEditableValues';
 import {CACHE_KEYS} from '../../../../../../app/utils/cache';
+import {isFormRequiredField} from '../../../../../../app/utils/isFormRequiredField';
 import {setIn} from '../../../../../../app/utils/setIn';
 import useCache from '../../../../../../app/utils/useCache';
 import Collapse from '../../../../../../common/components/Collapse';
@@ -42,44 +47,82 @@ const DEFAULT_FORM_CONFIGURATION = {classNameId: null, classTypeId: null};
 
 const FIELD_ID_CONFIGURATION_KEY = 'inputFieldId';
 const HELP_TEXT_CONFIGURATION_KEY = 'inputHelpText';
+const REQUIRED_CONFIGURATION_KEY = 'inputRequired';
 const SHOW_HELP_TEXT_CONFIGURATION_KEY = 'inputShowHelpText';
 
-const INPUT_COMMON_CONFIGURATION = [
-	{
-		defaultValue: false,
-		label: Liferay.Language.get('mark-as-required'),
-		name: 'inputRequired',
-		type: 'checkbox',
-	},
-	{
-		defaultValue: true,
-		label: Liferay.Language.get('show-label'),
-		name: 'inputShowLabel',
-		type: 'checkbox',
-		typeOptions: {displayType: 'toggle'},
-	},
-	{
-		defaultValue: '',
-		label: Liferay.Language.get('label'),
-		localizable: true,
-		name: 'inputLabel',
-		type: 'text',
-	},
-	{
-		defaultValue: true,
-		label: Liferay.Language.get('show-help-text'),
-		name: SHOW_HELP_TEXT_CONFIGURATION_KEY,
-		type: 'checkbox',
-		typeOptions: {displayType: 'toggle'},
-	},
-	{
-		defaultValue: '',
-		label: Liferay.Language.get('help-text'),
-		localizable: true,
-		name: HELP_TEXT_CONFIGURATION_KEY,
-		type: 'text',
-	},
-];
+function getInputCommonConfiguration(configurationValues, formFields) {
+	const fields = [];
+
+	if (configurationValues[FIELD_ID_CONFIGURATION_KEY]) {
+		const isRequiredField = isFormRequiredField(
+			configurationValues[FIELD_ID_CONFIGURATION_KEY],
+			formFields
+		);
+
+		fields.push({
+			defaultValue: isRequiredField,
+			disabled: isRequiredField,
+			label: Liferay.Language.get('mark-as-required'),
+			name: REQUIRED_CONFIGURATION_KEY,
+			type: 'checkbox',
+		});
+	}
+
+	fields.push(
+		{
+			defaultValue: true,
+			label: Liferay.Language.get('show-label'),
+			name: 'inputShowLabel',
+			type: 'checkbox',
+			typeOptions: {displayType: 'toggle'},
+		},
+		{
+			defaultValue: '',
+			label: Liferay.Language.get('label'),
+			localizable: true,
+			name: 'inputLabel',
+			type: 'text',
+		},
+		{
+			defaultValue: true,
+			label: Liferay.Language.get('show-help-text'),
+			name: SHOW_HELP_TEXT_CONFIGURATION_KEY,
+			type: 'checkbox',
+			typeOptions: {displayType: 'toggle'},
+		}
+	);
+
+	if (configurationValues[SHOW_HELP_TEXT_CONFIGURATION_KEY] !== false) {
+		fields.push({
+			defaultValue: Liferay.Language.get(
+				'guide-your-users-to-fill-in-the-field-by-adding-help-text-here'
+			),
+			label: Liferay.Language.get('help-text'),
+			localizable: true,
+			name: HELP_TEXT_CONFIGURATION_KEY,
+			type: 'text',
+		});
+	}
+
+	return fields;
+}
+
+function getTypeLabels(itemTypes, classNameId, classTypeId) {
+	if (!itemTypes || !classNameId) {
+		return {};
+	}
+
+	const selectedType = itemTypes.find(({value}) => value === classNameId);
+
+	const selectedSubtype = selectedType.subtypes.length
+		? selectedType.subtypes.find(({value}) => value === classTypeId)
+		: {};
+
+	return {
+		subtype: selectedSubtype.label,
+		type: selectedType.label,
+	};
+}
 
 export function FormInputGeneralPanel({item}) {
 	const dispatch = useDispatch();
@@ -98,17 +141,36 @@ export function FormInputGeneralPanel({item}) {
 		[item.itemId]
 	);
 
-	const fields = useMemo(() => {
-		let nextFields = INPUT_COMMON_CONFIGURATION;
+	const {classNameId, classTypeId, formId} = useSelectorCallback(
+		(state) =>
+			selectFormConfiguration(item, state.layoutData) ||
+			DEFAULT_FORM_CONFIGURATION,
+		[item.itemId]
+	);
 
-		if (configurationValues[SHOW_HELP_TEXT_CONFIGURATION_KEY] === false) {
-			nextFields = nextFields.filter(
-				(field) => field.name !== HELP_TEXT_CONFIGURATION_KEY
-			);
-		}
+	const formFields = useCache({
+		fetcher: () => FormService.getFormFields({classNameId, classTypeId}),
+		key: [CACHE_KEYS.formFields, classNameId, classTypeId],
+	});
+
+	const fields = useMemo(() => {
+		let nextFields = getInputCommonConfiguration(
+			configurationValues,
+			formFields
+		);
+
+		const fieldSetsWithoutLabel =
+			fragmentEntryLinkRef.current.configuration?.fieldSets?.filter(
+				(fieldSet) => !fieldSet.configurationRole && !fieldSet.label
+			) ?? [];
+
+		nextFields = [
+			...nextFields,
+			...fieldSetsWithoutLabel.flatMap((fieldSet) => fieldSet.fields),
+		];
 
 		return nextFields;
-	}, [configurationValues]);
+	}, [configurationValues, fragmentEntryLinkRef, formFields]);
 
 	const handleValueSelect = (key, value) => {
 		const keyPath = [FREEMARKER_FRAGMENT_ENTRY_PROCESSOR, key];
@@ -144,6 +206,12 @@ export function FormInputGeneralPanel({item}) {
 				>
 					<FormInputMappingOptions
 						configurationValues={configurationValues}
+						form={{
+							classNameId,
+							classTypeId,
+							fields: formFields,
+							formId,
+						}}
 						item={item}
 						onValueSelect={handleValueSelect}
 					/>
@@ -164,13 +232,13 @@ export function FormInputGeneralPanel({item}) {
 	);
 }
 
-function FormInputMappingOptions({configurationValues, item, onValueSelect}) {
-	const {classNameId, classTypeId} = useSelectorCallback(
-		(state) =>
-			selectFormConfiguration(item, state.layoutData) ||
-			DEFAULT_FORM_CONFIGURATION,
-		[item.itemId]
-	);
+function FormInputMappingOptions({
+	configurationValues,
+	form,
+	item,
+	onValueSelect,
+}) {
+	const {classNameId, classTypeId, fields, formId} = form;
 
 	const inputType = useSelectorCallback(
 		(state) => {
@@ -189,22 +257,76 @@ function FormInputMappingOptions({configurationValues, item, onValueSelect}) {
 		[item.itemId]
 	);
 
-	const fields = useCache({
-		fetcher: () => FormService.getFormFields({classNameId, classTypeId}),
-		key: [CACHE_KEYS.formFields, classNameId, classTypeId],
+	const itemTypes = useCache({
+		fetcher: () => InfoItemService.getAvailableInfoItemFormProviders(),
+		key: [CACHE_KEYS.itemTypes],
 	});
 
-	const filteredFields = useMemo(
-		() =>
-			fields
-				?.map((fieldset) => ({
+	const {subtype, type} = useMemo(
+		() => getTypeLabels(itemTypes, classNameId, classTypeId),
+		[itemTypes, classNameId, classTypeId]
+	);
+
+	const filteredFields = useSelectorCallback(
+		(state) => {
+			if (!fields) {
+				return fields;
+			}
+
+			let nextFields = fields;
+
+			const selectedFields = (() => {
+				const selectedFields = [];
+
+				const findSelectedFields = (itemId) => {
+					const inputItem = state.layoutData.items[itemId];
+
+					if (
+						inputItem?.itemId !== item.itemId &&
+						inputItem?.type === LAYOUT_DATA_ITEM_TYPES.fragment
+					) {
+						const {
+							editableValues,
+							fragmentEntryType,
+						} = selectFragmentEntryLink(state, inputItem);
+
+						if (
+							fragmentEntryType === FRAGMENT_ENTRY_TYPES.input &&
+							editableValues[FREEMARKER_FRAGMENT_ENTRY_PROCESSOR][
+								FIELD_ID_CONFIGURATION_KEY
+							]
+						) {
+							selectedFields.push(
+								editableValues[
+									FREEMARKER_FRAGMENT_ENTRY_PROCESSOR
+								][FIELD_ID_CONFIGURATION_KEY]
+							);
+						}
+					}
+
+					inputItem?.children.forEach(findSelectedFields);
+				};
+
+				findSelectedFields(formId);
+
+				return selectedFields;
+			})();
+
+			nextFields = nextFields
+				.map((fieldset) => ({
 					...fieldset,
-					fields: fieldset.fields.filter((field) =>
-						ALLOWED_INPUT_TYPES[field.type]?.includes(inputType)
+					fields: fieldset.fields.filter(
+						(field) =>
+							ALLOWED_INPUT_TYPES[field.type]?.includes(
+								inputType
+							) && !selectedFields.includes(field.key)
 					),
 				}))
-				.filter((fieldset) => fieldset.fields.length),
-		[fields, inputType]
+				.filter((fieldset) => fieldset.fields.length);
+
+			return nextFields;
+		},
+		[item.itemId, fields, inputType]
 	);
 
 	if (!classNameId || !classTypeId) {
@@ -212,14 +334,48 @@ function FormInputMappingOptions({configurationValues, item, onValueSelect}) {
 	}
 
 	return filteredFields ? (
-		<MappingFieldSelector
-			fieldType={inputType}
-			fields={filteredFields}
-			onValueSelect={(event) =>
-				onValueSelect(FIELD_ID_CONFIGURATION_KEY, event.target.value)
-			}
-			value={configurationValues[FIELD_ID_CONFIGURATION_KEY] || ''}
-		/>
+		<>
+			<MappingFieldSelector
+				fieldType={inputType}
+				fields={filteredFields}
+				onValueSelect={(event) =>
+					onValueSelect(
+						FIELD_ID_CONFIGURATION_KEY,
+						event.target.value === 'unmapped'
+							? null
+							: event.target.value
+					)
+				}
+				value={configurationValues[FIELD_ID_CONFIGURATION_KEY] || ''}
+			/>
+			{type && (
+				<p
+					className={classNames(
+						'page-editor__mapping-panel__type-label',
+						{
+							'mb-0': subtype,
+							'mb-3': !subtype,
+						}
+					)}
+				>
+					<span className="mr-1">
+						{Liferay.Language.get('content-type')}:
+					</span>
+
+					{type}
+				</p>
+			)}
+
+			{subtype && (
+				<p className="mb-3 page-editor__mapping-panel__type-label">
+					<span className="mr-1">
+						{Liferay.Language.get('subtype')}:
+					</span>
+
+					{subtype}
+				</p>
+			)}
+		</>
 	) : (
 		<ClayLoadingIndicator />
 	);

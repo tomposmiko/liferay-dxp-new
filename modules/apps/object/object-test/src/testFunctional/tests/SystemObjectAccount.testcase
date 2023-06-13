@@ -33,12 +33,23 @@ definition {
 	}
 
 	@description = "LPS-151765 - Verify if is possible to create Custom Action on System Object Account"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanCreateActionOnSystemAccount {
+		ObjectAdmin.openObjectAdmin();
 
-		// TODO LPS-153524 CanCreateActionOnSystemAccount pending implementation
+		ObjectPortlet.selectSystemObject(label = "Account");
 
+		ObjectAdmin.goToActionsTab();
+
+		ObjectAdmin.addObjectActionViaUI(
+			actionName = "Action Name",
+			thenAction = "Webhook",
+			urlAction = "http://localhost:8080",
+			whenAction = "On After Add");
+
+		ObjectAdmin.assertObjectActions(
+			actionActive = "Yes",
+			actionName = "Action Name");
 	}
 
 	@description = "LPS-151765 - Verify if is possible to create Relationship one to many on System Object Account and to relate with the Custom Object"
@@ -60,13 +71,23 @@ definition {
 	}
 
 	@description = "LPS-151765 - Verify if is not possible to delete the fields on System Object Account"
-	@ignore = "Test Stub"
 	@priority = "5"
 	test CannotDeleteDefaultFields {
 		property portal.acceptance = "true";
 
-		// TODO LPS-153522 CannotDeleteDefaultFields pending implementation
+		ObjectAdmin.openObjectAdmin();
 
+		ObjectPortlet.selectSystemObject(label = "Account");
+
+		ObjectAdmin.goToFieldsTab();
+
+		for (var label : list "Name,Description,Type") {
+			AssertElementNotPresent(
+				key_value = "${label}",
+				locator1 = "ObjectAdmin#BODY_VERTICAL_ELLIPSIS");
+
+			AssertElementNotPresent(locator1 = "ObjectPortlet#DELETE_ENTRY_BUTTON");
+		}
 	}
 
 	@description = "LPS-151765 - Verify if Disassociate deletion type of Relationship One to Many can delete normally and nothing happens with the child"
@@ -88,13 +109,35 @@ definition {
 	}
 
 	@description = "LPS-151765 - Verify if is not possible to edit default fields on System Object Account"
-	@ignore = "Test Stub"
 	@priority = "5"
 	test CannotEditDefaultFields {
 		property portal.acceptance = "true";
 
-		// TODO LPS-153521 CannotEditDefaultFields pending implementation
+		ObjectAdmin.openObjectAdmin();
 
+		ObjectPortlet.selectSystemObject(label = "Account");
+
+		ObjectAdmin.goToFieldsTab();
+
+		for (var label : list "Name,Description,Type") {
+			ObjectAdmin.goToFieldsDetails(label = "${label}");
+
+			ObjectField.assertTypeDisabled();
+
+			ObjectField.assertNameDisabled();
+
+			ObjectField.typeLabel(content = "Text Update");
+
+			Button.clickSave();
+
+			Click(locator1 = "Icon#TIMES");
+
+			AssertElementNotPresent(
+				key_tableEntry = "Text Update",
+				locator1 = "LexiconTable#TABLE_ENTRY");
+
+			Refresh();
+		}
 	}
 
 	@description = "LPS-151765 - Verify if is possible a Custom User to view the System Object Account, if it to have permission"
@@ -107,40 +150,129 @@ definition {
 	}
 
 	@description = "LPS-151765 - Verify if is possible to choose by Description Field on entries, when Title Field is Description"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanViewDescriptionOnFieldEntry {
+		Accounts.openAccountsAdmin();
 
-		// TODO LPS-153528 CanViewDescriptionOnFieldEntry pending implementation
+		Accounts.addBusinessAccount(
+			accountDescription = "Accounts Name Description for Test",
+			accountName = "Accounts Name for Test");
 
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 153528",
+			objectName = "CustomObject153528",
+			pluralLabelName = "Custom Objects 153528");
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectSystemObject(label = "Account");
+
+		ObjectAdmin.gotoRelationshipsTab();
+
+		ObjectAdmin.addObjectRelationshipViaUI(
+			label = "Relationship",
+			object = "CustomObject153528",
+			type = "One to Many");
+
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject153528");
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectSystemObject(label = "Account");
+
+		CreateObject.selectTitleField(fieldLabel = "Description");
+
+		CreateObject.saveObject();
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject153528");
+
+		ObjectAdmin.addEntryOnRelationshipFieldViaUI(entryOption = "Accounts Name Description for Test");
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject153528");
+
+		ObjectPortlet.viewEntry(entry = "Accounts Name Description for Test");
 	}
 
 	@description = "LPS-151765 - Verify if there are the fields Name, Description and Type as default on System Object Account"
-	@ignore = "Test Stub"
 	@priority = "5"
 	test CanViewFieldsLabelByDefault {
 		property portal.acceptance = "true";
 
-		// TODO LPS-153520 CanViewFieldsLabelByDefault pending implementation
+		ObjectAdmin.openObjectAdmin();
 
+		ObjectPortlet.selectSystemObject(label = "Account");
+
+		ObjectAdmin.goToFieldsTab();
+
+		for (var label : list "Name,Description,Type") {
+			ObjectAdmin.assertObjectField(
+				fieldLabel = "${label}",
+				fieldType = "Text");
+		}
 	}
 
 	@description = "LPS-151765 - Verify if the fields Name and Type are mandatory on System Object Account"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanViewNameAndTypeAsMandatoryFields {
+		ObjectAdmin.openObjectAdmin();
 
-		// TODO LPS-153523 CanViewNameAndTypeAsMandatoryFields pending implementation
+		ObjectPortlet.selectSystemObject(label = "Account");
 
+		ObjectAdmin.goToFieldsTab();
+
+		for (var label : list "Name,Type") {
+			ObjectAdmin.goToFieldsDetails(label = "${label}");
+
+			ObjectField.assertType(fieldType = "Text");
+
+			ObjectField.assertMandatory();
+
+			Refresh();
+		}
 	}
 
 	@description = "LPS-151765 - Verify if is possible to choose by Name Field on entries, when Title Field is Name"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanViewNameOnFieldEntry {
+		Accounts.openAccountsAdmin();
 
-		// TODO LPS-153527 CanViewNameOnFieldEntry pending implementation
+		Accounts.addBusinessAccount(
+			accountDescription = "Accounts Name Description for Test",
+			accountName = "Accounts Name for Test");
 
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 153527",
+			objectName = "CustomObject153527",
+			pluralLabelName = "Custom Objects 153527");
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectSystemObject(label = "Account");
+
+		ObjectAdmin.gotoRelationshipsTab();
+
+		ObjectAdmin.addObjectRelationshipViaUI(
+			label = "Relationship",
+			object = "CustomObject153527",
+			type = "One to Many");
+
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject153527");
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectSystemObject(label = "Account");
+
+		CreateObject.selectTitleField(fieldLabel = "Name");
+
+		CreateObject.saveObject();
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject153527");
+
+		ObjectAdmin.addEntryOnRelationshipFieldViaUI(entryOption = "Accounts Name for Test");
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject153527");
+
+		ObjectPortlet.viewEntry(entry = "Accounts Name for Test");
 	}
 
 	@description = "LPS-151765 - Verify if is possible to view the Relationship by Account on Custom Object Entries"
@@ -153,12 +285,47 @@ definition {
 	}
 
 	@description = "LPS-151765 - Verify if is possible to choose by Type Field on entries, when Title Field is Type"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanViewTypeOnFieldEntry {
+		Accounts.openAccountsAdmin();
 
-		// TODO LPS-153526 CanViewTypeOnFieldEntry pending implementation
+		Accounts.addBusinessAccount(
+			accountDescription = "Accounts Name Description for Test",
+			accountName = "Accounts Name for Test");
 
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 153526",
+			objectName = "CustomObject153526",
+			pluralLabelName = "Custom Objects 153526");
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectSystemObject(label = "Account");
+
+		ObjectAdmin.gotoRelationshipsTab();
+
+		ObjectAdmin.addObjectRelationshipViaUI(
+			label = "Relationship",
+			object = "CustomObject153526",
+			type = "One to Many");
+
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject153526");
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectSystemObject(label = "Account");
+
+		CreateObject.selectTitleField(fieldLabel = "Type");
+
+		CreateObject.saveObject();
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject153526");
+
+		ObjectAdmin.addEntryOnRelationshipFieldViaUI(entryOption = "business");
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject153526");
+
+		ObjectPortlet.viewEntry(entry = "business");
 	}
 
 	@description = "LPS-151765 - Verify if is possible to edit Title Field the System Object Account"

@@ -442,13 +442,13 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			}
 		}
 
-		if (roleIdSet.isEmpty()) {
-			return false;
-		}
-
 		long[] roleIds = ArrayUtil.toArray(roleIdSet.toArray(new Long[0]));
 
 		roleIds = UsersAdminUtil.addRequiredRoles(user, roleIds);
+
+		if (ArrayUtil.containsAll(userRoleIds, roleIds)) {
+			return false;
+		}
 
 		userPersistence.addRoles(userId, roleIds);
 
@@ -5610,6 +5610,12 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		}
 
 		if (user == null) {
+			if ((authResult == Authenticator.SUCCESS) &&
+				PropsValues.AUTH_PIPELINE_ENABLE_LIFERAY_CHECK) {
+
+				PwdAuthenticator.pretendToAuthenticate();
+			}
+
 			return Authenticator.DNE;
 		}
 

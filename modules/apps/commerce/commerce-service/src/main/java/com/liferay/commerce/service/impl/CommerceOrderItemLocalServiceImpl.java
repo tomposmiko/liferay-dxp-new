@@ -39,7 +39,6 @@ import com.liferay.commerce.order.CommerceOrderValidatorRegistry;
 import com.liferay.commerce.order.CommerceOrderValidatorResult;
 import com.liferay.commerce.price.CommerceProductPrice;
 import com.liferay.commerce.price.CommerceProductPriceCalculation;
-import com.liferay.commerce.price.CommerceProductPriceCalculationFactory;
 import com.liferay.commerce.price.CommerceProductPriceImpl;
 import com.liferay.commerce.price.CommerceProductPriceRequest;
 import com.liferay.commerce.product.constants.CPConstants;
@@ -541,7 +540,7 @@ public class CommerceOrderItemLocalServiceImpl
 
 		if (!Validator.isBlank(cpMeasurementUnitKey)) {
 			CPMeasurementUnit cpMeasurementUnit =
-				_cpMeasurementUnitLocalService.getCPMeasurementUnit(
+				_cpMeasurementUnitLocalService.getCPMeasurementUnitByKey(
 					user.getCompanyId(), cpMeasurementUnitKey);
 
 			commerceOrderItem.setCPMeasurementUnitId(
@@ -1384,10 +1383,6 @@ public class CommerceOrderItemLocalServiceImpl
 			CommerceContext commerceContext)
 		throws PortalException {
 
-		CommerceProductPriceCalculation commerceProductPriceCalculation =
-			_commerceProductPriceCalculationFactory.
-				getCommerceProductPriceCalculation();
-
 		CommerceProductPriceRequest commerceProductPriceRequest =
 			new CommerceProductPriceRequest();
 
@@ -1399,7 +1394,7 @@ public class CommerceOrderItemLocalServiceImpl
 			_getStaticOptionValuesNotLinkedToSku(cpDefinitionId, json));
 		commerceProductPriceRequest.setCalculateTax(true);
 
-		return commerceProductPriceCalculation.getCommerceProductPrice(
+		return _commerceProductPriceCalculation.getCommerceProductPrice(
 			commerceProductPriceRequest);
 	}
 
@@ -1696,19 +1691,19 @@ public class CommerceOrderItemLocalServiceImpl
 		commerceOrderItem.setHeight(cpInstance.getHeight());
 
 		if (commerceOrderItem.getHeight() <= 0) {
-			commerceOrderItem.setWidth(cpDefinition.getHeight());
+			commerceOrderItem.setHeight(cpDefinition.getHeight());
 		}
 
 		commerceOrderItem.setDepth(cpInstance.getDepth());
 
 		if (commerceOrderItem.getDepth() <= 0) {
-			commerceOrderItem.setWidth(cpDefinition.getDepth());
+			commerceOrderItem.setDepth(cpDefinition.getDepth());
 		}
 
 		commerceOrderItem.setWeight(cpInstance.getWeight());
 
 		if (commerceOrderItem.getWeight() <= 0) {
-			commerceOrderItem.setWidth(cpDefinition.getWeight());
+			commerceOrderItem.setWeight(cpDefinition.getWeight());
 		}
 	}
 
@@ -1973,9 +1968,8 @@ public class CommerceOrderItemLocalServiceImpl
 	@ServiceReference(type = CommerceOrderValidatorRegistry.class)
 	private CommerceOrderValidatorRegistry _commerceOrderValidatorRegistry;
 
-	@ServiceReference(type = CommerceProductPriceCalculationFactory.class)
-	private CommerceProductPriceCalculationFactory
-		_commerceProductPriceCalculationFactory;
+	@ServiceReference(type = CommerceProductPriceCalculation.class)
+	private CommerceProductPriceCalculation _commerceProductPriceCalculation;
 
 	@ServiceReference(type = CommerceShippingHelper.class)
 	private CommerceShippingHelper _commerceShippingHelper;

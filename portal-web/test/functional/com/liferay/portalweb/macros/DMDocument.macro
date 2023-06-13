@@ -864,6 +864,22 @@ definition {
 		}
 	}
 
+	macro assertNoZipFileFromTempFolder {
+		var liferayHome = PropsUtil.get("liferay.home.dir.name");
+		var fileName = StringUtil.split("**/${fileNamePattern}");
+
+		var tempFile = "${liferayHome}/${appServer}/temp/${fileName}";
+
+		var tempFileExists = FileUtil.exists("${tempFile}");
+
+		if ("${tempFileExists}" == "false") {
+			echo("There are no temporary zip files");
+		}
+		else {
+			fail("There is a temporary zip file");
+		}
+	}
+
 	macro cancelCheckoutCP {
 		var key_dmDocumentTitle = "${dmDocumentTitle}";
 
@@ -1266,6 +1282,12 @@ definition {
 		}
 	}
 
+	macro deleteDocumentLibraryFolder {
+		var liferayHome = PropsUtil.get("liferay.home.dir.name");
+
+		FileUtil.delete("${liferayHome}/data/document_library");
+	}
+
 	macro deletePG {
 		var key_dmDocumentTitle = "${dmDocumentTitle}";
 
@@ -1294,6 +1316,12 @@ definition {
 		AssertElementNotPresent(
 			key_mgDocumentTitle = "${mgDocumentTitle}",
 			locator1 = "MediaGallery#IMAGE_TITLE");
+	}
+
+	macro deleteTempFolder {
+		var liferayHome = PropsUtil.get("liferay.home.dir.name");
+
+		FileUtil.delete("${liferayHome}/${appServer}/temp");
 	}
 
 	macro deleteVersion {
@@ -1628,6 +1656,22 @@ definition {
 			}
 		}
 
+		if (isSet(updateAutoTags)) {
+			Panel.expandPanel(panel = "Categorization");
+
+			if ("${updateAutoTags}" == "disabled") {
+				FormFields.disableCheckbox(fieldName = "Update Auto Tags");
+			}
+			else if ("${updateAutoTags}" == "hidden") {
+				AssertElementNotPresent(
+					key_fieldName = "Update Auto Tags",
+					locator1 = "FormFields#CHECKBOX_LABEL");
+			}
+			else {
+				FormFields.enableCheckbox(fieldName = "Update Auto Tags");
+			}
+		}
+
 		if (isSet(checkedOut)) {
 			Click(locator1 = "Button#SAVE");
 		}
@@ -1699,6 +1743,15 @@ definition {
 				locator1 = "Select#PERMISSIONS",
 				value1 = "${viewableBy}");
 		}
+	}
+
+	macro editFriendlyURL {
+		Type(
+			inputFieldId = "urlTitle",
+			locator1 = "TextInput#INPUT_ID",
+			value1 = "${friendlyURLEdit}");
+
+		PortletEntry.publish();
 	}
 
 	macro editPG {
@@ -2179,6 +2232,22 @@ definition {
 		Alert.viewSuccessMessageText(successMessage = "Changes Saved");
 	}
 
+	macro removeOldFriendlyURL {
+		MouseOver(
+			key_oldFriendlyURL = "${oldFriendlyURL}",
+			locator1 = "DocumentsAndMediaDocument#FRIENDLY_URL_HISTORY_ITEM");
+
+		Click(
+			key_oldFriendlyURL = "${oldFriendlyURL}",
+			locator1 = "Icon#FRIENDLY_URL_HISTORY_ITEM_DELETE");
+
+		AssertElementNotPresent(
+			key_oldFriendlyURL = "${oldFriendlyURL}",
+			locator1 = "DocumentsAndMediaDocument#FRIENDLY_URL_HISTORY_ITEM");
+
+		Click(locator1 = "Modal#CLOSE_BUTTON");
+	}
+
 	macro removeTag {
 		if (IsElementPresent(locator1 = "Button#EDIT")) {
 			Click(locator1 = "Button#EDIT");
@@ -2196,6 +2265,29 @@ definition {
 		Click(
 			locator1 = "Icon#REMOVE_TAG",
 			value1 = "${removeTag}");
+	}
+
+	macro restoreOldFriendlyURL {
+		MouseOver(
+			key_oldFriendlyURL = "${oldFriendlyURL}",
+			locator1 = "DocumentsAndMediaDocument#FRIENDLY_URL_HISTORY_ITEM");
+
+		Click(locator1 = "Icon#FRIENDLY_URL_HISTORY_ITEM_RESTORE");
+
+		AssertVisible(
+			key_activeURL = "${restoredURL}",
+			locator1 = "DocumentsAndMediaDocument#FRIENDLY_URL_ACTIVE_URL");
+
+		AssertVisible(
+			key_oldFriendlyURL = "${activeURL}",
+			locator1 = "DocumentsAndMediaDocument#FRIENDLY_URL_HISTORY_ITEM");
+
+		Click(locator1 = "Modal#CLOSE_BUTTON");
+
+		AssertVisible(
+			inputFieldId = "urlTitle",
+			locator1 = "TextInput#INPUT_ID",
+			value1 = "${restoredURL}");
 	}
 
 	macro revertPG {
@@ -2634,6 +2726,12 @@ definition {
 		}
 
 		SystemSettings.saveConfiguration();
+	}
+
+	macro viewActiveURL {
+		AssertVisible(
+			key_activeURL = "${activeURL}",
+			locator1 = "DocumentsAndMediaDocument#FRIENDLY_URL_ACTIVE_URL");
 	}
 
 	macro viewAllPG {

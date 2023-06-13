@@ -20,6 +20,36 @@ import {fetch} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useRef, useState} from 'react';
 
+function mapItemsOnClick(items) {
+	return items.map((item) => {
+		const {items: nestedItems, jsOnClickConfig, ...otherKeys} = item;
+
+		const newVal = {...otherKeys};
+
+		if (nestedItems) {
+			newVal.items = mapItemsOnClick(nestedItems);
+		}
+
+		if (jsOnClickConfig) {
+			newVal.onClick = () => {
+				const {selectEventName, title, url} = jsOnClickConfig;
+
+				Liferay.Util.openSelectionModal({
+					id: selectEventName,
+					onSelect(selectedItem) {
+						Liferay.Util.navigate(selectedItem.url);
+					},
+					selectEventName,
+					title,
+					url,
+				});
+			};
+		}
+
+		return newVal;
+	});
+}
+
 function PersonalMenu({
 	color,
 	isImpersonated,
@@ -35,7 +65,9 @@ function PersonalMenu({
 		if (!preloadPromiseRef.current) {
 			preloadPromiseRef.current = fetch(itemsURL)
 				.then((response) => response.json())
-				.then((items) => setItems(items));
+				.then((responseItems) =>
+					setItems(mapItemsOnClick(responseItems))
+				);
 		}
 	}
 

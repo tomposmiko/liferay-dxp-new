@@ -6401,7 +6401,7 @@
 							"type": "String"
 						},
 						{
-							"defaultValue": "transparent",
+							"defaultValue": "var(--tab-secondary-item-border-color)",
 							"editorType": "ColorPicker",
 							"label": "tab-secondary-item-border-color-active",
 							"mappings": [

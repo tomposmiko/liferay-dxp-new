@@ -18,17 +18,19 @@ import Container from '../../../components/Layout/Container';
 import ListView from '../../../components/ListView/ListView';
 import {getSuites} from '../../../graphql/queries';
 import i18n from '../../../i18n';
+import {searchUtil} from '../../../util/search';
 import useSuiteActions from './useSuiteActions';
 
 const Suites = () => {
 	const navigate = useNavigate();
 	const {projectId} = useParams();
 
-	const {actions} = useSuiteActions();
+	const {actions, formModal} = useSuiteActions();
 
 	return (
 		<Container title={i18n.translate('suites')}>
 			<ListView
+				forceRefetch={formModal.forceRefetch}
 				managementToolbarProps={{addButton: () => navigate('create')}}
 				query={getSuites}
 				tableProps={{
@@ -55,7 +57,9 @@ const Suites = () => {
 					navigateTo: ({id}) => id?.toString(),
 				}}
 				transformData={(data) => data?.c?.suites}
-				variables={{filter: `projectId eq ${projectId}`}}
+				variables={{
+					filter: searchUtil.eq('projectId', projectId as string),
+				}}
 			/>
 		</Container>
 	);

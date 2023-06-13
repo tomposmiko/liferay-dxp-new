@@ -14,7 +14,7 @@
 
 import {useQuery} from '@apollo/client';
 import ClayButton from '@clayui/button';
-import ClayForm from '@clayui/form';
+import ClayForm, {ClayCheckbox} from '@clayui/form';
 import ClayLayout from '@clayui/layout';
 import {ReactNode, useEffect} from 'react';
 import {useForm} from 'react-hook-form';
@@ -30,16 +30,19 @@ import {
 	TestrayCase,
 	TestrayCaseType,
 	TestrayComponent,
+	TestrayProject,
 	getCaseTypes,
+	getCases,
 	getComponents,
 } from '../../../graphql/queries';
 import {useHeader} from '../../../hooks';
-import useFormState from '../../../hooks/useFormActions';
+import useFormActions from '../../../hooks/useFormActions';
 import i18n from '../../../i18n';
 import yupSchema, {yupResolver} from '../../../schema/yup';
 import {DescriptionType} from '../../../types';
 
 type CaseFormData = {
+	addAnother: boolean;
 	caseTypeId: number;
 	componentId: number;
 	description: string;
@@ -60,60 +63,37 @@ const descriptionTypes = Object.values(
 	DescriptionType
 ).map((descriptionType) => ({label: descriptionType, value: descriptionType}));
 
-const FormRow: React.FC<{children: ReactNode; title: string}> = ({
-	children,
-	title,
-}) => (
+const FormRow: React.FC<{
+	children: ReactNode;
+	separator?: boolean;
+	title: string;
+}> = ({children, separator = true, title}) => (
 	<>
 		<ClayLayout.Row justify="start">
-			<ClayLayout.Col size={3} sm={12} xl={3}>
-				<h5 className="font-weight-normal">{title}</h5>
+			<ClayLayout.Col size={3} sm={12} xl={2}>
+				<h5 className="font-weight-bold">{title}</h5>
 			</ClayLayout.Col>
 
-			<ClayLayout.Col size={3} sm={12} xl={9}>
+			<ClayLayout.Col size={3} sm={12} xl={10}>
 				{children}
 			</ClayLayout.Col>
 		</ClayLayout.Row>
 
-		<hr />
+		{separator && <hr />}
 	</>
 );
 
-const CaseForm: React.FC = () => {
-	const {setDropdownIcon, setTabs} = useHeader({
+const CaseForm = () => {
+	const {
+		testrayCase,
+		testrayProject,
+	}: {
+		testrayCase: TestrayCase;
+		testrayProject: TestrayProject;
+	} = useOutletContext();
+
+	const {setHeading, setTabs} = useHeader({
 		shouldUpdate: false,
-		useDropdown: [],
-	});
-
-	const context: {testrayCase?: TestrayCase} = useOutletContext();
-
-	useEffect(() => {
-		setDropdownIcon('polls');
-
-		setTimeout(() => {
-			setTabs([]);
-		}, 10);
-	}, [setDropdownIcon, setTabs]);
-
-	const {
-		form: {formState, onClose, onSubmit},
-	} = useFormState();
-
-	const {projectId} = useParams();
-	const {
-		formState: {errors},
-		handleSubmit,
-		register,
-		watch,
-	} = useForm<CaseFormData>({
-		defaultValues: context?.testrayCase
-			? {
-					...context?.testrayCase,
-					caseTypeId: context.testrayCase.caseType?.id,
-					componentId: context.testrayCase.component?.id,
-			  }
-			: formState,
-		resolver: yupResolver(yupSchema.case),
 	});
 
 	const {data: testrayComponentsData} = useQuery<
@@ -127,12 +107,57 @@ const CaseForm: React.FC = () => {
 	const testrayCaseTypes = testrayCaseTypesData?.c.caseTypes.items || [];
 	const testrayComponents = testrayComponentsData?.c.components.items || [];
 
+	useEffect(() => {
+		if (testrayProject) {
+			setTimeout(() => {
+				setHeading([
+					{
+						category: i18n.translate('project').toUpperCase(),
+						path: `/project/${testrayProject.id}/routines`,
+						title: testrayProject.name,
+					},
+					{
+						category: i18n.translate('project').toUpperCase(),
+						title: i18n.translate('add-case'),
+					},
+				]);
+
+				setTabs([]);
+			}, 10);
+		}
+	}, [setHeading, setTabs, testrayProject]);
+
+	const {
+		form: {onClose, onSubmit},
+	} = useFormActions();
+
+	const {projectId} = useParams();
+	const {
+		formState: {errors},
+		handleSubmit,
+		register,
+		setValue,
+		watch,
+	} = useForm<CaseFormData>({
+		defaultValues: testrayCase
+			? {
+					...testrayCase,
+					caseTypeId: testrayCase.caseType?.id,
+					componentId: testrayCase.component?.id,
+			  }
+			: {},
+		resolver: yupResolver(yupSchema.case),
+	});
+
 	const _onSubmit = (form: CaseFormData) => {
 		onSubmit(
 			{...form, projectId},
 			{
 				createMutation: CreateCase,
 				updateMutation: UpdateCase,
+			},
+			{
+				refetchQueries: [{query: getCases}],
 			}
 		);
 	};
@@ -141,6 +166,7 @@ const CaseForm: React.FC = () => {
 	const componentId = watch('componentId');
 	const description = watch('description');
 	const steps = watch('steps');
+	const addAnother = watch('addAnother');
 
 	const inputProps = {
 		errors,
@@ -151,7 +177,7 @@ const CaseForm: React.FC = () => {
 	return (
 		<Container className="container">
 			<ClayForm className="container pt-2">
-				<FormRow title={i18n.translate('case-name')}>
+				<FormRow title={i18n.translate('add-case')}>
 					<Input
 						{...inputProps}
 						label={i18n.translate('name')}
@@ -162,6 +188,7 @@ const CaseForm: React.FC = () => {
 				<FormRow title={i18n.translate('details')}>
 					<InputSelect
 						{...inputProps}
+						className="col-4"
 						label="priority"
 						name="priority"
 						options={priorities}
@@ -196,61 +223,73 @@ const CaseForm: React.FC = () => {
 
 					<Input
 						{...inputProps}
+						className="col-4"
 						label={i18n.translate('estimed-duration')}
 						name="estimatedDuration"
 						required={false}
 					/>
 				</FormRow>
 
-				<FormRow title={i18n.translate('description')}>
-					<ClayForm.Group className="form-group-sm">
-						<InputSelect
-							{...inputProps}
-							label="description-type"
-							name="descriptionType"
-							options={descriptionTypes}
-							required={false}
-						/>
-
-						<Input
-							{...inputProps}
-							label={i18n.translate('description')}
-							name="description"
-							required={false}
-							type="textarea"
-						/>
-					</ClayForm.Group>
-
-					<MarkdownPreview markdown={description} />
-				</FormRow>
-
-				<FormRow title={i18n.translate('steps')}>
+				<FormRow
+					separator={false}
+					title={i18n.translate('description')}
+				>
 					<InputSelect
 						{...inputProps}
-						label="steps-type"
+						className="col-2 ml-auto"
+						defaultOption={false}
+						name="descriptionType"
+						options={descriptionTypes}
+						required={false}
+					/>
+				</FormRow>
+
+				<Input
+					{...inputProps}
+					name="description"
+					required={false}
+					type="textarea"
+				/>
+
+				<MarkdownPreview markdown={description} />
+
+				<hr />
+
+				<FormRow separator={false} title={i18n.translate('steps')}>
+					<InputSelect
+						{...inputProps}
+						className="col-2 ml-auto"
+						defaultOption={false}
 						name="stepsType"
 						options={descriptionTypes}
 						required={false}
 					/>
-
-					<Input
-						{...inputProps}
-						label={i18n.translate('steps')}
-						name="steps"
-						required={false}
-						type="textarea"
-					/>
-
-					<MarkdownPreview markdown={steps} />
 				</FormRow>
+
+				<Input
+					{...inputProps}
+					name="steps"
+					required={false}
+					type="textarea"
+				/>
+
+				<MarkdownPreview markdown={steps} />
+
+				<hr />
+
+				<div className="my-5">
+					<ClayCheckbox
+						checked={addAnother}
+						label={i18n.translate('add-another')}
+						onChange={() => setValue('addAnother', !addAnother)}
+					/>
+				</div>
 
 				<div>
 					<ClayButton.Group spaced>
 						<ClayButton
 							displayType="secondary"
-							onClick={() =>
-								onClose(`/project/${projectId}/cases`)
-							}
+							onClick={() => onClose()}
 						>
 							{i18n.translate('close')}
 						</ClayButton>

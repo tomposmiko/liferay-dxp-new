@@ -27,52 +27,68 @@ definition {
 		}
 	}
 
-	@description = "LPS-150542 - Verify that by clicking on Results on sidebar the user goes to Project Directory Results."
+	@description = "This is a test for LPS-150542 - Verify that by clicking on Results on sidebar the user goes to Project Directory Results."
 	@priority = "5"
 	test CanAcessProejctDirectoryByClickingOnResults {
-		ApplicationsMenu.gotoSite(site = "Testray 2");
+		task ("Go to Testray") {
+			ApplicationsMenu.gotoSite(site = "Testray 2");
+		}
 
-		TestrayLayout.clickTestfowOnSidebar();
+		task ("Verify that by clicking on Results on sidebar the user goes to Project Directory Results") {
+			TestrayLayout.clickTestfowOnSidebar();
 
-		TestrayLayout.assertTabPageTitle(pageTabTitle = "Tasks");
+			TestrayLayout.assertTabPageTitle(pageTabTitle = "Tasks");
 
-		TestrayLayout.clickResultsOnSidebar();
+			TestrayLayout.clickResultsOnSidebar();
 
-		TestrayLayout.assertTabPageTitle(pageTabTitle = "Projects");
+			TestrayLayout.assertTabPageTitle(pageTabTitle = "Projects");
+		}
 	}
 
-	@description = "LPS-150539 - Verify that by clicking in Testray icon on sidebar the user is redirected to the Project Directory page."
+	@description = "This is a test for LPS-150539 - Verify that by clicking in Testray icon on sidebar the user is redirected to the Project Directory page."
 	@priority = "4"
 	test CanAcessProjectDirectoryBySidebarIcon {
-		ApplicationsMenu.gotoSite(site = "Testray 2");
+		task ("Go to Testray") {
+			ApplicationsMenu.gotoSite(site = "Testray 2");
+		}
 
-		TestrayLayout.clickTestfowOnSidebar();
+		task ("Verify that by clicking in Testray icon on sidebar the user is redirected to the Project Directory page") {
+			TestrayLayout.clickTestfowOnSidebar();
 
-		TestrayLayout.assertTabPageTitle(pageTabTitle = "Tasks");
+			TestrayLayout.assertTabPageTitle(pageTabTitle = "Tasks");
 
-		TestrayLayout.clickLogoOnSidebar();
+			TestrayLayout.clickLogoOnSidebar();
 
-		TestrayLayout.assertTabPageTitle(pageTabTitle = "Projects");
+			TestrayLayout.assertTabPageTitle(pageTabTitle = "Projects");
+		}
 	}
 
-	@description = "LPS-150540 - Verify that by clicking on Manage on sidebar shows a Management Options Dropdown on sidebar."
+	@description = "This is a test for LPS-150540 - Verify that by clicking on Manage on sidebar shows a Management Options Dropdown on sidebar."
 	@priority = "5"
 	test CanManageDropdownOnSidebarOpen {
-		ApplicationsMenu.gotoSite(site = "Testray 2");
+		task ("Go to Testray") {
+			ApplicationsMenu.gotoSite(site = "Testray 2");
+		}
 
-		TestrayLayout.clickManageOnSidebar();
+		task ("Verify that by clicking on Manage on sidebar shows a Management Options Dropdown on sidebar") {
+			TestrayLayout.clickManageOnSidebar();
 
-		TestrayLayout.assertDropdownOnSidebar();
+			TestrayLayout.assertDropdownOnSidebar();
+		}
 	}
 
-	@description = "LPS-150541 - Verify that by clicking on User on sidebar it shows User options on sidebar."
+	@description = "This is a test for LPS-150541 - Verify that by clicking on User on sidebar it shows User options on sidebar."
 	@priority = "5"
 	test CanUserDropdownOnSidebarOpen {
-		ApplicationsMenu.gotoSite(site = "Testray 2");
+		task ("Go to Testray") {
+			ApplicationsMenu.gotoSite(site = "Testray 2");
+		}
 
-		TestrayLayout.clickUserOnSidebar();
+		task ("Verify that by clicking on User on sidebar it shows User options on sidebar") {
+			TestrayLayout.clickUserOnSidebar();
 
-		TestrayLayout.assertDropdownOnSidebar();
+			TestrayLayout.assertDropdownOnSidebar();
+		}
 	}
 
 }

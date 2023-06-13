@@ -14,9 +14,8 @@
 
 package com.liferay.source.formatter.check;
 
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.tools.ToolsUtil;
+import com.liferay.source.formatter.check.util.JavaSourceUtil;
 import com.liferay.source.formatter.parser.JavaClass;
 import com.liferay.source.formatter.parser.JavaTerm;
 
@@ -41,26 +40,29 @@ public class JavaUpgradeDropTableCheck extends BaseJavaTermCheck {
 
 		JavaClass javaClass = (JavaClass)javaTerm;
 
-		List<String> extendedClassNames = javaClass.getExtendedClassNames();
-
-		if (!extendedClassNames.contains("UpgradeProcess")) {
-			return javaTerm.getContent();
+		if (!_isUpgradeJavaClass(javaClass)) {
+			return javaClass.getContent();
 		}
 
 		String content = javaTerm.getContent();
 
-		Matcher matcher = _runSqlPattern.matcher(content);
+		Matcher matcher1 = _runSqlPattern.matcher(content);
 
-		while (matcher.find()) {
-			String runSqlMethodCall = _getMethodCall(content, matcher.start());
+		while (matcher1.find()) {
+			String runSqlMethodCall = JavaSourceUtil.getMethodCall(
+				content, matcher1.start());
 
-			if (!runSqlMethodCall.contains("drop table if exists")) {
+			Matcher matcher2 = _dropTablePattern.matcher(runSqlMethodCall);
+
+			if (!matcher2.find()) {
 				continue;
 			}
 
+			String template = String.format(
+				"DROP_TABLE_IF_EXISTS(%s)", matcher2.group(1));
+
 			return StringUtil.replaceFirst(
-				content, "drop table if exists", "DROP_TABLE_IF_EXISTS",
-				matcher.start());
+				content, matcher2.group(0), template, matcher2.start());
 		}
 
 		return javaTerm.getContent();
@@ -71,24 +73,20 @@ public class JavaUpgradeDropTableCheck extends BaseJavaTermCheck {
 		return new String[] {JAVA_CLASS};
 	}
 
-	private String _getMethodCall(String s, int start) {
-		int x = start;
+	private boolean _isUpgradeJavaClass(JavaClass javaClass) {
+		List<String> extendedClassNames = javaClass.getExtendedClassNames();
 
-		while (true) {
-			x = s.indexOf(StringPool.CLOSE_PARENTHESIS, x + 1);
-
-			if (ToolsUtil.isInsideQuotes(s, x + 1)) {
-				continue;
-			}
-
-			String methodCall = s.substring(start, x + 1);
-
-			if (getLevel(methodCall) == 0) {
-				return methodCall;
+		for (String extendedClassName : extendedClassNames) {
+			if (extendedClassName.endsWith("UpgradeProcess")) {
+				return true;
 			}
 		}
+
+		return false;
 	}
 
+	private static final Pattern _dropTablePattern = Pattern.compile(
+		"drop table if exists ([\\w,\\s]+)");
 	private static final Pattern _runSqlPattern = Pattern.compile(
 		"\\brunSQL\\(");
 
