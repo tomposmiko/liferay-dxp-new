@@ -16,14 +16,17 @@ import 'codemirror/mode/groovy/groovy';
 import ClayTabs from '@clayui/tabs';
 import {
 	CustomItem,
+	FormError,
 	SidePanelForm,
 	closeSidePanel,
+	invalidateRequired,
 	openToast,
+	useForm,
 } from '@liferay/object-js-components-web';
 import {fetch} from 'frontend-js-web';
 import React, {useState} from 'react';
 
-import useForm, {FormError, invalidateRequired} from '../../hooks/useForm';
+import {HEADERS} from '../../utils/constants';
 import ActionBuilder from './tabs/ActionBuilder';
 import BasicInfo from './tabs/BasicInfo';
 
@@ -46,10 +49,7 @@ export default function Action({
 	const onSubmit = async (objectAction: ObjectAction) => {
 		const response = await fetch(url, {
 			body: JSON.stringify(objectAction),
-			headers: new Headers({
-				'Accept': 'application/json',
-				'Content-Type': 'application/json',
-			}),
+			headers: HEADERS,
 			method,
 		});
 
@@ -142,6 +142,13 @@ function useObjectActionForm({initialValues, onSubmit}: IUseObjectActionForm) {
 			invalidateRequired(values.parameters?.url)
 		) {
 			errors.url = REQUIRED_MSG;
+		}
+
+		if (
+			typeof values.conditionExpression === 'string' &&
+			invalidateRequired(values.conditionExpression)
+		) {
+			errors.conditionExpression = REQUIRED_MSG;
 		}
 
 		if (Object.keys(errors).length) {

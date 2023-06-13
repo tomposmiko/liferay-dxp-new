@@ -131,6 +131,29 @@ public class LayoutPermissionImpl
 	}
 
 	@Override
+	public void checkLayoutRestrictedUpdatePermission(
+			PermissionChecker permissionChecker, Layout layout)
+		throws PortalException {
+
+		if (!containsLayoutRestrictedUpdatePermission(
+				permissionChecker, layout)) {
+
+			throw new PrincipalException.MustHavePermission(
+				permissionChecker, Layout.class.getName(), layout.getPlid(),
+				ActionKeys.UPDATE);
+		}
+	}
+
+	@Override
+	public void checkLayoutRestrictedUpdatePermission(
+			PermissionChecker permissionChecker, long plid)
+		throws PortalException {
+
+		checkLayoutRestrictedUpdatePermission(
+			permissionChecker, LayoutLocalServiceUtil.getLayout(plid));
+	}
+
+	@Override
 	public void checkLayoutUpdatePermission(
 			PermissionChecker permissionChecker, Layout layout)
 		throws PortalException {
@@ -204,6 +227,42 @@ public class LayoutPermissionImpl
 		return contains(
 			permissionChecker, LayoutLocalServiceUtil.getLayout(plid),
 			actionId);
+	}
+
+	@Override
+	public boolean containsLayoutRestrictedUpdatePermission(
+			PermissionChecker permissionChecker, Layout layout)
+		throws PortalException {
+
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-132571"))) {
+			if (contains(permissionChecker, layout, ActionKeys.UPDATE) ||
+				contains(
+					permissionChecker, layout,
+					ActionKeys.UPDATE_LAYOUT_BASIC) ||
+				contains(
+					permissionChecker, layout,
+					ActionKeys.UPDATE_LAYOUT_LIMITED)) {
+
+				return true;
+			}
+
+			return false;
+		}
+
+		if (contains(permissionChecker, layout, ActionKeys.UPDATE)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean containsLayoutRestrictedUpdatePermission(
+			PermissionChecker permissionChecker, long plid)
+		throws PortalException {
+
+		return containsLayoutRestrictedUpdatePermission(
+			permissionChecker, LayoutLocalServiceUtil.getLayout(plid));
 	}
 
 	@Override

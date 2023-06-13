@@ -16,12 +16,13 @@ import ClayTabs from '@clayui/tabs';
 import {
 	SidePanelContent,
 	closeSidePanel,
+	invalidateRequired,
 	openToast,
 } from '@liferay/object-js-components-web';
 import {fetch} from 'frontend-js-web';
 import React, {useContext, useEffect, useState} from 'react';
 
-import {invalidateRequired} from '../../hooks/useForm';
+import {HEADERS} from '../../utils/constants';
 import {defaultLanguageId, locale} from '../../utils/locale';
 import BasicInfoScreen from './BasicInfoScreen/BasicInfoScreen';
 import {DefaultSortScreen} from './DefaultSortScreen/DefaultSortScreen';
@@ -49,11 +50,7 @@ const TABS = [
 	},
 ];
 
-const HEADERS = new Headers({
-	'Accept': 'application/json',
-	'Accept-Language': locale!.symbol,
-	'Content-Type': 'application/json',
-});
+HEADERS.append('Accept-Language', locale!.symbol);
 
 const CustomView: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 	const [{isViewOnly, objectView, objectViewId}, dispatch] = useContext(

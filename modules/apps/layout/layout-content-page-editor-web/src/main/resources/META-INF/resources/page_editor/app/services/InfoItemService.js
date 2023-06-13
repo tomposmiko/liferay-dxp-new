@@ -16,9 +16,17 @@ import {config} from '../config/index';
 import serviceFetch from './serviceFetch';
 
 export default {
-	getAvailableInfoItemFormProviders() {
+	getAvailableDisplayPageInfoItemFormProviders() {
 		return serviceFetch(
-			config.getAvailableInfoItemFormProviders,
+			config.getAvailableDisplayPageInfoItemFormProvidersURL,
+			{},
+			() => {}
+		);
+	},
+
+	getAvailableEditPageInfoItemFormProviders() {
+		return serviceFetch(
+			config.getAvailableEditPageInfoItemFormProvidersURL,
 			{},
 			() => {}
 		);

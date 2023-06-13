@@ -73,6 +73,14 @@ public class RenderFragmentEntryDisplayContext {
 		fragmentEntryLink.setJs(js);
 		fragmentEntryLink.setConfiguration(configuration);
 
+		String rendererKey = null;
+
+		if ((fragmentEntry != null) && (fragmentEntryId == 0)) {
+			rendererKey = fragmentEntry.getFragmentEntryKey();
+		}
+
+		fragmentEntryLink.setRendererKey(rendererKey);
+
 		DefaultFragmentRendererContext defaultFragmentRendererContext =
 			new DefaultFragmentRendererContext(fragmentEntryLink);
 

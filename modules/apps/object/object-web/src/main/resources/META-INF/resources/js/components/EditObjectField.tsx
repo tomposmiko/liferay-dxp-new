@@ -27,6 +27,7 @@ import {fetch} from 'frontend-js-web';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {createTextMaskInputElement} from 'text-mask-core';
 
+import {HEADERS} from '../utils/constants';
 import {createAutoCorrectedNumberPipe} from '../utils/createAutoCorrectedNumberPipe';
 import {ERRORS} from '../utils/errors';
 import {
@@ -59,6 +60,7 @@ export default function EditObjectField({
 	forbiddenLastChars,
 	forbiddenNames,
 	isApproved,
+	isSystemObject,
 	objectField: initialValues,
 	objectFieldTypes,
 	objectName,
@@ -69,10 +71,7 @@ export default function EditObjectField({
 			`/o/object-admin/v1.0/object-fields/${id}`,
 			{
 				body: JSON.stringify(objectField),
-				headers: new Headers({
-					'Accept': 'application/json',
-					'Content-Type': 'application/json',
-				}),
+				headers: HEADERS,
 				method: 'PUT',
 			}
 		);
@@ -133,13 +132,21 @@ export default function EditObjectField({
 		<SidePanelForm
 			className="lfr-objects__edit-object-field"
 			onSubmit={handleSubmit}
-			readOnly={readOnly}
+			readOnly={
+				isSystemObject && objectName !== 'AccountEntry'
+					? disabled
+					: readOnly
+			}
 			title={Liferay.Language.get('field')}
 		>
 			<Card title={Liferay.Language.get('basic-info')}>
 				<InputLocalized
 					defaultLanguageId={defaultLanguageId}
-					disabled={readOnly}
+					disabled={
+						isSystemObject && objectName !== 'AccountEntry'
+							? disabled
+							: readOnly
+					}
 					error={errors.label}
 					label={Liferay.Language.get('label')}
 					locales={locales}
@@ -172,8 +179,13 @@ export default function EditObjectField({
 					{(values.businessType === 'Text' ||
 						values.businessType === 'LongText') && (
 						<MaxLengthProperties
-							disabled={readOnly}
+							disabled={
+								isSystemObject && objectName !== 'AccountEntry'
+									? disabled
+									: readOnly
+							}
 							errors={errors}
+							isSystemObject={isSystemObject}
 							objectField={values}
 							objectFieldSettings={
 								values.objectFieldSettings as ObjectFieldSetting[]
@@ -294,6 +306,7 @@ function SearchableContainer({
 function MaxLengthProperties({
 	disabled,
 	errors,
+	isSystemObject,
 	objectField,
 	objectFieldSettings,
 	onSettingsChange,
@@ -327,7 +340,7 @@ function MaxLengthProperties({
 		<>
 			<ClayForm.Group>
 				<ClayToggle
-					disabled={disabled}
+					disabled={isSystemObject ?? disabled}
 					label={Liferay.Language.get('limit-characters')}
 					name="showCounter"
 					onToggle={(value) => {
@@ -465,6 +478,7 @@ interface IAttachmentPropertiesProps {
 interface IMaxLengthPropertiesProps {
 	disabled: boolean;
 	errors: ObjectFieldErrors;
+	isSystemObject: boolean;
 	objectField: Partial<ObjectField>;
 	objectFieldSettings: ObjectFieldSetting[];
 	onSettingsChange: (setting: ObjectFieldSetting) => void;
@@ -476,6 +490,7 @@ interface IProps {
 	forbiddenLastChars: string[];
 	forbiddenNames: string[];
 	isApproved: boolean;
+	isSystemObject: boolean;
 	objectField: ObjectField;
 	objectFieldTypes: ObjectFieldType[];
 	objectName: string;

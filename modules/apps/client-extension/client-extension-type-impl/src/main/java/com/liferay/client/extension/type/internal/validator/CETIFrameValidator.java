@@ -14,9 +14,10 @@
 
 package com.liferay.client.extension.type.internal.validator;
 
-import com.liferay.client.extension.exception.ClientExtensionEntryFriendlyURLMappingException;
-import com.liferay.client.extension.exception.ClientExtensionEntryIFrameURLException;
+import com.liferay.client.extension.constants.ClientExtensionEntryConstants;
+import com.liferay.client.extension.exception.ClientExtensionEntryTypeSettingsException;
 import com.liferay.client.extension.type.internal.CETIFrameImpl;
+import com.liferay.client.extension.type.validator.CETValidator;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
@@ -24,12 +25,19 @@ import com.liferay.portal.kernel.util.Validator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.osgi.service.component.annotations.Component;
+
 /**
  * @author Brian Wing Shun Chan
  */
-public class CETIFrameValidator {
+@Component(
+	property = "type=" + ClientExtensionEntryConstants.TYPE_IFRAME,
+	service = CETValidator.class
+)
+public class CETIFrameValidator implements CETValidator {
 
-	public CETIFrameValidator(
+	@Override
+	public void validate(
 			UnicodeProperties newTypeSettingsUnicodeProperties,
 			UnicodeProperties oldTypeSettingsUnicodeProperties)
 		throws PortalException {
@@ -37,21 +45,17 @@ public class CETIFrameValidator {
 		CETIFrameImpl newCETIFrameImpl = new CETIFrameImpl(
 			newTypeSettingsUnicodeProperties);
 
-		String friendlyURLMapping = newCETIFrameImpl.getFriendlyURLMapping();
-
 		Matcher matcher = _friendlyURLMappingPattern.matcher(
-			friendlyURLMapping);
+			newCETIFrameImpl.getFriendlyURLMapping());
 
 		if (!matcher.matches()) {
-			throw new ClientExtensionEntryFriendlyURLMappingException(
-				"Invalid friendly URL mapping " + friendlyURLMapping);
+			throw new ClientExtensionEntryTypeSettingsException(
+				"please-enter-a-valid-friendly-url-mapping");
 		}
 
-		String url = newCETIFrameImpl.getURL();
-
-		if (!Validator.isUrl(url)) {
-			throw new ClientExtensionEntryIFrameURLException(
-				"Invalid URL " + url);
+		if (!Validator.isUrl(newCETIFrameImpl.getURL())) {
+			throw new ClientExtensionEntryTypeSettingsException(
+				"please-enter-a-valid-url");
 		}
 
 		if (oldTypeSettingsUnicodeProperties != null) {
@@ -61,9 +65,8 @@ public class CETIFrameValidator {
 			if (newCETIFrameImpl.isInstanceable() !=
 					oldCETIFrameImpl.isInstanceable()) {
 
-				// TODO Use a different exception
-
-				throw new IllegalArgumentException();
+				throw new ClientExtensionEntryTypeSettingsException(
+					"the-instanceable-value-cannot-be-changed");
 			}
 		}
 	}

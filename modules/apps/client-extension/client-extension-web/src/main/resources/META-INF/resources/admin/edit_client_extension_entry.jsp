@@ -35,11 +35,14 @@ renderResponse.setTitle(editClientExtensionEntryDisplayContext.getTitle());
 	<aui:input name="redirect" type="hidden" value="<%= editClientExtensionEntryDisplayContext.getRedirect() %>" />
 	<aui:input name="externalReferenceCode" type="hidden" value="<%= editClientExtensionEntryDisplayContext.getExternalReferenceCode() %>" />
 
-	<liferay-ui:error exception="<%= ClientExtensionEntryCustomElementCSSURLsException.class %>" message="please-enter-valid-css-urls" />
-	<liferay-ui:error exception="<%= ClientExtensionEntryCustomElementHTMLElementNameException.class %>" message="please-enter-a-valid-html-element-name" />
-	<liferay-ui:error exception="<%= ClientExtensionEntryCustomElementURLsException.class %>" message="please-enter-valid-remote-app-urls" />
-	<liferay-ui:error exception="<%= ClientExtensionEntryFriendlyURLMappingException.class %>" message="please-enter-a-valid-friendly-url-mapping" />
-	<liferay-ui:error exception="<%= ClientExtensionEntryIFrameURLException.class %>" message="please-enter-a-unique-remote-app-url" />
+	<liferay-ui:error exception="<%= ClientExtensionEntryTypeSettingsException.class %>">
+
+		<%
+		ClientExtensionEntryTypeSettingsException clientExtensionEntryTypeSettingsException = (ClientExtensionEntryTypeSettingsException)errorException;
+		%>
+
+		<liferay-ui:message arguments="<%= clientExtensionEntryTypeSettingsException.getMessageArguments() %>" key="<%= clientExtensionEntryTypeSettingsException.getMessageKey() %>" />
+	</liferay-ui:error>
 
 	<liferay-frontend:edit-form-body>
 		<liferay-frontend:fieldset-group>
@@ -47,19 +50,19 @@ renderResponse.setTitle(editClientExtensionEntryDisplayContext.getTitle());
 
 			<%@ include file="/admin/edit_custom_element_fields.jspf" %>
 
-			<%--<%@ include file="/admin/edit_global_css_fields.jspf" %>
+			<%@ include file="/admin/edit_global_css_fields.jspf" %>
 
-			<%@ include file="/admin/edit_global_js_fields.jspf" %>--%>
+			<%@ include file="/admin/edit_global_js_fields.jspf" %>
 
 			<%@ include file="/admin/edit_iframe_fields.jspf" %>
 
 			<%@ include file="/admin/edit_portlet_fields.jspf" %>
 
-			<%--<%@ include file="/admin/edit_theme_css_fields.jspf" %>
+			<%@ include file="/admin/edit_theme_css_fields.jspf" %>
 
 			<%@ include file="/admin/edit_theme_favicon_fields.jspf" %>
 
-			<%@ include file="/admin/edit_theme_js_fields.jspf" %>--%>
+			<%@ include file="/admin/edit_theme_js_fields.jspf" %>
 		</liferay-frontend:fieldset-group>
 	</liferay-frontend:edit-form-body>
 

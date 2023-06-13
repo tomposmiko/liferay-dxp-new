@@ -162,10 +162,12 @@ export default withRouter(
 			fetchMessages();
 		}, [fetchMessages]);
 
-		const questionVisited = context.questionsVisited.includes(question.id);
+		const questionVisited = context?.questionsVisited?.includes(
+			question.id
+		);
 
 		useEffect(() => {
-			if (question.id && !questionVisited) {
+			if (question.id && context?.questionsVisited && !questionVisited) {
 				context.setQuestionsVisited([
 					...context.questionsVisited,
 					question.id,

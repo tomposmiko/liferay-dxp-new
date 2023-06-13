@@ -344,6 +344,15 @@ public class NotificationTemplateLocalServiceUtil {
 		return getService().getPersistedModel(primaryKeyObj);
 	}
 
+	public static void sendNotificationTemplate(
+			long userId, long notificationTemplateId,
+			String notificationTypeKey, Object object)
+		throws PortalException {
+
+		getService().sendNotificationTemplate(
+			userId, notificationTemplateId, notificationTypeKey, object);
+	}
+
 	public static NotificationTemplate updateNotificationTemplate(
 			long notificationTemplateId, String bcc,
 			Map<java.util.Locale, String> bodyMap, String cc,

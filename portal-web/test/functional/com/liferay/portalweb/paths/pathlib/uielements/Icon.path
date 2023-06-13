@@ -201,6 +201,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>FAVICON</td>
+	<td>//link[contains(@href,'${imageFileName}')][contains(@rel,'icon')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>FRIENDLY_URL_HISTORY_ITEM_DELETE</td>
 	<td>//*[normalize-space()='${key_oldFriendlyURL}']//following-sibling::button</td>
 	<td></td>
@@ -238,6 +243,16 @@
 <tr>
 	<td>FLAG_1</td>
 	<td>//*[*[name()='svg'][contains(@class,'exicon-icon-es-es')]]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FLAG_SPECIFIC</td>
+	<td>//*[name()='svg']//*[contains(@href,'${key_flagID}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FLAG_AND_LANGUAGE</td>
+	<td>//*[name()='svg']//*[contains(@href,'${key_flagID}')]//..//..//following-sibling::span[contains(text(),'${key_languageID}')]</td>
 	<td></td>
 </tr>
 <tr>

@@ -79,10 +79,8 @@ public class UpgradeCountryCode extends UpgradeProcess {
 				preparedStatement1.setString(
 					2, resultSet.getString("languageId"));
 				preparedStatement1.setLong(3, increment());
-				preparedStatement1.setLong(
-					4, resultSet.getLong("companyId"));
-				preparedStatement1.setLong(
-					5, resultSet.getLong("userId"));
+				preparedStatement1.setLong(4, resultSet.getLong("companyId"));
+				preparedStatement1.setLong(5, resultSet.getLong("userId"));
 				preparedStatement1.setTimestamp(6, now);
 				preparedStatement1.setTimestamp(7, now);
 				preparedStatement1.setString(8, "NA");
@@ -140,14 +138,11 @@ public class UpgradeCountryCode extends UpgradeProcess {
 				preparedStatement1.setString(
 					2, resultSet.getString("languageId"));
 				preparedStatement1.setLong(3, increment());
-				preparedStatement1.setLong(
-					4, resultSet.getLong("companyId"));
-				preparedStatement1.setLong(
-					5, resultSet.getLong("userId"));
+				preparedStatement1.setLong(4, resultSet.getLong("companyId"));
+				preparedStatement1.setLong(5, resultSet.getLong("userId"));
 				preparedStatement1.setTimestamp(6, now);
 				preparedStatement1.setTimestamp(7, now);
-				preparedStatement1.setLong(
-					8, resultSet.getLong("countryId"));
+				preparedStatement1.setLong(8, resultSet.getLong("countryId"));
 				preparedStatement1.setBoolean(9, true);
 				preparedStatement1.setString(10, regionName);
 				preparedStatement1.setDouble(11, 0.0);

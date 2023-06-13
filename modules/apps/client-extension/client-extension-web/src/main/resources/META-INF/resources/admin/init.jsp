@@ -16,11 +16,7 @@
 
 <%@ include file="/init.jsp" %>
 
-<%@ page import="com.liferay.client.extension.exception.ClientExtensionEntryCustomElementCSSURLsException" %><%@
-page import="com.liferay.client.extension.exception.ClientExtensionEntryCustomElementHTMLElementNameException" %><%@
-page import="com.liferay.client.extension.exception.ClientExtensionEntryCustomElementURLsException" %><%@
-page import="com.liferay.client.extension.exception.ClientExtensionEntryFriendlyURLMappingException" %><%@
-page import="com.liferay.client.extension.exception.ClientExtensionEntryIFrameURLException" %><%@
+<%@ page import="com.liferay.client.extension.exception.ClientExtensionEntryTypeSettingsException" %><%@
 page import="com.liferay.client.extension.web.internal.constants.ClientExtensionAdminFDSNames" %><%@
 page import="com.liferay.client.extension.web.internal.constants.ClientExtensionAdminWebKeys" %><%@
 page import="com.liferay.client.extension.web.internal.display.context.ClientExtensionAdminDisplayContext" %><%@

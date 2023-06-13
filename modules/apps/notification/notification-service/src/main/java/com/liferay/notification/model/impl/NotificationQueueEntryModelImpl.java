@@ -137,11 +137,23 @@ public class NotificationQueueEntryModelImpl
 	public static final long NOTIFICATIONTEMPLATEID_COLUMN_BITMASK = 1L;
 
 	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+	 */
+	@Deprecated
+	public static final long SENT_COLUMN_BITMASK = 2L;
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+	 */
+	@Deprecated
+	public static final long SENTDATE_COLUMN_BITMASK = 4L;
+
+	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
 	 *		#getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long NOTIFICATIONQUEUEENTRYID_COLUMN_BITMASK = 2L;
+	public static final long NOTIFICATIONQUEUEENTRYID_COLUMN_BITMASK = 8L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
@@ -712,6 +724,16 @@ public class NotificationQueueEntryModelImpl
 		_sent = sent;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getColumnOriginalValue(String)}
+	 */
+	@Deprecated
+	public boolean getOriginalSent() {
+		return GetterUtil.getBoolean(
+			this.<Boolean>getColumnOriginalValue("sent"));
+	}
+
 	@Override
 	public Date getSentDate() {
 		return _sentDate;
@@ -724,6 +746,15 @@ public class NotificationQueueEntryModelImpl
 		}
 
 		_sentDate = sentDate;
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getColumnOriginalValue(String)}
+	 */
+	@Deprecated
+	public Date getOriginalSentDate() {
+		return getColumnOriginalValue("sentDate");
 	}
 
 	@Override

@@ -13,7 +13,7 @@
  */
 
 import ClayManagementToolbar from '@clayui/management-toolbar';
-import {useContext, useState} from 'react';
+import {ReactNode, useContext} from 'react';
 
 import {ListViewContext, ListViewTypes} from '../../context/ListViewContext';
 import i18n from '../../i18n';
@@ -22,47 +22,48 @@ import {TableProps} from '../Table';
 import ManagementToolbarLeft from './ManagementToolbarLeft';
 import ManagementToolbarResultsBar from './ManagementToolbarResultsBar';
 import ManagementToolbarRight, {IItem} from './ManagementToolbarRight';
-import ManagementToolbarSearch from './ManagementToolbarSearch';
 
 export type ManagementToolbarProps = {
 	addButton?: () => void;
+	buttons?: ReactNode;
+	display?: {
+		columns?: boolean;
+	};
 	filterFields?: RendererFields[];
-	onSelectAllRows: () => void;
-	rowSelectable?: boolean;
-	tableProps: Omit<TableProps, 'items'>;
+	tableProps: Omit<TableProps, 'items' | 'onSelectAllRows'>;
+	title?: string;
 	totalItems: number;
 };
 
 const ManagementToolbar: React.FC<ManagementToolbarProps> = ({
 	addButton,
+	buttons,
+	display,
 	filterFields,
-	onSelectAllRows,
-	rowSelectable,
 	tableProps,
+	title,
 	totalItems,
 }) => {
-	const [{filters, keywords}, dispatch] = useContext(ListViewContext);
-	const [showMobile, setShowMobile] = useState(false);
+	const [{columns: contextColumns, filters}, dispatch] = useContext(
+		ListViewContext
+	);
 
 	const disabled = totalItems === 0;
 
 	const columns = [
 		{
 			items: tableProps.columns.map((column) => ({
-				checked: (filters.columns || {})[column.key] ?? true,
+				checked: (contextColumns || {})[column.key] ?? true,
 				label: column.value,
 				onChange: (value: boolean) => {
 					dispatch({
 						payload: {
-							filters: {
-								...filters,
-								columns: {
-									...filters.columns,
-									[column.key]: value,
-								},
+							columns: {
+								...contextColumns,
+								[column.key]: value,
 							},
 						},
-						type: ListViewTypes.SET_UPDATE_FILTERS_AND_SORT,
+						type: ListViewTypes.SET_COLUMNS,
 					});
 				},
 				type: 'checkbox',
@@ -72,44 +73,23 @@ const ManagementToolbar: React.FC<ManagementToolbarProps> = ({
 		},
 	];
 
-	const onSearch = (searchText: string) => {
-		dispatch({payload: searchText, type: ListViewTypes.SET_SEARCH});
-	};
-
 	return (
 		<>
 			<ClayManagementToolbar>
-				<ManagementToolbarLeft
-					disabled={disabled}
-					onSelectAllRows={onSelectAllRows}
-					rowSelectable={rowSelectable}
-				/>
-
-				<ManagementToolbarSearch
-					disabled={disabled}
-					onSubmit={(searchText: string) => onSearch(searchText)}
-					searchText={keywords}
-					setShowMobile={setShowMobile}
-					showMobile={showMobile}
-				/>
+				<ManagementToolbarLeft title={title} />
 
 				<ManagementToolbarRight
 					addButton={addButton}
+					buttons={buttons}
 					columns={columns as IItem[]}
 					disabled={disabled}
+					display={display}
 					filterFields={filterFields}
-					setShowMobile={setShowMobile}
 				/>
 			</ClayManagementToolbar>
 
-			{keywords && (
-				<ManagementToolbarResultsBar
-					keywords={keywords}
-					onClear={() => {
-						onSearch('');
-					}}
-					totalItems={totalItems}
-				/>
+			{!!filters.entries?.length && (
+				<ManagementToolbarResultsBar totalItems={totalItems} />
 			)}
 		</>
 	);

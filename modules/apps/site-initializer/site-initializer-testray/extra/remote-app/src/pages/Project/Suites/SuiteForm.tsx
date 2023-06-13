@@ -24,7 +24,7 @@ import Form from '../../../components/Form';
 import Container from '../../../components/Layout/Container';
 import {CreateSuite, UpdateSuite} from '../../../graphql/mutations';
 import {CreateSuiteCaseBatch} from '../../../graphql/mutations/testraySuiteCase';
-import {TestraySuite, getSuites} from '../../../graphql/queries';
+import {TestrayCase, TestraySuite, getSuites} from '../../../graphql/queries';
 import {useHeader} from '../../../hooks';
 import useFormActions from '../../../hooks/useFormActions';
 import useFormModal from '../../../hooks/useFormModal';
@@ -52,7 +52,10 @@ const SuiteForm = () => {
 	const {setTabs} = useHeader({shouldUpdate: false});
 	const {projectId} = useParams();
 	const [cases, setCases] = useState([]);
-	const context: {testraySuite?: TestraySuite} = useOutletContext();
+	const context: {
+		testrayProject?: any;
+		testraySuite?: TestraySuite;
+	} = useOutletContext();
 
 	useEffect(() => {
 		setTimeout(() => {
@@ -162,7 +165,9 @@ const SuiteForm = () => {
 				</ClayButton>
 			</ClayButton.Group>
 
-			{!caseParameters && (
+			{caseParameters ? (
+				<div />
+			) : (
 				<ClayAlert>There are no linked cases.</ClayAlert>
 			)}
 
@@ -175,28 +180,42 @@ const SuiteForm = () => {
 				<CaseListView
 					listViewProps={{
 						managementToolbarProps: {visible: false},
+						tableProps: {
+							actions: [
+								{
+									action: ({id}: TestrayCase) =>
+										setCases((prevCases) =>
+											prevCases.filter(
+												(prevCase: number) =>
+													prevCase !== id
+											)
+										),
+									name: i18n.translate('delete'),
+								},
+							],
+							columns: [
+								{
+									key: 'priority',
+									value: i18n.translate('priority'),
+								},
+								{
+									key: 'name',
+									size: 'md',
+									value: i18n.translate('name'),
+								},
+								{
+									key: 'description',
+									size: 'lg',
+									value: i18n.translate('description'),
+								},
+							],
+						},
 						variables: {filter: searchUtil.in('id', cases)},
 					}}
 				/>
 			)}
 
-			<div>
-				<ClayButton.Group spaced>
-					<ClayButton
-						displayType="secondary"
-						onClick={() => onClose()}
-					>
-						{i18n.translate('close')}
-					</ClayButton>
-
-					<ClayButton
-						displayType="primary"
-						onClick={handleSubmit(_onSubmit)}
-					>
-						{i18n.translate('save')}
-					</ClayButton>
-				</ClayButton.Group>
-			</div>
+			<Form.Footer onClose={onClose} onSubmit={handleSubmit(_onSubmit)} />
 		</Container>
 	);
 };

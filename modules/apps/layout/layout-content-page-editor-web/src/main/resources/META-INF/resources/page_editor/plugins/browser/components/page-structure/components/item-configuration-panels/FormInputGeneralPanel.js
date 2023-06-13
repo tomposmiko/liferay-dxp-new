@@ -12,11 +12,11 @@
  * details.
  */
 
+import ClayAlert from '@clayui/alert';
 import ClayLoadingIndicator from '@clayui/loading-indicator';
 import classNames from 'classnames';
 import React, {useMemo} from 'react';
 
-import {ALLOWED_INPUT_TYPES} from '../../../../../../app/config/constants/allowedInputTypes';
 import {FRAGMENT_ENTRY_TYPES} from '../../../../../../app/config/constants/fragmentEntryTypes';
 import {FREEMARKER_FRAGMENT_ENTRY_PROCESSOR} from '../../../../../../app/config/constants/freemarkerFragmentEntryProcessor';
 import {LAYOUT_DATA_ITEM_TYPES} from '../../../../../../app/config/constants/layoutDataItemTypes';
@@ -164,142 +164,21 @@ export function FormInputGeneralPanel({item}) {
 		key: [CACHE_KEYS.formFields, classNameId, classTypeId],
 	});
 
-	const fields = useMemo(() => {
-		let nextFields = getInputCommonConfiguration(
-			configurationValues,
-			formFields
-		);
+	const {fragmentEntryKey} = fragmentEntryLinkRef.current;
 
-		const fieldSetsWithoutLabel =
-			fragmentEntryLinkRef.current.configuration?.fieldSets?.filter(
-				(fieldSet) => !fieldSet.configurationRole && !fieldSet.label
-			) ?? [];
-
-		nextFields = [
-			...nextFields,
-			...fieldSetsWithoutLabel.flatMap((fieldSet) => fieldSet.fields),
-		];
-
-		return nextFields;
-	}, [configurationValues, fragmentEntryLinkRef, formFields]);
-
-	const handleValueSelect = (key, value) => {
-		const keyPath = [FREEMARKER_FRAGMENT_ENTRY_PROCESSOR, key];
-
-		const localizable =
-			fields.find((field) => field.name === key)?.localizable || false;
-
-		if (localizable) {
-			keyPath.push(languageId);
-		}
-
-		let editableValues = fragmentEntryLinkRef.current.editableValues;
-
-		if (key === FIELD_ID_CONFIGURATION_KEY) {
-			editableValues = setIn(
-				fragmentEntryLinkRef.current.editableValues,
-				[
-					FREEMARKER_FRAGMENT_ENTRY_PROCESSOR,
-					REQUIRED_CONFIGURATION_KEY,
-				],
-				isFormRequiredField(value, formFields)
-			);
-
-			editableValues = setIn(
-				editableValues,
-				[FREEMARKER_FRAGMENT_ENTRY_PROCESSOR, LABEL_CONFIGURATION_KEY],
-				getFieldLabel(value, formFields)
-			);
-		}
-
-		dispatch(
-			updateEditableValues({
-				editableValues: setIn(editableValues, keyPath, value),
-				fragmentEntryLinkId:
-					fragmentEntryLinkRef.current.fragmentEntryLinkId,
-				languageId,
-				segmentsExperienceId,
-			})
-		);
-	};
-
-	return (
-		<>
-			<div className="mb-3">
-				<Collapse
-					label={Liferay.Language.get('form-input-options')}
-					open
-				>
-					<FormInputMappingOptions
-						configurationValues={configurationValues}
-						form={{
-							classNameId,
-							classTypeId,
-							fields: formFields,
-							formId,
-						}}
-						item={item}
-						onValueSelect={handleValueSelect}
-					/>
-
-					<FieldSet
-						fields={fields}
-						item={item}
-						label=""
-						languageId={languageId}
-						onValueSelect={handleValueSelect}
-						values={configurationValues}
-					/>
-				</Collapse>
-			</div>
-
-			<FragmentGeneralPanel item={item} />
-		</>
-	);
-}
-
-function FormInputMappingOptions({
-	configurationValues,
-	form,
-	item,
-	onValueSelect,
-}) {
-	const {classNameId, classTypeId, fields, formId} = form;
-
-	const inputType = useSelectorCallback(
-		(state) => {
-			const element = document.createElement('div');
-			element.innerHTML = selectFragmentEntryLink(state, item).content;
-
-			if (element.querySelector('select')) {
-				return 'select';
-			}
-			else if (element.querySelector('textarea')) {
-				return 'textarea';
-			}
-
-			return element.querySelector('input')?.type || 'text';
-		},
-		[item.itemId]
-	);
-
-	const itemTypes = useCache({
-		fetcher: () => InfoItemService.getAvailableInfoItemFormProviders(),
-		key: [CACHE_KEYS.itemTypes],
+	const allowedInputTypes = useCache({
+		fetcher: () =>
+			FormService.getFragmentEntryInputFieldTypes({fragmentEntryKey}),
+		key: [CACHE_KEYS.allowedInputTypes, fragmentEntryKey],
 	});
 
-	const {subtype, type} = useMemo(
-		() => getTypeLabels(itemTypes, classNameId, classTypeId),
-		[itemTypes, classNameId, classTypeId]
-	);
-
-	const filteredFields = useSelectorCallback(
+	const filteredFormFields = useSelectorCallback(
 		(state) => {
-			if (!fields) {
-				return fields;
+			if (!formFields || !allowedInputTypes) {
+				return [];
 			}
 
-			let nextFields = fields;
+			let nextFields = formFields;
 
 			const selectedFields = (() => {
 				const selectedFields = [];
@@ -344,9 +223,8 @@ function FormInputMappingOptions({
 					fields: fieldset.fields
 						.filter(
 							(field) =>
-								ALLOWED_INPUT_TYPES[field.type]?.includes(
-									inputType
-								) && !selectedFields.includes(field.key)
+								allowedInputTypes.includes(field.type) &&
+								!selectedFields.includes(field.key)
 						)
 						.map((field) =>
 							field.required
@@ -358,18 +236,137 @@ function FormInputMappingOptions({
 
 			return nextFields;
 		},
-		[item.itemId, fields, inputType]
+		[allowedInputTypes, item.itemId, formFields]
+	);
+
+	const configFields = useMemo(() => {
+		let nextFields = getInputCommonConfiguration(
+			configurationValues,
+			formFields
+		);
+
+		const fieldSetsWithoutLabel =
+			fragmentEntryLinkRef.current.configuration?.fieldSets?.filter(
+				(fieldSet) => !fieldSet.configurationRole && !fieldSet.label
+			) ?? [];
+
+		nextFields = [
+			...nextFields,
+			...fieldSetsWithoutLabel.flatMap((fieldSet) => fieldSet.fields),
+		];
+
+		return nextFields;
+	}, [configurationValues, fragmentEntryLinkRef, formFields]);
+
+	const handleValueSelect = (key, value) => {
+		const keyPath = [FREEMARKER_FRAGMENT_ENTRY_PROCESSOR, key];
+
+		const localizable =
+			configFields.find((field) => field.name === key)?.localizable ||
+			false;
+
+		if (localizable) {
+			keyPath.push(languageId);
+		}
+
+		let editableValues = fragmentEntryLinkRef.current.editableValues;
+
+		if (key === FIELD_ID_CONFIGURATION_KEY) {
+			editableValues = setIn(
+				fragmentEntryLinkRef.current.editableValues,
+				[
+					FREEMARKER_FRAGMENT_ENTRY_PROCESSOR,
+					REQUIRED_CONFIGURATION_KEY,
+				],
+				isFormRequiredField(value, formFields)
+			);
+
+			editableValues = setIn(
+				editableValues,
+				[FREEMARKER_FRAGMENT_ENTRY_PROCESSOR, LABEL_CONFIGURATION_KEY],
+				getFieldLabel(value, formFields)
+			);
+		}
+
+		dispatch(
+			updateEditableValues({
+				editableValues: setIn(editableValues, keyPath, value),
+				fragmentEntryLinkId:
+					fragmentEntryLinkRef.current.fragmentEntryLinkId,
+				languageId,
+				segmentsExperienceId,
+			})
+		);
+	};
+
+	return (
+		<>
+			<div className="mb-3">
+				<Collapse
+					label={Liferay.Language.get('form-input-options')}
+					open
+				>
+					{filteredFormFields.flatMap((fieldSet) => fieldSet.fields)
+						.length ? (
+						<FormInputMappingOptions
+							allowedInputTypes={allowedInputTypes}
+							configurationValues={configurationValues}
+							form={{
+								classNameId,
+								classTypeId,
+								fields: filteredFormFields,
+							}}
+							item={item}
+							onValueSelect={handleValueSelect}
+						/>
+					) : (
+						<ClayAlert displayType="info">
+							{Liferay.Language.get(
+								'there-are-no-suitable-fields-in-the-item-to-be-mapped-to-the-fragment'
+							)}
+						</ClayAlert>
+					)}
+
+					{configurationValues[FIELD_ID_CONFIGURATION_KEY] && (
+						<FieldSet
+							fields={configFields}
+							item={item}
+							label=""
+							languageId={languageId}
+							onValueSelect={handleValueSelect}
+							values={configurationValues}
+						/>
+					)}
+				</Collapse>
+			</div>
+
+			<FragmentGeneralPanel item={item} />
+		</>
+	);
+}
+
+function FormInputMappingOptions({configurationValues, form, onValueSelect}) {
+	const {classNameId, classTypeId, fields} = form;
+
+	const itemTypes = useCache({
+		fetcher: () =>
+			InfoItemService.getAvailableEditPageInfoItemFormProviders(),
+		key: [CACHE_KEYS.itemTypes],
+	});
+
+	const {subtype, type} = useMemo(
+		() => getTypeLabels(itemTypes, classNameId, classTypeId),
+		[itemTypes, classNameId, classTypeId]
 	);
 
 	if (!classNameId || !classTypeId) {
 		return null;
 	}
 
-	return filteredFields ? (
+	return fields ? (
 		<>
 			<MappingFieldSelector
-				fieldType={inputType}
-				fields={filteredFields}
+				fields={fields}
 				onValueSelect={(event) =>
 					onValueSelect(
 						FIELD_ID_CONFIGURATION_KEY,

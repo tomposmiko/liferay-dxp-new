@@ -25,11 +25,23 @@ if (Validator.isNull(redirect)) {
 	redirect = portletURL.toString();
 }
 
+Map data = editAssetListDisplayContext.getData();
+
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(redirect);
 
 renderResponse.setTitle(assetListDisplayContext.getAssetListEntryTitle());
 %>
+
+<c:if test='<%= !(boolean)data.get("isSegmentationEnabled") %>'>
+	<clay:stripe
+		displayType="warning"
+	>
+		<strong class="lead"><%= LanguageUtil.get(request, "personalized-variations-can-not-be-displayed-because-segmentation-is-disabled") %></strong>
+
+		<span><%= LanguageUtil.get(request, "to-enable-segmentation-go-to-system-settings-segments-segments-service") %></span>
+	</clay:stripe>
+</c:if>
 
 <clay:container-fluid
 	cssClass="container-view"
@@ -48,7 +60,7 @@ renderResponse.setTitle(assetListDisplayContext.getAssetListEntryTitle());
 
 				<react:component
 					module="js/components/VariationsNav/index"
-					props="<%= editAssetListDisplayContext.getData() %>"
+					props="<%= data %>"
 				/>
 			</div>
 		</clay:col>

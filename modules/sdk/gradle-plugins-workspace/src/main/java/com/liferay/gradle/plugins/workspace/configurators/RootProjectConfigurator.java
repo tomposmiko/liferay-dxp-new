@@ -78,10 +78,12 @@ import org.gradle.api.Task;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.DependencySet;
 import org.gradle.api.file.CopySpec;
+import org.gradle.api.file.Directory;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.file.DuplicatesStrategy;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.file.FileCopyDetails;
+import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.file.RelativePath;
 import org.gradle.api.initialization.Settings;
 import org.gradle.api.logging.Logger;
@@ -89,6 +91,7 @@ import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.MapProperty;
 import org.gradle.api.provider.Property;
+import org.gradle.api.provider.Provider;
 import org.gradle.api.provider.SetProperty;
 import org.gradle.api.specs.Spec;
 import org.gradle.api.tasks.Copy;
@@ -126,6 +129,9 @@ public class RootProjectConfigurator implements Plugin<Project> {
 
 	public static final String CREATE_DOCKER_CONTAINER_TASK_NAME =
 		"createDockerContainer";
+
+	public static final String CREATE_DOCKERFILE_ALL_TASK_NAME =
+		"createDockerfileAll";
 
 	public static final String CREATE_DOCKERFILE_TASK_NAME = "createDockerfile";
 
@@ -312,6 +318,11 @@ public class RootProjectConfigurator implements Plugin<Project> {
 			project, workspaceExtension, providedModulesConfiguration);
 
 		Dockerfile dockerfile = _addTaskCreateDockerfile(
+			project, CREATE_DOCKERFILE_TASK_NAME,
+			workspaceExtension.getEnvironment(), workspaceExtension,
+			dockerDeploy, verifyProductTask);
+
+		_addTaskCreateDockerfileAll(
 			project, workspaceExtension, dockerDeploy, verifyProductTask);
 
 		DockerBuildImage dockerBuildImage = _addTaskBuildDockerImage(
@@ -366,6 +377,7 @@ public class RootProjectConfigurator implements Plugin<Project> {
 		dockerRemoveImage.dependsOn(REMOVE_DOCKER_CONTAINER_TASK_NAME);
 
 		dockerRemoveImage.setDescription("Removes the Docker image.");
+		dockerRemoveImage.setGroup(DOCKER_GROUP);
 
 		Property<Boolean> forceProperty = dockerRemoveImage.getForce();
 
@@ -535,6 +547,7 @@ public class RootProjectConfigurator implements Plugin<Project> {
 		dockerCreateContainer.setDescription(
 			"Creates a Docker container from your built image and mounts " +
 				dockerPath + " to /mnt/liferay.");
+		dockerCreateContainer.setGroup(DOCKER_GROUP);
 
 		ListProperty<String> portBindings = hostConfig.getPortBindings();
 
@@ -575,18 +588,18 @@ public class RootProjectConfigurator implements Plugin<Project> {
 	}
 
 	private Dockerfile _addTaskCreateDockerfile(
-		Project project, final WorkspaceExtension workspaceExtension,
-		Copy dockerDeploy, VerifyProductTask verifyProductTask) {
+		Project project, String taskName, String environment,
+		final WorkspaceExtension workspaceExtension, Copy dockerDeploy,
+		VerifyProductTask verifyProductTask) {
 
 		Dockerfile dockerfile = GradleUtil.addTask(
-			project, CREATE_DOCKERFILE_TASK_NAME, Dockerfile.class);
+			project, taskName, Dockerfile.class);
 
 		dockerfile.dependsOn(verifyProductTask, dockerDeploy);
 		dockerfile.mustRunAfter(verifyProductTask);
 
 		dockerfile.instruction(
-			"ENV LIFERAY_WORKSPACE_ENVIRONMENT=" +
-				workspaceExtension.getEnvironment());
+			"ENV LIFERAY_WORKSPACE_ENVIRONMENT=" + environment);
 
 		dockerfile.instruction(
 			"COPY --chown=liferay:liferay deploy /mnt/liferay/deploy");
@@ -714,6 +727,77 @@ public class RootProjectConfigurator implements Plugin<Project> {
 			});
 
 		return dockerfile;
+	}
+
+	private void _addTaskCreateDockerfileAll(
+		Project project, WorkspaceExtension workspaceExtension,
+		Copy dockerDeploy, VerifyProductTask verifyProductTask) {
+
+		long buildTime = System.currentTimeMillis();
+
+		File configsDir = workspaceExtension.getConfigsDir();
+
+		String[] environments = configsDir.list(
+			new FilenameFilter() {
+
+				@Override
+				public boolean accept(File file, String name) {
+					if (!name.startsWith(".") && file.isDirectory() &&
+						!name.equals("common") && !name.equals("docker")) {
+
+						return true;
+					}
+
+					return false;
+				}
+
+			});
+
+		if ((environments == null) || (environments.length == 0)) {
+			return;
+		}
+
+		Task createDockerfileAllTask = GradleUtil.addTask(
+			project, CREATE_DOCKERFILE_ALL_TASK_NAME, DefaultTask.class);
+
+		createDockerfileAllTask.setDescription(
+			"create docker file for each environment.");
+		createDockerfileAllTask.setGroup(DOCKER_GROUP);
+
+		project.afterEvaluate(
+			new Action<Project>() {
+
+				@Override
+				public void execute(Project project) {
+					for (String environment : environments) {
+						Dockerfile createDockerfileTask =
+							_addTaskCreateDockerfile(
+								project,
+								CREATE_DOCKERFILE_TASK_NAME +
+									StringUtil.capitalize(environment),
+								environment, workspaceExtension, dockerDeploy,
+								verifyProductTask);
+
+						RegularFileProperty destRegularFileProperty =
+							createDockerfileTask.getDestFile();
+
+						Provider<Directory> destProvider =
+							createDockerfileTask.getDestDir();
+
+						Directory destDirectory = destProvider.get();
+
+						File destDir = destDirectory.getAsFile();
+
+						destRegularFileProperty.set(
+							new File(
+								destDir,
+								"Dockerfile." + environment + "-" + buildTime));
+
+						createDockerfileAllTask.dependsOn(createDockerfileTask);
+					}
+				}
+
+			});
 	}
 
 	private CreateTokenTask _addTaskCreateToken(Project project) {
@@ -1090,6 +1174,7 @@ public class RootProjectConfigurator implements Plugin<Project> {
 			DockerLogsContainer.class);
 
 		dockerLogsContainer.setDescription("Logs the Docker container.");
+		dockerLogsContainer.setGroup(DOCKER_GROUP);
 
 		Property<Boolean> followProperty = dockerLogsContainer.getFollow();
 
@@ -1126,6 +1211,7 @@ public class RootProjectConfigurator implements Plugin<Project> {
 		property.set(workspaceExtension.getDockerImageLiferay());
 
 		dockerPullImage.setDescription("Pull the Docker image.");
+		dockerPullImage.setGroup(DOCKER_GROUP);
 
 		return dockerPullImage;
 	}
@@ -1138,6 +1224,7 @@ public class RootProjectConfigurator implements Plugin<Project> {
 			DockerRemoveContainer.class);
 
 		dockerRemoveContainer.setDescription("Removes the Docker container.");
+		dockerRemoveContainer.setGroup(DOCKER_GROUP);
 
 		Property<Boolean> forceProperty = dockerRemoveContainer.getForce();
 
@@ -1333,6 +1420,7 @@ public class RootProjectConfigurator implements Plugin<Project> {
 		dockerStartContainer.dependsOn(dockerCreateContainer);
 
 		dockerStartContainer.setDescription("Starts the Docker container.");
+		dockerStartContainer.setGroup(DOCKER_GROUP);
 
 		dockerStartContainer.targetContainerId(
 			new Callable<String>() {
@@ -1353,6 +1441,7 @@ public class RootProjectConfigurator implements Plugin<Project> {
 			DockerStopContainer.class);
 
 		dockerStopContainer.setDescription("Stops the Docker container.");
+		dockerStopContainer.setGroup(DOCKER_GROUP);
 
 		dockerStopContainer.targetContainerId(
 			new Callable<String>() {

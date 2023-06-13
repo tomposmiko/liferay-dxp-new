@@ -61,6 +61,34 @@ definition {
 		}
 	}
 
+	macro assertQuickLinksPanelInfo {
+		AssertElementPresent(
+			locator1 = "CP2NavigationMenu#QUICK_LINKS",
+			title = "${title}");
+	}
+
+	macro assertQuickLinksPanelIsHidden {
+		AssertElementPresent(locator1 = "CP2NavigationMenu#QUICK_LINKS_COLLAPSED");
+	}
+
+	macro assertSlaCard {
+		AssertElementPresent(
+			locator1 = "CustomerPortalSite#SLA_CARD",
+			type = "${type}");
+	}
+
+	macro assertSlaCardNotAppears {
+		AssertElementNotPresent(
+			locator1 = "CustomerPortalSite#SLA_CARD",
+			typeCard = "${typeCard}");
+	}
+
+	macro cannotAppearsQuickLinksPanelInfo {
+		AssertElementNotPresent(
+			locator1 = "CP2NavigationMenu#QUICK_LINKS",
+			title = "${title}");
+	}
+
 	macro changeUserRole {
 		ApplicationsMenu.gotoPortlet(
 			category = "Accounts",
@@ -247,8 +275,6 @@ definition {
 
 		Open.openInTheNewTab(locator1 = "https://login-dev.liferay.com/");
 
-		SelectWindow(locator1 = "title=Liferay-sandbox - Sign In");
-
 		Type(
 			locator1 = "CustomerPortalSite#OKTA_USERNAME",
 			value1 = "${userEmailAddress}");
@@ -258,6 +284,15 @@ definition {
 			value1 = "${userPassword}");
 
 		Click(locator1 = "CustomerPortalSite#OKTA_SUBMIT");
+	}
+
+	macro notViewProduct {
+		for (var product : list "${productTab}") {
+			AssertElementNotPresent(
+				key_product = "${productTab}",
+				locator1 = "CustomerPortalSite#SUBSCRIPTION_NAVBAR",
+				value = "${product}");
+		}
 	}
 
 	macro replaceCertificateAndPrivateKey {
@@ -539,6 +574,17 @@ definition {
 			locator1 = "CustomerPortalSite#TABLE_STATUS",
 			status = "Future",
 			value1 = "Future");
+	}
+
+	macro viewValueFieldKoroneiki {
+		ApplicationsMenu.gotoPortlet(
+			category = "Object",
+			panel = "Control Panel",
+			portlet = "Koroneiki Accounts");
+
+		CustomerPortal.viewCPObjectInfo();
+
+		AssertElementPresent(locator1 = "CustomerPortalSite#FIELDS_KORONEIKI");
 	}
 
 }

@@ -12,6 +12,11 @@
  * details.
  */
 
+interface ItemIdName {
+	id: string;
+	name: string;
+}
+
 interface ObjectAction {
 	active: boolean;
 	conditionExpression?: string;
@@ -82,16 +87,6 @@ interface ObjectValidation {
 	script: string;
 }
 
-interface ObjectValidationRuleElement {
-	items: ObjectValidationRuleElementItem[];
-	label: string;
-}
-
-interface ObjectValidationRuleElementItem {
-	content: string;
-	label: string;
-	tooltip: string;
-}
 interface ObjectRelationship {
 	deletionType: string;
 	id: string;
@@ -104,6 +99,8 @@ interface ObjectRelationship {
 	reverse?: boolean;
 	type: string;
 }
+
+interface PickListItems extends ItemIdName {}
 
 type ObjectValidationType = {
 	label: string;

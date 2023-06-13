@@ -267,6 +267,8 @@ definition {
 
 		PortletEntry.inputName(name = "${accountName}");
 
+		WaitForLiferayEvent.initializeLiferayEventLog();
+
 		AssertClick(
 			key_vocabularyName = "${vocabularyName}",
 			locator1 = "UsersAndOrganizationsEditUser#DETAILS_CATEGORY_SELECT",
@@ -276,7 +278,7 @@ definition {
 			locator1 = "Modal#HEADER",
 			value1 = "Select ${vocabularyName}");
 
-		AssetCategorization.selectCategory(categoryName = "${categoryName}");
+		AssetCategorization.selectCategories(categoryNameList = "${categoryName}");
 
 		PortletEntry.save();
 	}

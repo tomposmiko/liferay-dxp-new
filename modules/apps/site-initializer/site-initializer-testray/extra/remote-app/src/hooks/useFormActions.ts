@@ -19,7 +19,7 @@ import {useNavigate} from 'react-router-dom';
 
 import client from '../graphql/apolloClient';
 import i18n from '../i18n';
-import {Liferay} from '../services/liferay/liferay';
+import {Liferay} from '../services/liferay';
 
 type OnSubmitOptions = {
 	createMutation: DocumentNode;
@@ -27,7 +27,9 @@ type OnSubmitOptions = {
 };
 
 export type FormOptions = {
-	onChange: (state: any) => (event: any) => void;
+	onChange: (
+		state: any
+	) => (event: React.FormEvent<HTMLInputElement>) => void;
 	onClose: () => void;
 	onError: (error?: any) => void;
 	onSave: (param?: any) => void;

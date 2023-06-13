@@ -521,7 +521,8 @@ public class ObjectDefinitionLocalServiceImpl
 				_objectEntryLocalService, _objectFieldLocalService,
 				_objectRelationshipLocalService, _objectScopeProviderRegistry,
 				_objectViewLocalService, _persistedModelLocalServiceRegistry,
-				_resourceActions, _workflowStatusModelPreFilterContributor));
+				_resourceActions, _userLocalService,
+				_workflowStatusModelPreFilterContributor));
 
 		_objectDefinitionDeployerServiceTracker = new ServiceTracker<>(
 			_bundleContext, ObjectDefinitionDeployer.class,
@@ -753,7 +754,43 @@ public class ObjectDefinitionLocalServiceImpl
 			ObjectDefinition.class.getName(),
 			objectDefinition.getObjectDefinitionId(), false, true, true);
 
-		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-153768"))) {
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-154872"))) {
+			_objectFieldLocalService.addSystemObjectField(
+				userId, objectDefinition.getObjectDefinitionId(), "Date",
+				ObjectEntryTable.INSTANCE.status.getName(),
+				ObjectEntryTable.INSTANCE.getTableName(), "Date", false, false,
+				null,
+				LocalizedMapUtil.getLocalizedMap(
+					LanguageUtil.get(LocaleUtil.getDefault(), "create-date")),
+				"createDate", false);
+
+			_objectFieldLocalService.addSystemObjectField(
+				userId, objectDefinition.getObjectDefinitionId(), "Text",
+				ObjectEntryTable.INSTANCE.status.getName(),
+				ObjectEntryTable.INSTANCE.getTableName(), "String", false,
+				false, null,
+				LocalizedMapUtil.getLocalizedMap(
+					LanguageUtil.get(LocaleUtil.getDefault(), "author")),
+				"creator", false);
+
+			_objectFieldLocalService.addSystemObjectField(
+				userId, objectDefinition.getObjectDefinitionId(), "Integer",
+				ObjectEntryTable.INSTANCE.status.getName(),
+				ObjectEntryTable.INSTANCE.getTableName(), "Integer", false,
+				false, null,
+				LocalizedMapUtil.getLocalizedMap(
+					LanguageUtil.get(LocaleUtil.getDefault(), "id")),
+				"id", false);
+
+			_objectFieldLocalService.addSystemObjectField(
+				userId, objectDefinition.getObjectDefinitionId(), "Date",
+				ObjectEntryTable.INSTANCE.status.getName(),
+				ObjectEntryTable.INSTANCE.getTableName(), "Date", false, false,
+				null,
+				LocalizedMapUtil.getLocalizedMap(
+					LanguageUtil.get(LocaleUtil.getDefault(), "modified-date")),
+				"modifiedDate", false);
+
 			_objectFieldLocalService.addSystemObjectField(
 				userId, objectDefinition.getObjectDefinitionId(), "Text",
 				ObjectEntryTable.INSTANCE.status.getName(),

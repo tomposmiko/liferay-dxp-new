@@ -14,6 +14,7 @@
 
 package com.liferay.journal.web.internal.display.context;
 
+import com.liferay.dynamic.data.mapping.form.renderer.constants.DDMFormRendererConstants;
 import com.liferay.dynamic.data.mapping.form.values.factory.DDMFormValuesFactory;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
@@ -63,6 +64,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -227,7 +229,7 @@ public class JournalEditArticleDisplayContext {
 			return _ddmFormValues;
 		}
 
-		if (_article == null) {
+		if (_isDDMFormValuesEdited() || (_article == null)) {
 			DDMFormValuesFactory ddmFormValuesFactory =
 				_getDDMFormValuesFactory();
 
@@ -864,6 +866,27 @@ public class JournalEditArticleDisplayContext {
 				JournalFolderConstants.RESTRICTION_TYPE_INHERIT) {
 
 			return true;
+		}
+
+		return false;
+	}
+
+	private boolean _isDDMFormValuesEdited() {
+		Enumeration<String> enumeration =
+			_httpServletRequest.getParameterNames();
+
+		while (enumeration.hasMoreElements()) {
+			String parameterName = enumeration.nextElement();
+
+			if (StringUtil.startsWith(
+					parameterName,
+					DDMFormRendererConstants.DDM_FORM_FIELD_NAME_PREFIX) &&
+				StringUtil.endsWith(parameterName, "_edited") &&
+				GetterUtil.getBoolean(
+					_httpServletRequest.getParameter(parameterName))) {
+
+				return true;
+			}
 		}
 
 		return false;

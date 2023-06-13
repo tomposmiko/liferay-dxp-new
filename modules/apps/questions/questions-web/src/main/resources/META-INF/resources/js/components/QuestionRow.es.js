@@ -46,7 +46,7 @@ export default function QuestionRow({
 
 	const creatorInformation = question.creator
 		? {
-				link: `/questions/${sectionTitle}/creator/${question.creator.id}`,
+				link: `/questions/all/creator/${question.creator.id}`,
 				name: question.creator.name,
 				portraitURL: question.creator.image,
 				userId: String(question.creator.id),
@@ -135,7 +135,9 @@ export default function QuestionRow({
 						{
 							'question-seen':
 								question.seen ||
-								context.questionsVisited.includes(question.id),
+								context?.questionsVisited?.includes(
+									question.id
+								),
 						}
 					)}
 				>

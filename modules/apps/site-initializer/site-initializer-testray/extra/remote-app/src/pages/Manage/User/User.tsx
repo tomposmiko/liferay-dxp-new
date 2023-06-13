@@ -16,15 +16,16 @@ import ClayButton from '@clayui/button';
 import ClayForm, {ClayCheckbox} from '@clayui/form';
 import ClayLayout from '@clayui/layout';
 import {useContext, useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 
-import {Avatar} from '../../../components/Avatar';
+import Avatar from '../../../components/Avatar';
 import Form from '../../../components/Form';
 import Container from '../../../components/Layout/Container';
 import {AccountContext} from '../../../context/AccountContext';
 import {UserAccount} from '../../../graphql/queries';
 import {useHeader} from '../../../hooks';
 import i18n from '../../../i18n';
-import {Liferay} from '../../../services/liferay/liferay';
+import {Liferay} from '../../../services/liferay';
 
 type UserManagementProps = {
 	myUserAccount: UserAccount;
@@ -59,6 +60,7 @@ const UserManagement: React.FC<UserManagementProps> = ({myUserAccount}) => {
 			[name]: value,
 		});
 	};
+	const navigate = useNavigate();
 
 	return (
 		<ClayLayout.Container>
@@ -147,7 +149,10 @@ const UserManagement: React.FC<UserManagementProps> = ({myUserAccount}) => {
 
 						<ClayLayout.Col size={3} sm={12} xl={3}>
 							<ClayForm.Group className="form-group-sm">
-								<ClayButton className="bg-neutral-2 borderless neutral text-neutral-7">
+								<ClayButton
+									className="bg-neutral-2 borderless neutral text-neutral-7"
+									onClick={() => navigate('password')}
+								>
 									{i18n.translate('change-password')}
 								</ClayButton>
 							</ClayForm.Group>
