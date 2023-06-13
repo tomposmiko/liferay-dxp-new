@@ -6,12 +6,7 @@ import ProgressSavedModal from '../../../../routes/get-a-quote/components/contai
 
 import {WarningBadge} from '../Badges/Warning';
 
-export function CardFormActionsWithSave({
-	isValid = true,
-	onNext,
-	onPrevious,
-	onSave,
-}) {
+export function CardFormActions({isValid = true, onNext, onPrevious, onSave}) {
 	const {
 		formState: {errors},
 		getValues,

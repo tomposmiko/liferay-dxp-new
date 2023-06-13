@@ -979,13 +979,14 @@ public class JenkinsResultsParserUtil {
 			sb.append("=");
 
 			try {
-				String queryParameterValue = URLEncoder.encode(
-					matcher.group(2), StandardCharsets.UTF_8.name());
+				String queryParameterValue = matcher.group(2);
 
 				queryParameterValue = queryParameterValue.replaceAll(
-					"\\+", "%20");
+					"\\+", " ");
 
-				sb.append(queryParameterValue);
+				sb.append(
+					URLEncoder.encode(
+						queryParameterValue, StandardCharsets.UTF_8.name()));
 			}
 			catch (UnsupportedEncodingException unsupportedEncodingException) {
 				throw new RuntimeException(unsupportedEncodingException);
@@ -2479,9 +2480,29 @@ public class JenkinsResultsParserUtil {
 		Properties properties, String basePropertyName,
 		boolean useBasePropertyAsDefault, String... opts) {
 
+		String propertyName = getPropertyName(
+			properties, basePropertyName, opts);
+
+		if (!useBasePropertyAsDefault &&
+			basePropertyName.equals(propertyName)) {
+
+			return null;
+		}
+
+		return _getProperty(properties, new ArrayList<String>(), propertyName);
+	}
+
+	public static String getProperty(
+		Properties properties, String basePropertyName, String... opts) {
+
+		return getProperty(properties, basePropertyName, true, opts);
+	}
+
+	public static String getPropertyName(
+		Properties properties, String basePropertyName, String... opts) {
+
 		if ((opts == null) || (opts.length == 0)) {
-			return _getProperty(
-				properties, new ArrayList<String>(), basePropertyName);
+			return basePropertyName;
 		}
 
 		Set<String> optSet = new LinkedHashSet<>(Arrays.asList(opts));
@@ -2553,22 +2574,10 @@ public class JenkinsResultsParserUtil {
 		}
 
 		if (propertyName != null) {
-			return _getProperty(
-				properties, new ArrayList<String>(), propertyName);
+			return propertyName;
 		}
 
-		if (useBasePropertyAsDefault) {
-			return _getProperty(
-				properties, new ArrayList<String>(), basePropertyName);
-		}
-
-		return null;
-	}
-
-	public static String getProperty(
-		Properties properties, String basePropertyName, String... opts) {
-
-		return getProperty(properties, basePropertyName, true, opts);
+		return basePropertyName;
 	}
 
 	public static List<String> getPropertyOptions(String propertyName) {
@@ -3446,6 +3455,24 @@ public class JenkinsResultsParserUtil {
 		return string;
 	}
 
+	public static String removeDuplicates(
+		String delimiter, String delimitedString) {
+
+		if (isNullOrEmpty(delimitedString)) {
+			return delimitedString;
+		}
+
+		List<String> strings = new ArrayList<>();
+
+		for (String string : delimitedString.split(delimiter)) {
+			if (!strings.contains(string)) {
+				strings.add(string);
+			}
+		}
+
+		return join(",", strings);
+	}
+
 	public static List<File> removeExcludedFiles(
 		List<PathMatcher> excludesPathMatchers, List<File> files) {
 
@@ -4133,6 +4160,12 @@ public class JenkinsResultsParserUtil {
 			url, false, _RETRIES_SIZE_MAX_DEFAULT, null, postContent,
 			_SECONDS_RETRY_PERIOD_DEFAULT, _MILLIS_TIMEOUT_DEFAULT,
 			httpAuthorization);
+	}
+
+	public static List<PathMatcher> toPathMatchers(
+		String prefix, List<String> globs) {
+
+		return toPathMatchers(prefix, globs.toArray(new String[0]));
 	}
 
 	public static List<PathMatcher> toPathMatchers(

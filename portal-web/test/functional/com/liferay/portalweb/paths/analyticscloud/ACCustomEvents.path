@@ -16,10 +16,21 @@
 	<td>//button[@onclick]</td>
 	<td></td>
 </tr>
-<!-- DISPLAY_NAME_OR_DESCRIPTION -->
+<!-- EVENT_LIST_COLUMN-->
 <tr>
 	<td>DISPLAY_NAME_OR_DESCRIPTION_LIST</td>
 	<td>//td[contains(@class,'text-truncate')and text()='${key_nameValue}']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SAMPLE_RAW_DATA_LIST</td>
+	<td>//th/ancestor::table//a[text()='${key_attributeName}']/ancestor::tr//td[contains(@class,'table-cell-expand-smaller')]</td>
+	<td></td>
+</tr>
+<!-- SAMPLE_RAW_DATA_TABLE-->
+<tr>
+	<td>SAMPLE_RAW_DATA_IN_ORDER</td>
+	<td>xpath=(//td[contains(@class,'table-cell-expand-small')])[${index}]</td>
 	<td></td>
 </tr>
 <!-- DATA_TYPE -->
@@ -62,7 +73,7 @@
 	<td></td>
 </tr>
 <tr>
-	<td>BLOCK_HIDE_BUTTON</td>
+	<td>BLOCK_UNBLOCK_EVENT_BUTTON</td>
 	<td>//*[text()='${key_nameList}']/ancestor::tr//div[@class='quick-action-menu']//button[contains(@alt,'${key_actionButton}')]</td>
 	<td></td>
 </tr>

@@ -1408,12 +1408,29 @@ definition {
 	}
 
 	@description = "LPS-139160 - Verify it is not possible to delete an Object via API after it was published"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CannotDeletePublishedObjectViaApi {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-141680 CannotDeletePublishedObjectViaApi pending implementation
+		ObjectAdmin.addObjectFieldViaAPI(
+			fieldLabelName = "Field",
+			fieldName = "customObjectField",
+			fieldType = "String",
+			isRequired = "false",
+			objectName = "CustomObject");
 
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject");
+
+		ObjectAdmin.deleteAllCustomObjectsViaAPI();
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectAdmin.assertObjectStatus(
+			label = "Custom Object",
+			status = "Approved");
 	}
 
 	@description = "LPS-135400 - Verify it is not possible to delete a Relationship when an Object is published"
@@ -2076,21 +2093,29 @@ definition {
 	}
 
 	@description = "LPS-135649 - Verify that the Object is not displayed on Process Builder settings before Published"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CannotViewObjectOnProcessBuilderBeforePublished {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-141625 CannotViewObjectOnProcessBuilderBeforePublished pending implementation
+		ObjectAdmin.openWorkflowProcessBuilderConfiguration();
 
+		Workflow.viewDefinitionNotPresent(workflowDefinitionTitle = "Custom Object");
 	}
 
 	@description = "LPS-135649 - Verify that the Object is not not displayed on Workflow settings from Site Menu before Published"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CannotViewObjectOnWorkflowSettingsSiteMenuBeforePublished {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-141626 CannotViewObjectOnWorkflowSettingsSiteMenuBeforePublished pending implementation
+		Workflow.openWorkflowAdmin(siteURLKey = "guest");
 
+		Workflow.viewDefinitionNotPresent(workflowDefinitionTitle = "Custom Object");
 	}
 
 	@description = "LPS-135390 - Verify it is not possible to view an Object without the View permission"
@@ -3108,12 +3133,67 @@ definition {
 	}
 
 	@description = "LPS-135397 - Verify if it's possible to view the Entry with three columns"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanViewEntryWithThreeColumns {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-141513 CanViewEntryWithThreeColumns pending implementation
+		for (var letter : list "A,B,C") {
+			ObjectAdmin.addObjectFieldViaAPI(
+				fieldLabelName = "Custom Field ${letter}",
+				fieldName = "customObjectField${letter}",
+				fieldType = "String",
+				isRequired = "false",
+				objectName = "CustomObject");
+		}
 
+		ObjectAdmin.addObjectLayoutViaAPI(
+			layoutName = "Layout",
+			objectName = "CustomObject");
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+
+		ObjectAdmin.goToLayoutsTab();
+
+		ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+
+		SelectFrame(locator1 = "IFrame#IFRAME");
+
+		Click(locator1 = "ObjectAdmin#LAYOUT_LAYOUT_TAB");
+
+		ObjectAdmin.addTabFieldsOnLayout(
+			blockName = "Block 1",
+			columnsNumber = "3",
+			fieldList = "Custom Field A,Custom Field B,Custom Field C",
+			tabName = "Field Tab");
+
+		Click(locator1 = "ObjectAdmin#LAYOUT_INFO_TAB");
+
+		Click.clickAtNotVisible(locator1 = "ObjectAdmin#ENTRY_BOOLEAN_CHECKBOX");
+
+		Button.clickSave();
+
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject");
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject");
+
+		LexiconEntry.gotoAdd();
+
+		ObjectPortlet.assertFieldAtSpecificColumn(
+			fieldColumnNumber = "0",
+			fieldLabel = "Custom Field A");
+
+		ObjectPortlet.assertFieldAtSpecificColumn(
+			fieldColumnNumber = "1",
+			fieldLabel = "Custom Field B");
+
+		ObjectPortlet.assertFieldAtSpecificColumn(
+			fieldColumnNumber = "2",
+			fieldLabel = "Custom Field C");
 	}
 
 	@description = "LPS-135397 - Verify if it's possible to view the Entry with two columns"
@@ -4449,21 +4529,98 @@ definition {
 	}
 
 	@description = "LPS-135649 - Verify the Asset Title, Asset Type and Item Subject of a Object's entry on the Workflow Metrics page"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test ObjectInfoDisplayedOnWorkflowMetrics {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-141631 ObjectInfoDisplayedOnWorkflowMetrics pending implementation
+		ObjectAdmin.addObjectFieldViaAPI(
+			fieldLabelName = "Custom Field",
+			fieldName = "customObjectField",
+			fieldType = "String",
+			isRequired = "false",
+			objectName = "CustomObject");
 
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject");
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
+
+		CreateObject.selectTitleField(fieldLabel = "Custom Field");
+
+		CreateObject.saveObject();
+
+		Navigator.openURL();
+
+		ObjectAdmin.openWorkflowProcessBuilderConfiguration();
+
+		Workflow.configureWorkflow(
+			workflowDefinition = "Single Approver",
+			workflowResourceValue = "Custom Object");
+
+		ObjectAdmin.addObjectSingleFieldEntryViaAPI(
+			fieldName = "customObjectField",
+			objectName = "CustomObject",
+			value = "Entry Test");
+
+		Navigator.openURL();
+
+		WorkflowMetrics.goToWorkflowProcessMetrics(workflowProcessName = "Single Approver");
+
+		Click(locator1 = "WorkflowMetrics#DASHBOARD_TOTAL_PENDING_ITEMS_TITLE");
+
+		Workflow.assertInfoItem(
+			key_assignee = "Unassigned",
+			key_createdBy = "Test Test",
+			key_dueDate = "-",
+			key_itemSubject = "Custom Object: Entry Test",
+			key_processStep = "Review");
+
+		WorkflowMetricsAllItemsList.assertInfoItemByIDEntry(
+			assetTitle = "Entry Test",
+			assetType = "Custom Object",
+			createdBy = "Test Test",
+			currentAssignee = "Unassigned",
+			currentStep = "Review",
+			processStatus = "Pending");
 	}
 
 	@description = "LPS-139603 - Verify that the Object Name is displayed on the Relationship tab when a Relationship is created"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test ObjectNameDisplayedOnTheRelationshipTab {
+		for (var letter : list "A,B") {
+			ObjectAdmin.addObjectViaAPI(
+				labelName = "Custom Object ${letter}",
+				objectName = "CustomObject${letter}",
+				pluralLabelName = "Custom Objects ${letter}");
+		}
 
-		// TODO LPS-141681 ObjectNameDisplayedOnTheRelationshipTab pending implementation
+		for (var letter : list "A,B") {
+			ObjectAdmin.addObjectFieldViaAPI(
+				fieldLabelName = "Custom Field ${letter}",
+				fieldName = "customObjectField${letter}",
+				fieldType = "String",
+				isRequired = "false",
+				objectName = "CustomObject${letter}");
+		}
 
+		ObjectAdmin.addObjectRelationshipViaAPI(
+			objectName_1 = "CustomObjectA",
+			objectName_2 = "CustomObjectB",
+			relationshipLabel = "Relationship",
+			relationshipName = "relationship",
+			relationshipType = "oneToMany");
+
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object A");
+
+		ObjectAdmin.gotoRelationshipsTab();
+
+		CreateObject.assertRelatedObject(relatedObject = "CustomObjectB");
 	}
 
 	@description = "LPS-135549 - Verify that the Object Name is autofilled when Label is filled"
@@ -5286,12 +5443,112 @@ definition {
 	}
 
 	@description = "LPS-139005 - Verify that the Relationship tab is displayed again when the other object is reactivated (Many to Many)"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test RelationshipTabReappearsWhenReactivatedManyToMany {
+		for (var letter : list "A,B") {
+			ObjectAdmin.addObjectViaAPI(
+				labelName = "Custom Object ${letter}",
+				objectName = "CustomObject${letter}",
+				pluralLabelName = "Custom Objects ${letter}");
+		}
 
-		// TODO LPS-140875 RelationshipTabReappearsWhenReactivatedManyToMany pending implementation
+		for (var letter : list "A,B") {
+			ObjectAdmin.addObjectFieldViaAPI(
+				fieldLabelName = "Custom Field ${letter}",
+				fieldName = "customObjectField${letter}",
+				fieldType = "String",
+				isRequired = "false",
+				objectName = "CustomObject${letter}");
+		}
 
+		ObjectAdmin.addObjectRelationshipViaAPI(
+			objectName_1 = "CustomObjectA",
+			objectName_2 = "CustomObjectB",
+			relationshipLabel = "Relationship A",
+			relationshipName = "relationshipA",
+			relationshipType = "manyToMany");
+
+		ObjectAdmin.addObjectRelationshipViaAPI(
+			objectName_1 = "CustomObjectB",
+			objectName_2 = "CustomObjectA",
+			relationshipLabel = "Relationship B",
+			relationshipName = "relationshipB",
+			relationshipType = "manyToMany");
+
+		for (var letter : list "A,B") {
+			ObjectAdmin.addObjectLayoutViaAPI(
+				layoutName = "Layout",
+				objectName = "CustomObject${letter}");
+		}
+
+		for (var letter : list "A,B") {
+			ObjectAdmin.openObjectAdmin();
+
+			ObjectPortlet.selectCustomObject(label = "Custom Object ${letter}");
+
+			ObjectAdmin.goToLayoutsTab();
+
+			ObjectAdmin.selectKebabMenuOption(kebabOption = "View");
+
+			ObjectAdmin.markLayoutAsDefault();
+
+			ObjectAdmin.goToLayoutTabOnLayouts();
+
+			ObjectAdmin.addTabFieldsOnLayout(
+				blockName = "Block 1",
+				columnsNumber = "1",
+				fieldLabelName = "Custom Field ${letter}",
+				tabName = "Field Tab");
+
+			ObjectAdmin.addTabRelationshipsOnLayout(
+				relationshipsLabelName = "Relationship ${letter}",
+				tabName = "Relationship Tab");
+
+			Button.clickSave();
+		}
+
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObjectA");
+
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObjectB");
+
+		for (var fieldEntry : list "A,B") {
+			ObjectAdmin.addObjectSingleFieldEntryViaAPI(
+				fieldName = "customObjectField${fieldEntry}",
+				objectName = "CustomObject${fieldEntry}",
+				value = "Entry ${fieldEntry}");
+		}
+
+		ObjectAdmin.openObjectAdmin();
+
+		CreateObject.inactiveCustomObject(objectName = "Custom Object B");
+
+		ObjectAdmin.openObjectAdmin();
+
+		CreateObject.activeCustomObject(objectName = "Custom Object B");
+
+		Navigator.openURL();
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObjectA");
+
+		ObjectPortlet.viewEntryDetails(entry = "Entry A");
+
+		ObjectAdmin.assertRelationshipTabPresent();
+
+		ObjectAdmin.openObjectAdmin();
+
+		CreateObject.inactiveCustomObject(objectName = "Custom Object A");
+
+		ObjectAdmin.openObjectAdmin();
+
+		CreateObject.activeCustomObject(objectName = "Custom Object A");
+
+		Navigator.openURL();
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObjectB");
+
+		ObjectPortlet.viewEntryDetails(entry = "Entry B");
+
+		ObjectAdmin.assertRelationshipTabPresent();
 	}
 
 	@description = "LPS-139005 - Verify that the Relationship tab is displayed again when the child object is reactivated (One to Many)"
@@ -5446,12 +5703,63 @@ definition {
 	}
 
 	@description = "LPS-135649 - Verify that the workflow is triggered when submitting an entry through Forms"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test WorkflowTriggeredWhenSubmitingEntryThroughForms {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-141627 WorkflowTriggeredWhenSubmitingEntryThroughForms pending implementation
+		ObjectAdmin.addObjectFieldViaAPI(
+			fieldLabelName = "Custom Field",
+			fieldName = "customObjectField",
+			fieldType = "String",
+			isRequired = "false",
+			objectName = "CustomObject");
 
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject");
+
+		ObjectAdmin.openWorkflowProcessBuilderConfiguration();
+
+		Workflow.configureWorkflow(
+			workflowDefinition = "Single Approver",
+			workflowResourceValue = "Custom Object");
+
+		Navigator.openURL();
+
+		PopulateObjectFormsConfiguration.openForm();
+
+		FormsAdminNavigator.gotoAddForm();
+
+		Form.editName(formName = "Form Object");
+
+		PopulateObjectFormsConfiguration.openFormSettings();
+
+		PopulateObjectFormsConfiguration.selectObject(label = "Object");
+
+		PopulateObjectFormsConfiguration.selectCustomObject(label = "Custom Object");
+
+		Form.gotoAddField(fieldType = "Text");
+
+		PopulateObjectFormsConfiguration.mapFormField(fieldLabelName = "Custom Field");
+
+		Form.publishForm();
+
+		FormsAdminNavigator.gotoPublishedForm();
+
+		FormViewBuilder.editText(
+			fieldName = "Text",
+			fieldValue = "Entry Test");
+
+		FormPortlet.submitSuccessfully();
+
+		Navigator.openURL();
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject");
+
+		ObjectPortlet.assertEntryStauts(
+			key_entry = "Entry Test",
+			key_status = "Pending");
 	}
 
 	@description = "LPS-135649 - Verify that the workflow is triggered when submitting an entry through Custom Object portlet"
@@ -5464,12 +5772,41 @@ definition {
 	}
 
 	@description = "LPS-135649 - Verify that the workflow is triggered when submitting an entry when Object is scoped by Site and the workflow was assigned on the Workflow settings from the Site Menu"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test WorkflowTriggeredWhenSubmitingEntryThroughObjectPortletFromSiteMenu {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			panelCategoryKey = "site_administration.content",
+			pluralLabelName = "Custom Objects",
+			scope = "site");
 
-		// TODO LPS-141632 WorkflowTriggeredWhenSubmitingEntryThroughObjectPortletFromSiteMenu pending implementation
+		ObjectAdmin.addObjectFieldViaAPI(
+			fieldLabelName = "Custom Field",
+			fieldName = "customObjectField",
+			fieldType = "String",
+			isRequired = "false",
+			objectName = "CustomObject");
 
+		ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject");
+
+		ObjectAdmin.openWorkflowProcessBuilderConfiguration();
+
+		Workflow.configureWorkflow(
+			workflowDefinition = "Single Approver",
+			workflowResourceValue = "Custom Object");
+
+		Navigator.openURL();
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject");
+
+		ObjectPortlet.addSingleFieldEntryViaUI(entry = "Entry Test");
+
+		ObjectAdmin.goToCustomObject(objectName = "CustomObject");
+
+		ObjectPortlet.assertEntryStauts(
+			key_entry = "Entry Test",
+			key_status = "Pending");
 	}
 
 }

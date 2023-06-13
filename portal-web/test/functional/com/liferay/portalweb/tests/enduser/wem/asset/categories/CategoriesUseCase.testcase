@@ -703,8 +703,8 @@ definition {
 
 			var key_larFileName = "${larFileName}";
 
-			AssertTextEquals.assertPartialText(
-				locator1 = "SitePagesExport#CURRENT_AND_PREVIOUS_STATUS",
+			AssertTextEquals(
+				locator1 = "ExportImport#CURRENT_AND_PREVIOUS_STATUS_1",
 				value1 = "Successful");
 
 			var larFileName = LAR.getLarFileName();
@@ -1121,7 +1121,7 @@ definition {
 
 			AssertVisible(
 				key_itemName = "Test Content Page Name",
-				locator1 = "SitePages#LIST_GROUP_ITEM");
+				locator1 = "PagesAdmin#LIST_GROUP_ITEM");
 		}
 	}
 
@@ -1162,7 +1162,7 @@ definition {
 
 			AssertVisible(
 				key_itemName = "Test Content Page Name",
-				locator1 = "SitePages#LIST_GROUP_ITEM");
+				locator1 = "PagesAdmin#LIST_GROUP_ITEM");
 		}
 	}
 
@@ -1203,7 +1203,7 @@ definition {
 
 			AssertVisible(
 				key_itemName = "Test Widget Page Name",
-				locator1 = "SitePages#LIST_GROUP_ITEM");
+				locator1 = "PagesAdmin#LIST_GROUP_ITEM");
 		}
 
 		task ("Add a page with category via JSONWS") {
@@ -1218,7 +1218,7 @@ definition {
 
 			AssertVisible(
 				key_itemName = "Test Page Name 2",
-				locator1 = "SitePages#LIST_GROUP_ITEM");
+				locator1 = "PagesAdmin#LIST_GROUP_ITEM");
 		}
 	}
 

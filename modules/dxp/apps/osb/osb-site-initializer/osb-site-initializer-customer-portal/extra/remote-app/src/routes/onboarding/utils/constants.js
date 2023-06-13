@@ -6,11 +6,26 @@ const steps = {
 };
 
 const roles = {
-	ADMIN: 'Account Administrator',
-	MEMBER: 'Account Member',
-	PARTNER_MANAGER: 'Partner Manager',
-	PARTNER_MEMBER: 'Partner Manager',
-	REQUESTOR: 'Requestor',
+	ADMIN: {
+		key: 'Account Administrator',
+		name: 'Administrator',
+	},
+	MEMBER: {
+		key: 'Account Member',
+		name: 'User',
+	},
+	PARTNER_MANAGER: {
+		key: 'Partner Manager',
+		name: 'Partner Manager',
+	},
+	PARTNER_MEMBER: {
+		key: 'Partner Member',
+		name: 'Partner Member',
+	},
+	REQUESTOR: {
+		key: 'Requestor',
+		name: 'Requestor',
+	},
 };
 
 const getInitialDxpAdmin = () => ({
