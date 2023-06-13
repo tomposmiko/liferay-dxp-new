@@ -22,6 +22,12 @@ import React, {MouseEventHandler, useState} from 'react';
 import InviteUserFormGroup from './InviteUsersFormGroup';
 import {InputGroup, MultiSelectItem, ValidatableMultiSelectItem} from './types';
 
+const deduplicatePredicate = (
+	multiSelectItem: MultiSelectItem,
+	index: number,
+	array: MultiSelectItem[]
+) => index === array.findIndex((item) => item.value === multiSelectItem.value);
+
 interface IProps {
 	accountEntryId: number;
 	availableAccountRoles: MultiSelectItem[];
@@ -53,19 +59,26 @@ function InviteUsersForm({
 		openerWindow.Liferay.fire('closeModal', modalConfig);
 	}
 
+	function getInputGroup(inputGroupId: string) {
+		const inputGroup = inputGroups.find((item) => item.id === inputGroupId);
+
+		if (inputGroup) {
+			return inputGroup;
+		}
+
+		throw new Error(`No input group found for id ${inputGroupId}`);
+	}
+
 	function setAccountRoles(
 		inputGroupId: string,
 		accountRoles: MultiSelectItem[]
 	) {
-		const inputGroup = inputGroups.find(
-			(inputGroup) => inputGroup.id === inputGroupId
-		);
+		const inputGroup = getInputGroup(inputGroupId);
 
-		if (inputGroup) {
-			inputGroup.accountRoles = accountRoles.map((accountRole) => {
-				const validatedAccountRole: ValidatableMultiSelectItem = {
-					...accountRole,
-				};
+		inputGroup.accountRoles = accountRoles
+			.filter(deduplicatePredicate)
+			.map((accountRole) => {
+				let errorMessage = '';
 
 				if (
 					!availableAccountRoles.some(
@@ -73,60 +86,47 @@ function InviteUsersForm({
 							availableAccountRole.label === accountRole.label
 					)
 				) {
-					validatedAccountRole.errorMessage = sub(
+					errorMessage = sub(
 						Liferay.Language.get('x-is-not-a-valid-role'),
 						accountRole.label
 					);
 				}
 
-				return validatedAccountRole;
+				return {...accountRole, errorMessage};
 			});
 
-			setInputGroups([...inputGroups]);
-		}
+		setInputGroups([...inputGroups]);
 	}
 
 	async function setEmailAddresses(
 		inputGroupId: string,
 		emailAddresses: MultiSelectItem[]
 	) {
-		const inputGroup = inputGroups.find(
-			(inputGroup) => inputGroup.id === inputGroupId
+		const inputGroup = getInputGroup(inputGroupId);
+
+		const promises = emailAddresses.filter(deduplicatePredicate).map(
+			(emailAddress) =>
+				new Promise<ValidatableMultiSelectItem>((resolve) => {
+					Liferay.Util.fetch(
+						`/o/com-liferay-account-admin-web/validate-email-address/`,
+						{
+							body: Liferay.Util.objectToFormData({
+								accountEntryId,
+								emailAddress: emailAddress.label,
+							}),
+							method: 'POST',
+						}
+					)
+						.then((response) => response.json())
+						.then(({errorMessage}) =>
+							resolve({...emailAddress, errorMessage})
+						);
+				})
 		);
 
-		if (inputGroup) {
-			const promises = emailAddresses.map(
-				(emailAddress) =>
-					new Promise<ValidatableMultiSelectItem>((resolve) => {
-						const validatedEmailAddress: ValidatableMultiSelectItem = {
-							...emailAddress,
-						};
+		inputGroup.emailAddresses = await Promise.all(promises);
 
-						Liferay.Util.fetch(
-							`/o/com-liferay-account-admin-web/validate-email-address/`,
-							{
-								body: Liferay.Util.objectToFormData({
-									accountEntryId,
-									emailAddress: emailAddress.label,
-								}),
-								method: 'POST',
-							}
-						)
-							.then((response) => response.json())
-							.then(({errorMessage}) => {
-								if (errorMessage) {
-									validatedEmailAddress.errorMessage = errorMessage;
-								}
-
-								resolve(validatedEmailAddress);
-							});
-					})
-			);
-
-			inputGroup.emailAddresses = await Promise.all(promises);
-
-			setInputGroups([...inputGroups]);
-		}
+		setInputGroups([...inputGroups]);
 	}
 
 	const submitForm: MouseEventHandler<HTMLButtonElement> = async (event) => {
