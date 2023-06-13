@@ -16,8 +16,9 @@ import {InferType} from 'yup';
 
 import yupSchema from '../../schema/yup';
 import {getUniqueList} from '../../util';
-import {searchUtil} from '../../util/search';
+import {SearchBuilder} from '../../util/search';
 import Rest from './Rest';
+import {testrayTaskImpl} from './TestrayTask';
 import {APIResponse, TestrayTaskUser} from './types';
 
 type TaskToUser = InferType<typeof yupSchema.taskToUser>;
@@ -34,7 +35,7 @@ class TestrayTaskUsersImpl extends Rest<TaskToUser, TestrayTaskUser> {
 				r_taskToTasksUsers_c_taskId,
 				r_userToTasksUsers_userId,
 			}),
-			nestedFields: 'task.build.project,task.build.routine,user,',
+			nestedFields: 'task.build.project,task.build.routine,user',
 			transformData: (taskUser) => ({
 				...taskUser,
 				task: taskUser.r_taskToTasksUsers_c_task
@@ -65,7 +66,7 @@ class TestrayTaskUsersImpl extends Rest<TaskToUser, TestrayTaskUser> {
 
 	public async assign(taskId: number, userIds: number[] | number) {
 		let response = await this.getAll({
-			filter: searchUtil.eq('taskId', taskId),
+			filter: SearchBuilder.eq('taskId', taskId),
 			pageSize: 100,
 		});
 
@@ -102,6 +103,25 @@ class TestrayTaskUsersImpl extends Rest<TaskToUser, TestrayTaskUser> {
 				}))
 			);
 		}
+
+		response = await this.getAll({
+			fields: 'id',
+			filter: SearchBuilder.eq('taskId', taskId),
+			pageSize: 100,
+		});
+
+		response = this.transformDataFromList(
+			response as APIResponse<TestrayTaskUser>
+		);
+
+		await testrayTaskImpl.update(taskId, {
+			assignedUsers: JSON.stringify(
+				response?.items.map(({user}) => ({
+					id: user?.id,
+					name: user?.givenName,
+				}))
+			),
+		});
 	}
 }
 

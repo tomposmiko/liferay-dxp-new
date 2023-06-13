@@ -153,6 +153,7 @@ export declare function addPickListItem({
 export declare function updatePickList({
 	externalReferenceCode,
 	id,
+	listTypeEntries,
 	name_i18n,
 }: Partial<PickList>): Promise<void>;
 export declare function updatePickListItem({

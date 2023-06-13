@@ -475,30 +475,6 @@ definition {
 			value1 = "You do not have permission to delete this relationship.");
 	}
 
-	macro assertClobTypeText {
-		AssertElementPresent(
-			key_clobType = "${clobType}",
-			locator1 = "ObjectAdmin#VIEW_CLOB_TYPE_TEXT_ENTRY");
-	}
-
-	macro assertEntryOnPageNotPresent {
-		AssertElementNotPresent(
-			key_entryName = "${entryName}",
-			locator1 = "ObjectAdmin#VIEW_ENTRY_NAME_ON_PAGE");
-	}
-
-	macro assertFieldsTableColumnsAreDisplayed {
-		AssertElementPresent(locator1 = "ObjectAdmin#FIELDS_LABEL_COLUMN");
-
-		AssertElementPresent(locator1 = "ObjectAdmin#FIELDS_TYPE_COLUMN");
-	}
-
-	macro assertFieldTabIsPresent {
-		AssertElementPresent(
-			key_fieldTabName = "${fieldTabName}",
-			locator1 = "ObjectAdmin#FIELD_TAB_NAME");
-	}
-
 	macro assertKeywordAndText {
 		AssertElementPresent(locator1 = "ObjectAdmin#SEARCHABLE_SECTION_TITLE");
 
@@ -523,12 +499,6 @@ definition {
 			locator1 = "ObjectAdmin#FIELDS_RADIO_OPTION");
 	}
 
-	macro assertNoItemsWereFound {
-		AssertTextEquals(
-			locator1 = "Message#EMPTY_INFO",
-			value1 = "No items were found.");
-	}
-
 	macro assertNoResultsWereFound {
 		AssertTextEquals(
 			locator1 = "Message#EMPTY_STATE_INFO",
@@ -545,12 +515,6 @@ definition {
 				key_statusInfo = "${status}",
 				locator1 = "ObjectAction#ACTIONS_STATUS_INFO");
 		}
-	}
-
-	macro assertObjectActionsNotPresent {
-		AssertElementNotPresent(
-			key_actionLabel = "${actionLabel}",
-			locator1 = "ObjectAdmin#VIEW_ACTIONS_LABEL");
 	}
 
 	macro assertObjectColumnsAreDisplayed {
@@ -582,12 +546,6 @@ definition {
 		AssertTextEquals(
 			locator1 = "ObjectAdmin#OBJECT_STATUS",
 			value1 = "${status}");
-	}
-
-	macro assertObjectDetailsPage {
-		Click(locator1 = "ObjectAdmin#OBJECT_DETAILS_TAB");
-
-		AssertElementPresent(locator1 = "ObjectAdmin#DETAILS_PAGE_TITLE");
 	}
 
 	macro assertObjectEntryFieldValueViaAPI {
@@ -650,18 +608,6 @@ definition {
 			key_type = "${type}",
 			locator1 = "ObjectAdmin#RELATIONSHIPS_TYPE_DESCRIPTION",
 			value1 = "${description}");
-	}
-
-	macro assertRelationshipTabNotPresent {
-		AssertElementNotPresent(
-			key_tabName = "Relationship Tab",
-			locator1 = "ObjectAdmin#ENTRY_RELATIONSHIP_TAB");
-	}
-
-	macro assertRelationshipTabPresent {
-		AssertElementPresent(
-			key_tabName = "Relationship Tab",
-			locator1 = "ObjectAdmin#ENTRY_RELATIONSHIP_TAB");
 	}
 
 	macro assertRequiredErrorPresent {
@@ -1238,7 +1184,11 @@ definition {
 	macro publishObjectViaUI {
 		Button.clickPublish();
 
-		WaitForLiferayEvent.initializeLiferayEventLog();
+		Alert.viewSuccessMessage();
+
+		WaitForElementNotPresent(locator1 = "Message#SUCCESS");
+
+		WaitForPageLoad();
 	}
 
 	macro saveCustomObject {

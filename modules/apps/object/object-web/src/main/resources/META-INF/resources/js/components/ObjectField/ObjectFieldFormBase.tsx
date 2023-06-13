@@ -106,6 +106,7 @@ async function getFieldSettingsByBusinessType(
 	const {
 		businessType,
 		defaultValue,
+		listTypeDefinitionExternalReferenceCode,
 		listTypeDefinitionId,
 		objectFieldSettings,
 		state,
@@ -116,9 +117,9 @@ async function getFieldSettingsByBusinessType(
 
 		setPickLists(picklistData);
 
-		if (state && listTypeDefinitionId) {
+		if (state && listTypeDefinitionExternalReferenceCode) {
 			const picklistItemsData = await API.getPickListItems(
-				listTypeDefinitionId
+				listTypeDefinitionId!
 			);
 
 			setPickListItems(picklistItemsData);
@@ -393,6 +394,7 @@ export default function ObjectFieldFormBase({
 			{(values.businessType === 'Picklist' ||
 				values.businessType === 'MultiselectPicklist') && (
 				<AutoComplete<Partial<PickList>>
+					creationLanguageId={creationLanguageId2 as Locale}
 					disabled={disabled}
 					emptyStateMessage={Liferay.Language.get('option-not-found')}
 					error={errors.listTypeDefinitionId}
@@ -463,6 +465,7 @@ export default function ObjectFieldFormBase({
 
 			{values.state && (
 				<AutoComplete<PickListItem>
+					creationLanguageId={creationLanguageId2 as Locale}
 					emptyStateMessage={Liferay.Language.get('option-not-found')}
 					error={errors.defaultValue}
 					items={filteredPicklistItems}

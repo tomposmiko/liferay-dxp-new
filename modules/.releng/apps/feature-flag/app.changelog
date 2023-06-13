@@ -60,9 +60,9 @@ app.git.id-1.0.4=947a13b9030bf84268bad4342d3ef7c4579519d7
 app.artifacts-1.0.5=\
 	
 
-app.change.log-1.0.5=LPS-168928 LPS-171336
+app.change.log-1.0.5=LPS-168928 LPS-171336 LPS-173281
 
-app.git.id-1.0.5=43abc799c2c59efff6b1b473d221a21383bf1f44
+app.git.id-1.0.5=7229df9a5345a1438b1860de21d18e00d98b99b8
 
 #
 # Liferay App Version 1.0.6
@@ -71,6 +71,6 @@ app.git.id-1.0.5=43abc799c2c59efff6b1b473d221a21383bf1f44
 app.artifacts-1.0.6=\
 	
 
-app.change.log-1.0.6=LPS-168928 LPS-171336
+app.change.log-1.0.6=LPS-168928 LPS-171336 LPS-173281
 
-app.git.id-1.0.6=8c776bc401634f01b7d5c4116b111855c08ea8e0
+app.git.id-1.0.6=0e21412f9a0bdb5d8db63db85007aae2633405d0

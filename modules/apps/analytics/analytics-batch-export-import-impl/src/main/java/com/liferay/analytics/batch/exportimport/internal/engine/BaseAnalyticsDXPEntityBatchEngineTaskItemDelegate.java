@@ -44,7 +44,7 @@ public abstract class BaseAnalyticsDXPEntityBatchEngineTaskItemDelegate
 	public EntityModel getEntityModel(Map<String, List<String>> multivaluedMap)
 		throws Exception {
 
-		return new AnalyticsDXPEntityEntityModel();
+		return _entityModel;
 	}
 
 	protected DynamicQuery buildDynamicQuery(
@@ -98,5 +98,8 @@ public abstract class BaseAnalyticsDXPEntityBatchEngineTaskItemDelegate
 		searchContext.setUserId(0);
 		searchContext.setVulcanCheckPermissions(false);
 	}
+
+	private static final EntityModel _entityModel =
+		new AnalyticsDXPEntityEntityModel();
 
 }

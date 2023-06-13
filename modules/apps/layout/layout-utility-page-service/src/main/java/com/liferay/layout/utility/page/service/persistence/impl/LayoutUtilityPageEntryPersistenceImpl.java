@@ -5543,7 +5543,9 @@ public class LayoutUtilityPageEntryPersistenceImpl
 				if (ercLayoutUtilityPageEntry != null) {
 					throw new DuplicateLayoutUtilityPageEntryExternalReferenceCodeException(
 						"Duplicate layout utility page entry with external reference code " +
-							layoutUtilityPageEntry.getExternalReferenceCode());
+							layoutUtilityPageEntry.getExternalReferenceCode() +
+								" and group " +
+									layoutUtilityPageEntry.getGroupId());
 				}
 			}
 			else {
@@ -5554,7 +5556,9 @@ public class LayoutUtilityPageEntryPersistenceImpl
 
 					throw new DuplicateLayoutUtilityPageEntryExternalReferenceCodeException(
 						"Duplicate layout utility page entry with external reference code " +
-							layoutUtilityPageEntry.getExternalReferenceCode());
+							layoutUtilityPageEntry.getExternalReferenceCode() +
+								" and group " +
+									layoutUtilityPageEntry.getGroupId());
 				}
 			}
 		}

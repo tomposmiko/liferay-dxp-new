@@ -23,8 +23,6 @@ String pagesTreeState = SessionClicks.get(request, "com.liferay.product.navigati
 ApplicationsMenuInstanceConfiguration applicationsMenuInstanceConfiguration = ConfigurationProviderUtil.getCompanyConfiguration(ApplicationsMenuInstanceConfiguration.class, themeDisplay.getCompanyId());
 %>
 
-<liferay-ui:success key='<%= LayoutAdminPortletKeys.GROUP_PAGES + "requestProcessed" %>' message="your-request-completed-successfully" />
-
 <div class="lfr-product-menu-sidebar <%= applicationsMenuInstanceConfiguration.enableApplicationsMenu() ? "lfr-applications-menu" : "" %>" id="productMenuSidebar">
 	<c:if test="<%= !applicationsMenuInstanceConfiguration.enableApplicationsMenu() %>">
 		<div class="sidebar-header">
@@ -44,7 +42,11 @@ ApplicationsMenuInstanceConfiguration applicationsMenuInstanceConfiguration = Co
 				</clay:content-col>
 
 				<clay:content-col>
-					<aui:icon cssClass="d-inline-block d-md-none icon-monospaced sidenav-close" image="times" markupView="lexicon" url="javascript:void(0);" />
+					<clay:button
+						cssClass="d-md-none sidenav-close text-white"
+						displayType="unstyled"
+						icon="times"
+					/>
 				</clay:content-col>
 			</clay:content-row>
 		</div>

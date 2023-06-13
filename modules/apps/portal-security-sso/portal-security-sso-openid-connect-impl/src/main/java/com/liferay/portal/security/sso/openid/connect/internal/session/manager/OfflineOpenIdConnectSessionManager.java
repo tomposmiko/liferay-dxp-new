@@ -66,7 +66,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
@@ -75,7 +74,6 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.portal.security.sso.openid.connect.configuration.OpenIdConnectConfiguration",
-	configurationPolicy = ConfigurationPolicy.OPTIONAL,
 	service = OfflineOpenIdConnectSessionManager.class
 )
 public class OfflineOpenIdConnectSessionManager {
@@ -164,8 +162,7 @@ public class OfflineOpenIdConnectSessionManager {
 
 	@Activate
 	protected void activate(
-			BundleContext bundleContext, Map<String, Object> properties)
-		throws Exception {
+		BundleContext bundleContext, Map<String, Object> properties) {
 
 		OpenIdConnectConfiguration openIdConnectConfiguration =
 			ConfigurableUtil.createConfigurable(
@@ -179,28 +176,36 @@ public class OfflineOpenIdConnectSessionManager {
 		_tokenRefreshOffsetMillis =
 			openIdConnectConfiguration.tokenRefreshOffset() * Time.SECOND;
 
-		_tokenRefreshScheduledInterval =
-			openIdConnectConfiguration.tokenRefreshScheduledInterval();
-
 		if (!openIdConnectConfiguration.enabled()) {
-			deactivate();
-
 			return;
 		}
 
 		_registerServices(bundleContext);
 
-		if (_tokenRefreshScheduledInterval < 30) {
-			_unscheduleJob();
-		}
-		else {
-			_scheduleJob();
+		int tokenRefreshScheduledInterval =
+			openIdConnectConfiguration.tokenRefreshScheduledInterval();
+
+		if (tokenRefreshScheduledInterval >= 30) {
+			SchedulerEntry schedulerEntry = new SchedulerEntryImpl(
+				TokensRefreshMessageListener.class.getName(),
+				_triggerFactory.createTrigger(
+					TokensRefreshMessageListener.class.getName(),
+					OpenIdConnectConstants.SERVICE_NAME, null, null,
+					tokenRefreshScheduledInterval, TimeUnit.SECOND));
+
+			_tokensRefreshMessageListener = new TokensRefreshMessageListener();
+
+			_schedulerEngineHelper.register(
+				_tokensRefreshMessageListener, schedulerEntry,
+				DestinationNames.SCHEDULER_DISPATCH);
 		}
 	}
 
 	@Deactivate
 	protected void deactivate() {
-		_unscheduleJob();
+		if (_tokensRefreshMessageListener != null) {
+			_schedulerEngineHelper.unregister(_tokensRefreshMessageListener);
+		}
 
 		_unregisterServices();
 	}
@@ -299,21 +304,6 @@ public class OfflineOpenIdConnectSessionManager {
 			dictionary);
 	}
 
-	private void _scheduleJob() {
-		SchedulerEntry schedulerEntry = new SchedulerEntryImpl(
-			TokensRefreshMessageListener.class.getName(),
-			_triggerFactory.createTrigger(
-				TokensRefreshMessageListener.class.getName(),
-				OpenIdConnectConstants.SERVICE_NAME, null, null,
-				_tokenRefreshScheduledInterval, TimeUnit.SECOND));
-
-		_tokensRefreshMessageListener = new TokensRefreshMessageListener();
-
-		_schedulerEngineHelper.register(
-			_tokensRefreshMessageListener, schedulerEntry,
-			DestinationNames.SCHEDULER_DISPATCH);
-	}
-
 	private void _unregisterServices() {
 		if (_messageListenerServiceRegistration != null) {
 			_messageListenerServiceRegistration.unregister();
@@ -325,14 +315,6 @@ public class OfflineOpenIdConnectSessionManager {
 			_destinationServiceRegistration.unregister();
 
 			_destinationServiceRegistration = null;
-		}
-	}
-
-	private void _unscheduleJob() {
-		if (_tokensRefreshMessageListener != null) {
-			_schedulerEngineHelper.unregister(_tokensRefreshMessageListener);
-
-			_tokensRefreshMessageListener = null;
 		}
 	}
 
@@ -412,7 +394,6 @@ public class OfflineOpenIdConnectSessionManager {
 	private SchedulerEngineHelper _schedulerEngineHelper;
 
 	private long _tokenRefreshOffsetMillis = 60 * Time.SECOND;
-	private int _tokenRefreshScheduledInterval = 480;
 	private TokensRefreshMessageListener _tokensRefreshMessageListener;
 
 	@Reference

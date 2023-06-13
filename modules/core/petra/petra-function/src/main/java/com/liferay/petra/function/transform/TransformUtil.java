@@ -61,11 +61,33 @@ public class TransformUtil {
 		}
 	}
 
+	public static <T, R, E extends Throwable> int[] transformToIntArray(
+		Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction) {
+
+		try {
+			return unsafeTransformToIntArray(collection, unsafeFunction);
+		}
+		catch (Throwable throwable) {
+			throw new RuntimeException(throwable);
+		}
+	}
+
 	public static <T, R, E extends Throwable> List<R> transformToList(
 		T[] array, UnsafeFunction<T, R, E> unsafeFunction) {
 
 		try {
 			return unsafeTransformToList(array, unsafeFunction);
+		}
+		catch (Throwable throwable) {
+			throw new RuntimeException(throwable);
+		}
+	}
+
+	public static <T, R, E extends Throwable> long[] transformToLongArray(
+		Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction) {
+
+		try {
+			return unsafeTransformToLongArray(collection, unsafeFunction);
 		}
 		catch (Throwable throwable) {
 			throw new RuntimeException(throwable);
@@ -112,6 +134,14 @@ public class TransformUtil {
 		return list.toArray((R[])Array.newInstance(clazz, 0));
 	}
 
+	public static <T, R, E extends Throwable> int[] unsafeTransformToIntArray(
+			Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction)
+		throws E {
+
+		return (int[])_unsafeTransformToPrimitiveArray(
+			collection, unsafeFunction, int[].class);
+	}
+
 	public static <T, R, E extends Throwable> List<R> unsafeTransformToList(
 			T[] array, UnsafeFunction<T, R, E> unsafeFunction)
 		throws E {
@@ -131,6 +161,32 @@ public class TransformUtil {
 		}
 
 		return list;
+	}
+
+	public static <T, R, E extends Throwable> long[] unsafeTransformToLongArray(
+			Collection<T> collection, UnsafeFunction<T, R, E> unsafeFunction)
+		throws E {
+
+		return (long[])_unsafeTransformToPrimitiveArray(
+			collection, unsafeFunction, long[].class);
+	}
+
+	private static <T, R, E extends Throwable> Object
+			_unsafeTransformToPrimitiveArray(
+				Collection<T> collection,
+				UnsafeFunction<T, R, E> unsafeFunction, Class<?> clazz)
+		throws E {
+
+		List<R> list = unsafeTransform(collection, unsafeFunction);
+
+		Object array = clazz.cast(
+			Array.newInstance(clazz.getComponentType(), list.size()));
+
+		for (int i = 0; i < list.size(); i++) {
+			Array.set(array, i, list.get(i));
+		}
+
+		return array;
 	}
 
 }

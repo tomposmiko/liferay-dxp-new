@@ -89,22 +89,10 @@ definition {
 		PortletEntry.save();
 	}
 
-	macro assertColumnLabelPresent {
-		AssertElementPresent(
-			key_columnLabel = "${columnLabel}",
-			locator1 = "ObjectCustomViews#BUILDER_SEARCH_RESULT_COLUMN_LABEL");
-	}
-
 	macro assertColumnNotPresent {
 		AssertElementNotPresent(
 			key_columnName = "${columnName}",
 			locator1 = "ObjectCustomViews#VIEW_BUILDER_SEARCH_RESULT");
-	}
-
-	macro assertColumnNotPresentOnAddColumnModal {
-		AssertElementNotPresent(
-			key_columnName = "${columnOption}",
-			locator1 = "ObjectCustomViews#ADD_COLUMNS_COLUMN_LABEL");
 	}
 
 	macro assertColumnNotPresentOnDefaultSort {
@@ -166,18 +154,6 @@ definition {
 		var key_viewLabel = "${viewLabel}";
 
 		AssertElementPresent(locator1 = "ObjectCustomViews#OBJECT_VIEW_LABEL");
-	}
-
-	macro assertObjectViewName {
-		AssertElementPresent(
-			locator1 = "ObjectCustomViews#OBJECT_VIEWS_NAME",
-			value1 = "${name}");
-	}
-
-	macro assertObjectViewNotPresent {
-		var key_viewLabel = "${viewLabel}";
-
-		AssertElementNotPresent(locator1 = "ObjectCustomViews#OBJECT_VIEW_LABEL");
 	}
 
 	macro assertPresentEntriesOnFilters {

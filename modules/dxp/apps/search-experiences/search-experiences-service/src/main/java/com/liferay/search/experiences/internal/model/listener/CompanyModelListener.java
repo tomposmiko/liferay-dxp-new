@@ -26,8 +26,6 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
@@ -64,23 +62,23 @@ public class CompanyModelListener extends BaseModelListener<Company> {
 			Company company, SXPElementLocalService sxpElementLocalService)
 		throws PortalException {
 
-		Set<String> titles = new HashSet<>();
+		Set<String> externalReferenceCodes = new HashSet<>();
 
 		for (com.liferay.search.experiences.model.SXPElement sxpPElement :
 				sxpElementLocalService.getSXPElements(
 					company.getCompanyId(), true)) {
 
-			titles.add(sxpPElement.getTitle(LocaleUtil.US));
+			externalReferenceCodes.add(sxpPElement.getExternalReferenceCode());
 		}
 
-		for (SXPElement sxpElement : _sxpElements) {
+		for (SXPElement sxpElement : _getSXPElements()) {
 			if ((!GetterUtil.getBoolean(
 					PropsUtil.get("feature.flag.LPS-163688")) &&
 				 Objects.equals(
-					 MapUtil.getString(sxpElement.getTitle_i18n(), "en_US"),
-					 "Rescore by Text Embedding")) ||
-				titles.contains(
-					MapUtil.getString(sxpElement.getTitle_i18n(), "en_US"))) {
+					 sxpElement.getExternalReferenceCode(),
+					 "RESCORE_BY_TEXT_EMBEDDING")) ||
+				externalReferenceCodes.contains(
+					sxpElement.getExternalReferenceCode())) {
 
 				continue;
 			}
@@ -163,6 +161,14 @@ public class CompanyModelListener extends BaseModelListener<Company> {
 		return sxpElements;
 	}
 
+	private List<SXPElement> _getSXPElements() {
+		if (_sxpElements == null) {
+			_sxpElements = _createSXPElements();
+		}
+
+		return _sxpElements;
+	}
+
 	private static final String _SCHEMA_VERSION = StringUtil.replace(
 		StringUtil.extractFirst(
 			StringUtil.extractLast(SXPElement.class.getName(), ".v"),
@@ -178,6 +184,6 @@ public class CompanyModelListener extends BaseModelListener<Company> {
 	@Reference
 	private SXPElementLocalService _sxpElementLocalService;
 
-	private final List<SXPElement> _sxpElements = _createSXPElements();
+	private List<SXPElement> _sxpElements;
 
 }

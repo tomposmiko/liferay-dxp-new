@@ -18,21 +18,20 @@ import Container from '../../../components/Layout/Container';
 import ListViewRest from '../../../components/ListView';
 import ProgressBar from '../../../components/ProgressBar';
 import i18n from '../../../i18n';
-import {filters} from '../../../schema/filter';
 import {getTimeFromNow} from '../../../util/date';
-import {searchUtil} from '../../../util/search';
+import {SearchBuilder} from '../../../util/search';
 import useRoutineActions from './useRoutineActions';
 
 const Routines = () => {
-	const {projectId} = useParams();
 	const {actions, navigate} = useRoutineActions();
+	const {projectId} = useParams();
 
 	return (
 		<Container>
 			<ListViewRest
 				managementToolbarProps={{
 					addButton: () => navigate('create'),
-					filterFields: filters.routines,
+					filterSchema: 'routines',
 					title: i18n.translate('routines'),
 				}}
 				resource="/routines"
@@ -88,7 +87,7 @@ const Routines = () => {
 					navigateTo: ({id}) => id.toString(),
 				}}
 				variables={{
-					filter: searchUtil.eq('projectId', projectId as string),
+					filter: SearchBuilder.eq('projectId', projectId as string),
 				}}
 			/>
 		</Container>

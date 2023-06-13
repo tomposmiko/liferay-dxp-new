@@ -16,6 +16,7 @@ package com.liferay.analytics.batch.exportimport.internal.engine;
 
 import com.liferay.account.model.AccountEntry;
 import com.liferay.account.service.AccountEntryLocalService;
+import com.liferay.analytics.batch.exportimport.internal.odata.entity.AccountEntryAnalyticsDXPEntityEntityModel;
 import com.liferay.analytics.dxp.entity.rest.dto.v1_0.DXPEntity;
 import com.liferay.analytics.dxp.entity.rest.dto.v1_0.converter.DXPEntityDTOConverter;
 import com.liferay.batch.engine.BatchEngineTaskItemDelegate;
@@ -25,10 +26,12 @@ import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.vulcan.util.SearchUtil;
 
 import java.io.Serializable;
 
+import java.util.List;
 import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
@@ -43,6 +46,13 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class AccountEntryAnalyticsDXPEntityBatchEngineTaskItemDelegate
 	extends BaseAnalyticsDXPEntityBatchEngineTaskItemDelegate<DXPEntity> {
+
+	@Override
+	public EntityModel getEntityModel(Map<String, List<String>> multivaluedMap)
+		throws Exception {
+
+		return _entityModel;
+	}
 
 	@Override
 	public Page<DXPEntity> read(
@@ -71,6 +81,9 @@ public class AccountEntryAnalyticsDXPEntityBatchEngineTaskItemDelegate
 			Pagination.of(pagination.getPage(), pagination.getPageSize()),
 			page.getTotalCount());
 	}
+
+	private static final EntityModel _entityModel =
+		new AccountEntryAnalyticsDXPEntityEntityModel();
 
 	@Reference
 	private AccountEntryLocalService _accountEntryLocalService;
