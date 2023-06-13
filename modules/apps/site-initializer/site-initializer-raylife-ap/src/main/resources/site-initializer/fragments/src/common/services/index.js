@@ -15,4 +15,5 @@
 export * from './Application';
 export * from './Claim';
 export * from './Policy';
+export * from './Products';
 export * from './Report';

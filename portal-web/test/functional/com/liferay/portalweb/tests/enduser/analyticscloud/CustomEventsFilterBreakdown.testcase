@@ -1,6 +1,8 @@
 @component-name = "portal-analytics-cloud"
 definition {
 
+	property analytics.cloud.release = "true";
+	property analytics.cloud.upstream = "true";
 	property custom.properties = "jsonws.web.service.paths.excludes=";
 	property portal.release = "false";
 	property portal.upstream = "true";
@@ -571,7 +573,6 @@ definition {
 
 		var attributeName = "pageTitle";
 		var filterName = "category";
-		var dataSource = StringUtil.extractFirst("${assignedPropertyName}", " ");
 
 		task ("Fill fields and create custom event") {
 			var customEventName = ACCustomEvents.generateCustomEventName();
@@ -629,7 +630,7 @@ definition {
 
 			ACTimeFilter.setLast24Hours();
 
-			ACEventAnalysis.viewAnalysisInformation(informationValueList = "ac page - site name - ${dataSource}");
+			ACEventAnalysis.viewAnalysisInformation(informationValueList = "ac page - site name - liferay dxp");
 		}
 	}
 
@@ -724,7 +725,6 @@ definition {
 		var attributeName = "pageTitle";
 		var filterName1 = "like";
 		var filterName2 = "dislike";
-		var dataSource = StringUtil.extractFirst("${assignedPropertyName}", " ");
 
 		task ("Fill fields and create custom event") {
 			var customEventName = ACCustomEvents.generateCustomEventName();
@@ -769,7 +769,7 @@ definition {
 		}
 
 		task ("Check that the analysis result appears") {
-			ACEventAnalysis.viewAnalysisInformation(informationValueList = "ac page - site name - ${dataSource}");
+			ACEventAnalysis.viewAnalysisInformation(informationValueList = "ac page - site name - liferay dxp");
 		}
 
 		task ("Remove the filter from the analysis") {
@@ -783,7 +783,7 @@ definition {
 		}
 
 		task ("Check that the analysis result does not appear") {
-			ACEventAnalysis.viewAnalysisInformationNotPresent(informationValueList = "ac page - site name - ${dataSource}");
+			ACEventAnalysis.viewAnalysisInformationNotPresent(informationValueList = "ac page - site name - liferay dxp");
 		}
 
 		task ("Remove the filter from the analysis") {
@@ -797,7 +797,7 @@ definition {
 		}
 
 		task ("Check that the analysis result appears") {
-			ACEventAnalysis.viewAnalysisInformation(informationValueList = "ac page - site name - ${dataSource}");
+			ACEventAnalysis.viewAnalysisInformation(informationValueList = "ac page - site name - liferay dxp");
 		}
 
 		task ("Remove the filter from the analysis") {
@@ -811,7 +811,7 @@ definition {
 		}
 
 		task ("Check that the analysis result does not appear") {
-			ACEventAnalysis.viewAnalysisInformationNotPresent(informationValueList = "ac page - site name - ${dataSource}");
+			ACEventAnalysis.viewAnalysisInformationNotPresent(informationValueList = "ac page - site name - liferay dxp");
 		}
 	}
 
@@ -822,7 +822,6 @@ definition {
 
 		var attributeName = "pageTitle";
 		var filterName = "birthdate";
-		var dataSource = StringUtil.extractFirst("${assignedPropertyName}", " ");
 
 		task ("Fill fields and create custom event") {
 			var customEventName = ACCustomEvents.generateCustomEventName();
@@ -868,7 +867,7 @@ definition {
 		}
 
 		task ("Check that the analysis result appears") {
-			ACEventAnalysis.viewAnalysisInformation(informationValueList = "ac page - site name - ${dataSource}");
+			ACEventAnalysis.viewAnalysisInformation(informationValueList = "ac page - site name - liferay dxp");
 		}
 
 		task ("Remove the filter from the analysis") {
@@ -885,7 +884,7 @@ definition {
 		}
 
 		task ("Check that the analysis result does not appear") {
-			ACEventAnalysis.viewAnalysisInformationNotPresent(informationValueList = "ac page - site name - ${dataSource}");
+			ACEventAnalysis.viewAnalysisInformationNotPresent(informationValueList = "ac page - site name - liferay dxp");
 		}
 
 		task ("Remove the filter from the analysis") {
@@ -902,7 +901,7 @@ definition {
 		}
 
 		task ("Check that the analysis result appears") {
-			ACEventAnalysis.viewAnalysisInformation(informationValueList = "ac page - site name - ${dataSource}");
+			ACEventAnalysis.viewAnalysisInformation(informationValueList = "ac page - site name - liferay dxp");
 		}
 
 		task ("Remove the filter from the analysis") {
@@ -920,7 +919,7 @@ definition {
 		}
 
 		task ("Check that the analysis result appears") {
-			ACEventAnalysis.viewAnalysisInformation(informationValueList = "ac page - site name - ${dataSource}");
+			ACEventAnalysis.viewAnalysisInformation(informationValueList = "ac page - site name - liferay dxp");
 		}
 	}
 
@@ -931,7 +930,6 @@ definition {
 
 		var attributeName = "pageTitle";
 		var filterName = "price";
-		var dataSource = StringUtil.extractFirst("${assignedPropertyName}", " ");
 
 		task ("Fill fields and create custom event") {
 			var customEventName = ACCustomEvents.generateCustomEventName();
@@ -975,7 +973,7 @@ definition {
 		}
 
 		task ("Check that the analysis result appears") {
-			ACEventAnalysis.viewAnalysisInformation(informationValueList = "ac page - site name - ${dataSource}");
+			ACEventAnalysis.viewAnalysisInformation(informationValueList = "ac page - site name - liferay dxp");
 		}
 
 		task ("Remove the filter from the analysis") {
@@ -990,7 +988,7 @@ definition {
 		}
 
 		task ("Check that the analysis result does not appear") {
-			ACEventAnalysis.viewAnalysisInformationNotPresent(informationValueList = "ac page - site name - ${dataSource}");
+			ACEventAnalysis.viewAnalysisInformationNotPresent(informationValueList = "ac page - site name - liferay dxp");
 		}
 
 		task ("Remove the filter from the analysis") {
@@ -1006,7 +1004,7 @@ definition {
 		}
 
 		task ("Check that the analysis result appears") {
-			ACEventAnalysis.viewAnalysisInformation(informationValueList = "ac page - site name - ${dataSource}");
+			ACEventAnalysis.viewAnalysisInformation(informationValueList = "ac page - site name - liferay dxp");
 		}
 	}
 

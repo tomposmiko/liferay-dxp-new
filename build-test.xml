@@ -1329,7 +1329,12 @@ jdbc.counter.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 					if (job.isSegmentEnabled()) {
 						SegmentTestClassGroup segmentTestClassGroup = batchTestClassGroup.getSegmentTestClassGroup(getSegmentID());
 
-						project.setProperty("test.case.properties.content", segmentTestClassGroup.getTestCasePropertiesContent());
+						if (segmentTestClassGroup != null) {
+							project.setProperty("test.case.properties.content", segmentTestClassGroup.getTestCasePropertiesContent());
+						}
+						else {
+							project.setProperty("test.case.properties.content", batchTestClassGroup.getTestCasePropertiesContent());
+						}
 					}
 					else {
 						project.setProperty("test.case.properties.content", batchTestClassGroup.getTestCasePropertiesContent());
@@ -4085,6 +4090,15 @@ tell application "Safari" to quit
 				</then>
 			</if>
 
+			<get-testcase-property property.name="release.feature.flags.disable.DISABLE_PRIVATE_LAYOUTS" />
+
+			<if>
+				<equals arg1="${release.feature.flags.disable.DISABLE_PRIVATE_LAYOUTS}" arg2="true" />
+				<then>
+					<echo file="${liferay.home}/osgi/configs/com.liferay.release.feature.flag.web.internal.configuration.ReleaseFeatureFlagConfiguration.config">disabledReleaseFeatureFlags=["DISABLE_PRIVATE_LAYOUTS"]</echo>
+				</then>
+			</if>
+
 			<get-testcase-property property.name="test.assert.javascript.errors" />
 
 			<if>
@@ -5709,7 +5723,10 @@ go</echo>
 					</then>
 				</elseif>
 				<elseif>
-					<equals arg1="@{liferay.portal.bundle}" arg2="7.4.13.u1" />
+					<or>
+						<equals arg1="@{liferay.portal.bundle}" arg2="7.4.3.21" />
+						<equals arg1="@{liferay.portal.bundle}" arg2="7.4.13.u1" />
+					</or>
 					<then>
 						<var name="app.server.tomcat.version" value="9.0.56" />
 					</then>
@@ -7457,6 +7474,12 @@ war.path=${app.server.portal.dir}/</echo>
 							<property name="portal.version.url.path" value="7.4.1-ga2" />
 						</then>
 					</elseif>
+					<elseif>
+						<equals arg1="${portal.version}" arg2="7.4.3.21" />
+						<then>
+							<property name="portal.version.url.path" value="7.4.3.21-ga21" />
+						</then>
+					</elseif>
 					<else>
 						<property name="portal.version.url.path" value="${portal.version}" />
 					</else>
@@ -7477,6 +7500,7 @@ war.path=${app.server.portal.dir}/</echo>
 						<equals arg1="${portal.version}" arg2="7.3.5" />
 						<equals arg1="${portal.version}" arg2="7.4.0" />
 						<equals arg1="${portal.version}" arg2="7.4.1" />
+						<equals arg1="${portal.version}" arg2="7.4.3.21" />
 					</or>
 					<then>
 						<propertycopy from="sql.legacy.base.url[ce]" name="sql.legacy.base.url" />
@@ -8334,13 +8358,6 @@ org.apache.catalina.tribes.level = FINE]]>
 				</then>
 			</elseif>
 		</if>
-	</target>
-
-	<target name="copy-translation-file">
-		<copy
-			file="${selenium.output.dir.name}/${translation.zip.file.name}/${translation.file.name}"
-			tofile="${selenium.output.dir.name}/${translation.file.name}"
-		/>
 	</target>
 
 	<target name="create-hidden-osgi-file">
@@ -10913,11 +10930,6 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 					test.base.dir.name=${test.base.dir.name}
 				</echo>
 			</then>
-			<else>
-				<echo append="true" file="${test.ext.properties.file}">
-					test.base.dir.name=${basedir.unix}/portal-web/test/functional/com/liferay/portalweb/
-				</echo>
-			</else>
 		</if>
 
 		<if>
@@ -11031,6 +11043,18 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 		</if>
 
 		<if>
+			<or>
+				<equals arg1="${test.dirs}" arg2="" />
+				<isset property="test.dirs" />
+			</or>
+			<then>
+				<echo append="true" file="${test.ext.properties.file}">
+					test.dirs=${test.dirs}
+				</echo>
+			</then>
+		</if>
+
+		<if>
 			<isset property="test.include.dir.names" />
 			<then>
 				<echo append="true" file="${test.ext.properties.file}">
@@ -11071,15 +11095,6 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 			<then>
 				<echo append="true" file="${test.ext.properties.file}">
 					test.run.environment=${test.run.environment}
-				</echo>
-			</then>
-		</if>
-
-		<if>
-			<isset property="test.subrepo.dirs" />
-			<then>
-				<echo append="true" file="${test.ext.properties.file}">
-					test.subrepo.dirs=${test.subrepo.dirs}
 				</echo>
 			</then>
 		</if>
@@ -11280,11 +11295,6 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 					test.base.dir.name=${test.base.dir.name}
 				</echo>
 			</then>
-			<else>
-				<echo append="true" file="${test.ext.properties.file}">
-					test.base.dir.name=${basedir.unix}/portal-web/test/functional/com/liferay/portalweb/
-				</echo>
-			</else>
 		</if>
 
 		<get-testcase-property property.name="test.skip.tear.down" />
@@ -11428,10 +11438,6 @@ log.sanitizer.enabled=false</echo>
 		</if>
 
 		<antcall inheritAll="false" target="compile-test" />
-
-		<record-test-class-file-names />
-
-		<antcall inheritAll="false" target="record-test-plugin-names" />
 
 		<echo if:set="env.JENKINS_HOME">
 ANT_OPTS=${env.ANT_OPTS}</echo>
@@ -14609,10 +14615,6 @@ url=${short.hostname}:8080</echo>
 	</target>
 
 	<target name="unzip-temp-file">
-		<antelope:stringutil property="fileName" string="${fileName}">
-			<antelope:replace regex="\*" replacement=" " />
-		</antelope:stringutil>
-
 		<unzip
 			dest="${selenium.output.dir.name}"
 			src="${selenium.output.dir.name}/${fileName}"
@@ -14641,149 +14643,6 @@ url=${short.hostname}:8080</echo>
 		/>
 
 		<print-file file.name="${osgi.configs.dir}/${osgi.module.configuration.file.names}" />
-	</target>
-
-	<target name="update-translation-file">
-		<var name="translation.file.type" value="xlf" />
-
-		<antelope:stringutil property="translation.file.name" string="${translation.file.name}">
-			<antelope:replace regex="\*" replacement=" " />
-		</antelope:stringutil>
-
-		<antelope:stringutil property="translation.zip.file.name" string="${translation.zip.file.name}">
-			<antelope:replace regex="\*" replacement=" " />
-		</antelope:stringutil>
-
-		<if>
-			<equals arg1="${translation.zip.file.name}" arg2="WCGeneralName" />
-			<then>
-				<var name="translation.zip.file.name" value="Web Content Article Translations-en_US" />
-			</then>
-		</if>
-
-		<if>
-			<equals arg1="${operation}" arg2="unzip" />
-			<then>
-				<unzip
-					dest="${selenium.output.dir.name}/${translation.zip.file.name}"
-					src="${selenium.output.dir.name}/${translation.zip.file.name}.zip"
-				/>
-			</then>
-		</if>
-		<if>
-			<equals arg1="${translation.file.rename}" arg2="true" />
-			<then>
-				<move
-					file="${selenium.output.dir.name}/${translation.zip.file.name}/${translation.file.name}.${translation.file.type}"
-					tofile="${selenium.output.dir.name}/${translation.zip.file.name}/${translation.file.name}.xliff"
-				/>
-
-				<var name="translation.file.type" value="xliff" />
-			</then>
-		</if>
-
-		<if>
-			<equals arg1="${contentpage.translation.file}" arg2="true" />
-			<then>
-				<pathconvert property="translation.file.path">
-					<path>
-						<fileset
-							dir="${selenium.output.dir.name}/${translation.zip.file.name}"
-							includes="*${translation.file.name}.${translation.file.type}"
-						/>
-					</path>
-				</pathconvert>
-				<replace
-					file="${translation.file.path}"
-					token="${contentpage.translation.title.target.original}"
-					value="${contentpage.translation.title.target}"
-				/>
-				<replace
-					file="${translation.file.path}"
-					token="${contentpage.translation.fragment.target.original}"
-					value="${contentpage.translation.fragment.target}"
-				/>
-			</then>
-			<else>
-				<replace
-					file="${selenium.output.dir.name}/${translation.zip.file.name}/${translation.file.name}.${translation.file.type}"
-					token="${translation.title.target.original}"
-					value="${translation.title.target}"
-				/>
-				<replace
-					file="${selenium.output.dir.name}/${translation.zip.file.name}/${translation.file.name}.${translation.file.type}"
-					token="${translation.content.target.original}"
-					value="${translation.content.target}"
-				/>
-				<replace
-					file="${selenium.output.dir.name}/${translation.zip.file.name}/${translation.file.name}.${translation.file.type}"
-					token="${translation.description.target.original}"
-					value="${translation.description.target}"
-				/>
-			</else>
-		</if>
-
-		<if>
-			<equals arg1="${translation.file.encoding}" arg2="utf8" />
-			<then>
-				<pathconvert property="translation.file.path">
-					<path>
-						<fileset
-							dir="${selenium.output.dir.name}/${translation.zip.file.name}"
-							includes="*${translation.file.name}.${translation.file.type}"
-						/>
-					</path>
-				</pathconvert>
-
-				<propertyregex
-					input="${translation.file.path}"
-					property="translation.utf8.file.path"
-					regexp=".xlf"
-					replace="_utf8.xlf"
-				/>
-
-				<copy
-					file="${translation.file.path}"
-					outputencoding="UTF-8"
-					tofile="${translation.utf8.file.path}"
-				/>
-			</then>
-		</if>
-
-		<if>
-			<equals arg1="${operation}" arg2="zip" />
-			<then>
-				<zip
-					basedir="${selenium.output.dir.name}/${translation.zip.file.name}"
-					destfile="${selenium.output.dir.name}/${translation.zip.file.name}_translated.zip"
-				/>
-			</then>
-		</if>
-	</target>
-
-	<target name="update-translation-file-id">
-		<var name="translation.file.type" value="xlf" />
-
-		<antelope:stringutil property="translation.file.name" string="${translation.file.name}">
-			<antelope:replace regex="\*" replacement=" " />
-		</antelope:stringutil>
-
-		<antelope:stringutil property="translation.zip.file.name" string="${translation.zip.file.name}">
-			<antelope:replace regex="\*" replacement=" " />
-		</antelope:stringutil>
-
-		<if>
-			<equals arg1="${translation.zip.file.name}" arg2="WCGeneralName" />
-			<then>
-				<var name="translation.zip.file.name" value="Web Content Article Translations-en_US" />
-			</then>
-		</if>
-
-		<replace
-			file="${selenium.output.dir.name}/${translation.zip.file.name}/${translation.file.name}.${translation.file.type}"
-			token="${translation.entry.type}:"
-			value="${translation.entry.type}:1"
-		/>
 	</target>
 
 	<target name="upgrade-legacy-database">

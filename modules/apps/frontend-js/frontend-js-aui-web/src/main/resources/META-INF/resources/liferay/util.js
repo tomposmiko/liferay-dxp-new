@@ -20,19 +20,6 @@
 
 	var EVENT_CLICK = 'click';
 
-	var MAP_TOGGLE_STATE = {
-		false: {
-			cssClass: 'controls-hidden',
-			iconCssClass: 'hidden',
-			state: 'hidden',
-		},
-		true: {
-			cssClass: 'controls-visible',
-			iconCssClass: 'view',
-			state: 'visible',
-		},
-	};
-
 	var SRC_HIDE_LINK = {
 		src: 'hideLink',
 	};
@@ -424,17 +411,6 @@
 			var columnId = str.replace(/layout-column_/, '');
 
 			return columnId;
-		},
-
-		/**
-		 * @deprecated As of Cavanaugh (7.4.x), replaced by `openModal`
-		 */
-		getWindow(id) {
-			if (!id) {
-				id = Util.getWindowName();
-			}
-
-			return Util.getTop().Liferay.Util.Window.getById(id);
 		},
 
 		/**
@@ -1401,68 +1377,6 @@
 		},
 		['aui-base', 'liferay-util-window']
 	);
-
-	Liferay.provide(Util, 'toggleControls', (node) => {
-		const docBody = document.body;
-
-		node = node._node || docBody;
-
-		const trigger = node.querySelector('.toggle-controls');
-
-		if (!trigger) {
-			return;
-		}
-
-		let controlsVisible = Liferay._editControlsState === 'visible';
-
-		let currentState = MAP_TOGGLE_STATE[controlsVisible];
-
-		let icon = trigger.querySelector('.lexicon-icon');
-
-		if (icon) {
-			currentState.icon = icon;
-		}
-
-		docBody.classList.add(currentState.cssClass);
-
-		Liferay.fire('toggleControls', {
-			enabled: controlsVisible,
-		});
-
-		trigger.addEventListener('click', () => {
-			controlsVisible = !controlsVisible;
-
-			const previousState = currentState;
-
-			currentState = MAP_TOGGLE_STATE[controlsVisible];
-
-			docBody.classList.toggle(previousState.cssClass);
-			docBody.classList.toggle(currentState.cssClass);
-
-			const editControlsIconClass = currentState.iconCssClass;
-			const editControlsState = currentState.state;
-
-			const newIcon = Util.getLexiconIcon(editControlsIconClass);
-
-			currentState.icon = newIcon;
-
-			icon.replaceWith(newIcon);
-
-			icon = newIcon;
-
-			Liferay._editControlsState = editControlsState;
-
-			Liferay.Util.Session.set(
-				'com.liferay.frontend.js.web_toggleControls',
-				editControlsState
-			);
-
-			Liferay.fire('toggleControls', {
-				enabled: controlsVisible,
-				src: 'ui',
-			});
-		});
-	});
 
 	Liferay.provide(
 		Util,

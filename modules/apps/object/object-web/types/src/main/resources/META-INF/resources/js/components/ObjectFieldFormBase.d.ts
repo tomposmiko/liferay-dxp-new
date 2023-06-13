@@ -16,8 +16,6 @@ import React, {ChangeEventHandler, ReactNode} from 'react';
 import {FormError} from '../hooks/useForm';
 import './ObjectFieldFormBase.scss';
 export default function ObjectFieldFormBase({
-	allowMaxLength,
-	allowUploadDocAndMedia,
 	children,
 	disabled,
 	errors,
@@ -58,8 +56,6 @@ interface IUseObjectFieldForm {
 	onSubmit: (field: ObjectField) => void;
 }
 interface IProps {
-	allowMaxLength?: boolean;
-	allowUploadDocAndMedia?: boolean;
 	children?: ReactNode;
 	disabled?: boolean;
 	errors: ObjectFieldErrors;

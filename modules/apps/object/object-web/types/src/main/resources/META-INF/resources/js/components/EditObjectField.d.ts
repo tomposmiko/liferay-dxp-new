@@ -16,8 +16,6 @@
 
 import './EditObjectField.scss';
 export default function EditObjectField({
-	allowMaxLength,
-	allowUploadDocAndMedia,
 	forbiddenChars,
 	forbiddenLastChars,
 	forbiddenNames,
@@ -28,8 +26,6 @@ export default function EditObjectField({
 	readOnly,
 }: IProps): JSX.Element;
 interface IProps {
-	allowMaxLength?: boolean;
-	allowUploadDocAndMedia?: boolean;
 	forbiddenChars: string[];
 	forbiddenLastChars: string[];
 	forbiddenNames: string[];

@@ -117,7 +117,13 @@ public class ResourceOpenAPIParser {
 
 							javaMethodSignatures.add(javaMethodSignature);
 
-							if (configYAML.isGenerateBatch()) {
+							List<String> disabledBatchSchemaNames =
+								configYAML.getDisabledBatchSchemaNames();
+
+							if (configYAML.isGenerateBatch() &&
+								!disabledBatchSchemaNames.contains(
+									schemaName)) {
+
 								_addBatchJavaMethodSignature(
 									javaMethodSignature, javaMethodSignatures);
 							}
