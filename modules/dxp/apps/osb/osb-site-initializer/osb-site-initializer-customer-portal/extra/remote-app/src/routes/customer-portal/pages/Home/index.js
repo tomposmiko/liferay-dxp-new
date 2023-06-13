@@ -1,3 +1,14 @@
+/**
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
+ *
+ * The contents of this file are subject to the terms of the Liferay Enterprise
+ * Subscription License ("License"). You may not use this file except in
+ * compliance with the License. You can obtain a copy of the License by
+ * contacting Liferay, Inc. See the License for the specific language governing
+ * permissions and limitations under the License, including but not limited to
+ * distribution rights of the Software.
+ */
+
 import {useQuery} from '@apollo/client';
 import classNames from 'classnames';
 import {useState} from 'react';
@@ -96,11 +107,12 @@ const Home = ({userAccount}) => {
 		<div
 			className={classNames({
 				'mx-auto project-cards-container-sm': withManyProjects,
-				'pl-5 project-cards-container': !withManyProjects,
+				'project-cards-container': !withManyProjects,
 			})}
 		>
 			<div
-				className={classNames('d-flex flex-column w-100', {
+				className={classNames({
+					'd-flex flex-column w-100': withManyProjects,
 					'ml-3': !withManyProjects,
 				})}
 			>
@@ -109,7 +121,13 @@ const Home = ({userAccount}) => {
 						<SearchProject onChange={setKeyword} value={keyword} />
 
 						<h5 className="m-0 text-neutral-7">
-							{projects.length} projects
+							{keyword
+								? `${projectsFiltered.length} result${
+										projectsFiltered.length === 1 ? '' : 's'
+								  }`
+								: `${projects.length} project${
+										projects.length === 1 ? '' : 's'
+								  }`}
 						</h5>
 					</div>
 				)}
@@ -117,7 +135,7 @@ const Home = ({userAccount}) => {
 				{!loading ? (
 					<div
 						className={classNames('d-flex flex-wrap', {
-							'home-projects': !withManyProjects,
+							'home-projects px-5': !withManyProjects,
 							'home-projects-sm pt-2': withManyProjects,
 						})}
 					>

@@ -132,11 +132,21 @@ public class AddFormInstanceRecordMVCActionCommand
 			return;
 		}
 
-		DDMFormInstanceSettings formInstanceSettings =
+		if (SessionMessages.contains(
+				actionRequest,
+				_portal.getPortletId(actionRequest) +
+					SessionMessages.KEY_SUFFIX_HIDE_DEFAULT_SUCCESS_MESSAGE)) {
+
+			SessionMessages.clear(actionRequest);
+		}
+
+		SessionMessages.add(actionRequest, "formInstanceRecordAdded");
+
+		DDMFormInstanceSettings ddmFormInstanceSettings =
 			ddmFormInstance.getSettingsModel();
 
 		String redirectURL = ParamUtil.getString(
-			actionRequest, "redirect", formInstanceSettings.redirectURL());
+			actionRequest, "redirect", ddmFormInstanceSettings.redirectURL());
 
 		if (Validator.isNotNull(redirectURL)) {
 			portletSession.setAttribute(
@@ -151,13 +161,7 @@ public class AddFormInstanceRecordMVCActionCommand
 				ddmForm.getDDMFormSuccessPageSettings();
 
 			if (ddmFormSuccessPageSettings.isEnabled()) {
-				String portletId = _portal.getPortletId(actionRequest);
-
-				SessionMessages.add(
-					actionRequest,
-					portletId.concat(
-						SessionMessages.
-							KEY_SUFFIX_HIDE_DEFAULT_SUCCESS_MESSAGE));
+				hideDefaultSuccessMessage(actionRequest);
 			}
 		}
 	}

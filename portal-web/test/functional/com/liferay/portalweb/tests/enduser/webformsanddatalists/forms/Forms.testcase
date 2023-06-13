@@ -7,12 +7,9 @@ definition {
 	property testray.main.component.name = "Forms";
 
 	setUp {
-
-		//TestCase.setUpPortalInstance();
+		TestCase.setUpPortalInstance();
 
 		User.firstLoginPG();
-
-		Form.modifyModuleDefinitionTimeout(timeout = "15");
 	}
 
 	tearDown {
@@ -23,8 +20,6 @@ definition {
 		}
 		else {
 			Navigator.openURL();
-
-			Form.modifyModuleDefinitionTimeout(timeout = "7");
 
 			ProductMenu.gotoPortlet(
 				category = "Content & Data",
@@ -42,12 +37,9 @@ definition {
 
 	@priority = "5"
 	test AddFormInGlobal {
-		property forms.functional = "true";
 		property portal.acceptance = "true";
 		property portal.upstream = "true";
-
-		//property test.name.skip.portal.instance = "Forms#AddFormInGlobal";
-
+		property test.name.skip.portal.instance = "Forms#AddFormInGlobal";
 		property testray.component.names = "Training";
 
 		Navigator.openURL();
@@ -130,11 +122,9 @@ definition {
 	@description = "This is a use case for LPS-68377."
 	@priority = "3"
 	test AddFormToUserSiteAndViewNoDuplicates {
-		property forms.functional = "true";
 		property portal.acceptance = "true";
 		property portal.upstream = "true";
-
-		//property test.name.skip.portal.instance = "Forms#AddFormToUserSiteAndViewNoDuplicates";
+		property test.name.skip.portal.instance = "Forms#AddFormToUserSiteAndViewNoDuplicates";
 
 		Navigator.openURL();
 
@@ -249,11 +239,9 @@ definition {
 	@description = "LPS-68390 - Verify that a notification appears when a Form is autosaved."
 	@priority = "3"
 	test AutosaveDisplaysANotification {
-		property forms.functional = "true";
 		property portal.acceptance = "true";
 		property portal.upstream = "true";
-
-		//property test.name.skip.portal.instance = "Forms#AutosaveDisplaysANotification";
+		property test.name.skip.portal.instance = "Forms#AutosaveDisplaysANotification";
 
 		FormsAdmin.addForm();
 
@@ -275,11 +263,9 @@ definition {
 	@description = "LPS-68418 - Verify that a Form's autosave interval can be configured"
 	@priority = "3"
 	test AutosaveIntervalCanBeConfigured {
-		property forms.functional = "true";
 		property portal.acceptance = "true";
 		property portal.upstream = "true";
-
-		//property test.name.skip.portal.instance = "Forms#AutosaveIntervalCanBeConfigured";
+		property test.name.skip.portal.instance = "Forms#AutosaveIntervalCanBeConfigured";
 
 		Navigator.openURL();
 
@@ -341,11 +327,9 @@ definition {
 	@description = "LPS-72048 - Verify that Belongs To rule can be paired with Guest role"
 	@priority = "4"
 	test BelongsToRuleCanPairWithGuestUser {
-		property forms.functional = "true";
 		property portal.acceptance = "true";
 		property portal.upstream = "true";
-
-		//property test.name.skip.portal.instance = "Forms#BelongsToRuleCanPairWithGuestUser";
+		property test.name.skip.portal.instance = "Forms#BelongsToRuleCanPairWithGuestUser";
 
 		FormsAdmin.addForm();
 
@@ -439,7 +423,7 @@ definition {
 	@description = "Verify that a Form can be published from an autosaved draft"
 	@priority = "5"
 	test CanBeCreatedFromAutosavedDraft {
-		property forms.functional = "true";
+		property portal.acceptance = "true";
 
 		FormsAdmin.addForm();
 
@@ -546,11 +530,9 @@ definition {
 	@description = "LPS-64379 - Verify that a Form can be created without a Form Title"
 	@priority = "5"
 	test CanBeCreatedWithoutTitle {
-		property forms.functional = "true";
 		property portal.acceptance = "true";
 		property portal.upstream = "true";
-
-		//property test.name.skip.portal.instance = "Forms#CanBeCreatedWithoutTitle";
+		property test.name.skip.portal.instance = "Forms#CanBeCreatedWithoutTitle";
 
 		FormsAdmin.addForm();
 
@@ -596,7 +578,7 @@ definition {
 	@description = "Verify that a Form can be duplicated"
 	@priority = "5"
 	test CanBeDuplicated {
-		property forms.functional = "true";
+		property portal.acceptance = "true";
 
 		FormsAdmin.addForm();
 
@@ -688,11 +670,9 @@ definition {
 	@description = "LPS-69334 - Verify that a Form can be edited after the default language is changed"
 	@priority = "3"
 	test CanBeEditedAfterChangingLanguage {
-		property forms.functional = "true";
 		property portal.acceptance = "true";
 		property portal.upstream = "true";
-
-		//property test.name.skip.portal.instance = "Forms#CanBeEditedAfterChangingLanguage";
+		property test.name.skip.portal.instance = "Forms#CanBeEditedAfterChangingLanguage";
 
 		FormsAdmin.addForm();
 
@@ -732,11 +712,9 @@ definition {
 	@description = "LPS-69100 - Verify that a Form can be edited after the Site's default locale is changed"
 	@priority = "3"
 	test CanBeEditedAfterChangingLocale {
-		property forms.functional = "true";
 		property portal.acceptance = "true";
 		property portal.upstream = "true";
-
-		//property test.name.skip.portal.instance = "Forms#CanBeEditedAfterChangingLocale";
+		property test.name.skip.portal.instance = "Forms#CanBeEditedAfterChangingLocale";
 
 		FormsAdmin.addForm();
 
@@ -772,7 +750,7 @@ definition {
 	@description = "LPS-61740 - Verify that a Form can be previewed"
 	@priority = "5"
 	test CanBePreviewed {
-		property forms.functional = "true";
+		property portal.acceptance = "true";
 
 		FormsAdmin.addForm();
 
@@ -794,7 +772,7 @@ definition {
 	@description = "LPS-61740 - Verify that a Form can be published"
 	@priority = "5"
 	test CanBePublished {
-		property forms.functional = "true";
+		property portal.acceptance = "true";
 
 		FormsAdmin.addForm();
 
@@ -836,7 +814,7 @@ definition {
 	@description = "Verify that a Form can be unpublished"
 	@priority = "5"
 	test CanBeUnpublished {
-		property forms.functional = "true";
+		property portal.acceptance = "true";
 
 		FormsAdmin.addForm();
 
@@ -882,11 +860,9 @@ definition {
 	@description = "LPS-60520 - Verify that a Form can still be viewed after one of the Fields is deleted"
 	@priority = "4"
 	test CanBeViewedAfterDeletingAField {
-		property forms.functional = "true";
 		property portal.acceptance = "true";
 		property portal.upstream = "true";
-
-		//property test.name.skip.portal.instance = "Forms#CanBeViewedAfterDeletingAField";
+		property test.name.skip.portal.instance = "Forms#CanBeViewedAfterDeletingAField";
 
 		FormsAdmin.addForm();
 
@@ -990,11 +966,9 @@ definition {
 	@description = "LPS-69214 - Verify that a confirmation appears when attempting to leave a Form without saving."
 	@priority = "3"
 	test ConfirmationAppearsWhenLeavingFormWithoutSaving {
-		property forms.functional = "true";
 		property portal.acceptance = "true";
 		property portal.upstream = "true";
-
-		//property test.name.skip.portal.instance = "Forms#ConfirmationAppearsWhenLeavingFormWithoutSaving";
+		property test.name.skip.portal.instance = "Forms#ConfirmationAppearsWhenLeavingFormWithoutSaving";
 
 		FormsAdmin.addForm();
 
@@ -1023,8 +997,7 @@ definition {
 	@priority = "5"
 	test DataProviderCanRetrieveDataForGuestUser {
 		property portal.upstream = "true";
-
-		//property test.name.skip.portal.instance = "FormsDataProvider#DataProviderCanRetrieveDataForGuestUser";
+		property test.name.skip.portal.instance = "FormsDataProvider#DataProviderCanRetrieveDataForGuestUser";
 
 		var portalURL = PropsUtil.get("portal.url");
 
@@ -1105,11 +1078,8 @@ definition {
 
 	@priority = "4"
 	test EditAllFormFieldNames {
-		property forms.functional = "true";
-		property portal.acceptance = "true";
 		property portal.upstream = "true";
-
-		//property test.name.skip.portal.instance = "Forms#EditAllFormFieldNames";
+		property test.name.skip.portal.instance = "Forms#EditAllFormFieldNames";
 
 		FormsAdmin.addForm();
 
@@ -1218,11 +1188,9 @@ definition {
 	@description = "This is a use case for LPS-50757."
 	@priority = "4"
 	test EditAllFormFieldsTypesUsedBySystemSettings {
-		property forms.functional = "true";
 		property portal.acceptance = "true";
 		property portal.upstream = "true";
-
-		//property test.name.skip.portal.instance = "Forms#EditAllFormFieldsTypesUsedBySystemSettings";
+		property test.name.skip.portal.instance = "Forms#EditAllFormFieldsTypesUsedBySystemSettings";
 
 		Navigator.openURL();
 
@@ -1410,11 +1378,9 @@ definition {
 	@description = "This is a use case for LPS-59749"
 	@priority = "3"
 	test EditFormsConfigurationViaSystemSettings {
-		property forms.functional = "true";
 		property portal.acceptance = "true";
 		property portal.upstream = "true";
-
-		//property test.name.skip.portal.instance = "Forms#EditFormsConfigurationViaSystemSettings";
+		property test.name.skip.portal.instance = "Forms#EditFormsConfigurationViaSystemSettings";
 
 		Navigator.openURL();
 
@@ -1476,7 +1442,7 @@ definition {
 	@description = "This is a use case for LPS-81578."
 	@priority = "4"
 	test GuestUserCanNotSeeFormAfterPermissionRemoved {
-		property forms.functional = "true";
+		property portal.acceptance = "true";
 
 		FormsAdmin.addForm();
 
@@ -1524,7 +1490,7 @@ definition {
 	@description = "Verify that multiple Forms can be deleted"
 	@priority = "5"
 	test MultipleFormsCanBeDeleted {
-		property forms.functional = "true";
+		property portal.acceptance = "true";
 
 		FormsAdmin.addForm();
 
@@ -1564,11 +1530,9 @@ definition {
 	@description = "LPS-84276 - Verify that Form Pages can be removed"
 	@priority = "5"
 	test PagesCanBeDeleted {
-		property forms.functional = "true";
 		property portal.acceptance = "true";
 		property portal.upstream = "true";
-
-		//property test.name.skip.portal.instance = "Forms#PagesCanBeDeleted";
+		property test.name.skip.portal.instance = "Forms#PagesCanBeDeleted";
 
 		FormsAdmin.addForm();
 
@@ -1608,7 +1572,7 @@ definition {
 	@description = "Verify that Form Pages can be reordered"
 	@priority = "5"
 	test PagesCanBeReordered {
-		property forms.functional = "true";
+		property portal.acceptance = "true";
 
 		FormsAdmin.addForm();
 
@@ -1668,7 +1632,7 @@ definition {
 	@description = "Verify that Form Pages can be reset"
 	@priority = "5"
 	test PagesCanBeReset {
-		property forms.functional = "true";
+		property portal.acceptance = "true";
 
 		FormsAdmin.addForm();
 
@@ -1696,11 +1660,9 @@ definition {
 	@description = "This is a use case for LPS-59336."
 	@priority = "4"
 	test SearchFormRecordMultipleEntries {
-		property forms.functional = "true";
 		property portal.acceptance = "true";
 		property portal.upstream = "true";
-
-		//property test.name.skip.portal.instance = "Forms#SearchFormRecordMultipleEntries";
+		property test.name.skip.portal.instance = "Forms#SearchFormRecordMultipleEntries";
 
 		var fieldValueList = "testEntry1,exampleText,sampleAnswer";
 
@@ -1794,7 +1756,7 @@ definition {
 	@description = "Verify that a Form cannot be created without at least 1 field"
 	@priority = "5"
 	test ShouldHaveAtLeastOneField {
-		property forms.functional = "true";
+		property portal.acceptance = "true";
 
 		FormsAdmin.addForm();
 
@@ -1809,9 +1771,8 @@ definition {
 
 	@priority = "4"
 	test SubmitFormWithMultipleFieldsAndViewEntriesViaDescriptiveDisplay {
-		property forms.functional = "true";
-
-		//property test.name.skip.portal.instance = "Forms#SubmitFormWithMultipleFieldsAndViewEntriesViaDescriptiveDisplay";
+		property portal.acceptance = "true";
+		property test.name.skip.portal.instance = "Forms#SubmitFormWithMultipleFieldsAndViewEntriesViaDescriptiveDisplay";
 
 		FormsAdmin.addForm();
 
@@ -1985,11 +1946,9 @@ definition {
 	@description = "LPS-84637 - Form title and description get unescaped after unpublish it."
 	@priority = "5"
 	test TitleAndDescriptionXSSUnescapedAfterUnpublish {
-		property forms.functional = "true";
 		property portal.acceptance = "true";
 		property portal.upstream = "true";
-
-		//property test.name.skip.portal.instance = "Forms#TitleAndDescriptionXSSUnescapedAfterUnpublish";
+		property test.name.skip.portal.instance = "Forms#TitleAndDescriptionXSSUnescapedAfterUnpublish";
 
 		FormsAdmin.addForm();
 
@@ -2035,13 +1994,11 @@ definition {
 	@description = "This is a use case for LPS-64305 and LPS-96253."
 	@priority = "4"
 	test ViewDefaultFieldNamesWithPunctuationCharacters {
-		property forms.functional = "true";
 		property portal.acceptance = "true";
 		property portal.upstream = "true";
 		property test.assert.javascript.errors = "true";
 		property test.assert.warning.exceptions = "true";
-
-		//property test.name.skip.portal.instance = "Forms#ViewDefaultFieldNamesWithPunctuationCharacters";
+		property test.name.skip.portal.instance = "Forms#ViewDefaultFieldNamesWithPunctuationCharacters";
 
 		FormsAdmin.addForm();
 
@@ -2097,9 +2054,8 @@ definition {
 	@description = "This is a use case for LPS-126817."
 	@priority = "5"
 	test ViewSelectFromListOptionValueWithCharacter {
-		property forms.functional = "true";
-
-		//property test.name.skip.portal.instance = "Forms#ViewSelectFromListOptionValueWithCharacter";
+		property portal.acceptance = "true";
+		property test.name.skip.portal.instance = "Forms#ViewSelectFromListOptionValueWithCharacter";
 
 		FormsAdmin.addForm();
 
@@ -2140,7 +2096,7 @@ definition {
 	@description = "Verify that a Form autosaves after 1 minute by default"
 	@priority = "5"
 	test WillAutosaveAfterOneMinute {
-		property forms.functional = "true";
+		property portal.acceptance = "true";
 
 		FormsAdmin.addForm();
 

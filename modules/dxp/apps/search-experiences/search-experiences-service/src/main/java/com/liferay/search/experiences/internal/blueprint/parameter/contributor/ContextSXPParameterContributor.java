@@ -99,7 +99,7 @@ public class ContextSXPParameterContributor implements SXPParameterContributor {
 		}
 
 		Long scopeGroupId = (Long)searchContext.getAttribute(
-			"search.experiences.scope_group_id");
+			"search.experiences.current.group.id");
 
 		if (scopeGroupId != null) {
 			sxpParameters.add(
@@ -130,9 +130,6 @@ public class ContextSXPParameterContributor implements SXPParameterContributor {
 			new SXPParameterContributorDefinition(
 				LongSXPParameter.class, "company-id", "context.company_id"),
 			new SXPParameterContributorDefinition(
-				LongSXPParameter.class, "publication-id",
-				"context.ct_collection_id"),
-			new SXPParameterContributorDefinition(
 				BooleanSXPParameter.class, "is-staging-group",
 				"context.is_staging_group"),
 			new SXPParameterContributorDefinition(
@@ -144,6 +141,9 @@ public class ContextSXPParameterContributor implements SXPParameterContributor {
 				"context.layout-name-localized"),
 			new SXPParameterContributorDefinition(
 				LongSXPParameter.class, "page-layout-id", "context.plid"),
+			new SXPParameterContributorDefinition(
+				LongSXPParameter.class, "publication-id",
+				"context.publication_id"),
 			new SXPParameterContributorDefinition(
 				LongSXPParameter.class, "scope-group-id",
 				"context.scope_group_id"));

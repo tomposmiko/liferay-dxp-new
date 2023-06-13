@@ -1,3 +1,14 @@
+/**
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
+ *
+ * The contents of this file are subject to the terms of the Liferay Enterprise
+ * Subscription License ("License"). You may not use this file except in
+ * compliance with the License. You can obtain a copy of the License by
+ * contacting Liferay, Inc. See the License for the specific language governing
+ * permissions and limitations under the License, including but not limited to
+ * distribution rights of the Software.
+ */
+
 import {useMutation} from '@apollo/client';
 import ClayForm from '@clayui/form';
 import {useFormikContext} from 'formik';
@@ -26,9 +37,9 @@ const SLA = {
 	platinum: 'Platinum',
 };
 
-const Invites = () => {
+const Invites = ({project}) => {
 	const {supportLink} = useApplicationProvider();
-	const [{project, subscriptionGroups}, dispatch] = useOnboarding();
+	const [{subscriptionGroups}, dispatch] = useOnboarding();
 	const {errors, setFieldValue, setTouched, values} = useFormikContext();
 	const [rolesData, setRolesData] = useState();
 
@@ -274,8 +285,8 @@ const Invites = () => {
 				<div className="px-3">
 					<label>Project Name</label>
 
-					<p className="text-neutral-6 text-paragraph-lg">
-						<strong>{project ? project.code : ''}</strong>
+					<p className="invites-project-name text-neutral-6 text-paragraph-lg">
+						<strong>{project.name}</strong>
 					</p>
 				</div>
 

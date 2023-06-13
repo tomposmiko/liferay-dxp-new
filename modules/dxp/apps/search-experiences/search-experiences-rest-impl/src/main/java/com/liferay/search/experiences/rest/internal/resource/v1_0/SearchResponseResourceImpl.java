@@ -22,20 +22,25 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.search.document.Document;
 import com.liferay.portal.search.document.Field;
+import com.liferay.portal.search.hits.SearchHit;
 import com.liferay.portal.search.searcher.SearchRequest;
 import com.liferay.portal.search.searcher.SearchRequestBuilder;
 import com.liferay.portal.search.searcher.SearchRequestBuilderFactory;
 import com.liferay.portal.search.searcher.Searcher;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.search.experiences.blueprint.search.request.enhancer.SXPBlueprintSearchRequestEnhancer;
-import com.liferay.search.experiences.rest.dto.v1_0.Document;
+import com.liferay.search.experiences.exception.SXPExceptionUtil;
 import com.liferay.search.experiences.rest.dto.v1_0.DocumentField;
+import com.liferay.search.experiences.rest.dto.v1_0.Hit;
 import com.liferay.search.experiences.rest.dto.v1_0.SXPBlueprint;
+import com.liferay.search.experiences.rest.dto.v1_0.SearchHits;
 import com.liferay.search.experiences.rest.dto.v1_0.SearchResponse;
 import com.liferay.search.experiences.rest.dto.v1_0.util.SXPBlueprintUtil;
 import com.liferay.search.experiences.rest.resource.v1_0.SearchResponseResource;
@@ -47,8 +52,8 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -126,7 +131,7 @@ public class SearchResponseResourceImpl extends BaseSearchResponseResourceImpl {
 			runtimeException.addSuppressed(exception);
 		}
 
-		if (_hasErrors(runtimeException)) {
+		if (SXPExceptionUtil.hasErrors(runtimeException)) {
 			throw runtimeException;
 		}
 
@@ -153,36 +158,37 @@ public class SearchResponseResourceImpl extends BaseSearchResponseResourceImpl {
 	}
 
 	protected SearchResponse toSearchResponse(
-			com.liferay.portal.search.searcher.SearchResponse searchResponse1)
+			com.liferay.portal.search.searcher.SearchResponse searchResponse)
 		throws Exception {
 
-		SearchRequest portalSearchRequest = searchResponse1.getRequest();
+		SearchRequest portalSearchRequest = searchResponse.getRequest();
 
-		SearchResponse searchResponse2 = new SearchResponse() {
-			{
-				documents = _toDocuments(searchResponse1.getDocumentsStream());
-				page = portalSearchRequest.getFrom();
-				pageSize = portalSearchRequest.getSize();
-				request = _createJSONObject(searchResponse1.getRequestString());
-				requestString = searchResponse1.getRequestString();
-				response = _createJSONObject(
-					searchResponse1.getResponseString());
-				responseString = searchResponse1.getResponseString();
-				totalHits = searchResponse1.getTotalHits();
-			}
+		return SearchResponse.unsafeToDTO(
+			String.valueOf(
+				new SearchResponse() {
+					{
+						page = portalSearchRequest.getFrom();
+						pageSize = portalSearchRequest.getSize();
+						request = _createJSONObject(
+							searchResponse.getRequestString());
+						requestString = searchResponse.getRequestString();
+						response = _createJSONObject(
+							searchResponse.getResponseString());
+						responseString = searchResponse.getResponseString();
+						searchHits = _toSearchHits(
+							_getLocale(searchResponse),
+							searchResponse.getSearchHits());
+					}
+				}));
+	}
 
-			private JSONObject _createJSONObject(String string) {
-				try {
-					return JSONFactoryUtil.createJSONObject(string);
-				}
-				catch (JSONException jsonException) {
-					return null;
-				}
-			}
-
-		};
-
-		return SearchResponse.unsafeToDTO(searchResponse2.toString());
+	private JSONObject _createJSONObject(String string) {
+		try {
+			return JSONFactoryUtil.createJSONObject(string);
+		}
+		catch (JSONException jsonException) {
+			return null;
+		}
 	}
 
 	private AssetRenderer<?> _getAssetRenderer(Map<String, Field> fields) {
@@ -208,40 +214,31 @@ public class SearchResponseResourceImpl extends BaseSearchResponseResourceImpl {
 		return null;
 	}
 
-	private boolean _hasErrors(Throwable throwable1) {
-		if (_isWarning(throwable1)) {
-			return false;
+	private Locale _getLocale(
+		com.liferay.portal.search.searcher.SearchResponse searchResponse) {
+
+		Locale locale = searchResponse.withSearchContextGet(
+			SearchContext::getLocale);
+
+		if (locale != null) {
+			return locale;
 		}
 
-		if ((throwable1.getClass() == RuntimeException.class) &&
-			Validator.isBlank(throwable1.getMessage())) {
-
-			for (Throwable throwable2 : throwable1.getSuppressed()) {
-				if (_hasErrors(throwable2)) {
-					return true;
-				}
-			}
-
-			return false;
-		}
-
-		return true;
+		return contextAcceptLanguage.getPreferredLocale();
 	}
 
-	private boolean _isWarning(Throwable throwable) {
-		Class<? extends Throwable> clazz = throwable.getClass();
-
-		String simpleName = clazz.getSimpleName();
-
-		if (simpleName.equals("InvalidElementInstanceException")) {
-			return true;
+	private Float _getScore(float score) {
+		if (Float.isNaN(score)) {
+			return null;
 		}
 
-		return false;
+		return score;
 	}
 
 	private Map<String, DocumentField> _toDocumentFields(
-		Map<String, Field> fields) {
+		Document document, Locale locale) {
+
+		Map<String, Field> fields = document.getFields();
 
 		Map<String, DocumentField> documentFields = new LinkedHashMap<>();
 
@@ -274,8 +271,7 @@ public class SearchResponseResourceImpl extends BaseSearchResponseResourceImpl {
 			new DocumentField() {
 				{
 					values = new String[] {
-						assetRenderer.getSearchSummary(
-							contextAcceptLanguage.getPreferredLocale())
+						assetRenderer.getSearchSummary(locale)
 					};
 				}
 			});
@@ -283,31 +279,43 @@ public class SearchResponseResourceImpl extends BaseSearchResponseResourceImpl {
 			"assetTitle",
 			new DocumentField() {
 				{
-					values = new String[] {
-						assetRenderer.getTitle(
-							contextAcceptLanguage.getPreferredLocale())
-					};
+					values = new String[] {assetRenderer.getTitle(locale)};
 				}
 			});
 
 		return documentFields;
 	}
 
-	private Document[] _toDocuments(
-		Stream<com.liferay.portal.search.document.Document> stream) {
+	private Hit[] _toHits(Locale locale, List<SearchHit> searchHits) {
+		List<Hit> hits = new ArrayList<>();
 
-		List<Document> documents = new ArrayList<>();
-
-		stream.forEach(
-			document -> documents.add(
-				new Document() {
+		for (SearchHit searchHit : searchHits) {
+			hits.add(
+				new Hit() {
 					{
 						documentFields = _toDocumentFields(
-							document.getFields());
+							searchHit.getDocument(), locale);
+						explanation = searchHit.getExplanation();
+						id = searchHit.getId();
+						score = _getScore(searchHit.getScore());
+						version = searchHit.getVersion();
 					}
-				}));
+				});
+		}
 
-		return documents.toArray(new Document[0]);
+		return hits.toArray(new Hit[0]);
+	}
+
+	private SearchHits _toSearchHits(
+		Locale locale, com.liferay.portal.search.hits.SearchHits searchHits) {
+
+		return new SearchHits() {
+			{
+				hits = _toHits(locale, searchHits.getSearchHits());
+				maxScore = _getScore(searchHits.getMaxScore());
+				totalHits = searchHits.getTotalHits();
+			}
+		};
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
