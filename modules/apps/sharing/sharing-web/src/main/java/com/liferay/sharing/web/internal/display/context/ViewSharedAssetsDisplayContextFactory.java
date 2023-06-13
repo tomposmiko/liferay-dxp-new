@@ -18,12 +18,12 @@ import com.liferay.item.selector.ItemSelector;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.sharing.configuration.SharingConfigurationFactory;
-import com.liferay.sharing.display.context.util.SharingMenuItemFactory;
+import com.liferay.sharing.display.context.util.SharingDropdownItemFactory;
 import com.liferay.sharing.interpreter.SharingEntryInterpreterProvider;
 import com.liferay.sharing.security.permission.SharingPermission;
 import com.liferay.sharing.service.SharingEntryLocalService;
 import com.liferay.sharing.web.internal.filter.SharedAssetsFilterItemRegistry;
-import com.liferay.sharing.web.internal.servlet.taglib.ui.SharingEntryMenuItemContributorRegistry;
+import com.liferay.sharing.web.internal.servlet.taglib.ui.SharingEntryDropdownItemContributorRegistry;
 
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -45,9 +45,10 @@ public class ViewSharedAssetsDisplayContextFactory {
 			_portal.getLiferayPortletRequest(renderRequest),
 			_portal.getLiferayPortletResponse(renderResponse),
 			_sharedAssetsFilterItemRegistry, _sharingConfigurationFactory,
+			_sharingDropdownItemFactory,
+			_sharingEntryDropdownItemContributorRegistry,
 			_sharingEntryInterpreterProvider::getSharingEntryInterpreter,
-			_sharingEntryLocalService, _sharingEntryMenuItemContributorRegistry,
-			_sharingMenuItemFactory, _sharingPermission);
+			_sharingEntryLocalService, _sharingPermission);
 	}
 
 	@Reference
@@ -66,17 +67,17 @@ public class ViewSharedAssetsDisplayContextFactory {
 	private SharingConfigurationFactory _sharingConfigurationFactory;
 
 	@Reference
+	private SharingDropdownItemFactory _sharingDropdownItemFactory;
+
+	@Reference
+	private SharingEntryDropdownItemContributorRegistry
+		_sharingEntryDropdownItemContributorRegistry;
+
+	@Reference
 	private SharingEntryInterpreterProvider _sharingEntryInterpreterProvider;
 
 	@Reference
 	private SharingEntryLocalService _sharingEntryLocalService;
-
-	@Reference
-	private SharingEntryMenuItemContributorRegistry
-		_sharingEntryMenuItemContributorRegistry;
-
-	@Reference
-	private SharingMenuItemFactory _sharingMenuItemFactory;
 
 	@Reference
 	private SharingPermission _sharingPermission;

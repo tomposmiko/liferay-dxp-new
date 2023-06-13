@@ -231,9 +231,8 @@ public class IndexerPostProcessorRegistryTest {
 		Indexer<BlogsEntry> blogsEntryIndexer = IndexerRegistryUtil.getIndexer(
 			BlogsEntry.class.getName());
 
-		Class<?> clazz = blogsEntryIndexer.getClass();
-
-		testQueuedIndexerPostProcessor(blogsEntryIndexer, clazz.getName());
+		testQueuedIndexerPostProcessor(
+			blogsEntryIndexer, blogsEntryIndexer.getClassName());
 	}
 
 	@Test
@@ -297,8 +296,6 @@ public class IndexerPostProcessorRegistryTest {
 			Arrays.toString(indexerPostProcessors), 0,
 			indexerPostProcessors.length);
 
-		IndexerRegistryUtil.unregister(indexer);
-
 		Bundle bundle = FrameworkUtil.getBundle(getClass());
 
 		BundleContext bundleContext = bundle.getBundleContext();
@@ -314,8 +311,6 @@ public class IndexerPostProcessorRegistryTest {
 				).build());
 
 		try {
-			IndexerRegistryUtil.register(indexer);
-
 			indexerPostProcessors = indexer.getIndexerPostProcessors();
 
 			Assert.assertEquals(

@@ -23,11 +23,20 @@ import com.liferay.notification.model.NotificationTemplate;
 import com.liferay.notification.service.NotificationRecipientLocalServiceUtil;
 import com.liferay.notification.service.NotificationTemplateLocalServiceUtil;
 import com.liferay.notification.type.NotificationType;
+import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.model.ObjectField;
+import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,15 +45,46 @@ import java.util.List;
 public class NotificationUtil {
 
 	public static NotificationContext toNotificationContext(
-			com.liferay.notification.rest.dto.v1_0.NotificationTemplate
-				notificationTemplate)
-		throws Exception {
+		com.liferay.notification.rest.dto.v1_0.NotificationTemplate
+			notificationTemplate,
+		ObjectFieldLocalService objectFieldLocalService) {
 
 		NotificationContext notificationContext = new NotificationContext();
 
-		notificationContext.setAttachmentObjectFieldIds(
-			ListUtil.fromArray(
-				notificationTemplate.getAttachmentObjectFieldIds()));
+		List<Long> attachmentObjectFieldIds = new ArrayList<>();
+
+		String[] attachmentObjectFieldExternalReferenceCodes =
+			notificationTemplate.
+				getAttachmentObjectFieldExternalReferenceCodes();
+
+		if (attachmentObjectFieldExternalReferenceCodes != null) {
+			for (String attachmentObjectFieldExternalReferenceCode :
+					attachmentObjectFieldExternalReferenceCodes) {
+
+				ObjectField objectField =
+					objectFieldLocalService.fetchObjectField(
+						attachmentObjectFieldExternalReferenceCode,
+						notificationTemplate.getObjectDefinitionId());
+
+				if (objectField == null) {
+					attachmentObjectFieldIds.clear();
+
+					break;
+				}
+
+				attachmentObjectFieldIds.add(objectField.getObjectFieldId());
+			}
+		}
+
+		if (attachmentObjectFieldIds.isEmpty()) {
+			notificationContext.setAttachmentObjectFieldIds(
+				ListUtil.fromArray(
+					notificationTemplate.getAttachmentObjectFieldIds()));
+		}
+		else {
+			notificationContext.setAttachmentObjectFieldIds(
+				attachmentObjectFieldIds);
+		}
 
 		notificationContext.setType(notificationTemplate.getType());
 
@@ -87,7 +127,7 @@ public class NotificationUtil {
 		long notificationTemplateId,
 		com.liferay.notification.rest.dto.v1_0.NotificationTemplate
 			notificationTemplate,
-		User user) {
+		ObjectDefinitionLocalService objectDefinitionLocalService, User user) {
 
 		NotificationTemplate serviceBuilderNotificationTemplate =
 			NotificationTemplateLocalServiceUtil.fetchNotificationTemplate(
@@ -99,12 +139,36 @@ public class NotificationUtil {
 					0L);
 		}
 
+		serviceBuilderNotificationTemplate.setExternalReferenceCode(
+			notificationTemplate.getExternalReferenceCode());
 		serviceBuilderNotificationTemplate.setCompanyId(user.getCompanyId());
 		serviceBuilderNotificationTemplate.setUserId(user.getUserId());
 		serviceBuilderNotificationTemplate.setUserName(user.getFullName());
 
+		long objectDefinitionId = GetterUtil.getLong(
+			notificationTemplate.getObjectDefinitionId());
+
+		String objectDefinitionExternalReferenceCode =
+			notificationTemplate.getObjectDefinitionExternalReferenceCode();
+
+		if (Validator.isNotNull(objectDefinitionExternalReferenceCode)) {
+			try {
+				ObjectDefinition objectDefinition =
+					objectDefinitionLocalService.
+						getObjectDefinitionByExternalReferenceCode(
+							objectDefinitionExternalReferenceCode,
+							user.getCompanyId());
+
+				objectDefinitionId = objectDefinition.getObjectDefinitionId();
+			}
+			catch (PortalException portalException) {
+				_log.error(portalException);
+			}
+		}
+
 		serviceBuilderNotificationTemplate.setObjectDefinitionId(
-			GetterUtil.getLong(notificationTemplate.getObjectDefinitionId()));
+			objectDefinitionId);
+
 		serviceBuilderNotificationTemplate.setBodyMap(
 			LocalizedMapUtil.getLocalizedMap(notificationTemplate.getBody()));
 		serviceBuilderNotificationTemplate.setDescription(
@@ -125,5 +189,8 @@ public class NotificationUtil {
 
 		return serviceBuilderNotificationTemplate;
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		NotificationUtil.class);
 
 }

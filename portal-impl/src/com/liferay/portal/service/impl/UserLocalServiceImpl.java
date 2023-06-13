@@ -4806,7 +4806,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 		if (user.isPasswordEncrypted()) {
 			newEncPwd = PasswordEncryptorUtil.encrypt(
-				password1, user.getPassword());
+				password1, user.getPassword(), true);
 		}
 		else {
 			newEncPwd = PasswordEncryptorUtil.encrypt(password1);

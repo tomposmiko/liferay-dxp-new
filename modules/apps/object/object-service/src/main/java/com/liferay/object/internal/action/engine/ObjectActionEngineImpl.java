@@ -32,6 +32,10 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -53,36 +57,30 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 
 	@Override
 	public void executeObjectAction(
-		String objectActionName, String objectActionTriggerKey,
-		long objectDefinitionId, JSONObject payloadJSONObject, long userId) {
+			String objectActionName, String objectActionTriggerKey,
+			long objectDefinitionId, JSONObject payloadJSONObject, long userId)
+		throws Exception {
 
 		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-166918"))) {
 			throw new UnsupportedOperationException();
 		}
 
-		try {
-			ObjectAction objectAction =
-				_objectActionLocalService.getObjectAction(
-					objectDefinitionId, objectActionName,
-					objectActionTriggerKey);
+		ObjectAction objectAction = _objectActionLocalService.getObjectAction(
+			objectDefinitionId, objectActionName, objectActionTriggerKey);
 
-			ObjectDefinition objectDefinition =
-				_objectDefinitionLocalService.getObjectDefinition(
-					objectDefinitionId);
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.getObjectDefinition(
+				objectDefinitionId);
 
-			_updatePayloadJSONObject(
-				objectDefinition, payloadJSONObject,
-				_userLocalService.getUser(userId));
+		_updatePayloadJSONObject(
+			objectDefinition, payloadJSONObject,
+			_userLocalService.getUser(userId));
 
-			_executeObjectAction(
-				objectAction, objectDefinition, payloadJSONObject, userId,
-				ObjectEntryVariablesUtil.getActionVariables(
-					_dtoConverterRegistry, objectDefinition, payloadJSONObject,
-					_systemObjectDefinitionMetadataRegistry));
-		}
-		catch (Exception exception) {
-			_log.error(exception);
-		}
+		_executeObjectAction(
+			objectAction, objectDefinition, payloadJSONObject, userId,
+			ObjectEntryVariablesUtil.getActionVariables(
+				_dtoConverterRegistry, objectDefinition, payloadJSONObject,
+				_systemObjectDefinitionMetadataRegistry));
 	}
 
 	@Override
@@ -90,13 +88,61 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 		String className, long companyId, String objectActionTriggerKey,
 		JSONObject payloadJSONObject, long userId) {
 
-		try {
-			_executeObjectActions(
-				className, companyId, objectActionTriggerKey, payloadJSONObject,
-				userId);
+		if ((companyId == 0) || (userId == 0)) {
+			return;
 		}
-		catch (Exception exception) {
-			_log.error(exception);
+
+		User user = _userLocalService.fetchUser(userId);
+
+		if ((user == null) || (companyId != user.getCompanyId())) {
+			return;
+		}
+
+		ObjectDefinition objectDefinition =
+			_objectDefinitionLocalService.fetchObjectDefinitionByClassName(
+				user.getCompanyId(), className);
+
+		if (objectDefinition == null) {
+			return;
+		}
+
+		String name = PrincipalThreadLocal.getName();
+
+		PermissionChecker permissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
+
+		try {
+			PrincipalThreadLocal.setName(user.getUserId());
+
+			PermissionThreadLocal.setPermissionChecker(
+				_permissionCheckerFactory.create(user));
+
+			_updatePayloadJSONObject(objectDefinition, payloadJSONObject, user);
+
+			Map<String, Object> variables =
+				ObjectEntryVariablesUtil.getActionVariables(
+					_dtoConverterRegistry, objectDefinition, payloadJSONObject,
+					_systemObjectDefinitionMetadataRegistry);
+
+			for (ObjectAction objectAction :
+					_objectActionLocalService.getObjectActions(
+						objectDefinition.getObjectDefinitionId(),
+						objectActionTriggerKey)) {
+
+				try {
+					_executeObjectAction(
+						objectAction, objectDefinition, payloadJSONObject,
+						userId, variables);
+				}
+				catch (Exception exception) {
+					_log.error(exception);
+				}
+			}
+		}
+		finally {
+			PrincipalThreadLocal.setName(name);
+
+			PermissionThreadLocal.setPermissionChecker(permissionChecker);
 		}
 	}
 
@@ -152,52 +198,11 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 				ObjectActionConstants.STATUS_SUCCESS);
 		}
 		catch (Exception exception) {
-			_log.error(exception);
-
 			_objectActionLocalService.updateStatus(
 				objectAction.getObjectActionId(),
 				ObjectActionConstants.STATUS_FAILED);
-		}
-	}
 
-	private void _executeObjectActions(
-			String className, long companyId, String objectActionTriggerKey,
-			JSONObject payloadJSONObject, long userId)
-		throws Exception {
-
-		if ((companyId == 0) || (userId == 0)) {
-			return;
-		}
-
-		User user = _userLocalService.fetchUser(userId);
-
-		if ((user == null) || (companyId != user.getCompanyId())) {
-			return;
-		}
-
-		ObjectDefinition objectDefinition =
-			_objectDefinitionLocalService.fetchObjectDefinitionByClassName(
-				user.getCompanyId(), className);
-
-		if (objectDefinition == null) {
-			return;
-		}
-
-		_updatePayloadJSONObject(objectDefinition, payloadJSONObject, user);
-
-		Map<String, Object> variables =
-			ObjectEntryVariablesUtil.getActionVariables(
-				_dtoConverterRegistry, objectDefinition, payloadJSONObject,
-				_systemObjectDefinitionMetadataRegistry);
-
-		for (ObjectAction objectAction :
-				_objectActionLocalService.getObjectActions(
-					objectDefinition.getObjectDefinitionId(),
-					objectActionTriggerKey)) {
-
-			_executeObjectAction(
-				objectAction, objectDefinition, payloadJSONObject, userId,
-				variables);
+			throw exception;
 		}
 	}
 
@@ -235,6 +240,9 @@ public class ObjectActionEngineImpl implements ObjectActionEngine {
 
 	@Reference
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
+
+	@Reference
+	private PermissionCheckerFactory _permissionCheckerFactory;
 
 	@Reference
 	private SystemObjectDefinitionMetadataRegistry

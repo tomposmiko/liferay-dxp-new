@@ -20,12 +20,78 @@ import StatusBadge from '../../../components/StatusBadge';
 import {StatusBadgeType} from '../../../components/StatusBadge/StatusBadge';
 import {ListViewTypes} from '../../../context/ListViewContext';
 import i18n from '../../../i18n';
+import {Liferay} from '../../../services/liferay';
 import {TestraySubTaskCaseResult} from '../../../services/rest';
 import {testraySubtaskCaseResultImpl} from '../../../services/rest/TestraySubtaskCaseResults';
 import {searchUtil} from '../../../util/search';
+import {SubTaskStatuses} from '../../../util/statuses';
 
 const SubtasksCaseResults = () => {
 	const {subtaskId} = useParams();
+
+	const getFloatingBoxAlerts = (
+		subtasksCaseResults: TestraySubTaskCaseResult[],
+		selectRows: number[]
+	) => {
+		const alerts = [];
+		const selectedRows = selectRows.map((rowId) =>
+			subtasksCaseResults.find(({id}) => rowId === id)
+		) as TestraySubTaskCaseResult[];
+
+		if (subtasksCaseResults.length === selectRows.length) {
+			alerts.push({
+				text: i18n.translate(
+					'you-cannot-split-all-case-results-from-a-subtask'
+				),
+			});
+		}
+
+		const subtaskStatusCheck = () => {
+			const subtasksOpenStatus = selectedRows.filter(
+				({subTask}) =>
+					subTask?.dueStatus &&
+					subTask?.dueStatus.key === SubTaskStatuses.OPEN
+			);
+
+			if (subtasksOpenStatus.length) {
+				return [
+					{
+						text: i18n.sub(
+							'subtask-x-must-be-in-analysis-to-be-used-in-a-split',
+							subtasksOpenStatus[0].subTask?.name as string
+						),
+					},
+				];
+			}
+		};
+
+		const subtaskUserCheck = () => {
+			const subtaskName = selectedRows.map(({subTask}) => subTask?.name);
+
+			const subtasksWithDifferentAssignedUsers = selectedRows.filter(
+				({subTask}) =>
+					subTask?.user?.id &&
+					subTask?.user?.id?.toString() ===
+						Liferay.ThemeDisplay.getUserId()
+			);
+
+			if (!subtasksWithDifferentAssignedUsers.length) {
+				return [
+					{
+						text: i18n.sub(
+							'subtask-x-must-be-assigned-to-you-to-be-user-in-a-split',
+							subtaskName[0] as string
+						),
+					},
+				];
+			}
+		};
+
+		const alreadyAssigned = subtaskUserCheck() || [];
+		const statusOpen = subtaskStatusCheck() || [];
+
+		return [...alerts, ...alreadyAssigned, ...statusOpen];
+	};
 
 	return (
 		<ListView
@@ -79,7 +145,6 @@ const SubtasksCaseResults = () => {
 
 						value: i18n.translate('component'),
 					},
-
 					{
 						clickable: true,
 						key: 'case',
@@ -92,7 +157,6 @@ const SubtasksCaseResults = () => {
 						value: i18n.translate('case'),
 					},
 					{key: 'issues', value: i18n.translate('issues')},
-
 					{
 						key: 'dueStatus',
 						render: (
@@ -127,24 +191,30 @@ const SubtasksCaseResults = () => {
 				filter: searchUtil.eq('subtaskId', subtaskId as string),
 			}}
 		>
-			{(_, {dispatch, listViewContext: {selectedRows}}) => (
-				<FloatingBox
-					clearList={() =>
-						dispatch({
-							payload: [],
-							type: ListViewTypes.SET_CHECKED_ROW,
-						})
-					}
-					isVisible={!!selectedRows.length}
-					primaryButtonProps={{
-						title: i18n.translate('split-tests'),
-					}}
-					selectedCount={selectedRows.length}
-					tooltipText={i18n.translate(
-						'move-selected-tests-to-a-new-subtask'
-					)}
-				/>
-			)}
+			{({items}, {dispatch, listViewContext: {selectedRows}}) => {
+				const alerts = getFloatingBoxAlerts(items, selectedRows);
+
+				return (
+					<FloatingBox
+						alerts={alerts}
+						clearList={() =>
+							dispatch({
+								payload: [],
+								type: ListViewTypes.SET_CHECKED_ROW,
+							})
+						}
+						isVisible={!!selectedRows.length}
+						primaryButtonProps={{
+							disabled: !!alerts.length,
+							title: i18n.translate('split-tests'),
+						}}
+						selectedCount={selectedRows.length}
+						tooltipText={i18n.translate(
+							'move-selected-tests-to-a-new-subtask'
+						)}
+					/>
+				);
+			}}
 		</ListView>
 	);
 };

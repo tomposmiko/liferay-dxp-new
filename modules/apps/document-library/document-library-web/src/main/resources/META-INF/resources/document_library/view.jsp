@@ -50,6 +50,20 @@ DLViewDisplayContext dlViewDisplayContext = new DLViewDisplayContext(dlAdminDisp
 		<clay:management-toolbar
 			additionalProps='<%=
 				HashMapBuilder.<String, Object>put(
+					"bulkPermissionsConfiguration",
+					HashMapBuilder.<String, Object>put(
+						"defaultModelClassName", Folder.class.getSimpleName()
+					).put(
+						"permissionsURLs",
+						HashMapBuilder.<String, Object>put(
+							DLFileShortcut.class.getSimpleName(), dlViewDisplayContext.getPermissionURL(DLFileShortcutConstants.getClassName())
+						).put(
+							FileEntry.class.getSimpleName(), dlViewDisplayContext.getPermissionURL(DLFileEntryConstants.getClassName())
+						).put(
+							Folder.class.getSimpleName(), dlViewDisplayContext.getPermissionURL(DLFolderConstants.getClassName())
+						).build()
+					).build()
+				).put(
 					"collectDigitalSignaturePortlet", DigitalSignaturePortletKeys.COLLECT_DIGITAL_SIGNATURE
 				).put(
 					"downloadEntryURL", dlViewDisplayContext.getDownloadEntryURL()
@@ -69,8 +83,6 @@ DLViewDisplayContext dlViewDisplayContext = new DLViewDisplayContext(dlAdminDisp
 					).build()
 				).put(
 					"openViewMoreFileEntryTypesURL", dlViewDisplayContext.getViewMoreFileEntryTypesURL()
-				).put(
-					"permissionsURL", dlViewDisplayContext.getPermissionURL()
 				).put(
 					"selectFileEntryTypeURL", dlViewDisplayContext.getSelectFileEntryTypeURL()
 				).put(

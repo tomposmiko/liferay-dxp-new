@@ -39,8 +39,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.client.extension.type.configuration.CETConfiguration",
-	configurationPolicy = ConfigurationPolicy.REQUIRE, immediate = true,
-	service = CETConfigurationFactory.class
+	configurationPolicy = ConfigurationPolicy.REQUIRE, service = {}
 )
 public class CETConfigurationFactory {
 

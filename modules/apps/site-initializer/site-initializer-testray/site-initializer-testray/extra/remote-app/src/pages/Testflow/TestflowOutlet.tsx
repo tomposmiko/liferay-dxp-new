@@ -28,13 +28,16 @@ const TestflowOutlet = () => {
 	const archivedPathIsActive = pathname === '/testflow/archived';
 
 	const {data: testrayTask, mutate: mutateTask} = useFetch<TestrayTask>(
-		testrayTaskImpl.getResource(taskId as string),
+		taskId ? testrayTaskImpl.getResource(taskId) : null,
 		(response) => testrayTaskImpl.transformData(response)
 	);
 
 	const {setDropdownIcon, setHeading, setTabs} = useHeader({
 		shouldUpdate: currentPathIsActive || archivedPathIsActive,
 		useDropdown: [],
+		useHeaderActions: {
+			actions: [],
+		},
 		useHeading: [
 			{
 				category: i18n.translate('task').toUpperCase(),

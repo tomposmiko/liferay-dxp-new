@@ -3327,9 +3327,9 @@ public class BundleSiteInitializer implements SiteInitializer {
 		_addRoles(
 			objectDefinitionIdsAndObjectEntryIdsStringUtilReplaceValues,
 			serviceContext);
-
 		_addUserAccounts(serviceContext);
 
+		_addRolesAssignments(serviceContext);
 		_addUserRoles(serviceContext);
 	}
 
@@ -3434,6 +3434,127 @@ public class BundleSiteInitializer implements SiteInitializer {
 		_addOrUpdateResourcePermissions(
 			objectDefinitionIdsAndObjectEntryIdsStringUtilReplaceValues,
 			"/site-initializer/resource-permissions.json", serviceContext);
+	}
+
+	private void _addRolesAssignments(ServiceContext serviceContext)
+		throws Exception {
+
+		String json = SiteInitializerUtil.read(
+			"/site-initializer/roles-assignments.json", _servletContext);
+
+		if (json == null) {
+			return;
+		}
+
+		JSONArray jsonArray = _jsonFactory.createJSONArray(json);
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+			JSONArray groupsJSONArray = jsonObject.getJSONArray("groups");
+
+			if (JSONUtil.isEmpty(groupsJSONArray)) {
+				continue;
+			}
+
+			List<Long> groupIds = new ArrayList<>();
+
+			for (int j = 0; j < groupsJSONArray.length(); j++) {
+				JSONObject groupJSONObject = groupsJSONArray.getJSONObject(j);
+
+				String groupType = groupJSONObject.getString("groupType");
+
+				if (StringUtil.equals(groupType, "Organization")) {
+					com.liferay.portal.kernel.model.Organization organization =
+						_organizationLocalService.fetchOrganization(
+							serviceContext.getCompanyId(),
+							groupJSONObject.getString("groupName"));
+
+					if (organization == null) {
+						if (_log.isWarnEnabled()) {
+							_log.warn(
+								"No organization found with name " +
+									groupJSONObject.getString("groupName"));
+						}
+
+						continue;
+					}
+
+					Group group = _groupLocalService.getOrganizationGroup(
+						serviceContext.getCompanyId(),
+						organization.getOrganizationId());
+
+					groupIds.add(group.getGroupId());
+				}
+				else if (StringUtil.equals(groupType, "Site")) {
+					groupIds.add(serviceContext.getScopeGroupId());
+				}
+				else if (StringUtil.equals(groupType, "User")) {
+					User user = _userLocalService.fetchUserByScreenName(
+						serviceContext.getCompanyId(),
+						groupJSONObject.getString("groupName"));
+
+					if (user == null) {
+						if (_log.isWarnEnabled()) {
+							_log.warn(
+								"No user found with screen name " +
+									groupJSONObject.getString("groupName"));
+						}
+
+						continue;
+					}
+
+					Group group = _groupLocalService.getUserGroup(
+						serviceContext.getCompanyId(), user.getUserId());
+
+					groupIds.add(group.getGroupId());
+				}
+				else if (StringUtil.equals(groupType, "UserGroups")) {
+					UserGroup userGroup = _userGroupLocalService.fetchUserGroup(
+						serviceContext.getCompanyId(),
+						groupJSONObject.getString("groupName"));
+
+					if (userGroup == null) {
+						if (_log.isWarnEnabled()) {
+							_log.warn(
+								"No user group found with name " +
+									groupJSONObject.getString("groupName"));
+						}
+
+						continue;
+					}
+
+					Group group = _groupLocalService.getUserGroupGroup(
+						serviceContext.getCompanyId(),
+						userGroup.getUserGroupId());
+
+					groupIds.add(group.getGroupId());
+				}
+			}
+
+			if (ListUtil.isEmpty(groupIds)) {
+				continue;
+			}
+
+			Role role = _roleLocalService.fetchRole(
+				serviceContext.getCompanyId(),
+				jsonObject.getString("roleName"));
+
+			if (role == null) {
+				if (_log.isWarnEnabled()) {
+					if (_log.isWarnEnabled()) {
+						_log.warn(
+							"No role found with name " +
+								jsonObject.getString("roleName"));
+					}
+				}
+
+				continue;
+			}
+
+			_groupLocalService.setRoleGroups(
+				role.getRoleId(), ArrayUtil.toLongArray(groupIds));
+		}
 	}
 
 	private void _addSiteConfiguration(ServiceContext serviceContext)

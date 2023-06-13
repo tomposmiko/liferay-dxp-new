@@ -21,6 +21,7 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.petra.string.StringUtil;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,14 +42,17 @@ public class ClientExtension {
 	}
 
 	public Map<String, Object> toJSONMap() throws Exception {
-		Map<String, Object> config = new HashMap<>();
+		Map<String, Object> jsonMap = new HashMap<>();
 
-		config.put("baseURL", "${portalURL}/o/" + projectName);
-		config.put("description", description);
-		config.put("dxp.lxc.liferay.com.virtualInstanceId", "default");
-		config.put("name", name);
-		config.put("sourceCodeURL", sourceCodeURL);
-		config.put("type", type);
+		Map<String, Object> configMap = new HashMap<>();
+
+		configMap.put("baseURL", "${portalURL}/o/" + projectName);
+		configMap.put("description", description);
+		configMap.put("dxp.lxc.liferay.com.virtualInstanceId", "default");
+		configMap.put("name", name);
+		configMap.put("properties", _encode(properties));
+		configMap.put("sourceCodeURL", sourceCodeURL);
+		configMap.put("type", type);
 
 		Properties clientExtensionProperties = _getClientExtensionProperties();
 
@@ -68,15 +72,34 @@ public class ClientExtension {
 
 		Set<Map.Entry<String, Object>> set = _typeSettings.entrySet();
 
-		Stream<Map.Entry<String, Object>> stream = set.stream();
-
-		List<String> typeSettings = stream.peek(
+		set.forEach(
 			entry -> {
 				if (!pid.contains("CETConfiguration")) {
-					config.put(entry.getKey(), entry.getValue());
+					configMap.put(entry.getKey(), entry.getValue());
 				}
-			}
-		).map(
+			});
+
+		configMap.put("typeSettings", _encode(_typeSettings));
+
+		jsonMap.put(pid + "~" + id, configMap);
+
+		return jsonMap;
+	}
+
+	public String description = "";
+	public String id;
+	public String name = "";
+	public String projectName;
+	public Map<String, Object> properties = Collections.emptyMap();
+	public String sourceCodeURL = "";
+	public String type;
+
+	private List<String> _encode(Map<String, Object> map) {
+		Set<Map.Entry<String, Object>> set = map.entrySet();
+
+		Stream<Map.Entry<String, Object>> stream = set.stream();
+
+		return stream.map(
 			entry -> {
 				Object value = entry.getValue();
 
@@ -90,22 +113,7 @@ public class ClientExtension {
 		).collect(
 			Collectors.toList()
 		);
-
-		config.put("typeSettings", typeSettings);
-
-		Map<String, Object> jsonMap = new HashMap<>();
-
-		jsonMap.put(pid + "~" + id, config);
-
-		return jsonMap;
 	}
-
-	public String description = "";
-	public String id;
-	public String name = "";
-	public String projectName;
-	public String sourceCodeURL = "";
-	public String type;
 
 	private Properties _getClientExtensionProperties() throws Exception {
 		Properties properties = new Properties();

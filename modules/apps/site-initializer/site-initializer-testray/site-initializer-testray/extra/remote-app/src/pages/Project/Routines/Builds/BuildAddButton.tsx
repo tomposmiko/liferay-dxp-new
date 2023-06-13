@@ -46,14 +46,12 @@ const BuildAddButton: React.FC<BuildAddButtonProps> = ({routineId}) => {
 		.and()
 		.eq('template', true)
 		.and()
-		.eq('active', true);
+		.eq('active', true)
+		.and();
 
 	const totalFilter = baseFilter.build();
 
-	const searchFilter = baseFilter
-		.and()
-		.contains('name', debouncedValue)
-		.build();
+	const searchFilter = baseFilter.contains('name', debouncedValue).build();
 
 	const {data: buildResponseWithSearch} = useFetch<APIResponse<TestrayBuild>>(
 		`${testrayBuildImpl.resource}&filter=${searchFilter}`
@@ -93,6 +91,7 @@ const BuildAddButton: React.FC<BuildAddButtonProps> = ({routineId}) => {
 					<Tooltip position="down" title={i18n.translate('manage')}>
 						<div className="testray-sidebar-item">
 							<ClayButtonWithIcon
+								aria-label={i18n.translate('manage')}
 								className="nav-btn nav-btn-monospaced"
 								symbol="plus"
 							/>

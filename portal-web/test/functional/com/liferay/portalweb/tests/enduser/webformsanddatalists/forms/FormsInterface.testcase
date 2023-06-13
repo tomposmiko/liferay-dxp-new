@@ -398,7 +398,7 @@ definition {
 
 		Form.gotoFieldContainer(fieldName = "Fields Group");
 
-		FormFields.viewField(fieldName = "FieldsGroup");
+		FormFields.viewField(fieldName = "Fields Group");
 
 		FormFields.duplicateField();
 
@@ -449,7 +449,7 @@ definition {
 		Form.closeSidebar();
 
 		FormFields.viewFieldSize(
-			fieldName = "FieldsGroup",
+			fieldName = "Fields Group",
 			size = "12");
 
 		FormFields.resizeFieldGroup(
@@ -457,7 +457,7 @@ definition {
 			moveForce = "-300");
 
 		FormFields.viewFieldSize(
-			fieldName = "FieldsGroup",
+			fieldName = "Fields Group",
 			size = "6");
 
 		Form.save();
@@ -467,7 +467,7 @@ definition {
 		FormsAdminNavigator.gotoEditFormByName(formName = "Form 1");
 
 		FormFields.viewFieldSize(
-			fieldName = "FieldsGroup",
+			fieldName = "Fields Group",
 			size = "6");
 	}
 
@@ -536,7 +536,7 @@ definition {
 			sourceFieldName = "Numeric",
 			targetFieldLabel = "Text");
 
-		FormFields.viewField(fieldName = "FieldsGroup");
+		FormFields.viewField(fieldName = "Fields Group");
 
 		Form.gotoFieldContainer(fieldName = "Fields Group");
 
@@ -592,7 +592,7 @@ definition {
 			sourceFieldName = "Numeric",
 			targetFieldLabel = "Text");
 
-		FormFields.viewField(fieldName = "FieldsGroup");
+		FormFields.viewField(fieldName = "Fields Group");
 
 		Form.gotoFieldContainer(fieldName = "Fields Group");
 
@@ -615,7 +615,7 @@ definition {
 			fieldLabel = "Copy of Fields Group");
 
 		FormFields.viewFieldSize(
-			fieldName = "FieldsGroup",
+			fieldName = "Fields Group",
 			size = "6");
 
 		FormFields.viewFieldSize(
@@ -635,7 +635,7 @@ definition {
 			moveForce = "50");
 
 		FormFields.viewFieldSize(
-			fieldName = "FieldsGroup",
+			fieldName = "Fields Group",
 			size = "7");
 
 		FormFields.viewFieldSize(

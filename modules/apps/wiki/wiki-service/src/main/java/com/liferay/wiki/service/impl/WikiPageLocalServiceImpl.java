@@ -114,6 +114,7 @@ import com.liferay.wiki.engine.WikiEngine;
 import com.liferay.wiki.engine.WikiEngineRenderer;
 import com.liferay.wiki.escape.WikiEscapeUtil;
 import com.liferay.wiki.exception.DuplicatePageException;
+import com.liferay.wiki.exception.DuplicateWikiPageExternalReferenceCodeException;
 import com.liferay.wiki.exception.NoSuchPageException;
 import com.liferay.wiki.exception.PageContentException;
 import com.liferay.wiki.exception.PageTitleException;
@@ -193,9 +194,9 @@ import org.osgi.service.component.annotations.Reference;
 public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 
 	/**
-	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
-	 * #addPage(String, long, long, String, double, String, String, boolean,
-	 * String, boolean, String, String, ServiceContext)}
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link #addPage(String,
+	 *             long, long, String, double, String, String, boolean, String,
+	 *             boolean, String, String, ServiceContext)}
 	 */
 	@Deprecated
 	@Override
@@ -254,6 +255,9 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 		Date date = new Date();
 
 		long pageId = counterLocalService.increment();
+
+		_validateExternalReferenceCode(
+			externalReferenceCode, node.getGroupId());
 
 		content = SanitizerUtil.sanitize(
 			user.getCompanyId(), node.getGroupId(), userId,
@@ -892,8 +896,8 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 	 * Returns the latest wiki page matching the group and the external
 	 * reference code
 	 *
-	 * @param groupId the primary key of the group
-	 * @param externalReferenceCode the wiki page external reference code
+	 * @param  groupId the primary key of the group
+	 * @param  externalReferenceCode the wiki page external reference code
 	 * @return the latest matching wiki page, or <code>null</code> if no
 	 *         matching wiki page could be found
 	 */
@@ -1126,8 +1130,8 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 	 * Returns the latest wiki page matching the group and the external
 	 * reference code
 	 *
-	 * @param groupId the primary key of the group
-	 * @param externalReferenceCode the wiki page external reference code
+	 * @param  groupId the primary key of the group
+	 * @param  externalReferenceCode the wiki page external reference code
 	 * @return the latest matching wiki page
 	 * @throws PortalException if a portal exception occurred
 	 */
@@ -3426,6 +3430,25 @@ public class WikiPageLocalServiceImpl extends WikiPageLocalServiceBaseImpl {
 		_wikiPageTitleValidator.validate(title);
 
 		_validate(nodeId, content, format);
+	}
+
+	private void _validateExternalReferenceCode(
+			String externalReferenceCode, long groupId)
+		throws PortalException {
+
+		if (Validator.isNull(externalReferenceCode)) {
+			return;
+		}
+
+		WikiPage wikiPage = fetchLatestPageByExternalReferenceCode(
+			groupId, externalReferenceCode);
+
+		if (wikiPage != null) {
+			throw new DuplicateWikiPageExternalReferenceCodeException(
+				StringBundler.concat(
+					"Duplicate wiki page external reference code ",
+					externalReferenceCode, " in group ", groupId));
+		}
 	}
 
 	private static final String _OUTGOING_LINKS = "OUTGOING_LINKS";

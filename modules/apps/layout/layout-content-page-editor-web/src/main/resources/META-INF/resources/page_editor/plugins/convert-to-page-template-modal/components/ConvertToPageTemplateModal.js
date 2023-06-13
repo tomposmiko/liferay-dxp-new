@@ -12,14 +12,15 @@
  * details.
  */
 
-import ClayAlert from '@clayui/alert';
 import ClayButton from '@clayui/button';
+import ClayForm, {ClayInput, ClaySelectWithOption} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
 import ClayModal, {useModal} from '@clayui/modal';
 import {useIsMounted} from '@liferay/frontend-js-react-web';
 import {openToast, sub} from 'frontend-js-web';
 import PropTypes from 'prop-types';
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {flushSync} from 'react-dom';
 
 import {config} from '../../../app/config/index';
 import {useSelector} from '../../../app/contexts/StoreContext';
@@ -59,18 +60,26 @@ export default function ModalWrapper() {
 }
 
 const ConvertToPageTemplateModal = ({observer, onClose}) => {
-	const [error, setError] = useState(null);
+	const segmentsExperienceId = useSelector(selectSegmentsExperienceId);
 	const hasMultipleSegmentsExperienceIds = useSelector(
 		(state) => Object.keys(state.availableSegmentsExperiences).length > 1
 	);
-	const [
-		layoutPageTemplateCollections,
-		setLayoutPageTemplateCollections,
-	] = useState([]);
+
+	const [availableSets, setAvailableSets] = useState([]);
+	const [templateName, setTemplateName] = useState('');
+	const [templateSet, setTemplateSet] = useState('');
+	const [formErrors, setFormErrors] = useState({});
 	const [loading, setLoading] = useState(false);
-	const layoutPageTemplateCollectionInputRef = useRef(null);
+
 	const nameInputRef = useRef(null);
-	const segmentsExperienceId = useSelector(selectSegmentsExperienceId);
+
+	const templateSetSelectOptions = useMemo(
+		() => [
+			{label: `-- ${Liferay.Language.get('not-selected')} --`, value: ''},
+			...availableSets.map((set) => ({label: set.name, value: set.id})),
+		],
+		[availableSets]
+	);
 
 	useEffect(() => {
 		if (nameInputRef.current) {
@@ -80,11 +89,9 @@ const ConvertToPageTemplateModal = ({observer, onClose}) => {
 
 	useEffect(() => {
 		LayoutService.getLayoutPageTemplateCollections()
-			.then((layoutPageTemplateCollections) => {
-				if (Array.isArray(layoutPageTemplateCollections)) {
-					setLayoutPageTemplateCollections(
-						layoutPageTemplateCollections
-					);
+			.then((sets) => {
+				if (Array.isArray(sets)) {
+					setAvailableSets(sets);
 				}
 				else {
 					throw new Error();
@@ -96,29 +103,47 @@ const ConvertToPageTemplateModal = ({observer, onClose}) => {
 	}, []);
 
 	const validateForm = useCallback(() => {
-		const error = {};
+		const errors = {};
 
-		const errorMessage = Liferay.Language.get('this-field-is-required');
-
-		if (!nameInputRef.current.value) {
-			error.name = errorMessage;
+		if (!templateName) {
+			errors.templateName = sub(
+				Liferay.Language.get('x-field-is-required'),
+				Liferay.Language.get('name')
+			);
 		}
 
-		if (layoutPageTemplateCollectionInputRef.current.selectedIndex === 0) {
-			error.layoutPageTemplateCollectionId = errorMessage;
+		if (!templateSet) {
+			errors.templateSet = sub(
+				Liferay.Language.get('x-field-is-required'),
+				Liferay.Language.get('page-template-set')
+			);
 		}
 
-		return error;
-	}, []);
+		return errors;
+	}, [templateName, templateSet]);
+
+	// We are using flush here because this way we can clear errors inmediately
+	// in handleSubmit. Otherwise, React will batch setStates and will do only
+	// one update.
+
+	const resetErrors = useCallback(
+		() =>
+			flushSync(() => {
+				setFormErrors({});
+			}),
+		[]
+	);
 
 	const handleSubmit = useCallback(
 		(event) => {
 			event.preventDefault();
 
-			const error = validateForm();
+			const errors = validateForm();
 
-			if (Object.keys(error).length !== 0) {
-				setError(error);
+			resetErrors();
+
+			if (Object.keys(errors).length) {
+				setFormErrors(errors);
 
 				return;
 			}
@@ -126,8 +151,8 @@ const ConvertToPageTemplateModal = ({observer, onClose}) => {
 			setLoading(true);
 
 			LayoutService.createLayoutPageTemplateEntry(
-				layoutPageTemplateCollectionInputRef.current.value,
-				nameInputRef.current.value,
+				templateSet,
+				templateName,
 				segmentsExperienceId
 			)
 				.then((response) => {
@@ -136,7 +161,7 @@ const ConvertToPageTemplateModal = ({observer, onClose}) => {
 							Liferay.Language.get(
 								'the-page-template-was-created-successfully.-you-can-view-it-here-x'
 							),
-							`<a href="${response.url}"><b>${nameInputRef.current.value}</b></a>`
+							`<a href="${response.url}"><b>${templateName}</b></a>`
 						),
 						type: 'success',
 					});
@@ -146,17 +171,30 @@ const ConvertToPageTemplateModal = ({observer, onClose}) => {
 				.catch((error) => {
 					setLoading(false);
 
-					setError({
-						other:
-							typeof error === 'string'
-								? error
-								: Liferay.Language.get(
-										'an-unexpected-error-occurred'
-								  ),
-					});
+					if (typeof error === 'string') {
+						setFormErrors((previousErrors) => ({
+							...previousErrors,
+							templateName: error,
+						}));
+					}
+					else {
+						openToast({
+							message: Liferay.Language.get(
+								'an-unexpected-error-occurred'
+							),
+							type: 'danger',
+						});
+					}
 				});
 		},
-		[onClose, segmentsExperienceId, validateForm]
+		[
+			onClose,
+			segmentsExperienceId,
+			validateForm,
+			templateName,
+			templateSet,
+			resetErrors,
+		]
 	);
 
 	return (
@@ -170,16 +208,6 @@ const ConvertToPageTemplateModal = ({observer, onClose}) => {
 			</ClayModal.Header>
 
 			<ClayModal.Body>
-				{error && error.other && (
-					<ClayAlert
-						displayType="danger"
-						onClose={() => setError({...error, other: null})}
-						title={Liferay.Language.get('error')}
-					>
-						{error.other}
-					</ClayAlert>
-				)}
-
 				{hasMultipleSegmentsExperienceIds && (
 					<div className="form-feedback-group mb-3">
 						<div className="form-feedback-item text-info">
@@ -194,61 +222,49 @@ const ConvertToPageTemplateModal = ({observer, onClose}) => {
 					</div>
 				)}
 
-				<form onSubmit={handleSubmit}>
+				<ClayForm onSubmit={handleSubmit}>
 					<FormField
-						error={error && error.name}
-						id={`${config.portletNamespace}name`}
+						error={formErrors.templateName}
+						id={`${config.portletNamespace}templateName`}
 						name={Liferay.Language.get('name')}
 					>
-						<input
-							aria-required="true"
-							className="form-control"
-							id={`${config.portletNamespace}name`}
-							onChange={() => setError({...error, name: null})}
+						<ClayInput
+							id={`${config.portletNamespace}templateName`}
+							name={`${config.portletNamespace}name`}
+							onChange={(event) => {
+								setTemplateName(event.target.value);
+
+								setFormErrors({
+									...formErrors,
+									templateName: null,
+								});
+							}}
 							ref={nameInputRef}
 							required
+							value={templateName}
 						/>
 					</FormField>
 
-					<fieldset>
-						<FormField
-							error={
-								error && error.layoutPageTemplateCollectionId
-							}
-							id={`${config.portletNamespace}layoutPageTemplateCollectionId`}
-							name={Liferay.Language.get('page-template-set')}
-						>
-							<select
-								aria-required="true"
-								className="form-control"
-								id={`${config.portletNamespace}layoutPageTemplateCollectionId`}
-								ref={layoutPageTemplateCollectionInputRef}
-								required
-							>
-								<option value="">
-									{`-- ${Liferay.Language.get(
-										'not-selected'
-									)} --`}
-								</option>
-
-								{layoutPageTemplateCollections.map(
-									(layoutPageTemplateCollection) => (
-										<option
-											key={
-												layoutPageTemplateCollection.id
-											}
-											value={
-												layoutPageTemplateCollection.id
-											}
-										>
-											{layoutPageTemplateCollection.name}
-										</option>
-									)
-								)}
-							</select>
-						</FormField>
-					</fieldset>
-				</form>
+					<FormField
+						error={formErrors.templateSet}
+						id={`${config.portletNamespace}templateSet`}
+						name={Liferay.Language.get('page-template-set')}
+					>
+						<ClaySelectWithOption
+							id={`${config.portletNamespace}templateSet`}
+							onChange={(event) => {
+								setTemplateSet(event.target.value);
+								setFormErrors({
+									...formErrors,
+									templateSet: null,
+								});
+							}}
+							options={templateSetSelectOptions}
+							required
+							value={templateSet}
+						/>
+					</FormField>
+				</ClayForm>
 			</ClayModal.Body>
 
 			<ClayModal.Footer

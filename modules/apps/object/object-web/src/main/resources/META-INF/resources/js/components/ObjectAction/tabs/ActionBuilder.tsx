@@ -24,6 +24,7 @@ import {
 	CustomItem,
 	ExpressionBuilder,
 	Input,
+	InputLocalized,
 	SelectWithOption,
 	SidebarCategory,
 	SingleSelect,
@@ -35,6 +36,8 @@ import PredefinedValuesTable from '../PredefinedValuesTable';
 
 import './ActionBuilder.scss';
 import {ActionError} from '../index';
+
+const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
 
 type ObjectsOptionsList = Array<
 	(
@@ -48,6 +51,7 @@ type ObjectsOptionsList = Array<
 
 export default function ActionBuilder({
 	errors,
+	isApproved,
 	objectActionCodeEditorElements,
 	objectActionExecutors,
 	objectActionTriggers,
@@ -224,11 +228,27 @@ export default function ActionBuilder({
 		setValues({conditionExpression});
 	};
 
-	const isValidField = ({businessType, system}: ObjectField) =>
-		businessType !== 'Aggregation' &&
-		businessType !== 'Formula' &&
-		businessType !== 'Relationship' &&
-		!system;
+	const isValidField = ({
+		businessType,
+		objectFieldSettings,
+		system,
+	}: ObjectField) => {
+		const userRelationship = !!objectFieldSettings?.find(
+			({name, value}) =>
+				name === 'objectDefinition1ShortName' && value === 'User'
+		);
+
+		if (businessType === 'Relationship' && userRelationship) {
+			return true;
+		}
+
+		return (
+			businessType !== 'Aggregation' &&
+			businessType !== 'Formula' &&
+			businessType !== 'Relationship' &&
+			!system
+		);
+	};
 
 	const fetchObjectDefinitionFields = async () => {
 		let validFields: ObjectField[] = [];
@@ -258,7 +278,7 @@ export default function ActionBuilder({
 
 		const newPredefinedValues: PredefinedValue[] = [];
 
-		validFields.forEach(({name, required}) => {
+		validFields.forEach(({label, name, required}) => {
 			if (predefinedValuesMap.has(name)) {
 				const field = predefinedValuesMap.get(name);
 
@@ -270,6 +290,7 @@ export default function ActionBuilder({
 			) {
 				newPredefinedValues.push({
 					inputAsValue: false,
+					label,
 					name,
 					value: '',
 				});
@@ -309,6 +330,7 @@ export default function ActionBuilder({
 				) {
 					(parameters.predefinedValues as PredefinedValue[]).push({
 						inputAsValue: false,
+						label: field.label,
 						name: field.name,
 						value: '',
 					});
@@ -433,6 +455,7 @@ export default function ActionBuilder({
 					viewMode="inline"
 				>
 					<SingleSelect
+						disabled={isApproved}
 						error={errors.objectActionTriggerKey}
 						onChange={({value}) =>
 							setValues({
@@ -449,9 +472,15 @@ export default function ActionBuilder({
 				</Card>
 			</Card>
 
-			<Card title={Liferay.Language.get('condition')}>
+			<Card
+				disabled={values.objectActionTriggerKey === 'standalone'}
+				title={Liferay.Language.get('condition')}
+			>
 				<ClayForm.Group>
 					<ClayToggle
+						disabled={
+							values.objectActionTriggerKey === 'standalone'
+						}
 						label={Liferay.Language.get('enable-condition')}
 						name="condition"
 						onToggle={(enable) =>
@@ -494,6 +523,7 @@ export default function ActionBuilder({
 					/>
 				)}
 			</Card>
+
 			{warningAlerts.requiredFields && (
 				<ClayAlert
 					className="lfr-objects__side-panel-content-container"
@@ -730,12 +760,33 @@ export default function ActionBuilder({
 					/>
 				)}
 			</Card>
+
+			{Liferay.FeatureFlags['LPS-148804'] &&
+				values.objectActionTriggerKey === 'standalone' && (
+					<Card title={Liferay.Language.get('error-message')}>
+						<InputLocalized
+							error={errors.errorMessage}
+							label={Liferay.Language.get('message')}
+							name="label"
+							onChange={(value) =>
+								setValues({
+									errorMessage: value,
+								})
+							}
+							required
+							translations={
+								values.errorMessage ?? {[defaultLanguageId]: ''}
+							}
+						/>
+					</Card>
+				)}
 		</>
 	);
 }
 
 interface IProps {
 	errors: ActionError;
+	isApproved: boolean;
 	objectActionCodeEditorElements: SidebarCategory[];
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];

@@ -96,6 +96,39 @@ public class NotificationTemplate implements Serializable {
 	protected Map<String, Map<String, String>> actions;
 
 	@Schema
+	public String[] getAttachmentObjectFieldExternalReferenceCodes() {
+		return attachmentObjectFieldExternalReferenceCodes;
+	}
+
+	public void setAttachmentObjectFieldExternalReferenceCodes(
+		String[] attachmentObjectFieldExternalReferenceCodes) {
+
+		this.attachmentObjectFieldExternalReferenceCodes =
+			attachmentObjectFieldExternalReferenceCodes;
+	}
+
+	@JsonIgnore
+	public void setAttachmentObjectFieldExternalReferenceCodes(
+		UnsafeSupplier<String[], Exception>
+			attachmentObjectFieldExternalReferenceCodesUnsafeSupplier) {
+
+		try {
+			attachmentObjectFieldExternalReferenceCodes =
+				attachmentObjectFieldExternalReferenceCodesUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String[] attachmentObjectFieldExternalReferenceCodes;
+
+	@Schema
 	public Long[] getAttachmentObjectFieldIds() {
 		return attachmentObjectFieldIds;
 	}
@@ -277,6 +310,34 @@ public class NotificationTemplate implements Serializable {
 	protected EditorType editorType;
 
 	@Schema
+	public String getExternalReferenceCode() {
+		return externalReferenceCode;
+	}
+
+	public void setExternalReferenceCode(String externalReferenceCode) {
+		this.externalReferenceCode = externalReferenceCode;
+	}
+
+	@JsonIgnore
+	public void setExternalReferenceCode(
+		UnsafeSupplier<String, Exception> externalReferenceCodeUnsafeSupplier) {
+
+		try {
+			externalReferenceCode = externalReferenceCodeUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String externalReferenceCode;
+
+	@Schema
 	public Long getId() {
 		return id;
 	}
@@ -357,6 +418,39 @@ public class NotificationTemplate implements Serializable {
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Map<String, String> name_i18n;
+
+	@Schema
+	public String getObjectDefinitionExternalReferenceCode() {
+		return objectDefinitionExternalReferenceCode;
+	}
+
+	public void setObjectDefinitionExternalReferenceCode(
+		String objectDefinitionExternalReferenceCode) {
+
+		this.objectDefinitionExternalReferenceCode =
+			objectDefinitionExternalReferenceCode;
+	}
+
+	@JsonIgnore
+	public void setObjectDefinitionExternalReferenceCode(
+		UnsafeSupplier<String, Exception>
+			objectDefinitionExternalReferenceCodeUnsafeSupplier) {
+
+		try {
+			objectDefinitionExternalReferenceCode =
+				objectDefinitionExternalReferenceCodeUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String objectDefinitionExternalReferenceCode;
 
 	@Schema
 	public Long getObjectDefinitionId() {
@@ -567,6 +661,35 @@ public class NotificationTemplate implements Serializable {
 			sb.append(_toJSON(actions));
 		}
 
+		if (attachmentObjectFieldExternalReferenceCodes != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"attachmentObjectFieldExternalReferenceCodes\": ");
+
+			sb.append("[");
+
+			for (int i = 0;
+				 i < attachmentObjectFieldExternalReferenceCodes.length; i++) {
+
+				sb.append("\"");
+
+				sb.append(
+					_escape(attachmentObjectFieldExternalReferenceCodes[i]));
+
+				sb.append("\"");
+
+				if ((i + 1) <
+						attachmentObjectFieldExternalReferenceCodes.length) {
+
+					sb.append(", ");
+				}
+			}
+
+			sb.append("]");
+		}
+
 		if (attachmentObjectFieldIds != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -653,6 +776,20 @@ public class NotificationTemplate implements Serializable {
 			sb.append("\"");
 		}
 
+		if (externalReferenceCode != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"externalReferenceCode\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(externalReferenceCode));
+
+			sb.append("\"");
+		}
+
 		if (id != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -685,6 +822,20 @@ public class NotificationTemplate implements Serializable {
 			sb.append("\"name_i18n\": ");
 
 			sb.append(_toJSON(name_i18n));
+		}
+
+		if (objectDefinitionExternalReferenceCode != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"objectDefinitionExternalReferenceCode\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(objectDefinitionExternalReferenceCode));
+
+			sb.append("\"");
 		}
 
 		if (objectDefinitionId != null) {

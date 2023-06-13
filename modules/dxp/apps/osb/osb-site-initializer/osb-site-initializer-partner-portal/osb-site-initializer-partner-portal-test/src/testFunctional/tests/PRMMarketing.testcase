@@ -17,13 +17,32 @@ definition {
 			User.firstLoginPG();
 		}
 
+		task ("Add a new user") {
+			JSONUser.addUser(
+				userEmailAddress = "partner@liferay.com",
+				userFirstName = "partner",
+				userLastName = "partner",
+				userScreenName = "partner");
+
+			JSONUser.setFirstPassword(
+				agreeToTermsAndAnswerReminderQuery = "true",
+				requireReset = "false",
+				userEmailAddress = "partner@liferay.com");
+		}
+
 		task ("Create a new Partner Portal Site") {
 			PRMUtils.addPRMSite();
 		}
 
-		task ("Go to Marketing page on Partner Portal") {
-			PRMUtils.gotoPRM();
+		task ("Go to Partner Portal and login with the created user") {
+			User.logoutAndLoginPG(
+				userLoginEmailAddress = "partner@liferay.com",
+				userLoginFullName = "partner");
 
+			PRMUtils.gotoPRM();
+		}
+
+		task ("Go to 'Marketing' page") {
 			PRMNavigator.goToNavItem(navItem = "Marketing");
 		}
 	}
@@ -35,7 +54,7 @@ definition {
 			PortalInstances.tearDownCP();
 		}
 		else {
-			JSONGroup.deleteGroupByName(groupName = "${siteName}");
+			JSONGroup.deleteGroupByName(groupName = "Partner Portal");
 		}
 	}
 

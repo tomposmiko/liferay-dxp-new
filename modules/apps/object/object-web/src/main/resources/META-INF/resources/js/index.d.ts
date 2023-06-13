@@ -34,7 +34,9 @@ interface ObjectAction {
 	active: boolean;
 	conditionExpression?: string;
 	description?: string;
+	errorMessage: LocalizedValue<string>;
 	id?: number;
+	label: LocalizedValue<string>;
 	name: string;
 	objectActionExecutorKey: string;
 	objectActionTriggerKey: string;
@@ -218,6 +220,7 @@ type ObjectFieldSettingName =
 	| 'function'
 	| 'maxLength'
 	| 'maximumFileSize'
+	| 'objectDefinition1ShortName'
 	| 'objectFieldName'
 	| 'objectRelationshipName'
 	| 'output'
@@ -298,6 +301,7 @@ interface HTTPMethod {
 
 interface PredefinedValue {
 	inputAsValue: boolean;
+	label: LocalizedValue<string>;
 	name: string;
 	value: string;
 }

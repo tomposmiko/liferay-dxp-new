@@ -16,6 +16,16 @@ package com.liferay.analytics.settings.rest.internal.graphql.servlet.v1_0;
 
 import com.liferay.analytics.settings.rest.internal.graphql.mutation.v1_0.Mutation;
 import com.liferay.analytics.settings.rest.internal.graphql.query.v1_0.Query;
+import com.liferay.analytics.settings.rest.internal.resource.v1_0.ChannelResourceImpl;
+import com.liferay.analytics.settings.rest.internal.resource.v1_0.CommerceChannelResourceImpl;
+import com.liferay.analytics.settings.rest.internal.resource.v1_0.ContactAccountGroupResourceImpl;
+import com.liferay.analytics.settings.rest.internal.resource.v1_0.ContactConfigurationResourceImpl;
+import com.liferay.analytics.settings.rest.internal.resource.v1_0.ContactOrganizationResourceImpl;
+import com.liferay.analytics.settings.rest.internal.resource.v1_0.ContactUserGroupResourceImpl;
+import com.liferay.analytics.settings.rest.internal.resource.v1_0.DataSourceResourceImpl;
+import com.liferay.analytics.settings.rest.internal.resource.v1_0.FieldResourceImpl;
+import com.liferay.analytics.settings.rest.internal.resource.v1_0.FieldSummaryResourceImpl;
+import com.liferay.analytics.settings.rest.internal.resource.v1_0.SiteResourceImpl;
 import com.liferay.analytics.settings.rest.resource.v1_0.ChannelResource;
 import com.liferay.analytics.settings.rest.resource.v1_0.CommerceChannelResource;
 import com.liferay.analytics.settings.rest.resource.v1_0.ContactAccountGroupResource;
@@ -26,7 +36,11 @@ import com.liferay.analytics.settings.rest.resource.v1_0.DataSourceResource;
 import com.liferay.analytics.settings.rest.resource.v1_0.FieldResource;
 import com.liferay.analytics.settings.rest.resource.v1_0.FieldSummaryResource;
 import com.liferay.analytics.settings.rest.resource.v1_0.SiteResource;
+import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.vulcan.graphql.servlet.ServletData;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.Generated;
 
@@ -76,6 +90,10 @@ public class ServletDataImpl implements ServletData {
 			_siteResourceComponentServiceObjects);
 	}
 
+	public String getApplicationName() {
+		return "Liferay.Analytyics.Settings.REST";
+	}
+
 	@Override
 	public Mutation getMutation() {
 		return new Mutation();
@@ -90,6 +108,99 @@ public class ServletDataImpl implements ServletData {
 	public Query getQuery() {
 		return new Query();
 	}
+
+	public ObjectValuePair<Class<?>, String> getResourceMethodObjectValuePair(
+		String methodName, boolean mutation) {
+
+		if (mutation) {
+			return _resourceMethodObjectValuePairs.get(
+				"mutation#" + methodName);
+		}
+
+		return _resourceMethodObjectValuePairs.get("query#" + methodName);
+	}
+
+	private static final Map<String, ObjectValuePair<Class<?>, String>>
+		_resourceMethodObjectValuePairs =
+			new HashMap<String, ObjectValuePair<Class<?>, String>>() {
+				{
+					put(
+						"mutation#patchChannel",
+						new ObjectValuePair<>(
+							ChannelResourceImpl.class, "patchChannel"));
+					put(
+						"mutation#createChannel",
+						new ObjectValuePair<>(
+							ChannelResourceImpl.class, "postChannel"));
+					put(
+						"mutation#updateContactConfiguration",
+						new ObjectValuePair<>(
+							ContactConfigurationResourceImpl.class,
+							"putContactConfiguration"));
+					put(
+						"mutation#deleteDataSource",
+						new ObjectValuePair<>(
+							DataSourceResourceImpl.class, "deleteDataSource"));
+					put(
+						"mutation#createDataSource",
+						new ObjectValuePair<>(
+							DataSourceResourceImpl.class, "postDataSource"));
+					put(
+						"mutation#patchFieldAccount",
+						new ObjectValuePair<>(
+							FieldResourceImpl.class, "patchFieldAccount"));
+					put(
+						"mutation#patchFieldPeople",
+						new ObjectValuePair<>(
+							FieldResourceImpl.class, "patchFieldPeople"));
+
+					put(
+						"query#channels",
+						new ObjectValuePair<>(
+							ChannelResourceImpl.class, "getChannelsPage"));
+					put(
+						"query#commerceChannels",
+						new ObjectValuePair<>(
+							CommerceChannelResourceImpl.class,
+							"getCommerceChannelsPage"));
+					put(
+						"query#contactAccountGroups",
+						new ObjectValuePair<>(
+							ContactAccountGroupResourceImpl.class,
+							"getContactAccountGroupsPage"));
+					put(
+						"query#contactConfiguration",
+						new ObjectValuePair<>(
+							ContactConfigurationResourceImpl.class,
+							"getContactConfiguration"));
+					put(
+						"query#contactOrganizations",
+						new ObjectValuePair<>(
+							ContactOrganizationResourceImpl.class,
+							"getContactOrganizationsPage"));
+					put(
+						"query#contactUserGroups",
+						new ObjectValuePair<>(
+							ContactUserGroupResourceImpl.class,
+							"getContactUserGroupsPage"));
+					put(
+						"query#fieldsAccounts",
+						new ObjectValuePair<>(
+							FieldResourceImpl.class, "getFieldsAccountsPage"));
+					put(
+						"query#fieldsPeople",
+						new ObjectValuePair<>(
+							FieldResourceImpl.class, "getFieldsPeoplePage"));
+					put(
+						"query#field",
+						new ObjectValuePair<>(
+							FieldSummaryResourceImpl.class, "getField"));
+					put(
+						"query#sites",
+						new ObjectValuePair<>(
+							SiteResourceImpl.class, "getSitesPage"));
+				}
+			};
 
 	@Reference(scope = ReferenceScope.PROTOTYPE_REQUIRED)
 	private ComponentServiceObjects<ChannelResource>

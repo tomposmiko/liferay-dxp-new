@@ -32,6 +32,10 @@
 		border-right: none;
 	}
 
+	&.item-actions {
+		min-height: 58px;
+	}
+
 	&.item-actions,
 	&.item-selector {
 		width: 1%;
@@ -160,7 +164,8 @@
 	}
 
 	&.with-quick-actions {
-		.dnd-tr:hover:not(.nested):not(.selected) {
+		.dnd-tr:hover:not(.nested):not(.selected),
+		.dnd-tr.menu-active:not(.nested):not(.selected) {
 			.item-actions {
 				overflow: visible;
 				position: relative;

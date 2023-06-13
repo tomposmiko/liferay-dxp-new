@@ -31,11 +31,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>DISABLED_BUTTON_SPECIFIC</td>
-	<td>//button[normalize-space()='${key_text}' and @disabled]</td>
-	<td></td>
-</tr>
-<tr>
 	<td>ADD_ADDRESS</td>
 	<td>//a[contains(@class,'add-address')]</td>
 	<td></td>
@@ -138,6 +133,11 @@
 <tr>
 	<td>ANY_DISABLED</td>
 	<td>//button[@disabled][contains(@class,'btn')][normalize-space()='${key_text}'] | //button[@disabled][contains(@class,'btn')][@*='${key_text}'] | //button[@disabled][contains(@class,'btn') and contains(@aria-label,'${key_text}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>ANY_DISABLED_CLASS</td>
+	<td>//button[contains(@class,'disabled')][normalize-space()='${key_text}']</td>
 	<td></td>
 </tr>
 <tr>
@@ -277,7 +277,7 @@
 </tr>
 <tr>
 	<td>COLOR_SWATCH_ITEM</td>
-	<td>//div[contains(@class,'dropdown-menu') and contains(@class,'show')]//button[contains(@class,'color')][@*='${key_colorSwatchItem}']</td>
+	<td>//div[contains(@class,'dropdown-menu') and contains(@class,'show')]//button[contains(@class,'color')][@*='${key_colorSwatchItem}'] | //div[contains(@class,'dropdown-menu')]//button[@title='#${key_colorSwatchItem}']</td>
 	<td></td>
 </tr>
 <tr>

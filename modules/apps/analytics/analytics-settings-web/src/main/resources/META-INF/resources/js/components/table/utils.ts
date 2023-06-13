@@ -63,10 +63,15 @@ export function getResultsLanguage(rows: string[]) {
 }
 
 export function getGlobalChecked(formattedItems: TFormattedItems): boolean {
-	return (
-		!!Object.values(formattedItems).length &&
-		Object.values(formattedItems).every(({checked}) => checked)
+	const items = Object.values(formattedItems).filter(
+		({disabled}) => !disabled
 	);
+
+	if (!items.length) {
+		return false;
+	}
+
+	return items.every(({checked}) => checked);
 }
 
 export function updateFormattedItems(

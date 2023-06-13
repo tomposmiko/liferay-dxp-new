@@ -44,6 +44,7 @@ export default {
 	'assign-and-begin-analysis': 'Assign and Begin Analysis',
 	'assign-and-reanalyze': 'Assign and Reanalyze',
 	'assign-to-me': 'Assign to Me',
+	'assign-to-me-and-x': 'Assign to Me and {0}',
 	'assign-user-groups': 'Assign User Groups',
 	'assign-users': 'Assign Users',
 	'assigned': 'Assigned',
@@ -66,6 +67,7 @@ export default {
 	'available-teams': 'Available Teams',
 	'avatar': 'Avatar',
 	'back': 'Back',
+	'begin-analysis': 'Begin Analysis',
 	'blocked': 'Blocked',
 	'browser': 'Browser',
 	'build': 'Build',
@@ -260,6 +262,7 @@ export default {
 	'project-name': 'Project Name',
 	'projects': 'Projects',
 	'promote': 'Promote',
+	'reanalyze': 'Reanalyze',
 	'remaining-estimated': 'Remaining Estimated',
 	'remove': 'Remove',
 	'reopen-test': 'Reopen Test',
@@ -313,8 +316,12 @@ export default {
 	'subtask': 'Subtask',
 	'subtask-details': 'Subtask Details',
 	'subtask-name': 'Subtask Name',
-	'subtask-x-must-be-assigned-to-you-to-be-user-id-a-merge':
-		'Subtask {0} must be assigned to you to be used id a merge.',
+	'subtask-x-must-be-assigned-to-you-to-be-user-in-a-merge':
+		'Subtask {0} must be assigned to you to be used in a merge.',
+	'subtask-x-must-be-assigned-to-you-to-be-user-in-a-split':
+		'Subtask {0} must be assigned to you to be used in a split.',
+	'subtask-x-must-be-in-analysis-to-be-used-in-a-split':
+		'Subtask {0} must be in analysis to be used in a split.',
 	'subtasks': 'Subtasks',
 	'suite': 'Suite',
 	'suite-name': 'Suite Name',
@@ -392,6 +399,8 @@ export default {
 	'x-minutes': '{0} Minutes',
 	'x-results-for-x': '{0} Results for {1}',
 	'you-are-not-the-assigned-user': 'You are not the assigned user.',
+	'you-cannot-split-all-case-results-from-a-subtask':
+		'You cannot split all case results from a subtask.',
 	'you-do-not-have-permissions-to-access-this-app-contact-the-app-administrator-to-request-the-access':
 		'You do not have permissions to access this app. Contact the app administrator to request the access.',
 	'you-must-have-at-least-one-column-selected':

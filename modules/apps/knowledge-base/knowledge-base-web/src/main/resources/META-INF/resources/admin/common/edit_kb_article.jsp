@@ -129,20 +129,18 @@ if (editKBArticleDisplayContext.isPortletTitleBasedNavigation()) {
 						</aui:fieldset>
 					</c:if>
 
-					<c:if test='<%= GetterUtil.getBoolean(com.liferay.portal.kernel.util.PropsUtil.get("feature.flag.LPS-125653")) %>'>
-						<liferay-frontend:fieldset
-							collapsed="<%= true %>"
-							collapsible="<%= true %>"
-							label="display-page"
-						>
-							<liferay-asset:select-asset-display-page
-								classNameId="<%= PortalUtil.getClassNameId(KBArticle.class) %>"
-								classPK="<%= editKBArticleDisplayContext.getKBArticleId() %>"
-								groupId="<%= scopeGroupId %>"
-								showViewInContextLink="<%= true %>"
-							/>
-						</liferay-frontend:fieldset>
-					</c:if>
+					<liferay-frontend:fieldset
+						collapsed="<%= true %>"
+						collapsible="<%= true %>"
+						label="display-page"
+					>
+						<liferay-asset:select-asset-display-page
+							classNameId="<%= PortalUtil.getClassNameId(KBArticle.class) %>"
+							classPK="<%= editKBArticleDisplayContext.getKBArticleId() %>"
+							groupId="<%= scopeGroupId %>"
+							showViewInContextLink="<%= true %>"
+						/>
+					</liferay-frontend:fieldset>
 
 					<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="categorization">
 						<liferay-asset:asset-categories-selector
@@ -299,34 +297,36 @@ if (editKBArticleDisplayContext.isPortletTitleBasedNavigation()) {
 
 				<aui:model-context bean="<%= editKBArticleDisplayContext.getKBArticle() %>" model="<%= KBArticle.class %>" />
 
-				<aui:fieldset-group markupView="lexicon">
-					<aui:fieldset>
-						<div class="kb-entity-body">
-							<liferay-editor:editor
-								contents="<%= editKBArticleDisplayContext.getContent() %>"
-								editorName="<%= kbGroupServiceConfiguration.getEditorName() %>"
-								fileBrowserParams='<%=
-									HashMapBuilder.put(
-										"resourcePrimKey", String.valueOf(editKBArticleDisplayContext.getResourcePrimKey())
-									).build()
-								%>'
-								name="contentEditor"
-								placeholder="content"
-								required="<%= true %>"
-							>
-								<aui:validator errorMessage='<%= LanguageUtil.format(resourceBundle, "the-x-field-is-required", "content", true) %>' name="required" />
-							</liferay-editor:editor>
+				<div class="sheet">
+					<div class="panel-group panel-group-flush">
+						<aui:fieldset>
+							<div class="kb-entity-body">
+								<liferay-editor:editor
+									contents="<%= editKBArticleDisplayContext.getContent() %>"
+									editorName="<%= kbGroupServiceConfiguration.getEditorName() %>"
+									fileBrowserParams='<%=
+										HashMapBuilder.put(
+											"resourcePrimKey", String.valueOf(editKBArticleDisplayContext.getResourcePrimKey())
+										).build()
+									%>'
+									name="contentEditor"
+									placeholder="content"
+									required="<%= true %>"
+								>
+									<aui:validator errorMessage='<%= LanguageUtil.format(resourceBundle, "the-x-field-is-required", "content", true) %>' name="required" />
+								</liferay-editor:editor>
 
-							<aui:input name="content" type="hidden" />
-						</div>
-					</aui:fieldset>
+								<aui:input name="content" type="hidden" />
+							</div>
+						</aui:fieldset>
 
-					<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="attachments">
-						<div id="<portlet:namespace />attachments">
-							<liferay-util:include page="/admin/common/attachments.jsp" servletContext="<%= application %>" />
-						</div>
-					</aui:fieldset>
-				</aui:fieldset-group>
+						<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="attachments">
+							<div id="<portlet:namespace />attachments">
+								<liferay-util:include page="/admin/common/attachments.jsp" servletContext="<%= application %>" />
+							</div>
+						</aui:fieldset>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
