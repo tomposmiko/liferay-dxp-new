@@ -152,8 +152,11 @@ const ListViewRest: React.FC<ListViewProps> = ({
 	);
 
 	const onSelectRow = useCallback(
-		(row: any) => {
-			dispatch({payload: row?.id, type: ListViewTypes.SET_CHECKED_ROW});
+		(rowId: number | number[]) => {
+			dispatch({
+				payload: rowId,
+				type: ListViewTypes.SET_CHECKED_ROW,
+			});
 		},
 		[dispatch]
 	);
@@ -168,15 +171,27 @@ const ListViewRest: React.FC<ListViewProps> = ({
 		[dispatch]
 	);
 
+	const contextString = JSON.stringify(listViewContext);
+
 	const onSelectAllRows = useCallback(() => {
-		items.forEach(onSelectRow);
+		onSelectRow(items.map(({id}) => id));
 	}, [items, onSelectRow]);
 
 	useEffect(() => {
 		if (onContextChange) {
-			onContextChange(listViewContext);
+			onContextChange(JSON.parse(contextString));
 		}
-	}, [listViewContext, onContextChange]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [contextString]);
+
+	useEffect(() => {
+		if (tableProps.rowSelectable) {
+			dispatch({
+				payload: items.every(({id}) => selectedRows.includes(id)),
+				type: ListViewTypes.SET_CHECKED_ALL_ROWS,
+			});
+		}
+	}, [items, tableProps, selectedRows, dispatch]);
 
 	if (error) {
 		return <span>{error.message}</span>;
@@ -221,16 +236,17 @@ const ListViewRest: React.FC<ListViewProps> = ({
 
 			{!items.length && <EmptyState />}
 
+			{children && children(response as APIResponse, mutate)}
+
 			{!!items.length && (
 				<>
-					{children && children(response as APIResponse, mutate)}
-
 					{pagination?.displayTop && (
 						<div className="mt-4">{Pagination}</div>
 					)}
 
 					<Table
 						{...tableProps}
+						allRowsChecked={listViewContext.checkAll}
 						columns={columns}
 						items={items}
 						mutate={mutate}

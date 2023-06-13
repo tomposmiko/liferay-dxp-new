@@ -679,13 +679,11 @@ public class CommerceOrderItemLocalServiceUtil {
 
 	public static CommerceOrderItem updateCommerceOrderItem(
 			long commerceOrderItemId, long cpMeasurementUnitId, int quantity,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext,
-			boolean validateOrder)
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().updateCommerceOrderItem(
-			commerceOrderItemId, cpMeasurementUnitId, quantity, serviceContext,
-			validateOrder);
+			commerceOrderItemId, cpMeasurementUnitId, quantity, serviceContext);
 	}
 
 	public static CommerceOrderItem updateCommerceOrderItem(
@@ -701,12 +699,11 @@ public class CommerceOrderItemLocalServiceUtil {
 
 	public static CommerceOrderItem updateCommerceOrderItem(
 			long commerceOrderItemId, String json, int quantity,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext,
-			boolean validateOrder)
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		return getService().updateCommerceOrderItem(
-			commerceOrderItemId, json, quantity, serviceContext, validateOrder);
+			commerceOrderItemId, json, quantity, serviceContext);
 	}
 
 	public static CommerceOrderItem updateCommerceOrderItemDeliveryDate(

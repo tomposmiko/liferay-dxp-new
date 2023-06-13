@@ -12,12 +12,28 @@
  * details.
  */
 
+import {TreeView as ClayTreeView} from '@clayui/core';
 import ClayEmptyState from '@clayui/empty-state';
+import ClayLink from '@clayui/link';
 import PropTypes from 'prop-types';
 import React from 'react';
 
 export default function TemplatesPanel({items}) {
-	return items?.length ? null : (
+	return items?.length ? (
+		<ClayTreeView defaultItems={items} nestedKey="children">
+			{(item) => {
+				return (
+					<ClayTreeView.Item className="pl-1">
+						<ClayTreeView.ItemStack>
+							<ClayLink displayType="secondary" href={item.href}>
+								{item.name}
+							</ClayLink>
+						</ClayTreeView.ItemStack>
+					</ClayTreeView.Item>
+				);
+			}}
+		</ClayTreeView>
+	) : (
 		<ClayEmptyState
 			description=""
 			imgSrc={`${themeDisplay.getPathThemeImages()}/states/empty_state.gif`}
@@ -28,5 +44,10 @@ export default function TemplatesPanel({items}) {
 }
 
 TemplatesPanel.propTypes = {
-	items: PropTypes.array,
+	items: PropTypes.arrayOf(
+		PropTypes.shape({
+			href: PropTypes.string.isRequired,
+			name: PropTypes.string.isRequired,
+		})
+	),
 };

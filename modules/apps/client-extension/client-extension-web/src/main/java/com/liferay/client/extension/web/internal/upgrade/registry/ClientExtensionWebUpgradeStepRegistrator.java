@@ -31,8 +31,10 @@ public class ClientExtensionWebUpgradeStepRegistrator
 
 	@Override
 	public void register(Registry registry) {
+		registry.registerInitialization();
+
 		registry.register(
-			"0.0.0", "1.0.0",
+			"0.0.1", "1.0.0",
 			new com.liferay.client.extension.web.internal.upgrade.v1_0_0.
 				UpgradePortletId());
 

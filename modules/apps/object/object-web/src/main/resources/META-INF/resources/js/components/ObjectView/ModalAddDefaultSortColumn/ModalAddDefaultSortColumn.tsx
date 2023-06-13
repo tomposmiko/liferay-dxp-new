@@ -18,7 +18,8 @@ import ClayModal from '@clayui/modal';
 import {Observer} from '@clayui/modal/lib/types';
 import {
 	AutoComplete,
-	FormCustomSelect,
+	SingleSelect,
+	stringIncludesQuery,
 } from '@liferay/object-js-components-web';
 import React, {FormEvent, useEffect, useMemo, useState} from 'react';
 
@@ -86,9 +87,9 @@ export function ModalAddDefaultSortColumn({
 	const [query, setQuery] = useState<string>('');
 
 	const filteredObjectSortColumn = useMemo(() => {
-		return availableViewColumns.filter(({fieldLabel}) => {
-			return fieldLabel?.toLowerCase().includes(query.toLowerCase());
-		});
+		return availableViewColumns.filter(({fieldLabel}) =>
+			stringIncludesQuery(fieldLabel as string, query)
+		);
 	}, [availableViewColumns, query]);
 
 	const onSubmit = (event: FormEvent) => {
@@ -153,7 +154,7 @@ export function ModalAddDefaultSortColumn({
 						</AutoComplete>
 					)}
 
-					<FormCustomSelect
+					<SingleSelect
 						label={Liferay.Language.get('sorting')}
 						onChange={(item: TSortOptions) => {
 							setSelectedObjetSort(item);

@@ -19,15 +19,18 @@ import Modal from '../../../components/Modal';
 import {withVisibleContent} from '../../../hoc/withVisibleContent';
 import {FormModalOptions} from '../../../hooks/useFormModal';
 import i18n from '../../../i18n';
+import {TestrayRequirementCase} from '../../../services/rest';
 import {RequirementListView} from '../Requirements';
 
 type CaseRequirementLinkModalProps = {
+	items: TestrayRequirementCase[];
 	modal: FormModalOptions;
 };
 
 export type State = {caseId?: number; requirementId?: number}[];
 
 const CaseRequirementLinkModal: React.FC<CaseRequirementLinkModalProps> = ({
+	items,
 	modal: {observer, onClose, onSave, visible},
 }) => {
 	const [state, setState] = useState<State>([]);
@@ -38,7 +41,7 @@ const CaseRequirementLinkModal: React.FC<CaseRequirementLinkModalProps> = ({
 				<Form.Footer
 					isModal
 					onClose={onClose}
-					onSubmit={() => onSave(state)}
+					onSubmit={() => onSave({items, state})}
 					primaryButtonTitle={i18n.translate('select-requirements')}
 				/>
 			}
@@ -49,15 +52,21 @@ const CaseRequirementLinkModal: React.FC<CaseRequirementLinkModalProps> = ({
 		>
 			<RequirementListView
 				listViewProps={{
+					initialContext: {
+						selectedRows: items.map(
+							({requirement}) => requirement?.id
+						),
+					},
 					managementToolbarProps: {
 						title: i18n.translate('requirements'),
 					},
-					onContextChange: ({selectedRows}) =>
+					onContextChange: ({selectedRows}) => {
 						setState(
 							selectedRows.map((requirementId) => ({
 								requirementId,
 							}))
-						),
+						);
+					},
 				}}
 				tableProps={{navigateTo: undefined, rowSelectable: true}}
 			/>

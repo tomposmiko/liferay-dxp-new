@@ -32,6 +32,9 @@ import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -96,6 +99,11 @@ public class JournalArticleContentDashboardItem
 		}
 
 		_portal = portal;
+	}
+
+	@Override
+	public List<Version> getAllVersions(ThemeDisplay themeDisplay) {
+		return Collections.emptyList();
 	}
 
 	@Override
@@ -271,13 +279,29 @@ public class JournalArticleContentDashboardItem
 	}
 
 	@Override
+	public List<Version> getLatestVersions(Locale locale) {
+		return Stream.of(
+			_toVersionOptional(_journalArticle, locale),
+			_toVersionOptional(_latestApprovedJournalArticle, locale)
+		).filter(
+			Optional::isPresent
+		).map(
+			Optional::get
+		).sorted(
+			Comparator.comparing(Version::getVersion)
+		).collect(
+			Collectors.toList()
+		);
+	}
+
+	@Override
 	public Date getModifiedDate() {
 		return _journalArticle.getModifiedDate();
 	}
 
 	@Override
 	public Preview getPreview() {
-		return Preview.EMPTY;
+		return new Preview(_getPreviewImageURL(), null);
 	}
 
 	@Override
@@ -334,22 +358,6 @@ public class JournalArticleContentDashboardItem
 	}
 
 	@Override
-	public List<Version> getVersions(Locale locale) {
-		return Stream.of(
-			_toVersionOptional(_journalArticle, locale),
-			_toVersionOptional(_latestApprovedJournalArticle, locale)
-		).filter(
-			Optional::isPresent
-		).map(
-			Optional::get
-		).sorted(
-			Comparator.comparing(Version::getVersion)
-		).collect(
-			Collectors.toList()
-		);
-	}
-
-	@Override
 	public boolean isViewable(HttpServletRequest httpServletRequest) {
 		if (!_journalArticle.hasApprovedVersion()) {
 			return false;
@@ -372,9 +380,36 @@ public class JournalArticleContentDashboardItem
 	}
 
 	private Version _getLastVersion(Locale locale) {
-		List<Version> versions = getVersions(locale);
+		List<Version> versions = getLatestVersions(locale);
 
 		return versions.get(versions.size() - 1);
+	}
+
+	private String _getPreviewImageURL() {
+		return Optional.ofNullable(
+			ServiceContextThreadLocal.getServiceContext()
+		).map(
+			ServiceContext::getLiferayPortletRequest
+		).map(
+			portletRequest -> {
+				List<ContentDashboardItemAction> contentDashboardItemActions =
+					getContentDashboardItemActions(
+						_portal.getHttpServletRequest(portletRequest),
+						ContentDashboardItemAction.Type.PREVIEW_IMAGE);
+
+				Stream<ContentDashboardItemAction> stream =
+					contentDashboardItemActions.stream();
+
+				return stream.findAny(
+				).map(
+					ContentDashboardItemAction::getURL
+				).orElse(
+					null
+				);
+			}
+		).orElse(
+			null
+		);
 	}
 
 	private ContentDashboardItemAction _toContentDashboardItemAction(
@@ -407,7 +442,9 @@ public class JournalArticleContentDashboardItem
 					WorkflowConstants.getStatusLabel(
 						curJournalArticle.getStatus())),
 				WorkflowConstants.getStatusStyle(curJournalArticle.getStatus()),
-				String.valueOf(curJournalArticle.getVersion()))
+				String.valueOf(curJournalArticle.getVersion()), null,
+				curJournalArticle.getUserName(),
+				curJournalArticle.getCreateDate())
 		);
 	}
 

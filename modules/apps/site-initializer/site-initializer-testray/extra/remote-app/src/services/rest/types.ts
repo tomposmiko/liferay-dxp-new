@@ -106,6 +106,7 @@ export type TestrayCaseResult = {
 	errors: string;
 	id: number;
 	issue: string;
+	key: string;
 	r_buildToCaseResult_c_build?: TestrayBuild;
 	r_caseToCaseResult_c_case?: TestrayCase;
 	r_componentToCaseResult_c_component?: TestrayComponent;
@@ -209,6 +210,9 @@ export type TestraySuite = {
 export type TestraySuiteCase = {
 	case: TestrayCase;
 	id: number;
+	r_caseToSuitesCases_c_case: TestrayCase;
+	r_caseToSuitesCases_c_caseId: number;
+	r_caseToSuitesCases_c_suite: TestraySuite;
 	suite: TestraySuite;
 };
 

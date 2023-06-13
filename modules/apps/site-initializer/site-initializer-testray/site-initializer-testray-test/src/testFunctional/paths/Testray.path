@@ -12,7 +12,7 @@
 <tbody>
 <tr>
 	<td>ITEMS_PER_PAGE_BUTTON</td>
-	<td>xpath=(//div[contains(@class, 'pagination')]//button[contains(@class, 'dropdown') and contains(.,'')])[3]</td>
+	<td>//h5[contains(., '')]//ancestor::div//div[contains(@class, 'pagination')]//button[contains(@class, 'dropdown') and contains(.,'${key_numberItems}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -21,8 +21,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>ITEMS_PER_PAGE_BUTTON_ON_MODAL</td>
-	<td>xpath=(//div[contains(@class, 'pagination')]//button[contains(@class, 'dropdown') and contains(.,'')])[1]</td>
+	<td>ITEMS_PER_PAGE_BUTTON_MODAL</td>
+	<td>//div[contains(@class, 'modal-title') and contains(., '')]//ancestor::div//div[contains(@class, 'pagination')]//button[contains(@class, 'dropdown') and contains(.,'${key_numberItems}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -51,8 +51,13 @@
 	<td></td>
 </tr>
 <tr>
+	<td>NUMBER_PAGE_BUTTON_MODAL</td>
+	<td>//div[contains(@class, 'modal-content')]//li[contains(@class, 'page-item') and contains(., '${key_pageDirection}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>PROJECT_NAME</td>
-	<td>//section[contains(@class, 'testray-content')]//td[text()='${key_projectName}']</td>
+	<td>//td[contains(@class,'text') and contains(.,'${key_projectName}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -118,11 +123,6 @@
 <tr>
 	<td>ELEMENT_REMOTE</td>
 	<td>//div[(@class='dnd-tbody')]//div[contains(@class, 'dnd-td')and contains(., '${key_value}')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>NUMBER_MODAL_BUTTON</td>
-	<td>//div[contains(@class, 'modal-content')]//li[contains(@class, 'page-item') and contains(., '${key_pageDirection}')]</td>
 	<td></td>
 </tr>
 <tr>

@@ -12,16 +12,18 @@
  * details.
  */
 
+import ClayAlert from '@clayui/alert';
 import ClayForm, {ClayToggle} from '@clayui/form';
 import {
 	API,
 	AutoComplete,
-	FormCustomSelect,
 	FormError,
 	Input,
 	Select,
+	SingleSelect,
 	Toggle,
 	invalidateRequired,
+	stringIncludesQuery,
 	useForm,
 } from '@liferay/object-js-components-web';
 import {sub} from 'frontend-js-web';
@@ -107,8 +109,33 @@ export default function ObjectFieldFormBase({
 		return businessTypeMap;
 	}, [objectFieldTypes]);
 
+	const [picklistDefaultValue, setPicklistDefaultValue] = useState<
+		ObjectState
+	>();
+	const [picklistDefaultValueQuery, setPicklistDefaultValueQuery] = useState<
+		string
+	>('');
 	const [pickLists, setPickLists] = useState<PickList[]>([]);
 	const [pickListItems, setPickListItems] = useState<PickListItem[]>([]);
+
+	useEffect(() => {
+		const {businessType, defaultValue, objectFieldSettings} = values;
+
+		if (businessType === 'Picklist' && objectFieldSettings?.length) {
+			const [{value}] = objectFieldSettings;
+			const {objectStates} = value as ObjectFieldPicklistSetting;
+			const defaultPicklistValue = objectStates.find(
+				({key}) => key === defaultValue
+			);
+
+			if (!defaultPicklistValue && defaultValue) {
+				setValues({defaultValue: undefined});
+			}
+
+			setPicklistDefaultValue(defaultPicklistValue);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [values.defaultValue]);
 
 	const picklistBusinessType = values.businessType === 'Picklist';
 	const validListTypeDefinitionId =
@@ -128,6 +155,14 @@ export default function ObjectFieldFormBase({
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [values.businessType, values.listTypeDefinitionId]);
+
+	const filteredPicklistItens = useMemo(() => {
+		return pickListItems.filter(({name}) => {
+			return name
+				.toLowerCase()
+				.includes(picklistDefaultValueQuery.toLocaleLowerCase());
+		});
+	}, [picklistDefaultValueQuery, pickListItems]);
 
 	const selectedPicklist = useMemo(() => {
 		return pickLists.find(({id}) => values.listTypeDefinitionId === id);
@@ -178,28 +213,16 @@ export default function ObjectFieldFormBase({
 				? values.indexedLanguageId ?? defaultLanguageId
 				: null;
 
-		if (Liferay.FeatureFlags['LPS-152677']) {
-			setValues({
-				DBType: option.dbType,
-				businessType: option.businessType,
-				defaultValue: '',
-				indexedAsKeyword,
-				indexedLanguageId,
-				listTypeDefinitionId: 0,
-				objectFieldSettings,
-				state: false,
-			});
-		}
-		else {
-			setValues({
-				DBType: option.dbType,
-				businessType: option.businessType,
-				indexedAsKeyword,
-				indexedLanguageId,
-				listTypeDefinitionId: 0,
-				objectFieldSettings,
-			});
-		}
+		setValues({
+			DBType: option.dbType,
+			businessType: option.businessType,
+			defaultValue: '',
+			indexedAsKeyword,
+			indexedLanguageId,
+			listTypeDefinitionId: 0,
+			objectFieldSettings,
+			state: false,
+		});
 	};
 
 	return (
@@ -217,7 +240,7 @@ export default function ObjectFieldFormBase({
 				}
 			/>
 
-			<FormCustomSelect<ObjectFieldType>
+			<SingleSelect<ObjectFieldType>
 				disabled={disabled}
 				error={errors.businessType}
 				label={Liferay.Language.get('type')}
@@ -259,22 +282,13 @@ export default function ObjectFieldFormBase({
 					error={errors.listTypeDefinitionId}
 					label={Liferay.Language.get('picklist')}
 					onChange={({target: {value}}) => {
-						if (Liferay.FeatureFlags['LPS-152677']) {
-							setValues({
-								defaultValue: '',
-								listTypeDefinitionId: Number(
-									pickLists[Number(value)].id
-								),
-								state: false,
-							});
-						}
-						else {
-							setValues({
-								listTypeDefinitionId: Number(
-									pickLists[Number(value)].id
-								),
-							});
-						}
+						setValues({
+							defaultValue: '',
+							listTypeDefinitionId: Number(
+								pickLists[Number(value)].id
+							),
+							state: false,
+						});
 					}}
 					options={pickLists.map(({name}) => name)}
 					required
@@ -299,57 +313,71 @@ export default function ObjectFieldFormBase({
 					/>
 				)}
 
-				{Liferay.FeatureFlags['LPS-152677'] &&
-					picklistBusinessType &&
-					validListTypeDefinitionId && (
-						<ClayToggle
-							disabled={disabled}
-							label={Liferay.Language.get('mark-as-state')}
-							name="state"
-							onToggle={async (state) => {
-								if (state) {
-									setValues({required: state, state});
-									setPickListItems(
-										await API.getPickListItems(
-											values.listTypeDefinitionId!
-										)
-									);
-								}
-								else {
-									setValues({
-										defaultValue: '',
-										required: state,
-										state,
-									});
-								}
-							}}
-							toggled={values.state}
-						/>
-					)}
+				{picklistBusinessType && validListTypeDefinitionId && (
+					<ClayToggle
+						disabled={disabled}
+						label={Liferay.Language.get('mark-as-state')}
+						name="state"
+						onToggle={async (state) => {
+							if (state) {
+								setValues({required: state, state});
+								setPickListItems(
+									await API.getPickListItems(
+										values.listTypeDefinitionId!
+									)
+								);
+							}
+							else {
+								setValues({
+									defaultValue: '',
+									required: state,
+									state,
+								});
+							}
+						}}
+						toggled={values.state}
+					/>
+				)}
 			</ClayForm.Group>
 
 			{values.state && (
-				<Select
-					disabled={disabled}
+				<AutoComplete
+					emptyStateMessage={Liferay.Language.get('option-not-found')}
 					error={errors.defaultValue}
+					items={filteredPicklistItens}
 					label={Liferay.Language.get('default-value')}
-					onChange={({target: {value}}) =>
+					onChangeQuery={setPicklistDefaultValueQuery}
+					onSelectItem={(item) => {
 						setValues({
-							defaultValue: pickListItems[Number(value)].key,
-						})
-					}
-					options={pickListItems.map(({name}) => name)}
+							defaultValue: item.key,
+						});
+					}}
+					placeholder={Liferay.Language.get('choose-an-option')}
+					query={picklistDefaultValueQuery}
 					required
-					value={
-						values.defaultValue &&
-						pickListItems.indexOf(
-							pickListItems.find(
-								({key}) => values.defaultValue === key
-							)!
-						)
-					}
-				/>
+					value={values.defaultValue}
+				>
+					{({name}) => (
+						<div className="d-flex justify-content-between">
+							<div>{name}</div>
+						</div>
+					)}
+				</AutoComplete>
 			)}
+
+			{values.businessType === 'Picklist' &&
+				values.state &&
+				!picklistDefaultValue && (
+					<div className="c-mt-1">
+						<ClayAlert
+							displayType="danger"
+							title={Liferay.Language.get(
+								'missing-picklist-default-value'
+							)}
+							variant="feedback"
+						/>
+					</div>
+				)}
 		</>
 	);
 }
@@ -505,11 +533,7 @@ export function useObjectFieldForm({
 				errors.listTypeDefinitionId = REQUIRED_MSG;
 			}
 
-			if (
-				Liferay.FeatureFlags['LPS-152677'] &&
-				field.state &&
-				!field.defaultValue
-			) {
+			if (field.state && !field.defaultValue) {
 				errors.defaultValue = REQUIRED_MSG;
 			}
 		}
@@ -539,7 +563,10 @@ function AggregationSourceProperty({
 	objectFieldSettings = [],
 	setValues,
 }: IAggregationSourcePropertyProps) {
-	const [query, setQuery] = useState<string>('');
+	const [relationshipsQuery, setRelationshipsQuery] = useState<string>('');
+	const [relationshipFieldsQuery, setRelationshipFieldsQuery] = useState<
+		string
+	>('');
 	const [
 		selectedRelatedObjectRelationship,
 		setSelectRelatedObjectRelationship,
@@ -557,6 +584,24 @@ function AggregationSourceProperty({
 	const [objectRelationshipFields, setObjectRelationshipFields] = useState<
 		ObjectField[]
 	>();
+
+	const filteredObjectRelationships = useMemo(() => {
+		return objectRelationships?.filter(({label}) =>
+			stringIncludesQuery(
+				label[defaultLanguageId] as string,
+				relationshipsQuery
+			)
+		);
+	}, [objectRelationships, relationshipsQuery]);
+
+	const filteredObjectRelationshipFields = useMemo(() => {
+		return objectRelationshipFields?.filter(({label}) =>
+			stringIncludesQuery(
+				label[defaultLanguageId] as string,
+				relationshipFieldsQuery
+			)
+		);
+	}, [objectRelationshipFields, relationshipFieldsQuery]);
 
 	useEffect(() => {
 		const makeFetch = async () => {
@@ -769,13 +814,13 @@ function AggregationSourceProperty({
 					'no-relationships-were-found'
 				)}
 				error={errors.objectRelationshipName}
-				items={objectRelationships ?? []}
+				items={filteredObjectRelationships ?? []}
 				label={Liferay.Language.get('relationship')}
-				onChangeQuery={setQuery}
+				onChangeQuery={setRelationshipsQuery}
 				onSelectItem={(item: TObjectRelationship) => {
 					handleChangeRelatedObjectRelationship(item);
 				}}
-				query={query}
+				query={relationshipsQuery}
 				required
 				value={
 					selectedRelatedObjectRelationship?.label[defaultLanguageId]
@@ -788,7 +833,7 @@ function AggregationSourceProperty({
 				)}
 			</AutoComplete>
 
-			<FormCustomSelect
+			<SingleSelect
 				disabled={disabled}
 				error={errors.function}
 				label={Liferay.Language.get('function')}
@@ -804,13 +849,13 @@ function AggregationSourceProperty({
 						'no-fields-were-found'
 					)}
 					error={errors.objectFieldName}
-					items={objectRelationshipFields ?? []}
+					items={filteredObjectRelationshipFields ?? []}
 					label={Liferay.Language.get('field')}
-					onChangeQuery={setQuery}
+					onChangeQuery={setRelationshipFieldsQuery}
 					onSelectItem={(item: ObjectField) => {
 						handleSummarizeFieldChange(item);
 					}}
-					query={query}
+					query={relationshipFieldsQuery}
 					required
 					value={selectedSummarizeField}
 				>
@@ -884,7 +929,7 @@ function AttachmentSourceProperty({
 
 	return (
 		<>
-			<FormCustomSelect
+			<SingleSelect
 				disabled={disabled}
 				error={error}
 				label={Liferay.Language.get('request-files')}
