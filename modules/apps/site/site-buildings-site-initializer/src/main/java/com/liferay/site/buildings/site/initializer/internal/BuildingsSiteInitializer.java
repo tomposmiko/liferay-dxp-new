@@ -56,6 +56,7 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -145,10 +146,10 @@ public class BuildingsSiteInitializer implements SiteInitializer {
 
 			_updateLookAndFeel();
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new InitializationException(e);
+			throw new InitializationException(exception);
 		}
 	}
 
@@ -268,7 +269,7 @@ public class BuildingsSiteInitializer implements SiteInitializer {
 				StringPool.BLANK, editableValues, StringPool.BLANK, 0,
 				fragmentEntryKey, _serviceContext);
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 		}
 
 		return null;
@@ -365,9 +366,9 @@ public class BuildingsSiteInitializer implements SiteInitializer {
 			long parentLayoutId, String name, String type, String dataPath)
 		throws Exception {
 
-		Map<Locale, String> nameMap = new HashMap<>();
-
-		nameMap.put(LocaleUtil.getSiteDefault(), name);
+		Map<Locale, String> nameMap = HashMapBuilder.put(
+			LocaleUtil.getSiteDefault(), name
+		).build();
 
 		Layout layout = _layoutLocalService.addLayout(
 			_serviceContext.getUserId(), _serviceContext.getScopeGroupId(),

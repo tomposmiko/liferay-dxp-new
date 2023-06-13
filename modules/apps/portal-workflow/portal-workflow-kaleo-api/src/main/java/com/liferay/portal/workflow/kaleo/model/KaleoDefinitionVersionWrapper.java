@@ -577,11 +577,6 @@ public class KaleoDefinitionVersionWrapper
 		return model.isScheduled();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a kaleo definition version model instance should use the <code>KaleoDefinitionVersion</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

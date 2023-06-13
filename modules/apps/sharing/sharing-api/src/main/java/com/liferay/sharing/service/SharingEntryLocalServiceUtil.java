@@ -32,7 +32,7 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class SharingEntryLocalServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.sharing.service.impl.SharingEntryLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
@@ -740,9 +740,8 @@ public class SharingEntryLocalServiceUtil {
 	 {@code SharingEntryAction#VIEW}, or contain a {@code null}
 	 value), or if the expiration date is a past value
 	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 SharingEntryLocalService#
-	 updateSharingEntry(long, long, Collection, boolean, Date,
-	 ServiceContext)}
+	 SharingEntryLocalService#updateSharingEntry(
+	 long, long, Collection, boolean, Date, ServiceContext)}
 	 * @review
 	 */
 	@Deprecated

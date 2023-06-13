@@ -153,6 +153,19 @@ public class UserPermissionImpl
 						return true;
 					}
 
+					// Organization administrators and those with "Manage
+					// Users" permission can only manage normal users
+
+					if (!UserGroupRoleLocalServiceUtil.hasUserGroupRole(
+							user.getUserId(), organization.getGroupId(),
+							RoleConstants.ORGANIZATION_ADMINISTRATOR, true) &&
+						!UserGroupRoleLocalServiceUtil.hasUserGroupRole(
+							user.getUserId(), organization.getGroupId(),
+							RoleConstants.ORGANIZATION_OWNER, true)) {
+
+						return true;
+					}
+
 					Organization curOrganization = organization;
 
 					while (curOrganization != null) {
@@ -167,33 +180,14 @@ public class UserPermissionImpl
 							return true;
 						}
 
-						// Organization administrators can only manage normal
-						// users
-
-						if (UserGroupRoleLocalServiceUtil.hasUserGroupRole(
-								permissionChecker.getUserId(),
-								curOrganization.getGroupId(),
-								RoleConstants.ORGANIZATION_ADMINISTRATOR,
-								true) &&
-							!UserGroupRoleLocalServiceUtil.hasUserGroupRole(
-								user.getUserId(), organization.getGroupId(),
-								RoleConstants.ORGANIZATION_ADMINISTRATOR,
-								true) &&
-							!UserGroupRoleLocalServiceUtil.hasUserGroupRole(
-								user.getUserId(), organization.getGroupId(),
-								RoleConstants.ORGANIZATION_OWNER, true)) {
-
-							return true;
-						}
-
 						curOrganization =
 							curOrganization.getParentOrganization();
 					}
 				}
 			}
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 
 		return false;

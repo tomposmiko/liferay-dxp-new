@@ -41,6 +41,8 @@ import com.liferay.portal.kernel.util.Validator;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -67,10 +69,10 @@ public class DDMFormValuesInfoDisplayFieldProviderImpl<T extends GroupedModel>
 
 		Map<String, Object> infoDisplayFieldValues = new HashMap<>();
 
-		Map<String, List<DDMFormFieldValue>> ddmFormFieldsValuesMap =
+		Map<String, List<DDMFormFieldValue>> ddmFormFieldValuesMap =
 			ddmFormValues.getDDMFormFieldValuesMap();
 
-		if (MapUtil.isEmpty(ddmFormFieldsValuesMap)) {
+		if (MapUtil.isEmpty(ddmFormFieldValuesMap)) {
 			return infoDisplayFieldValues;
 		}
 
@@ -80,7 +82,7 @@ public class DDMFormValuesInfoDisplayFieldProviderImpl<T extends GroupedModel>
 			true);
 
 		for (Map.Entry<String, List<DDMFormFieldValue>> entry :
-				ddmFormFieldsValuesMap.entrySet()) {
+				ddmFormFieldValuesMap.entrySet()) {
 
 			DDMFormField ddmFormField = ddmFormFields.get(entry.getKey());
 
@@ -127,11 +129,11 @@ public class DDMFormValuesInfoDisplayFieldProviderImpl<T extends GroupedModel>
 						return _sanitizeFieldValue(
 							t, ddmFormFieldValue, locale);
 					}
-					catch (PortalException pe) {
+					catch (PortalException portalException) {
 						_log.error(
 							"Unable to sanitize field " +
 								ddmFormFieldValue.getName(),
-							pe);
+							portalException);
 
 						return null;
 					}
@@ -143,7 +145,30 @@ public class DDMFormValuesInfoDisplayFieldProviderImpl<T extends GroupedModel>
 			);
 		}
 
-		classTypeValues.put(key, fieldValue);
+		if (classTypeValues.containsKey(key)) {
+			Collection fieldValues = new ArrayList<>();
+
+			Object classTypeValue = classTypeValues.get(key);
+
+			if (classTypeValue instanceof Collection) {
+				fieldValues.addAll((Collection)classTypeValue);
+			}
+			else {
+				fieldValues.add(classTypeValue);
+			}
+
+			if (fieldValue instanceof Collection) {
+				fieldValues.addAll((Collection)fieldValue);
+			}
+			else {
+				fieldValues.add(fieldValue);
+			}
+
+			classTypeValues.put(key, fieldValues);
+		}
+		else {
+			classTypeValues.put(key, fieldValue);
+		}
 	}
 
 	private void _addNestedFields(
@@ -151,11 +176,11 @@ public class DDMFormValuesInfoDisplayFieldProviderImpl<T extends GroupedModel>
 			Map<String, Object> classTypeValues, Locale locale)
 		throws PortalException {
 
-		Map<String, List<DDMFormFieldValue>> nestedDDMFormFieldsValuesMap =
+		Map<String, List<DDMFormFieldValue>> nestedDDMFormFieldValuesMap =
 			ddmFormFieldValue.getNestedDDMFormFieldValuesMap();
 
 		for (Map.Entry<String, List<DDMFormFieldValue>> entry :
-				nestedDDMFormFieldsValuesMap.entrySet()) {
+				nestedDDMFormFieldValuesMap.entrySet()) {
 
 			List<DDMFormFieldValue> ddmFormFieldValues = entry.getValue();
 
@@ -170,6 +195,10 @@ public class DDMFormValuesInfoDisplayFieldProviderImpl<T extends GroupedModel>
 
 		Value value = ddmFormFieldValue.getValue();
 
+		if (value == null) {
+			return StringPool.BLANK;
+		}
+
 		String valueString = value.getString(locale);
 
 		if (Objects.equals(ddmFormFieldValue.getType(), "ddm-date")) {
@@ -182,7 +211,7 @@ public class DDMFormValuesInfoDisplayFieldProviderImpl<T extends GroupedModel>
 
 				return dateFormat.format(date);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				return valueString;
 			}
 		}
@@ -223,9 +252,9 @@ public class DDMFormValuesInfoDisplayFieldProviderImpl<T extends GroupedModel>
 			return _dlURLHelper.getDownloadURL(
 				fileEntry, fileEntry.getFileVersion(), null, StringPool.BLANK);
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(e, e);
+				_log.debug(exception, exception);
 			}
 		}
 

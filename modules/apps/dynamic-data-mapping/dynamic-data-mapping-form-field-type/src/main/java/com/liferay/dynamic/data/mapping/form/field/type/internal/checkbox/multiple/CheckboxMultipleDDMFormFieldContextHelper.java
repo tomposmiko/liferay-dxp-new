@@ -24,12 +24,11 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -54,20 +53,17 @@ public class CheckboxMultipleDDMFormFieldContextHelper {
 		List<Object> options = new ArrayList<>();
 
 		for (String optionValue : _ddmFormFieldOptions.getOptionsValues()) {
-			Map<String, String> optionMap = new HashMap<>();
+			Map<String, String> optionMap = HashMapBuilder.put(
+				"label",
+				() -> {
+					LocalizedValue optionLabel =
+						_ddmFormFieldOptions.getOptionLabels(optionValue);
 
-			LocalizedValue optionLabel = _ddmFormFieldOptions.getOptionLabels(
-				optionValue);
-
-			String optionLabelString = optionLabel.getString(_locale);
-
-			if (ddmFormFieldRenderingContext.isViewMode()) {
-				optionLabelString = HtmlUtil.extractText(optionLabelString);
-			}
-
-			optionMap.put("label", optionLabelString);
-
-			optionMap.put("value", optionValue);
+					return optionLabel.getString(_locale);
+				}
+			).put(
+				"value", optionValue
+			).build();
 
 			options.add(optionMap);
 		}
@@ -85,12 +81,12 @@ public class CheckboxMultipleDDMFormFieldContextHelper {
 
 			return ArrayUtil.toStringArray(jsonArray);
 		}
-		catch (JSONException jsone) {
+		catch (JSONException jsonException) {
 
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(jsone, jsone);
+				_log.debug(jsonException, jsonException);
 			}
 
 			return StringUtil.split(value);

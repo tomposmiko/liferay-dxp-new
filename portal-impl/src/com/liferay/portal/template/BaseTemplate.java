@@ -39,8 +39,9 @@ import javax.servlet.http.HttpServletRequest;
 public abstract class BaseTemplate implements Template {
 
 	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link #BaseTemplate(
-	 * 			TemplateResource, Map, TemplateContextHelper, boolean)}
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             #BaseTemplate(TemplateResource, Map, TemplateContextHelper,
+	 *             boolean)}
 	 */
 	@Deprecated
 	public BaseTemplate(
@@ -126,11 +127,11 @@ public abstract class BaseTemplate implements Template {
 		try {
 			processTemplate(_templateResource, writer);
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			throw new TemplateException(
 				"Unable to process template " +
 					_templateResource.getTemplateId(),
-				e);
+				exception);
 		}
 	}
 
@@ -158,7 +159,7 @@ public abstract class BaseTemplate implements Template {
 
 			sb.writeTo(writer);
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			TemplateResource errorTemplateResource =
 				errorTemplateResourceSupplier.get();
 
@@ -166,13 +167,13 @@ public abstract class BaseTemplate implements Template {
 				throw new TemplateException(
 					"Unable to process template " +
 						_templateResource.getTemplateId(),
-					e);
+					exception);
 			}
 
 			put(TemplateConstants.WRITER, writer);
 
 			handleException(
-				_templateResource, errorTemplateResource, e, writer);
+				_templateResource, errorTemplateResource, exception, writer);
 		}
 		finally {
 			put(TemplateConstants.WRITER, oldWriter);

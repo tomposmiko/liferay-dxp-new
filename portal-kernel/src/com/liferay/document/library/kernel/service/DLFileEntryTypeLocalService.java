@@ -66,7 +66,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface DLFileEntryTypeLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link DLFileEntryTypeLocalServiceUtil} to access the document library file entry type local service. Add custom service methods to <code>com.liferay.portlet.documentlibrary.service.impl.DLFileEntryTypeLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -110,8 +110,7 @@ public interface DLFileEntryTypeLocalService
 
 	public void clearDLFolderDLFileEntryTypes(long folderId);
 
-	public DLFileEntryType createBasicDocumentDLFileEntryType()
-		throws NoSuchFileEntryTypeException;
+	public DLFileEntryType createBasicDocumentDLFileEntryType();
 
 	/**
 	 * Creates a new document library file entry type with the primary key. Does not add the document library file entry type to the database.

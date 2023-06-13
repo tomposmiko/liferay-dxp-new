@@ -47,7 +47,7 @@ public abstract class FragmentCollectionServiceBaseImpl
 	extends BaseServiceImpl
 	implements AopService, FragmentCollectionService, IdentifiableOSGiService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>FragmentCollectionService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.fragment.service.FragmentCollectionServiceUtil</code>.
@@ -102,8 +102,8 @@ public abstract class FragmentCollectionServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

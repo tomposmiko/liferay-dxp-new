@@ -34,11 +34,11 @@ import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.repository.registry.RepositoryEventRegistry;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.repository.capabilities.util.GroupServiceAdapter;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFileEntry;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFolder;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
@@ -109,7 +109,7 @@ public class LiferaySyncCapability
 
 			return group.isStagingGroup();
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			return false;
 		}
 	}
@@ -130,8 +130,8 @@ public class LiferaySyncCapability
 				return;
 			}
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 
 		registerDLSyncEventCallback(
@@ -164,12 +164,16 @@ public class LiferaySyncCapability
 				public Void call() throws Exception {
 					Message message = new Message();
 
-					Map<String, Object> values = new HashMap<>();
-
-					values.put("event", event);
-					values.put("modifiedTime", modifiedTime);
-					values.put("type", type);
-					values.put("typePK", typePK);
+					Map<String, Object> values =
+						HashMapBuilder.<String, Object>put(
+							"event", event
+						).put(
+							"modifiedTime", modifiedTime
+						).put(
+							"type", type
+						).put(
+							"typePK", typePK
+						).build();
 
 					message.setValues(values);
 

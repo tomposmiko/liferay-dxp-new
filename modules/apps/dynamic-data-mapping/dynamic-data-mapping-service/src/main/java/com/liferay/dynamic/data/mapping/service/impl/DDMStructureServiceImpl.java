@@ -318,9 +318,9 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 				searchContext, DDMStructure.class,
 				ddmStructurePersistence::findByPrimaryKey);
 		}
-		catch (PrincipalException pe) {
+		catch (PrincipalException principalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(pe, pe);
+				_log.debug(principalException, principalException);
 			}
 		}
 
@@ -343,9 +343,9 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 				searchContext, DDMStructure.class,
 				ddmStructurePersistence::findByPrimaryKey);
 		}
-		catch (PrincipalException pe) {
+		catch (PrincipalException principalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(pe, pe);
+				_log.debug(principalException, principalException);
 			}
 		}
 
@@ -357,8 +357,9 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 		long companyId, long[] groupIds, long classNameId, int start, int end,
 		OrderByComparator<DDMStructure> orderByComparator) {
 
-		return ddmStructureLocalService.getStructures(
-			companyId, groupIds, classNameId, start, end, orderByComparator);
+		return ddmStructureFinder.filterFindByC_G_C_S(
+			companyId, groupIds, classNameId, WorkflowConstants.STATUS_ANY,
+			start, end, orderByComparator);
 	}
 
 	@Override
@@ -376,7 +377,7 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 	public int getStructuresCount(
 		long companyId, long[] groupIds, long classNameId) {
 
-		return _ddmStructureFinder.countByC_G_C_S(
+		return _ddmStructureFinder.filterCountByC_G_C_S(
 			companyId, groupIds, classNameId, WorkflowConstants.STATUS_ANY);
 	}
 
@@ -448,9 +449,9 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 				searchContext, DDMStructure.class,
 				ddmStructurePersistence::findByPrimaryKey);
 		}
-		catch (PrincipalException pe) {
+		catch (PrincipalException principalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(pe, pe);
+				_log.debug(principalException, principalException);
 			}
 		}
 
@@ -502,9 +503,9 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 				searchContext, DDMStructure.class,
 				ddmStructureLocalService::fetchStructure);
 		}
-		catch (PrincipalException pe) {
+		catch (PrincipalException principalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(pe, pe);
+				_log.debug(principalException, principalException);
 			}
 		}
 
@@ -563,9 +564,9 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 				searchContext, DDMStructure.class,
 				ddmStructurePersistence::findByPrimaryKey);
 		}
-		catch (PrincipalException pe) {
+		catch (PrincipalException principalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(pe, pe);
+				_log.debug(principalException, principalException);
 			}
 		}
 
@@ -600,9 +601,9 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 			return _ddmSearchHelper.doSearchCount(
 				searchContext, DDMStructure.class);
 		}
-		catch (PrincipalException pe) {
+		catch (PrincipalException principalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(pe, pe);
+				_log.debug(principalException, principalException);
 			}
 		}
 
@@ -639,9 +640,9 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 			return _ddmSearchHelper.doSearchCount(
 				searchContext, DDMStructure.class);
 		}
-		catch (PrincipalException pe) {
+		catch (PrincipalException principalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(pe, pe);
+				_log.debug(principalException, principalException);
 			}
 		}
 
@@ -683,9 +684,9 @@ public class DDMStructureServiceImpl extends DDMStructureServiceBaseImpl {
 			return _ddmSearchHelper.doSearchCount(
 				searchContext, DDMStructure.class);
 		}
-		catch (PrincipalException pe) {
+		catch (PrincipalException principalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(pe, pe);
+				_log.debug(principalException, principalException);
 			}
 		}
 

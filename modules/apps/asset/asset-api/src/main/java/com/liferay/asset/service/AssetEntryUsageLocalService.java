@@ -15,8 +15,10 @@
 package com.liferay.asset.service;
 
 import com.liferay.asset.model.AssetEntryUsage;
+import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -46,8 +48,11 @@ import org.osgi.annotation.versioning.ProviderType;
  *
  * @author Brian Wing Shun Chan
  * @see AssetEntryUsageLocalServiceUtil
+ * @deprecated As of Mueller (7.2.x), replaced by {@link
+ com.liferay.layout.service.impl.LayoutClassedModelUsageLocalServiceImpl}
  * @generated
  */
+@Deprecated
 @ProviderType
 @Transactional(
 	isolation = Isolation.PORTAL,
@@ -56,7 +61,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface AssetEntryUsageLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link AssetEntryUsageLocalServiceUtil} to access the asset entry usage local service. Add custom service methods to <code>com.liferay.asset.service.impl.AssetEntryUsageLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -264,6 +269,32 @@ public interface AssetEntryUsageLocalService
 	public List<AssetEntryUsage> getAssetEntryUsagesByPlid(long plid);
 
 	/**
+	 * Returns all the asset entry usages matching the UUID and company.
+	 *
+	 * @param uuid the UUID of the asset entry usages
+	 * @param companyId the primary key of the company
+	 * @return the matching asset entry usages, or an empty list if no matches were found
+	 */
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<AssetEntryUsage> getAssetEntryUsagesByUuidAndCompanyId(
+		String uuid, long companyId);
+
+	/**
+	 * Returns a range of asset entry usages matching the UUID and company.
+	 *
+	 * @param uuid the UUID of the asset entry usages
+	 * @param companyId the primary key of the company
+	 * @param start the lower bound of the range of asset entry usages
+	 * @param end the upper bound of the range of asset entry usages (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the range of matching asset entry usages, or an empty list if no matches were found
+	 */
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<AssetEntryUsage> getAssetEntryUsagesByUuidAndCompanyId(
+		String uuid, long companyId, int start, int end,
+		OrderByComparator<AssetEntryUsage> orderByComparator);
+
+	/**
 	 * Returns the number of asset entry usages.
 	 *
 	 * @return the number of asset entry usages
@@ -276,6 +307,10 @@ public interface AssetEntryUsageLocalService
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getAssetEntryUsagesCount(long assetEntryId, int type);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
+		PortletDataContext portletDataContext);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();

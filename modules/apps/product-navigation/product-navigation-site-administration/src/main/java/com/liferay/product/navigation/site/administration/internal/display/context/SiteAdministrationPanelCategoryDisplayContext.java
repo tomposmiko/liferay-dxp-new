@@ -180,24 +180,28 @@ public class SiteAdministrationPanelCategoryDisplayContext {
 				_liveGroupURL = StagingUtil.getRemoteSiteURL(
 					group, layout.isPrivateLayout());
 			}
-			catch (PortalException pe) {
+			catch (PortalException portalException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug("Unable to get live group URL", pe);
+					_log.debug("Unable to get live group URL", portalException);
 				}
 
-				_log.error("Unable to get live group URL: " + pe.getMessage());
+				_log.error(
+					"Unable to get live group URL: " +
+						portalException.getMessage());
 			}
-			catch (SystemException se) {
-				Throwable cause = se.getCause();
+			catch (SystemException systemException) {
+				Throwable cause = systemException.getCause();
 
 				if (!(cause instanceof ConnectException)) {
-					throw se;
+					throw systemException;
 				}
 
-				if (_log.isWarnEnabled()) {
-					_log.warn(
-						"Unable to connect to remote live: " +
-							cause.getMessage());
+				_log.error(
+					"Unable to connect to remote live: " +
+						systemException.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(systemException, systemException);
 				}
 
 				throw new RemoteExportException(

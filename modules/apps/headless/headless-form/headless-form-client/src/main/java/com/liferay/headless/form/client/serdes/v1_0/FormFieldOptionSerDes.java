@@ -79,6 +79,16 @@ public class FormFieldOptionSerDes {
 			sb.append("\"");
 		}
 
+		if (formFieldOption.getLabel_i18n() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"label_i18n\": ");
+
+			sb.append(_toJSON(formFieldOption.getLabel_i18n()));
+		}
+
 		if (formFieldOption.getValue() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -126,6 +136,14 @@ public class FormFieldOptionSerDes {
 			map.put("label", String.valueOf(formFieldOption.getLabel()));
 		}
 
+		if (formFieldOption.getLabel_i18n() == null) {
+			map.put("label_i18n", null);
+		}
+		else {
+			map.put(
+				"label_i18n", String.valueOf(formFieldOption.getLabel_i18n()));
+		}
+
 		if (formFieldOption.getValue() == null) {
 			map.put("value", null);
 		}
@@ -165,6 +183,13 @@ public class FormFieldOptionSerDes {
 					formFieldOption.setLabel((String)jsonParserFieldValue);
 				}
 			}
+			else if (Objects.equals(jsonParserFieldName, "label_i18n")) {
+				if (jsonParserFieldValue != null) {
+					formFieldOption.setLabel_i18n(
+						(Map)FormFieldOptionSerDes.toMap(
+							(String)jsonParserFieldValue));
+				}
+			}
 			else if (Objects.equals(jsonParserFieldName, "value")) {
 				if (jsonParserFieldValue != null) {
 					formFieldOption.setValue((String)jsonParserFieldValue);
@@ -181,9 +206,11 @@ public class FormFieldOptionSerDes {
 	private static String _escape(Object object) {
 		String string = String.valueOf(object);
 
-		string = string.replace("\\", "\\\\");
+		for (String[] strings : BaseJSONParser.JSON_ESCAPE_STRINGS) {
+			string = string.replace(strings[0], strings[1]);
+		}
 
-		return string.replace("\"", "\\\"");
+		return string;
 	}
 
 	private static String _toJSON(Map<String, ?> map) {

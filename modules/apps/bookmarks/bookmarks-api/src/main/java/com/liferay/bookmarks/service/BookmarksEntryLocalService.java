@@ -61,7 +61,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface BookmarksEntryLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link BookmarksEntryLocalServiceUtil} to access the bookmarks entry local service. Add custom service methods to <code>com.liferay.bookmarks.service.impl.BookmarksEntryLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -340,13 +340,6 @@ public interface BookmarksEntryLocalService
 	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
 
 	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<BookmarksEntry> getNoAssetEntries();
-
-	/**
 	 * Returns the OSGi service identifier.
 	 *
 	 * @return the OSGi service identifier
@@ -374,6 +367,7 @@ public interface BookmarksEntryLocalService
 	public BookmarksEntry moveEntryToTrash(long userId, long entryId)
 		throws PortalException;
 
+	@Transactional(enabled = false)
 	public BookmarksEntry openEntry(long userId, BookmarksEntry entry);
 
 	public BookmarksEntry openEntry(long userId, long entryId)

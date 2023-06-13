@@ -170,7 +170,7 @@ PortletURL portletURL = editAssetListDisplayContext.getPortletURL();
 	Liferay.provide(window, 'addRow', function(groupId, name, scopeLabel) {
 		var rowColumns = [];
 
-		rowColumns.push('<span class="truncate-text">' + name + '</span>');
+		rowColumns.push('<span class="text-truncate">' + name + '</span>');
 		rowColumns.push(scopeLabel);
 		rowColumns.push(
 			'<a class="modify-link" data-rowId="' +

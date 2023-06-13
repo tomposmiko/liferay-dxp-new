@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.test.rule;
 
+import com.liferay.petra.lang.SafeClosable;
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -153,7 +154,8 @@ public class SynchronousDestinationTestRule
 			_destinations = ReflectionTestUtil.getFieldValue(
 				MessageBusUtil.getMessageBus(), "_destinations");
 
-			ProxyModeThreadLocal.setForceSync(true);
+			_forceSyncSafeClosable = ProxyModeThreadLocal.setWithSafeClosable(
+				true);
 
 			replaceDestination(DestinationNames.ASYNC_SERVICE);
 			replaceDestination(DestinationNames.BACKGROUND_TASK);
@@ -227,8 +229,8 @@ public class SynchronousDestinationTestRule
 					try {
 						endCountDownLatch.await();
 					}
-					catch (InterruptedException ie) {
-						ReflectionUtil.throwException(ie);
+					catch (InterruptedException interruptedException) {
+						ReflectionUtil.throwException(interruptedException);
 					}
 				}
 			};
@@ -242,8 +244,8 @@ public class SynchronousDestinationTestRule
 			try {
 				startCountDownLatch.await();
 			}
-			catch (InterruptedException ie) {
-				ReflectionUtil.throwException(ie);
+			catch (InterruptedException interruptedException) {
+				ReflectionUtil.throwException(interruptedException);
 			}
 
 			schedulerDestination.unregister(messageListener);
@@ -259,11 +261,12 @@ public class SynchronousDestinationTestRule
 			if (destination != null) {
 				try {
 					ReflectionTestUtil.getField(
-						destination.getClass(), "_threadPoolExecutor");
+						destination.getClass(),
+						"_noticeableThreadPoolExecutor");
 
 					asyncDestination = true;
 				}
-				catch (Exception e) {
+				catch (Exception exception) {
 				}
 			}
 
@@ -290,7 +293,9 @@ public class SynchronousDestinationTestRule
 		}
 
 		public void restorePreviousSync() {
-			ProxyModeThreadLocal.setForceSync(_forceSync);
+			if (_forceSyncSafeClosable != null) {
+				_forceSyncSafeClosable.close();
+			}
 
 			for (Destination destination : _asyncServiceDestinations) {
 				_destinations.put(destination.getName(), destination);
@@ -318,8 +323,11 @@ public class SynchronousDestinationTestRule
 			}
 		}
 
+		/**
+		 * @deprecated As of Mueller (7.2.x), with no direct replacement
+		 */
+		@Deprecated
 		public void setForceSync(boolean forceSync) {
-			_forceSync = forceSync;
 		}
 
 		public void setSync(Sync sync) {
@@ -339,7 +347,7 @@ public class SynchronousDestinationTestRule
 		private final List<Destination> _asyncServiceDestinations =
 			new ArrayList<>();
 		private Map<String, Destination> _destinations;
-		private boolean _forceSync;
+		private SafeClosable _forceSyncSafeClosable;
 		private final List<InvokerMessageListener>
 			_schedulerInvokerMessageListeners = new ArrayList<>();
 		private Sync _sync;
@@ -354,8 +362,10 @@ public class SynchronousDestinationTestRule
 				try {
 					messageListener.receive(message);
 				}
-				catch (MessageListenerException mle) {
-					_log.error("Unable to process message " + message, mle);
+				catch (MessageListenerException messageListenerException) {
+					_log.error(
+						"Unable to process message " + message,
+						messageListenerException);
 				}
 			}
 		}
@@ -371,7 +381,6 @@ public class SynchronousDestinationTestRule
 	private SyncHandler _createSyncHandler(Sync sync) {
 		SyncHandler syncHandler = new SyncHandler();
 
-		syncHandler.setForceSync(ProxyModeThreadLocal.isForceSync());
 		syncHandler.setSync(sync);
 
 		syncHandler.enableSync();

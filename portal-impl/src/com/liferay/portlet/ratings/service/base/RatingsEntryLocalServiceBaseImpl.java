@@ -51,9 +51,7 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.ratings.kernel.model.RatingsEntry;
 import com.liferay.ratings.kernel.service.RatingsEntryLocalService;
-import com.liferay.ratings.kernel.service.persistence.RatingsEntryFinder;
 import com.liferay.ratings.kernel.service.persistence.RatingsEntryPersistence;
-import com.liferay.ratings.kernel.service.persistence.RatingsStatsFinder;
 import com.liferay.ratings.kernel.service.persistence.RatingsStatsPersistence;
 
 import java.io.Serializable;
@@ -77,7 +75,7 @@ public abstract class RatingsEntryLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements IdentifiableOSGiService, RatingsEntryLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>RatingsEntryLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.ratings.kernel.service.RatingsEntryLocalServiceUtil</code>.
@@ -501,24 +499,6 @@ public abstract class RatingsEntryLocalServiceBaseImpl
 	}
 
 	/**
-	 * Returns the ratings entry finder.
-	 *
-	 * @return the ratings entry finder
-	 */
-	public RatingsEntryFinder getRatingsEntryFinder() {
-		return ratingsEntryFinder;
-	}
-
-	/**
-	 * Sets the ratings entry finder.
-	 *
-	 * @param ratingsEntryFinder the ratings entry finder
-	 */
-	public void setRatingsEntryFinder(RatingsEntryFinder ratingsEntryFinder) {
-		this.ratingsEntryFinder = ratingsEntryFinder;
-	}
-
-	/**
 	 * Returns the ratings stats local service.
 	 *
 	 * @return the ratings stats local service
@@ -559,24 +539,6 @@ public abstract class RatingsEntryLocalServiceBaseImpl
 		RatingsStatsPersistence ratingsStatsPersistence) {
 
 		this.ratingsStatsPersistence = ratingsStatsPersistence;
-	}
-
-	/**
-	 * Returns the ratings stats finder.
-	 *
-	 * @return the ratings stats finder
-	 */
-	public RatingsStatsFinder getRatingsStatsFinder() {
-		return ratingsStatsFinder;
-	}
-
-	/**
-	 * Sets the ratings stats finder.
-	 *
-	 * @param ratingsStatsFinder the ratings stats finder
-	 */
-	public void setRatingsStatsFinder(RatingsStatsFinder ratingsStatsFinder) {
-		this.ratingsStatsFinder = ratingsStatsFinder;
 	}
 
 	/**
@@ -835,8 +797,8 @@ public abstract class RatingsEntryLocalServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 
@@ -846,9 +808,6 @@ public abstract class RatingsEntryLocalServiceBaseImpl
 	@BeanReference(type = RatingsEntryPersistence.class)
 	protected RatingsEntryPersistence ratingsEntryPersistence;
 
-	@BeanReference(type = RatingsEntryFinder.class)
-	protected RatingsEntryFinder ratingsEntryFinder;
-
 	@BeanReference(
 		type = com.liferay.ratings.kernel.service.RatingsStatsLocalService.class
 	)
@@ -857,9 +816,6 @@ public abstract class RatingsEntryLocalServiceBaseImpl
 
 	@BeanReference(type = RatingsStatsPersistence.class)
 	protected RatingsStatsPersistence ratingsStatsPersistence;
-
-	@BeanReference(type = RatingsStatsFinder.class)
-	protected RatingsStatsFinder ratingsStatsFinder;
 
 	@BeanReference(
 		type = com.liferay.counter.kernel.service.CounterLocalService.class

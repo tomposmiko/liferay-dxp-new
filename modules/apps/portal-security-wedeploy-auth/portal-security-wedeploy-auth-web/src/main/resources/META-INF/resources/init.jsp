@@ -24,20 +24,21 @@ taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
 taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
 taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 
-<%@ page import="com.liferay.frontend.taglib.clay.servlet.taglib.util.JSPNavigationItemList" %><%@
-page import="com.liferay.petra.string.StringPool" %><%@
+<%@ page import="com.liferay.petra.string.StringPool" %><%@
 page import="com.liferay.portal.kernel.dao.orm.QueryUtil" %><%@
 page import="com.liferay.portal.kernel.dao.search.ResultRow" %><%@
+page import="com.liferay.portal.kernel.dao.search.SearchContainer" %><%@
 page import="com.liferay.portal.kernel.language.LanguageUtil" %><%@
 page import="com.liferay.portal.kernel.security.permission.ActionKeys" %><%@
 page import="com.liferay.portal.kernel.util.Constants" %><%@
 page import="com.liferay.portal.kernel.util.ParamUtil" %><%@
 page import="com.liferay.portal.kernel.util.WebKeys" %><%@
-page import="com.liferay.portal.security.wedeploy.auth.constants.WeDeployAuthActionKeys" %><%@
 page import="com.liferay.portal.security.wedeploy.auth.model.WeDeployAuthApp" %><%@
 page import="com.liferay.portal.security.wedeploy.auth.service.WeDeployAuthAppLocalServiceUtil" %><%@
-page import="com.liferay.portal.security.wedeploy.auth.web.internal.security.permission.resource.WeDeployAuthAppPermission" %><%@
-page import="com.liferay.portal.security.wedeploy.auth.web.internal.security.permission.resource.WeDeployAuthPermission" %>
+page import="com.liferay.portal.security.wedeploy.auth.web.internal.display.context.WeDeployAuthAppsManagementToolbarDisplayContext" %><%@
+page import="com.liferay.portal.security.wedeploy.auth.web.internal.security.permission.resource.WeDeployAuthAppPermission" %>
+
+<%@ page import="java.util.List" %>
 
 <%@ page import="javax.portlet.PortletURL" %>
 

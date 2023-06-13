@@ -349,6 +349,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>LANGUAGE_DROPDOWN</td>
+	<td>//button[contains(@id,'${key_portletName}')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>LEAVE</td>
 	<td>//button[contains(.,'Leave')]</td>
 	<td></td>
@@ -361,6 +366,11 @@
 <tr>
 	<td>LOCALIZATION_GENERIC</td>
 	<td>//div[contains(@class,'form-group')]//div[contains(@class,'localized')]//button[contains(@class,'localized')] | //button[contains(@class,'localized')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LOCALIZATION_OPEN_GRAPH</td>
+	<td>//div[contains(@id,'${key_fieldName}')]//button[contains(@class,'localized')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -425,7 +435,7 @@
 </tr>
 <tr>
 	<td>PERMISSIONS</td>
-	<td>//a[contains(.,'Permissions') and contains(@class,'btn')] | //button[contains(.,'Permissions')]</td>
+	<td>//a[contains(.,'Permissions') and contains(@class,'btn')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -435,7 +445,7 @@
 </tr>
 <tr>
 	<td>PLUS_IE</td>
-	<td>//a[contains(@class,'nav-btn-monospaced')] | //button[@data-title='New' or @title='New']</td>
+	<td>//a[contains(@class,'nav-btn-monospaced')] | //button[@data-title='New' or @title='New' or @title='Add']</td>
 	<td></td>
 </tr>
 <tr>
@@ -455,7 +465,7 @@
 </tr>
 <tr>
 	<td>PROPAGATE</td>
-	<td>//button[contains(@data-title,'Propagate')]</td>
+	<td>//button[contains(@title,'Propagate')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -600,7 +610,7 @@
 </tr>
 <tr>
 	<td>SELECT_CATEGORIES</td>
-	<td>//button[contains(@class,'btn-secondary')]</td>
+	<td>//div[@class='field-content']//button[contains(@class,'btn-secondary')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -626,6 +636,16 @@
 <tr>
 	<td>SELECT_MOBILE_DEVICE_RULES</td>
 	<td>//div[@class='btn-toolbar']/button[contains(.,'Select')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SELECT_OPEN_GRAPH_IMAGE</td>
+	<td>//button[contains(@name,'openGraphImageButton')][contains(.,'Select')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CLEAR_OPEN_GRAPH_IMAGE</td>
+	<td>//button[contains(@name,'openGraphClearImageButton')][contains(.,'Clear')]</td>
 	<td></td>
 </tr>
 <tr>

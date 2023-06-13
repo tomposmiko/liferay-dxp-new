@@ -52,7 +52,7 @@ public class DataLayoutBuilderTag extends BaseDataLayoutBuilderTag {
 					"/DataLayoutBuilder.es"));
 		setNamespacedAttribute(
 			request, "fieldTypes",
-			DataLayoutTaglibUtil.getFieldTypesJSONArray(request));
+			DataLayoutTaglibUtil.getFieldTypesJSONArray(request, getScopes()));
 		setNamespacedAttribute(
 			request, "fieldTypesModules",
 			DataLayoutTaglibUtil.resolveFieldTypesModules());

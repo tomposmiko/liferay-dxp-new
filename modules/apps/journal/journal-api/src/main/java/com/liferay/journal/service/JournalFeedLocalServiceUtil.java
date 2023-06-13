@@ -32,16 +32,10 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class JournalFeedLocalServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.journal.service.impl.JournalFeedLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
-	 */
-
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link JournalFeedLocalServiceUtil} to access the journal feed local service. Add custom service methods to <code>com.liferay.journal.service.impl.JournalFeedLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	public static com.liferay.journal.model.JournalFeed addFeed(
 			long userId, long groupId, String feedId, boolean autoFeedId,
@@ -78,19 +72,6 @@ public class JournalFeedLocalServiceUtil {
 		getService().addFeedResources(feed, modelPermissions);
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #addFeedResources(JournalFeed, ModelPermissions)}
-	 */
-	@Deprecated
-	public static void addFeedResources(
-			com.liferay.journal.model.JournalFeed feed,
-			String[] groupPermissions, String[] guestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		getService().addFeedResources(feed, groupPermissions, guestPermissions);
-	}
-
 	public static void addFeedResources(
 			long feedId, boolean addGroupPermissions,
 			boolean addGuestPermissions)
@@ -98,19 +79,6 @@ public class JournalFeedLocalServiceUtil {
 
 		getService().addFeedResources(
 			feedId, addGroupPermissions, addGuestPermissions);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #addFeedResources(JournalFeed, ModelPermissions)}
-	 */
-	@Deprecated
-	public static void addFeedResources(
-			long feedId, String[] groupPermissions, String[] guestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		getService().addFeedResources(
-			feedId, groupPermissions, guestPermissions);
 	}
 
 	/**

@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.PortletLocalService;
+import com.liferay.portal.kernel.servlet.BrowserSnifferUtil;
 import com.liferay.portal.kernel.servlet.ServletResponseConstants;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -177,6 +178,23 @@ public class SPAUtil {
 		return _log.isDebugEnabled();
 	}
 
+	public boolean isDisabled(HttpServletRequest httpServletRequest) {
+		if (BrowserSnifferUtil.isIe(httpServletRequest)) {
+			if (_spaConfiguration.disableInInternetExplorer()) {
+				return true;
+			}
+
+			double majorVersion = BrowserSnifferUtil.getMajorVersion(
+				httpServletRequest);
+
+			if (majorVersion == 11.0) {
+				return _spaConfiguration.disableInInternetExplorer11();
+			}
+		}
+
+		return false;
+	}
+
 	@Activate
 	protected void activate(
 			BundleContext bundleContext, Map<String, Object> properties)
@@ -269,7 +287,7 @@ public class SPAUtil {
 			try {
 				jsonArray.put(field.getInt(null));
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 			}
 		}
 

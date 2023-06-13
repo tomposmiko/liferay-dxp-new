@@ -14,12 +14,17 @@
 
 package com.liferay.portal.search.elasticsearch7.internal.search.engine.adapter.document;
 
+import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchClientResolver;
 import com.liferay.portal.search.engine.adapter.document.BulkableDocumentRequestTranslator;
 import com.liferay.portal.search.engine.adapter.document.DeleteDocumentRequest;
 import com.liferay.portal.search.engine.adapter.document.DeleteDocumentResponse;
 
-import org.elasticsearch.action.delete.DeleteRequestBuilder;
+import java.io.IOException;
+
+import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.rest.RestStatus;
 
 import org.osgi.service.component.annotations.Component;
@@ -36,14 +41,32 @@ public class DeleteDocumentRequestExecutorImpl
 	public DeleteDocumentResponse execute(
 		DeleteDocumentRequest deleteDocumentRequest) {
 
-		DeleteRequestBuilder deleteRequestBuilder =
+		DeleteRequest deleteRequest =
 			_bulkableDocumentRequestTranslator.translate(deleteDocumentRequest);
 
-		DeleteResponse deleteResponse = deleteRequestBuilder.get();
+		DeleteResponse deleteResponse = getDeleteResponse(
+			deleteRequest, deleteDocumentRequest);
 
 		RestStatus restStatus = deleteResponse.status();
 
 		return new DeleteDocumentResponse(restStatus.getStatus());
+	}
+
+	protected DeleteResponse getDeleteResponse(
+		DeleteRequest deleteRequest,
+		DeleteDocumentRequest deleteDocumentRequest) {
+
+		RestHighLevelClient restHighLevelClient =
+			_elasticsearchClientResolver.getRestHighLevelClient(
+				deleteDocumentRequest.getConnectionId(), false);
+
+		try {
+			return restHighLevelClient.delete(
+				deleteRequest, RequestOptions.DEFAULT);
+		}
+		catch (IOException ioException) {
+			throw new RuntimeException(ioException);
+		}
 	}
 
 	@Reference(target = "(search.engine.impl=Elasticsearch)", unbind = "-")
@@ -53,7 +76,15 @@ public class DeleteDocumentRequestExecutorImpl
 		_bulkableDocumentRequestTranslator = bulkableDocumentRequestTranslator;
 	}
 
+	@Reference(unbind = "-")
+	protected void setElasticsearchClientResolver(
+		ElasticsearchClientResolver elasticsearchClientResolver) {
+
+		_elasticsearchClientResolver = elasticsearchClientResolver;
+	}
+
 	private BulkableDocumentRequestTranslator
 		_bulkableDocumentRequestTranslator;
+	private ElasticsearchClientResolver _elasticsearchClientResolver;
 
 }

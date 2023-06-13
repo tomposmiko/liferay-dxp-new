@@ -30,11 +30,6 @@ public class MBMessageServiceWrapper
 		_mbMessageService = mbMessageService;
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link MBMessageServiceUtil} to access the message-boards message remote service. Add custom service methods to <code>com.liferay.message.boards.service.impl.MBMessageServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
-	 */
 	@Override
 	public com.liferay.message.boards.model.MBMessage addDiscussionMessage(
 			long groupId, String className, long classPK, long threadId,
@@ -371,27 +366,6 @@ public class MBMessageServiceWrapper
 		return _mbMessageService.updateMessage(
 			messageId, subject, body, inputStreamOVPs, priority, allowPingbacks,
 			serviceContext);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link #updateMessage(long,
-	 String, String, List, double, boolean, ServiceContext)}
-	 */
-	@Deprecated
-	@Override
-	public com.liferay.message.boards.model.MBMessage updateMessage(
-			long messageId, String subject, String body,
-			java.util.List
-				<com.liferay.portal.kernel.util.ObjectValuePair
-					<String, java.io.InputStream>> inputStreamOVPs,
-			java.util.List<String> existingFiles, double priority,
-			boolean allowPingbacks,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _mbMessageService.updateMessage(
-			messageId, subject, body, inputStreamOVPs, existingFiles, priority,
-			allowPingbacks, serviceContext);
 	}
 
 	@Override

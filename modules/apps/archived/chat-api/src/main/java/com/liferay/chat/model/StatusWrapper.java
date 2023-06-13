@@ -233,11 +233,6 @@ public class StatusWrapper
 		return model.isPlaySound();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a status model instance should use the <code>Status</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

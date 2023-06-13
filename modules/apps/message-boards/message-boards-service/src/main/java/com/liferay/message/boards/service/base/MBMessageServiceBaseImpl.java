@@ -49,7 +49,7 @@ public abstract class MBMessageServiceBaseImpl
 	extends BaseServiceImpl
 	implements AopService, IdentifiableOSGiService, MBMessageService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>MBMessageService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.message.boards.service.MBMessageServiceUtil</code>.
@@ -103,8 +103,8 @@ public abstract class MBMessageServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

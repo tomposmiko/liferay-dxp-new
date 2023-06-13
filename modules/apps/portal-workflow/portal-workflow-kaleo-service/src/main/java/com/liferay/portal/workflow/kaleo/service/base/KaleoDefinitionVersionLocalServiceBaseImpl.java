@@ -83,7 +83,7 @@ public abstract class KaleoDefinitionVersionLocalServiceBaseImpl
 	implements AopService, IdentifiableOSGiService,
 			   KaleoDefinitionVersionLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>KaleoDefinitionVersionLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.workflow.kaleo.service.KaleoDefinitionVersionLocalServiceUtil</code>.
@@ -426,8 +426,8 @@ public abstract class KaleoDefinitionVersionLocalServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

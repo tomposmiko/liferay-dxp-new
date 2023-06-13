@@ -30,7 +30,7 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface LayoutRevision extends LayoutRevisionModel, PersistedModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.portal.model.impl.LayoutRevisionImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -96,6 +96,9 @@ public interface LayoutRevision extends LayoutRevisionModel, PersistedModel {
 	public boolean hasChildren();
 
 	public boolean isContentDisplayPage();
+
+	public boolean isCustomizable()
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public boolean isIconImage();
 

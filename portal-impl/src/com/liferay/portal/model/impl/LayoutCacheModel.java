@@ -76,14 +76,14 @@ public class LayoutCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(73);
+		StringBundler sb = new StringBundler(83);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
+		sb.append(", ctCollectionId=");
+		sb.append(ctCollectionId);
 		sb.append(", uuid=");
 		sb.append(uuid);
-		sb.append(", headId=");
-		sb.append(headId);
 		sb.append(", plid=");
 		sb.append(plid);
 		sb.append(", groupId=");
@@ -140,6 +140,8 @@ public class LayoutCacheModel
 		sb.append(css);
 		sb.append(", priority=");
 		sb.append(priority);
+		sb.append(", masterLayoutPlid=");
+		sb.append(masterLayoutPlid);
 		sb.append(", layoutPrototypeUuid=");
 		sb.append(layoutPrototypeUuid);
 		sb.append(", layoutPrototypeLinkEnabled=");
@@ -150,6 +152,14 @@ public class LayoutCacheModel
 		sb.append(publishDate);
 		sb.append(", lastPublishDate=");
 		sb.append(lastPublishDate);
+		sb.append(", status=");
+		sb.append(status);
+		sb.append(", statusByUserId=");
+		sb.append(statusByUserId);
+		sb.append(", statusByUserName=");
+		sb.append(statusByUserName);
+		sb.append(", statusDate=");
+		sb.append(statusDate);
 		sb.append("}");
 
 		return sb.toString();
@@ -160,6 +170,7 @@ public class LayoutCacheModel
 		LayoutImpl layoutImpl = new LayoutImpl();
 
 		layoutImpl.setMvccVersion(mvccVersion);
+		layoutImpl.setCtCollectionId(ctCollectionId);
 
 		if (uuid == null) {
 			layoutImpl.setUuid("");
@@ -168,8 +179,6 @@ public class LayoutCacheModel
 			layoutImpl.setUuid(uuid);
 		}
 
-		layoutImpl.setHeadId(headId);
-		layoutImpl.setHead(head);
 		layoutImpl.setPlid(plid);
 		layoutImpl.setGroupId(groupId);
 		layoutImpl.setCompanyId(companyId);
@@ -286,6 +295,7 @@ public class LayoutCacheModel
 		}
 
 		layoutImpl.setPriority(priority);
+		layoutImpl.setMasterLayoutPlid(masterLayoutPlid);
 
 		if (layoutPrototypeUuid == null) {
 			layoutImpl.setLayoutPrototypeUuid("");
@@ -317,6 +327,23 @@ public class LayoutCacheModel
 			layoutImpl.setLastPublishDate(new Date(lastPublishDate));
 		}
 
+		layoutImpl.setStatus(status);
+		layoutImpl.setStatusByUserId(statusByUserId);
+
+		if (statusByUserName == null) {
+			layoutImpl.setStatusByUserName("");
+		}
+		else {
+			layoutImpl.setStatusByUserName(statusByUserName);
+		}
+
+		if (statusDate == Long.MIN_VALUE) {
+			layoutImpl.setStatusDate(null);
+		}
+		else {
+			layoutImpl.setStatusDate(new Date(statusDate));
+		}
+
 		layoutImpl.resetOriginalValues();
 
 		return layoutImpl;
@@ -325,11 +352,9 @@ public class LayoutCacheModel
 	@Override
 	public void readExternal(ObjectInput objectInput) throws IOException {
 		mvccVersion = objectInput.readLong();
+
+		ctCollectionId = objectInput.readLong();
 		uuid = objectInput.readUTF();
-
-		headId = objectInput.readLong();
-
-		head = objectInput.readBoolean();
 
 		plid = objectInput.readLong();
 
@@ -372,17 +397,27 @@ public class LayoutCacheModel
 		css = objectInput.readUTF();
 
 		priority = objectInput.readInt();
+
+		masterLayoutPlid = objectInput.readLong();
 		layoutPrototypeUuid = objectInput.readUTF();
 
 		layoutPrototypeLinkEnabled = objectInput.readBoolean();
 		sourcePrototypeLayoutUuid = objectInput.readUTF();
 		publishDate = objectInput.readLong();
 		lastPublishDate = objectInput.readLong();
+
+		status = objectInput.readInt();
+
+		statusByUserId = objectInput.readLong();
+		statusByUserName = objectInput.readUTF();
+		statusDate = objectInput.readLong();
 	}
 
 	@Override
 	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
+
+		objectOutput.writeLong(ctCollectionId);
 
 		if (uuid == null) {
 			objectOutput.writeUTF("");
@@ -390,10 +425,6 @@ public class LayoutCacheModel
 		else {
 			objectOutput.writeUTF(uuid);
 		}
-
-		objectOutput.writeLong(headId);
-
-		objectOutput.writeBoolean(head);
 
 		objectOutput.writeLong(plid);
 
@@ -510,6 +541,8 @@ public class LayoutCacheModel
 
 		objectOutput.writeInt(priority);
 
+		objectOutput.writeLong(masterLayoutPlid);
+
 		if (layoutPrototypeUuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -528,12 +561,24 @@ public class LayoutCacheModel
 
 		objectOutput.writeLong(publishDate);
 		objectOutput.writeLong(lastPublishDate);
+
+		objectOutput.writeInt(status);
+
+		objectOutput.writeLong(statusByUserId);
+
+		if (statusByUserName == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(statusByUserName);
+		}
+
+		objectOutput.writeLong(statusDate);
 	}
 
 	public long mvccVersion;
+	public long ctCollectionId;
 	public String uuid;
-	public long headId;
-	public boolean head;
 	public long plid;
 	public long groupId;
 	public long companyId;
@@ -562,10 +607,15 @@ public class LayoutCacheModel
 	public String colorSchemeId;
 	public String css;
 	public int priority;
+	public long masterLayoutPlid;
 	public String layoutPrototypeUuid;
 	public boolean layoutPrototypeLinkEnabled;
 	public String sourcePrototypeLayoutUuid;
 	public long publishDate;
 	public long lastPublishDate;
+	public int status;
+	public long statusByUserId;
+	public String statusByUserName;
+	public long statusDate;
 
 }

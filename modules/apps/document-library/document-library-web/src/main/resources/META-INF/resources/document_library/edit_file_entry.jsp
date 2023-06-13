@@ -116,17 +116,13 @@ else if ((dlFileEntryType != null) && (fileEntryTypeId != 0)) {
 	headerTitle = LanguageUtil.format(request, "new-x", dlFileEntryType.getName(locale), false);
 }
 
-boolean portletTitleBasedNavigation = GetterUtil.getBoolean(portletConfig.getInitParameter("portlet-title-based-navigation"));
+portletDisplay.setShowBackIcon(true);
+portletDisplay.setURLBack(redirect);
 
-if (portletTitleBasedNavigation) {
-	portletDisplay.setShowBackIcon(true);
-	portletDisplay.setURLBack(redirect);
-
-	renderResponse.setTitle(headerTitle);
-}
+renderResponse.setTitle(headerTitle);
 %>
 
-<c:if test="<%= portletTitleBasedNavigation && (fileVersion != null) %>">
+<c:if test="<%= fileVersion != null %>">
 
 	<%
 	String version = null;
@@ -141,7 +137,7 @@ if (portletTitleBasedNavigation) {
 	</liferay-frontend:info-bar>
 </c:if>
 
-<div <%= portletTitleBasedNavigation ? "class=\"container-fluid-1280\"" : StringPool.BLANK %>>
+<div class="container-fluid-1280">
 	<c:if test="<%= checkedOut %>">
 
 		<%
@@ -171,14 +167,6 @@ if (portletTitleBasedNavigation) {
 		</c:choose>
 	</c:if>
 
-	<c:if test="<%= !portletTitleBasedNavigation && showHeader %>">
-		<liferay-ui:header
-			backURL="<%= redirect %>"
-			localizeTitle="<%= false %>"
-			title="<%= headerTitle %>"
-		/>
-	</c:if>
-
 	<liferay-portlet:actionURL name="/document_library/edit_file_entry" varImpl="editFileEntryURL">
 		<liferay-portlet:param name="mvcRenderCommandName" value="/document_library/edit_file_entry" />
 	</liferay-portlet:actionURL>
@@ -186,6 +174,7 @@ if (portletTitleBasedNavigation) {
 	<aui:form action="<%= editFileEntryURL %>" cssClass="lfr-dynamic-form" enctype="multipart/form-data" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "saveFileEntry(" + saveAsDraft + ");" %>'>
 		<aui:input name="<%= Constants.CMD %>" type="hidden" />
 		<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
+		<aui:input name="portletResource" type="hidden" value='<%= ParamUtil.getString(request, "portletResource") %>' />
 		<aui:input name="uploadProgressId" type="hidden" value="<%= uploadProgressId %>" />
 		<aui:input name="repositoryId" type="hidden" value="<%= repositoryId %>" />
 		<aui:input name="folderId" type="hidden" value="<%= folderId %>" />
@@ -459,11 +448,10 @@ if (portletTitleBasedNavigation) {
 				<c:if test="<%= !scopeGroup.isCompany() %>">
 					<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="display-page-template">
 						<liferay-asset:select-asset-display-page
-							classNameId="<%= PortalUtil.getClassNameId(DLFileEntry.class) %>"
+							classNameId="<%= PortalUtil.getClassNameId(FileEntry.class) %>"
 							classPK="<%= (fileEntry != null) ? fileEntry.getFileEntryId() : 0 %>"
 							classTypeId="<%= (fileEntryTypeId < 0) ? DLFileEntryTypeConstants.FILE_ENTRY_TYPE_ID_BASIC_DOCUMENT : fileEntryTypeId %>"
 							groupId="<%= scopeGroupId %>"
-							showPortletLayouts="<%= true %>"
 							showViewInContextLink="<%= true %>"
 						/>
 					</aui:fieldset>

@@ -32,16 +32,10 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class AssetListEntryServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.asset.list.service.impl.AssetListEntryServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
-	 */
-
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link AssetListEntryServiceUtil} to access the asset list entry remote service. Add custom service methods to <code>com.liferay.asset.list.service.impl.AssetListEntryServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	public static void addAssetEntrySelection(
 			long assetListEntryId, long assetEntryId, long segmentsEntryId,
@@ -147,12 +141,42 @@ public class AssetListEntryServiceUtil {
 			groupId, title, start, end, orderByComparator);
 	}
 
+	public static java.util.List<com.liferay.asset.list.model.AssetListEntry>
+		getAssetListEntries(
+			long[] groupIds, int start, int end,
+			com.liferay.portal.kernel.util.OrderByComparator
+				<com.liferay.asset.list.model.AssetListEntry>
+					orderByComparator) {
+
+		return getService().getAssetListEntries(
+			groupIds, start, end, orderByComparator);
+	}
+
+	public static java.util.List<com.liferay.asset.list.model.AssetListEntry>
+		getAssetListEntries(
+			long[] groupIds, String title, int start, int end,
+			com.liferay.portal.kernel.util.OrderByComparator
+				<com.liferay.asset.list.model.AssetListEntry>
+					orderByComparator) {
+
+		return getService().getAssetListEntries(
+			groupIds, title, start, end, orderByComparator);
+	}
+
 	public static int getAssetListEntriesCount(long groupId) {
 		return getService().getAssetListEntriesCount(groupId);
 	}
 
 	public static int getAssetListEntriesCount(long groupId, String title) {
 		return getService().getAssetListEntriesCount(groupId, title);
+	}
+
+	public static int getAssetListEntriesCount(long[] groupIds) {
+		return getService().getAssetListEntriesCount(groupIds);
+	}
+
+	public static int getAssetListEntriesCount(long[] groupIds, String title) {
+		return getService().getAssetListEntriesCount(groupIds, title);
 	}
 
 	public static com.liferay.asset.list.model.AssetListEntry getAssetListEntry(

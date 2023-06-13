@@ -36,7 +36,7 @@ public abstract class CounterLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements CounterLocalService, IdentifiableOSGiService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>CounterLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.counter.kernel.service.CounterLocalServiceUtil</code>.

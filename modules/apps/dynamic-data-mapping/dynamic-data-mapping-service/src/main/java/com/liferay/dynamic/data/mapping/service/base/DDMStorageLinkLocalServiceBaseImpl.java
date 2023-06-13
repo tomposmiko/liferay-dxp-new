@@ -63,7 +63,7 @@ public abstract class DDMStorageLinkLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements AopService, DDMStorageLinkLocalService, IdentifiableOSGiService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>DDMStorageLinkLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.dynamic.data.mapping.service.DDMStorageLinkLocalServiceUtil</code>.
@@ -408,8 +408,8 @@ public abstract class DDMStorageLinkLocalServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

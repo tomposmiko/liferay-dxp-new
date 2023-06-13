@@ -32,7 +32,7 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class LayoutSEOEntryLocalServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.layout.seo.service.impl.LayoutSEOEntryLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
@@ -368,14 +368,35 @@ public class LayoutSEOEntryLocalServiceUtil {
 	public static com.liferay.layout.seo.model.LayoutSEOEntry
 			updateLayoutSEOEntry(
 				long userId, long groupId, boolean privateLayout, long layoutId,
-				boolean enabled,
+				boolean canonicalURLEnabled,
+				java.util.Map<java.util.Locale, String> canonicalURLMap,
+				boolean openGraphDescriptionEnabled,
+				java.util.Map<java.util.Locale, String> openGraphDescriptionMap,
+				java.util.Map<java.util.Locale, String> openGraphImageAltMap,
+				long openGraphImageFileEntryId, boolean openGraphTitleEnabled,
+				java.util.Map<java.util.Locale, String> openGraphTitleMap,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return getService().updateLayoutSEOEntry(
+			userId, groupId, privateLayout, layoutId, canonicalURLEnabled,
+			canonicalURLMap, openGraphDescriptionEnabled,
+			openGraphDescriptionMap, openGraphImageAltMap,
+			openGraphImageFileEntryId, openGraphTitleEnabled, openGraphTitleMap,
+			serviceContext);
+	}
+
+	public static com.liferay.layout.seo.model.LayoutSEOEntry
+			updateLayoutSEOEntry(
+				long userId, long groupId, boolean privateLayout, long layoutId,
+				boolean canonicalURLEnabled,
 				java.util.Map<java.util.Locale, String> canonicalURLMap,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return getService().updateLayoutSEOEntry(
-			userId, groupId, privateLayout, layoutId, enabled, canonicalURLMap,
-			serviceContext);
+			userId, groupId, privateLayout, layoutId, canonicalURLEnabled,
+			canonicalURLMap, serviceContext);
 	}
 
 	public static LayoutSEOEntryLocalService getService() {

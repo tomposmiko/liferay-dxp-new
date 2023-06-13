@@ -50,6 +50,21 @@ class Radio extends Component {
 		return newValue;
 	}
 
+	_handleFieldBlurred() {
+		this.emit('fieldBlurred', {
+			fieldInstance: this,
+			originalEvent: window.event,
+			value: window.event.target.value
+		});
+	}
+
+	_handleFieldFocused(event) {
+		this.emit('fieldFocused', {
+			fieldInstance: this,
+			originalEvent: event
+		});
+	}
+
 	_handleValueChanged(event) {
 		this.emit('fieldEdited', {
 			fieldInstance: this,

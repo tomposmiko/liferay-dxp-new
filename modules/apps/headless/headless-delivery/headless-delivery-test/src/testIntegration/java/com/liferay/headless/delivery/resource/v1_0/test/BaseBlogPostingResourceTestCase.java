@@ -689,7 +689,7 @@ public abstract class BaseBlogPostingResourceTestCase {
 					{
 						put("page", 1);
 						put("pageSize", 2);
-						put("siteId", testGroup.getGroupId());
+						put("siteKey", "\"" + testGroup.getGroupId() + "\"");
 					}
 				},
 				graphQLFields.toArray(new GraphQLField[0])));
@@ -762,11 +762,13 @@ public abstract class BaseBlogPostingResourceTestCase {
 
 		assertHttpResponseStatusCode(
 			204,
-			blogPostingResource.putSiteBlogPostingSubscribeHttpResponse(null));
+			blogPostingResource.putSiteBlogPostingSubscribeHttpResponse(
+				testGroup.getGroupId()));
 
 		assertHttpResponseStatusCode(
 			404,
-			blogPostingResource.putSiteBlogPostingSubscribeHttpResponse(null));
+			blogPostingResource.putSiteBlogPostingSubscribeHttpResponse(
+				testGroup.getGroupId()));
 	}
 
 	protected BlogPosting testPutSiteBlogPostingSubscribe_addBlogPosting()
@@ -785,12 +787,12 @@ public abstract class BaseBlogPostingResourceTestCase {
 		assertHttpResponseStatusCode(
 			204,
 			blogPostingResource.putSiteBlogPostingUnsubscribeHttpResponse(
-				null));
+				testGroup.getGroupId()));
 
 		assertHttpResponseStatusCode(
 			404,
 			blogPostingResource.putSiteBlogPostingUnsubscribeHttpResponse(
-				null));
+				testGroup.getGroupId()));
 	}
 
 	protected BlogPosting testPutSiteBlogPostingUnsubscribe_addBlogPosting()
@@ -1043,7 +1045,7 @@ public abstract class BaseBlogPostingResourceTestCase {
 				"createSiteBlogPosting",
 				new HashMap<String, Object>() {
 					{
-						put("siteId", testGroup.getGroupId());
+						put("siteKey", "\"" + testGroup.getGroupId() + "\"");
 						put("blogPosting", sb.toString());
 					}
 				},
@@ -1159,6 +1161,14 @@ public abstract class BaseBlogPostingResourceTestCase {
 
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
+
+			if (Objects.equals("actions", additionalAssertFieldName)) {
+				if (blogPosting.getActions() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
 
 			if (Objects.equals("aggregateRating", additionalAssertFieldName)) {
 				if (blogPosting.getAggregateRating() == null) {
@@ -1345,6 +1355,14 @@ public abstract class BaseBlogPostingResourceTestCase {
 		for (String additionalAssertFieldName :
 				getAdditionalRatingAssertFieldNames()) {
 
+			if (Objects.equals("actions", additionalAssertFieldName)) {
+				if (rating.getActions() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("bestRating", additionalAssertFieldName)) {
 				if (rating.getBestRating() == null) {
 					valid = false;
@@ -1424,6 +1442,16 @@ public abstract class BaseBlogPostingResourceTestCase {
 
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
+
+			if (Objects.equals("actions", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						blogPosting1.getActions(), blogPosting2.getActions())) {
+
+					return false;
+				}
+
+				continue;
+			}
 
 			if (Objects.equals("aggregateRating", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
@@ -1664,6 +1692,16 @@ public abstract class BaseBlogPostingResourceTestCase {
 		for (String additionalAssertFieldName :
 				getAdditionalRatingAssertFieldNames()) {
 
+			if (Objects.equals("actions", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						rating1.getActions(), rating2.getActions())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("bestRating", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						rating1.getBestRating(), rating2.getBestRating())) {
@@ -1887,6 +1925,11 @@ public abstract class BaseBlogPostingResourceTestCase {
 		sb.append(" ");
 		sb.append(operator);
 		sb.append(" ");
+
+		if (entityFieldName.equals("actions")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
 
 		if (entityFieldName.equals("aggregateRating")) {
 			throw new IllegalArgumentException(

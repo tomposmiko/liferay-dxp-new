@@ -16,6 +16,7 @@ package com.liferay.dynamic.data.mapping.service;
 
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMStructureVersion;
+import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
@@ -27,6 +28,8 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.change.tracking.CTService;
+import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
@@ -54,9 +57,10 @@ import org.osgi.annotation.versioning.ProviderType;
 	rollbackFor = {PortalException.class, SystemException.class}
 )
 public interface DDMStructureVersionLocalService
-	extends BaseLocalService, PersistedModelLocalService {
+	extends BaseLocalService, CTService<DDMStructureVersion>,
+			PersistedModelLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link DDMStructureVersionLocalServiceUtil} to access the ddm structure version local service. Add custom service methods to <code>com.liferay.dynamic.data.mapping.service.impl.DDMStructureVersionLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -271,5 +275,20 @@ public interface DDMStructureVersionLocalService
 	@Indexable(type = IndexableType.REINDEX)
 	public DDMStructureVersion updateDDMStructureVersion(
 		DDMStructureVersion ddmStructureVersion);
+
+	@Override
+	@Transactional(enabled = false)
+	public CTPersistence<DDMStructureVersion> getCTPersistence();
+
+	@Override
+	@Transactional(enabled = false)
+	public Class<DDMStructureVersion> getModelClass();
+
+	@Override
+	@Transactional(rollbackFor = Throwable.class)
+	public <R, E extends Throwable> R updateWithUnsafeFunction(
+			UnsafeFunction<CTPersistence<DDMStructureVersion>, R, E>
+				updateUnsafeFunction)
+		throws E;
 
 }

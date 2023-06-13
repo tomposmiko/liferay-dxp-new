@@ -27,7 +27,7 @@ definition {
 				userLoginEmailAddress = "test@liferay.com",
 				userLoginFullName = "Test Test");
 
-			User.tearDownCP();
+			JSONUser.tearDownNonAdminUsers();
 
 			UserGroup.tearDownCP();
 
@@ -55,6 +55,11 @@ definition {
 			menuItem = "Manage",
 			rowEntry = "Site Template Name");
 
+		ProductMenu.gotoPortlet(
+			category = "Site Builder",
+			panel = "Site Administration",
+			portlet = "Page Templates");
+
 		NavItem.gotoPageTemplates();
 
 		PageTemplatesAdmin.addCollection(collectionName = "Page Template Collection");
@@ -80,6 +85,11 @@ definition {
 			category = "Site Builder",
 			panel = "Site Administration",
 			portlet = "Pages");
+
+		ProductMenu.gotoPortlet(
+			category = "Site Builder",
+			panel = "Site Administration",
+			portlet = "Page Templates");
 
 		NavItem.gotoPageTemplates();
 
@@ -602,6 +612,8 @@ definition {
 	@description = "This is a use case for LPS-86487."
 	@priority = "4"
 	test SiteTemplatePageLinkInWebContentRedirectCorrectly {
+		property test.name.skip.portal.instance = "SitetemplatesUsecase#SiteTemplatePageLinkInWebContentRedirectCorrectly";
+
 		var portalURL = PropsUtil.get("portal.url");
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
 
@@ -658,6 +670,8 @@ definition {
 		AlloyEditor.addEntryExternalURL(entryExternalURL = "${page2URL}");
 
 		PortletEntry.publish();
+
+		Close.closeAndSelectWindow(locator1 = "Site Templates - Control Panel - ${siteName}");
 
 		ProductMenu.gotoPortlet(
 			category = "Sites",
@@ -757,12 +771,9 @@ definition {
 			locator1 = "TextInput#FRIENDLY_URL",
 			value1 = "/hello");
 
-		ProductMenu.gotoPortlet(
-			category = "Publishing",
-			panel = "Site Administration",
-			portlet = "Export");
-
-		LAR.exportSiteCP(larFileName = "Export");
+		LAR.exportSiteCP(
+			larFileName = "Export",
+			siteScopeName = "Export");
 
 		var larFileName = LAR.getLarFileName();
 
@@ -833,7 +844,9 @@ definition {
 			siteName = "${siteName}",
 			siteTemplateName = "Site Template Name");
 
-		PermissionsInline.gotoConfigurationPG(portletName = "Web Content Display");
+		PermissionsInline.gotoConfigurationPG(
+			portletName = "Web Content Display",
+			siteTemplate = "true");
 
 		Role.viewPermissionPG(
 			permissionDefinitionKey = "CONTENT_PERMISSIONS_VIEW_CHECKBOX",

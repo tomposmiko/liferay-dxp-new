@@ -45,7 +45,7 @@ public interface SegmentsExperienceModel
 	extends AttachedModel, BaseModel<SegmentsExperience>, LocalizedModel,
 			MVCCModel, ShardedModel, StagedGroupedModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a segments experience model instance should use the {@link SegmentsExperience} interface instead.

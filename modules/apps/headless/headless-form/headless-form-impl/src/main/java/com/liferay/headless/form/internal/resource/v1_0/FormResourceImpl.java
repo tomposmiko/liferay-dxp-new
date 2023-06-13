@@ -36,6 +36,7 @@ import com.liferay.portal.vulcan.multipart.BinaryFile;
 import com.liferay.portal.vulcan.multipart.MultipartBody;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
 import java.util.Optional;
 
@@ -141,10 +142,17 @@ public class FormResourceImpl extends BaseFormResourceImpl {
 				defaultLanguage = ddmFormInstance.getDefaultLanguageId();
 				description = ddmFormInstance.getDescription(
 					contextAcceptLanguage.getPreferredLocale());
+				description_i18n = LocalizedMapUtil.getLocalizedMap(
+					contextAcceptLanguage.isAcceptAllLanguages(),
+					ddmFormInstance.getDescriptionMap());
 				id = ddmFormInstance.getFormInstanceId();
 				name = ddmFormInstance.getName(
 					contextAcceptLanguage.getPreferredLocale());
+				name_i18n = LocalizedMapUtil.getLocalizedMap(
+					contextAcceptLanguage.isAcceptAllLanguages(),
+					ddmFormInstance.getNameMap());
 				structure = StructureUtil.toFormStructure(
+					contextAcceptLanguage.isAcceptAllLanguages(),
 					ddmFormInstance.getStructure(),
 					contextAcceptLanguage.getPreferredLocale(), _portal,
 					_userLocalService);

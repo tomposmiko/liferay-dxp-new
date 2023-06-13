@@ -100,23 +100,12 @@ class CriteriaGroup extends Component {
 		this.NestedCriteriaGroupWithDrag = withDragSource(CriteriaGroup);
 	}
 
-	_handleConjunctionClick = event => {
-		event.preventDefault();
-
-		const {criteria, onChange, supportedConjunctions} = this.props;
-
-		const index = supportedConjunctions.findIndex(
-			item => item.name === criteria.conjunctionName
-		);
-
-		const conjunctionSelected =
-			index === supportedConjunctions.length - 1
-				? supportedConjunctions[0].name
-				: supportedConjunctions[index + 1].name;
+	_handleConjunctionSelect = conjunctionName => {
+		const {criteria, onChange} = this.props;
 
 		onChange({
 			...criteria,
-			conjunctionName: conjunctionSelected
+			conjunctionName
 		});
 	};
 
@@ -221,7 +210,7 @@ class CriteriaGroup extends Component {
 				<Conjunction
 					conjunctionName={criteria.conjunctionName}
 					editing={editing}
-					onClick={this._handleConjunctionClick}
+					onSelect={this._handleConjunctionSelect}
 					supportedConjunctions={supportedConjunctions}
 				/>
 

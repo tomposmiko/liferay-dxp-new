@@ -48,14 +48,14 @@ import javax.servlet.http.HttpServletRequest;
 public class KBSuggestionListManagementToolbarDisplayContext {
 
 	public KBSuggestionListManagementToolbarDisplayContext(
+		HttpServletRequest httpServletRequest,
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
-		HttpServletRequest httpServletRequest,
 		SearchContainer searchContainer) {
 
+		_httpServletRequest = httpServletRequest;
 		_liferayPortletRequest = liferayPortletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
-		_httpServletRequest = httpServletRequest;
 		_searchContainer = searchContainer;
 
 		_currentURLObj = PortletURLUtil.getCurrent(

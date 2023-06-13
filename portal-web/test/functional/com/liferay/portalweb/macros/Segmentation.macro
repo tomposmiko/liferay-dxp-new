@@ -31,18 +31,22 @@ definition {
 			value1 = "${criterionInputOption}");
 	}
 
+	macro deleteProperties {
+		Click(locator1 = "Segmentation#DELETE_SEGMENT");
+	}
+
 	macro editSegment {
 		while (IsElementPresent(locator1 = "Icon#BODY_VERTICAL_ELLIPSIS")) {
 			LexiconEntry.gotoEllipsisMenuItemNoError(menuItem = "Edit");
 		}
 	}
 
-	macro fillEmailAddress {
-		Click(locator1 = "Segmentation#EMAIL_ADDRESS_FIELD");
+	macro fillProperty {
+		Click(locator1 = "Segmentation#PROPERTY_FIELD");
 
 		Type(
-			locator1 = "Segmentation#EMAIL_ADDRESS_FIELD",
-			value1 = "${emailAddressField}");
+			locator1 = "Segmentation#PROPERTY_FIELD",
+			value1 = "${PropertyField}");
 	}
 
 	macro fillTitle {
@@ -51,6 +55,14 @@ definition {
 		Type(
 			locator1 = "Segmentation#TITLE_FIELD",
 			value1 = "${titleField}");
+	}
+
+	macro selectOrganization {
+		Click(locator1 = "Segmentation#ORGANIZATION_MENU");
+	}
+
+	macro selectSession {
+		Click(locator1 = "Segmentation#SESSION_MENU");
 	}
 
 	macro tearDown {

@@ -177,16 +177,16 @@ public abstract class BaseSalesforceClientImpl implements SalesforceClient {
 
 					Files.createFile(filePath);
 				}
-				catch (IOException ioe) {
-					_logger.error("Unable to create log file", ioe);
+				catch (IOException ioException) {
+					_logger.error("Unable to create log file", ioException);
 				}
 			}
 
 			try {
 				_connectorConfig.setTraceFile(filePathName);
 			}
-			catch (FileNotFoundException fnfe) {
-				_logger.error("File not found", fnfe);
+			catch (FileNotFoundException fileNotFoundException) {
+				_logger.error("File not found", fileNotFoundException);
 			}
 		}
 	}
@@ -240,7 +240,7 @@ public abstract class BaseSalesforceClientImpl implements SalesforceClient {
 						sessionSecondsValid);
 				}
 			}
-			catch (ConnectionException ce) {
+			catch (ConnectionException connectionException) {
 				if (_logger.isInfoEnabled()) {
 					_logger.info("Session has expired and will be renewed now");
 				}
@@ -256,7 +256,7 @@ public abstract class BaseSalesforceClientImpl implements SalesforceClient {
 
 			return _partnerConnection;
 		}
-		catch (ConnectionException ce1) {
+		catch (ConnectionException connectionException1) {
 			for (int i = 0; i < _SALESFORCE_CONNECTION_RETRY_COUNT; i++) {
 				if (_logger.isInfoEnabled()) {
 					_logger.info("Retrying new connection: {}", i + 1);
@@ -268,14 +268,14 @@ public abstract class BaseSalesforceClientImpl implements SalesforceClient {
 
 					return _partnerConnection;
 				}
-				catch (ConnectionException ce2) {
+				catch (ConnectionException connectionException2) {
 					if ((i + 1) >= _SALESFORCE_CONNECTION_RETRY_COUNT) {
-						throw ce2;
+						throw connectionException2;
 					}
 				}
 			}
 
-			throw ce1;
+			throw connectionException1;
 		}
 	}
 

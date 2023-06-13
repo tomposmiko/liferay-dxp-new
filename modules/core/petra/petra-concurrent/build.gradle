@@ -1,5 +1,5 @@
 dependencies {
-	compileOnly group: "com.liferay", name: "com.liferay.petra.memory", version: "3.0.0"
+	compileOnly project(":core:petra:petra-memory")
 
 	testCompile project(":core:petra:petra-reflect")
 	testCompile project(":core:petra:petra-test-util")

@@ -1,5 +1,5 @@
 <#assign
-	groupIds = dataFactory.getNewUserGroupIds(groupModel.groupId)
+	groupIds = dataFactory.getNewUserGroupIds(groupModel.groupId, guestGroupModel)
 	roleIds = [dataFactory.administratorRoleModel.roleId, dataFactory.powerUserRoleModel.roleId, dataFactory.userRoleModel.roleId]
 
 	userModels = dataFactory.newUserModels()
@@ -14,10 +14,7 @@
 
 	<@insertLayout _layoutModel=layoutModel />
 
-	<@insertGroup
-		_groupModel=userGroupModel
-		_publicPageCount=1
-	/>
+	<@insertGroup _groupModel=userGroupModel />
 
 	<@insertUser
 		_groupIds=groupIds

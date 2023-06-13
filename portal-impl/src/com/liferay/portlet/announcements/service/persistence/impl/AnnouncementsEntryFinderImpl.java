@@ -28,7 +28,6 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.util.CalendarUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -129,55 +128,12 @@ public class AnnouncementsEntryFinderImpl
 
 			return 0;
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
 		}
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link #countByScope(long,
-	 *             long, long, long[], int, int, int, int, int, int, int, int,
-	 *             int, int, boolean, int)}
-	 */
-	@Deprecated
-	@Override
-	public int countByScope(
-		long userId, long classNameId, long[] classPKs, int displayDateMonth,
-		int displayDateDay, int displayDateYear, int displayDateHour,
-		int displayDateMinute, int expirationDateMonth, int expirationDateDay,
-		int expirationDateYear, int expirationDateHour,
-		int expirationDateMinute, boolean alert, int flagValue) {
-
-		return countByScope(
-			CompanyThreadLocal.getCompanyId(), userId, classNameId, classPKs,
-			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
-			displayDateMinute, expirationDateMonth, expirationDateDay,
-			expirationDateYear, expirationDateHour, expirationDateMinute, alert,
-			flagValue);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link #countByScopes(long,
-	 *             long, LinkedHashMap, int, int, int, int, int, int, int, int,
-	 *             int, int, boolean, int)}
-	 */
-	@Deprecated
-	@Override
-	public int countByScopes(
-		long userId, LinkedHashMap<Long, long[]> scopes, int displayDateMonth,
-		int displayDateDay, int displayDateYear, int displayDateHour,
-		int displayDateMinute, int expirationDateMonth, int expirationDateDay,
-		int expirationDateYear, int expirationDateHour,
-		int expirationDateMinute, boolean alert, int flagValue) {
-
-		return countByScopes(
-			CompanyThreadLocal.getCompanyId(), userId, scopes, displayDateMonth,
-			displayDateDay, displayDateYear, displayDateHour, displayDateMinute,
-			expirationDateMonth, expirationDateDay, expirationDateYear,
-			expirationDateHour, expirationDateMinute, alert, flagValue);
 	}
 
 	@Override
@@ -242,8 +198,8 @@ public class AnnouncementsEntryFinderImpl
 
 			return 0;
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -275,8 +231,8 @@ public class AnnouncementsEntryFinderImpl
 
 			return q.list(true);
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -338,58 +294,12 @@ public class AnnouncementsEntryFinderImpl
 			return (List<AnnouncementsEntry>)QueryUtil.list(
 				q, getDialect(), start, end);
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
 		}
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link #findByScope(long,
-	 *             long, long, long[], int, int, int, int, int, int, int, int,
-	 *             int, int, boolean, int, int, int)}
-	 */
-	@Deprecated
-	@Override
-	public List<AnnouncementsEntry> findByScope(
-		long userId, long classNameId, long[] classPKs, int displayDateMonth,
-		int displayDateDay, int displayDateYear, int displayDateHour,
-		int displayDateMinute, int expirationDateMonth, int expirationDateDay,
-		int expirationDateYear, int expirationDateHour,
-		int expirationDateMinute, boolean alert, int flagValue, int start,
-		int end) {
-
-		return findByScope(
-			CompanyThreadLocal.getCompanyId(), userId, classNameId, classPKs,
-			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
-			displayDateMinute, expirationDateMonth, expirationDateDay,
-			expirationDateYear, expirationDateHour, expirationDateMinute, alert,
-			flagValue, start, end);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link #findByScopes(long,
-	 *             long, LinkedHashMap, int, int, int, int, int, int, int, int,
-	 *             int, int, boolean, int, int, int)}
-	 */
-	@Deprecated
-	@Override
-	public List<AnnouncementsEntry> findByScopes(
-		long userId, LinkedHashMap<Long, long[]> scopes, int displayDateMonth,
-		int displayDateDay, int displayDateYear, int displayDateHour,
-		int displayDateMinute, int expirationDateMonth, int expirationDateDay,
-		int expirationDateYear, int expirationDateHour,
-		int expirationDateMinute, boolean alert, int flagValue, int start,
-		int end) {
-
-		return findByScopes(
-			CompanyThreadLocal.getCompanyId(), userId, scopes, displayDateMonth,
-			displayDateDay, displayDateYear, displayDateHour, displayDateMinute,
-			expirationDateMonth, expirationDateDay, expirationDateYear,
-			expirationDateHour, expirationDateMinute, alert, flagValue, start,
-			end);
 	}
 
 	@Override
@@ -446,8 +356,8 @@ public class AnnouncementsEntryFinderImpl
 			return (List<AnnouncementsEntry>)QueryUtil.list(
 				q, getDialect(), start, end);
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -537,12 +447,12 @@ public class AnnouncementsEntryFinderImpl
 				displayDateMonth, displayDateDay, displayDateYear,
 				displayDateHour, displayDateMinute, null);
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(pe, pe);
+				_log.debug(portalException, portalException);
 			}
 		}
 
@@ -559,12 +469,12 @@ public class AnnouncementsEntryFinderImpl
 				expirationDateMonth, expirationDateDay, expirationDateYear,
 				expirationDateHour, expirationDateMinute, null);
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(pe, pe);
+				_log.debug(portalException, portalException);
 			}
 		}
 

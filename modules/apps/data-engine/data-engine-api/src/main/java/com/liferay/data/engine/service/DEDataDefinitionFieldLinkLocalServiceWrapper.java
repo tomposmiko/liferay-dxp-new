@@ -108,6 +108,28 @@ public class DEDataDefinitionFieldLinkLocalServiceWrapper
 			deleteDEDataDefinitionFieldLink(deDataDefinitionFieldLinkId);
 	}
 
+	@Override
+	public void deleteDEDataDefinitionFieldLinks(long ddmStructureId) {
+		_deDataDefinitionFieldLinkLocalService.deleteDEDataDefinitionFieldLinks(
+			ddmStructureId);
+	}
+
+	@Override
+	public void deleteDEDataDefinitionFieldLinks(
+		long classNameId, long classPK) {
+
+		_deDataDefinitionFieldLinkLocalService.deleteDEDataDefinitionFieldLinks(
+			classNameId, classPK);
+	}
+
+	@Override
+	public void deleteDEDataDefinitionFieldLinks(
+		long classNameId, long ddmStructureId, String fieldName) {
+
+		_deDataDefinitionFieldLinkLocalService.deleteDEDataDefinitionFieldLinks(
+			classNameId, ddmStructureId, fieldName);
+	}
+
 	/**
 	 * @throws PortalException
 	 */
@@ -297,6 +319,58 @@ public class DEDataDefinitionFieldLinkLocalServiceWrapper
 
 		return _deDataDefinitionFieldLinkLocalService.
 			getDEDataDefinitionFieldLinks(start, end);
+	}
+
+	@Override
+	public java.util.List
+		<com.liferay.data.engine.model.DEDataDefinitionFieldLink>
+			getDEDataDefinitionFieldLinks(
+				long classNameId, long ddmStructureId, String fieldName) {
+
+		return _deDataDefinitionFieldLinkLocalService.
+			getDEDataDefinitionFieldLinks(
+				classNameId, ddmStructureId, fieldName);
+	}
+
+	/**
+	 * Returns all the de data definition field links matching the UUID and company.
+	 *
+	 * @param uuid the UUID of the de data definition field links
+	 * @param companyId the primary key of the company
+	 * @return the matching de data definition field links, or an empty list if no matches were found
+	 */
+	@Override
+	public java.util.List
+		<com.liferay.data.engine.model.DEDataDefinitionFieldLink>
+			getDEDataDefinitionFieldLinksByUuidAndCompanyId(
+				String uuid, long companyId) {
+
+		return _deDataDefinitionFieldLinkLocalService.
+			getDEDataDefinitionFieldLinksByUuidAndCompanyId(uuid, companyId);
+	}
+
+	/**
+	 * Returns a range of de data definition field links matching the UUID and company.
+	 *
+	 * @param uuid the UUID of the de data definition field links
+	 * @param companyId the primary key of the company
+	 * @param start the lower bound of the range of de data definition field links
+	 * @param end the upper bound of the range of de data definition field links (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the range of matching de data definition field links, or an empty list if no matches were found
+	 */
+	@Override
+	public java.util.List
+		<com.liferay.data.engine.model.DEDataDefinitionFieldLink>
+			getDEDataDefinitionFieldLinksByUuidAndCompanyId(
+				String uuid, long companyId, int start, int end,
+				com.liferay.portal.kernel.util.OrderByComparator
+					<com.liferay.data.engine.model.DEDataDefinitionFieldLink>
+						orderByComparator) {
+
+		return _deDataDefinitionFieldLinkLocalService.
+			getDEDataDefinitionFieldLinksByUuidAndCompanyId(
+				uuid, companyId, start, end, orderByComparator);
 	}
 
 	/**

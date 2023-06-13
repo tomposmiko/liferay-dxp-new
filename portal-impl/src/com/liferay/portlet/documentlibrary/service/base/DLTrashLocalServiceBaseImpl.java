@@ -43,7 +43,7 @@ public abstract class DLTrashLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements DLTrashLocalService, IdentifiableOSGiService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>DLTrashLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.document.library.kernel.service.DLTrashLocalServiceUtil</code>.
@@ -127,8 +127,8 @@ public abstract class DLTrashLocalServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

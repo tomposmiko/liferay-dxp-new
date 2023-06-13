@@ -23,7 +23,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.model.PortletApp;
 import com.liferay.portal.kernel.model.PortletURLListener;
@@ -43,6 +42,7 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CookieKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.HttpUtil;
@@ -66,12 +66,10 @@ import java.security.Key;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
@@ -185,7 +183,7 @@ public class PortletURLImpl
 					_layout = LayoutLocalServiceUtil.getLayout(_plid);
 				}
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (_log.isWarnEnabled()) {
 					_log.warn("Layout cannot be found for " + _plid);
 				}
@@ -424,6 +422,27 @@ public class PortletURLImpl
 
 		if (Validator.isNull(paramName)) {
 			paramName = portletSerializableClass.getSimpleName();
+
+			if (paramName.endsWith("$$EnhancerBySpringCGLIB")) {
+
+				// If RenderURL#setBeanParameter(PortletSerializable) is called
+				// from within a bean portlet that uses Spring for IoC, and if
+				// Spring dynamically created the bean at runtime using CGLib,
+				// then the parameter name will have "$$EnhanderBySpringCGLib"
+				// as a suffix.
+
+				paramName = paramName.substring(
+					0, paramName.length() - "$$EnhancerBySpringCGLIB".length());
+			}
+			else if (paramName.endsWith("$Proxy$_$$_WeldClientProxy")) {
+
+				// Otherwise, if using CDI, then the parameter name will have
+				// "$Proxy$_$$_WeldClientProxy" as a suffix.
+
+				paramName = paramName.substring(
+					0,
+					paramName.length() - "$Proxy$_$$_WeldClientProxy".length());
+			}
 		}
 
 		MutableRenderParameters mutableRenderParameters = getRenderParameters();
@@ -691,8 +710,8 @@ public class PortletURLImpl
 
 				newParams.put(key, value);
 			}
-			catch (ClassCastException cce) {
-				throw new IllegalArgumentException(cce);
+			catch (ClassCastException classCastException) {
+				throw new IllegalArgumentException(classCastException);
 			}
 		}
 
@@ -945,8 +964,8 @@ public class PortletURLImpl
 				}
 			}
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 
 		StringBundler sb = new StringBundler(64);
@@ -1085,9 +1104,7 @@ public class PortletURLImpl
 		if (layoutAssetEntry instanceof AssetEntry) {
 			AssetEntry assetEntry = (AssetEntry)layoutAssetEntry;
 
-			if ((_layout != null) &&
-				Objects.equals(
-					_layout.getType(), LayoutConstants.TYPE_ASSET_DISPLAY) &&
+			if ((_layout != null) && _layout.isTypeAssetDisplay() &&
 				(assetEntry != null)) {
 
 				sb.append("assetEntryId=");
@@ -1227,7 +1244,7 @@ public class PortletURLImpl
 		try {
 			return URLCodec.encodeURL(Encryptor.encrypt(key, value));
 		}
-		catch (EncryptorException ee) {
+		catch (EncryptorException encryptorException) {
 			return value;
 		}
 	}
@@ -1345,8 +1362,8 @@ public class PortletURLImpl
 					portletURLGenerationListener.filterResourceURL(this);
 				}
 			}
-			catch (PortletException pe) {
-				_log.error(pe, pe);
+			catch (PortletException portletException) {
+				_log.error(portletException, portletException);
 			}
 		}
 	}
@@ -1516,8 +1533,8 @@ public class PortletURLImpl
 				return company.getKeyObj();
 			}
 		}
-		catch (Exception e) {
-			_log.error("Unable to get company key", e);
+		catch (Exception exception) {
+			_log.error("Unable to get company key", exception);
 		}
 
 		return null;
@@ -1700,13 +1717,13 @@ public class PortletURLImpl
 	private static final Log _log = LogFactoryUtil.getLog(PortletURLImpl.class);
 
 	private static final Map<String, String> _cacheabilities =
-		new HashMap<String, String>() {
-			{
-				put("FULL", ResourceURL.FULL);
-				put("PAGE", ResourceURL.PAGE);
-				put("PORTLET", ResourceURL.PORTLET);
-			}
-		};
+		HashMapBuilder.put(
+			"FULL", ResourceURL.FULL
+		).put(
+			"PAGE", ResourceURL.PAGE
+		).put(
+			"PORTLET", ResourceURL.PORTLET
+		).build();
 
 	private boolean _anchor = true;
 	private String _cacheability = ResourceURL.PAGE;

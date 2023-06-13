@@ -33,11 +33,6 @@ public class UserNotificationDeliveryLocalServiceWrapper
 			userNotificationDeliveryLocalService;
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link UserNotificationDeliveryLocalServiceUtil} to access the user notification delivery local service. Add custom service methods to <code>com.liferay.portal.service.impl.UserNotificationDeliveryLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
-	 */
 	@Override
 	public com.liferay.portal.kernel.model.UserNotificationDelivery
 			addUserNotificationDelivery(

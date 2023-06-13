@@ -1022,6 +1022,13 @@ public class LayoutRevisionWrapper
 		return model.isContentDisplayPage();
 	}
 
+	@Override
+	public boolean isCustomizable()
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return model.isCustomizable();
+	}
+
 	/**
 	 * Returns <code>true</code> if this layout revision is denied.
 	 *
@@ -1132,11 +1139,6 @@ public class LayoutRevisionWrapper
 		return model.isScheduled();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a layout revision model instance should use the <code>LayoutRevision</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

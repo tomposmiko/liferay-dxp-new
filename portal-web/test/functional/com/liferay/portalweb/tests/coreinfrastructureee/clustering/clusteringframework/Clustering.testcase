@@ -6,6 +6,7 @@ definition {
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property remote.elasticsearch.enabled = "true";
+	property test.assert.warning.exceptions = "true";
 	property testray.main.component.name = "Clustering";
 
 	setUp {
@@ -27,7 +28,7 @@ definition {
 		}
 	}
 
-	@priority = "5"
+	@priority = "4"
 	test AddAndDeleteBlogEntriesOnSeparateNodes {
 		property test.name.skip.portal.instance = "Clustering#AddAndDeleteBlogEntriesOnSeparateNodes";
 
@@ -273,7 +274,7 @@ definition {
 			userEmailAddress = "test@liferay.com");
 	}
 
-	@priority = "5"
+	@priority = "4"
 	test ValidateLiveUsers {
 		property custom.properties = "live.users.enabled=true";
 		property test.name.skip.portal.instance = "Clustering#ValidateLiveUsers";

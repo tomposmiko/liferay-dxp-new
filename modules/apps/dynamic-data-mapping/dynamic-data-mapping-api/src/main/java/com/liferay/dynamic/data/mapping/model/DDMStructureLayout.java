@@ -34,7 +34,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface DDMStructureLayout
 	extends DDMStructureLayoutModel, PersistedModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.dynamic.data.mapping.model.impl.DDMStructureLayoutImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -61,5 +61,11 @@ public interface DDMStructureLayout
 			};
 
 	public DDMFormLayout getDDMFormLayout();
+
+	public DDMStructure getDDMStructure()
+		throws com.liferay.portal.kernel.exception.PortalException;
+
+	public long getDDMStructureId()
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 }

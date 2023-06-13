@@ -15,8 +15,6 @@
 package com.liferay.headless.delivery.resource.v1_0;
 
 import com.liferay.headless.delivery.dto.v1_0.WikiPage;
-import com.liferay.portal.kernel.model.Company;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
@@ -52,10 +50,6 @@ public interface WikiPageResource {
 	public WikiPage postWikiNodeWikiPage(Long wikiNodeId, WikiPage wikiPage)
 		throws Exception;
 
-	public void putWikiPageSubscribe(Long wikiPageId) throws Exception;
-
-	public void putWikiPageUnsubscribe(Long wikiPageId) throws Exception;
-
 	public Page<WikiPage> getWikiPageWikiPagesPage(Long parentWikiPageId)
 		throws Exception;
 
@@ -70,11 +64,16 @@ public interface WikiPageResource {
 	public WikiPage putWikiPage(Long wikiPageId, WikiPage wikiPage)
 		throws Exception;
 
+	public void putWikiPageSubscribe(Long wikiPageId) throws Exception;
+
+	public void putWikiPageUnsubscribe(Long wikiPageId) throws Exception;
+
 	public default void setContextAcceptLanguage(
 		AcceptLanguage contextAcceptLanguage) {
 	}
 
-	public void setContextCompany(Company contextCompany);
+	public void setContextCompany(
+		com.liferay.portal.kernel.model.Company contextCompany);
 
 	public default void setContextHttpServletRequest(
 		HttpServletRequest contextHttpServletRequest) {
@@ -87,6 +86,7 @@ public interface WikiPageResource {
 	public default void setContextUriInfo(UriInfo contextUriInfo) {
 	}
 
-	public void setContextUser(User contextUser);
+	public void setContextUser(
+		com.liferay.portal.kernel.model.User contextUser);
 
 }

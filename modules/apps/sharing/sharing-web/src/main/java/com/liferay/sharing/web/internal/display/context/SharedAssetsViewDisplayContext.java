@@ -17,23 +17,21 @@ package com.liferay.sharing.web.internal.display.context;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemList;
+import com.liferay.item.selector.ItemSelector;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
+import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
 import com.liferay.portal.kernel.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.servlet.taglib.ui.Menu;
 import com.liferay.portal.kernel.servlet.taglib.ui.MenuItem;
 import com.liferay.portal.kernel.servlet.taglib.ui.URLMenuItem;
-import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -50,20 +48,18 @@ import com.liferay.sharing.security.permission.SharingPermission;
 import com.liferay.sharing.service.SharingEntryLocalService;
 import com.liferay.sharing.servlet.taglib.ui.SharingEntryMenuItemContributor;
 import com.liferay.sharing.util.comparator.SharingEntryModifiedDateComparator;
+import com.liferay.sharing.web.internal.filter.SharedAssetsFilterItemTracker;
+import com.liferay.sharing.web.internal.item.selector.SharedAssetsFilterItemItemSelectorCriterion;
 import com.liferay.sharing.web.internal.servlet.taglib.ui.SharingEntryMenuItemContributorRegistry;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
 import javax.portlet.PortletException;
-import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
-import javax.portlet.WindowStateException;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -73,10 +69,10 @@ import javax.servlet.http.HttpServletRequest;
 public class SharedAssetsViewDisplayContext {
 
 	public SharedAssetsViewDisplayContext(
-		GroupLocalService groupLocalService,
+		GroupLocalService groupLocalService, ItemSelector itemSelector,
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
-		List<SharedAssetsFilterItem> sharedAssetsFilterItems,
+		SharedAssetsFilterItemTracker sharedAssetsFilterItemTracker,
 		SharingConfigurationFactory sharingConfigurationFactory,
 		Function<SharingEntry, SharingEntryInterpreter>
 			sharingEntryInterpreterFunction,
@@ -87,9 +83,10 @@ public class SharedAssetsViewDisplayContext {
 		SharingPermission sharingPermission) {
 
 		_groupLocalService = groupLocalService;
+		_itemSelector = itemSelector;
 		_liferayPortletRequest = liferayPortletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
-		_sharedAssetsFilterItems = sharedAssetsFilterItems;
+		_sharedAssetsFilterItemTracker = sharedAssetsFilterItemTracker;
 		_sharingConfigurationFactory = sharingConfigurationFactory;
 		_sharingEntryInterpreterFunction = sharingEntryInterpreterFunction;
 		_sharingEntryLocalService = sharingEntryLocalService;
@@ -187,8 +184,11 @@ public class SharedAssetsViewDisplayContext {
 		};
 	}
 
-	public List<SharedAssetsFilterItem> getSharedAssetsFilterItems() {
-		return _sharedAssetsFilterItems;
+	public PortletURL getSelectAssetTypeURL() {
+		return _itemSelector.getItemSelectorURL(
+			RequestBackedPortletURLFactoryUtil.create(_liferayPortletRequest),
+			_liferayPortletResponse.getNamespace() + "selectAssetType",
+			new SharedAssetsFilterItemItemSelectorCriterion());
 	}
 
 	public Menu getSharingEntryMenu(SharingEntry sharingEntry)
@@ -349,43 +349,21 @@ public class SharedAssetsViewDisplayContext {
 	private MenuItem _createEditMenuItem(SharingEntry sharingEntry)
 		throws PortalException {
 
-		try {
-			PortletURL editPortletURL = _getURLEdit(
-				sharingEntry, _liferayPortletRequest, _liferayPortletResponse);
+		PortletURL editPortletURL = _getURLEdit(
+			sharingEntry, _liferayPortletRequest, _liferayPortletResponse);
 
-			if (editPortletURL == null) {
-				return null;
-			}
-
-			URLMenuItem urlMenuItem = new URLMenuItem();
-
-			Map<String, Object> data = new HashMap<>();
-
-			data.put("destroyOnHide", true);
-			data.put(
-				"id",
-				HtmlUtil.escape(_liferayPortletResponse.getNamespace()) +
-					"editAsset");
-			data.put(
-				"title",
-				LanguageUtil.format(
-					_httpServletRequest, "edit-x",
-					HtmlUtil.escape(getTitle(sharingEntry)), false));
-
-			urlMenuItem.setData(data);
-
-			urlMenuItem.setLabel(LanguageUtil.get(_httpServletRequest, "edit"));
-			urlMenuItem.setMethod("get");
-
-			urlMenuItem.setURL(editPortletURL.toString());
-
-			urlMenuItem.setUseDialog(true);
-
-			return urlMenuItem;
+		if (editPortletURL == null) {
+			return null;
 		}
-		catch (WindowStateException wse) {
-			throw new SystemException(wse);
-		}
+
+		URLMenuItem urlMenuItem = new URLMenuItem();
+
+		urlMenuItem.setLabel(LanguageUtil.get(_httpServletRequest, "edit"));
+		urlMenuItem.setMethod("get");
+
+		urlMenuItem.setURL(editPortletURL.toString());
+
+		return urlMenuItem;
 	}
 
 	private PortletURL _getCurrentSortingURL() throws PortletException {
@@ -425,25 +403,18 @@ public class SharedAssetsViewDisplayContext {
 			}
 
 			private String _getClassNameLabel(String className) {
-				String label = LanguageUtil.get(
-					_httpServletRequest, "asset-types");
-
 				if (Validator.isNotNull(className)) {
-					for (SharedAssetsFilterItem sharedAssetsFilterItem :
-							_sharedAssetsFilterItems) {
+					SharedAssetsFilterItem sharedAssetsFilterItem =
+						_sharedAssetsFilterItemTracker.
+							getSharedAssetsFilterItem(className);
 
-						if (className.equals(
-								sharedAssetsFilterItem.getClassName())) {
-
-							label = sharedAssetsFilterItem.getLabel(
-								_themeDisplay.getLocale());
-
-							break;
-						}
+					if (sharedAssetsFilterItem != null) {
+						return sharedAssetsFilterItem.getLabel(
+							_themeDisplay.getLocale());
 					}
 				}
 
-				return label;
+				return LanguageUtil.get(_httpServletRequest, "asset-types");
 			}
 
 		};
@@ -474,7 +445,7 @@ public class SharedAssetsViewDisplayContext {
 			SharingEntry sharingEntry,
 			LiferayPortletRequest liferayPortletRequest,
 			LiferayPortletResponse liferayPortletResponse)
-		throws PortalException, WindowStateException {
+		throws PortalException {
 
 		SharingEntryInterpreter sharingEntryInterpreter =
 			_sharingEntryInterpreterFunction.apply(sharingEntry);
@@ -494,24 +465,7 @@ public class SharedAssetsViewDisplayContext {
 		}
 
 		portletURL.setParameter(
-			"hideDefaultSuccessMessage", Boolean.TRUE.toString());
-
-		PortletDisplay portletDisplay = _themeDisplay.getPortletDisplay();
-
-		PortletURL redirectURL =
-			_liferayPortletResponse.createLiferayPortletURL(
-				_themeDisplay.getPlid(), portletDisplay.getId(),
-				PortletRequest.RENDER_PHASE, false);
-
-		redirectURL.setParameter(
-			"mvcRenderCommandName",
-			"/shared_assets/close_sharing_entry_edit_dialog");
-
-		portletURL.setParameter("redirect", redirectURL.toString());
-
-		portletURL.setParameter("showHeader", Boolean.FALSE.toString());
-
-		portletURL.setWindowState(LiferayWindowState.POP_UP);
+			"redirect", PortalUtil.getCurrentURL(_liferayPortletRequest));
 
 		return portletURL;
 	}
@@ -536,9 +490,10 @@ public class SharedAssetsViewDisplayContext {
 	private final PortletURL _currentURLObj;
 	private final GroupLocalService _groupLocalService;
 	private final HttpServletRequest _httpServletRequest;
+	private final ItemSelector _itemSelector;
 	private final LiferayPortletRequest _liferayPortletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;
-	private final List<SharedAssetsFilterItem> _sharedAssetsFilterItems;
+	private final SharedAssetsFilterItemTracker _sharedAssetsFilterItemTracker;
 	private final SharingConfigurationFactory _sharingConfigurationFactory;
 	private final Function<SharingEntry, SharingEntryInterpreter>
 		_sharingEntryInterpreterFunction;

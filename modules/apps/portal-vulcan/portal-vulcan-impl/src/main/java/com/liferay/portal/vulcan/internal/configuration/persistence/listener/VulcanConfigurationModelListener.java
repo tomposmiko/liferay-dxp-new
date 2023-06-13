@@ -46,11 +46,6 @@ import org.osgi.service.component.runtime.dto.ComponentDescriptionDTO;
 public class VulcanConfigurationModelListener
 	implements ConfigurationModelListener {
 
-	@Activate
-	public void activate(BundleContext bundleContext) {
-		_bundleContext = bundleContext;
-	}
-
 	@Override
 	public void onAfterSave(String pid, Dictionary<String, Object> dictionary) {
 		Collection<ComponentDescriptionDTO> componentDescriptionDTOs =
@@ -98,11 +93,16 @@ public class VulcanConfigurationModelListener
 
 			_validateUniqueConfiguration(path, dictionary);
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			throw new ConfigurationModelListenerException(
-				e.getMessage(), VulcanConfigurationModelListener.class,
+				exception.getMessage(), VulcanConfigurationModelListener.class,
 				getClass(), dictionary);
 		}
+	}
+
+	@Activate
+	protected void activate(BundleContext bundleContext) {
+		_bundleContext = bundleContext;
 	}
 
 	private void _validatePathExists(String path) throws Exception {

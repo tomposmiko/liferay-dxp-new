@@ -86,7 +86,7 @@ public abstract class DLFileShortcutLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements DLFileShortcutLocalService, IdentifiableOSGiService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>DLFileShortcutLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.document.library.kernel.service.DLFileShortcutLocalServiceUtil</code>.
@@ -1027,8 +1027,8 @@ public abstract class DLFileShortcutLocalServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

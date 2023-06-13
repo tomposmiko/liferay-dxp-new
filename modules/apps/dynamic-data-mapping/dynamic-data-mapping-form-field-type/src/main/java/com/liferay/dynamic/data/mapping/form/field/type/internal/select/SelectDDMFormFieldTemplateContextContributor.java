@@ -26,13 +26,12 @@ import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.AggregateResourceBundle;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
-import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,8 +39,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -64,15 +61,11 @@ public class SelectDDMFormFieldTemplateContextContributor
 		DDMFormField ddmFormField,
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
 
-		Map<String, Object> parameters = new HashMap<>();
-
-		parameters.put(
-			"dataSourceType",
-			GetterUtil.getString(
-				ddmFormField.getProperty("dataSourceType"), "manual"));
-		parameters.put(
-			"multiple",
-			getMultiple(ddmFormField, ddmFormFieldRenderingContext));
+		Map<String, Object> parameters = HashMapBuilder.<String, Object>put(
+			"dataSourceType", ddmFormField.getDataSourceType()
+		).put(
+			"multiple", getMultiple(ddmFormField, ddmFormFieldRenderingContext)
+		).build();
 
 		DDMFormFieldOptions ddmFormFieldOptions =
 			ddmFormFieldOptionsFactory.create(
@@ -84,16 +77,15 @@ public class SelectDDMFormFieldTemplateContextContributor
 				ddmFormFieldOptions, ddmFormFieldRenderingContext.getLocale(),
 				ddmFormFieldRenderingContext));
 
-		Map<String, String> stringsMap = new HashMap<>();
-
-		Locale displayLocale = getDisplayLocale(
-			ddmFormFieldRenderingContext.getHttpServletRequest());
+		Locale displayLocale = LocaleThreadLocal.getThemeDisplayLocale();
 
 		if (displayLocale == null) {
 			displayLocale = ddmFormFieldRenderingContext.getLocale();
 		}
 
 		ResourceBundle resourceBundle = getResourceBundle(displayLocale);
+
+		Map<String, String> stringsMap = new HashMap<>();
 
 		stringsMap.put(
 			"chooseAnOption",
@@ -126,14 +118,6 @@ public class SelectDDMFormFieldTemplateContextContributor
 		return parameters;
 	}
 
-	protected Locale getDisplayLocale(HttpServletRequest httpServletRequest) {
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		return themeDisplay.getLocale();
-	}
-
 	protected boolean getMultiple(
 		DDMFormField ddmFormField,
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
@@ -160,20 +144,21 @@ public class SelectDDMFormFieldTemplateContextContributor
 		List<Object> options = new ArrayList<>();
 
 		for (String optionValue : ddmFormFieldOptions.getOptionsValues()) {
-			Map<String, String> optionMap = new HashMap<>();
-
-			LocalizedValue optionLabel = ddmFormFieldOptions.getOptionLabels(
-				optionValue);
-
-			String optionLabelString = optionLabel.getString(locale);
-
-			if (ddmFormFieldRenderingContext.isViewMode()) {
-				optionLabelString = HtmlUtil.extractText(optionLabelString);
+			if (optionValue == null) {
+				continue;
 			}
 
-			optionMap.put("label", optionLabelString);
+			Map<String, String> optionMap = HashMapBuilder.put(
+				"label",
+				() -> {
+					LocalizedValue optionLabel =
+						ddmFormFieldOptions.getOptionLabels(optionValue);
 
-			optionMap.put("value", optionValue);
+					return optionLabel.getString(locale);
+				}
+			).put(
+				"value", optionValue
+			).build();
 
 			options.add(optionMap);
 		}
@@ -213,9 +198,9 @@ public class SelectDDMFormFieldTemplateContextContributor
 		try {
 			jsonArray = jsonFactory.createJSONArray(valueString);
 		}
-		catch (JSONException jsone) {
+		catch (JSONException jsonException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(jsone, jsone);
+				_log.debug(jsonException, jsonException);
 			}
 
 			jsonArray = jsonFactory.createJSONArray();

@@ -39,9 +39,11 @@ import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.TreeMapBuilder;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.test.rule.Inject;
@@ -95,18 +97,14 @@ public class LayoutConverterTest {
 
 	@Test
 	public void testConvertOneColumnMultiplePortlets() throws Exception {
-		Map<String, String[]> portletIdsMap = new HashMap<String, String[]>() {
-			{
-				put(
-					"column-1",
-					new String[] {
-						"com_liferay_hello_velocity_web_portlet_" +
-							"HelloVelocityPortlet",
-						"com_liferay_hello_world_web_portlet_HelloWorldPortlet",
-						"hello_soy_portlet"
-					});
+		Map<String, String[]> portletIdsMap = HashMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_hello_velocity_web_portlet_HelloVelocityPortlet",
+				"com_liferay_hello_world_web_portlet_HelloWorldPortlet",
+				"com_liferay_announcements_web_portlet_AnnouncementsPortlet"
 			}
-		};
+		).build();
 
 		List<Map<String, String[]>> portletIdsMaps =
 			new ArrayList<Map<String, String[]>>() {
@@ -125,15 +123,12 @@ public class LayoutConverterTest {
 
 	@Test
 	public void testConvertOneColumnSinglePortlet() throws Exception {
-		Map<String, String[]> portletIdsMap = new HashMap<String, String[]>() {
-			{
-				put(
-					"column-1",
-					new String[] {
-						"com_liferay_hello_world_web_portlet_HelloWorldPortlet"
-					});
+		Map<String, String[]> portletIdsMap = HashMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_hello_world_web_portlet_HelloWorldPortlet"
 			}
-		};
+		).build();
 
 		List<Map<String, String[]>> portletIdsMaps =
 			new ArrayList<Map<String, String[]>>() {
@@ -143,6 +138,228 @@ public class LayoutConverterTest {
 			};
 
 		_testConvert("1_column", portletIdsMaps);
+	}
+
+	@Test
+	public void testConvertOneThreeOneColumnsMultiplePortlets()
+		throws Exception {
+
+		Map<String, String[]> portletIdsMap1 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).build();
+		Map<String, String[]> portletIdsMap2 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_hello_velocity_web_portlet_HelloVelocityPortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).put(
+			"column-2",
+			new String[] {
+				"com_liferay_hello_world_web_portlet_HelloWorldPortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).put(
+			"column-3",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).build();
+		Map<String, String[]> portletIdsMap3 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).build();
+
+		List<Map<String, String[]>> portletIdsMaps =
+			new ArrayList<Map<String, String[]>>() {
+				{
+					add(portletIdsMap1);
+					add(portletIdsMap2);
+					add(portletIdsMap3);
+				}
+			};
+
+		_testConvert("1_3_1_columns", portletIdsMaps);
+	}
+
+	@Test
+	public void testConvertOneThreeOneColumnsNoPortlets() throws Exception {
+		_testConvertNoPortlets("1_3_1_columns");
+	}
+
+	@Test
+	public void testConvertOneThreeOneColumnsSinglePortlet() throws Exception {
+		Map<String, String[]> portletIdsMap1 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).build();
+		Map<String, String[]> portletIdsMap2 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_hello_velocity_web_portlet_HelloVelocityPortlet"
+			}
+		).put(
+			"column-2",
+			new String[] {
+				"com_liferay_hello_world_web_portlet_HelloWorldPortlet"
+			}
+		).put(
+			"column-3",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).build();
+		Map<String, String[]> portletIdsMap3 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).build();
+
+		List<Map<String, String[]>> portletIdsMaps =
+			new ArrayList<Map<String, String[]>>() {
+				{
+					add(portletIdsMap1);
+					add(portletIdsMap2);
+					add(portletIdsMap3);
+				}
+			};
+
+		_testConvert("1_3_1_columns", portletIdsMaps);
+	}
+
+	@Test
+	public void testConvertOneThreeTwoColumnsMultiplePortlets()
+		throws Exception {
+
+		Map<String, String[]> portletIdsMap1 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).build();
+		Map<String, String[]> portletIdsMap2 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_hello_velocity_web_portlet_HelloVelocityPortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).put(
+			"column-2",
+			new String[] {
+				"com_liferay_hello_world_web_portlet_HelloWorldPortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).put(
+			"column-3",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).build();
+		Map<String, String[]> portletIdsMap3 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).put(
+			"column-2",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).build();
+
+		List<Map<String, String[]>> portletIdsMaps =
+			new ArrayList<Map<String, String[]>>() {
+				{
+					add(portletIdsMap1);
+					add(portletIdsMap2);
+					add(portletIdsMap3);
+				}
+			};
+
+		_testConvert("1_3_2_columns", portletIdsMaps);
+	}
+
+	@Test
+	public void testConvertOneThreeTwoColumnsNoPortlets() throws Exception {
+		_testConvertNoPortlets("1_3_2_columns");
+	}
+
+	@Test
+	public void testConvertOneThreeTwoColumnsSinglePortlet() throws Exception {
+		Map<String, String[]> portletIdsMap1 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).build();
+		Map<String, String[]> portletIdsMap2 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_hello_velocity_web_portlet_HelloVelocityPortlet"
+			}
+		).put(
+			"column-2",
+			new String[] {
+				"com_liferay_hello_world_web_portlet_HelloWorldPortlet"
+			}
+		).put(
+			"column-3",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).build();
+		Map<String, String[]> portletIdsMap3 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).put(
+			"column-2",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).build();
+
+		List<Map<String, String[]>> portletIdsMaps =
+			new ArrayList<Map<String, String[]>>() {
+				{
+					add(portletIdsMap1);
+					add(portletIdsMap2);
+					add(portletIdsMap3);
+				}
+			};
+
+		_testConvert("1_3_2_columns", portletIdsMaps);
+	}
+
+	@Test
+	public void testConvertOneTwoColumnsIIMultiplePortlets() throws Exception {
+		_testConvertOneTwoColumnsMultiplePortlets("1_2_columns_ii");
+	}
+
+	@Test
+	public void testConvertOneTwoColumnsIINoPortlets() throws Exception {
+		_testConvertNoPortlets("1_2_columns_ii");
+	}
+
+	@Test
+	public void testConvertOneTwoColumnsIISinglePortlet() throws Exception {
+		_testConvertOneTwoColumnsSinglePortlet("1_2_columns_ii");
 	}
 
 	@Test
@@ -161,29 +378,60 @@ public class LayoutConverterTest {
 	}
 
 	@Test
-	public void testConvertThreeColumnsMultiplePortlets() throws Exception {
-		Map portletIdsMap = new TreeMap();
+	public void testConvertOneTwoOneColumnsIIMultiplePortlets()
+		throws Exception {
 
-		portletIdsMap.put(
+		_testConvertOneTwoOneColumnsMultiplePortlets("1_2_1_columns_i");
+	}
+
+	@Test
+	public void testConvertOneTwoOneColumnsIINoPortlets() throws Exception {
+		_testConvertNoPortlets("1_2_1_columns_ii");
+	}
+
+	@Test
+	public void testConvertOneTwoOneColumnsIISinglePortlet() throws Exception {
+		_testConvertOneTwoOneColumnsSinglePortlet("1_2_1_columns_ii");
+	}
+
+	@Test
+	public void testConvertOneTwoOneColumnsIMultiplePortlets()
+		throws Exception {
+
+		_testConvertOneTwoOneColumnsMultiplePortlets("1_2_1_columns_i");
+	}
+
+	@Test
+	public void testConvertOneTwoOneColumnsINoPortlets() throws Exception {
+		_testConvertNoPortlets("1_2_1_columns_i");
+	}
+
+	@Test
+	public void testConvertOneTwoOneColumnsISinglePortlet() throws Exception {
+		_testConvertOneTwoOneColumnsSinglePortlet("1_2_1_columns_i");
+	}
+
+	@Test
+	public void testConvertThreeColumnsMultiplePortlets() throws Exception {
+		Map<String, String[]> portletIdsMap = TreeMapBuilder.put(
 			"column-1",
 			new String[] {
 				"com_liferay_hello_velocity_web_portlet_HelloVelocityPortlet",
 				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
-			});
-
-		portletIdsMap.put(
+			}
+		).put(
 			"column-2",
 			new String[] {
 				"com_liferay_hello_world_web_portlet_HelloWorldPortlet",
-				"hello_soy_portlet"
-			});
-
-		portletIdsMap.put(
+				"com_liferay_announcements_web_portlet_AnnouncementsPortlet"
+			}
+		).put(
 			"column-3",
 			new String[] {
 				"com_liferay_clay_sample_web_portlet_ClaySamplePortlet",
 				"com_liferay_clay_sample_web_portlet_ClaySamplePortlet"
-			});
+			}
+		).build();
 
 		_testConvert("3_columns", Collections.singletonList(portletIdsMap));
 	}
@@ -195,23 +443,157 @@ public class LayoutConverterTest {
 
 	@Test
 	public void testConvertThreeColumnsSinglePortlet() throws Exception {
-		Map portletIdsMap = new TreeMap();
-
-		portletIdsMap.put(
+		Map<String, String[]> portletIdsMap = TreeMapBuilder.put(
 			"column-1",
 			new String[] {
 				"com_liferay_hello_velocity_web_portlet_HelloVelocityPortlet"
-			});
-
-		portletIdsMap.put(
+			}
+		).put(
 			"column-2",
 			new String[] {
 				"com_liferay_hello_world_web_portlet_HelloWorldPortlet"
-			});
-
-		portletIdsMap.put("column-3", new String[] {"hello_soy_portlet"});
+			}
+		).put(
+			"column-3",
+			new String[] {
+				"com_liferay_announcements_web_portlet_AnnouncementsPortlet"
+			}
+		).build();
 
 		_testConvert("3_columns", Collections.singletonList(portletIdsMap));
+	}
+
+	@Test
+	public void testConvertThreeTwoThreeColumnsMultiplePortlets()
+		throws Exception {
+
+		Map<String, String[]> portletIdsMap1 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).put(
+			"column-2",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).put(
+			"column-3",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).build();
+		Map<String, String[]> portletIdsMap2 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_hello_velocity_web_portlet_HelloVelocityPortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).put(
+			"column-2",
+			new String[] {
+				"com_liferay_hello_world_web_portlet_HelloWorldPortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).build();
+		Map<String, String[]> portletIdsMap3 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).put(
+			"column-2",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).put(
+			"column-3|",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).build();
+
+		List<Map<String, String[]>> portletIdsMaps =
+			new ArrayList<Map<String, String[]>>() {
+				{
+					add(portletIdsMap1);
+					add(portletIdsMap2);
+					add(portletIdsMap3);
+				}
+			};
+
+		_testConvert("3_2_3_columns", portletIdsMaps);
+	}
+
+	@Test
+	public void testConvertThreeTwoThreeColumnsNoPortlets() throws Exception {
+		_testConvertNoPortlets("3_2_3_columns");
+	}
+
+	@Test
+	public void testConvertThreeTwoThreeColumnsSinglePortlet()
+		throws Exception {
+
+		Map<String, String[]> portletIdsMap1 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).put(
+			"column-2",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).put(
+			"column-3",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).build();
+		Map<String, String[]> portletIdsMap2 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_hello_velocity_web_portlet_HelloVelocityPortlet"
+			}
+		).put(
+			"column-2",
+			new String[] {
+				"com_liferay_hello_world_web_portlet_HelloWorldPortlet"
+			}
+		).build();
+		Map<String, String[]> portletIdsMap3 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).put(
+			"column-2",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).put(
+			"column-3|",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).build();
+
+		List<Map<String, String[]>> portletIdsMaps =
+			new ArrayList<Map<String, String[]>>() {
+				{
+					add(portletIdsMap1);
+					add(portletIdsMap2);
+					add(portletIdsMap3);
+				}
+			};
+
+		_testConvert("3_2_3_columns", portletIdsMaps);
 	}
 
 	@Test
@@ -260,9 +642,195 @@ public class LayoutConverterTest {
 	}
 
 	@Test
-	public void testIsConvertibleFalseWidgetPageCustomizable()
-		throws Exception {
+	public void testConvertTwoOneTwoColumnsMultiplePortlets() throws Exception {
+		Map<String, String[]> portletIdsMap1 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).put(
+			"column-2",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).build();
+		Map<String, String[]> portletIdsMap2 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_hello_velocity_web_portlet_HelloVelocityPortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).build();
+		Map<String, String[]> portletIdsMap3 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_hello_world_web_portlet_HelloWorldPortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).put(
+			"column-2",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).build();
 
+		List<Map<String, String[]>> portletIdsMaps =
+			new ArrayList<Map<String, String[]>>() {
+				{
+					add(portletIdsMap1);
+					add(portletIdsMap2);
+					add(portletIdsMap3);
+				}
+			};
+
+		_testConvert("2_1_2_columns", portletIdsMaps);
+	}
+
+	@Test
+	public void testConvertTwoOneTwoColumnsNoPortlets() throws Exception {
+		_testConvertNoPortlets("2_1_2_columns");
+	}
+
+	@Test
+	public void testConvertTwoOneTwoColumnsSinglePortlet() throws Exception {
+		Map<String, String[]> portletIdsMap1 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).put(
+			"column-2",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).build();
+		Map<String, String[]> portletIdsMap2 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_hello_velocity_web_portlet_HelloVelocityPortlet"
+			}
+		).build();
+		Map<String, String[]> portletIdsMap3 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_hello_world_web_portlet_HelloWorldPortlet"
+			}
+		).put(
+			"column-2",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).build();
+
+		List<Map<String, String[]>> portletIdsMaps =
+			new ArrayList<Map<String, String[]>>() {
+				{
+					add(portletIdsMap1);
+					add(portletIdsMap2);
+					add(portletIdsMap3);
+				}
+			};
+
+		_testConvert("2_1_2_columns", portletIdsMaps);
+	}
+
+	@Test
+	public void testConvertTwoTwoColumnsMultiplePortlets() throws Exception {
+		Map<String, String[]> portletIdsMap1 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).put(
+			"column-2",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).build();
+		Map<String, String[]> portletIdsMap2 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_hello_velocity_web_portlet_HelloVelocityPortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).put(
+			"column-2",
+			new String[] {
+				"com_liferay_hello_world_web_portlet_HelloWorldPortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).build();
+
+		List<Map<String, String[]>> portletIdsMaps =
+			new ArrayList<Map<String, String[]>>() {
+				{
+					add(portletIdsMap1);
+					add(portletIdsMap2);
+				}
+			};
+
+		_testConvert("2_2_columns", portletIdsMaps);
+	}
+
+	@Test
+	public void testConvertTwoTwoColumnsNoPortlets() throws Exception {
+		_testConvertNoPortlets("2_2_columns");
+	}
+
+	@Test
+	public void testConvertTwoTwoColumnsSinglePortlet() throws Exception {
+		Map<String, String[]> portletIdsMap1 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).put(
+			"column-2",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).build();
+		Map<String, String[]> portletIdsMap2 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_hello_velocity_web_portlet_HelloVelocityPortlet"
+			}
+		).put(
+			"column-2",
+			new String[] {
+				"com_liferay_hello_world_web_portlet_HelloWorldPortlet"
+			}
+		).build();
+
+		List<Map<String, String[]>> portletIdsMaps =
+			new ArrayList<Map<String, String[]>>() {
+				{
+					add(portletIdsMap1);
+					add(portletIdsMap2);
+				}
+			};
+
+		_testConvert("2_2_columns", portletIdsMaps);
+	}
+
+	@Test
+	public void testIsConvertibleTrue() throws Exception {
+		Layout layout = LayoutTestUtil.addLayout(_group.getGroupId());
+
+		LayoutConverter layoutConverter =
+			_layoutConverterRegistry.getLayoutConverter(
+				_getLayoutTemplateId(layout));
+
+		Assert.assertTrue(layoutConverter.isConvertible(layout));
+	}
+
+	@Test
+	public void testIsConvertibleTrueWidgetPageCustomizable() throws Exception {
 		UnicodeProperties typeSettingsProperties = new UnicodeProperties();
 
 		typeSettingsProperties.setProperty(
@@ -275,11 +843,11 @@ public class LayoutConverterTest {
 			_layoutConverterRegistry.getLayoutConverter(
 				_getLayoutTemplateId(layout));
 
-		Assert.assertEquals(false, layoutConverter.isConvertible(layout));
+		Assert.assertTrue(layoutConverter.isConvertible(layout));
 	}
 
 	@Test
-	public void testIsConvertibleFalseWidgetPageWithNestedApplicationsWidget()
+	public void testIsConvertibleTrueWidgetPageWithNestedApplicationsWidget()
 		throws Exception {
 
 		UnicodeProperties typeSettingsProperties = new UnicodeProperties();
@@ -295,18 +863,7 @@ public class LayoutConverterTest {
 			_layoutConverterRegistry.getLayoutConverter(
 				_getLayoutTemplateId(layout));
 
-		Assert.assertEquals(false, layoutConverter.isConvertible(layout));
-	}
-
-	@Test
-	public void testIsConvertibleTrue() throws Exception {
-		Layout layout = LayoutTestUtil.addLayout(_group.getGroupId());
-
-		LayoutConverter layoutConverter =
-			_layoutConverterRegistry.getLayoutConverter(
-				_getLayoutTemplateId(layout));
-
-		Assert.assertEquals(true, layoutConverter.isConvertible(layout));
+		Assert.assertTrue(layoutConverter.isConvertible(layout));
 	}
 
 	private String _getLayoutTemplateId(Layout layout) {
@@ -471,37 +1028,26 @@ public class LayoutConverterTest {
 			String layoutTemplateId)
 		throws Exception {
 
-		Map<String, String[]> portletIdsMap1 = new TreeMap<String, String[]>() {
-			{
-				put(
-					"column-1",
-					new String[] {
-						"com_liferay_chart_sample_web_portlet_" +
-							"ChartSamplePortlet",
-						"com_liferay_chart_sample_web_portlet_" +
-							"ChartSamplePortlet"
-					});
+		Map<String, String[]> portletIdsMap1 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
 			}
-		};
-		Map<String, String[]> portletIdsMap2 = new TreeMap<String, String[]>() {
-			{
-				put(
-					"column-1",
-					new String[] {
-						"com_liferay_hello_velocity_web_portlet_" +
-							"HelloVelocityPortlet",
-						"com_liferay_chart_sample_web_portlet_" +
-							"ChartSamplePortlet"
-					});
-				put(
-					"column-2",
-					new String[] {
-						"com_liferay_hello_world_web_portlet_HelloWorldPortlet",
-						"com_liferay_chart_sample_web_portlet_" +
-							"ChartSamplePortlet"
-					});
+		).build();
+		Map<String, String[]> portletIdsMap2 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_hello_velocity_web_portlet_HelloVelocityPortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
 			}
-		};
+		).put(
+			"column-2",
+			new String[] {
+				"com_liferay_hello_world_web_portlet_HelloWorldPortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).build();
 
 		List<Map<String, String[]>> portletIdsMaps =
 			new ArrayList<Map<String, String[]>>() {
@@ -517,31 +1063,23 @@ public class LayoutConverterTest {
 	private void _testConvertOneTwoColumnsSinglePortlet(String layoutTemplateId)
 		throws Exception {
 
-		Map<String, String[]> portletIdsMap1 = new TreeMap<String, String[]>() {
-			{
-				put(
-					"column-1",
-					new String[] {
-						"com_liferay_chart_sample_web_portlet_" +
-							"ChartSamplePortlet"
-					});
+		Map<String, String[]> portletIdsMap1 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
 			}
-		};
-		Map<String, String[]> portletIdsMap2 = new TreeMap<String, String[]>() {
-			{
-				put(
-					"column-1",
-					new String[] {
-						"com_liferay_hello_velocity_web_portlet_" +
-							"HelloVelocityPortlet"
-					});
-				put(
-					"column-2",
-					new String[] {
-						"com_liferay_hello_world_web_portlet_HelloWorldPortlet"
-					});
+		).build();
+		Map<String, String[]> portletIdsMap2 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_hello_velocity_web_portlet_HelloVelocityPortlet"
 			}
-		};
+		).put(
+			"column-2",
+			new String[] {
+				"com_liferay_hello_world_web_portlet_HelloWorldPortlet"
+			}
+		).build();
 
 		List<Map<String, String[]>> portletIdsMaps =
 			new ArrayList<Map<String, String[]>>() {
@@ -554,27 +1092,106 @@ public class LayoutConverterTest {
 		_testConvert(layoutTemplateId, portletIdsMaps);
 	}
 
+	private void _testConvertOneTwoOneColumnsMultiplePortlets(
+			String layoutTemplateId)
+		throws Exception {
+
+		Map<String, String[]> portletIdsMap1 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).build();
+		Map<String, String[]> portletIdsMap2 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_hello_velocity_web_portlet_HelloVelocityPortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).put(
+			"column-2",
+			new String[] {
+				"com_liferay_hello_world_web_portlet_HelloWorldPortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).build();
+		Map<String, String[]> portletIdsMap3 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).build();
+
+		List<Map<String, String[]>> portletIdsMaps =
+			new ArrayList<Map<String, String[]>>() {
+				{
+					add(portletIdsMap1);
+					add(portletIdsMap2);
+					add(portletIdsMap3);
+				}
+			};
+
+		_testConvert(layoutTemplateId, portletIdsMaps);
+	}
+
+	private void _testConvertOneTwoOneColumnsSinglePortlet(
+			String layoutTemplateId)
+		throws Exception {
+
+		Map<String, String[]> portletIdsMap1 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).build();
+		Map<String, String[]> portletIdsMap2 = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_hello_velocity_web_portlet_HelloVelocityPortlet"
+			}
+		).put(
+			"column-2",
+			new String[] {
+				"com_liferay_hello_world_web_portlet_HelloWorldPortlet"
+			}
+		).build();
+		Map<String, String[]> portletIdsMap3 = TreeMapBuilder.put(
+			"column-3",
+			new String[] {
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
+			}
+		).build();
+
+		List<Map<String, String[]>> portletIdsMaps =
+			new ArrayList<Map<String, String[]>>() {
+				{
+					add(portletIdsMap1);
+					add(portletIdsMap2);
+					add(portletIdsMap3);
+				}
+			};
+
+		_testConvert(layoutTemplateId, portletIdsMaps);
+	}
+
 	private void _testConvertTwoColumnsMultiplePortlets(String layoutTemplateId)
 		throws Exception {
 
-		Map<String, String[]> portletIdsMap = new TreeMap<String, String[]>() {
-			{
-				put(
-					"column-1",
-					new String[] {
-						"com_liferay_hello_velocity_web_portlet_" +
-							"HelloVelocityPortlet",
-						"com_liferay_chart_sample_web_portlet_" +
-							"ChartSamplePortlet"
-					});
-				put(
-					"column-2",
-					new String[] {
-						"com_liferay_hello_world_web_portlet_HelloWorldPortlet",
-						"hello_soy_portlet"
-					});
+		Map<String, String[]> portletIdsMap = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_hello_velocity_web_portlet_HelloVelocityPortlet",
+				"com_liferay_chart_sample_web_portlet_ChartSamplePortlet"
 			}
-		};
+		).put(
+			"column-2",
+			new String[] {
+				"com_liferay_hello_world_web_portlet_HelloWorldPortlet",
+				"com_liferay_announcements_web_portlet_AnnouncementsPortlet"
+			}
+		).build();
 
 		List<Map<String, String[]>> portletIdsMaps =
 			new ArrayList<Map<String, String[]>>() {
@@ -589,21 +1206,17 @@ public class LayoutConverterTest {
 	private void _testConvertTwoColumnsSinglePortlet(String layoutTemplateId)
 		throws Exception {
 
-		Map<String, String[]> portletIdsMap = new TreeMap<String, String[]>() {
-			{
-				put(
-					"column-1",
-					new String[] {
-						"com_liferay_hello_velocity_web_portlet_" +
-							"HelloVelocityPortlet"
-					});
-				put(
-					"column-2",
-					new String[] {
-						"com_liferay_hello_world_web_portlet_HelloWorldPortlet"
-					});
+		Map<String, String[]> portletIdsMap = TreeMapBuilder.put(
+			"column-1",
+			new String[] {
+				"com_liferay_hello_velocity_web_portlet_HelloVelocityPortlet"
 			}
-		};
+		).put(
+			"column-2",
+			new String[] {
+				"com_liferay_hello_world_web_portlet_HelloWorldPortlet"
+			}
+		).build();
 
 		List<Map<String, String[]>> portletIdsMaps =
 			new ArrayList<Map<String, String[]>>() {

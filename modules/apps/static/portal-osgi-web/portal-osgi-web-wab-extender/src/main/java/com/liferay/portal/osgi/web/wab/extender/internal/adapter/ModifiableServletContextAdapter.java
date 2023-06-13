@@ -202,11 +202,11 @@ public class ModifiableServletContextAdapter
 
 			_eventListeners.put(eventListenerClass, null);
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			_log.error(
 				"Bundle " + _bundle + " is unable to load filter " + className);
 
-			throw new IllegalArgumentException(e);
+			throw new IllegalArgumentException(exception);
 		}
 	}
 
@@ -385,7 +385,7 @@ public class ModifiableServletContextAdapter
 
 				listenerDefinitions.add(listenerDefinition);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				_log.error(
 					"Bundle " + _bundle + " is unable to load listener " +
 						eventListenerClass);
@@ -502,7 +502,7 @@ public class ModifiableServletContextAdapter
 				filterDefinitions.put(
 					filterRegistrationImpl.getName(), filterDefinition);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				_log.error(
 					"Bundle " + _bundle + " is unable to load filter " +
 						filterClassName);
@@ -566,7 +566,7 @@ public class ModifiableServletContextAdapter
 				servletDefinitions.put(
 					servletRegistrationImpl.getName(), servletDefinition);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				_log.error(
 					"Bundle " + _bundle + " is unable to load servlet " +
 						servletClassName);
@@ -616,14 +616,14 @@ public class ModifiableServletContextAdapter
 
 				methods.put(method, adapterMethod);
 			}
-			catch (NoSuchMethodException nsme1) {
+			catch (NoSuchMethodException noSuchMethodException1) {
 				try {
 					Method method = ModifiableServletContext.class.getMethod(
 						name, parameterTypes);
 
 					methods.put(method, adapterMethod);
 				}
-				catch (NoSuchMethodException nsme2) {
+				catch (NoSuchMethodException noSuchMethodException2) {
 				}
 			}
 		}
@@ -647,7 +647,7 @@ public class ModifiableServletContextAdapter
 
 			methods.put(hashCodeMethod, hashCodeHandlerMethod);
 		}
-		catch (NoSuchMethodException nsme) {
+		catch (NoSuchMethodException noSuchMethodException) {
 		}
 
 		return Collections.unmodifiableMap(methods);

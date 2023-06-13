@@ -49,7 +49,7 @@ public abstract class LayoutBranchServiceBaseImpl
 	extends BaseServiceImpl
 	implements IdentifiableOSGiService, LayoutBranchService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>LayoutBranchService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.kernel.service.LayoutBranchServiceUtil</code>.
@@ -460,8 +460,8 @@ public abstract class LayoutBranchServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

@@ -64,16 +64,6 @@ public class LanguageResources {
 				return LanguageResources.getResourceBundle(locale);
 			}
 
-			/**
-			 * @deprecated As of Judson (7.1.x), replaced by {@link #loadResourceBundle(
-			 *             Locale)}
-			 */
-			@Deprecated
-			public ResourceBundle loadResourceBundle(String languageId) {
-				return ResourceBundleLoader.super.loadResourceBundle(
-					languageId);
-			}
-
 		};
 
 	public static String fixValue(String value) {
@@ -278,9 +268,9 @@ public class LanguageResources {
 				}
 			}
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(e, e);
+				_log.warn(exception, exception);
 			}
 		}
 

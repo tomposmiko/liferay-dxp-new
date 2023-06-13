@@ -177,11 +177,6 @@ public class OAuth2ApplicationScopeAliasesWrapper
 		return model.getUserUuid();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a o auth2 application scope aliases model instance should use the <code>OAuth2ApplicationScopeAliases</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

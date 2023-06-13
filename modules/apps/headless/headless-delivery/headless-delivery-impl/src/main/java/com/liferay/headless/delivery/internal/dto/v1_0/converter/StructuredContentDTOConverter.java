@@ -36,8 +36,6 @@ import com.liferay.headless.delivery.dto.v1_0.StructuredContent;
 import com.liferay.headless.delivery.dto.v1_0.StructuredContentLink;
 import com.liferay.headless.delivery.dto.v1_0.TaxonomyCategory;
 import com.liferay.headless.delivery.dto.v1_0.Value;
-import com.liferay.headless.delivery.dto.v1_0.converter.DTOConverter;
-import com.liferay.headless.delivery.dto.v1_0.converter.DTOConverterContext;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.AggregateRatingUtil;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.ContentDocumentUtil;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.ContentStructureUtil;
@@ -59,14 +57,19 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.vulcan.dto.converter.DTOConverter;
+import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 import com.liferay.portal.vulcan.util.JaxRsLinkUtil;
+import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 import com.liferay.portal.vulcan.util.TransformUtil;
 import com.liferay.ratings.kernel.service.RatingsStatsLocalService;
 import com.liferay.subscription.service.SubscriptionLocalService;
 
 import java.text.ParseException;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TimeZone;
@@ -82,10 +85,11 @@ import org.osgi.service.component.annotations.Reference;
  * @author Víctor Galán
  */
 @Component(
-	property = "asset.entry.class.name=com.liferay.journal.model.JournalArticle",
+	property = "dto.class.name=com.liferay.journal.model.JournalArticle",
 	service = {DTOConverter.class, StructuredContentDTOConverter.class}
 )
-public class StructuredContentDTOConverter implements DTOConverter {
+public class StructuredContentDTOConverter
+	implements DTOConverter<JournalArticle, StructuredContent> {
 
 	@Override
 	public String getContentType() {
@@ -97,28 +101,30 @@ public class StructuredContentDTOConverter implements DTOConverter {
 		throws Exception {
 
 		JournalArticle journalArticle = _journalArticleService.getLatestArticle(
-			dtoConverterContext.getResourcePrimKey());
+			(Long)dtoConverterContext.getId());
 
 		DDMStructure ddmStructure = journalArticle.getDDMStructure();
 
 		return new StructuredContent() {
 			{
-				availableLanguages = LocaleUtil.toW3cLanguageIds(
-					journalArticle.getAvailableLanguageIds());
+				actions = dtoConverterContext.getActions();
 				aggregateRating = AggregateRatingUtil.toAggregateRating(
 					_ratingsStatsLocalService.fetchStats(
 						JournalArticle.class.getName(),
 						journalArticle.getResourcePrimKey()));
+				availableLanguages = LocaleUtil.toW3cLanguageIds(
+					journalArticle.getAvailableLanguageIds());
 				contentFields = _toContentFields(
-					journalArticle, dtoConverterContext.getLocale(),
-					_dlAppService, _dlURLHelper,
-					_fieldsToDDMFormValuesConverter, _journalArticleService,
-					_journalConverter, _layoutLocalService);
+					dtoConverterContext, journalArticle, _dlAppService,
+					_dlURLHelper, _fieldsToDDMFormValuesConverter,
+					_journalArticleService, _journalConverter,
+					_layoutLocalService);
 				contentStructureId = ddmStructure.getStructureId();
 				creator = CreatorUtil.toCreator(
 					_portal,
 					_userLocalService.getUserById(journalArticle.getUserId()));
 				customFields = CustomFieldsUtil.toCustomFields(
+					dtoConverterContext.isAcceptAllLanguages(),
 					JournalArticle.class.getName(), journalArticle.getId(),
 					journalArticle.getCompanyId(),
 					dtoConverterContext.getLocale());
@@ -127,8 +133,14 @@ public class StructuredContentDTOConverter implements DTOConverter {
 				datePublished = journalArticle.getDisplayDate();
 				description = journalArticle.getDescription(
 					dtoConverterContext.getLocale());
+				description_i18n = LocalizedMapUtil.getLocalizedMap(
+					dtoConverterContext.isAcceptAllLanguages(),
+					journalArticle.getDescriptionMap());
 				friendlyUrlPath = journalArticle.getUrlTitle(
 					dtoConverterContext.getLocale());
+				friendlyUrlPath_i18n = LocalizedMapUtil.getLocalizedMap(
+					dtoConverterContext.isAcceptAllLanguages(),
+					journalArticle.getFriendlyURLMap());
 				id = journalArticle.getResourcePrimKey();
 				key = journalArticle.getArticleId();
 				keywords = ListUtil.toArray(
@@ -141,12 +153,13 @@ public class StructuredContentDTOConverter implements DTOConverter {
 					journalArticle.getResourcePrimKey());
 				relatedContents = RelatedContentUtil.toRelatedContents(
 					_assetEntryLocalService, _assetLinkLocalService,
+					dtoConverterContext.getDTOConverterRegistry(),
 					JournalArticle.class.getName(),
 					journalArticle.getResourcePrimKey(),
 					dtoConverterContext.getLocale());
 				renderedContents = _toRenderedContents(
-					ddmStructure, journalArticle,
-					dtoConverterContext.getLocale(),
+					dtoConverterContext.isAcceptAllLanguages(), ddmStructure,
+					journalArticle, dtoConverterContext.getLocale(),
 					dtoConverterContext.getUriInfoOptional());
 				siteId = journalArticle.getGroupId();
 				subscribed = _subscriptionLocalService.isSubscribed(
@@ -167,130 +180,21 @@ public class StructuredContentDTOConverter implements DTOConverter {
 					TaxonomyCategory.class);
 				title = journalArticle.getTitle(
 					dtoConverterContext.getLocale());
+				title_i18n = LocalizedMapUtil.getLocalizedMap(
+					dtoConverterContext.isAcceptAllLanguages(),
+					journalArticle.getTitleMap());
 				uuid = journalArticle.getUuid();
 			}
 		};
 	}
 
-	private ContentField _toContentField(
-			DDMFormFieldValue ddmFormFieldValue, Locale locale,
-			DLAppService dlAppService, DLURLHelper dlURLHelper,
-			JournalArticleService journalArticleService,
-			LayoutLocalService layoutLocalService)
-		throws Exception {
-
-		DDMFormField ddmFormField = ddmFormFieldValue.getDDMFormField();
-
-		return new ContentField() {
-			{
-				dataType = ContentStructureUtil.toDataType(ddmFormField);
-				inputControl = ContentStructureUtil.toInputControl(
-					ddmFormField);
-				name = ddmFormField.getName();
-				nestedContentFields = TransformUtil.transformToArray(
-					ddmFormFieldValue.getNestedDDMFormFieldValues(),
-					value -> _toContentField(
-						value, locale, dlAppService, dlURLHelper,
-						journalArticleService, layoutLocalService),
-					ContentField.class);
-				repeatable = ddmFormField.isRepeatable();
-				value = _toValue(
-					ddmFormFieldValue, dlAppService, dlURLHelper,
-					journalArticleService, layoutLocalService, locale);
-
-				setLabel(
-					() -> {
-						LocalizedValue localizedValue = ddmFormField.getLabel();
-
-						return localizedValue.getString(locale);
-					});
-			}
-		};
-	}
-
-	private ContentField[] _toContentFields(
-			JournalArticle journalArticle, Locale locale,
-			DLAppService dlAppService, DLURLHelper dlURLHelper,
-			FieldsToDDMFormValuesConverter fieldsToDDMFormValuesConverter,
-			JournalArticleService journalArticleService,
-			JournalConverter journalConverter,
-			LayoutLocalService layoutLocalService)
-		throws Exception {
-
-		DDMStructure ddmStructure = journalArticle.getDDMStructure();
-
-		Fields fields = journalConverter.getDDMFields(
-			ddmStructure, journalArticle.getContent());
-
-		DDMFormValues ddmFormValues = fieldsToDDMFormValuesConverter.convert(
-			ddmStructure, fields);
-
-		return TransformUtil.transformToArray(
-			ddmFormValues.getDDMFormFieldValues(),
-			aDDMFormFieldValue -> _toContentField(
-				aDDMFormFieldValue, locale, dlAppService, dlURLHelper,
-				journalArticleService, layoutLocalService),
-			ContentField.class);
-	}
-
-	private String _toDateString(Locale locale, String valueString) {
-		if (Validator.isNull(valueString)) {
-			return "";
-		}
-
-		try {
-			return DateUtil.getDate(
-				DateUtil.parseDate("yyyy-MM-dd", valueString, locale),
-				"yyyy-MM-dd'T'HH:mm:ss'Z'", locale,
-				TimeZone.getTimeZone("UTC"));
-		}
-		catch (ParseException pe) {
-			throw new BadRequestException(
-				"Unable to parse date that does not conform to ISO-8601", pe);
-		}
-	}
-
-	private RenderedContent[] _toRenderedContents(
-		DDMStructure ddmStructure, JournalArticle journalArticle, Locale locale,
-		Optional<UriInfo> uriInfoOptional) {
-
-		if (!uriInfoOptional.isPresent()) {
-			return null;
-		}
-
-		return TransformUtil.transformToArray(
-			ddmStructure.getTemplates(),
-			ddmTemplate -> new RenderedContent() {
-				{
-					renderedContentURL = JaxRsLinkUtil.getJaxRsLink(
-						BaseStructuredContentResourceImpl.class,
-						"getStructuredContentRenderedContentTemplate",
-						uriInfoOptional.get(),
-						journalArticle.getResourcePrimKey(),
-						ddmTemplate.getTemplateId());
-					templateName = ddmTemplate.getName(locale);
-				}
-			},
-			RenderedContent.class);
-	}
-
-	private Value _toValue(
-			DDMFormFieldValue ddmFormFieldValue, DLAppService dlAppService,
+	private Value _getValue(
+			DDMFormField ddmFormField, DLAppService dlAppService,
 			DLURLHelper dlURLHelper,
 			JournalArticleService journalArticleService,
-			LayoutLocalService layoutLocalService, Locale locale)
+			LayoutLocalService layoutLocalService, Locale locale,
+			String valueString)
 		throws Exception {
-
-		com.liferay.dynamic.data.mapping.model.Value value =
-			ddmFormFieldValue.getValue();
-
-		if (value == null) {
-			return new Value();
-		}
-
-		DDMFormField ddmFormField = ddmFormFieldValue.getDDMFormField();
-
-		String valueString = String.valueOf(value.getString(locale));
 
 		if (Objects.equals(DDMFormFieldType.DATE, ddmFormField.getType())) {
 			return new Value() {
@@ -377,6 +281,7 @@ public class StructuredContentDTOConverter implements DTOConverter {
 				{
 					structuredContentLink = new StructuredContentLink() {
 						{
+							contentType = "StructuredContent";
 							id = journalArticle.getResourcePrimKey();
 							title = journalArticle.getTitle();
 						}
@@ -415,6 +320,164 @@ public class StructuredContentDTOConverter implements DTOConverter {
 				data = valueString;
 			}
 		};
+	}
+
+	private ContentField _toContentField(
+			DDMFormFieldValue ddmFormFieldValue, DLAppService dlAppService,
+			DLURLHelper dlURLHelper, DTOConverterContext dtoConverterContext,
+			JournalArticleService journalArticleService,
+			LayoutLocalService layoutLocalService)
+		throws Exception {
+
+		DDMFormField ddmFormField = ddmFormFieldValue.getDDMFormField();
+
+		LocalizedValue localizedValue = ddmFormField.getLabel();
+
+		return new ContentField() {
+			{
+				dataType = ContentStructureUtil.toDataType(ddmFormField);
+				inputControl = ContentStructureUtil.toInputControl(
+					ddmFormField);
+				label = localizedValue.getString(
+					dtoConverterContext.getLocale());
+				label_i18n = LocalizedMapUtil.getLocalizedMap(
+					dtoConverterContext.isAcceptAllLanguages(),
+					localizedValue.getValues());
+				name = ddmFormField.getName();
+				nestedContentFields = TransformUtil.transformToArray(
+					ddmFormFieldValue.getNestedDDMFormFieldValues(),
+					value -> _toContentField(
+						value, dlAppService, dlURLHelper, dtoConverterContext,
+						journalArticleService, layoutLocalService),
+					ContentField.class);
+				repeatable = ddmFormField.isRepeatable();
+				value = _toValue(
+					ddmFormField, ddmFormFieldValue.getValue(), dlAppService,
+					dlURLHelper, journalArticleService, layoutLocalService,
+					dtoConverterContext.getLocale());
+
+				setValue_i18n(
+					() -> {
+						if (!dtoConverterContext.isAcceptAllLanguages()) {
+							return null;
+						}
+
+						Map<String, Object> map = new HashMap<>();
+
+						com.liferay.dynamic.data.mapping.model.Value ddmValue =
+							ddmFormFieldValue.getValue();
+
+						Map<Locale, String> ddmValueValues =
+							ddmValue.getValues();
+
+						for (Map.Entry<Locale, String> entry :
+								ddmValueValues.entrySet()) {
+
+							Locale locale = entry.getKey();
+
+							map.put(
+								locale.toLanguageTag(),
+								_getValue(
+									ddmFormField, dlAppService, dlURLHelper,
+									journalArticleService, layoutLocalService,
+									entry.getKey(), entry.getValue()));
+						}
+
+						return map;
+					});
+			}
+		};
+	}
+
+	private ContentField[] _toContentFields(
+			DTOConverterContext dtoConverterContext,
+			JournalArticle journalArticle, DLAppService dlAppService,
+			DLURLHelper dlURLHelper,
+			FieldsToDDMFormValuesConverter fieldsToDDMFormValuesConverter,
+			JournalArticleService journalArticleService,
+			JournalConverter journalConverter,
+			LayoutLocalService layoutLocalService)
+		throws Exception {
+
+		DDMStructure ddmStructure = journalArticle.getDDMStructure();
+
+		Fields fields = journalConverter.getDDMFields(
+			ddmStructure, journalArticle.getContent());
+
+		DDMFormValues ddmFormValues = fieldsToDDMFormValuesConverter.convert(
+			ddmStructure, fields);
+
+		return TransformUtil.transformToArray(
+			ddmFormValues.getDDMFormFieldValues(),
+			ddmFormFieldValue -> _toContentField(
+				ddmFormFieldValue, dlAppService, dlURLHelper,
+				dtoConverterContext, journalArticleService, layoutLocalService),
+			ContentField.class);
+	}
+
+	private String _toDateString(Locale locale, String valueString) {
+		if (Validator.isNull(valueString)) {
+			return "";
+		}
+
+		try {
+			return DateUtil.getDate(
+				DateUtil.parseDate("yyyy-MM-dd", valueString, locale),
+				"yyyy-MM-dd'T'HH:mm:ss'Z'", locale,
+				TimeZone.getTimeZone("UTC"));
+		}
+		catch (ParseException parseException) {
+			throw new BadRequestException(
+				"Unable to parse date that does not conform to ISO-8601",
+				parseException);
+		}
+	}
+
+	private RenderedContent[] _toRenderedContents(
+		boolean acceptAllLanguages, DDMStructure ddmStructure,
+		JournalArticle journalArticle, Locale locale,
+		Optional<UriInfo> uriInfoOptional) {
+
+		if (!uriInfoOptional.isPresent()) {
+			return null;
+		}
+
+		return TransformUtil.transformToArray(
+			ddmStructure.getTemplates(),
+			ddmTemplate -> new RenderedContent() {
+				{
+					renderedContentURL = JaxRsLinkUtil.getJaxRsLink(
+						"headless-delivery",
+						BaseStructuredContentResourceImpl.class,
+						"getStructuredContentRenderedContentTemplate",
+						uriInfoOptional.get(),
+						journalArticle.getResourcePrimKey(),
+						ddmTemplate.getTemplateId());
+					templateName = ddmTemplate.getName(locale);
+					templateName_i18n = LocalizedMapUtil.getLocalizedMap(
+						acceptAllLanguages, ddmTemplate.getNameMap());
+				}
+			},
+			RenderedContent.class);
+	}
+
+	private Value _toValue(
+			DDMFormField ddmFormField,
+			com.liferay.dynamic.data.mapping.model.Value value,
+			DLAppService dlAppService, DLURLHelper dlURLHelper,
+			JournalArticleService journalArticleService,
+			LayoutLocalService layoutLocalService, Locale locale)
+		throws Exception {
+
+		if (value == null) {
+			return new Value();
+		}
+
+		String valueString = String.valueOf(value.getString(locale));
+
+		return _getValue(
+			ddmFormField, dlAppService, dlURLHelper, journalArticleService,
+			layoutLocalService, locale, valueString);
 	}
 
 	@Reference

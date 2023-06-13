@@ -41,14 +41,15 @@ public class KaleoInstanceOrderByComparator
 			orderByComparator, kaleoWorkflowModelConverter, serviceContext);
 	}
 
+	@Override
 	public WorkflowInstance adapt(KaleoInstance kaleoInstance) {
 		try {
 			return _kaleoWorkflowModelConverter.toWorkflowInstance(
 				kaleoInstance,
 				kaleoInstance.getRootKaleoInstanceToken(_serviceContext));
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

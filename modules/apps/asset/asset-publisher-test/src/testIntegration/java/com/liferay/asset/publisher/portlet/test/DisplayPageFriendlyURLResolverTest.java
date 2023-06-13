@@ -38,13 +38,15 @@ import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.webdav.methods.Method;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.service.test.ServiceTestUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.util.PortalInstances;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -77,7 +79,9 @@ public class DisplayPageFriendlyURLResolverTest {
 
 	@Before
 	public void setUp() throws Exception {
-		ServiceTestUtil.initPermissions();
+		PortalInstances.addCompanyId(TestPropsValues.getCompanyId());
+
+		UserTestUtil.setUser(TestPropsValues.getUser());
 
 		_group = GroupTestUtil.addGroup();
 
@@ -112,13 +116,13 @@ public class DisplayPageFriendlyURLResolverTest {
 			layout.getGroupId(), layout.isPrivateLayout(), layout.getLayoutId(),
 			layout.getTypeSettings());
 
-		Map<Locale, String> titleMap = new HashMap<>();
+		Map<Locale, String> titleMap = HashMapBuilder.put(
+			LocaleUtil.US, "Test Journal Article"
+		).build();
 
-		titleMap.put(LocaleUtil.US, "Test Journal Article");
-
-		Map<Locale, String> contentMap = new HashMap<>();
-
-		contentMap.put(LocaleUtil.US, "This test content is in English.");
+		Map<Locale, String> contentMap = HashMapBuilder.put(
+			LocaleUtil.US, "This test content is in English."
+		).build();
 
 		_article = JournalTestUtil.addArticle(
 			_group.getGroupId(),
@@ -166,8 +170,8 @@ public class DisplayPageFriendlyURLResolverTest {
 
 			Assert.fail();
 		}
-		catch (NoSuchLayoutException nsle) {
-			_assertCause(nsle, urlTitle);
+		catch (NoSuchLayoutException noSuchLayoutException) {
+			_assertCause(noSuchLayoutException, urlTitle);
 		}
 	}
 
@@ -184,8 +188,8 @@ public class DisplayPageFriendlyURLResolverTest {
 
 			Assert.fail();
 		}
-		catch (NoSuchLayoutException nsle) {
-			_assertCause(nsle, urlTitle);
+		catch (NoSuchLayoutException noSuchLayoutException) {
+			_assertCause(noSuchLayoutException, urlTitle);
 		}
 	}
 
@@ -205,13 +209,15 @@ public class DisplayPageFriendlyURLResolverTest {
 
 			Assert.fail();
 		}
-		catch (NoSuchLayoutException nsle) {
-			_assertCause(nsle, urlTitle);
+		catch (NoSuchLayoutException noSuchLayoutException) {
+			_assertCause(noSuchLayoutException, urlTitle);
 		}
 	}
 
-	private void _assertCause(NoSuchLayoutException nsle, String urlTitle) {
-		Throwable cause = nsle.getCause();
+	private void _assertCause(
+		NoSuchLayoutException noSuchLayoutException, String urlTitle) {
+
+		Throwable cause = noSuchLayoutException.getCause();
 
 		Assert.assertTrue(
 			String.valueOf(cause), cause instanceof NoSuchArticleException);

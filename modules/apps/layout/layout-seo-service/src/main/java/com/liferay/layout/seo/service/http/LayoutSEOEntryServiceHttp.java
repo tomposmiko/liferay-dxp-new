@@ -54,8 +54,14 @@ public class LayoutSEOEntryServiceHttp {
 	public static com.liferay.layout.seo.model.LayoutSEOEntry
 			updateLayoutSEOEntry(
 				HttpPrincipal httpPrincipal, long groupId,
-				boolean privateLayout, long layoutId, boolean enabled,
+				boolean privateLayout, long layoutId,
+				boolean canonicalURLEnabled,
 				java.util.Map<java.util.Locale, String> canonicalURLMap,
+				boolean openGraphDescriptionEnabled,
+				java.util.Map<java.util.Locale, String> openGraphDescriptionMap,
+				java.util.Map<java.util.Locale, String> openGraphImageAltMap,
+				long openGraphImageFileEntryId, boolean openGraphTitleEnabled,
+				java.util.Map<java.util.Locale, String> openGraphTitleMap,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -65,32 +71,83 @@ public class LayoutSEOEntryServiceHttp {
 				_updateLayoutSEOEntryParameterTypes0);
 
 			MethodHandler methodHandler = new MethodHandler(
-				methodKey, groupId, privateLayout, layoutId, enabled,
-				canonicalURLMap, serviceContext);
+				methodKey, groupId, privateLayout, layoutId,
+				canonicalURLEnabled, canonicalURLMap,
+				openGraphDescriptionEnabled, openGraphDescriptionMap,
+				openGraphImageAltMap, openGraphImageFileEntryId,
+				openGraphTitleEnabled, openGraphTitleMap, serviceContext);
 
 			Object returnObj = null;
 
 			try {
 				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
 			}
-			catch (Exception e) {
-				if (e instanceof
+			catch (Exception exception) {
+				if (exception instanceof
 						com.liferay.portal.kernel.exception.PortalException) {
 
 					throw (com.liferay.portal.kernel.exception.PortalException)
-						e;
+						exception;
 				}
 
 				throw new com.liferay.portal.kernel.exception.SystemException(
-					e);
+					exception);
 			}
 
 			return (com.liferay.layout.seo.model.LayoutSEOEntry)returnObj;
 		}
-		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+		catch (com.liferay.portal.kernel.exception.SystemException
+					systemException) {
 
-			throw se;
+			_log.error(systemException, systemException);
+
+			throw systemException;
+		}
+	}
+
+	public static com.liferay.layout.seo.model.LayoutSEOEntry
+			updateLayoutSEOEntry(
+				HttpPrincipal httpPrincipal, long groupId,
+				boolean privateLayout, long layoutId,
+				boolean enabledCanonicalURLMap,
+				java.util.Map<java.util.Locale, String> canonicalURLMap,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		try {
+			MethodKey methodKey = new MethodKey(
+				LayoutSEOEntryServiceUtil.class, "updateLayoutSEOEntry",
+				_updateLayoutSEOEntryParameterTypes1);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, groupId, privateLayout, layoutId,
+				enabledCanonicalURLMap, canonicalURLMap, serviceContext);
+
+			Object returnObj = null;
+
+			try {
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception exception) {
+				if (exception instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						exception;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					exception);
+			}
+
+			return (com.liferay.layout.seo.model.LayoutSEOEntry)returnObj;
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException
+					systemException) {
+
+			_log.error(systemException, systemException);
+
+			throw systemException;
 		}
 	}
 
@@ -98,6 +155,13 @@ public class LayoutSEOEntryServiceHttp {
 		LayoutSEOEntryServiceHttp.class);
 
 	private static final Class<?>[] _updateLayoutSEOEntryParameterTypes0 =
+		new Class[] {
+			long.class, boolean.class, long.class, boolean.class,
+			java.util.Map.class, boolean.class, java.util.Map.class,
+			java.util.Map.class, long.class, boolean.class, java.util.Map.class,
+			com.liferay.portal.kernel.service.ServiceContext.class
+		};
+	private static final Class<?>[] _updateLayoutSEOEntryParameterTypes1 =
 		new Class[] {
 			long.class, boolean.class, long.class, boolean.class,
 			java.util.Map.class,

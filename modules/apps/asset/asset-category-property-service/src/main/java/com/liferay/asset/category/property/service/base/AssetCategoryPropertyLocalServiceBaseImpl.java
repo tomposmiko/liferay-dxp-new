@@ -65,7 +65,7 @@ public abstract class AssetCategoryPropertyLocalServiceBaseImpl
 	implements AopService, AssetCategoryPropertyLocalService,
 			   IdentifiableOSGiService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>AssetCategoryPropertyLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.asset.category.property.service.AssetCategoryPropertyLocalServiceUtil</code>.
@@ -401,8 +401,8 @@ public abstract class AssetCategoryPropertyLocalServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

@@ -21,7 +21,7 @@ SelectAssetListDisplayContext selectAssetListDisplayContext = new SelectAssetLis
 %>
 
 <clay:management-toolbar
-	displayContext="<%= new SelectAssetListManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, selectAssetListDisplayContext) %>"
+	displayContext="<%= new SelectAssetListManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, selectAssetListDisplayContext) %>"
 />
 
 <div class="container-fluid-1280" id="<portlet:namespace />assetLists">
@@ -38,10 +38,17 @@ SelectAssetListDisplayContext selectAssetListDisplayContext = new SelectAssetLis
 		>
 
 			<%
-			Map<String, Object> data = new HashMap<>();
+			Map<String, Object> data = HashMapBuilder.<String, Object>put(
+				"assetListEntryId", assetListEntry.getAssetListEntryId()
+			).put(
+				"assetListEntryTitle", assetListEntry.getTitle()
+			).build();
 
-			data.put("assetListEntryId", assetListEntry.getAssetListEntryId());
-			data.put("assetListEntryTitle", assetListEntry.getTitle());
+			String title = HtmlUtil.escape(assetListEntry.getTitle());
+
+			if (assetListEntry.getGroupId() != scopeGroupId) {
+				title = HtmlUtil.escape(assetListEntry.getUnambiguousTitle(locale));
+			}
 			%>
 
 			<liferay-ui:search-container-column-icon
@@ -55,11 +62,11 @@ SelectAssetListDisplayContext selectAssetListDisplayContext = new SelectAssetLis
 					<c:choose>
 						<c:when test="<%= assetListEntry.getAssetListEntryId() != selectAssetListDisplayContext.getSelectedAssetListEntryId() %>">
 							<aui:a cssClass="selector-button" data="<%= data %>" href="javascript:;">
-								<%= HtmlUtil.escape(assetListEntry.getTitle()) %>
+								<%= title %>
 							</aui:a>
 						</c:when>
 						<c:otherwise>
-							<%= HtmlUtil.escape(assetListEntry.getTitle()) %>
+							<%= title %>
 						</c:otherwise>
 					</c:choose>
 				</h5>

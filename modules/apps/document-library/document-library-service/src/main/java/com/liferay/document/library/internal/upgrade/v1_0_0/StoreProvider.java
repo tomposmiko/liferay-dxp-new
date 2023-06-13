@@ -35,7 +35,7 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 /**
  * @author Sergio González
  */
-@Component(immediate = true, service = {})
+@Component(service = {})
 public class StoreProvider {
 
 	@Activate
@@ -103,7 +103,7 @@ public class StoreProvider {
 			try {
 				_serviceRegistration.unregister();
 			}
-			catch (IllegalStateException ise) {
+			catch (IllegalStateException illegalStateException) {
 			}
 		}
 

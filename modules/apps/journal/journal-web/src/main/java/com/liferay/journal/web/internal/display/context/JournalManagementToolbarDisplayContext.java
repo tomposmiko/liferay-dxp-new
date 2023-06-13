@@ -42,6 +42,7 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -51,7 +52,6 @@ import com.liferay.staging.StagingGroupHelperUtil;
 import com.liferay.trash.TrashHelper;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -67,15 +67,15 @@ public class JournalManagementToolbarDisplayContext
 	extends SearchContainerManagementToolbarDisplayContext {
 
 	public JournalManagementToolbarDisplayContext(
+			HttpServletRequest httpServletRequest,
 			LiferayPortletRequest liferayPortletRequest,
 			LiferayPortletResponse liferayPortletResponse,
-			HttpServletRequest httpServletRequest,
 			JournalDisplayContext journalDisplayContext,
 			TrashHelper trashHelper)
 		throws PortalException {
 
 		super(
-			liferayPortletRequest, liferayPortletResponse, httpServletRequest,
+			httpServletRequest, liferayPortletRequest, liferayPortletResponse,
 			journalDisplayContext.getSearchContainer());
 
 		_journalDisplayContext = journalDisplayContext;
@@ -148,79 +148,99 @@ public class JournalManagementToolbarDisplayContext
 	}
 
 	public Map<String, Object> getComponentContext() throws Exception {
-		Map<String, Object> componentContext = new HashMap<>();
+		return HashMapBuilder.<String, Object>put(
+			"addArticleURL",
+			() -> {
+				PortletURL addArticleURL =
+					liferayPortletResponse.createRenderURL();
 
-		PortletURL addArticleURL = liferayPortletResponse.createRenderURL();
+				addArticleURL.setParameter("mvcPath", "/edit_article.jsp");
+				addArticleURL.setParameter(
+					"redirect", _themeDisplay.getURLCurrent());
+				addArticleURL.setParameter(
+					"groupId", String.valueOf(_themeDisplay.getScopeGroupId()));
+				addArticleURL.setParameter(
+					"folderId",
+					String.valueOf(_journalDisplayContext.getFolderId()));
 
-		addArticleURL.setParameter("mvcPath", "/edit_article.jsp");
-		addArticleURL.setParameter("redirect", _themeDisplay.getURLCurrent());
-		addArticleURL.setParameter(
-			"groupId", String.valueOf(_themeDisplay.getScopeGroupId()));
-		addArticleURL.setParameter(
-			"folderId", String.valueOf(_journalDisplayContext.getFolderId()));
-
-		componentContext.put("addArticleURL", addArticleURL.toString());
-
-		componentContext.put(
+				return addArticleURL.toString();
+			}
+		).put(
 			"folderId",
-			String.valueOf(JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID));
+			String.valueOf(JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID)
+		).put(
+			"moveEntriesURL",
+			() -> {
+				PortletURL moveEntriesURL =
+					liferayPortletResponse.createRenderURL();
 
-		PortletURL moveEntriesURL = liferayPortletResponse.createRenderURL();
+				moveEntriesURL.setParameter("mvcPath", "/move_entries.jsp");
 
-		moveEntriesURL.setParameter("mvcPath", "/move_entries.jsp");
+				String redirect = ParamUtil.getString(
+					liferayPortletRequest, "redirect",
+					_themeDisplay.getURLCurrent());
 
-		String redirect = ParamUtil.getString(
-			liferayPortletRequest, "redirect", _themeDisplay.getURLCurrent());
+				moveEntriesURL.setParameter("redirect", redirect);
 
-		moveEntriesURL.setParameter("redirect", redirect);
+				String referringPortletResource = ParamUtil.getString(
+					liferayPortletRequest, "referringPortletResource");
 
-		String referringPortletResource = ParamUtil.getString(
-			liferayPortletRequest, "referringPortletResource");
+				moveEntriesURL.setParameter(
+					"referringPortletResource", referringPortletResource);
 
-		moveEntriesURL.setParameter(
-			"referringPortletResource", referringPortletResource);
+				return moveEntriesURL.toString();
+			}
+		).put(
+			"openViewMoreStructuresURL",
+			() -> {
+				PortletURL openViewMoreStructuresURL =
+					liferayPortletResponse.createRenderURL();
 
-		componentContext.put("moveEntriesURL", moveEntriesURL.toString());
+				openViewMoreStructuresURL.setParameter(
+					"mvcPath", "/view_more_menu_items.jsp");
+				openViewMoreStructuresURL.setParameter(
+					"folderId",
+					String.valueOf(_journalDisplayContext.getFolderId()));
+				openViewMoreStructuresURL.setParameter(
+					"eventName",
+					liferayPortletResponse.getNamespace() +
+						"selectAddMenuItem");
+				openViewMoreStructuresURL.setWindowState(
+					LiferayWindowState.POP_UP);
 
-		PortletURL openViewMoreStructuresURL =
-			liferayPortletResponse.createRenderURL();
+				return openViewMoreStructuresURL.toString();
+			}
+		).put(
+			"selectEntityURL",
+			() -> {
+				PortletURL selectEntityURL =
+					liferayPortletResponse.createRenderURL();
 
-		openViewMoreStructuresURL.setParameter(
-			"mvcPath", "/view_more_menu_items.jsp");
-		openViewMoreStructuresURL.setParameter(
-			"folderId", String.valueOf(_journalDisplayContext.getFolderId()));
-		openViewMoreStructuresURL.setParameter(
-			"eventName",
-			liferayPortletResponse.getNamespace() + "selectAddMenuItem");
-		openViewMoreStructuresURL.setWindowState(LiferayWindowState.POP_UP);
+				selectEntityURL.setParameter(
+					"mvcPath", "/select_ddm_structure.jsp");
+				selectEntityURL.setWindowState(LiferayWindowState.POP_UP);
 
-		componentContext.put(
-			"openViewMoreStructuresURL", openViewMoreStructuresURL.toString());
-
-		PortletURL selectEntityURL = liferayPortletResponse.createRenderURL();
-
-		selectEntityURL.setParameter("mvcPath", "/select_ddm_structure.jsp");
-		selectEntityURL.setWindowState(LiferayWindowState.POP_UP);
-
-		componentContext.put("selectEntityURL", selectEntityURL.toString());
-
-		componentContext.put(
+				return selectEntityURL.toString();
+			}
+		).put(
 			"trashEnabled",
-			_trashHelper.isTrashEnabled(_themeDisplay.getScopeGroupId()));
-
-		PortletURL viewDDMStructureArticlesURL =
-			liferayPortletResponse.createRenderURL();
-
-		viewDDMStructureArticlesURL.setParameter("navigation", "structure");
-		viewDDMStructureArticlesURL.setParameter(
-			"folderId",
-			String.valueOf(JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID));
-
-		componentContext.put(
+			_trashHelper.isTrashEnabled(_themeDisplay.getScopeGroupId())
+		).put(
 			"viewDDMStructureArticlesURL",
-			viewDDMStructureArticlesURL.toString());
+			() -> {
+				PortletURL viewDDMStructureArticlesURL =
+					liferayPortletResponse.createRenderURL();
 
-		return componentContext;
+				viewDDMStructureArticlesURL.setParameter(
+					"navigation", "structure");
+				viewDDMStructureArticlesURL.setParameter(
+					"folderId",
+					String.valueOf(
+						JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID));
+
+				return viewDDMStructureArticlesURL.toString();
+			}
+		).build();
 	}
 
 	@Override
@@ -233,9 +253,9 @@ public class JournalManagementToolbarDisplayContext
 		try {
 			return _getCreationMenu();
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug("Unable to get creation menu", pe);
+				_log.debug("Unable to get creation menu", portalException);
 			}
 		}
 
@@ -387,6 +407,12 @@ public class JournalManagementToolbarDisplayContext
 
 		portletURL.setParameter(
 			"folderId", String.valueOf(_journalDisplayContext.getFolderId()));
+		portletURL.setParameter(
+			"navigation", _journalDisplayContext.getNavigation());
+		portletURL.setParameter("orderByCol", getOrderByCol());
+		portletURL.setParameter("orderByType", getOrderByType());
+		portletURL.setParameter(
+			"status", String.valueOf(_journalDisplayContext.getStatus()));
 
 		return portletURL.toString();
 	}
@@ -435,9 +461,9 @@ public class JournalManagementToolbarDisplayContext
 		try {
 			return _isShowAddButton();
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug("Unable to get creation menu", pe);
+				_log.debug("Unable to get creation menu", portalException);
 			}
 
 			return false;

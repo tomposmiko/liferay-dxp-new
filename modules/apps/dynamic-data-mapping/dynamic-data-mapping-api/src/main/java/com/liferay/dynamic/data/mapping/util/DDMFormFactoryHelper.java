@@ -102,7 +102,7 @@ public class DDMFormFactoryHelper {
 				resourceBundles.add(resourceBundle);
 			}
 		}
-		catch (MissingResourceException mre) {
+		catch (MissingResourceException missingResourceException) {
 		}
 	}
 
@@ -168,7 +168,7 @@ public class DDMFormFactoryHelper {
 
 	protected Locale getDefaultLocale() {
 		if (Validator.isNull(_ddmForm.defaultLanguageId())) {
-			Locale defaultLocale = LocaleThreadLocal.getThemeDisplayLocale();
+			Locale defaultLocale = LocaleThreadLocal.getSiteDefaultLocale();
 
 			if (defaultLocale == null) {
 				defaultLocale = LocaleUtil.getDefault();

@@ -61,7 +61,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface JournalFeedLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link JournalFeedLocalServiceUtil} to access the journal feed local service. Add custom service methods to <code>com.liferay.journal.service.impl.JournalFeedLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -85,28 +85,9 @@ public interface JournalFeedLocalService
 			JournalFeed feed, ModelPermissions modelPermissions)
 		throws PortalException;
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #addFeedResources(JournalFeed, ModelPermissions)}
-	 */
-	@Deprecated
-	public void addFeedResources(
-			JournalFeed feed, String[] groupPermissions,
-			String[] guestPermissions)
-		throws PortalException;
-
 	public void addFeedResources(
 			long feedId, boolean addGroupPermissions,
 			boolean addGuestPermissions)
-		throws PortalException;
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #addFeedResources(JournalFeed, ModelPermissions)}
-	 */
-	@Deprecated
-	public void addFeedResources(
-			long feedId, String[] groupPermissions, String[] guestPermissions)
 		throws PortalException;
 
 	/**

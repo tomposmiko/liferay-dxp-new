@@ -87,16 +87,6 @@ import org.osgi.util.tracker.BundleTracker;
 @Component(immediate = true, service = LPKGDeployer.class)
 public class DefaultLPKGDeployer implements LPKGDeployer {
 
-	@Activate
-	public void activate(BundleContext bundleContext) {
-		try {
-			_activate(bundleContext);
-		}
-		catch (Throwable t) {
-			_throwableCollector.collect(t);
-		}
-	}
-
 	@Override
 	public List<Bundle> deploy(BundleContext bundleContext, File lpkgFile)
 		throws IOException {
@@ -136,12 +126,12 @@ public class DefaultLPKGDeployer implements LPKGDeployer {
 						"Removed old LPKG bundle " + bundle.getLocation());
 				}
 			}
-			catch (BundleException be) {
+			catch (BundleException bundleException) {
 				_log.error(
 					StringBundler.concat(
 						"Unable to uninstall ", bundle, " in order to install ",
 						lpkgFile),
-					be);
+					bundleException);
 			}
 		}
 
@@ -213,8 +203,8 @@ public class DefaultLPKGDeployer implements LPKGDeployer {
 
 			return bundles;
 		}
-		catch (Exception e) {
-			throw new IOException(e);
+		catch (Exception exception) {
+			throw new IOException(exception);
 		}
 	}
 
@@ -253,6 +243,16 @@ public class DefaultLPKGDeployer implements LPKGDeployer {
 			return new UnsyncByteArrayInputStream(
 				unsyncByteArrayOutputStream.unsafeGetByteArray(), 0,
 				unsyncByteArrayOutputStream.size());
+		}
+	}
+
+	@Activate
+	protected void activate(BundleContext bundleContext) {
+		try {
+			_activate(bundleContext);
+		}
+		catch (Throwable t) {
+			_throwableCollector.collect(t);
 		}
 	}
 
@@ -390,8 +390,8 @@ public class DefaultLPKGDeployer implements LPKGDeployer {
 					lpkgBundle.start();
 				}
 			}
-			catch (Exception e) {
-				_log.error("Unable to deploy LPKG file " + lpkgFile, e);
+			catch (Exception exception) {
+				_log.error("Unable to deploy LPKG file " + lpkgFile, exception);
 			}
 		}
 	}

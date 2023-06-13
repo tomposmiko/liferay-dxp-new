@@ -381,18 +381,6 @@ public class BlogsEntryWrapper
 	}
 
 	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #getSmallImageURL(ThemeDisplay)}
-	 */
-	@Deprecated
-	@Override
-	public String getEntryImageURL(
-		com.liferay.portal.kernel.theme.ThemeDisplay themeDisplay) {
-
-		return model.getEntryImageURL(themeDisplay);
-	}
-
-	/**
 	 * Returns the group ID of this blogs entry.
 	 *
 	 * @return the group ID of this blogs entry
@@ -470,17 +458,6 @@ public class BlogsEntryWrapper
 	@Override
 	public long getSmallImageId() {
 		return model.getSmallImageId();
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public String getSmallImageType()
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return model.getSmallImageType();
 	}
 
 	/**
@@ -810,11 +787,6 @@ public class BlogsEntryWrapper
 		return model.isVisible();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a blogs entry model instance should use the <code>BlogsEntry</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

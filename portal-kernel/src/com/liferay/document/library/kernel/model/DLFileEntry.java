@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface DLFileEntry
 	extends DLFileEntryModel, PersistedModel, TreeModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.portlet.documentlibrary.model.impl.DLFileEntryImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -110,6 +110,8 @@ public interface DLFileEntry
 	public com.liferay.portal.kernel.lock.Lock getLock();
 
 	public String getLuceneProperties();
+
+	public long getReadCount();
 
 	public boolean hasLock();
 

@@ -1,11 +1,12 @@
 {
 	"dependencies": {
+		"@clayui/progress-bar": "3.0.2",
+		"frontend-js-react-web": "*",
 		"frontend-js-web": "*",
 		"metal": "2.16.8",
-		"metal-component": "2.16.8",
 		"metal-dom": "2.16.8",
-		"metal-events": "2.16.8",
-		"metal-soy": "2.16.8"
+		"prop-types": "15.7.2",
+		"react": "16.12.0"
 	},
 	"name": "adaptive-media-web",
 	"scripts": {
@@ -13,5 +14,5 @@
 		"checkFormat": "liferay-npm-scripts check",
 		"format": "liferay-npm-scripts fix"
 	},
-	"version": "3.0.26"
+	"version": "4.0.6"
 }

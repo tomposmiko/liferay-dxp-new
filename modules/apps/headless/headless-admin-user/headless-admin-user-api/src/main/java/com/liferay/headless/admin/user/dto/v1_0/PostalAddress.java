@@ -32,6 +32,8 @@ import java.util.Set;
 
 import javax.annotation.Generated;
 
+import javax.validation.Valid;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -68,9 +70,41 @@ public class PostalAddress {
 		}
 	}
 
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@GraphQLField(description = "The address's country (e.g., USA).")
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String addressCountry;
+
+	@Schema
+	@Valid
+	public Map<String, String> getAddressCountry_i18n() {
+		return addressCountry_i18n;
+	}
+
+	public void setAddressCountry_i18n(
+		Map<String, String> addressCountry_i18n) {
+
+		this.addressCountry_i18n = addressCountry_i18n;
+	}
+
+	@JsonIgnore
+	public void setAddressCountry_i18n(
+		UnsafeSupplier<Map<String, String>, Exception>
+			addressCountry_i18nUnsafeSupplier) {
+
+		try {
+			addressCountry_i18n = addressCountry_i18nUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Map<String, String> addressCountry_i18n;
 
 	@Schema(description = "The address's locality (e.g., city).")
 	public String getAddressLocality() {
@@ -96,8 +130,8 @@ public class PostalAddress {
 		}
 	}
 
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@GraphQLField(description = "The address's locality (e.g., city).")
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String addressLocality;
 
 	@Schema(description = "The address's region (e.g., state).")
@@ -124,8 +158,8 @@ public class PostalAddress {
 		}
 	}
 
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@GraphQLField(description = "The address's region (e.g., state).")
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String addressRegion;
 
 	@Schema(description = "The address's type.")
@@ -152,8 +186,8 @@ public class PostalAddress {
 		}
 	}
 
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@GraphQLField(description = "The address's type.")
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String addressType;
 
 	@Schema(description = "The address's ID.")
@@ -178,8 +212,8 @@ public class PostalAddress {
 		}
 	}
 
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@GraphQLField(description = "The address's ID.")
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long id;
 
 	@Schema(description = "The address's postal code (e.g., zip code).")
@@ -206,8 +240,8 @@ public class PostalAddress {
 		}
 	}
 
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@GraphQLField(description = "The address's postal code (e.g., zip code).")
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String postalCode;
 
 	@Schema(
@@ -236,8 +270,10 @@ public class PostalAddress {
 		}
 	}
 
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@GraphQLField(
+		description = "A flag that identifies whether this is the main address of the user/organization."
+	)
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean primary;
 
 	@Schema(
@@ -266,8 +302,10 @@ public class PostalAddress {
 		}
 	}
 
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@GraphQLField(
+		description = "The street address's first line (e.g., 1600 Amphitheatre Pkwy.)."
+	)
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String streetAddressLine1;
 
 	@Schema(description = "The street address's second line.")
@@ -294,8 +332,8 @@ public class PostalAddress {
 		}
 	}
 
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@GraphQLField(description = "The street address's second line.")
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String streetAddressLine2;
 
 	@Schema(description = "The street address's third line.")
@@ -322,8 +360,8 @@ public class PostalAddress {
 		}
 	}
 
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@GraphQLField(description = "The street address's third line.")
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String streetAddressLine3;
 
 	@Override
@@ -365,6 +403,16 @@ public class PostalAddress {
 			sb.append(_escape(addressCountry));
 
 			sb.append("\"");
+		}
+
+		if (addressCountry_i18n != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"addressCountry_i18n\": ");
+
+			sb.append(_toJSON(addressCountry_i18n));
 		}
 
 		if (addressLocality != null) {

@@ -77,8 +77,7 @@ public class AssetCategoryModelDocumentContributor
 			document, Field.TITLE, siteDefaultLocale,
 			assetCategory.getTitleMap());
 
-		document.addKeyword(
-			"leftCategoryId", assetCategory.getLeftCategoryId());
+		document.addKeyword("treePath", assetCategory.getTreePath());
 		document.addLocalizedKeyword(
 			"localized_title",
 			LocalizationUtil.populateLocalizationMap(
@@ -146,8 +145,8 @@ public class AssetCategoryModelDocumentContributor
 		try {
 			return portal.getSiteDefaultLocale(assetCategory.getGroupId());
 		}
-		catch (PortalException pe) {
-			throw new SystemException(pe);
+		catch (PortalException portalException) {
+			throw new SystemException(portalException);
 		}
 	}
 

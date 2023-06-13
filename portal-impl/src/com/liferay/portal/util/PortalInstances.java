@@ -18,6 +18,7 @@ import com.liferay.petra.io.StreamUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.events.EventsProcessorUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
@@ -51,6 +52,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeMap;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -125,8 +127,8 @@ public class PortalInstances {
 						}
 					}
 				}
-				catch (Exception e) {
-					_log.error(e, e);
+				catch (Exception exception) {
+					_log.error(exception, exception);
 				}
 			}
 		}
@@ -159,13 +161,16 @@ public class PortalInstances {
 				LayoutSet layoutSet = LayoutSetLocalServiceUtil.getLayoutSet(
 					group.getGroupId(), false);
 
-				if (Validator.isNull(layoutSet.getVirtualHostname())) {
+				TreeMap<String, String> virtualHostnames =
+					layoutSet.getVirtualHostnames();
+
+				if (virtualHostnames.isEmpty()) {
 					httpServletRequest.setAttribute(
 						WebKeys.VIRTUAL_HOST_LAYOUT_SET, layoutSet);
 				}
 			}
-			catch (Exception e) {
-				_log.error(e, e);
+			catch (Exception exception) {
+				_log.error(exception, exception);
 			}
 		}
 
@@ -235,8 +240,8 @@ public class PortalInstances {
 
 			_webIds = webIdsList.toArray(new String[0]);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 
 		if (ArrayUtil.isEmpty(_webIds)) {
@@ -262,8 +267,8 @@ public class PortalInstances {
 
 			companyId = company.getCompanyId();
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 
 		Long currentThreadCompanyId = CompanyThreadLocal.getCompanyId();
@@ -324,8 +329,8 @@ public class PortalInstances {
 				WebAppPool.put(
 					companyId, WebKeys.PORTLET_CATEGORY, portletCategory);
 			}
-			catch (Exception e) {
-				_log.error(e, e);
+			catch (Exception exception) {
+				_log.error(exception, exception);
 			}
 
 			// Process application startup events
@@ -340,8 +345,8 @@ public class PortalInstances {
 					PropsValues.APPLICATION_STARTUP_EVENTS,
 					new String[] {String.valueOf(companyId)});
 			}
-			catch (Exception e) {
-				_log.error(e, e);
+			catch (Exception exception) {
+				_log.error(exception, exception);
 			}
 
 			// End initializing company
@@ -381,8 +386,8 @@ public class PortalInstances {
 				return company.isActive();
 			}
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 
 		return false;
@@ -414,8 +419,8 @@ public class PortalInstances {
 				PropsValues.APPLICATION_SHUTDOWN_EVENTS,
 				new String[] {String.valueOf(companyId)});
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 
 		_companyIds = ArrayUtil.remove(_companyIds, companyId);
@@ -461,12 +466,31 @@ public class PortalInstances {
 
 				httpServletRequest.setAttribute(
 					WebKeys.VIRTUAL_HOST_LAYOUT_SET, layoutSet);
+
+				// Virtual host default locale
+
+				String languageId = virtualHost.getLanguageId();
+
+				if (Validator.isNotNull(languageId) &&
+					LanguageUtil.isAvailableLocale(
+						layoutSet.getGroupId(), languageId)) {
+
+					if (_log.isDebugEnabled()) {
+						_log.debug(
+							StringBundler.concat(
+								"Virtual host ", virtualHost.getHostname(),
+								" has default language ", languageId));
+					}
+
+					httpServletRequest.setAttribute(
+						WebKeys.I18N_LANGUAGE_ID, languageId);
+				}
 			}
 
 			return virtualHost.getCompanyId();
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 
 		return 0;

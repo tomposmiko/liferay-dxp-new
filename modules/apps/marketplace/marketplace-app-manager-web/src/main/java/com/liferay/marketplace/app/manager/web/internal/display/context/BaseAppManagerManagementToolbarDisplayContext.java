@@ -46,12 +46,12 @@ public abstract class BaseAppManagerManagementToolbarDisplayContext
 	extends BaseManagementToolbarDisplayContext {
 
 	public BaseAppManagerManagementToolbarDisplayContext(
+		HttpServletRequest httpServletRequest,
 		LiferayPortletRequest liferayPortletRequest,
-		LiferayPortletResponse liferayPortletResponse,
-		HttpServletRequest httpServletRequest) {
+		LiferayPortletResponse liferayPortletResponse) {
 
 		super(
-			liferayPortletRequest, liferayPortletResponse, httpServletRequest);
+			httpServletRequest, liferayPortletRequest, liferayPortletResponse);
 	}
 
 	public String getCategory() {

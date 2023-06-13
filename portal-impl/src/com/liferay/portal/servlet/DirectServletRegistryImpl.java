@@ -78,7 +78,7 @@ public class DirectServletRegistryImpl implements DirectServletRegistry {
 
 	@Override
 	public void putServlet(String path, Servlet servlet) {
-		if (_servletInfos.containsKey(path)) {
+		if (path.startsWith("/o/") || _servletInfos.containsKey(path)) {
 			return;
 		}
 
@@ -177,7 +177,7 @@ public class DirectServletRegistryImpl implements DirectServletRegistry {
 				servlet = null;
 			}
 		}
-		catch (NoSuchMethodException nsme) {
+		catch (NoSuchMethodException noSuchMethodException) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
 					"Reloading of dependant JSP is disabled because your " +
@@ -186,8 +186,8 @@ public class DirectServletRegistryImpl implements DirectServletRegistry {
 
 			_reloadDependants = false;
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 
 		return servlet;

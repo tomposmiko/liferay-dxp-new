@@ -516,11 +516,6 @@ public class SegmentsEntryWrapper
 		return model.isActive();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a segments entry model instance should use the <code>SegmentsEntry</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

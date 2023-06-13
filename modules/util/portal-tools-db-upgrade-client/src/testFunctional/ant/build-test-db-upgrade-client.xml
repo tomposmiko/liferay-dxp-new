@@ -10,6 +10,7 @@
 			<stop-one-java-process process.name="DBUpgrader" />
 
 			<delete file="${db.upgrade.client.log}" />
+			<delete file="temp.log" />
 		</sequential>
 	</macrodef>
 
@@ -21,6 +22,32 @@
 			<property name="db.upgrade.client.jar" value="${db.upgrade.client.home}/com.liferay.portal.tools.db.upgrade.client.jar" />
 			<property name="db.upgrade.client.log" value="${db.upgrade.client.home}/logs/upgrade.log" />
 			<property name="db.upgrade.client.src.dir" value="${project.dir}/modules/util/portal-tools-db-upgrade-client" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="rebuild-upgrade-database">
+		<sequential>
+			<antcall target="rebuild-legacy-database">
+				<param name="portal.version" value="6.2.5" />
+				<param name="data.archive.type" value="data-archive-polls" />
+				<param name="skip.get.testcase.database.properties" value="true" />
+			</antcall>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="send-sighup-to-upgrade-process">
+		<sequential>
+			<exec executable="/bin/bash" logError="true" output="true">
+				<arg value="-c" />
+				<arg value="pkill -1 -f db_upgrade" />
+			</exec>
+
+			<exec executable="/bin/bash" logError="true" output="true">
+				<arg value="-c" />
+				<arg value="pkill -1 -f com.liferay.portal.tools.db.upgrade.client.jar" />
+			</exec>
+
+			<echo message="SIGHUP signals sent to db_upgrade script and upgrade client jar." />
 		</sequential>
 	</macrodef>
 
@@ -143,6 +170,65 @@
 		<clean-database-upgrade-client />
 	</target>
 
+	<target name="check-upgrade-client-gogoshell-failed-upgrade">
+		<rebuild-upgrade-database />
+
+		<get-database-upgrade-client-paths />
+
+		<parallel>
+			<java
+				dir="${db.upgrade.client.home}"
+				fork="true"
+				jar="${db.upgrade.client.jar}"
+				timeout="900000"
+			>
+			</java>
+
+			<sequential>
+				<waitfor maxwait="30" maxwaitunit="second" timeoutproperty="upgrade.startfailed">
+					<available file="${db.upgrade.client.log}" />
+				</waitfor>
+
+				<fail if="upgrade.startfailed" message="Upgrade has failed to start." />
+
+				<sql classpath="${app.server.lib.global.dir}/${jdbc.mysql.driver}" driver="${database.mysql.driver}" onerror="continue" output="output.txt" password="${database.mysql.password}" print="true" url="${database.mysql.url}" userid="${database.mysql.username}">
+					<![CDATA[
+						ALTER TABLE JournalArticle DROP type_;
+					]]>
+				</sql>
+
+				<waitfor maxwait="900000" timeoutproperty="upgrade.notfailed">
+					<resourcecontains
+						resource="${db.upgrade.client.log}"
+						substring="Checking to see if all upgrades have completed... your upgrades have failed, have not started, or are still running"
+					/>
+				</waitfor>
+
+				<if>
+					<isset property="upgrade.notfailed" />
+					<then>
+						<fail message="The upgrade process failure has timed out." />
+					</then>
+				</if>
+
+				<waitfor maxwait="300" maxwaitunit="second" timeoutproperty="gogoshell.timeout">
+					<resourcecontains
+						resource="${db.upgrade.client.log}"
+						substring="Type &quot;help&quot; to get available upgrade and verify commands"
+					/>
+				</waitfor>
+
+				<fail if="gogoshell.timeout" message="The Gogo shell connection did not connect as expected." />
+
+				<stop-one-java-process process.name="jar" />
+			</sequential>
+		</parallel>
+
+		<rebuild-upgrade-database />
+
+		<clean-database-upgrade-client />
+	</target>
+
 	<target name="check-upgrade-client-help">
 		<get-database-upgrade-client-paths />
 
@@ -170,6 +256,7 @@
 		</if>
 
 		<delete file="help.output" />
+
 		<clean-database-upgrade-client />
 	</target>
 
@@ -211,6 +298,49 @@
 		<clean-database-upgrade-client />
 	</target>
 
+	<target name="check-upgrade-client-second-process">
+		<get-database-upgrade-client-paths />
+
+		<parallel failonany="true">
+			<exec executable="/bin/bash" spawn="true">
+				<arg value="-c" />
+				<arg value="${db.upgrade.client.home}/db_upgrade${file.suffix.bat}" />
+			</exec>
+
+			<sequential>
+				<waitfor maxwait="300" maxwaitunit="second" timeoutproperty="upgrade.startfailed">
+					<available file="${db.upgrade.client.log}" />
+				</waitfor>
+
+				<fail if="upgrade.startfailed" message="Upgrade has failed to start." />
+
+				<exec executable="/bin/bash">
+					<arg value="-c" />
+					<arg value="${db.upgrade.client.home}/db_upgrade${file.suffix.bat} > temp.log" />
+				</exec>
+
+				<loadfile
+					property="upgrade.process.output"
+					srcFile="temp.log"
+				/>
+
+				<echo>${upgrade.process.output}</echo>
+
+				<if>
+					<contains string="${upgrade.process.output}" substring="Database upgrade client is already running" />
+					<then>
+						<echo message="PASSED. Second Upgrade process is denied from starting." />
+					</then>
+					<else>
+						<fail message="FAILED. Upgrade Client is attempting to start a second upgrade process." />
+					</else>
+				</if>
+			</sequential>
+		</parallel>
+
+		<clean-database-upgrade-client />
+	</target>
+
 	<target name="check-upgrade-client-sh-disconnect">
 		<get-database-upgrade-client-paths />
 
@@ -225,19 +355,9 @@
 					<available file="${db.upgrade.client.log}" />
 				</waitfor>
 
-				<fail if="upgrade.failed" message="Upgrade has failed to start." />
+				<fail if="upgrade.startfailed" message="Upgrade has failed to start." />
 
-				<exec executable="/bin/bash" failonerror="true" logError="true" output="true">
-					<arg value="-c" />
-					<arg value="pkill -1 -f db_upgrade" />
-				</exec>
-
-				<exec executable="/bin/bash" failonerror="true" logError="true" output="true">
-					<arg value="-c" />
-					<arg value="pkill -1 -f com.liferay.portal.tools.db.upgrade.client.jar" />
-				</exec>
-
-				<echo message="SIGHUP signals sent to db_upgrade script and upgrade client jar." />
+				<send-sighup-to-upgrade-process />
 
 				<waitfor maxwait="300" maxwaitunit="second" timeoutproperty="upgrade.failed">
 					<resourcecontains
@@ -261,15 +381,12 @@
 	</target>
 
 	<target name="check-upgrade-client-upgrade-core-only">
-		<antcall target="rebuild-legacy-database">
-			<param name="portal.version" value="6.2.5" />
-			<param name="data.archive.type" value="data-archive-polls" />
-			<param name="skip.get.testcase.database.properties" value="true" />
-		</antcall>
-
-		<echo file="${liferay.home}/osgi/configs/com.liferay.portal.upgrade.internal.configuration.ReleaseManagerConfiguration.config">autoUpgrade="false"</echo>
+		<rebuild-upgrade-database />
 
 		<get-database-upgrade-client-paths />
+
+		<echo append="true" file="${db.upgrade.client.home}/portal-upgrade-ext.properties">
+upgrade.database.auto.run=false</echo>
 
 		<parallel failonany="true">
 			<java
@@ -315,7 +432,9 @@
 			</sequential>
 		</parallel>
 
-		<delete file="${liferay.home}/osgi/configs/com.liferay.portal.upgrade.internal.configuration.ReleaseManagerConfiguration.config" />
+		<delete file="${db.upgrade.client.home}/portal-upgrade-ext.properties" />
+
+		<prepare-database-upgrade-configuration />
 
 		<clean-database-upgrade-client />
 	</target>

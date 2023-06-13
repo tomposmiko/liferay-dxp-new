@@ -60,17 +60,16 @@ public abstract class BaseUpgradeAttachments extends UpgradeProcess {
 		try {
 			long fileEntryId = increment();
 
-			StringBundler sb = new StringBundler(9);
+			StringBundler sb = new StringBundler(8);
 
 			sb.append("insert into DLFileEntry (uuid_, fileEntryId, groupId, ");
 			sb.append("companyId, userId, userName, createDate, ");
 			sb.append("modifiedDate, classNameId, classPK, repositoryId, ");
 			sb.append("folderId, name, extension, mimeType, title, ");
 			sb.append("description, extraSettings, fileEntryTypeId, version, ");
-			sb.append("size_, readCount, smallImageId, largeImageId, ");
-			sb.append("custom1ImageId, custom2ImageId) values (?, ?, ?, ?, ");
-			sb.append("?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ");
-			sb.append("?, ?, ?, ?)");
+			sb.append("size_, smallImageId, largeImageId, custom1ImageId, ");
+			sb.append("custom2ImageId) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ");
+			sb.append("?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
 			String sql = sb.toString();
 
@@ -101,7 +100,6 @@ public abstract class BaseUpgradeAttachments extends UpgradeProcess {
 			ps.setLong(23, 0);
 			ps.setLong(24, 0);
 			ps.setLong(25, 0);
-			ps.setLong(26, 0);
 
 			ps.executeUpdate();
 
@@ -124,9 +122,9 @@ public abstract class BaseUpgradeAttachments extends UpgradeProcess {
 
 			return fileEntryId;
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn("Unable to add file entry " + name, e);
+				_log.warn("Unable to add file entry " + name, exception);
 			}
 
 			return -1;
@@ -188,11 +186,11 @@ public abstract class BaseUpgradeAttachments extends UpgradeProcess {
 
 			ps.executeUpdate();
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
 					"Unable to add file version 1.0 for file entry " + title,
-					e);
+					exception);
 			}
 		}
 		finally {
@@ -276,9 +274,9 @@ public abstract class BaseUpgradeAttachments extends UpgradeProcess {
 
 			return folderId;
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn("Unable to add folder " + name, e);
+				_log.warn("Unable to add folder " + name, exception);
 			}
 
 			return -1;
@@ -336,10 +334,11 @@ public abstract class BaseUpgradeAttachments extends UpgradeProcess {
 
 			return repositoryId;
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
-					"Unable to add repository for portlet " + portletId, e);
+					"Unable to add repository for portlet " + portletId,
+					exception);
 			}
 
 			return -1;
@@ -381,9 +380,11 @@ public abstract class BaseUpgradeAttachments extends UpgradeProcess {
 
 			ps.executeUpdate();
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn("Unable to add resource permission " + className, e);
+				_log.warn(
+					"Unable to add resource permission " + className,
+					exception);
 			}
 		}
 		finally {
@@ -652,9 +653,10 @@ public abstract class BaseUpgradeAttachments extends UpgradeProcess {
 				DLStoreUtil.addFile(
 					companyId, containerModelFolderId, name, false, bytes);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (_log.isWarnEnabled()) {
-					_log.warn("Unable to add attachment " + attachment, e);
+					_log.warn(
+						"Unable to add attachment " + attachment, exception);
 				}
 			}
 
@@ -662,9 +664,10 @@ public abstract class BaseUpgradeAttachments extends UpgradeProcess {
 				DLStoreUtil.deleteFile(
 					companyId, CompanyConstants.SYSTEM, attachment);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (_log.isWarnEnabled()) {
-					_log.warn("Unable to delete attachment " + attachment, e);
+					_log.warn(
+						"Unable to delete attachment " + attachment, exception);
 				}
 			}
 		}

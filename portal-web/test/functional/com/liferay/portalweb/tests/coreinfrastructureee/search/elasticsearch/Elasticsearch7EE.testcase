@@ -3,7 +3,7 @@ definition {
 
 	property osgi.app.includes = "portal-search-elasticsearch7";
 	property osgi.module.configuration.file.names = "com.liferay.portal.bundle.blacklist.internal.BundleBlacklistConfiguration.config";
-	property osgi.module.configurations = "blacklistBundleSymbolicNames=&quot;com.liferay.portal.mobile.device.detection.fiftyonedegrees.api,com.liferay.portal.mobile.device.detection.fiftyonedegrees.enterprise,com.liferay.portal.mobile.device.detection.fiftyonedegrees.enterprise.test.data,com.liferay.portal.mobile.device.detection.fiftyonedegrees,com.liferay.portal.search.elasticsearch6.impl,com.liferay.portal.search.elasticsearch6.spi,com.liferay.portal.search.elasticsearch6.api,com.liferay.portal.search.elasticsearch6.xpack.security.impl,com.liferay.portal.search.elasticsearch6.xpack.monitoring.web&quot;";
+	property osgi.module.configurations = "blacklistBundleSymbolicNames=&quot;com.liferay.portal.mobile.device.detection.fiftyonedegrees.api,com.liferay.portal.mobile.device.detection.fiftyonedegrees.enterprise,com.liferay.portal.mobile.device.detection.fiftyonedegrees.enterprise.test.data,com.liferay.portal.mobile.device.detection.fiftyonedegrees,com.liferay.portal.search.elasticsearch6.impl,com.liferay.portal.search.elasticsearch6.spi,com.liferay.portal.search.elasticsearch6.api,com.liferay.portal.search.elasticsearch6.xpack.security.impl&quot;";
 	property portal.release = "true";
 	property portal.suite.search.engine = "elasticsearch7";
 	property portal.upstream = "true";
@@ -31,11 +31,255 @@ definition {
 		}
 	}
 
-	@ignore = "true"
+	test AssertSimilarResultsDisplayTemplate {
+		property test.name.skip.portal.instance = "Elasticsearch7EE#AssertSimilarResultsDisplayTemplate";
+
+		for (var count : list "1,2,3") {
+			JSONWebcontent.addWebContent(
+				content = "WC Content",
+				groupName = "Guest",
+				title = "WC Title ${count}");
+		}
+
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Similar Results Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Guest",
+			layoutName = "Similar Results Page",
+			widgetName = "Asset Publisher");
+
+		Navigator.gotoPage(pageName = "Similar Results Page");
+
+		Portlet.addPG(portletName = "Similar Results");
+
+		SearchPortlets.configureSimilarResults(
+			displayTemplate = "Compact Layout",
+			minimumDocumentFrequency = "1",
+			minimumTermFrequency = "1");
+
+		AssetPublisherPortlet.clickAssetTitle(assetTitle = "WC Title 1");
+
+		AssertElementPresent(
+			key_linkResultTitle = "WC Title 2",
+			locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
+
+		AssertElementPresent(
+			key_linkResultTitle = "WC Title 3",
+			locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
+
+		SearchPortlets.configureSimilarResults(displayTemplate = "List Layout");
+
+		AssertElementPresent(
+			key_listResultTitle = "WC Title 2",
+			locator1 = "Search#SIMILAR_RESULTS_LIST_TITLE");
+
+		AssertElementPresent(
+			key_listResultTitle = "WC Title 3",
+			locator1 = "Search#SIMILAR_RESULTS_LIST_TITLE");
+
+		SearchPortlets.configureSimilarResults(displayTemplate = "Card Layout");
+
+		AssertElementPresent(
+			key_cardResultTitle = "WC Title 2",
+			locator1 = "Search#SIMILAR_RESULTS_CARD_TITLE");
+
+		AssertElementPresent(
+			key_cardResultTitle = "WC Title 3",
+			locator1 = "Search#SIMILAR_RESULTS_CARD_TITLE");
+	}
+
+	test AssertSimilarResultsMatchesAssetType {
+		property test.name.skip.portal.instance = "Elasticsearch7EE#AssertSimilarResultsMatchesAssetType";
+
+		for (var count : list "1,2,3") {
+			JSONBlog.addEntry(
+				entryContent = "Blogs Content",
+				entryTitle = "Similar Results Blogs Title ${count}");
+
+			JSONDocument.addFile(
+				dmDocumentDescription = "DM Content",
+				dmDocumentTitle = "Similar Results DM Title ${count}",
+				groupName = "Guest");
+
+			JSONMBMessage.addMessage(
+				groupName = "Guest",
+				threadBody = "MB Content",
+				threadSubject = "Similar Results MB Title ${count}");
+
+			JSONWebcontent.addWebContent(
+				content = "WC Content",
+				groupName = "Guest",
+				title = "Similar Results WC Title ${count}");
+		}
+
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Similar Results Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Guest",
+			layoutName = "Similar Results Page",
+			widgetName = "Asset Publisher");
+
+		Navigator.gotoPage(pageName = "Similar Results Page");
+
+		Portlet.addPG(portletName = "Similar Results");
+
+		SearchPortlets.configureSimilarResults(
+			displayTemplate = "Compact Layout",
+			minimumDocumentFrequency = "1",
+			minimumTermFrequency = "1");
+
+		AssetPublisherPortlet.clickAssetTitle(assetTitle = "Similar Results Blogs Title 1");
+
+		AssertElementPresent(
+			key_linkResultTitle = "Similar Results Blogs Title 2",
+			locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
+
+		AssertElementPresent(
+			key_linkResultTitle = "Similar Results Blogs Title 3",
+			locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
+
+		AssertElementNotPresent(
+			key_linkResultTitle = "Similar Results DM Title",
+			locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
+
+		AssertElementNotPresent(
+			key_linkResultTitle = "Similar Results MB Title",
+			locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
+
+		AssertElementNotPresent(
+			key_linkResultTitle = "Similar Results WC Title",
+			locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
+
+		Click(locator1 = "Icon#ANGLE_LEFT_BACK");
+
+		AssetPublisherPortlet.clickAssetTitle(assetTitle = "Similar Results DM Title 1");
+
+		AssertElementPresent(
+			key_linkResultTitle = "Similar Results DM Title 2",
+			locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
+
+		AssertElementPresent(
+			key_linkResultTitle = "Similar Results DM Title 3",
+			locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
+
+		AssertElementNotPresent(
+			key_linkResultTitle = "Similar Results Blogs Title",
+			locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
+
+		AssertElementNotPresent(
+			key_linkResultTitle = "Similar Results MB Title",
+			locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
+
+		AssertElementNotPresent(
+			key_linkResultTitle = "Similar Results WC Title",
+			locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
+
+		Click(locator1 = "Icon#ANGLE_LEFT_BACK");
+
+		AssetPublisherPortlet.clickAssetTitle(assetTitle = "Similar Results MB Title 1");
+
+		AssertElementPresent(
+			key_linkResultTitle = "Similar Results MB Title 2",
+			locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
+
+		AssertElementPresent(
+			key_linkResultTitle = "Similar Results MB Title 3",
+			locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
+
+		AssertElementNotPresent(
+			key_linkResultTitle = "Similar Results Blogs Title",
+			locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
+
+		AssertElementNotPresent(
+			key_linkResultTitle = "Similar Results DM Title",
+			locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
+
+		AssertElementNotPresent(
+			key_linkResultTitle = "Similar Results WC Title",
+			locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
+
+		Click(locator1 = "Icon#ANGLE_LEFT_BACK");
+
+		AssetPublisherPortlet.clickAssetTitle(assetTitle = "Similar Results WC Title 1");
+
+		AssertElementPresent(
+			key_linkResultTitle = "Similar Results WC Title 2",
+			locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
+
+		AssertElementPresent(
+			key_linkResultTitle = "Similar Results WC Title 3",
+			locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
+
+		AssertElementNotPresent(
+			key_linkResultTitle = "Similar Results Blogs Title",
+			locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
+
+		AssertElementNotPresent(
+			key_linkResultTitle = "Similar Results DM Title",
+			locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
+
+		AssertElementNotPresent(
+			key_linkResultTitle = "Similar Results MB Title",
+			locator1 = "Search#SIMILAR_RESULTS_LINK_TITLE");
+	}
+
+	test HotDeployLearningToRankApp {
+		property hot.deploy.osgi.app.includes = "portal-search-learning-to-rank";
+		property test.assert.warning.exceptions = "true";
+		property test.name.skip.portal.instance = "Elasticsearch7EE#HotDeployLearningToRankApp";
+
+		var appName = "Liferay Learning to Rank ";
+
+		AssertConsoleTextNotPresent(value1 = "The portal instance needs to be restarted");
+
+		AssertConsoleTextPresent(value1 = "STARTED ${appName}");
+
+		ProductMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "System Settings");
+
+		SystemSettings.gotoConfiguration(
+			configurationCategory = "Search",
+			configurationName = "Learning to Rank",
+			configurationScope = "System Scope");
+
+		ProductMenu.gotoPortlet(
+			category = "Apps",
+			panel = "Control Panel",
+			portlet = "App Manager");
+
+		AppManager.viewAppCP(
+			appName = "${appName}",
+			appStatus = "Active",
+			searchTerm = "Learning");
+
+		AppManager.deactivateAppCP(appName = "${appName}");
+
+		AppManager.viewAppCP(
+			appName = "${appName}",
+			appStatus = "Resolved",
+			searchTerm = "Learning");
+
+		AssertConsoleTextPresent(value1 = "STOPPED com.liferay.portal.search.learning.to.rank");
+
+		AppManager.activateAppCP(appName = "${appName}");
+
+		AssertConsoleTextPresent(value1 = "STARTED com.liferay.portal.search.learning.to.rank");
+
+		AssertConsoleTextNotPresent(value1 = "The portal instance needs to be restarted");
+	}
+
 	@priority = "5"
 	test LearningToRankSmoke {
-		property osgi.module.configuration.file.names = "com.liferay.portal.search.learning.to.rank.configuration.LearningToRankConfiguration.config";
-		property osgi.module.configurations = "enabled=&quot;true&quot;${line.separator}model=&quot;linearregression&quot;";
+		property osgi.module.configuration.file.names = "com.liferay.portal.search.learning.to.rank.configuration.LearningToRankConfiguration.config:com.liferay.portal.bundle.blacklist.internal.BundleBlacklistConfiguration.config";
+		property osgi.module.configurations = "enabled=&quot;true&quot;${line.separator}model=&quot;linearregression&quot;:blacklistBundleSymbolicNames=&quot;com.liferay.portal.mobile.device.detection.fiftyonedegrees.api,com.liferay.portal.mobile.device.detection.fiftyonedegrees.enterprise,com.liferay.portal.mobile.device.detection.fiftyonedegrees.enterprise.test.data,com.liferay.portal.mobile.device.detection.fiftyonedegrees,com.liferay.portal.search.elasticsearch6.impl,com.liferay.portal.search.elasticsearch6.spi,com.liferay.portal.search.elasticsearch6.api,com.liferay.portal.search.elasticsearch6.xpack.security.impl,com.liferay.portal.search.elasticsearch6.xpack.monitoring.web&quot;";
 		property remote.elasticsearch.enabled = "true";
 		property remote.elasticsearch.ltr.enabled = "true";
 		property test.name.skip.portal.instance = "Elasticsearch7EE#LearningToRankSmoke";
@@ -57,14 +301,14 @@ definition {
 
 		Navigator.openURL();
 
-		SearchPortlets.searchEmbedded(searchTerm = "movies");
+		SearchPortlets.searchEmbedded(searchTerm = "alien");
 
-		Pagination.viewResults(results = "Showing 1 to 8 of 8 entries.");
-
-		AssertTextEquals.assertPartialText(
-			locator1 = "SearchResults#ASSET_ENTRY_TABLE_TITLE_SPECIFIC_ORDER",
-			resultOrder = "8",
-			value1 = "Alaska");
+		if (IsTextEqual(locator1 = "SearchResults#ASSET_ENTRY_TABLE_TITLE_SPECIFIC_ORDER", resultOrder = "1", value1 = "Alien³")) {
+			SearchResultPortlet.viewSearchResultsSpecificOrder(resultsList = "Alien³,Alien,Alien Nation");
+		}
+		else {
+			SearchResultPortlet.viewSearchResultsSpecificOrder(resultsList = "Alien,Alien³,Alien Nation");
+		}
 	}
 
 	@priority = "5"
@@ -157,15 +401,16 @@ definition {
 			searchAssetType = "Message Boards Message");
 	}
 
-	@ignore = "true"
 	@priority = "5"
 	test XPackSmokeTest {
 		property elastic.xpack.enabled = "true";
-		property osgi.app.includes = "portal-search-elasticsearch7-xpack-monitoring,portal-search-elasticsearch7-xpack-security";
+		property osgi.app.includes = "portal-search-elasticsearch6-xpack-monitoring,portal-search-elasticsearch7";
 		property remote.elasticsearch.enabled = "true";
 		property test.name.skip.portal.instance = "Elasticsearch7EE#XPackSmokeTest";
 
-		JSONWebcontent.addWebContent(
+		// Workaround for LPS-104802
+
+		/*JSONWebcontent.addWebContent(
 			content = "WC Content",
 			groupName = "Guest",
 			title = "WC Title");
@@ -174,7 +419,7 @@ definition {
 
 		SearchResultPortlet.viewSearchResults(
 			searchAssetTitle = "WC Title",
-			searchAssetType = "Web Content Article");
+			searchAssetType = "Web Content Article");*/
 
 		ProductMenu.gotoPortlet(
 			category = "Site Builder",

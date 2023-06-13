@@ -87,7 +87,13 @@ class ManagementToolbarDefaultEventHandler extends DefaultEventHandler {
 	moveEntries() {
 		let moveEntriesURL = this.moveEntriesURL;
 
-		const entrySelectorNodes = document.querySelectorAll('.entry-selector');
+		let entrySelectorNodes = document.querySelectorAll('.entry-selector');
+
+		if (entrySelectorNodes.length === 0) {
+			entrySelectorNodes = document.querySelectorAll(
+				'.entry-card input[type="checkbox"]'
+			);
+		}
 
 		entrySelectorNodes.forEach(node => {
 			if (node.checked) {

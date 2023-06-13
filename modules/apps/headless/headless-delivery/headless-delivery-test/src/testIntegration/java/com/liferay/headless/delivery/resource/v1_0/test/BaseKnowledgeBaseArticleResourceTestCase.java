@@ -503,8 +503,8 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 			knowledgeBaseArticleResource.
 				getKnowledgeBaseArticleKnowledgeBaseArticlesPage(
 					testGetKnowledgeBaseArticleKnowledgeBaseArticlesPage_getParentKnowledgeBaseArticleId(),
-					RandomTestUtil.randomString(), null, Pagination.of(1, 2),
-					null);
+					null, RandomTestUtil.randomString(), null,
+					Pagination.of(1, 2), null);
 
 		Assert.assertEquals(0, page.getTotalCount());
 
@@ -523,7 +523,7 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 				knowledgeBaseArticleResource.
 					getKnowledgeBaseArticleKnowledgeBaseArticlesPage(
 						irrelevantParentKnowledgeBaseArticleId, null, null,
-						Pagination.of(1, 2), null);
+						null, Pagination.of(1, 2), null);
 
 			Assert.assertEquals(1, page.getTotalCount());
 
@@ -544,7 +544,7 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 		page =
 			knowledgeBaseArticleResource.
 				getKnowledgeBaseArticleKnowledgeBaseArticlesPage(
-					parentKnowledgeBaseArticleId, null, null,
+					parentKnowledgeBaseArticleId, null, null, null,
 					Pagination.of(1, 2), null);
 
 		Assert.assertEquals(2, page.getTotalCount());
@@ -586,7 +586,7 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 			Page<KnowledgeBaseArticle> page =
 				knowledgeBaseArticleResource.
 					getKnowledgeBaseArticleKnowledgeBaseArticlesPage(
-						parentKnowledgeBaseArticleId, null,
+						parentKnowledgeBaseArticleId, null, null,
 						getFilterString(
 							entityField, "between", knowledgeBaseArticle1),
 						Pagination.of(1, 2), null);
@@ -624,7 +624,7 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 			Page<KnowledgeBaseArticle> page =
 				knowledgeBaseArticleResource.
 					getKnowledgeBaseArticleKnowledgeBaseArticlesPage(
-						parentKnowledgeBaseArticleId, null,
+						parentKnowledgeBaseArticleId, null, null,
 						getFilterString(
 							entityField, "eq", knowledgeBaseArticle1),
 						Pagination.of(1, 2), null);
@@ -657,7 +657,7 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 		Page<KnowledgeBaseArticle> page1 =
 			knowledgeBaseArticleResource.
 				getKnowledgeBaseArticleKnowledgeBaseArticlesPage(
-					parentKnowledgeBaseArticleId, null, null,
+					parentKnowledgeBaseArticleId, null, null, null,
 					Pagination.of(1, 2), null);
 
 		List<KnowledgeBaseArticle> knowledgeBaseArticles1 =
@@ -670,7 +670,7 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 		Page<KnowledgeBaseArticle> page2 =
 			knowledgeBaseArticleResource.
 				getKnowledgeBaseArticleKnowledgeBaseArticlesPage(
-					parentKnowledgeBaseArticleId, null, null,
+					parentKnowledgeBaseArticleId, null, null, null,
 					Pagination.of(2, 2), null);
 
 		Assert.assertEquals(3, page2.getTotalCount());
@@ -685,7 +685,7 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 		Page<KnowledgeBaseArticle> page3 =
 			knowledgeBaseArticleResource.
 				getKnowledgeBaseArticleKnowledgeBaseArticlesPage(
-					parentKnowledgeBaseArticleId, null, null,
+					parentKnowledgeBaseArticleId, null, null, null,
 					Pagination.of(1, 3), null);
 
 		assertEqualsIgnoringOrder(
@@ -792,7 +792,7 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 			Page<KnowledgeBaseArticle> ascPage =
 				knowledgeBaseArticleResource.
 					getKnowledgeBaseArticleKnowledgeBaseArticlesPage(
-						parentKnowledgeBaseArticleId, null, null,
+						parentKnowledgeBaseArticleId, null, null, null,
 						Pagination.of(1, 2), entityField.getName() + ":asc");
 
 			assertEquals(
@@ -802,7 +802,7 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 			Page<KnowledgeBaseArticle> descPage =
 				knowledgeBaseArticleResource.
 					getKnowledgeBaseArticleKnowledgeBaseArticlesPage(
-						parentKnowledgeBaseArticleId, null, null,
+						parentKnowledgeBaseArticleId, null, null, null,
 						Pagination.of(1, 2), entityField.getName() + ":desc");
 
 			assertEquals(
@@ -1564,7 +1564,7 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 					{
 						put("page", 1);
 						put("pageSize", 2);
-						put("siteId", testGroup.getGroupId());
+						put("siteKey", "\"" + testGroup.getGroupId() + "\"");
 					}
 				},
 				graphQLFields.toArray(new GraphQLField[0])));
@@ -1649,12 +1649,14 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 		assertHttpResponseStatusCode(
 			204,
 			knowledgeBaseArticleResource.
-				putSiteKnowledgeBaseArticleSubscribeHttpResponse(null));
+				putSiteKnowledgeBaseArticleSubscribeHttpResponse(
+					testGroup.getGroupId()));
 
 		assertHttpResponseStatusCode(
 			404,
 			knowledgeBaseArticleResource.
-				putSiteKnowledgeBaseArticleSubscribeHttpResponse(null));
+				putSiteKnowledgeBaseArticleSubscribeHttpResponse(
+					testGroup.getGroupId()));
 	}
 
 	protected KnowledgeBaseArticle
@@ -1674,12 +1676,14 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 		assertHttpResponseStatusCode(
 			204,
 			knowledgeBaseArticleResource.
-				putSiteKnowledgeBaseArticleUnsubscribeHttpResponse(null));
+				putSiteKnowledgeBaseArticleUnsubscribeHttpResponse(
+					testGroup.getGroupId()));
 
 		assertHttpResponseStatusCode(
 			404,
 			knowledgeBaseArticleResource.
-				putSiteKnowledgeBaseArticleUnsubscribeHttpResponse(null));
+				putSiteKnowledgeBaseArticleUnsubscribeHttpResponse(
+					testGroup.getGroupId()));
 	}
 
 	protected KnowledgeBaseArticle
@@ -1983,7 +1987,7 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 				"createSiteKnowledgeBaseArticle",
 				new HashMap<String, Object>() {
 					{
-						put("siteId", testGroup.getGroupId());
+						put("siteKey", "\"" + testGroup.getGroupId() + "\"");
 						put("knowledgeBaseArticle", sb.toString());
 					}
 				},
@@ -2119,6 +2123,14 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
+
+			if (Objects.equals("actions", additionalAssertFieldName)) {
+				if (knowledgeBaseArticle.getActions() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
 
 			if (Objects.equals("aggregateRating", additionalAssertFieldName)) {
 				if (knowledgeBaseArticle.getAggregateRating() == null) {
@@ -2327,6 +2339,14 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 		for (String additionalAssertFieldName :
 				getAdditionalRatingAssertFieldNames()) {
 
+			if (Objects.equals("actions", additionalAssertFieldName)) {
+				if (rating.getActions() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("bestRating", additionalAssertFieldName)) {
 				if (rating.getBestRating() == null) {
 					valid = false;
@@ -2408,6 +2428,17 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
+
+			if (Objects.equals("actions", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						knowledgeBaseArticle1.getActions(),
+						knowledgeBaseArticle2.getActions())) {
+
+					return false;
+				}
+
+				continue;
+			}
 
 			if (Objects.equals("aggregateRating", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
@@ -2672,6 +2703,16 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 		for (String additionalAssertFieldName :
 				getAdditionalRatingAssertFieldNames()) {
 
+			if (Objects.equals("actions", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						rating1.getActions(), rating2.getActions())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("bestRating", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						rating1.getBestRating(), rating2.getBestRating())) {
@@ -2919,6 +2960,11 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 		sb.append(" ");
 		sb.append(operator);
 		sb.append(" ");
+
+		if (entityFieldName.equals("actions")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
 
 		if (entityFieldName.equals("aggregateRating")) {
 			throw new IllegalArgumentException(

@@ -32,13 +32,13 @@ import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.service.base.LayoutPrototypeLocalServiceBaseImpl;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -78,7 +78,7 @@ public class LayoutPrototypeLocalServiceImpl
 		layoutPrototype.setDescriptionMap(descriptionMap);
 		layoutPrototype.setActive(active);
 
-		layoutPrototypePersistence.update(layoutPrototype);
+		layoutPrototype = layoutPrototypePersistence.update(layoutPrototype);
 
 		// Resources
 
@@ -102,9 +102,9 @@ public class LayoutPrototypeLocalServiceImpl
 		if (GetterUtil.getBoolean(
 				serviceContext.getAttribute("addDefaultLayout"), true)) {
 
-			Map<Locale, String> friendlyURLMap = new HashMap<>();
-
-			friendlyURLMap.put(LocaleUtil.getSiteDefault(), "/layout");
+			Map<Locale, String> friendlyURLMap = HashMapBuilder.put(
+				LocaleUtil.getSiteDefault(), "/layout"
+			).build();
 
 			layoutLocalService.addLayout(
 				userId, group.getGroupId(), true,
@@ -129,9 +129,8 @@ public class LayoutPrototypeLocalServiceImpl
 		// Group
 
 		if (!CompanyThreadLocal.isDeleteInProcess()) {
-			int count = layoutPersistence.countByC_L_Head(
-				layoutPrototype.getCompanyId(), layoutPrototype.getUuid(),
-				false);
+			int count = layoutPersistence.countByC_L(
+				layoutPrototype.getCompanyId(), layoutPrototype.getUuid());
 
 			if (count > 0) {
 				StringBundler sb = new StringBundler(5);
@@ -290,7 +289,7 @@ public class LayoutPrototypeLocalServiceImpl
 		layoutPrototype.setDescriptionMap(descriptionMap);
 		layoutPrototype.setActive(active);
 
-		layoutPrototypePersistence.update(layoutPrototype);
+		layoutPrototype = layoutPrototypePersistence.update(layoutPrototype);
 
 		// Layout
 

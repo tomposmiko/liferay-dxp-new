@@ -181,13 +181,13 @@ public class DDMFormAdminFieldSetDisplayContext
 
 		if (structureId > 0) {
 			try {
-				DDMStructureService structureService = getStructureService();
+				DDMStructureService ddmStructureService = getStructureService();
 
-				_structure = structureService.getStructure(structureId);
+				_structure = ddmStructureService.getStructure(structureId);
 			}
-			catch (PortalException pe) {
+			catch (PortalException portalException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(pe, pe);
+					_log.debug(portalException, portalException);
 				}
 			}
 		}
@@ -400,9 +400,9 @@ public class DDMFormAdminFieldSetDisplayContext
 		FieldSetSearchTerms fieldSetSearchTerms =
 			(FieldSetSearchTerms)fieldSetSearch.getSearchTerms();
 
-		DDMStructureService structureService = getStructureService();
+		DDMStructureService ddmStructureService = getStructureService();
 
-		List<DDMStructure> results = structureService.search(
+		List<DDMStructure> results = ddmStructureService.search(
 			getCompanyId(), new long[] {getScopeGroupId()},
 			PortalUtil.getClassNameId(DDMFormInstance.class),
 			fieldSetSearchTerms.getKeywords(),
@@ -417,9 +417,9 @@ public class DDMFormAdminFieldSetDisplayContext
 		FieldSetSearchTerms fieldSetSearchTerms =
 			(FieldSetSearchTerms)fieldSetSearch.getSearchTerms();
 
-		DDMStructureService structureService = getStructureService();
+		DDMStructureService ddmStructureService = getStructureService();
 
-		int total = structureService.searchCount(
+		int total = ddmStructureService.searchCount(
 			getCompanyId(), new long[] {getScopeGroupId()},
 			PortalUtil.getClassNameId(DDMFormInstance.class),
 			fieldSetSearchTerms.getKeywords(),

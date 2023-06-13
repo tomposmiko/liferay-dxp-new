@@ -32,11 +32,6 @@ public class AssetListEntryServiceWrapper
 		_assetListEntryService = assetListEntryService;
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link AssetListEntryServiceUtil} to access the asset list entry remote service. Add custom service methods to <code>com.liferay.asset.list.service.impl.AssetListEntryServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
-	 */
 	@Override
 	public void addAssetEntrySelection(
 			long assetListEntryId, long assetEntryId, long segmentsEntryId,
@@ -153,6 +148,30 @@ public class AssetListEntryServiceWrapper
 	}
 
 	@Override
+	public java.util.List<com.liferay.asset.list.model.AssetListEntry>
+		getAssetListEntries(
+			long[] groupIds, int start, int end,
+			com.liferay.portal.kernel.util.OrderByComparator
+				<com.liferay.asset.list.model.AssetListEntry>
+					orderByComparator) {
+
+		return _assetListEntryService.getAssetListEntries(
+			groupIds, start, end, orderByComparator);
+	}
+
+	@Override
+	public java.util.List<com.liferay.asset.list.model.AssetListEntry>
+		getAssetListEntries(
+			long[] groupIds, String title, int start, int end,
+			com.liferay.portal.kernel.util.OrderByComparator
+				<com.liferay.asset.list.model.AssetListEntry>
+					orderByComparator) {
+
+		return _assetListEntryService.getAssetListEntries(
+			groupIds, title, start, end, orderByComparator);
+	}
+
+	@Override
 	public int getAssetListEntriesCount(long groupId) {
 		return _assetListEntryService.getAssetListEntriesCount(groupId);
 	}
@@ -160,6 +179,16 @@ public class AssetListEntryServiceWrapper
 	@Override
 	public int getAssetListEntriesCount(long groupId, String title) {
 		return _assetListEntryService.getAssetListEntriesCount(groupId, title);
+	}
+
+	@Override
+	public int getAssetListEntriesCount(long[] groupIds) {
+		return _assetListEntryService.getAssetListEntriesCount(groupIds);
+	}
+
+	@Override
+	public int getAssetListEntriesCount(long[] groupIds, String title) {
+		return _assetListEntryService.getAssetListEntriesCount(groupIds, title);
 	}
 
 	@Override

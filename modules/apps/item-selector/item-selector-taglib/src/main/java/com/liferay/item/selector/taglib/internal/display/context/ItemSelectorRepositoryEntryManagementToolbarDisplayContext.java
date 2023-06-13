@@ -24,9 +24,9 @@ import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -42,13 +42,14 @@ import javax.servlet.http.HttpServletRequest;
 public class ItemSelectorRepositoryEntryManagementToolbarDisplayContext {
 
 	public ItemSelectorRepositoryEntryManagementToolbarDisplayContext(
+		HttpServletRequest httpServletRequest,
 		LiferayPortletRequest liferayPortletRequest,
-		LiferayPortletResponse liferayPortletResponse,
-		HttpServletRequest httpServletRequest) {
+		LiferayPortletResponse liferayPortletResponse) {
+
+		_httpServletRequest = httpServletRequest;
 
 		_liferayPortletRequest = liferayPortletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
-		_httpServletRequest = httpServletRequest;
 
 		_currentURLObj = PortletURLUtil.getCurrent(
 			_liferayPortletRequest, _liferayPortletResponse);
@@ -144,11 +145,13 @@ public class ItemSelectorRepositoryEntryManagementToolbarDisplayContext {
 	private List<DropdownItem> _getOrderByDropdownItems() {
 		return new DropdownItemList() {
 			{
-				Map<String, String> orderColumnsMap = new HashMap<>();
-
-				orderColumnsMap.put("modifiedDate", "modified-date");
-				orderColumnsMap.put("size", "size");
-				orderColumnsMap.put("title", "title");
+				Map<String, String> orderColumnsMap = HashMapBuilder.put(
+					"modifiedDate", "modified-date"
+				).put(
+					"size", "size"
+				).put(
+					"title", "title"
+				).build();
 
 				for (Map.Entry<String, String> orderByColEntry :
 						orderColumnsMap.entrySet()) {

@@ -79,7 +79,9 @@ import com.liferay.portal.kernel.util.ColorSchemeFactoryUtil;
 import com.liferay.portal.kernel.util.CookieKeys;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -107,7 +109,6 @@ import java.io.File;
 import java.io.Serializable;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -149,8 +150,8 @@ public class ServicePreAction extends Action {
 		try {
 			servicePre(httpServletRequest, httpServletResponse, true);
 		}
-		catch (Exception e) {
-			throw new ActionException(e);
+		catch (Exception exception) {
+			throw new ActionException(exception);
 		}
 
 		if (_log.isDebugEnabled()) {
@@ -246,38 +247,37 @@ public class ServicePreAction extends Action {
 
 		User user = UserLocalServiceUtil.getUser(userId);
 
-		Map<String, String[]> parameterMap = new HashMap<>();
-
-		parameterMap.put(
+		Map<String, String[]> parameterMap = HashMapBuilder.put(
 			PortletDataHandlerKeys.PERMISSIONS,
-			new String[] {Boolean.TRUE.toString()});
-		parameterMap.put(
+			new String[] {Boolean.TRUE.toString()}
+		).put(
 			PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS_ALL,
-			new String[] {Boolean.TRUE.toString()});
-		parameterMap.put(
+			new String[] {Boolean.TRUE.toString()}
+		).put(
 			PortletDataHandlerKeys.PORTLET_CONFIGURATION,
-			new String[] {Boolean.TRUE.toString()});
-		parameterMap.put(
+			new String[] {Boolean.TRUE.toString()}
+		).put(
 			PortletDataHandlerKeys.PORTLET_CONFIGURATION_ALL,
-			new String[] {Boolean.TRUE.toString()});
-		parameterMap.put(
+			new String[] {Boolean.TRUE.toString()}
+		).put(
 			PortletDataHandlerKeys.PORTLET_DATA,
-			new String[] {Boolean.TRUE.toString()});
-		parameterMap.put(
+			new String[] {Boolean.TRUE.toString()}
+		).put(
 			PortletDataHandlerKeys.PORTLET_DATA_ALL,
-			new String[] {Boolean.TRUE.toString()});
-		parameterMap.put(
+			new String[] {Boolean.TRUE.toString()}
+		).put(
 			PortletDataHandlerKeys.PORTLET_DATA_CONTROL_DEFAULT,
-			new String[] {Boolean.TRUE.toString()});
-		parameterMap.put(
+			new String[] {Boolean.TRUE.toString()}
+		).put(
 			PortletDataHandlerKeys.PORTLET_SETUP_ALL,
-			new String[] {Boolean.TRUE.toString()});
-		parameterMap.put(
+			new String[] {Boolean.TRUE.toString()}
+		).put(
 			PortletDataHandlerKeys.PORTLET_USER_PREFERENCES_ALL,
-			new String[] {Boolean.TRUE.toString()});
-		parameterMap.put(
+			new String[] {Boolean.TRUE.toString()}
+		).put(
 			PortletDataHandlerKeys.THEME_REFERENCE,
-			new String[] {Boolean.TRUE.toString()});
+			new String[] {Boolean.TRUE.toString()}
+		).build();
 
 		Map<String, Serializable> importLayoutSettingsMap =
 			ExportImportConfigurationSettingsMapFactoryUtil.
@@ -502,9 +502,10 @@ public class ServicePreAction extends Action {
 	private LayoutComposite _getDefaultUserSitesLayoutComposite(final User user)
 		throws PortalException {
 
-		final LinkedHashMap<String, Object> groupParams = new LinkedHashMap<>();
-
-		groupParams.put("usersGroups", Long.valueOf(user.getUserId()));
+		final LinkedHashMap<String, Object> groupParams =
+			LinkedHashMapBuilder.<String, Object>put(
+				"usersGroups", Long.valueOf(user.getUserId())
+			).build();
 
 		int count = GroupLocalServiceUtil.searchCount(
 			user.getCompanyId(), null, null, groupParams);
@@ -912,12 +913,12 @@ public class ServicePreAction extends Action {
 		try {
 			user = PortalUtil.initUser(httpServletRequest);
 		}
-		catch (NoSuchUserException nsue) {
+		catch (NoSuchUserException noSuchUserException) {
 
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(nsue, nsue);
+				_log.debug(noSuchUserException, noSuchUserException);
 			}
 
 			return null;
@@ -984,7 +985,7 @@ public class ServicePreAction extends Action {
 
 			CookieKeys.validateSupportCookie(httpServletRequest);
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			CookieKeys.addSupportCookie(
 				httpServletRequest, httpServletResponse);
 		}
@@ -1866,9 +1867,9 @@ public class ServicePreAction extends Action {
 					previousGroup = GroupLocalServiceUtil.getGroup(
 						previousGroupId.longValue());
 				}
-				catch (NoSuchGroupException nsge) {
+				catch (NoSuchGroupException noSuchGroupException) {
 					if (_log.isWarnEnabled()) {
-						_log.warn(nsge, nsge);
+						_log.warn(noSuchGroupException, noSuchGroupException);
 					}
 
 					return layouts;

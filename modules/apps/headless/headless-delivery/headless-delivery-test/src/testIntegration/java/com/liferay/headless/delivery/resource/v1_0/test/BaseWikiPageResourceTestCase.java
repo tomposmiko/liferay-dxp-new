@@ -488,46 +488,6 @@ public abstract class BaseWikiPageResourceTestCase {
 	}
 
 	@Test
-	public void testPutWikiPageSubscribe() throws Exception {
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		WikiPage wikiPage = testPutWikiPageSubscribe_addWikiPage();
-
-		assertHttpResponseStatusCode(
-			204,
-			wikiPageResource.putWikiPageSubscribeHttpResponse(
-				wikiPage.getId()));
-
-		assertHttpResponseStatusCode(
-			404, wikiPageResource.putWikiPageSubscribeHttpResponse(0L));
-	}
-
-	protected WikiPage testPutWikiPageSubscribe_addWikiPage() throws Exception {
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
-	public void testPutWikiPageUnsubscribe() throws Exception {
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		WikiPage wikiPage = testPutWikiPageUnsubscribe_addWikiPage();
-
-		assertHttpResponseStatusCode(
-			204,
-			wikiPageResource.putWikiPageUnsubscribeHttpResponse(
-				wikiPage.getId()));
-
-		assertHttpResponseStatusCode(
-			404, wikiPageResource.putWikiPageUnsubscribeHttpResponse(0L));
-	}
-
-	protected WikiPage testPutWikiPageUnsubscribe_addWikiPage()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	@Test
 	public void testGetWikiPageWikiPagesPage() throws Exception {
 		Page<WikiPage> page = wikiPageResource.getWikiPageWikiPagesPage(
 			testGetWikiPageWikiPagesPage_getParentWikiPageId());
@@ -746,6 +706,46 @@ public abstract class BaseWikiPageResourceTestCase {
 			"This method needs to be implemented");
 	}
 
+	@Test
+	public void testPutWikiPageSubscribe() throws Exception {
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		WikiPage wikiPage = testPutWikiPageSubscribe_addWikiPage();
+
+		assertHttpResponseStatusCode(
+			204,
+			wikiPageResource.putWikiPageSubscribeHttpResponse(
+				wikiPage.getId()));
+
+		assertHttpResponseStatusCode(
+			404, wikiPageResource.putWikiPageSubscribeHttpResponse(0L));
+	}
+
+	protected WikiPage testPutWikiPageSubscribe_addWikiPage() throws Exception {
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	@Test
+	public void testPutWikiPageUnsubscribe() throws Exception {
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		WikiPage wikiPage = testPutWikiPageUnsubscribe_addWikiPage();
+
+		assertHttpResponseStatusCode(
+			204,
+			wikiPageResource.putWikiPageUnsubscribeHttpResponse(
+				wikiPage.getId()));
+
+		assertHttpResponseStatusCode(
+			404, wikiPageResource.putWikiPageUnsubscribeHttpResponse(0L));
+	}
+
+	protected WikiPage testPutWikiPageUnsubscribe_addWikiPage()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
 	protected WikiPage testGraphQLWikiPage_addWikiPage() throws Exception {
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
@@ -840,6 +840,14 @@ public abstract class BaseWikiPageResourceTestCase {
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
 
+			if (Objects.equals("actions", additionalAssertFieldName)) {
+				if (wikiPage.getActions() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("aggregateRating", additionalAssertFieldName)) {
 				if (wikiPage.getAggregateRating() == null) {
 					valid = false;
@@ -918,6 +926,14 @@ public abstract class BaseWikiPageResourceTestCase {
 					"numberOfWikiPages", additionalAssertFieldName)) {
 
 				if (wikiPage.getNumberOfWikiPages() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("parentWikiPageId", additionalAssertFieldName)) {
+				if (wikiPage.getParentWikiPageId() == null) {
 					valid = false;
 				}
 
@@ -1024,6 +1040,16 @@ public abstract class BaseWikiPageResourceTestCase {
 
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
+
+			if (Objects.equals("actions", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						wikiPage1.getActions(), wikiPage2.getActions())) {
+
+					return false;
+				}
+
+				continue;
+			}
 
 			if (Objects.equals("aggregateRating", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
@@ -1158,6 +1184,17 @@ public abstract class BaseWikiPageResourceTestCase {
 				if (!Objects.deepEquals(
 						wikiPage1.getNumberOfWikiPages(),
 						wikiPage2.getNumberOfWikiPages())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("parentWikiPageId", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						wikiPage1.getParentWikiPageId(),
+						wikiPage2.getParentWikiPageId())) {
 
 					return false;
 				}
@@ -1310,6 +1347,17 @@ public abstract class BaseWikiPageResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("parentWikiPageId", fieldName)) {
+				if (!Objects.deepEquals(
+						wikiPage.getParentWikiPageId(),
+						jsonObject.getLong("parentWikiPageId"))) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("subscribed", fieldName)) {
 				if (!Objects.deepEquals(
 						wikiPage.getSubscribed(),
@@ -1377,6 +1425,11 @@ public abstract class BaseWikiPageResourceTestCase {
 		sb.append(" ");
 		sb.append(operator);
 		sb.append(" ");
+
+		if (entityFieldName.equals("actions")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
 
 		if (entityFieldName.equals("aggregateRating")) {
 			throw new IllegalArgumentException(
@@ -1507,6 +1560,11 @@ public abstract class BaseWikiPageResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("parentWikiPageId")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
 		if (entityFieldName.equals("relatedContents")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
@@ -1570,6 +1628,7 @@ public abstract class BaseWikiPageResourceTestCase {
 				id = RandomTestUtil.randomLong();
 				numberOfAttachments = RandomTestUtil.randomInt();
 				numberOfWikiPages = RandomTestUtil.randomInt();
+				parentWikiPageId = RandomTestUtil.randomLong();
 				siteId = testGroup.getGroupId();
 				subscribed = RandomTestUtil.randomBoolean();
 			}

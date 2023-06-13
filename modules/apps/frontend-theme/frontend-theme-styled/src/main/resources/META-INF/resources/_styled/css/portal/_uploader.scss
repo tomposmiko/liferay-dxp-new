@@ -32,16 +32,6 @@
 		}
 	}
 
-	.multiple-files .upload-file {
-		&.upload-complete {
-		}
-	}
-
-	.upload-file {
-		.file-title {
-		}
-	}
-
 	.upload-list-info h4 {
 		font-size: 1.3em;
 	}
@@ -67,6 +57,8 @@
 		border-color: #900;
 		color: #900;
 		font-weight: normal;
+		margin-bottom: 16px;
+		padding: 8px 8px 8px 24px;
 	}
 
 	.upload-complete {
@@ -78,17 +70,6 @@
 
 	.file-uploading {
 		background-color: #ffc;
-	}
-
-	.progress-bar {
-		background: #fff;
-		margin-top: 25px;
-		text-align: left;
-		width: 100%;
-	}
-
-	.progress {
-		background: #8db2e3;
 	}
 }
 

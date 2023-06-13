@@ -19,6 +19,7 @@ import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServices
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderer;
 import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderingContext;
 import com.liferay.dynamic.data.mapping.form.values.factory.DDMFormValuesFactory;
+import com.liferay.dynamic.data.mapping.form.web.internal.configuration.DDMFormWebConfiguration;
 import com.liferay.dynamic.data.mapping.form.web.internal.security.permission.resource.DDMFormInstancePermission;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
@@ -98,6 +99,7 @@ public class DDMFormDisplayContext {
 		DDMFormRenderer ddmFormRenderer,
 		DDMFormValuesFactory ddmFormValuesFactory,
 		DDMFormValuesMerger ddmFormValuesMerger,
+		DDMFormWebConfiguration ddmFormWebConfiguration,
 		GroupLocalService groupLocalService, JSONFactory jsonFactory,
 		WorkflowDefinitionLinkLocalService workflowDefinitionLinkLocalService,
 		Portal portal) {
@@ -114,6 +116,7 @@ public class DDMFormDisplayContext {
 		_ddmFormRenderer = ddmFormRenderer;
 		_ddmFormValuesFactory = ddmFormValuesFactory;
 		_ddmFormValuesMerger = ddmFormValuesMerger;
+		_ddmFormWebConfiguration = ddmFormWebConfiguration;
 		_groupLocalService = groupLocalService;
 		_jsonFactory = jsonFactory;
 		_workflowDefinitionLinkLocalService =
@@ -136,6 +139,10 @@ public class DDMFormDisplayContext {
 		}
 	}
 
+	public int getAutosaveInterval() {
+		return _ddmFormWebConfiguration.autosaveInterval() * 60000;
+	}
+
 	public String[] getAvailableLanguageIds() throws PortalException {
 		ThemeDisplay themeDisplay = getThemeDisplay();
 
@@ -146,9 +153,9 @@ public class DDMFormDisplayContext {
 
 		Set<Locale> availableLocales = ddmForm.getAvailableLocales();
 
-		Stream<Locale> localeStreams = availableLocales.stream();
+		Stream<Locale> availableLocalesStream = availableLocales.stream();
 
-		return localeStreams.filter(
+		return availableLocalesStream.filter(
 			locale -> siteAvailablesLocales.contains(locale)
 		).map(
 			locale -> LanguageUtil.getLanguageId(locale)
@@ -239,12 +246,12 @@ public class DDMFormDisplayContext {
 			_ddmFormInstance = _ddmFormInstanceService.fetchFormInstance(
 				getFormInstanceId());
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(pe, pe);
+				_log.debug(portalException, portalException);
 			}
 
 			return null;
@@ -350,7 +357,9 @@ public class DDMFormDisplayContext {
 			DDMFormInstanceSettings formInstanceSettings =
 				formInstance.getSettingsModel();
 
-			_autosaveEnabled = formInstanceSettings.autosaveEnabled();
+			_autosaveEnabled =
+				formInstanceSettings.autosaveEnabled() &&
+				(getAutosaveInterval() > 0);
 		}
 
 		return _autosaveEnabled;
@@ -761,6 +770,7 @@ public class DDMFormDisplayContext {
 	private final DDMFormRenderer _ddmFormRenderer;
 	private final DDMFormValuesFactory _ddmFormValuesFactory;
 	private final DDMFormValuesMerger _ddmFormValuesMerger;
+	private final DDMFormWebConfiguration _ddmFormWebConfiguration;
 	private final GroupLocalService _groupLocalService;
 	private Boolean _hasAddFormInstanceRecordPermission;
 	private Boolean _hasViewPermission;

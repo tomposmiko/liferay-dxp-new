@@ -83,7 +83,7 @@ public abstract class KaleoTimerInstanceTokenLocalServiceBaseImpl
 	implements AopService, IdentifiableOSGiService,
 			   KaleoTimerInstanceTokenLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>KaleoTimerInstanceTokenLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.workflow.kaleo.service.KaleoTimerInstanceTokenLocalServiceUtil</code>.
@@ -428,8 +428,8 @@ public abstract class KaleoTimerInstanceTokenLocalServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

@@ -21,7 +21,6 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutType;
 import com.liferay.portal.kernel.model.LayoutTypePortlet;
 import com.liferay.portal.kernel.model.Portlet;
@@ -94,7 +93,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import javax.portlet.Event;
 import javax.portlet.MimeResponse;
@@ -129,8 +127,8 @@ public class PortletContainerImpl implements PortletContainer {
 		try {
 			_preparePortlet(httpServletRequest, portlet);
 		}
-		catch (Exception e) {
-			throw new PortletContainerException(e);
+		catch (Exception exception) {
+			throw new PortletContainerException(exception);
 		}
 	}
 
@@ -331,8 +329,8 @@ public class PortletContainerImpl implements PortletContainer {
 				return event;
 			}
 		}
-		catch (ClassNotFoundException cnfe) {
-			throw new RuntimeException(cnfe);
+		catch (ClassNotFoundException classNotFoundException) {
+			throw new RuntimeException(classNotFoundException);
 		}
 
 		byte[] serializedValue = SerializableUtil.serialize(value);
@@ -344,8 +342,10 @@ public class PortletContainerImpl implements PortletContainer {
 	}
 
 	private boolean _isPublishedContentPage(Layout layout) {
-		if (Objects.equals(layout.getType(), LayoutConstants.TYPE_CONTENT) &&
-			(layout.getClassNameId() == 0)) {
+		if (layout.isTypeContent() &&
+			((layout.getClassNameId() == 0) ||
+			 (PortalUtil.getClassNameId(Layout.class.getName()) !=
+				 layout.getClassNameId()))) {
 
 			return true;
 		}
@@ -424,8 +424,8 @@ public class PortletContainerImpl implements PortletContainer {
 		try {
 			return unsafeSupplier.get();
 		}
-		catch (Exception e) {
-			throw new PortletContainerException(e);
+		catch (Exception exception) {
+			throw new PortletContainerException(exception);
 		}
 		finally {
 			if (themeDisplay != null) {

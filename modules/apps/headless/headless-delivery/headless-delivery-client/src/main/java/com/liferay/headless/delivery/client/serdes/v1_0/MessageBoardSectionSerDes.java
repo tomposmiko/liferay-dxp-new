@@ -63,6 +63,16 @@ public class MessageBoardSectionSerDes {
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
+		if (messageBoardSection.getActions() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"actions\": ");
+
+			sb.append(_toJSON(messageBoardSection.getActions()));
+		}
+
 		if (messageBoardSection.getCreator() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -172,6 +182,16 @@ public class MessageBoardSectionSerDes {
 			sb.append(messageBoardSection.getNumberOfMessageBoardThreads());
 		}
 
+		if (messageBoardSection.getParentMessageBoardSectionId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"parentMessageBoardSectionId\": ");
+
+			sb.append(messageBoardSection.getParentMessageBoardSectionId());
+		}
+
 		if (messageBoardSection.getSiteId() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -244,6 +264,14 @@ public class MessageBoardSectionSerDes {
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
+		if (messageBoardSection.getActions() == null) {
+			map.put("actions", null);
+		}
+		else {
+			map.put(
+				"actions", String.valueOf(messageBoardSection.getActions()));
+		}
+
 		if (messageBoardSection.getCreator() == null) {
 			map.put("creator", null);
 		}
@@ -307,6 +335,16 @@ public class MessageBoardSectionSerDes {
 					messageBoardSection.getNumberOfMessageBoardThreads()));
 		}
 
+		if (messageBoardSection.getParentMessageBoardSectionId() == null) {
+			map.put("parentMessageBoardSectionId", null);
+		}
+		else {
+			map.put(
+				"parentMessageBoardSectionId",
+				String.valueOf(
+					messageBoardSection.getParentMessageBoardSectionId()));
+		}
+
 		if (messageBoardSection.getSiteId() == null) {
 			map.put("siteId", null);
 		}
@@ -360,7 +398,14 @@ public class MessageBoardSectionSerDes {
 			MessageBoardSection messageBoardSection, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
 
-			if (Objects.equals(jsonParserFieldName, "creator")) {
+			if (Objects.equals(jsonParserFieldName, "actions")) {
+				if (jsonParserFieldValue != null) {
+					messageBoardSection.setActions(
+						(Map)MessageBoardSectionSerDes.toMap(
+							(String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "creator")) {
 				if (jsonParserFieldValue != null) {
 					messageBoardSection.setCreator(
 						CreatorSerDes.toDTO((String)jsonParserFieldValue));
@@ -418,6 +463,14 @@ public class MessageBoardSectionSerDes {
 						Integer.valueOf((String)jsonParserFieldValue));
 				}
 			}
+			else if (Objects.equals(
+						jsonParserFieldName, "parentMessageBoardSectionId")) {
+
+				if (jsonParserFieldValue != null) {
+					messageBoardSection.setParentMessageBoardSectionId(
+						Long.valueOf((String)jsonParserFieldValue));
+				}
+			}
 			else if (Objects.equals(jsonParserFieldName, "siteId")) {
 				if (jsonParserFieldValue != null) {
 					messageBoardSection.setSiteId(
@@ -453,9 +506,11 @@ public class MessageBoardSectionSerDes {
 	private static String _escape(Object object) {
 		String string = String.valueOf(object);
 
-		string = string.replace("\\", "\\\\");
+		for (String[] strings : BaseJSONParser.JSON_ESCAPE_STRINGS) {
+			string = string.replace(strings[0], strings[1]);
+		}
 
-		return string.replace("\"", "\\\"");
+		return string;
 	}
 
 	private static String _toJSON(Map<String, ?> map) {

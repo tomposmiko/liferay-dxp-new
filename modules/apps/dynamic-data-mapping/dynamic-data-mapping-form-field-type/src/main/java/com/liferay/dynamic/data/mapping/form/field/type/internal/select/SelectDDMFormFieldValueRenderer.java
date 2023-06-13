@@ -22,7 +22,6 @@ import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.util.GetterUtil;
 
 import java.util.Locale;
 import java.util.Objects;
@@ -62,7 +61,12 @@ public class SelectDDMFormFieldValueRenderer
 				LocalizedValue optionLabel =
 					ddmFormFieldOptions.getOptionLabels(optionValue);
 
-				sb.append(optionLabel.getString(locale));
+				if (optionLabel != null) {
+					sb.append(optionLabel.getString(locale));
+				}
+				else {
+					sb.append(optionValue);
+				}
 			}
 			else {
 				sb.append(optionValue);
@@ -85,10 +89,7 @@ public class SelectDDMFormFieldValueRenderer
 	}
 
 	protected boolean isManualDataSourceType(DDMFormField ddmFormField) {
-		String dataSourceType = GetterUtil.getString(
-			ddmFormField.getProperty("dataSourceType"), "manual");
-
-		if (Objects.equals(dataSourceType, "manual")) {
+		if (Objects.equals(ddmFormField.getDataSourceType(), "manual")) {
 			return true;
 		}
 

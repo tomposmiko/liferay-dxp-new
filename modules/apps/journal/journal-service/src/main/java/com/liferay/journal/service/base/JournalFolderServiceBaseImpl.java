@@ -49,7 +49,7 @@ public abstract class JournalFolderServiceBaseImpl
 	extends BaseServiceImpl
 	implements AopService, IdentifiableOSGiService, JournalFolderService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>JournalFolderService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.journal.service.JournalFolderServiceUtil</code>.
@@ -103,8 +103,8 @@ public abstract class JournalFolderServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 
@@ -181,17 +181,5 @@ public abstract class JournalFolderServiceBaseImpl
 	@Reference
 	protected com.liferay.ratings.kernel.service.RatingsStatsLocalService
 		ratingsStatsLocalService;
-
-	@Reference
-	protected com.liferay.trash.kernel.service.TrashEntryLocalService
-		trashEntryLocalService;
-
-	@Reference
-	protected com.liferay.trash.kernel.service.TrashEntryService
-		trashEntryService;
-
-	@Reference
-	protected com.liferay.trash.kernel.service.TrashVersionLocalService
-		trashVersionLocalService;
 
 }

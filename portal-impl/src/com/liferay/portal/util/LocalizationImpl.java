@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.security.xml.SecureXMLFactoryProviderUtil;
 import com.liferay.portal.kernel.settings.LocalizedValuesMap;
 import com.liferay.portal.kernel.settings.Settings;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Localization;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -349,9 +350,9 @@ public class LocalizationImpl implements Localization {
 				value = defaultValue;
 			}
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(e, e);
+				_log.warn(exception, exception);
 			}
 		}
 		finally {
@@ -363,7 +364,7 @@ public class LocalizationImpl implements Localization {
 				try {
 					xmlStreamReader.close();
 				}
-				catch (Exception e) {
+				catch (Exception exception) {
 				}
 			}
 		}
@@ -534,14 +535,14 @@ public class LocalizationImpl implements Localization {
 			return null;
 		}
 
-		Map<Locale, String> map = new HashMap<>();
-
 		Locale defaultLocale = LocaleUtil.getSiteDefault();
 
 		String defaultValue = _getLocalization(
 			bundleName, defaultLocale, classLoader, key, key);
 
-		map.put(defaultLocale, defaultValue);
+		Map<Locale, String> map = HashMapBuilder.put(
+			defaultLocale, defaultValue
+		).build();
 
 		Set<Locale> locales = null;
 
@@ -824,8 +825,8 @@ public class LocalizationImpl implements Localization {
 
 			return unsyncStringWriter.toString();
 		}
-		catch (XMLStreamException xmlse) {
-			throw new RuntimeException(xmlse);
+		catch (XMLStreamException xmlStreamException) {
+			throw new RuntimeException(xmlStreamException);
 		}
 		finally {
 			_close(xmlStreamWriter);
@@ -893,8 +894,8 @@ public class LocalizationImpl implements Localization {
 
 			return unsyncStringWriter.toString();
 		}
-		catch (Exception ioe) {
-			_log.error(ioe, ioe);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 		finally {
 			if (contextClassLoader != portalClassLoader) {
@@ -905,8 +906,8 @@ public class LocalizationImpl implements Localization {
 				try {
 					xmlStreamWriter.close();
 				}
-				catch (XMLStreamException xmlse) {
-					_log.error(xmlse, xmlse);
+				catch (XMLStreamException xmlStreamException) {
+					_log.error(xmlStreamException, xmlStreamException);
 				}
 			}
 		}
@@ -1043,9 +1044,9 @@ public class LocalizationImpl implements Localization {
 				xml = unsyncStringWriter.toString();
 			}
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(e, e);
+				_log.warn(exception, exception);
 			}
 		}
 		finally {
@@ -1057,7 +1058,7 @@ public class LocalizationImpl implements Localization {
 				try {
 					xmlStreamReader.close();
 				}
-				catch (Exception e) {
+				catch (Exception exception) {
 				}
 			}
 
@@ -1065,7 +1066,7 @@ public class LocalizationImpl implements Localization {
 				try {
 					xmlStreamWriter.close();
 				}
-				catch (Exception e) {
+				catch (Exception exception) {
 				}
 			}
 		}
@@ -1286,9 +1287,9 @@ public class LocalizationImpl implements Localization {
 
 			xml = unsyncStringWriter.toString();
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(e, e);
+				_log.warn(exception, exception);
 			}
 		}
 		finally {
@@ -1300,7 +1301,7 @@ public class LocalizationImpl implements Localization {
 				try {
 					xmlStreamReader.close();
 				}
-				catch (Exception e) {
+				catch (Exception exception) {
 				}
 			}
 
@@ -1308,7 +1309,7 @@ public class LocalizationImpl implements Localization {
 				try {
 					xmlStreamWriter.close();
 				}
-				catch (Exception e) {
+				catch (Exception exception) {
 				}
 			}
 		}
@@ -1321,7 +1322,7 @@ public class LocalizationImpl implements Localization {
 			try {
 				xmlStreamWriter.close();
 			}
-			catch (XMLStreamException xmlse) {
+			catch (XMLStreamException xmlStreamException) {
 			}
 		}
 	}
@@ -1404,7 +1405,7 @@ public class LocalizationImpl implements Localization {
 				value = new String(
 					value.getBytes(StringPool.ISO_8859_1), StringPool.UTF8);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 			}
 		}
 
@@ -1460,9 +1461,9 @@ public class LocalizationImpl implements Localization {
 				value = xmlStreamReader.getAttributeValue(null, name);
 			}
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(e, e);
+				_log.warn(exception, exception);
 			}
 		}
 		finally {
@@ -1474,7 +1475,7 @@ public class LocalizationImpl implements Localization {
 				try {
 					xmlStreamReader.close();
 				}
-				catch (Exception e) {
+				catch (Exception exception) {
 				}
 			}
 		}

@@ -30,13 +30,13 @@ String id = (String)request.getAttribute("liferay-ui:page-iterator:id");
 String jsCall = GetterUtil.getString((String)request.getAttribute("liferay-ui:page-iterator:jsCall"));
 PortletURL portletURL = (PortletURL)request.getAttribute("liferay-ui:page-iterator:portletURL");
 int total = GetterUtil.getInteger((String)request.getAttribute("liferay-ui:page-iterator:total"));
-String url = (String)request.getAttribute("liferay-ui:page-iterator:url");
-String urlAnchor = (String)request.getAttribute("liferay-ui:page-iterator:urlAnchor");
+String url = StringPool.BLANK;
+String urlAnchor = StringPool.BLANK;
 int pages = GetterUtil.getInteger((String)request.getAttribute("liferay-ui:page-iterator:pages"));
 
 int initialPages = 20;
 
-if ((portletURL != null) && Validator.isNull(url) && Validator.isNull(urlAnchor)) {
+if (portletURL != null) {
 	String[] urlArray = PortalUtil.stripURLAnchor(portletURL.toString(), StringPool.POUND);
 
 	url = urlArray[0];
@@ -70,7 +70,7 @@ if (forcePost && (portletURL != null)) {
 %>
 
 	<liferay-util:html-bottom>
-		<form action="<%= url %>" id="<%= randomNamespace + namespace %>pageIteratorFm" method="post" name="<%= randomNamespace + namespace %>pageIteratorFm">
+		<form action="<%= HtmlUtil.escapeAttribute(url) %>" id="<%= randomNamespace + namespace %>pageIteratorFm" method="post" name="<%= randomNamespace + namespace %>pageIteratorFm">
 			<aui:input name="<%= curParam %>" type="hidden" />
 			<liferay-portlet:renderURLParams portletURL="<%= portletURL %>" />
 		</form>
@@ -102,7 +102,7 @@ if (forcePost && (portletURL != null)) {
 					%>
 
 						<li>
-							<a href="<%= curDeltaURL %>" onClick="<%= forcePost ? _getOnClick(namespace, deltaParam, curDelta) : "" %>">
+							<a class="dropdown-icon" href="<%= HtmlUtil.escapeHREF(curDeltaURL) %>" onClick="<%= forcePost ? _getOnClick(namespace, deltaParam, curDelta) : "" %>">
 								<%= String.valueOf(curDelta) %>
 
 								<span class="sr-only"><liferay-ui:message key="entries-per-page" /></span>
@@ -176,7 +176,7 @@ if (forcePost && (portletURL != null)) {
 								%>
 
 									<li>
-										<a href="<%= _getHREF(formName, namespace + curParam, i, jsCall, url, urlAnchor) %>" onclick="<%= forcePost ? _getOnClick(namespace, curParam, i) : "" %>"><span class="sr-only"><liferay-ui:message key="page" /></span><%= i %></a>
+										<a class="dropdown-icon" href="<%= _getHREF(formName, namespace + curParam, i, jsCall, url, urlAnchor) %>" onclick="<%= forcePost ? _getOnClick(namespace, curParam, i) : "" %>"><span class="sr-only"><liferay-ui:message key="page" /></span><%= i %></a>
 									</li>
 
 								<%
@@ -205,11 +205,11 @@ if (forcePost && (portletURL != null)) {
 							<ul class="inline-scroller link-list" data-max-index="<%= pages - 2 %>">
 
 								<%
-								for (int i = 2; i < (initialPages > (cur - 2) ? cur - 2 : initialPages); i++) {
+								for (int i = 2; i < ((initialPages > (cur - 2)) ? cur - 2 : initialPages); i++) {
 								%>
 
 									<li>
-										<a href="<%= _getHREF(formName, namespace + curParam, i, jsCall, url, urlAnchor) %>" onclick="<%= forcePost ? _getOnClick(namespace, curParam, i) : "" %>"><span class="sr-only"><liferay-ui:message key="page" /></span><%= i %></a>
+										<a class="dropdown-icon" href="<%= _getHREF(formName, namespace + curParam, i, jsCall, url, urlAnchor) %>" onclick="<%= forcePost ? _getOnClick(namespace, curParam, i) : "" %>"><span class="sr-only"><liferay-ui:message key="page" /></span><%= i %></a>
 									</li>
 
 								<%
@@ -247,11 +247,11 @@ if (forcePost && (portletURL != null)) {
 					</c:if>
 
 					<%
-					for (int i = 2; i < (initialPages > (cur - 1) ? cur - 1 : initialPages); i++) {
+					for (int i = 2; i < ((initialPages > (cur - 1)) ? cur - 1 : initialPages); i++) {
 					%>
 
 						<li class="page-item">
-							<a class="page-link" href="<%= _getHREF(formName, namespace + curParam, i, jsCall, url, urlAnchor) %>" onclick="<%= forcePost ? _getOnClick(namespace, curParam, i) : "" %>"><span class="sr-only"><liferay-ui:message key="page" /></span><%= i %></a>
+							<a class="dropdown-icon page-link" href="<%= _getHREF(formName, namespace + curParam, i, jsCall, url, urlAnchor) %>" onclick="<%= forcePost ? _getOnClick(namespace, curParam, i) : "" %>"><span class="sr-only"><liferay-ui:message key="page" /></span><%= i %></a>
 						</li>
 
 					<%
@@ -295,11 +295,11 @@ if (forcePost && (portletURL != null)) {
 					<%
 					int remainingPages = ((pages - (cur + 2)) < initialPages) ? (pages - (cur + 2)) : initialPages;
 
-					for (int i = (cur + 2); i < ((cur + 2) + remainingPages); i++) {
+					for (int i = cur + 2; i < ((cur + 2) + remainingPages); i++) {
 					%>
 
 						<li class="page-item">
-							<a class="page-link" href="<%= _getHREF(formName, namespace + curParam, i, jsCall, url, urlAnchor) %>" onclick="<%= forcePost ? _getOnClick(namespace, curParam, i) : "" %>"><span class="sr-only"><liferay-ui:message key="page" /></span><%= i %></a>
+							<a class="dropdown-icon page-link" href="<%= _getHREF(formName, namespace + curParam, i, jsCall, url, urlAnchor) %>" onclick="<%= forcePost ? _getOnClick(namespace, curParam, i) : "" %>"><span class="sr-only"><liferay-ui:message key="page" /></span><%= i %></a>
 						</li>
 
 					<%
@@ -344,7 +344,7 @@ if (forcePost && (portletURL != null)) {
 				namespace: '<%= namespace %>',
 				pages: '<%= pages %>',
 				randomNamespace: '<%= randomNamespace %>',
-				url: '<%= url %>',
+				url: '<%= HtmlUtil.escapeJS(url) %>',
 				urlAnchor: '<%= urlAnchor %>'
 			}
 		);
@@ -369,7 +369,7 @@ if (forcePost && (portletURL != null)) {
 <%!
 private String _getHREF(String formName, String curParam, int cur, String jsCall, String url, String urlAnchor) throws Exception {
 	if (Validator.isNotNull(url)) {
-		return HttpUtil.addParameter(HttpUtil.removeParameter(url, curParam) + urlAnchor, curParam, cur);
+		return HtmlUtil.escapeHREF(HttpUtil.addParameter(HttpUtil.removeParameter(url, curParam) + urlAnchor, curParam, cur));
 	}
 
 	return "javascript:document." + formName + "." + curParam + ".value = '" + cur + "'; " + jsCall;

@@ -442,11 +442,6 @@ public class OAuth2ApplicationWrapper
 		return model.getUserUuid();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a o auth2 application model instance should use the <code>OAuth2Application</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

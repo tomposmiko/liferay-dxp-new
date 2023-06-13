@@ -1,5 +1,4 @@
 dependencies {
-	testIntegrationCompile group: "com.liferay", name: "com.liferay.arquillian.extension.junit.bridge", version: "1.0.19"
 	testIntegrationCompile group: "com.liferay.portal", name: "com.liferay.portal.impl", version: "default"
 	testIntegrationCompile group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "default"
 	testIntegrationCompile group: "commons-collections", name: "commons-collections", version: "3.2.2"
@@ -11,4 +10,5 @@ dependencies {
 	testIntegrationCompile project(":apps:static:portal-osgi-web:portal-osgi-web-portlet-container-test-util")
 	testIntegrationCompile project(":core:petra:petra-reflect")
 	testIntegrationCompile project(":core:petra:petra-string")
+	testIntegrationCompile project(":test:arquillian-extension-junit-bridge")
 }

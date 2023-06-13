@@ -29,6 +29,7 @@
 		<hint name="max-length">4000</hint>
 	</hint-collection>
 	<model name="com.liferay.announcements.kernel.model.AnnouncementsDelivery">
+		<field name="mvccVersion" type="long" />
 		<field name="deliveryId" type="long" />
 		<field name="companyId" type="long" />
 		<field name="userId" type="long" />
@@ -38,6 +39,7 @@
 		<field name="website" type="boolean" />
 	</model>
 	<model name="com.liferay.announcements.kernel.model.AnnouncementsEntry">
+		<field name="mvccVersion" type="long" />
 		<field name="uuid" type="String" />
 		<field name="entryId" type="long" />
 		<field name="companyId" type="long" />
@@ -66,6 +68,7 @@
 		<field name="alert" type="boolean" />
 	</model>
 	<model name="com.liferay.announcements.kernel.model.AnnouncementsFlag">
+		<field name="mvccVersion" type="long" />
 		<field name="flagId" type="long" />
 		<field name="companyId" type="long" />
 		<field name="userId" type="long" />
@@ -74,6 +77,8 @@
 		<field name="value" type="int" />
 	</model>
 	<model name="com.liferay.asset.kernel.model.AssetCategory">
+		<field name="mvccVersion" type="long" />
+		<field name="ctCollectionId" type="long" />
 		<field name="uuid" type="String" />
 		<field name="externalReferenceCode" type="String" />
 		<field name="categoryId" type="long" />
@@ -84,8 +89,9 @@
 		<field name="createDate" type="Date" />
 		<field name="modifiedDate" type="Date" />
 		<field name="parentCategoryId" type="long" />
-		<field name="leftCategoryId" type="long" />
-		<field name="rightCategoryId" type="long" />
+		<field name="treePath" type="String">
+			<hint name="max-length">4000</hint>
+		</field>
 		<field name="name" type="String" />
 		<field localized="true" name="title" type="String">
 			<validator name="required" />
@@ -98,6 +104,8 @@
 		<field name="lastPublishDate" type="Date" />
 	</model>
 	<model name="com.liferay.asset.kernel.model.AssetCategoryProperty">
+		<field name="mvccVersion" type="long" />
+		<field name="ctCollectionId" type="long" />
 		<field name="categoryPropertyId" type="long" />
 		<field name="companyId" type="long" />
 		<field name="userId" type="long" />
@@ -109,6 +117,8 @@
 		<field name="value" type="String" />
 	</model>
 	<model name="com.liferay.asset.kernel.model.AssetEntry">
+		<field name="mvccVersion" type="long" />
+		<field name="ctCollectionId" type="long" />
 		<field name="entryId" type="long" />
 		<field name="groupId" type="long" />
 		<field name="companyId" type="long" />
@@ -143,9 +153,10 @@
 		<field name="height" type="int" />
 		<field name="width" type="int" />
 		<field name="priority" type="double" />
-		<field name="viewCount" type="int" />
 	</model>
 	<model name="com.liferay.asset.kernel.model.AssetLink">
+		<field name="mvccVersion" type="long" />
+		<field name="ctCollectionId" type="long" />
 		<field name="linkId" type="long" />
 		<field name="companyId" type="long" />
 		<field name="userId" type="long" />
@@ -157,6 +168,8 @@
 		<field name="weight" type="int" />
 	</model>
 	<model name="com.liferay.asset.kernel.model.AssetTag">
+		<field name="mvccVersion" type="long" />
+		<field name="ctCollectionId" type="long" />
 		<field name="uuid" type="String" />
 		<field name="tagId" type="long" />
 		<field name="groupId" type="long" />
@@ -171,14 +184,9 @@
 		<field name="assetCount" type="int" />
 		<field name="lastPublishDate" type="Date" />
 	</model>
-	<model name="com.liferay.asset.kernel.model.AssetTagStats">
-		<field name="tagStatsId" type="long" />
-		<field name="companyId" type="long" />
-		<field name="tagId" type="long" />
-		<field name="classNameId" type="long" />
-		<field name="assetCount" type="int" />
-	</model>
 	<model name="com.liferay.asset.kernel.model.AssetVocabulary">
+		<field name="mvccVersion" type="long" />
+		<field name="ctCollectionId" type="long" />
 		<field name="uuid" type="String" />
 		<field name="externalReferenceCode" type="String" />
 		<field name="vocabularyId" type="long" />
@@ -244,7 +252,6 @@
 		<field name="fileEntryTypeId" type="long" />
 		<field name="version" type="String" />
 		<field name="size" type="long" />
-		<field name="readCount" type="int" />
 		<field name="smallImageId" type="long" />
 		<field name="largeImageId" type="long" />
 		<field name="custom1ImageId" type="long" />
@@ -507,13 +514,6 @@
 			<hint name="max-length">200</hint>
 		</field>
 	</model>
-	<model name="com.liferay.portal.kernel.model.ClusterGroup">
-		<field name="mvccVersion" type="long" />
-		<field name="clusterGroupId" type="long" />
-		<field name="name" type="String" />
-		<field name="clusterNodeIds" type="String" />
-		<field name="wholeCluster" type="boolean" />
-	</model>
 	<model name="com.liferay.portal.kernel.model.Company">
 		<default-hints>
 			<hint name="display-width">210</hint>
@@ -522,9 +522,6 @@
 		<field name="companyId" type="long" />
 		<field name="accountId" type="long" />
 		<field name="webId" type="String" />
-		<field name="key" type="String">
-			<hint-collection name="CLOB" />
-		</field>
 		<field name="mx" type="String">
 			<hint-collection name="HOSTNAME" />
 			<validator name="required" />
@@ -536,6 +533,14 @@
 		<field name="system" type="boolean" />
 		<field name="maxUsers" type="int" />
 		<field name="active" type="boolean" />
+	</model>
+	<model name="com.liferay.portal.kernel.model.CompanyInfo">
+		<field name="mvccVersion" type="long" />
+		<field name="companyInfoId" type="long" />
+		<field name="companyId" type="long" />
+		<field name="key" type="String">
+			<hint-collection name="CLOB" />
+		</field>
 	</model>
 	<model name="com.liferay.portal.kernel.model.Contact">
 		<default-hints>
@@ -659,8 +664,8 @@
 	</model>
 	<model name="com.liferay.portal.kernel.model.Layout">
 		<field name="mvccVersion" type="long" />
+		<field name="ctCollectionId" type="long" />
 		<field name="uuid" type="String" />
-		<field name="headId" type="long" />
 		<field name="plid" type="long" />
 		<field name="groupId" type="long" />
 		<field name="companyId" type="long" />
@@ -712,11 +717,16 @@
 			<hint-collection name="CLOB" />
 		</field>
 		<field name="priority" type="int" />
+		<field name="masterLayoutPlid" type="long" />
 		<field name="layoutPrototypeUuid" type="String" />
 		<field name="layoutPrototypeLinkEnabled" type="boolean" />
 		<field name="sourcePrototypeLayoutUuid" type="String" />
 		<field name="publishDate" type="Date" />
 		<field name="lastPublishDate" type="Date" />
+		<field name="status" type="int" />
+		<field name="statusByUserId" type="long" />
+		<field name="statusByUserName" type="String" />
+		<field name="statusDate" type="Date" />
 	</model>
 	<model name="com.liferay.portal.kernel.model.LayoutBranch">
 		<field name="mvccVersion" type="long" />
@@ -738,6 +748,7 @@
 	</model>
 	<model name="com.liferay.portal.kernel.model.LayoutFriendlyURL">
 		<field name="mvccVersion" type="long" />
+		<field name="ctCollectionId" type="long" />
 		<field name="uuid" type="String" />
 		<field name="layoutFriendlyURLId" type="long" />
 		<field name="groupId" type="long" />
@@ -819,7 +830,6 @@
 	</model>
 	<model name="com.liferay.portal.kernel.model.LayoutSet">
 		<field name="mvccVersion" type="long" />
-		<field name="headId" type="long" />
 		<field name="layoutSetId" type="long" />
 		<field name="groupId" type="long" />
 		<field name="companyId" type="long" />
@@ -832,7 +842,6 @@
 		<field name="css" type="String">
 			<hint-collection name="CLOB" />
 		</field>
-		<field name="pageCount" type="int" />
 		<field name="settings" type="String">
 			<hint-collection name="CLOB" />
 		</field>
@@ -889,89 +898,6 @@
 			<hint-collection name="TEXTAREA" />
 		</field>
 		<field name="active" type="boolean" />
-	</model>
-	<model name="com.liferay.portal.kernel.model.LayoutSetVersion">
-		<field name="layoutSetVersionId" type="long" />
-		<field name="version" type="int" />
-		<field name="layoutSetId" type="long" />
-		<field name="groupId" type="long" />
-		<field name="companyId" type="long" />
-		<field name="createDate" type="Date" />
-		<field name="modifiedDate" type="Date" />
-		<field name="privateLayout" type="boolean" />
-		<field name="logoId" type="long" />
-		<field name="themeId" type="String" />
-		<field name="colorSchemeId" type="String" />
-		<field name="css" type="String">
-			<hint-collection name="CLOB" />
-		</field>
-		<field name="pageCount" type="int" />
-		<field name="settings" type="String">
-			<hint-collection name="CLOB" />
-		</field>
-		<field name="layoutSetPrototypeUuid" type="String" />
-		<field name="layoutSetPrototypeLinkEnabled" type="boolean" />
-	</model>
-	<model name="com.liferay.portal.kernel.model.LayoutVersion">
-		<field name="layoutVersionId" type="long" />
-		<field name="version" type="int" />
-		<field name="uuid" type="String" />
-		<field name="plid" type="long" />
-		<field name="groupId" type="long" />
-		<field name="companyId" type="long" />
-		<field name="userId" type="long" />
-		<field name="userName" type="String" />
-		<field name="createDate" type="Date" />
-		<field name="modifiedDate" type="Date" />
-		<field name="parentPlid" type="long" />
-		<field name="privateLayout" type="boolean" />
-		<field name="layoutId" type="long" />
-		<field name="parentLayoutId" type="long" />
-		<field name="classNameId" type="long" />
-		<field name="classPK" type="long" />
-		<field localized="true" name="name" type="String">
-			<hint name="display-width">210</hint>
-			<hint name="max-length">4000</hint>
-			<validator name="required" />
-		</field>
-		<field localized="true" name="title" type="String">
-			<hint name="display-width">210</hint>
-			<hint name="max-length">4000</hint>
-		</field>
-		<field localized="true" name="description" type="String">
-			<hint-collection name="TEXTAREA" />
-			<hint name="display-width">300</hint>
-		</field>
-		<field localized="true" name="keywords" type="String">
-			<hint-collection name="TEXTAREA" />
-			<hint name="display-width">300</hint>
-		</field>
-		<field localized="true" name="robots" type="String">
-			<hint-collection name="TEXTAREA" />
-			<hint name="display-width">300</hint>
-		</field>
-		<field name="type" type="String" />
-		<field name="typeSettings" type="String">
-			<hint-collection name="CLOB" />
-		</field>
-		<field name="hidden" type="boolean" />
-		<field name="system" type="boolean" />
-		<field name="friendlyURL" type="String">
-			<hint name="display-width">210</hint>
-			<hint name="max-length">255</hint>
-		</field>
-		<field name="iconImageId" type="long" />
-		<field name="themeId" type="String" />
-		<field name="colorSchemeId" type="String" />
-		<field name="css" type="String">
-			<hint-collection name="CLOB" />
-		</field>
-		<field name="priority" type="int" />
-		<field name="layoutPrototypeUuid" type="String" />
-		<field name="layoutPrototypeLinkEnabled" type="boolean" />
-		<field name="sourcePrototypeLayoutUuid" type="String" />
-		<field name="publishDate" type="Date" />
-		<field name="lastPublishDate" type="Date" />
 	</model>
 	<model name="com.liferay.portal.kernel.model.ListType">
 		<field name="mvccVersion" type="long" />
@@ -1199,6 +1125,7 @@
 	</model>
 	<model name="com.liferay.portal.kernel.model.PortletPreferences">
 		<field name="mvccVersion" type="long" />
+		<field name="ctCollectionId" type="long" />
 		<field name="portletPreferencesId" type="long" />
 		<field name="companyId" type="long" />
 		<field name="ownerId" type="long" />
@@ -1315,25 +1242,9 @@
 		<field name="actionId" type="String" />
 		<field name="bitwiseValue" type="long" />
 	</model>
-	<model name="com.liferay.portal.kernel.model.ResourceBlock">
-		<field name="mvccVersion" type="long" />
-		<field name="resourceBlockId" type="long" />
-		<field name="companyId" type="long" />
-		<field name="groupId" type="long" />
-		<field name="name" type="String" />
-		<field name="permissionsHash" type="String" />
-		<field name="referenceCount" type="long" />
-	</model>
-	<model name="com.liferay.portal.kernel.model.ResourceBlockPermission">
-		<field name="mvccVersion" type="long" />
-		<field name="resourceBlockPermissionId" type="long" />
-		<field name="companyId" type="long" />
-		<field name="resourceBlockId" type="long" />
-		<field name="roleId" type="long" />
-		<field name="actionIds" type="long" />
-	</model>
 	<model name="com.liferay.portal.kernel.model.ResourcePermission">
 		<field name="mvccVersion" type="long" />
+		<field name="ctCollectionId" type="long" />
 		<field name="resourcePermissionId" type="long" />
 		<field name="companyId" type="long" />
 		<field name="name" type="String">
@@ -1348,15 +1259,6 @@
 		<field name="ownerId" type="long" />
 		<field name="actionIds" type="long" />
 		<field name="viewActionId" type="boolean" />
-	</model>
-	<model name="com.liferay.portal.kernel.model.ResourceTypePermission">
-		<field name="mvccVersion" type="long" />
-		<field name="resourceTypePermissionId" type="long" />
-		<field name="companyId" type="long" />
-		<field name="groupId" type="long" />
-		<field name="name" type="String" />
-		<field name="roleId" type="long" />
-		<field name="actionIds" type="long" />
 	</model>
 	<model name="com.liferay.portal.kernel.model.Role">
 		<field name="mvccVersion" type="long" />
@@ -1636,6 +1538,8 @@
 			<hint-collection name="HOSTNAME" />
 			<validator name="required" />
 		</field>
+		<field name="defaultVirtualHost" type="boolean" />
+		<field name="languageId" type="String" />
 	</model>
 	<model name="com.liferay.portal.kernel.model.WebDAVProps">
 		<field name="mvccVersion" type="long" />
@@ -1715,6 +1619,8 @@
 	<model name="com.liferay.ratings.kernel.model.RatingsStats">
 		<field name="statsId" type="long" />
 		<field name="companyId" type="long" />
+		<field name="createDate" type="Date" />
+		<field name="modifiedDate" type="Date" />
 		<field name="classNameId" type="long" />
 		<field name="classPK" type="long" />
 		<field name="totalEntries" type="int" />

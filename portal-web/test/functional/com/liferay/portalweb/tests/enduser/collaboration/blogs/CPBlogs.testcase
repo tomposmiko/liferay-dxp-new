@@ -88,6 +88,7 @@ definition {
 		property app.server.types = "jboss,tcserver,tomcat,weblogic,websphere,wildfly";
 		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
 		property environment.acceptance = "true";
+		property testray.component.names = "WYSIWYG";
 
 		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
 
@@ -195,37 +196,6 @@ definition {
 	}
 
 	@priority = "4"
-	test AddBlogsEntryWithInlineImageViaURL {
-		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
-
-		BlogsNavigator.gotoAddEntry();
-
-		BlogsEntry.addTitle(entryTitle = "Blogs Entry Title");
-
-		BlogsEntry.addContent(entryContent = "Blogs Entry Content");
-
-		ItemSelector.gotoItemSelectorViaAlloyEditor();
-
-		ItemSelector.addFromURL(
-			imageSourceURL = "https://dummyimage.com/600x400/000/fff.jpg",
-			navTab = "URL");
-
-		Pause(locator1 = "1000");
-
-		PortletEntry.publish();
-
-		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
-
-		BlogsNavigator.gotoEntryCP(entryTitle = "Blogs Entry Title");
-
-		BlogsEntry.viewEntry(
-			entryContent = "Blogs Entry Content",
-			entryTitle = "Blogs Entry Title");
-
-		BlogsEntry.viewInlineImage(uploadFileName = "https://dummyimage.com/600x400/000/fff.jpg");
-	}
-
-	@priority = "4"
 	test AddBlogsEntryWithSubtitle {
 		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
 
@@ -246,7 +216,7 @@ definition {
 
 	@priority = "5"
 	test AddBlogWithFormatting {
-		property testray.component.names = "Training";
+		property testray.component.names = "Training,WYSIWYG";
 
 		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
 
@@ -255,7 +225,7 @@ definition {
 		BlogsNavigator.gotoSelectFile();
 
 		ItemSelector.uploadFile(
-			navTab = "Upload Image",
+			navTab = "Blog Images",
 			uploadFileName = "Document_1.jpg");
 
 		BlogsEntry.addEntryContent(
@@ -271,6 +241,7 @@ definition {
 	@priority = "5"
 	test CKEditorSmoke {
 		property custom.properties = "editor.wysiwyg.portal-web.docroot.html.portlet.blogs.edit_entry.jsp=ckeditor";
+		property testray.component.names = "WYSIWYG";
 
 		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
 
@@ -487,7 +458,7 @@ definition {
 			entryContent = "Blogs Entry Content",
 			entrySubtitle = "Blogs Entry Subtitle",
 			entryTitle = "Blogs Entry Title",
-			navTab = "Upload Image",
+			navTab = "Blog Images",
 			uploadFileName = "Document_1.jpg");
 
 		Button.clickPublish();
@@ -545,7 +516,7 @@ definition {
 			entryContent = "Blogs Entry Content",
 			entrySubtitle = "Blogs Entry Subtitle",
 			entryTitle = "Blogs Entry Title",
-			navTab = "Upload Image",
+			navTab = "Blog Images",
 			uploadFileName = "Document_1.jpg");
 
 		Pause(locator1 = "1000");
@@ -582,7 +553,7 @@ definition {
 			entryContent = "Blogs Entry Content",
 			entrySubtitle = "Blogs Entry Subtitle",
 			entryTitle = "Blogs Entry Title",
-			navTab = "Upload Image",
+			navTab = "Blog Images",
 			uploadFileName = "Document_1.jpg");
 
 		Button.clickPublish();

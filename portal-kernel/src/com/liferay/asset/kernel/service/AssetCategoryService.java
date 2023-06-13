@@ -53,7 +53,7 @@ import org.osgi.annotation.versioning.ProviderType;
 )
 public interface AssetCategoryService extends BaseService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link AssetCategoryServiceUtil} to access the asset category remote service. Add custom service methods to <code>com.liferay.portlet.asset.service.impl.AssetCategoryServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -70,15 +70,6 @@ public interface AssetCategoryService extends BaseService {
 		throws PortalException;
 
 	public void deleteCategories(long[] categoryIds) throws PortalException;
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), Replaced by {@link
-	 #deleteCategories(long[])}
-	 */
-	@Deprecated
-	public List<AssetCategory> deleteCategories(
-			long[] categoryIds, ServiceContext serviceContext)
-		throws PortalException;
 
 	public void deleteCategory(long categoryId) throws PortalException;
 

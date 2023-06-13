@@ -62,27 +62,6 @@ public class DDMStructureLayoutLocalServiceWrapper
 			userId, groupId, structureVersionId, ddmFormLayout, serviceContext);
 	}
 
-	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 #addStructureLayout(long, long, long, long, Map, Map, String,
-	 String, ServiceContext)}
-	 */
-	@Deprecated
-	@Override
-	public com.liferay.dynamic.data.mapping.model.DDMStructureLayout
-			addStructureLayout(
-				long userId, long groupId, long structureVersionId,
-				java.util.Map<java.util.Locale, String> name,
-				java.util.Map<java.util.Locale, String> description,
-				String definition,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _ddmStructureLayoutLocalService.addStructureLayout(
-			userId, groupId, structureVersionId, name, description, definition,
-			serviceContext);
-	}
-
 	@Override
 	public com.liferay.dynamic.data.mapping.model.DDMStructureLayout
 			addStructureLayout(
@@ -521,6 +500,16 @@ public class DDMStructureLayoutLocalServiceWrapper
 
 		return _ddmStructureLayoutLocalService.getStructureLayouts(
 			groupId, classNameId, start, end, orderByComparator);
+	}
+
+	@Override
+	public java.util.List
+		<com.liferay.dynamic.data.mapping.model.DDMStructureLayout>
+			getStructureLayouts(
+				long groupId, long classNameId, long structureVersionId) {
+
+		return _ddmStructureLayoutLocalService.getStructureLayouts(
+			groupId, classNameId, structureVersionId);
 	}
 
 	@Override

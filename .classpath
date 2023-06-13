@@ -22,7 +22,6 @@
 	<classpathentry excluding="**/.svn/**|.svn/" kind="src" path="portal-kernel/src"/>
 	<classpathentry excluding="**/.svn/**|.svn/" kind="src" path="portal-kernel/test/unit"/>
 	<classpathentry excluding="**/.svn/**|.svn/" kind="src" path="portal-test/src"/>
-	<classpathentry excluding="**/.svn/**|.svn/" kind="src" path="portal-test-integration/src"/>
 	<classpathentry excluding="**/.svn/**|.svn/|com/liferay/portalweb/dependencies/" kind="src" path="portal-web/test/functional"/>
 	<classpathentry excluding="**/.svn/**|.svn/" kind="src" path="support-tomcat/src"/>
 	<classpathentry excluding="**/.svn/**|.svn/" kind="src" path="util-bridges/src"/>
@@ -51,6 +50,7 @@
 	<classpathentry kind="lib" path="lib/development/dtdparser.jar"/>
 	<classpathentry kind="lib" path="lib/development/dumbster.jar"/>
 	<classpathentry kind="lib" path="lib/development/error-prone-ant.jar"/>
+	<classpathentry kind="lib" path="lib/development/freemarker.jar"/>
 	<classpathentry kind="lib" path="lib/development/gson.jar"/>
 	<classpathentry kind="lib" path="lib/development/guava.jar"/>
 	<classpathentry kind="lib" path="lib/development/hamcrest-core.jar"/>
@@ -85,9 +85,9 @@
 	<classpathentry kind="lib" path="lib/development/mysql.jar"/>
 	<classpathentry kind="lib" path="lib/development/objenesis.jar"/>
 	<classpathentry kind="lib" path="lib/development/osgi-annotation-versioning.jar"/>
-	<classpathentry kind="lib" path="lib/development/freemarker.jar"/>
 	<classpathentry kind="lib" path="lib/development/p6spy.jar"/>
 	<classpathentry kind="lib" path="lib/development/persistence.jar"/>
+	<classpathentry kind="lib" path="lib/development/portletmvc4spring-test.jar"/>
 	<classpathentry kind="lib" path="lib/development/postgresql.jar"/>
 	<classpathentry kind="lib" path="lib/development/powermock-api-mockito.jar"/>
 	<classpathentry kind="lib" path="lib/development/powermock-api-support.jar"/>
@@ -180,6 +180,7 @@
 	<classpathentry kind="lib" path="lib/portal/im4java.jar"/>
 	<classpathentry kind="lib" path="lib/portal/isoparser.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jabsorb.jar"/>
+	<classpathentry kind="lib" path="lib/portal/jackson-databind.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jai-imageio-core.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jai-imageio-jpeg2000.jar"/>
 	<classpathentry kind="lib" path="lib/portal/jai_codec.jar"/>
@@ -248,6 +249,7 @@
 	<classpathentry kind="lib" path="lib/portal/poi-ooxml-schemas.jar"/>
 	<classpathentry kind="lib" path="lib/portal/poi-scratchpad.jar"/>
 	<classpathentry kind="lib" path="lib/portal/portal-client.jar"/>
+	<classpathentry kind="lib" path="lib/portal/portletmvc4spring-framework.jar"/>
 	<classpathentry kind="lib" path="lib/portal/rdffilter.jar"/>
 	<classpathentry kind="lib" path="lib/portal/rhino.jar"/>
 	<classpathentry kind="lib" path="lib/portal/ridl.jar"/>
@@ -276,7 +278,6 @@
 	<classpathentry kind="lib" path="lib/portal/spring-tx.jar"/>
 	<classpathentry kind="lib" path="lib/portal/spring-web.jar"/>
 	<classpathentry kind="lib" path="lib/portal/spring-webmvc.jar"/>
-	<classpathentry kind="lib" path="lib/portal/spring-webmvc-portlet.jar"/>
 	<classpathentry kind="lib" path="lib/portal/stax.jar"/>
 	<classpathentry kind="lib" path="lib/portal/stax-ex.jar"/>
 	<classpathentry kind="lib" path="lib/portal/streambuffer.jar"/>
@@ -306,11 +307,5 @@
 	<classpathentry kind="lib" path="lib/portal/xuggle-xuggler-noarch.jar"/>
 	<classpathentry kind="lib" path="lib/portal/xz.jar"/>
 	<classpathentry kind="lib" path="lib/portal/yui-compressor.jar"/>
-	<classpathentry kind="lib" path="tmp/lib-pre/com.liferay.portal.impl.trash.compat.jar"/>
-	<classpathentry kind="lib" path="tmp/lib-pre/com.liferay.portal.kernel.concurrent.compat.jar"/>
-	<classpathentry kind="lib" path="tmp/lib-pre/com.liferay.portal.kernel.io.compat.jar"/>
-	<classpathentry kind="lib" path="tmp/lib-pre/com.liferay.portal.kernel.memory.compat.jar"/>
-	<classpathentry kind="lib" path="tmp/lib-pre/com.liferay.portal.kernel.nio.compat.jar"/>
-	<classpathentry kind="lib" path="tmp/lib-pre/com.liferay.portal.kernel.util.compat.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

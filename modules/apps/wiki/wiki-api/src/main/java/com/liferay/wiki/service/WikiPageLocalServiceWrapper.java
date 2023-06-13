@@ -32,11 +32,6 @@ public class WikiPageLocalServiceWrapper
 		_wikiPageLocalService = wikiPageLocalService;
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link WikiPageLocalServiceUtil} to access the wiki page local service. Add custom service methods to <code>com.liferay.wiki.service.impl.WikiPageLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
-	 */
 	@Override
 	public com.liferay.wiki.model.WikiPage addPage(
 			long userId, long nodeId, String title, double version,
@@ -106,21 +101,6 @@ public class WikiPageLocalServiceWrapper
 			nodeId, title, addGroupPermissions, addGuestPermissions);
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #addPageResources(WikiPage, ModelPermissions)}
-	 */
-	@Deprecated
-	@Override
-	public void addPageResources(
-			long nodeId, String title, String[] groupPermissions,
-			String[] guestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_wikiPageLocalService.addPageResources(
-			nodeId, title, groupPermissions, guestPermissions);
-	}
-
 	@Override
 	public void addPageResources(
 			com.liferay.wiki.model.WikiPage page, boolean addGroupPermissions,
@@ -141,21 +121,6 @@ public class WikiPageLocalServiceWrapper
 		_wikiPageLocalService.addPageResources(page, modelPermissions);
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #addPageResources(WikiPage, ModelPermissions)}
-	 */
-	@Deprecated
-	@Override
-	public void addPageResources(
-			com.liferay.wiki.model.WikiPage page, String[] groupPermissions,
-			String[] guestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_wikiPageLocalService.addPageResources(
-			page, groupPermissions, guestPermissions);
-	}
-
 	@Override
 	public com.liferay.portal.kernel.repository.model.FileEntry
 			addTempFileEntry(
@@ -165,22 +130,6 @@ public class WikiPageLocalServiceWrapper
 
 		return _wikiPageLocalService.addTempFileEntry(
 			groupId, userId, folderName, fileName, inputStream, mimeType);
-	}
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 #addTempFileEntry(long, long, String, String, InputStream,
-	 String)}
-	 */
-	@Deprecated
-	@Override
-	public void addTempPageAttachment(
-			long groupId, long userId, String fileName, String tempFolderName,
-			java.io.InputStream inputStream, String mimeType)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_wikiPageLocalService.addTempPageAttachment(
-			groupId, userId, fileName, tempFolderName, inputStream, mimeType);
 	}
 
 	/**
@@ -609,15 +558,6 @@ public class WikiPageLocalServiceWrapper
 
 		return _wikiPageLocalService.getLatestPage(
 			nodeId, title, status, preferApproved);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public java.util.List<com.liferay.wiki.model.WikiPage> getNoAssetPages() {
-		return _wikiPageLocalService.getNoAssetPages();
 	}
 
 	@Override
@@ -1051,21 +991,6 @@ public class WikiPageLocalServiceWrapper
 		_wikiPageLocalService.moveDependentToTrash(page, trashEntryId);
 	}
 
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 #renamePage(long, long, String, String, ServiceContext)}
-	 */
-	@Deprecated
-	@Override
-	public void movePage(
-			long userId, long nodeId, String title, String newTitle,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_wikiPageLocalService.movePage(
-			userId, nodeId, title, newTitle, serviceContext);
-	}
-
 	@Override
 	public com.liferay.portal.kernel.repository.model.FileEntry
 			movePageAttachmentToTrash(
@@ -1084,21 +1009,6 @@ public class WikiPageLocalServiceWrapper
 
 		return _wikiPageLocalService.movePageFromTrash(
 			userId, nodeId, title, newNodeId, newParentTitle);
-	}
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 #movePageFromTrash(long, long, String, long, String)} *
-	 */
-	@Deprecated
-	@Override
-	public com.liferay.wiki.model.WikiPage movePageFromTrash(
-			long userId, long nodeId, String title, String newParentTitle,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _wikiPageLocalService.movePageFromTrash(
-			userId, nodeId, title, newParentTitle, serviceContext);
 	}
 
 	@Override
@@ -1228,21 +1138,6 @@ public class WikiPageLocalServiceWrapper
 			userId, resourcePrimKey, status, serviceContext);
 	}
 
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 #updateStatus(long, WikiPage, int, ServiceContext, Map)}
-	 */
-	@Deprecated
-	@Override
-	public com.liferay.wiki.model.WikiPage updateStatus(
-			long userId, com.liferay.wiki.model.WikiPage page, int status,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _wikiPageLocalService.updateStatus(
-			userId, page, status, serviceContext);
-	}
-
 	@Override
 	public com.liferay.wiki.model.WikiPage updateStatus(
 			long userId, com.liferay.wiki.model.WikiPage page, int status,
@@ -1267,16 +1162,12 @@ public class WikiPageLocalServiceWrapper
 		return _wikiPageLocalService.updateWikiPage(wikiPage);
 	}
 
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 WikiPageTitleValidator#validate(String)}
-	 */
-	@Deprecated
 	@Override
-	public void validateTitle(String title)
-		throws com.liferay.portal.kernel.exception.PortalException {
+	public com.liferay.wiki.model.WikiPage updateWikiPage(
+		com.liferay.wiki.model.WikiPage wikiPage,
+		com.liferay.portal.kernel.service.ServiceContext serviceContext) {
 
-		_wikiPageLocalService.validateTitle(title);
+		return _wikiPageLocalService.updateWikiPage(wikiPage, serviceContext);
 	}
 
 	@Override

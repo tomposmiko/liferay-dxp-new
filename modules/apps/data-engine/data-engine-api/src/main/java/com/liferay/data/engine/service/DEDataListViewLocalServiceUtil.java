@@ -32,7 +32,7 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class DEDataListViewLocalServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.data.engine.service.impl.DEDataListViewLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
@@ -100,6 +100,10 @@ public class DEDataListViewLocalServiceUtil {
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return getService().deleteDEDataListView(deDataListViewId);
+	}
+
+	public static void deleteDEDataListViews(long ddmStructureId) {
+		getService().deleteDEDataListViews(ddmStructureId);
 	}
 
 	/**
@@ -267,6 +271,12 @@ public class DEDataListViewLocalServiceUtil {
 		getDEDataListViews(int start, int end) {
 
 		return getService().getDEDataListViews(start, end);
+	}
+
+	public static java.util.List<com.liferay.data.engine.model.DEDataListView>
+		getDEDataListViews(long ddmStructureId) {
+
+		return getService().getDEDataListViews(ddmStructureId);
 	}
 
 	public static java.util.List<com.liferay.data.engine.model.DEDataListView>

@@ -264,8 +264,6 @@ definition {
 				locator1 = "TextInput#FILE",
 				value1 = "${document}");
 
-			SelectFrame(locator1 = "ItemSelector#ITEM_SELECTOR_MODAL_FOOTER");
-
 			AssertClick(
 				locator1 = "ItemSelector#ADD_BUTTON",
 				value1 = "Add");
@@ -424,7 +422,7 @@ definition {
 
 	macro populateFieldWebContentChooseFromWebContentLibrary {
 		var key_fieldName = "${fieldName}";
-		var key_webContentTitle = "${webContentTitle}";
+		var key_listEntry = "${webContentTitle}";
 
 		AssertClick(
 			locator1 = "Button#SELECT_CONTENT",
@@ -432,8 +430,8 @@ definition {
 
 		SelectFrame(locator1 = "IFrame#DIALOG");
 
-		AssertClick(
-			locator1 = "Link#WEB_CONTENT_ARTICLE",
+		AssertClick.assertPartialTextClickAt(
+			locator1 = "LexiconList#LIST_ENTRY",
 			value1 = "${webContentTitle}");
 
 		SelectFrame(value1 = "relative=top");
@@ -503,6 +501,7 @@ definition {
 
 	macro viewFieldCP {
 		var key_ddlRecordFieldData = "${ddlRecordFieldData}";
+		var key_ddlRecordFieldData_1 = "${ddlRecordFieldData_1}";
 		var key_fieldFieldLabel = "${fieldFieldLabel}";
 
 		if ("${ddlRecordFieldData}" == "") {
@@ -533,6 +532,13 @@ definition {
 				locator1 = "DDLRecord#FIELD",
 				value1 = "${fieldFieldLabel}${ddlRecordFieldData}");
 		}
+
+		if ("${field}" == "Date") {
+			AssertTextEquals.assertPartialText(
+				locator1 = "DDLRecord#FIELD_1",
+				value1 = "${fieldFieldLabel} ${ddlRecordFieldData_1}");
+		}
+
 		else {
 			DDLRecord.viewPopulatedField(
 				ddlRecordFieldData = "${ddlRecordFieldData}",
@@ -730,14 +736,29 @@ definition {
 		}
 
 		if ("${fieldShowLabel}" == "No") {
-			AssertTextEquals(
-				locator1 = "DDLRecord#FIELD_1",
-				value1 = "${ddlRecordFieldData}");
+			if ("${field}" == "Date") {
+				AssertTextEquals(
+					locator1 = "DDLRecord#FIELD_1",
+					value1 = "${ddlRecordFieldData_1}");
+			}
+			else {
+				AssertTextEquals(
+					locator1 = "DDLRecord#FIELD_1",
+					value1 = "${ddlRecordFieldData}");
+			}
 		}
+
 		else {
-			AssertTextEquals(
-				locator1 = "DDLRecord#FIELD_1",
-				value1 = "${fieldFieldLabel} ${ddlRecordFieldData}");
+			if ("${field}" == "Date") {
+				AssertTextEquals(
+					locator1 = "DDLRecord#FIELD_1",
+					value1 = "${fieldFieldLabel} ${ddlRecordFieldData_1}");
+			}
+			else {
+				AssertTextEquals(
+					locator1 = "DDLRecord#FIELD_1",
+					value1 = "${fieldFieldLabel} ${ddlRecordFieldData}");
+			}
 		}
 	}
 
@@ -965,6 +986,7 @@ definition {
 			value1 = "${fieldFieldLabel}");
 
 		var key_ddlRecordFieldData = "${key_ddlRecordFieldData}";
+		var key_ddlRecordFieldData_1 = "${key_ddlRecordFieldData_1}";
 
 		if (isSet(ddlRecordFieldDataTableDisplay)) {
 			var key_ddlRecordFieldData = "${ddlRecordFieldDataTableDisplay}";
@@ -1001,15 +1023,28 @@ definition {
 			}
 		}
 
-		AssertElementPresent(locator1 = "Portlet#H2_HEADER");
+		if ("${field}" == "Date") {
+			AssertElementPresent(locator1 = "Portlet#H2_HEADER");
 
-		AssertTextEquals.assertPartialText(
-			locator1 = "DDLRecord#FIELD_1",
-			value1 = "${fieldFieldLabel}");
+			AssertTextEquals.assertPartialText(
+				locator1 = "DDLRecord#FIELD_1",
+				value1 = "${fieldFieldLabel}");
 
-		AssertTextEquals.assertPartialText(
-			locator1 = "DDLRecord#FIELD_1",
-			value1 = "${ddlRecordFieldData}");
+			AssertTextEquals.assertPartialText(
+				locator1 = "DDLRecord#FIELD_1",
+				value1 = "${ddlRecordFieldData_1}");
+		}
+		else {
+			AssertElementPresent(locator1 = "Portlet#H2_HEADER");
+
+			AssertTextEquals.assertPartialText(
+				locator1 = "DDLRecord#FIELD_1",
+				value1 = "${fieldFieldLabel}");
+
+			AssertTextEquals.assertPartialText(
+				locator1 = "DDLRecord#FIELD_1",
+				value1 = "${ddlRecordFieldData}");
+		}
 
 		if (isSet(ddlRecordNestedFieldData)) {
 			var key_ddlRecordFieldData = "${ddlRecordNestedFieldData}";

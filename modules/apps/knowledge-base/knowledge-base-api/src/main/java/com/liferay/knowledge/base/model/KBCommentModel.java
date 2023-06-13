@@ -41,7 +41,7 @@ public interface KBCommentModel
 	extends AttachedModel, BaseModel<KBComment>, MVCCModel, ShardedModel,
 			StagedGroupedModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a kb comment model instance should use the {@link KBComment} interface instead.

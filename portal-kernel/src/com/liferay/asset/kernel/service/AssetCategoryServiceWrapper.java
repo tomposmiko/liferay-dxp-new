@@ -14,6 +14,7 @@
 
 package com.liferay.asset.kernel.service;
 
+import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.portal.kernel.service.ServiceWrapper;
 
 /**
@@ -32,13 +33,8 @@ public class AssetCategoryServiceWrapper
 		_assetCategoryService = assetCategoryService;
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link AssetCategoryServiceUtil} to access the asset category remote service. Add custom service methods to <code>com.liferay.portlet.asset.service.impl.AssetCategoryServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
-	 */
 	@Override
-	public com.liferay.asset.kernel.model.AssetCategory addCategory(
+	public AssetCategory addCategory(
 			long groupId, long parentCategoryId,
 			java.util.Map<java.util.Locale, String> titleMap,
 			java.util.Map<java.util.Locale, String> descriptionMap,
@@ -52,7 +48,7 @@ public class AssetCategoryServiceWrapper
 	}
 
 	@Override
-	public com.liferay.asset.kernel.model.AssetCategory addCategory(
+	public AssetCategory addCategory(
 			long groupId, String title, long vocabularyId,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -68,22 +64,6 @@ public class AssetCategoryServiceWrapper
 		_assetCategoryService.deleteCategories(categoryIds);
 	}
 
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), Replaced by {@link
-	 #deleteCategories(long[])}
-	 */
-	@Deprecated
-	@Override
-	public java.util.List<com.liferay.asset.kernel.model.AssetCategory>
-			deleteCategories(
-				long[] categoryIds,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _assetCategoryService.deleteCategories(
-			categoryIds, serviceContext);
-	}
-
 	@Override
 	public void deleteCategory(long categoryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -92,8 +72,7 @@ public class AssetCategoryServiceWrapper
 	}
 
 	@Override
-	public com.liferay.asset.kernel.model.AssetCategory fetchCategory(
-			long categoryId)
+	public AssetCategory fetchCategory(long categoryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _assetCategoryService.fetchCategory(categoryId);
@@ -110,16 +89,16 @@ public class AssetCategoryServiceWrapper
 	 * @return the matching assetCategories
 	 */
 	@Override
-	public java.util.List<com.liferay.asset.kernel.model.AssetCategory>
-		getCategories(long classNameId, long classPK, int start, int end) {
+	public java.util.List<AssetCategory> getCategories(
+		long classNameId, long classPK, int start, int end) {
 
 		return _assetCategoryService.getCategories(
 			classNameId, classPK, start, end);
 	}
 
 	@Override
-	public java.util.List<com.liferay.asset.kernel.model.AssetCategory>
-			getCategories(String className, long classPK)
+	public java.util.List<AssetCategory> getCategories(
+			String className, long classPK)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _assetCategoryService.getCategories(className, classPK);
@@ -139,8 +118,7 @@ public class AssetCategoryServiceWrapper
 	}
 
 	@Override
-	public com.liferay.asset.kernel.model.AssetCategory getCategory(
-			long categoryId)
+	public AssetCategory getCategory(long categoryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _assetCategoryService.getCategory(categoryId);
@@ -154,8 +132,8 @@ public class AssetCategoryServiceWrapper
 	}
 
 	@Override
-	public java.util.List<com.liferay.asset.kernel.model.AssetCategory>
-			getChildCategories(long parentCategoryId)
+	public java.util.List<AssetCategory> getChildCategories(
+			long parentCategoryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _assetCategoryService.getChildCategories(parentCategoryId);
@@ -172,11 +150,9 @@ public class AssetCategoryServiceWrapper
 	 * @throws PortalException
 	 */
 	@Override
-	public java.util.List<com.liferay.asset.kernel.model.AssetCategory>
-			getChildCategories(
-				long parentCategoryId, int start, int end,
-				com.liferay.portal.kernel.util.OrderByComparator
-					<com.liferay.asset.kernel.model.AssetCategory> obc)
+	public java.util.List<AssetCategory> getChildCategories(
+			long parentCategoryId, int start, int end,
+			com.liferay.portal.kernel.util.OrderByComparator<AssetCategory> obc)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _assetCategoryService.getChildCategories(
@@ -208,11 +184,9 @@ public class AssetCategoryServiceWrapper
 	}
 
 	@Override
-	public java.util.List<com.liferay.asset.kernel.model.AssetCategory>
-			getVocabularyCategories(
-				long vocabularyId, int start, int end,
-				com.liferay.portal.kernel.util.OrderByComparator
-					<com.liferay.asset.kernel.model.AssetCategory> obc)
+	public java.util.List<AssetCategory> getVocabularyCategories(
+			long vocabularyId, int start, int end,
+			com.liferay.portal.kernel.util.OrderByComparator<AssetCategory> obc)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _assetCategoryService.getVocabularyCategories(
@@ -220,11 +194,9 @@ public class AssetCategoryServiceWrapper
 	}
 
 	@Override
-	public java.util.List<com.liferay.asset.kernel.model.AssetCategory>
-			getVocabularyCategories(
-				long parentCategoryId, long vocabularyId, int start, int end,
-				com.liferay.portal.kernel.util.OrderByComparator
-					<com.liferay.asset.kernel.model.AssetCategory> obc)
+	public java.util.List<AssetCategory> getVocabularyCategories(
+			long parentCategoryId, long vocabularyId, int start, int end,
+			com.liferay.portal.kernel.util.OrderByComparator<AssetCategory> obc)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _assetCategoryService.getVocabularyCategories(
@@ -232,23 +204,19 @@ public class AssetCategoryServiceWrapper
 	}
 
 	@Override
-	public java.util.List<com.liferay.asset.kernel.model.AssetCategory>
-		getVocabularyCategories(
-			long groupId, long parentCategoryId, long vocabularyId, int start,
-			int end,
-			com.liferay.portal.kernel.util.OrderByComparator
-				<com.liferay.asset.kernel.model.AssetCategory> obc) {
+	public java.util.List<AssetCategory> getVocabularyCategories(
+		long groupId, long parentCategoryId, long vocabularyId, int start,
+		int end,
+		com.liferay.portal.kernel.util.OrderByComparator<AssetCategory> obc) {
 
 		return _assetCategoryService.getVocabularyCategories(
 			groupId, parentCategoryId, vocabularyId, start, end, obc);
 	}
 
 	@Override
-	public java.util.List<com.liferay.asset.kernel.model.AssetCategory>
-		getVocabularyCategories(
-			long groupId, String name, long vocabularyId, int start, int end,
-			com.liferay.portal.kernel.util.OrderByComparator
-				<com.liferay.asset.kernel.model.AssetCategory> obc) {
+	public java.util.List<AssetCategory> getVocabularyCategories(
+		long groupId, String name, long vocabularyId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<AssetCategory> obc) {
 
 		return _assetCategoryService.getVocabularyCategories(
 			groupId, name, vocabularyId, start, end, obc);
@@ -280,8 +248,8 @@ public class AssetCategoryServiceWrapper
 	public com.liferay.asset.kernel.model.AssetCategoryDisplay
 			getVocabularyCategoriesDisplay(
 				long vocabularyId, int start, int end,
-				com.liferay.portal.kernel.util.OrderByComparator
-					<com.liferay.asset.kernel.model.AssetCategory> obc)
+				com.liferay.portal.kernel.util.OrderByComparator<AssetCategory>
+					obc)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _assetCategoryService.getVocabularyCategoriesDisplay(
@@ -293,8 +261,8 @@ public class AssetCategoryServiceWrapper
 			getVocabularyCategoriesDisplay(
 				long groupId, String name, long vocabularyId, int start,
 				int end,
-				com.liferay.portal.kernel.util.OrderByComparator
-					<com.liferay.asset.kernel.model.AssetCategory> obc)
+				com.liferay.portal.kernel.util.OrderByComparator<AssetCategory>
+					obc)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _assetCategoryService.getVocabularyCategoriesDisplay(
@@ -302,11 +270,9 @@ public class AssetCategoryServiceWrapper
 	}
 
 	@Override
-	public java.util.List<com.liferay.asset.kernel.model.AssetCategory>
-		getVocabularyRootCategories(
-			long groupId, long vocabularyId, int start, int end,
-			com.liferay.portal.kernel.util.OrderByComparator
-				<com.liferay.asset.kernel.model.AssetCategory> obc) {
+	public java.util.List<AssetCategory> getVocabularyRootCategories(
+		long groupId, long vocabularyId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<AssetCategory> obc) {
 
 		return _assetCategoryService.getVocabularyRootCategories(
 			groupId, vocabularyId, start, end, obc);
@@ -321,7 +287,7 @@ public class AssetCategoryServiceWrapper
 	}
 
 	@Override
-	public com.liferay.asset.kernel.model.AssetCategory moveCategory(
+	public AssetCategory moveCategory(
 			long categoryId, long parentCategoryId, long vocabularyId,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -331,10 +297,9 @@ public class AssetCategoryServiceWrapper
 	}
 
 	@Override
-	public java.util.List<com.liferay.asset.kernel.model.AssetCategory> search(
+	public java.util.List<AssetCategory> search(
 		long groupId, String keywords, long vocabularyId, int start, int end,
-		com.liferay.portal.kernel.util.OrderByComparator
-			<com.liferay.asset.kernel.model.AssetCategory> obc) {
+		com.liferay.portal.kernel.util.OrderByComparator<AssetCategory> obc) {
 
 		return _assetCategoryService.search(
 			groupId, keywords, vocabularyId, start, end, obc);
@@ -430,7 +395,7 @@ public class AssetCategoryServiceWrapper
 	}
 
 	@Override
-	public com.liferay.asset.kernel.model.AssetCategory updateCategory(
+	public AssetCategory updateCategory(
 			long categoryId, long parentCategoryId,
 			java.util.Map<java.util.Locale, String> titleMap,
 			java.util.Map<java.util.Locale, String> descriptionMap,

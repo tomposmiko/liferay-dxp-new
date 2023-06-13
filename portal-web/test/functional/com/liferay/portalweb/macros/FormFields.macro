@@ -164,10 +164,25 @@ definition {
 	}
 
 	macro editText {
-		Type(
-			key_fieldName = "${fieldName}",
-			locator1 = "FormFields#TEXT_FIELD",
-			value1 = "${fieldValue}");
+		var browserType = PropsUtil.get("browser.type");
+
+		if ("${browserType}" == "internetexplorer") {
+			Type(
+				key_fieldName = "${fieldName}",
+				locator1 = "FormFields#TEXT_FIELD",
+				value1 = "");
+
+			Type.sendKeys(
+				key_fieldName = "${fieldName}",
+				locator1 = "FormFields#TEXT_FIELD",
+				value1 = "${fieldValue}");
+		}
+		else {
+			Type(
+				key_fieldName = "${fieldName}",
+				locator1 = "FormFields#TEXT_FIELD",
+				value1 = "${fieldValue}");
+		}
 	}
 
 	macro editTextAlt {
@@ -253,7 +268,7 @@ definition {
 	}
 
 	macro moveGridOptionsRow {
-		DragAndDrop(
+		DragAndDrop.dragAndDropPortletToObject(
 			key_gridField = "${gridField}",
 			key_rowNumber1 = "${rowNumberStart}",
 			key_rowNumber2 = "${rowNumberEnd}",
@@ -266,9 +281,7 @@ definition {
 		var key_rowNumber1 = "${rowNumberStart}";
 		var key_rowNumber2 = "${rowNumberEnd}";
 
-		Click(locator1 = "FormFields#OPTIONS_DRAG_ICON_1");
-
-		DragAndDrop.dragAndDropToObject(
+		DragAndDrop.dragAndDropPortletToObject(
 			locator1 = "FormFields#OPTIONS_DRAG_ICON_1",
 			locator2 = "FormFields#OPTIONS_DRAG_ICON_2",
 			value1 = "");
@@ -292,8 +305,6 @@ definition {
 			Click(
 				key_fieldName = "${fieldName}",
 				locator1 = "FormFields#SELECT_FIELD");
-
-			Click(locator1 = "FormFields#CHANGE_FIELD_TYPE_BUTTON");
 		}
 
 		FormFields.disableCheckbox(fieldName = "${selectOption}");

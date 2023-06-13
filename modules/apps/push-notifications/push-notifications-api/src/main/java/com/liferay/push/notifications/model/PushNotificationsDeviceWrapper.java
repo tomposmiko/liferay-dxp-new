@@ -175,11 +175,6 @@ public class PushNotificationsDeviceWrapper
 		return model.getUserUuid();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a push notifications device model instance should use the <code>PushNotificationsDevice</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

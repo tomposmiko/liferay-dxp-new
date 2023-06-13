@@ -127,7 +127,7 @@ public class SubscriptionLocalServiceImpl
 			subscription.setClassPK(classPK);
 			subscription.setFrequency(frequency);
 
-			subscriptionPersistence.update(subscription);
+			subscription = subscriptionPersistence.update(subscription);
 		}
 
 		if (groupId > 0) {
@@ -140,7 +140,7 @@ public class SubscriptionLocalServiceImpl
 				assetEntry = assetEntryLocalService.getEntry(
 					className, classPK);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				assetEntry = assetEntryLocalService.updateEntry(
 					userId, groupId, subscription.getCreateDate(),
 					subscription.getModifiedDate(), className, classPK, null, 0,

@@ -977,11 +977,6 @@ public class GroupWrapper
 		return model.isUserPersonalSite();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a group model instance should use the <code>Group</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

@@ -72,9 +72,7 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 		HttpServletRequest httpServletRequest =
 			ddmFormFieldRenderingContext.getHttpServletRequest();
 
-		if (ddmFormFieldRenderingContext.isReadOnly() &&
-			Validator.isNotNull(ddmFormFieldRenderingContext.getValue())) {
-
+		if (Validator.isNotNull(ddmFormFieldRenderingContext.getValue())) {
 			JSONObject valueJSONObject = getValueJSONObject(
 				ddmFormFieldRenderingContext.getValue());
 
@@ -97,8 +95,6 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 		parameters.put(
 			"lexiconIconsPath", getLexiconIconsPath(httpServletRequest));
 
-		Map<String, String> stringsMap = new HashMap<>();
-
 		Locale displayLocale;
 
 		if (ddmFormFieldRenderingContext.isViewMode()) {
@@ -108,6 +104,8 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 			displayLocale = getDisplayLocale(
 				ddmFormFieldRenderingContext.getHttpServletRequest());
 		}
+
+		Map<String, String> stringsMap = new HashMap<>();
 
 		stringsMap.put(
 			"select",
@@ -121,7 +119,7 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 			value = "{}";
 		}
 
-		parameters.put("value", jsonFactory.looseDeserialize(value));
+		parameters.put("value", value);
 
 		return parameters;
 	}
@@ -140,8 +138,8 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 				valueJSONObject.getString("uuid"),
 				valueJSONObject.getLong("groupId"));
 		}
-		catch (PortalException pe) {
-			_log.error("Unable to retrieve file entry ", pe);
+		catch (PortalException portalException) {
+			_log.error("Unable to retrieve file entry ", portalException);
 
 			return null;
 		}
@@ -200,8 +198,10 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 				portal.getControlPanelPlid(themeDisplay.getCompanyId()),
 				PortletKeys.ITEM_SELECTOR);
 		}
-		catch (PortalException pe) {
-			_log.error("Unable to generate item selector auth token ", pe);
+		catch (PortalException portalException) {
+			_log.error(
+				"Unable to generate item selector auth token ",
+				portalException);
 		}
 
 		return StringPool.BLANK;
@@ -237,9 +237,9 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 		try {
 			return jsonFactory.createJSONObject(value);
 		}
-		catch (JSONException jsone) {
+		catch (JSONException jsonException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(jsone, jsone);
+				_log.debug(jsonException, jsonException);
 			}
 
 			return null;

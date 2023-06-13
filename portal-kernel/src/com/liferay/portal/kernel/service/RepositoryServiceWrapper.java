@@ -28,11 +28,6 @@ public class RepositoryServiceWrapper
 		_repositoryService = repositoryService;
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link RepositoryServiceUtil} to access the repository remote service. Add custom service methods to <code>com.liferay.portal.service.impl.RepositoryServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
-	 */
 	@Override
 	public com.liferay.portal.kernel.model.Repository addRepository(
 			long groupId, long classNameId, long parentFolderId,
@@ -78,6 +73,14 @@ public class RepositoryServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _repositoryService.getRepository(repositoryId);
+	}
+
+	@Override
+	public com.liferay.portal.kernel.model.Repository getRepository(
+			long groupId, java.lang.String portletId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _repositoryService.getRepository(groupId, portletId);
 	}
 
 	@Override

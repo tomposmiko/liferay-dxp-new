@@ -64,7 +64,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface DDMStructureLayoutLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link DDMStructureLayoutLocalServiceUtil} to access the ddm structure layout local service. Add custom service methods to <code>com.liferay.dynamic.data.mapping.service.impl.DDMStructureLayoutLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -83,19 +83,6 @@ public interface DDMStructureLayoutLocalService
 	public DDMStructureLayout addStructureLayout(
 			long userId, long groupId, long structureVersionId,
 			DDMFormLayout ddmFormLayout, ServiceContext serviceContext)
-		throws PortalException;
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 #addStructureLayout(long, long, long, long, Map, Map, String,
-	 String, ServiceContext)}
-	 */
-	@Deprecated
-	@Indexable(type = IndexableType.REINDEX)
-	public DDMStructureLayout addStructureLayout(
-			long userId, long groupId, long structureVersionId,
-			Map<Locale, String> name, Map<Locale, String> description,
-			String definition, ServiceContext serviceContext)
 		throws PortalException;
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -361,6 +348,10 @@ public interface DDMStructureLayoutLocalService
 	public List<DDMStructureLayout> getStructureLayouts(
 		long groupId, long classNameId, int start, int end,
 		OrderByComparator<DDMStructureLayout> orderByComparator);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<DDMStructureLayout> getStructureLayouts(
+		long groupId, long classNameId, long structureVersionId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<DDMStructureLayout> getStructureLayouts(

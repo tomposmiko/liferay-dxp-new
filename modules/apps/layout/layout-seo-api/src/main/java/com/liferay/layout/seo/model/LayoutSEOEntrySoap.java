@@ -42,8 +42,17 @@ public class LayoutSEOEntrySoap implements Serializable {
 		soapModel.setModifiedDate(model.getModifiedDate());
 		soapModel.setPrivateLayout(model.isPrivateLayout());
 		soapModel.setLayoutId(model.getLayoutId());
-		soapModel.setEnabled(model.isEnabled());
 		soapModel.setCanonicalURL(model.getCanonicalURL());
+		soapModel.setCanonicalURLEnabled(model.isCanonicalURLEnabled());
+		soapModel.setDDMStorageId(model.getDDMStorageId());
+		soapModel.setOpenGraphDescription(model.getOpenGraphDescription());
+		soapModel.setOpenGraphDescriptionEnabled(
+			model.isOpenGraphDescriptionEnabled());
+		soapModel.setOpenGraphImageAlt(model.getOpenGraphImageAlt());
+		soapModel.setOpenGraphImageFileEntryId(
+			model.getOpenGraphImageFileEntryId());
+		soapModel.setOpenGraphTitle(model.getOpenGraphTitle());
+		soapModel.setOpenGraphTitleEnabled(model.isOpenGraphTitleEnabled());
 		soapModel.setLastPublishDate(model.getLastPublishDate());
 
 		return soapModel;
@@ -195,24 +204,90 @@ public class LayoutSEOEntrySoap implements Serializable {
 		_layoutId = layoutId;
 	}
 
-	public boolean getEnabled() {
-		return _enabled;
-	}
-
-	public boolean isEnabled() {
-		return _enabled;
-	}
-
-	public void setEnabled(boolean enabled) {
-		_enabled = enabled;
-	}
-
 	public String getCanonicalURL() {
 		return _canonicalURL;
 	}
 
 	public void setCanonicalURL(String canonicalURL) {
 		_canonicalURL = canonicalURL;
+	}
+
+	public boolean getCanonicalURLEnabled() {
+		return _canonicalURLEnabled;
+	}
+
+	public boolean isCanonicalURLEnabled() {
+		return _canonicalURLEnabled;
+	}
+
+	public void setCanonicalURLEnabled(boolean canonicalURLEnabled) {
+		_canonicalURLEnabled = canonicalURLEnabled;
+	}
+
+	public long getDDMStorageId() {
+		return _DDMStorageId;
+	}
+
+	public void setDDMStorageId(long DDMStorageId) {
+		_DDMStorageId = DDMStorageId;
+	}
+
+	public String getOpenGraphDescription() {
+		return _openGraphDescription;
+	}
+
+	public void setOpenGraphDescription(String openGraphDescription) {
+		_openGraphDescription = openGraphDescription;
+	}
+
+	public boolean getOpenGraphDescriptionEnabled() {
+		return _openGraphDescriptionEnabled;
+	}
+
+	public boolean isOpenGraphDescriptionEnabled() {
+		return _openGraphDescriptionEnabled;
+	}
+
+	public void setOpenGraphDescriptionEnabled(
+		boolean openGraphDescriptionEnabled) {
+
+		_openGraphDescriptionEnabled = openGraphDescriptionEnabled;
+	}
+
+	public String getOpenGraphImageAlt() {
+		return _openGraphImageAlt;
+	}
+
+	public void setOpenGraphImageAlt(String openGraphImageAlt) {
+		_openGraphImageAlt = openGraphImageAlt;
+	}
+
+	public long getOpenGraphImageFileEntryId() {
+		return _openGraphImageFileEntryId;
+	}
+
+	public void setOpenGraphImageFileEntryId(long openGraphImageFileEntryId) {
+		_openGraphImageFileEntryId = openGraphImageFileEntryId;
+	}
+
+	public String getOpenGraphTitle() {
+		return _openGraphTitle;
+	}
+
+	public void setOpenGraphTitle(String openGraphTitle) {
+		_openGraphTitle = openGraphTitle;
+	}
+
+	public boolean getOpenGraphTitleEnabled() {
+		return _openGraphTitleEnabled;
+	}
+
+	public boolean isOpenGraphTitleEnabled() {
+		return _openGraphTitleEnabled;
+	}
+
+	public void setOpenGraphTitleEnabled(boolean openGraphTitleEnabled) {
+		_openGraphTitleEnabled = openGraphTitleEnabled;
 	}
 
 	public Date getLastPublishDate() {
@@ -234,8 +309,15 @@ public class LayoutSEOEntrySoap implements Serializable {
 	private Date _modifiedDate;
 	private boolean _privateLayout;
 	private long _layoutId;
-	private boolean _enabled;
 	private String _canonicalURL;
+	private boolean _canonicalURLEnabled;
+	private long _DDMStorageId;
+	private String _openGraphDescription;
+	private boolean _openGraphDescriptionEnabled;
+	private String _openGraphImageAlt;
+	private long _openGraphImageFileEntryId;
+	private String _openGraphTitle;
+	private boolean _openGraphTitleEnabled;
 	private Date _lastPublishDate;
 
 }

@@ -43,7 +43,7 @@ public interface MBThreadModel
 	extends BaseModel<MBThread>, ContainerModel, ShardedModel,
 			StagedGroupedModel, TrashedModel, WorkflowedModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a message boards thread model instance should use the {@link MBThread} interface instead.
@@ -291,20 +291,6 @@ public interface MBThreadModel
 	 * @param messageCount the message count of this message boards thread
 	 */
 	public void setMessageCount(int messageCount);
-
-	/**
-	 * Returns the view count of this message boards thread.
-	 *
-	 * @return the view count of this message boards thread
-	 */
-	public int getViewCount();
-
-	/**
-	 * Sets the view count of this message boards thread.
-	 *
-	 * @param viewCount the view count of this message boards thread
-	 */
-	public void setViewCount(int viewCount);
 
 	/**
 	 * Returns the last post by user ID of this message boards thread.

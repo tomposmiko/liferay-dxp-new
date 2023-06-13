@@ -16,20 +16,16 @@
 
 <%@ include file="/init.jsp" %>
 
-<%
-Group group = themeDisplay.getScopeGroup();
-%>
-
 <c:choose>
-	<c:when test="<%= group.isUser() %>">
+	<c:when test="<%= scopeGroup.isUser() %>">
 
 		<%
-		List<User> users = UserLocalServiceUtil.getSocialUsers(group.getClassPK(), SocialRelationConstants.TYPE_BI_CONNECTION, StringPool.EQUAL, 0, 10, new UserLastNameComparator());
+		List<User> users = UserLocalServiceUtil.getSocialUsers(scopeGroup.getClassPK(), SocialRelationConstants.TYPE_BI_CONNECTION, StringPool.EQUAL, 0, 10, new UserLastNameComparator());
 
 		PortletURL portletURL = null;
 
 		try {
-			long contactsPlid = PortalUtil.getPlidFromPortletId(group.getGroupId(), false, ContactsPortletKeys.CONTACTS_CENTER);
+			long contactsPlid = PortalUtil.getPlidFromPortletId(scopeGroup.getGroupId(), false, ContactsPortletKeys.CONTACTS_CENTER);
 
 			if (contactsPlid > 0) {
 				portletURL = PortletURLFactoryUtil.create(request, ContactsPortletKeys.CONTACTS_CENTER, contactsPlid, PortletRequest.RENDER_PHASE);
@@ -42,7 +38,7 @@ Group group = themeDisplay.getScopeGroup();
 		<c:choose>
 			<c:when test="<%= users.isEmpty() %>">
 				<div class="alert alert-info">
-					<liferay-ui:message arguments="<%= HtmlUtil.escape(group.getDescriptiveName(locale)) %>" key="x-has-no-connections" translateArguments="<%= false %>" />
+					<liferay-ui:message arguments="<%= HtmlUtil.escape(scopeGroup.getDescriptiveName(locale)) %>" key="x-has-no-connections" translateArguments="<%= false %>" />
 				</div>
 			</c:when>
 			<c:otherwise>
@@ -78,7 +74,7 @@ Group group = themeDisplay.getScopeGroup();
 						%>
 
 						<c:if test="<%= portletURL != null %>">
-							<a class="lfr-contact-grid-item" href="<%= portletURL %>"><liferay-ui:message arguments="<%= HtmlUtil.escape(group.getDescriptiveName(locale)) %>" key="view-all-x-connections" translateArguments="<%= false %>" /></a>
+							<a class="lfr-contact-grid-item" href="<%= portletURL %>"><liferay-ui:message arguments="<%= HtmlUtil.escape(scopeGroup.getDescriptiveName(locale)) %>" key="view-all-x-connections" translateArguments="<%= false %>" /></a>
 						</c:if>
 					</aui:col>
 				</aui:row>

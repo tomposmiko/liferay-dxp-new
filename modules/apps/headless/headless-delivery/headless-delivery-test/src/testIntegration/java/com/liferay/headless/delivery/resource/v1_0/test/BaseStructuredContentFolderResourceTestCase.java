@@ -554,7 +554,7 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 					{
 						put("page", 1);
 						put("pageSize", 2);
-						put("siteId", testGroup.getGroupId());
+						put("siteKey", "\"" + testGroup.getGroupId() + "\"");
 					}
 				},
 				graphQLFields.toArray(new GraphQLField[0])));
@@ -1384,6 +1384,29 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 				sb.append(", ");
 			}
 
+			if (Objects.equals(
+					"parentStructuredContentFolderId",
+					additionalAssertFieldName)) {
+
+				sb.append(additionalAssertFieldName);
+				sb.append(": ");
+
+				Object value =
+					structuredContentFolder.
+						getParentStructuredContentFolderId();
+
+				if (value instanceof String) {
+					sb.append("\"");
+					sb.append(value);
+					sb.append("\"");
+				}
+				else {
+					sb.append(value);
+				}
+
+				sb.append(", ");
+			}
+
 			if (Objects.equals("siteId", additionalAssertFieldName)) {
 				sb.append(additionalAssertFieldName);
 				sb.append(": ");
@@ -1433,7 +1456,7 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 				"createSiteStructuredContentFolder",
 				new HashMap<String, Object>() {
 					{
-						put("siteId", testGroup.getGroupId());
+						put("siteKey", "\"" + testGroup.getGroupId() + "\"");
 						put("structuredContentFolder", sb.toString());
 					}
 				},
@@ -1572,6 +1595,14 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
 
+			if (Objects.equals("actions", additionalAssertFieldName)) {
+				if (structuredContentFolder.getActions() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("creator", additionalAssertFieldName)) {
 				if (structuredContentFolder.getCreator() == null) {
 					valid = false;
@@ -1622,6 +1653,19 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 
 				if (structuredContentFolder.getNumberOfStructuredContents() ==
 						null) {
+
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"parentStructuredContentFolderId",
+					additionalAssertFieldName)) {
+
+				if (structuredContentFolder.
+						getParentStructuredContentFolderId() == null) {
 
 					valid = false;
 				}
@@ -1708,6 +1752,17 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
+
+			if (Objects.equals("actions", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						structuredContentFolder1.getActions(),
+						structuredContentFolder2.getActions())) {
+
+					return false;
+				}
+
+				continue;
+			}
 
 			if (Objects.equals("creator", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
@@ -1817,6 +1872,22 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals(
+					"parentStructuredContentFolderId",
+					additionalAssertFieldName)) {
+
+				if (!Objects.deepEquals(
+						structuredContentFolder1.
+							getParentStructuredContentFolderId(),
+						structuredContentFolder2.
+							getParentStructuredContentFolderId())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("subscribed", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						structuredContentFolder1.getSubscribed(),
@@ -1909,6 +1980,19 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("parentStructuredContentFolderId", fieldName)) {
+				if (!Objects.deepEquals(
+						structuredContentFolder.
+							getParentStructuredContentFolderId(),
+						jsonObject.getLong(
+							"parentStructuredContentFolderId"))) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("subscribed", fieldName)) {
 				if (!Objects.deepEquals(
 						structuredContentFolder.getSubscribed(),
@@ -1979,6 +2063,11 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 		sb.append(" ");
 		sb.append(operator);
 		sb.append(" ");
+
+		if (entityFieldName.equals("actions")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
 
 		if (entityFieldName.equals("creator")) {
 			throw new IllegalArgumentException(
@@ -2091,6 +2180,11 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("parentStructuredContentFolderId")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
 		if (entityFieldName.equals("siteId")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
@@ -2139,6 +2233,7 @@ public abstract class BaseStructuredContentFolderResourceTestCase {
 				name = RandomTestUtil.randomString();
 				numberOfStructuredContentFolders = RandomTestUtil.randomInt();
 				numberOfStructuredContents = RandomTestUtil.randomInt();
+				parentStructuredContentFolderId = RandomTestUtil.randomLong();
 				siteId = testGroup.getGroupId();
 				subscribed = RandomTestUtil.randomBoolean();
 			}

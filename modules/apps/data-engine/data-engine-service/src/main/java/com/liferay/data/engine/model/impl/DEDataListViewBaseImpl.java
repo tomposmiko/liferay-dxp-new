@@ -32,7 +32,7 @@ import com.liferay.data.engine.service.DEDataListViewLocalServiceUtil;
 public abstract class DEDataListViewBaseImpl
 	extends DEDataListViewModelImpl implements DEDataListView {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a de data list view model instance should use the <code>DEDataListView</code> interface instead.

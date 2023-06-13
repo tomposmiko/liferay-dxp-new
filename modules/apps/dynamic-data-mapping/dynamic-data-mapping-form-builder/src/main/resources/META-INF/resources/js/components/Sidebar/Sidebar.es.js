@@ -215,9 +215,7 @@ class Sidebar extends Component {
 
 	refreshDragAndDrop() {
 		this._dragAndDrop.setState({
-			targets: Liferay.Browser.isIe()
-				? this._dragAndDrop.setterTargetsFn_('.ddm-target')
-				: '.ddm-target'
+			targets: '.ddm-target'
 		});
 	}
 
@@ -439,7 +437,11 @@ class Sidebar extends Component {
 
 		return fieldTypes.reduce((prev, next) => {
 			if (next.group && !next.system) {
-				prev[next.group].fields.push(next);
+				if (next.group === 'interface') {
+					prev.basic.fields.push(next);
+				} else {
+					prev[next.group].fields.push(next);
+				}
 			}
 
 			return prev;
@@ -514,8 +516,10 @@ class Sidebar extends Component {
 		if (
 			this._isCloseButton(target) ||
 			(open &&
-				(!this._isSidebarElement(target) &&
-					!this._isTranslationItem(target)))
+				!this._isControlProductMenuItem(target) &&
+				!this._isProductMenuSidebarItem(target) &&
+				!this._isSidebarElement(target) &&
+				!this._isTranslationItem(target))
 		) {
 			this.close();
 
@@ -671,6 +675,10 @@ class Sidebar extends Component {
 		return closeButton.contains(node);
 	}
 
+	_isControlProductMenuItem(node) {
+		return !!dom.closest(node, '.sidenav-toggler');
+	}
+
 	_isEditMode() {
 		const {focusedField} = this.props;
 
@@ -679,6 +687,10 @@ class Sidebar extends Component {
 
 	_isModalElement(node) {
 		return dom.closest(node, '.modal');
+	}
+
+	_isProductMenuSidebarItem(node) {
+		return !!dom.closest(node, '.sidenav-menu');
 	}
 
 	_isOutsideModal(node) {

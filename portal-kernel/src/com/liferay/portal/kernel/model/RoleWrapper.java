@@ -497,11 +497,6 @@ public class RoleWrapper
 		return model.isTeam();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a role model instance should use the <code>Role</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

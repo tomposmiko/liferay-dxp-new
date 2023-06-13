@@ -298,13 +298,13 @@ public class SharingEntryLocalServiceImpl
 			try {
 				indexer.reindex(className, classPK);
 			}
-			catch (SearchException se) {
+			catch (SearchException searchException) {
 				if (_log.isWarnEnabled()) {
 					_log.warn(
 						StringBundler.concat(
 							"Unable to index sharing entry for class name ",
 							className, " and primary key ", classPK),
-						se);
+						searchException);
 				}
 			}
 		}
@@ -652,9 +652,8 @@ public class SharingEntryLocalServiceImpl
 	 *             {@code SharingEntryAction#VIEW}, or contain a {@code null}
 	 *             value), or if the expiration date is a past value
 	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 *             com.liferay.sharing.service.SharingEntryLocalService#
-	 *             updateSharingEntry(long, long, Collection, boolean, Date,
-	 *             ServiceContext)}
+	 *             com.liferay.sharing.service.SharingEntryLocalService#updateSharingEntry(
+	 *             long, long, Collection, boolean, Date, ServiceContext)}
 	 * @review
 	 */
 	@Deprecated

@@ -501,6 +501,26 @@ function updateEditableValueReducer(state, action) {
 /**
  * @param {object} state
  * @param {object} action
+ * @param {string} action.allowNewFragmentEntries
+ * @param {object} action.fragmentEntryKeys
+ * @param {string} action.type
+ * @return {object}
+ * @review
+ */
+function updateFragmentEntryKeysReducer(state, action) {
+	return {
+		...state,
+		layoutData: {
+			...state.layoutData,
+			allowNewFragmentEntries: action.allowNewFragmentEntries,
+			fragmentEntryKeys: action.fragmentEntryKeys
+		}
+	};
+}
+
+/**
+ * @param {object} state
+ * @param {object} action
  * @param {object} action.config
  * @param {string} action.editableId
  * @param {string} action.fragmentEntryLinkId
@@ -667,8 +687,16 @@ function _addFragmentToColumn(
 	const columnIndex = row.columns.indexOf(column);
 	const rowIndex = structure.indexOf(row);
 
-	return updateIn(
+	const newLayoutData = updateIn(
 		layoutData,
+		['structure', rowIndex, 'columns', columnIndex],
+		column => ({
+			...column
+		})
+	);
+
+	return updateIn(
+		newLayoutData,
 		['structure', rowIndex, 'columns', columnIndex, 'fragmentEntryLinkIds'],
 		fragmentEntryLinkIds =>
 			add(fragmentEntryLinkIds, fragmentEntryLinkId, position)
@@ -844,6 +872,7 @@ export {
 	moveFragmentEntryLinkReducer,
 	removeFragmentEntryLinkReducer,
 	toggleShowResolvedCommentsReducer,
+	updateFragmentEntryKeysReducer,
 	updateEditableValueReducer,
 	updateFragmentEntryLinkConfigReducer,
 	updateFragmentEntryLinkCommentReducer,

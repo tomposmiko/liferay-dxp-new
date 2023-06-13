@@ -33,25 +33,25 @@ public class FragmentManagementToolbarDisplayContextFactory {
 
 	public FragmentManagementToolbarDisplayContext
 		getFragmentManagementToolbarDisplayContext(
+			HttpServletRequest httpServletRequest,
 			LiferayPortletRequest liferayPortletRequest,
 			LiferayPortletResponse liferayPortletResponse,
-			HttpServletRequest httpServletRequest,
 			FragmentDisplayContext fragmentDisplayContext) {
 
 		String type = fragmentDisplayContext.getFragmentType();
 
 		if (Objects.equals(type, FragmentTypeConstants.BASIC_FRAGMENT_TYPE)) {
 			return new BasicFragmentManagementToolbarDisplayContext(
-				liferayPortletRequest, liferayPortletResponse,
-				httpServletRequest, fragmentDisplayContext);
+				httpServletRequest, liferayPortletRequest,
+				liferayPortletResponse, fragmentDisplayContext);
 		}
 
 		if (Objects.equals(
 				type, FragmentTypeConstants.INHERITED_FRAGMENT_TYPE)) {
 
 			return new InheritedFragmentManagementToolbarDisplayContext(
-				liferayPortletRequest, liferayPortletResponse,
-				httpServletRequest, fragmentDisplayContext);
+				httpServletRequest, liferayPortletRequest,
+				liferayPortletResponse, fragmentDisplayContext);
 		}
 
 		return null;

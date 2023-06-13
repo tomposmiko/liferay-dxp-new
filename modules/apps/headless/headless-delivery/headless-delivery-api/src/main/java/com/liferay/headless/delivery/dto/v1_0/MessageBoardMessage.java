@@ -86,6 +86,35 @@ public class MessageBoardMessage {
 
 	}
 
+	@Schema
+	@Valid
+	public Map<String, Map> getActions() {
+		return actions;
+	}
+
+	public void setActions(Map<String, Map> actions) {
+		this.actions = actions;
+	}
+
+	@JsonIgnore
+	public void setActions(
+		UnsafeSupplier<Map<String, Map>, Exception> actionsUnsafeSupplier) {
+
+		try {
+			actions = actionsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected Map<String, Map> actions;
+
 	@Schema(description = "The message's average rating.")
 	@Valid
 	public AggregateRating getAggregateRating() {
@@ -112,7 +141,7 @@ public class MessageBoardMessage {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The message's average rating.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected AggregateRating aggregateRating;
 
@@ -142,7 +171,9 @@ public class MessageBoardMessage {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A flag that indicates whether the message's author is anonymous."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean anonymous;
 
@@ -170,7 +201,7 @@ public class MessageBoardMessage {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The message's main content.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String articleBody;
 
@@ -199,7 +230,7 @@ public class MessageBoardMessage {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The message's author.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator creator;
 
@@ -256,7 +287,7 @@ public class MessageBoardMessage {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The date the message was created.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
@@ -286,7 +317,9 @@ public class MessageBoardMessage {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The last time the content or metadata of the message was changed."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateModified;
 
@@ -316,7 +349,9 @@ public class MessageBoardMessage {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The message's media format (e.g., HTML, BBCode, etc.)."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String encodingFormat;
 
@@ -344,7 +379,7 @@ public class MessageBoardMessage {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The message's main title.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String headline;
 
@@ -370,7 +405,7 @@ public class MessageBoardMessage {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The message's ID.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
@@ -398,7 +433,7 @@ public class MessageBoardMessage {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "A list of keywords describing the message.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String[] keywords;
 
@@ -428,7 +463,9 @@ public class MessageBoardMessage {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The ID of the Message Board Thread to which this message is scoped."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long messageBoardThreadId;
 
@@ -460,7 +497,7 @@ public class MessageBoardMessage {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The number of the message's attachments.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer numberOfMessageBoardAttachments;
 
@@ -492,9 +529,41 @@ public class MessageBoardMessage {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The number of the message's child messages.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer numberOfMessageBoardMessages;
+
+	@Schema
+	public Long getParentMessageBoardMessageId() {
+		return parentMessageBoardMessageId;
+	}
+
+	public void setParentMessageBoardMessageId(
+		Long parentMessageBoardMessageId) {
+
+		this.parentMessageBoardMessageId = parentMessageBoardMessageId;
+	}
+
+	@JsonIgnore
+	public void setParentMessageBoardMessageId(
+		UnsafeSupplier<Long, Exception>
+			parentMessageBoardMessageIdUnsafeSupplier) {
+
+		try {
+			parentMessageBoardMessageId =
+				parentMessageBoardMessageIdUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Long parentMessageBoardMessageId;
 
 	@Schema
 	@Valid
@@ -552,7 +621,9 @@ public class MessageBoardMessage {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A flag that indicates whether the message is answering a question."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean showAsAnswer;
 
@@ -580,7 +651,9 @@ public class MessageBoardMessage {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The ID of the site to which this message is scoped."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long siteId;
 
@@ -648,7 +721,9 @@ public class MessageBoardMessage {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A write-only property that specifies the default permissions."
+	)
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	protected ViewableBy viewableBy;
 
@@ -681,6 +756,16 @@ public class MessageBoardMessage {
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+		if (actions != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"actions\": ");
+
+			sb.append(_toJSON(actions));
+		}
 
 		if (aggregateRating != null) {
 			if (sb.length() > 1) {
@@ -864,6 +949,16 @@ public class MessageBoardMessage {
 			sb.append("\"numberOfMessageBoardMessages\": ");
 
 			sb.append(numberOfMessageBoardMessages);
+		}
+
+		if (parentMessageBoardMessageId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"parentMessageBoardMessageId\": ");
+
+			sb.append(parentMessageBoardMessageId);
 		}
 
 		if (relatedContents != null) {

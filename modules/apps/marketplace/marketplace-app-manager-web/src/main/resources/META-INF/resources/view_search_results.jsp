@@ -17,7 +17,11 @@
 <%@ include file="/init.jsp" %>
 
 <%
-String redirect = ParamUtil.getString(request, "redirect", String.valueOf(renderResponse.createRenderURL()));
+String redirect = PortalUtil.escapeRedirect(ParamUtil.getString(request, "redirect"));
+
+if (Validator.isNull(redirect)) {
+	redirect = String.valueOf(renderResponse.createRenderURL());
+}
 
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(redirect);
@@ -35,7 +39,7 @@ PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "search-
 
 <%
 AppManagerSearchResultsManagementToolbarDisplayContext
-	appManagerSearchResultsManagementToolbarDisplayContext = new AppManagerSearchResultsManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request);
+	appManagerSearchResultsManagementToolbarDisplayContext = new AppManagerSearchResultsManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse);
 
 SearchContainer searchContainer = appManagerSearchResultsManagementToolbarDisplayContext.getSearchContainer();
 %>

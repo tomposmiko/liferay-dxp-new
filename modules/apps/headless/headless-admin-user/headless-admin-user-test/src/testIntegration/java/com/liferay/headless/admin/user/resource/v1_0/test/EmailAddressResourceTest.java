@@ -76,7 +76,7 @@ public class EmailAddressResourceTest extends BaseEmailAddressResourceTestCase {
 	@Override
 	protected EmailAddress
 			testGetOrganizationEmailAddressesPage_addEmailAddress(
-				Long organizationId, EmailAddress emailAddress)
+				String organizationId, EmailAddress emailAddress)
 		throws Exception {
 
 		return _addEmailAddress(
@@ -86,8 +86,8 @@ public class EmailAddressResourceTest extends BaseEmailAddressResourceTestCase {
 	}
 
 	@Override
-	protected Long testGetOrganizationEmailAddressesPage_getOrganizationId() {
-		return _organization.getOrganizationId();
+	protected String testGetOrganizationEmailAddressesPage_getOrganizationId() {
+		return String.valueOf(_organization.getOrganizationId());
 	}
 
 	@Override
@@ -117,7 +117,7 @@ public class EmailAddressResourceTest extends BaseEmailAddressResourceTestCase {
 			String listTypeId)
 		throws Exception {
 
-		return _toEmail(
+		return _toEmailAddress(
 			EmailAddressLocalServiceUtil.addEmailAddress(
 				_user.getUserId(), className, classPK,
 				emailAddress.getEmailAddress(), _getListTypeId(listTypeId),
@@ -132,7 +132,7 @@ public class EmailAddressResourceTest extends BaseEmailAddressResourceTestCase {
 		return listType.getListTypeId();
 	}
 
-	private EmailAddress _toEmail(
+	private EmailAddress _toEmailAddress(
 		com.liferay.portal.kernel.model.EmailAddress
 			serviceBuilderEmailAddress) {
 

@@ -58,8 +58,6 @@ import java.io.OutputStream;
 
 import java.lang.reflect.Field;
 
-import java.security.PrivilegedExceptionAction;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -121,8 +119,8 @@ public class ServiceComponentLocalServiceImpl
 				classLoader,
 				serviceComponentConfiguration.getModelHintsInputStream());
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 
 		try {
@@ -130,8 +128,8 @@ public class ServiceComponentLocalServiceImpl
 				classLoader,
 				serviceComponentConfiguration.getModelHintsExtInputStream());
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 
 		long previousBuildNumber = 0;
@@ -232,47 +230,9 @@ public class ServiceComponentLocalServiceImpl
 
 			return serviceComponent;
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #initServiceComponent(ServiceComponentConfiguration,
-	 *             ClassLoader, String, long, long)}
-	 */
-	@Deprecated
-	@Override
-	public ServiceComponent initServiceComponent(
-			ServiceComponentConfiguration serviceComponentConfiguration,
-			ClassLoader classLoader, String buildNamespace, long buildNumber,
-			long buildDate, boolean buildAutoUpgrade)
-		throws PortalException {
-
-		return initServiceComponent(
-			serviceComponentConfiguration, classLoader, buildNamespace,
-			buildNumber, buildDate);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #upgradeDB(ClassLoader, String, long, ServiceComponent,
-	 *             String, String, String)}
-	 */
-	@Deprecated
-	@Override
-	public void upgradeDB(
-			final ClassLoader classLoader, final String buildNamespace,
-			final long buildNumber, final boolean buildAutoUpgrade,
-			final ServiceComponent previousServiceComponent,
-			final String tablesSQL, final String sequencesSQL,
-			final String indexesSQL)
-		throws Exception {
-
-		upgradeDB(
-			classLoader, buildNamespace, buildNumber, previousServiceComponent,
-			tablesSQL, sequencesSQL, indexesSQL);
 	}
 
 	@Override
@@ -284,7 +244,7 @@ public class ServiceComponentLocalServiceImpl
 			final String indexesSQL)
 		throws Exception {
 
-		_doUpgradeDB(
+		_upgradeDB(
 			classLoader, buildNamespace, buildNumber, previousServiceComponent,
 			tablesSQL, sequencesSQL, indexesSQL);
 	}
@@ -334,83 +294,10 @@ public class ServiceComponentLocalServiceImpl
 
 				releaseLocalService.updateRelease(release);
 			}
-			catch (Exception e) {
-				_log.error(e, e);
+			catch (Exception exception) {
+				_log.error(exception, exception);
 			}
 		}
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public class DoUpgradeDBPrivilegedExceptionAction
-		implements PrivilegedExceptionAction<Void> {
-
-		public DoUpgradeDBPrivilegedExceptionAction(
-			ClassLoader classLoader, String buildNamespace, long buildNumber,
-			ServiceComponent previousServiceComponent, String tablesSQL,
-			String sequencesSQL, String indexesSQL) {
-
-			_classLoader = classLoader;
-			_buildNamespace = buildNamespace;
-			_buildNumber = buildNumber;
-			_previousServiceComponent = previousServiceComponent;
-			_tablesSQL = tablesSQL;
-			_sequencesSQL = sequencesSQL;
-			_indexesSQL = indexesSQL;
-		}
-
-		public ClassLoader getClassLoader() {
-			return _classLoader;
-		}
-
-		@Override
-		public Void run() throws Exception {
-			_doUpgradeDB(
-				_classLoader, _buildNamespace, _buildNumber,
-				_previousServiceComponent, _tablesSQL, _sequencesSQL,
-				_indexesSQL);
-
-			return null;
-		}
-
-		private final String _buildNamespace;
-		private final long _buildNumber;
-		private final ClassLoader _classLoader;
-		private final String _indexesSQL;
-		private final ServiceComponent _previousServiceComponent;
-		private final String _sequencesSQL;
-		private final String _tablesSQL;
-
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public interface PACL {
-
-		public void doUpgradeDB(
-				DoUpgradeDBPrivilegedExceptionAction
-					doUpgradeDBPrivilegedExceptionAction)
-			throws Exception;
-
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	protected void doUpgradeDB(
-			ClassLoader classLoader, String buildNamespace, long buildNumber,
-			boolean buildAutoUpgrade, ServiceComponent previousServiceComponent,
-			String tablesSQL, String sequencesSQL, String indexesSQL)
-		throws Exception {
-
-		_doUpgradeDB(
-			classLoader, buildNamespace, buildNumber, previousServiceComponent,
-			tablesSQL, sequencesSQL, indexesSQL);
 	}
 
 	protected List<String> getModelNames(ClassLoader classLoader)
@@ -429,7 +316,7 @@ public class ServiceComponentLocalServiceImpl
 
 			modelNames.addAll(getModelNames(xml));
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isInfoEnabled()) {
 				_log.info(
 					"No optional file META-INF/portlet-model-hints-ext.xml " +
@@ -503,7 +390,7 @@ public class ServiceComponentLocalServiceImpl
 
 			return upgradeTableListener;
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
 				_log.debug(
 					"Unable to instantiate " + upgradeTableListenerClassName);
@@ -596,7 +483,42 @@ public class ServiceComponentLocalServiceImpl
 		}
 	}
 
-	private void _doUpgradeDB(
+	private Map<String, ServiceComponent> _getServiceComponents() {
+		if (_serviceComponents != null) {
+			return _serviceComponents;
+		}
+
+		synchronized (this) {
+			if (_serviceComponents != null) {
+				return _serviceComponents;
+			}
+
+			Map<String, ServiceComponent> serviceComponents =
+				new ConcurrentHashMap<>();
+
+			for (ServiceComponent serviceComponent :
+					serviceComponentPersistence.findAll()) {
+
+				String buildNamespace = serviceComponent.getBuildNamespace();
+
+				ServiceComponent previousServiceComponent =
+					serviceComponents.get(buildNamespace);
+
+				if ((previousServiceComponent == null) ||
+					(serviceComponent.getBuildNumber() >
+						previousServiceComponent.getBuildNumber())) {
+
+					serviceComponents.put(buildNamespace, serviceComponent);
+				}
+			}
+
+			_serviceComponents = serviceComponents;
+		}
+
+		return _serviceComponents;
+	}
+
+	private void _upgradeDB(
 			ClassLoader classLoader, String buildNamespace, long buildNumber,
 			ServiceComponent previousServiceComponent, String tablesSQL,
 			String sequencesSQL, String indexesSQL)
@@ -660,41 +582,6 @@ public class ServiceComponentLocalServiceImpl
 		}
 	}
 
-	private Map<String, ServiceComponent> _getServiceComponents() {
-		if (_serviceComponents != null) {
-			return _serviceComponents;
-		}
-
-		synchronized (this) {
-			if (_serviceComponents != null) {
-				return _serviceComponents;
-			}
-
-			Map<String, ServiceComponent> serviceComponents =
-				new ConcurrentHashMap<>();
-
-			for (ServiceComponent serviceComponent :
-					serviceComponentPersistence.findAll()) {
-
-				String buildNamespace = serviceComponent.getBuildNamespace();
-
-				ServiceComponent previousServiceComponent =
-					serviceComponents.get(buildNamespace);
-
-				if ((previousServiceComponent == null) ||
-					(serviceComponent.getBuildNumber() >
-						previousServiceComponent.getBuildNumber())) {
-
-					serviceComponents.put(buildNamespace, serviceComponent);
-				}
-			}
-
-			_serviceComponents = serviceComponents;
-		}
-
-		return _serviceComponents;
-	}
-
 	private static final String _DATA_SOURCE_DEFAULT = "liferayDataSource";
 
 	private static final int _SERVICE_COMPONENTS_MAX = 10;
@@ -717,7 +604,7 @@ public class ServiceComponentLocalServiceImpl
 			_upgradeStep = upgradeStep;
 		}
 
-		private int _buildNumber;
+		private final int _buildNumber;
 		private final String _servletContextName;
 		private final UpgradeStep _upgradeStep;
 

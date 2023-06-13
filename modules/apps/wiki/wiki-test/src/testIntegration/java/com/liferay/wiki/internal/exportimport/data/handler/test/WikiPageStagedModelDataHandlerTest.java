@@ -282,11 +282,13 @@ public class WikiPageStagedModelDataHandlerTest
 					stagedModelDataHandler.deleteStagedModel(
 						dependentStagedModel);
 				}
-				catch (NoSuchModelException nsme) {
-					if (!(nsme instanceof NoSuchFileEntryException) &&
-						!(nsme instanceof NoSuchFolderException)) {
+				catch (NoSuchModelException noSuchModelException) {
+					if (!(noSuchModelException instanceof
+							NoSuchFileEntryException) &&
+						!(noSuchModelException instanceof
+							NoSuchFolderException)) {
 
-						throw nsme;
+						throw noSuchModelException;
 					}
 				}
 			}
@@ -341,11 +343,12 @@ public class WikiPageStagedModelDataHandlerTest
 
 		WikiPage page = (WikiPage)stagedModel;
 
-		List<FileEntry> attachmentFileEntries =
+		List<FileEntry> attachmentsFileEntries =
 			page.getAttachmentsFileEntries();
 
 		Assert.assertEquals(
-			attachmentFileEntries.toString(), 1, attachmentFileEntries.size());
+			attachmentsFileEntries.toString(), 1,
+			attachmentsFileEntries.size());
 
 		validateImport(dependentStagedModelsMap, group);
 	}

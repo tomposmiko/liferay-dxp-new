@@ -33,11 +33,6 @@ public class JournalFeedLocalServiceWrapper
 		_journalFeedLocalService = journalFeedLocalService;
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link JournalFeedLocalServiceUtil} to access the journal feed local service. Add custom service methods to <code>com.liferay.journal.service.impl.JournalFeedLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
-	 */
 	@Override
 	public com.liferay.journal.model.JournalFeed addFeed(
 			long userId, long groupId, String feedId, boolean autoFeedId,
@@ -76,21 +71,6 @@ public class JournalFeedLocalServiceWrapper
 		_journalFeedLocalService.addFeedResources(feed, modelPermissions);
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #addFeedResources(JournalFeed, ModelPermissions)}
-	 */
-	@Deprecated
-	@Override
-	public void addFeedResources(
-			com.liferay.journal.model.JournalFeed feed,
-			String[] groupPermissions, String[] guestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_journalFeedLocalService.addFeedResources(
-			feed, groupPermissions, guestPermissions);
-	}
-
 	@Override
 	public void addFeedResources(
 			long feedId, boolean addGroupPermissions,
@@ -99,20 +79,6 @@ public class JournalFeedLocalServiceWrapper
 
 		_journalFeedLocalService.addFeedResources(
 			feedId, addGroupPermissions, addGuestPermissions);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #addFeedResources(JournalFeed, ModelPermissions)}
-	 */
-	@Deprecated
-	@Override
-	public void addFeedResources(
-			long feedId, String[] groupPermissions, String[] guestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_journalFeedLocalService.addFeedResources(
-			feedId, groupPermissions, guestPermissions);
 	}
 
 	/**

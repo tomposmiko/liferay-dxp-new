@@ -89,6 +89,22 @@ JournalDDMTemplateUtil journalDDMTemplateUtil = (JournalDDMTemplateUtil)request.
 		%>
 
 		<div class="lfr-editor-container <%= editorContainerClass %>" id="<portlet:namespace />editorContainer">
+
+			<%
+			DDMTemplate ddmTemplate = journalEditDDMTemplateDisplayContext.getDDMTemplate();
+			String[] templateLanguageTypes = journalEditDDMTemplateDisplayContext.getTemplateLanguageTypes();
+			%>
+
+			<clay:alert
+				closeable="true"
+				componentId="languageMessageContainer"
+				destroyOnHide="true"
+				elementClasses='<%= ((ddmTemplate == null) && (templateLanguageTypes.length > 1)) || ((ddmTemplate != null) && !Objects.equals(ddmTemplate.getLanguage(), journalEditDDMTemplateDisplayContext.getLanguage())) ? "mb-3" : "hide mb-3" %>'
+				message='<%= LanguageUtil.get(request, "changing-the-language-does-not-automatically-translate-the-existing-template-script") %>'
+				style="warning"
+				title='<%= LanguageUtil.get(request, "warning") %>'
+			/>
+
 			<clay:alert
 				closeable="true"
 				componentId="cacheableMessageContainer"
@@ -111,6 +127,8 @@ JournalDDMTemplateUtil journalDDMTemplateUtil = (JournalDDMTemplateUtil)request.
 	var Util = Liferay.Util;
 
 	var STR_HEIGHT = 'height';
+
+	var selectLanguageNode = A.one('#<portlet:namespace />language');
 
 	var panelScriptContainer = A.one('#templateScriptContainer');
 
@@ -346,6 +364,10 @@ JournalDDMTemplateUtil journalDDMTemplateUtil = (JournalDDMTemplateUtil)request.
 
 			Liferay.on('<portlet:namespace />saveTemplate', function(event) {
 				editorContentElement.val(getEditorContent());
+			});
+
+			selectLanguageNode.on('change', function(event) {
+				Liferay.fire('<portlet:namespace />refreshEditor');
 			});
 
 			setEditorPlugins();

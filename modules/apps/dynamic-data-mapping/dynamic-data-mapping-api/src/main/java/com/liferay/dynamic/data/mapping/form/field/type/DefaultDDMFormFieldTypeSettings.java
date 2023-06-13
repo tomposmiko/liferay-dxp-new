@@ -132,9 +132,6 @@ public interface DefaultDDMFormFieldTypeSettings
 	)
 	public DDMFormFieldValidation validation();
 
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
 	@DDMFormField(
 		label = "%field-visibility-expression",
 		properties = {
@@ -143,7 +140,6 @@ public interface DefaultDDMFormFieldTypeSettings
 		},
 		visibilityExpression = "FALSE"
 	)
-	@Deprecated
 	public String visibilityExpression();
 
 }

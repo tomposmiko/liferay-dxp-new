@@ -32,11 +32,6 @@ public class SAPEntryLocalServiceWrapper
 		_sapEntryLocalService = sapEntryLocalService;
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link SAPEntryLocalServiceUtil} to access the sap entry local service. Add custom service methods to <code>com.liferay.portal.security.service.access.policy.service.impl.SAPEntryLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
-	 */
 	@Override
 	public com.liferay.portal.security.service.access.policy.model.SAPEntry
 			addSAPEntry(
@@ -228,8 +223,7 @@ public class SAPEntryLocalServiceWrapper
 
 	@Override
 	public com.liferay.portal.security.service.access.policy.model.SAPEntry
-			fetchSAPEntry(long companyId, String name)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		fetchSAPEntry(long companyId, String name) {
 
 		return _sapEntryLocalService.fetchSAPEntry(companyId, name);
 	}

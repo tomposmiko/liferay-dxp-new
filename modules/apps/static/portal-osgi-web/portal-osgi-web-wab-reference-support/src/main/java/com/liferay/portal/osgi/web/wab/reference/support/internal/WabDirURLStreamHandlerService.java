@@ -18,6 +18,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
@@ -36,7 +37,6 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -66,8 +66,6 @@ public class WabDirURLStreamHandlerService
 	@Override
 	public URLConnection openConnection(URL url) {
 		try {
-			Map<String, String[]> parameters = new HashMap<>();
-
 			URI uri = new URI(url.getPath());
 
 			File warDir = new File(uri);
@@ -86,9 +84,6 @@ public class WabDirURLStreamHandlerService
 			if (bundleSymbolicName.equals(StringPool.BLANK)) {
 				bundleSymbolicName = _getNameFromProperties(warDir);
 			}
-
-			parameters.put(
-				"Bundle-SymbolicName", new String[] {bundleSymbolicName});
 
 			String contextName = _http.getParameter(
 				url.toExternalForm(), "Web-ContextPath");
@@ -114,7 +109,11 @@ public class WabDirURLStreamHandlerService
 				contextName = StringPool.SLASH.concat(contextName);
 			}
 
-			parameters.put("Web-ContextPath", new String[] {contextName});
+			Map<String, String[]> parameters = HashMapBuilder.put(
+				"Bundle-SymbolicName", new String[] {bundleSymbolicName}
+			).put(
+				"Web-ContextPath", new String[] {contextName}
+			).build();
 
 			File generatedJarFile = _wabGenerator.generate(
 				_classLoader, warDir, parameters);
@@ -130,15 +129,15 @@ public class WabDirURLStreamHandlerService
 
 			return wabDirHandler.openConnection(url);
 		}
-		catch (Exception e) {
-			_log.error("Unable to open connection", e);
+		catch (Exception exception) {
+			_log.error("Unable to open connection", exception);
 		}
 
 		return null;
 	}
 
 	@Activate
-	public void start(BundleContext bundleContext) {
+	protected void activate(BundleContext bundleContext) {
 		Bundle bundle = bundleContext.getBundle(0);
 
 		Class<?> clazz = bundle.getClass();
@@ -212,8 +211,8 @@ public class WabDirURLStreamHandlerService
 		try {
 			return UnsecureSAXReaderUtil.read(content);
 		}
-		catch (DocumentException de) {
-			throw new IOException(de);
+		catch (DocumentException documentException) {
+			throw new IOException(documentException);
 		}
 	}
 

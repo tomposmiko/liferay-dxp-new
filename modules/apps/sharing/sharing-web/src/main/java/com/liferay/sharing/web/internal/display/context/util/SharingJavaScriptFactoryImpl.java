@@ -24,7 +24,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.util.Html;
-import com.liferay.portal.kernel.util.JavaConstants;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -33,8 +33,6 @@ import com.liferay.sharing.web.internal.util.SharingJavaScriptThreadLocal;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
-
-import javax.portlet.PortletResponse;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -52,26 +50,32 @@ public class SharingJavaScriptFactoryImpl implements SharingJavaScriptFactory {
 	public String createManageCollaboratorsOnClickMethod(
 		String className, long classPK, HttpServletRequest httpServletRequest) {
 
-		SharingJavaScriptThreadLocal.setSharingJavaScriptNeeded(true);
+		requestSharingJavascript();
 
 		return StringBundler.concat(
 			"Liferay.Sharing.manageCollaborators(",
 			_classNameLocalService.getClassNameId(className), ", ", classPK,
-			", '", _getNamespace(httpServletRequest), "', true)");
+			")");
 	}
 
 	@Override
 	public String createSharingOnClickMethod(
 		String className, long classPK, HttpServletRequest httpServletRequest) {
 
-		SharingJavaScriptThreadLocal.setSharingJavaScriptNeeded(true);
+		requestSharingJavascript();
 
 		return StringBundler.concat(
 			"Liferay.Sharing.share(",
 			_classNameLocalService.getClassNameId(className), ", ", classPK,
 			", '",
-			_getSharingDialogTitle(className, classPK, httpServletRequest),
-			"', '", _getNamespace(httpServletRequest), "', false)");
+			HtmlUtil.escapeJS(
+				_getSharingDialogTitle(className, classPK, httpServletRequest)),
+			"')");
+	}
+
+	@Override
+	public void requestSharingJavascript() {
+		SharingJavaScriptThreadLocal.setSharingJavaScriptNeeded(true);
 	}
 
 	private String _getAssetTitle(
@@ -95,24 +99,16 @@ public class SharingJavaScriptFactoryImpl implements SharingJavaScriptFactory {
 
 			return assetRenderer.getTitle(locale);
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
 					"Unable to get asset renderer with class primary key " +
 						classPK,
-					pe);
+					portalException);
 			}
 
 			return null;
 		}
-	}
-
-	private String _getNamespace(HttpServletRequest httpServletRequest) {
-		PortletResponse portletResponse =
-			(PortletResponse)httpServletRequest.getAttribute(
-				JavaConstants.JAVAX_PORTLET_RESPONSE);
-
-		return portletResponse.getNamespace();
 	}
 
 	private String _getSharingDialogTitle(
@@ -126,8 +122,7 @@ public class SharingJavaScriptFactoryImpl implements SharingJavaScriptFactory {
 		String title = _getAssetTitle(className, classPK, locale);
 
 		if (Validator.isNotNull(title)) {
-			return _language.format(
-				resourceBundle, "share-x", _html.escapeJS(title));
+			return _language.format(resourceBundle, "share-x", title);
 		}
 
 		return _language.get(resourceBundle, "share");

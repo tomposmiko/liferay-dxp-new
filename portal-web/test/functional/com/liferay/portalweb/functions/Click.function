@@ -114,6 +114,16 @@ definition {
 		selenium.click();
 	}
 
+	function javaScriptClick {
+		WaitForSPARefresh();
+
+		selenium.javaScriptClick();
+
+		selenium.assertJavaScriptErrors();
+
+		selenium.assertLiferayErrors();
+	}
+
 	function mouseDownMouseUp {
 		WaitForSPARefresh();
 
@@ -172,6 +182,22 @@ definition {
 		if (selenium.isElementPresent("//iframe")) {
 			selenium.selectFrame("//iframe");
 		}
+
+		selenium.pause("3000");
+
+		Click();
+
+		selenium.assertJavaScriptErrors();
+
+		selenium.assertLiferayErrors();
+	}
+
+	function waitForPersonalMenuJSClick {
+		WaitForSPARefresh();
+
+		selenium.waitForElementPresent(
+			"//script[contains(@src,'personal_menu/js/PersonalMenu.es.js')]"
+		);
 
 		selenium.pause("3000");
 

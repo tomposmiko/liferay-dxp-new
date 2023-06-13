@@ -46,7 +46,7 @@ public abstract class LayoutSEOEntryServiceBaseImpl
 	extends BaseServiceImpl
 	implements AopService, IdentifiableOSGiService, LayoutSEOEntryService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>LayoutSEOEntryService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.layout.seo.service.LayoutSEOEntryServiceUtil</code>.
@@ -100,8 +100,8 @@ public abstract class LayoutSEOEntryServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

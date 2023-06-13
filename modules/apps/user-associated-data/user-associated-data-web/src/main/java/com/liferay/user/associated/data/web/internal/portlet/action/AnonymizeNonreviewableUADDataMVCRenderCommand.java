@@ -94,8 +94,8 @@ public class AnonymizeNonreviewableUADDataMVCRenderCommand
 			renderRequest.setAttribute(
 				WebKeys.SEARCH_CONTAINER, searchContainer);
 		}
-		catch (PortalException pe) {
-			throw new PortletException(pe);
+		catch (PortalException portalException) {
+			throw new PortletException(portalException);
 		}
 
 		return "/anonymize_nonreviewable_uad_data.jsp";
@@ -221,10 +221,10 @@ public class AnonymizeNonreviewableUADDataMVCRenderCommand
 		List<UADApplicationSummaryDisplay> uadApplicationSummaryDisplays =
 			new ArrayList<>();
 
-		Set<String> applicationUADAnonymizerKeySet =
+		Set<String> applicationUADAnonymizersKeySet =
 			_uadRegistry.getApplicationUADAnonymizersKeySet();
 
-		Iterator<String> iterator = applicationUADAnonymizerKeySet.iterator();
+		Iterator<String> iterator = applicationUADAnonymizersKeySet.iterator();
 
 		while (iterator.hasNext()) {
 			String applicationKey = iterator.next();

@@ -14,7 +14,7 @@
 
 import {
 	ADD_FRAGMENT_ENTRY_LINK,
-	ADD_MAPPED_ASSET_ENTRY,
+	ADD_MAPPED_INFO_ITEM,
 	ADD_PORTLET,
 	ADD_ROW,
 	CHANGE_LANGUAGE_ID,
@@ -37,6 +37,7 @@ import {
 	UPDATE_DROP_TARGET,
 	UPDATE_EDITABLE_VALUE_ERROR,
 	UPDATE_EDITABLE_VALUE_LOADING,
+	UPDATE_FRAGMENT_ENTRY_KEYS,
 	UPDATE_FRAGMENT_ENTRY_LINK_COMMENT,
 	UPDATE_FRAGMENT_ENTRY_LINK_COMMENT_REPLY,
 	UPDATE_FRAGMENT_ENTRY_LINK_CONTENT,
@@ -62,11 +63,12 @@ import {
 	removeFragmentEntryLinkReducer,
 	toggleShowResolvedCommentsReducer,
 	updateEditableValueReducer,
+	updateFragmentEntryKeysReducer,
 	updateFragmentEntryLinkCommentReducer,
 	updateFragmentEntryLinkConfigReducer,
 	updateFragmentEntryLinkContentReducer
 } from './fragments.es';
-import {addMappingAssetEntry} from './mapping.es';
+import {addMappingInfoItem} from './mapping.es';
 import {
 	updateActiveItemReducer,
 	updateDropTargetReducer,
@@ -95,7 +97,7 @@ import {updateWigetsReducer} from './widgets.es';
  */
 const reducers = {
 	[ADD_FRAGMENT_ENTRY_LINK]: addFragmentEntryLinkReducer,
-	[ADD_MAPPED_ASSET_ENTRY]: addMappingAssetEntry,
+	[ADD_MAPPED_INFO_ITEM]: addMappingInfoItem,
 	[ADD_PORTLET]: addPortletReducer,
 	[ADD_ROW]: addRowReducer,
 	[CHANGE_LANGUAGE_ID]: createSetValueReducer('languageId'),
@@ -118,6 +120,7 @@ const reducers = {
 	[UPDATE_DROP_TARGET]: updateDropTargetReducer,
 	[UPDATE_EDITABLE_VALUE_ERROR]: updateEditableValueReducer,
 	[UPDATE_EDITABLE_VALUE_LOADING]: updateEditableValueReducer,
+	[UPDATE_FRAGMENT_ENTRY_KEYS]: updateFragmentEntryKeysReducer,
 	[UPDATE_FRAGMENT_ENTRY_LINK_COMMENT]: updateFragmentEntryLinkCommentReducer,
 	[UPDATE_FRAGMENT_ENTRY_LINK_COMMENT_REPLY]: updateFragmentEntryLinkCommentReducer,
 	[UPDATE_FRAGMENT_ENTRY_LINK_CONTENT]: updateFragmentEntryLinkContentReducer,

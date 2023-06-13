@@ -30,7 +30,7 @@ import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
  */
 public class AssetCategoryLocalServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.portlet.asset.service.impl.AssetCategoryLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
@@ -698,10 +698,6 @@ public class AssetCategoryLocalServiceUtil {
 
 		return getService().moveCategory(
 			categoryId, parentCategoryId, vocabularyId, serviceContext);
-	}
-
-	public static void rebuildTree(long groupId, boolean force) {
-		getService().rebuildTree(groupId, force);
 	}
 
 	public static java.util.List<com.liferay.asset.kernel.model.AssetCategory>

@@ -91,15 +91,6 @@ public class BasicRegistryImpl implements Registry {
 		return this;
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public <T> T getService(Class<T> clazz) {
-		return getService(clazz.getName());
-	}
-
 	@Override
 	public <T> T getService(ServiceReference<T> serviceReference) {
 		BasicServiceReference<?> basicServiceReference =
@@ -109,25 +100,6 @@ public class BasicRegistryImpl implements Registry {
 				_services.entrySet()) {
 
 			if (basicServiceReference.matches(entry.getKey())) {
-				return (T)entry.getValue();
-			}
-		}
-
-		return null;
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public <T> T getService(String className) {
-		Filter filter = getFilter("(objectClass=" + className + ")");
-
-		for (Map.Entry<ServiceReference<?>, Object> entry :
-				_services.entrySet()) {
-
-			if (filter.matches(entry.getKey())) {
 				return (T)entry.getValue();
 			}
 		}
@@ -545,11 +517,11 @@ public class BasicRegistryImpl implements Registry {
 			try {
 				_filter = _filterConstructor.newInstance(filterString);
 			}
-			catch (InvocationTargetException ite) {
-				throwException(ite.getCause());
+			catch (InvocationTargetException invocationTargetException) {
+				throwException(invocationTargetException.getCause());
 			}
-			catch (ReflectiveOperationException roe) {
-				throw new RuntimeException(roe);
+			catch (ReflectiveOperationException reflectiveOperationException) {
+				throw new RuntimeException(reflectiveOperationException);
 			}
 		}
 
@@ -561,11 +533,11 @@ public class BasicRegistryImpl implements Registry {
 			try {
 				return (boolean)_matchMethod.invoke(_filter, dictionary);
 			}
-			catch (InvocationTargetException ite) {
-				return throwException(ite.getCause());
+			catch (InvocationTargetException invocationTargetException) {
+				return throwException(invocationTargetException.getCause());
 			}
-			catch (ReflectiveOperationException roe) {
-				throw new RuntimeException(roe);
+			catch (ReflectiveOperationException reflectiveOperationException) {
+				throw new RuntimeException(reflectiveOperationException);
 			}
 		}
 
@@ -581,11 +553,11 @@ public class BasicRegistryImpl implements Registry {
 			try {
 				return (boolean)_matchMethod.invoke(_filter, dictionary);
 			}
-			catch (InvocationTargetException ite) {
-				return throwException(ite.getCause());
+			catch (InvocationTargetException invocationTargetException) {
+				return throwException(invocationTargetException.getCause());
 			}
-			catch (ReflectiveOperationException roe) {
-				throw new RuntimeException(roe);
+			catch (ReflectiveOperationException reflectiveOperationException) {
+				throw new RuntimeException(reflectiveOperationException);
 			}
 		}
 
@@ -618,8 +590,9 @@ public class BasicRegistryImpl implements Registry {
 
 				_matchMethod = filterClass.getMethod("match", Dictionary.class);
 			}
-			catch (ReflectiveOperationException roe) {
-				throw new ExceptionInInitializerError(roe);
+			catch (ReflectiveOperationException reflectiveOperationException) {
+				throw new ExceptionInInitializerError(
+					reflectiveOperationException);
 			}
 		}
 

@@ -50,7 +50,7 @@ import org.osgi.annotation.versioning.ProviderType;
 )
 public interface SegmentsExperienceService extends BaseService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link SegmentsExperienceServiceUtil} to access the segments experience remote service. Add custom service methods to <code>com.liferay.segments.service.impl.SegmentsExperienceServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

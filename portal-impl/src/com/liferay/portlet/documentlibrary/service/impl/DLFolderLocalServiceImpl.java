@@ -125,7 +125,7 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 		dlFolder.setRestrictionType(DLFolderConstants.RESTRICTION_TYPE_INHERIT);
 		dlFolder.setExpandoBridgeAttributes(serviceContext);
 
-		dlFolderPersistence.update(dlFolder);
+		dlFolder = dlFolderPersistence.update(dlFolder);
 
 		// Resources
 
@@ -152,16 +152,6 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 		}
 
 		return dlFolder;
-	}
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             #deleteAllByGroup(long)}
-	 */
-	@Deprecated
-	@Override
-	public void deleteAll(long groupId) throws PortalException {
-		deleteAllByGroup(groupId);
 	}
 
 	@Override
@@ -361,16 +351,6 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 		return getFolderId(dlFolderPersistence, companyId, folderId);
 	}
 
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             #getGroupFolderIds(long, long)}
-	 */
-	@Deprecated
-	@Override
-	public List<Long> getFolderIds(long groupId, long parentFolderId) {
-		return getGroupFolderIds(groupId, parentFolderId);
-	}
-
 	@Override
 	public List<DLFolder> getFolders(long groupId, long parentFolderId) {
 		return getFolders(groupId, parentFolderId, true);
@@ -391,6 +371,20 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 	@Override
 	public List<DLFolder> getFolders(
 		long groupId, long parentFolderId, boolean includeMountfolders,
+		int status, int start, int end, OrderByComparator<DLFolder> obc) {
+
+		if (includeMountfolders) {
+			return dlFolderPersistence.findByG_P_H_S(
+				groupId, parentFolderId, false, status, start, end, obc);
+		}
+
+		return dlFolderPersistence.findByG_M_P_H_S(
+			groupId, false, parentFolderId, false, status, start, end, obc);
+	}
+
+	@Override
+	public List<DLFolder> getFolders(
+		long groupId, long parentFolderId, boolean includeMountfolders,
 		int start, int end, OrderByComparator<DLFolder> obc) {
 
 		if (includeMountfolders) {
@@ -402,19 +396,21 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 			groupId, false, parentFolderId, false, start, end, obc);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getFolders(long, long, boolean, int, int,
+	 *             OrderByComparator)}
+	 */
+	@Deprecated
 	@Override
 	public List<DLFolder> getFolders(
 		long groupId, long parentFolderId, int status,
 		boolean includeMountfolders, int start, int end,
 		OrderByComparator<DLFolder> obc) {
 
-		if (includeMountfolders) {
-			return dlFolderPersistence.findByG_P_H_S(
-				groupId, parentFolderId, false, status, start, end, obc);
-		}
-
-		return dlFolderPersistence.findByG_M_P_H_S(
-			groupId, false, parentFolderId, false, status, start, end, obc);
+		return getFolders(
+			groupId, parentFolderId, includeMountfolders, status, start, end,
+			obc);
 	}
 
 	@Override
@@ -462,8 +458,8 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 
 	@Override
 	public int getFoldersCount(
-		long groupId, long parentFolderId, int status,
-		boolean includeMountfolders) {
+		long groupId, long parentFolderId, boolean includeMountfolders,
+		int status) {
 
 		if (status == WorkflowConstants.STATUS_ANY) {
 			return getFoldersCount(
@@ -476,6 +472,20 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 
 		return dlFolderPersistence.countByG_M_P_H_S(
 			groupId, false, parentFolderId, false, status);
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getFoldersCount(long, long, boolean, int)}
+	 */
+	@Deprecated
+	@Override
+	public int getFoldersCount(
+		long groupId, long parentFolderId, int status,
+		boolean includeMountfolders) {
+
+		return getFoldersCount(
+			groupId, parentFolderId, includeMountfolders, status);
 	}
 
 	@Override
@@ -567,18 +577,6 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 			getRepositorySubfolderIds(
 				folderIds, dlFolder.getRepositoryId(), dlFolder.getFolderId());
 		}
-	}
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             #getGroupSubfolderIds(List, long, long)}
-	 */
-	@Deprecated
-	@Override
-	public void getSubfolderIds(
-		List<Long> folderIds, long groupId, long folderId) {
-
-		getGroupSubfolderIds(folderIds, groupId, folderId);
 	}
 
 	@Override
@@ -683,7 +681,7 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 			dlFolder.setTreePath(dlFolder.buildTreePath());
 			dlFolder.setExpandoBridgeAttributes(serviceContext);
 
-			dlFolderPersistence.update(dlFolder);
+			dlFolder = dlFolderPersistence.update(dlFolder);
 
 			rebuildTree(
 				dlFolder.getCompanyId(), folderId, dlFolder.getTreePath(),
@@ -769,32 +767,6 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 		}
 
 		LockManagerUtil.unlock(DLFolder.class.getName(), folderId);
-	}
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             #updateFolder(long, long, String, String, long, List, int,
-	 *             ServiceContext)}
-	 */
-	@Deprecated
-	@Override
-	public DLFolder updateFolder(
-			long folderId, long parentFolderId, String name, String description,
-			long defaultFileEntryTypeId, List<Long> fileEntryTypeIds,
-			boolean overrideFileEntryTypes, ServiceContext serviceContext)
-		throws PortalException {
-
-		int restrictionType = DLFolderConstants.RESTRICTION_TYPE_INHERIT;
-
-		if (overrideFileEntryTypes) {
-			restrictionType =
-				DLFolderConstants.
-					RESTRICTION_TYPE_FILE_ENTRY_TYPES_AND_WORKFLOW;
-		}
-
-		return updateFolder(
-			folderId, name, description, defaultFileEntryTypeId,
-			fileEntryTypeIds, restrictionType, serviceContext);
 	}
 
 	@Indexable(type = IndexableType.REINDEX)
@@ -915,33 +887,6 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 		}
 	}
 
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced {@link
-	 *             #updateFolder(long, long, String, String, long, List, int,
-	 *             ServiceContext)}
-	 */
-	@Deprecated
-	@Override
-	public DLFolder updateFolder(
-			long folderId, String name, String description,
-			long defaultFileEntryTypeId, List<Long> fileEntryTypeIds,
-			boolean overrideFileEntryTypes, ServiceContext serviceContext)
-		throws PortalException {
-
-		int restrictionType = DLFolderConstants.RESTRICTION_TYPE_INHERIT;
-
-		if (overrideFileEntryTypes) {
-			restrictionType =
-				DLFolderConstants.
-					RESTRICTION_TYPE_FILE_ENTRY_TYPES_AND_WORKFLOW;
-		}
-
-		return updateFolder(
-			serviceContext.getScopeGroupId(), folderId, name, description,
-			defaultFileEntryTypeId, fileEntryTypeIds, restrictionType,
-			serviceContext);
-	}
-
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public DLFolder updateFolder(
@@ -961,34 +906,6 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 		return updateFolder(
 			folderId, parentFolderId, name, description, defaultFileEntryTypeId,
 			fileEntryTypeIds, restrictionType, serviceContext);
-	}
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link #
-	 *             updateFolderAndFileEntryTypes(long, long, long, String,
-	 *             String, long, List, int, ServiceContext)}
-	 */
-	@Deprecated
-	@Override
-	public DLFolder updateFolderAndFileEntryTypes(
-			long userId, long folderId, long parentFolderId, String name,
-			String description, long defaultFileEntryTypeId,
-			List<Long> fileEntryTypeIds, boolean overrideFileEntryTypes,
-			ServiceContext serviceContext)
-		throws PortalException {
-
-		int restrictionType = DLFolderConstants.RESTRICTION_TYPE_INHERIT;
-
-		if (overrideFileEntryTypes) {
-			restrictionType =
-				DLFolderConstants.
-					RESTRICTION_TYPE_FILE_ENTRY_TYPES_AND_WORKFLOW;
-		}
-
-		return updateFolderAndFileEntryTypes(
-			userId, folderId, parentFolderId, name, description,
-			defaultFileEntryTypeId, fileEntryTypeIds, restrictionType,
-			serviceContext);
 	}
 
 	@Override
@@ -1049,7 +966,7 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 			dlFolder.setDefaultFileEntryTypeId(defaultFileEntryTypeId);
 			dlFolder.setRestrictionType(restrictionType);
 
-			dlFolderPersistence.update(dlFolder);
+			dlFolder = dlFolderPersistence.update(dlFolder);
 
 			// File entry types
 
@@ -1126,7 +1043,7 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 		dlFolder.setStatusByUserName(user.getFullName());
 		dlFolder.setStatusDate(new Date());
 
-		dlFolderPersistence.update(dlFolder);
+		dlFolder = dlFolderPersistence.update(dlFolder);
 
 		// Asset
 
@@ -1175,8 +1092,8 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 				verified = true;
 			}
 		}
-		catch (ExpiredLockException ele) {
-			throw new NoSuchLockException(ele);
+		catch (ExpiredLockException expiredLockException) {
+			throw new NoSuchLockException(expiredLockException);
 		}
 
 		return verified;

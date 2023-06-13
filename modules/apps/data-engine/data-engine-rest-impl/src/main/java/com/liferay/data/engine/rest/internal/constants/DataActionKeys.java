@@ -21,14 +21,10 @@ public class DataActionKeys {
 
 	public static final String ADD_DATA_DEFINITION = "ADD_DATA_DEFINITION";
 
-	public static final String ADD_DATA_LAYOUT = "ADD_DATA_LAYOUT";
-
 	public static final String ADD_DATA_RECORD = "ADD_DATA_RECORD";
 
 	public static final String ADD_DATA_RECORD_COLLECTION =
 		"ADD_DATA_RECORD_COLLECTION";
-
-	public static final String DEFINE_PERMISSIONS = "DEFINE_PERMISSIONS";
 
 	public static final String DELETE_DATA_RECORD = "DELETE_DATA_RECORD";
 

@@ -67,7 +67,7 @@ public interface KBArticleLocalService
 	extends BaseLocalService, PersistedModelLocalService,
 			PersistedResourcedModelLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link KBArticleLocalServiceUtil} to access the kb article local service. Add custom service methods to <code>com.liferay.knowledge.base.service.impl.KBArticleLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -103,29 +103,9 @@ public interface KBArticleLocalService
 			KBArticle kbArticle, ModelPermissions modelPermissions)
 		throws PortalException;
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #addKBArticleResources(KBArticle, ModelPermissions)}
-	 */
-	@Deprecated
-	public void addKBArticleResources(
-			KBArticle kbArticle, String[] groupPermissions,
-			String[] guestPermissions)
-		throws PortalException;
-
 	public void addKBArticleResources(
 			long kbArticleId, boolean addGroupPermissions,
 			boolean addGuestPermissions)
-		throws PortalException;
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #addKBArticleResources(KBArticle, ModelPermissions)}
-	 */
-	@Deprecated
-	public void addKBArticleResources(
-			long kbArticleId, String[] groupPermissions,
-			String[] guestPermissions)
 		throws PortalException;
 
 	public int addKBArticlesMarkdown(
@@ -347,17 +327,6 @@ public interface KBArticleLocalService
 		long resourcePrimKey, int status,
 		OrderByComparator<KBArticle> orderByComparator);
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #getKBArticleAndAllDescendantKBArticles(long, int,
-	 OrderByComparator)}
-	 */
-	@Deprecated
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<KBArticle> getKBArticleAndAllDescendants(
-		long resourcePrimKey, int status,
-		OrderByComparator<KBArticle> orderByComparator);
-
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public KBArticle getKBArticleByUrlTitle(
 			long groupId, long kbFolderId, String urlTitle)
@@ -497,28 +466,14 @@ public interface KBArticleLocalService
 	public int getSectionsKBArticlesCount(
 		long groupId, String[] sections, int status);
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link #getKBArticles(long,
-	 long, int, int, int, OrderByComparator)}
-	 */
-	@Deprecated
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<KBArticle> getSiblingKBArticles(
-		long groupId, long parentResourcePrimKey, int status, int start,
-		int end, OrderByComparator<KBArticle> orderByComparator);
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #getKBArticlesCount(long, long, int)}
-	 */
-	@Deprecated
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int getSiblingKBArticlesCount(
-		long groupId, long parentResourcePrimKey, int status);
-
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public String[] getTempAttachmentNames(
 			long groupId, long userId, String tempFolderName)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public void incrementViewCount(
+			long userId, long resourcePrimKey, int increment)
 		throws PortalException;
 
 	public void moveKBArticle(
@@ -585,10 +540,6 @@ public interface KBArticleLocalService
 	public KBArticle updateStatus(
 			long userId, long resourcePrimKey, int status,
 			ServiceContext serviceContext)
-		throws PortalException;
-
-	public void updateViewCount(
-			long userId, long resourcePrimKey, int viewCount)
 		throws PortalException;
 
 }

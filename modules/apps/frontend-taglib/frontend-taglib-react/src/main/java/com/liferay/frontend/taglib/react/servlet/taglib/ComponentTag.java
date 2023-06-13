@@ -28,7 +28,6 @@ import com.liferay.taglib.util.ParamAndPropertyAncestorTagImpl;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 
@@ -55,8 +54,8 @@ public class ComponentTag extends ParamAndPropertyAncestorTagImpl {
 			reactRenderer.renderReact(
 				componentDescriptor, data, request, jspWriter);
 		}
-		catch (Exception e) {
-			throw new JspException(e);
+		catch (Exception exception) {
+			throw new JspException(exception);
 		}
 		finally {
 			cleanUp();
@@ -85,10 +84,8 @@ public class ComponentTag extends ParamAndPropertyAncestorTagImpl {
 			);
 		}
 
-		HttpServletRequest httpServletRequest =
-			(HttpServletRequest)pageContext.getRequest();
-
-		String namespace = NPMResolvedPackageNameUtil.get(httpServletRequest);
+		String namespace = NPMResolvedPackageNameUtil.get(
+			pageContext.getServletContext());
 
 		return namespace.concat(
 			"/"
@@ -127,6 +124,7 @@ public class ComponentTag extends ParamAndPropertyAncestorTagImpl {
 		_componentId = null;
 		_data = null;
 		_module = null;
+		_setServletContext = false;
 	}
 
 	protected Map<String, Object> getData() {

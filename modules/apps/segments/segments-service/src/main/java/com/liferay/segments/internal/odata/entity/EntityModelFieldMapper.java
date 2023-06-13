@@ -75,9 +75,10 @@ public class EntityModelFieldMapper {
 		try {
 			return _expandoColumnLocalService.getColumn(expandoColumnId);
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			_log.error(
-				"Unable to find Expando Column with id " + expandoColumnId, pe);
+				"Unable to find Expando Column with id " + expandoColumnId,
+				portalException);
 
 			return null;
 		}
@@ -162,7 +163,7 @@ public class EntityModelFieldMapper {
 		}
 
 		Optional<SegmentsFieldCustomizer> segmentsFieldCustomizerOptional =
-			_segmentsFieldCustomizerRegistry.getSegmentFieldCustomizerOptional(
+			_segmentsFieldCustomizerRegistry.getSegmentsFieldCustomizerOptional(
 				entityModel.getName(), entityField.getName());
 
 		if ((entityFieldType == EntityField.Type.ID) &&
@@ -220,8 +221,14 @@ public class EntityModelFieldMapper {
 				Optional<SegmentsFieldCustomizer>
 					segmentsFieldCustomizerOptional =
 						_segmentsFieldCustomizerRegistry.
-							getSegmentFieldCustomizerOptional(
+							getSegmentsFieldCustomizerOptional(
 								entityModelName, entityField.getName());
+
+				if ((entityField.getType() == EntityField.Type.ID) &&
+					!segmentsFieldCustomizerOptional.isPresent()) {
+
+					return;
+				}
 
 				complexFields.add(
 					getField(

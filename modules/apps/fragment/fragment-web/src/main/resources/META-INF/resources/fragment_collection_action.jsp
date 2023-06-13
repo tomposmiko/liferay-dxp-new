@@ -52,13 +52,15 @@
 			onClick='<%= "openImportCollectionView();" %>'
 			url="javascript:;"
 		/>
+	</c:if>
 
+	<c:if test="<%= fragmentDisplayContext.hasDeletePermission() %>">
 		<portlet:renderURL var="redirectURL">
 			<portlet:param name="mvcRenderCommandName" value="/fragment/view" />
 		</portlet:renderURL>
 
 		<portlet:actionURL name="/fragment/delete_fragment_collection" var="deleteFragmentCollectionURL">
-			<portlet:param name="redirect" value="<%= redirectURL.toString() %>" />
+			<portlet:param name="redirect" value="<%= redirectURL %>" />
 			<portlet:param name="fragmentCollectionId" value="<%= String.valueOf(fragmentDisplayContext.getFragmentCollectionId()) %>" />
 		</portlet:actionURL>
 

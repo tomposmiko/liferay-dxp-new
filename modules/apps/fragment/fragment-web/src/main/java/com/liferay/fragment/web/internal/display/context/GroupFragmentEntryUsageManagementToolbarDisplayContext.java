@@ -37,13 +37,13 @@ public class GroupFragmentEntryUsageManagementToolbarDisplayContext
 	extends SearchContainerManagementToolbarDisplayContext {
 
 	public GroupFragmentEntryUsageManagementToolbarDisplayContext(
+		HttpServletRequest httpServletRequest,
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
-		HttpServletRequest httpServletRequest,
 		SearchContainer searchContainer) {
 
 		super(
-			liferayPortletRequest, liferayPortletResponse, httpServletRequest,
+			httpServletRequest, liferayPortletRequest, liferayPortletResponse,
 			searchContainer);
 	}
 

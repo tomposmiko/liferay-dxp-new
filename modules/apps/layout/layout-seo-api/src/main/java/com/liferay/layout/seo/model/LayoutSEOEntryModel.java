@@ -44,7 +44,7 @@ public interface LayoutSEOEntryModel
 	extends BaseModel<LayoutSEOEntry>, LocalizedModel, MVCCModel, ShardedModel,
 			StagedGroupedModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a layout seo entry model instance should use the {@link LayoutSEOEntry} interface instead.
@@ -260,27 +260,6 @@ public interface LayoutSEOEntryModel
 	public void setLayoutId(long layoutId);
 
 	/**
-	 * Returns the enabled of this layout seo entry.
-	 *
-	 * @return the enabled of this layout seo entry
-	 */
-	public boolean getEnabled();
-
-	/**
-	 * Returns <code>true</code> if this layout seo entry is enabled.
-	 *
-	 * @return <code>true</code> if this layout seo entry is enabled; <code>false</code> otherwise
-	 */
-	public boolean isEnabled();
-
-	/**
-	 * Sets whether this layout seo entry is enabled.
-	 *
-	 * @param enabled the enabled of this layout seo entry
-	 */
-	public void setEnabled(boolean enabled);
-
-	/**
 	 * Returns the canonical url of this layout seo entry.
 	 *
 	 * @return the canonical url of this layout seo entry
@@ -380,6 +359,405 @@ public interface LayoutSEOEntryModel
 	 */
 	public void setCanonicalURLMap(
 		Map<Locale, String> canonicalURLMap, Locale defaultLocale);
+
+	/**
+	 * Returns the canonical url enabled of this layout seo entry.
+	 *
+	 * @return the canonical url enabled of this layout seo entry
+	 */
+	public boolean getCanonicalURLEnabled();
+
+	/**
+	 * Returns <code>true</code> if this layout seo entry is canonical url enabled.
+	 *
+	 * @return <code>true</code> if this layout seo entry is canonical url enabled; <code>false</code> otherwise
+	 */
+	public boolean isCanonicalURLEnabled();
+
+	/**
+	 * Sets whether this layout seo entry is canonical url enabled.
+	 *
+	 * @param canonicalURLEnabled the canonical url enabled of this layout seo entry
+	 */
+	public void setCanonicalURLEnabled(boolean canonicalURLEnabled);
+
+	/**
+	 * Returns the ddm storage ID of this layout seo entry.
+	 *
+	 * @return the ddm storage ID of this layout seo entry
+	 */
+	public long getDDMStorageId();
+
+	/**
+	 * Sets the ddm storage ID of this layout seo entry.
+	 *
+	 * @param DDMStorageId the ddm storage ID of this layout seo entry
+	 */
+	public void setDDMStorageId(long DDMStorageId);
+
+	/**
+	 * Returns the open graph description of this layout seo entry.
+	 *
+	 * @return the open graph description of this layout seo entry
+	 */
+	public String getOpenGraphDescription();
+
+	/**
+	 * Returns the localized open graph description of this layout seo entry in the language. Uses the default language if no localization exists for the requested language.
+	 *
+	 * @param locale the locale of the language
+	 * @return the localized open graph description of this layout seo entry
+	 */
+	@AutoEscape
+	public String getOpenGraphDescription(Locale locale);
+
+	/**
+	 * Returns the localized open graph description of this layout seo entry in the language, optionally using the default language if no localization exists for the requested language.
+	 *
+	 * @param locale the local of the language
+	 * @param useDefault whether to use the default language if no localization exists for the requested language
+	 * @return the localized open graph description of this layout seo entry. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
+	 */
+	@AutoEscape
+	public String getOpenGraphDescription(Locale locale, boolean useDefault);
+
+	/**
+	 * Returns the localized open graph description of this layout seo entry in the language. Uses the default language if no localization exists for the requested language.
+	 *
+	 * @param languageId the ID of the language
+	 * @return the localized open graph description of this layout seo entry
+	 */
+	@AutoEscape
+	public String getOpenGraphDescription(String languageId);
+
+	/**
+	 * Returns the localized open graph description of this layout seo entry in the language, optionally using the default language if no localization exists for the requested language.
+	 *
+	 * @param languageId the ID of the language
+	 * @param useDefault whether to use the default language if no localization exists for the requested language
+	 * @return the localized open graph description of this layout seo entry
+	 */
+	@AutoEscape
+	public String getOpenGraphDescription(
+		String languageId, boolean useDefault);
+
+	@AutoEscape
+	public String getOpenGraphDescriptionCurrentLanguageId();
+
+	@AutoEscape
+	public String getOpenGraphDescriptionCurrentValue();
+
+	/**
+	 * Returns a map of the locales and localized open graph descriptions of this layout seo entry.
+	 *
+	 * @return the locales and localized open graph descriptions of this layout seo entry
+	 */
+	public Map<Locale, String> getOpenGraphDescriptionMap();
+
+	/**
+	 * Sets the open graph description of this layout seo entry.
+	 *
+	 * @param openGraphDescription the open graph description of this layout seo entry
+	 */
+	public void setOpenGraphDescription(String openGraphDescription);
+
+	/**
+	 * Sets the localized open graph description of this layout seo entry in the language.
+	 *
+	 * @param openGraphDescription the localized open graph description of this layout seo entry
+	 * @param locale the locale of the language
+	 */
+	public void setOpenGraphDescription(
+		String openGraphDescription, Locale locale);
+
+	/**
+	 * Sets the localized open graph description of this layout seo entry in the language, and sets the default locale.
+	 *
+	 * @param openGraphDescription the localized open graph description of this layout seo entry
+	 * @param locale the locale of the language
+	 * @param defaultLocale the default locale
+	 */
+	public void setOpenGraphDescription(
+		String openGraphDescription, Locale locale, Locale defaultLocale);
+
+	public void setOpenGraphDescriptionCurrentLanguageId(String languageId);
+
+	/**
+	 * Sets the localized open graph descriptions of this layout seo entry from the map of locales and localized open graph descriptions.
+	 *
+	 * @param openGraphDescriptionMap the locales and localized open graph descriptions of this layout seo entry
+	 */
+	public void setOpenGraphDescriptionMap(
+		Map<Locale, String> openGraphDescriptionMap);
+
+	/**
+	 * Sets the localized open graph descriptions of this layout seo entry from the map of locales and localized open graph descriptions, and sets the default locale.
+	 *
+	 * @param openGraphDescriptionMap the locales and localized open graph descriptions of this layout seo entry
+	 * @param defaultLocale the default locale
+	 */
+	public void setOpenGraphDescriptionMap(
+		Map<Locale, String> openGraphDescriptionMap, Locale defaultLocale);
+
+	/**
+	 * Returns the open graph description enabled of this layout seo entry.
+	 *
+	 * @return the open graph description enabled of this layout seo entry
+	 */
+	public boolean getOpenGraphDescriptionEnabled();
+
+	/**
+	 * Returns <code>true</code> if this layout seo entry is open graph description enabled.
+	 *
+	 * @return <code>true</code> if this layout seo entry is open graph description enabled; <code>false</code> otherwise
+	 */
+	public boolean isOpenGraphDescriptionEnabled();
+
+	/**
+	 * Sets whether this layout seo entry is open graph description enabled.
+	 *
+	 * @param openGraphDescriptionEnabled the open graph description enabled of this layout seo entry
+	 */
+	public void setOpenGraphDescriptionEnabled(
+		boolean openGraphDescriptionEnabled);
+
+	/**
+	 * Returns the open graph image alt of this layout seo entry.
+	 *
+	 * @return the open graph image alt of this layout seo entry
+	 */
+	public String getOpenGraphImageAlt();
+
+	/**
+	 * Returns the localized open graph image alt of this layout seo entry in the language. Uses the default language if no localization exists for the requested language.
+	 *
+	 * @param locale the locale of the language
+	 * @return the localized open graph image alt of this layout seo entry
+	 */
+	@AutoEscape
+	public String getOpenGraphImageAlt(Locale locale);
+
+	/**
+	 * Returns the localized open graph image alt of this layout seo entry in the language, optionally using the default language if no localization exists for the requested language.
+	 *
+	 * @param locale the local of the language
+	 * @param useDefault whether to use the default language if no localization exists for the requested language
+	 * @return the localized open graph image alt of this layout seo entry. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
+	 */
+	@AutoEscape
+	public String getOpenGraphImageAlt(Locale locale, boolean useDefault);
+
+	/**
+	 * Returns the localized open graph image alt of this layout seo entry in the language. Uses the default language if no localization exists for the requested language.
+	 *
+	 * @param languageId the ID of the language
+	 * @return the localized open graph image alt of this layout seo entry
+	 */
+	@AutoEscape
+	public String getOpenGraphImageAlt(String languageId);
+
+	/**
+	 * Returns the localized open graph image alt of this layout seo entry in the language, optionally using the default language if no localization exists for the requested language.
+	 *
+	 * @param languageId the ID of the language
+	 * @param useDefault whether to use the default language if no localization exists for the requested language
+	 * @return the localized open graph image alt of this layout seo entry
+	 */
+	@AutoEscape
+	public String getOpenGraphImageAlt(String languageId, boolean useDefault);
+
+	@AutoEscape
+	public String getOpenGraphImageAltCurrentLanguageId();
+
+	@AutoEscape
+	public String getOpenGraphImageAltCurrentValue();
+
+	/**
+	 * Returns a map of the locales and localized open graph image alts of this layout seo entry.
+	 *
+	 * @return the locales and localized open graph image alts of this layout seo entry
+	 */
+	public Map<Locale, String> getOpenGraphImageAltMap();
+
+	/**
+	 * Sets the open graph image alt of this layout seo entry.
+	 *
+	 * @param openGraphImageAlt the open graph image alt of this layout seo entry
+	 */
+	public void setOpenGraphImageAlt(String openGraphImageAlt);
+
+	/**
+	 * Sets the localized open graph image alt of this layout seo entry in the language.
+	 *
+	 * @param openGraphImageAlt the localized open graph image alt of this layout seo entry
+	 * @param locale the locale of the language
+	 */
+	public void setOpenGraphImageAlt(String openGraphImageAlt, Locale locale);
+
+	/**
+	 * Sets the localized open graph image alt of this layout seo entry in the language, and sets the default locale.
+	 *
+	 * @param openGraphImageAlt the localized open graph image alt of this layout seo entry
+	 * @param locale the locale of the language
+	 * @param defaultLocale the default locale
+	 */
+	public void setOpenGraphImageAlt(
+		String openGraphImageAlt, Locale locale, Locale defaultLocale);
+
+	public void setOpenGraphImageAltCurrentLanguageId(String languageId);
+
+	/**
+	 * Sets the localized open graph image alts of this layout seo entry from the map of locales and localized open graph image alts.
+	 *
+	 * @param openGraphImageAltMap the locales and localized open graph image alts of this layout seo entry
+	 */
+	public void setOpenGraphImageAltMap(
+		Map<Locale, String> openGraphImageAltMap);
+
+	/**
+	 * Sets the localized open graph image alts of this layout seo entry from the map of locales and localized open graph image alts, and sets the default locale.
+	 *
+	 * @param openGraphImageAltMap the locales and localized open graph image alts of this layout seo entry
+	 * @param defaultLocale the default locale
+	 */
+	public void setOpenGraphImageAltMap(
+		Map<Locale, String> openGraphImageAltMap, Locale defaultLocale);
+
+	/**
+	 * Returns the open graph image file entry ID of this layout seo entry.
+	 *
+	 * @return the open graph image file entry ID of this layout seo entry
+	 */
+	public long getOpenGraphImageFileEntryId();
+
+	/**
+	 * Sets the open graph image file entry ID of this layout seo entry.
+	 *
+	 * @param openGraphImageFileEntryId the open graph image file entry ID of this layout seo entry
+	 */
+	public void setOpenGraphImageFileEntryId(long openGraphImageFileEntryId);
+
+	/**
+	 * Returns the open graph title of this layout seo entry.
+	 *
+	 * @return the open graph title of this layout seo entry
+	 */
+	public String getOpenGraphTitle();
+
+	/**
+	 * Returns the localized open graph title of this layout seo entry in the language. Uses the default language if no localization exists for the requested language.
+	 *
+	 * @param locale the locale of the language
+	 * @return the localized open graph title of this layout seo entry
+	 */
+	@AutoEscape
+	public String getOpenGraphTitle(Locale locale);
+
+	/**
+	 * Returns the localized open graph title of this layout seo entry in the language, optionally using the default language if no localization exists for the requested language.
+	 *
+	 * @param locale the local of the language
+	 * @param useDefault whether to use the default language if no localization exists for the requested language
+	 * @return the localized open graph title of this layout seo entry. If <code>useDefault</code> is <code>false</code> and no localization exists for the requested language, an empty string will be returned.
+	 */
+	@AutoEscape
+	public String getOpenGraphTitle(Locale locale, boolean useDefault);
+
+	/**
+	 * Returns the localized open graph title of this layout seo entry in the language. Uses the default language if no localization exists for the requested language.
+	 *
+	 * @param languageId the ID of the language
+	 * @return the localized open graph title of this layout seo entry
+	 */
+	@AutoEscape
+	public String getOpenGraphTitle(String languageId);
+
+	/**
+	 * Returns the localized open graph title of this layout seo entry in the language, optionally using the default language if no localization exists for the requested language.
+	 *
+	 * @param languageId the ID of the language
+	 * @param useDefault whether to use the default language if no localization exists for the requested language
+	 * @return the localized open graph title of this layout seo entry
+	 */
+	@AutoEscape
+	public String getOpenGraphTitle(String languageId, boolean useDefault);
+
+	@AutoEscape
+	public String getOpenGraphTitleCurrentLanguageId();
+
+	@AutoEscape
+	public String getOpenGraphTitleCurrentValue();
+
+	/**
+	 * Returns a map of the locales and localized open graph titles of this layout seo entry.
+	 *
+	 * @return the locales and localized open graph titles of this layout seo entry
+	 */
+	public Map<Locale, String> getOpenGraphTitleMap();
+
+	/**
+	 * Sets the open graph title of this layout seo entry.
+	 *
+	 * @param openGraphTitle the open graph title of this layout seo entry
+	 */
+	public void setOpenGraphTitle(String openGraphTitle);
+
+	/**
+	 * Sets the localized open graph title of this layout seo entry in the language.
+	 *
+	 * @param openGraphTitle the localized open graph title of this layout seo entry
+	 * @param locale the locale of the language
+	 */
+	public void setOpenGraphTitle(String openGraphTitle, Locale locale);
+
+	/**
+	 * Sets the localized open graph title of this layout seo entry in the language, and sets the default locale.
+	 *
+	 * @param openGraphTitle the localized open graph title of this layout seo entry
+	 * @param locale the locale of the language
+	 * @param defaultLocale the default locale
+	 */
+	public void setOpenGraphTitle(
+		String openGraphTitle, Locale locale, Locale defaultLocale);
+
+	public void setOpenGraphTitleCurrentLanguageId(String languageId);
+
+	/**
+	 * Sets the localized open graph titles of this layout seo entry from the map of locales and localized open graph titles.
+	 *
+	 * @param openGraphTitleMap the locales and localized open graph titles of this layout seo entry
+	 */
+	public void setOpenGraphTitleMap(Map<Locale, String> openGraphTitleMap);
+
+	/**
+	 * Sets the localized open graph titles of this layout seo entry from the map of locales and localized open graph titles, and sets the default locale.
+	 *
+	 * @param openGraphTitleMap the locales and localized open graph titles of this layout seo entry
+	 * @param defaultLocale the default locale
+	 */
+	public void setOpenGraphTitleMap(
+		Map<Locale, String> openGraphTitleMap, Locale defaultLocale);
+
+	/**
+	 * Returns the open graph title enabled of this layout seo entry.
+	 *
+	 * @return the open graph title enabled of this layout seo entry
+	 */
+	public boolean getOpenGraphTitleEnabled();
+
+	/**
+	 * Returns <code>true</code> if this layout seo entry is open graph title enabled.
+	 *
+	 * @return <code>true</code> if this layout seo entry is open graph title enabled; <code>false</code> otherwise
+	 */
+	public boolean isOpenGraphTitleEnabled();
+
+	/**
+	 * Sets whether this layout seo entry is open graph title enabled.
+	 *
+	 * @param openGraphTitleEnabled the open graph title enabled of this layout seo entry
+	 */
+	public void setOpenGraphTitleEnabled(boolean openGraphTitleEnabled);
 
 	/**
 	 * Returns the last publish date of this layout seo entry.

@@ -89,14 +89,6 @@ public class IconTag extends IncludeTag {
 		return _linkCssClass;
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public String getLinkTitle() {
-		return _linkTitle;
-	}
-
 	public String getMarkupView() {
 		return _markupView;
 	}
@@ -165,14 +157,6 @@ public class IconTag extends IncludeTag {
 		_linkCssClass = linkCssClass;
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public void setLinkTitle(String linkTitle) {
-		_linkTitle = linkTitle;
-	}
-
 	public void setLocalizeMessage(boolean localizeMessage) {
 		_localizeMessage = localizeMessage;
 	}
@@ -233,7 +217,6 @@ public class IconTag extends IncludeTag {
 		_label = null;
 		_lang = null;
 		_linkCssClass = null;
-		_linkTitle = null;
 		_localizeMessage = true;
 		_markupView = null;
 		_message = null;
@@ -246,28 +229,6 @@ public class IconTag extends IncludeTag {
 		_toolTip = null;
 		_url = null;
 		_useDialog = false;
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	protected Map<String, Object> getData() {
-		return _getData();
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	protected String getDetails() {
-		HttpServletRequest httpServletRequest = getRequest();
-
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		return _getDetails(themeDisplay);
 	}
 
 	protected String getId() {
@@ -357,7 +318,7 @@ public class IconTag extends IncludeTag {
 			sb.append("event.preventDefault();");
 			sb.append(onClick);
 			sb.append("submitForm(document.hrefFm, '");
-			sb.append(getUrl());
+			sb.append(HtmlUtil.escapeJS(getUrl()));
 			sb.append("')");
 
 			onClick = sb.toString();
@@ -387,34 +348,6 @@ public class IconTag extends IncludeTag {
 		}
 
 		return _url;
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	protected String getSrc() {
-		HttpServletRequest httpServletRequest = getRequest();
-
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		return _getSrc(themeDisplay);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	protected String getSrcHover() {
-		HttpServletRequest httpServletRequest = getRequest();
-
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		return _getSrcHover(themeDisplay);
 	}
 
 	protected String getUrl() {
@@ -534,8 +467,6 @@ public class IconTag extends IncludeTag {
 		httpServletRequest.setAttribute(
 			"liferay-ui:icon:linkCssClass", _linkCssClass);
 		httpServletRequest.setAttribute(
-			"liferay-ui:icon:linkTitle", _linkTitle);
-		httpServletRequest.setAttribute(
 			"liferay-ui:icon:localizeMessage",
 			String.valueOf(_localizeMessage));
 		httpServletRequest.setAttribute(
@@ -596,8 +527,9 @@ public class IconTag extends IncludeTag {
 		String details = null;
 
 		if (_alt != null) {
-			details =
-				" alt=\"" + LanguageUtil.get(_getResourceBundle(), _alt) + "\"";
+			String alt = LanguageUtil.get(_getResourceBundle(), _alt);
+
+			details = " alt=\"" + HtmlUtil.escapeAttribute(alt) + "\"";
 		}
 		else if (isLabel()) {
 			details = " alt=\"\"";
@@ -609,7 +541,8 @@ public class IconTag extends IncludeTag {
 
 			String localizedProcessedMessage = StringPool.BLANK;
 
-			String processedMessage = getProcessedMessage();
+			String processedMessage = HtmlUtil.escapeAttribute(
+				getProcessedMessage());
 
 			if (processedMessage != null) {
 				localizedProcessedMessage = LanguageUtil.get(
@@ -653,7 +586,7 @@ public class IconTag extends IncludeTag {
 
 					imageFileName = imageURL.getPath();
 				}
-				catch (MalformedURLException murle) {
+				catch (MalformedURLException malformedURLException) {
 				}
 			}
 		}
@@ -727,7 +660,7 @@ public class IconTag extends IncludeTag {
 
 			sb.append(details);
 			sb.append(" style=\"background-image: url('");
-			sb.append(spriteFileURL);
+			sb.append(HtmlUtil.escapeCSS(spriteFileURL));
 			sb.append("'); background-position: 50% -");
 			sb.append(spriteImage.getOffset());
 			sb.append("px; background-repeat: no-repeat; height: ");
@@ -807,7 +740,6 @@ public class IconTag extends IncludeTag {
 	private Boolean _label;
 	private String _lang;
 	private String _linkCssClass;
-	private String _linkTitle;
 	private boolean _localizeMessage = true;
 	private String _markupView;
 	private String _message;

@@ -44,15 +44,15 @@ public class SiteAdminManagementToolbarDisplayContext
 	extends SearchContainerManagementToolbarDisplayContext {
 
 	public SiteAdminManagementToolbarDisplayContext(
+			HttpServletRequest httpServletRequest,
 			LiferayPortletRequest liferayPortletRequest,
 			LiferayPortletResponse liferayPortletResponse,
-			HttpServletRequest httpServletRequest,
 			SiteAdminDisplayContext siteAdminDisplayContext)
 		throws PortalException {
 
 		super(
-			liferayPortletRequest, liferayPortletResponse, httpServletRequest,
-			siteAdminDisplayContext.getSearchContainer());
+			httpServletRequest, liferayPortletRequest, liferayPortletResponse,
+			siteAdminDisplayContext.getGroupSearch());
 
 		_siteAdminDisplayContext = siteAdminDisplayContext;
 	}
@@ -136,7 +136,7 @@ public class SiteAdminManagementToolbarDisplayContext
 				}
 			};
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 		}
 
 		return null;

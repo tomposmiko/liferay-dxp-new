@@ -27,6 +27,7 @@ import com.liferay.item.selector.ItemSelector;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
@@ -35,6 +36,7 @@ import com.liferay.portal.kernel.service.GroupService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.staging.StagingGroupHelper;
 
 import java.io.IOException;
 
@@ -84,6 +86,14 @@ public class FragmentPortlet extends MVCPortlet {
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
+		Group scopeGroup = themeDisplay.getScopeGroup();
+
+		if (_stagingGroupHelper.isLocalLiveGroup(scopeGroup) ||
+			_stagingGroupHelper.isRemoteLiveGroup(scopeGroup)) {
+
+			throw new PortletException();
+		}
+
 		FragmentPortletConfiguration fragmentPortletConfiguration = null;
 
 		try {
@@ -92,8 +102,8 @@ public class FragmentPortlet extends MVCPortlet {
 					FragmentPortletConfiguration.class,
 					themeDisplay.getCompanyId());
 		}
-		catch (ConfigurationException ce) {
-			throw new PortletException(ce);
+		catch (ConfigurationException configurationException) {
+			throw new PortletException(configurationException);
 		}
 
 		renderRequest.setAttribute(
@@ -118,14 +128,18 @@ public class FragmentPortlet extends MVCPortlet {
 				FragmentWebKeys.INHERITED_FRAGMENT_COLLECTIONS,
 				_getInheritedFragmentCollections(themeDisplay));
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(pe, pe);
+				_log.warn(portalException, portalException);
 			}
 		}
 
 		renderRequest.setAttribute(
 			FragmentWebKeys.ITEM_SELECTOR, _itemSelector);
+		renderRequest.setAttribute(
+			FragmentWebKeys.SYSTEM_FRAGMENT_COLLECTIONS,
+			_fragmentCollectionService.getFragmentCollections(
+				CompanyConstants.SYSTEM));
 
 		super.doDispatch(renderRequest, renderResponse);
 	}
@@ -183,5 +197,8 @@ public class FragmentPortlet extends MVCPortlet {
 
 	@Reference
 	private ItemSelector _itemSelector;
+
+	@Reference
+	private StagingGroupHelper _stagingGroupHelper;
 
 }

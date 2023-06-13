@@ -35,13 +35,13 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.webdav.BaseResourceImpl;
 import com.liferay.portal.kernel.webdav.Resource;
 import com.liferay.portal.kernel.webdav.WebDAVException;
 import com.liferay.portal.kernel.webdav.WebDAVRequest;
 
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -80,9 +80,9 @@ public class DDMWebDAVImpl implements DDMWebDAV {
 
 			DDMFormLayout ddmFormLayout = _ddm.getDefaultDDMFormLayout(ddmForm);
 
-			Map<Locale, String> nameMap = new HashMap<>();
-
-			nameMap.put(ddmForm.getDefaultLocale(), pathArray[3]);
+			Map<Locale, String> nameMap = HashMapBuilder.put(
+				ddmForm.getDefaultLocale(), pathArray[3]
+			).build();
 
 			ServiceContext serviceContext = new ServiceContext();
 
@@ -141,15 +141,15 @@ public class DDMWebDAVImpl implements DDMWebDAV {
 
 			return HttpServletResponse.SC_FORBIDDEN;
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(pe, pe);
+				_log.debug(portalException, portalException);
 			}
 
 			return HttpServletResponse.SC_FORBIDDEN;
 		}
-		catch (Exception e) {
-			throw new WebDAVException(e);
+		catch (Exception exception) {
+			throw new WebDAVException(exception);
 		}
 	}
 
@@ -213,8 +213,8 @@ public class DDMWebDAVImpl implements DDMWebDAV {
 
 			return null;
 		}
-		catch (Exception e) {
-			throw new WebDAVException(e);
+		catch (Exception exception) {
+			throw new WebDAVException(exception);
 		}
 	}
 
@@ -278,15 +278,15 @@ public class DDMWebDAVImpl implements DDMWebDAV {
 
 			return HttpServletResponse.SC_FORBIDDEN;
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(pe, pe);
+				_log.debug(portalException, portalException);
 			}
 
 			return HttpServletResponse.SC_FORBIDDEN;
 		}
-		catch (Exception e) {
-			throw new WebDAVException(e);
+		catch (Exception exception) {
+			throw new WebDAVException(exception);
 		}
 	}
 

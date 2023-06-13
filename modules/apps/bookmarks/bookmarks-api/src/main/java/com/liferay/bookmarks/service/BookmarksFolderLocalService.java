@@ -60,7 +60,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface BookmarksFolderLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link BookmarksFolderLocalServiceUtil} to access the bookmarks folder local service. Add custom service methods to <code>com.liferay.bookmarks.service.impl.BookmarksFolderLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -421,19 +421,6 @@ public interface BookmarksFolderLocalService
 	@Indexable(type = IndexableType.REINDEX)
 	public BookmarksFolder updateBookmarksFolder(
 		BookmarksFolder bookmarksFolder);
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 #updateFolder(long, long, long, String, String,
-	 ServiceContext)} and {@link #mergeFolders(long, long)}
-	 */
-	@Deprecated
-	@Indexable(type = IndexableType.REINDEX)
-	public BookmarksFolder updateFolder(
-			long userId, long folderId, long parentFolderId, String name,
-			String description, boolean mergeWithParentFolder,
-			ServiceContext serviceContext)
-		throws PortalException;
 
 	@Indexable(type = IndexableType.REINDEX)
 	public BookmarksFolder updateFolder(

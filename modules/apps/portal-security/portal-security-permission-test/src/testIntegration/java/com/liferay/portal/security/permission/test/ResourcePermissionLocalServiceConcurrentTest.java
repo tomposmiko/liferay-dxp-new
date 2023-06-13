@@ -25,14 +25,14 @@ import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.persistence.ResourcePermissionPersistence;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.test.SynchronousInvocationHandler;
 import com.liferay.portal.kernel.test.randomizerbumpers.UniqueStringRandomizerBumper;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceTestConstants;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.service.impl.ResourcePermissionLocalServiceImpl;
-import com.liferay.portal.service.test.ServiceTestUtil;
-import com.liferay.portal.service.test.SynchronousInvocationHandler;
 import com.liferay.portal.spring.aop.AopInvocationHandler;
 import com.liferay.portal.spring.transaction.DefaultTransactionExecutor;
 import com.liferay.portal.test.rule.ExpectedDBType;
@@ -79,7 +79,7 @@ public class ResourcePermissionLocalServiceConcurrentTest {
 	public void setUp() throws NoSuchMethodException {
 		Assume.assumeTrue(PropsValues.RETRY_ADVICE_MAX_RETRIES != 0);
 
-		_threadCount = ServiceTestUtil.THREAD_COUNT;
+		_threadCount = ServiceTestConstants.THREAD_COUNT;
 
 		if ((PropsValues.RETRY_ADVICE_MAX_RETRIES > 0) &&
 			(_threadCount > PropsValues.RETRY_ADVICE_MAX_RETRIES)) {

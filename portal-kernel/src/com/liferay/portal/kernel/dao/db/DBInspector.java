@@ -73,8 +73,8 @@ public class DBInspector {
 
 			return true;
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 
 		return false;
@@ -82,7 +82,7 @@ public class DBInspector {
 
 	/**
 	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 * 				#hasColumnType(String, String, String)}
+	 *             #hasColumnType(String, String, String)}
 	 */
 	@Deprecated
 	public boolean hasColumnType(
@@ -159,8 +159,8 @@ public class DBInspector {
 				}
 			}
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 
 		return false;
@@ -233,12 +233,12 @@ public class DBInspector {
 			try {
 				return Integer.parseInt(columnSize);
 			}
-			catch (NumberFormatException nfe) {
+			catch (NumberFormatException numberFormatException) {
 				throw new UpgradeException(
 					StringBundler.concat(
 						"Column type ", columnType,
 						" has an invalid column size ", columnSize),
-					nfe);
+					numberFormatException);
 			}
 		}
 
@@ -262,17 +262,9 @@ public class DBInspector {
 	private boolean _isColumnNullable(String typeName) {
 		typeName = typeName.trim();
 
-		int i = typeName.indexOf("null");
+		typeName = StringUtil.toLowerCase(typeName);
 
-		if (i == -1) {
-			return false;
-		}
-
-		if ((i > 0) && !Character.isSpaceChar(typeName.charAt(i - 1))) {
-			return false;
-		}
-
-		if ((i + 4) < typeName.length()) {
+		if (typeName.endsWith("not null")) {
 			return false;
 		}
 

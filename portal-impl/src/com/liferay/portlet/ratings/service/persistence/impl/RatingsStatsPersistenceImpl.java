@@ -26,6 +26,8 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -43,8 +45,10 @@ import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * The persistence implementation for the ratings stats service.
@@ -60,7 +64,7 @@ public class RatingsStatsPersistenceImpl
 	extends BasePersistenceImpl<RatingsStats>
 	implements RatingsStatsPersistence {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>RatingsStatsUtil</code> to access the ratings stats persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
@@ -255,13 +259,13 @@ public class RatingsStatsPersistenceImpl
 						_finderPathWithPaginationFindByC_C, finderArgs, list);
 				}
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (useFinderCache) {
 					FinderCacheUtil.removeResult(
 						_finderPathWithPaginationFindByC_C, finderArgs);
 				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 		}
 
@@ -320,8 +324,8 @@ public class RatingsStatsPersistenceImpl
 			list = (List<RatingsStats>)QueryUtil.list(
 				q, getDialect(), start, end);
 		}
-		catch (Exception e) {
-			throw processException(e);
+		catch (Exception exception) {
+			throw processException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -454,13 +458,13 @@ public class RatingsStatsPersistenceImpl
 					cacheResult(ratingsStats);
 				}
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (useFinderCache) {
 					FinderCacheUtil.removeResult(
 						_finderPathFetchByC_C, finderArgs);
 				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -535,10 +539,10 @@ public class RatingsStatsPersistenceImpl
 
 				FinderCacheUtil.putResult(finderPath, finderArgs, count);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				FinderCacheUtil.removeResult(finderPath, finderArgs);
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -593,11 +597,11 @@ public class RatingsStatsPersistenceImpl
 				FinderCacheUtil.putResult(
 					_finderPathWithPaginationCountByC_C, finderArgs, count);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				FinderCacheUtil.removeResult(
 					_finderPathWithPaginationCountByC_C, finderArgs);
 
-				throw processException(e);
+				throw processException(exception);
 			}
 		}
 
@@ -644,8 +648,8 @@ public class RatingsStatsPersistenceImpl
 
 			count = (Long)q.uniqueResult();
 		}
-		catch (Exception e) {
-			throw processException(e);
+		catch (Exception exception) {
+			throw processException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -762,6 +766,19 @@ public class RatingsStatsPersistenceImpl
 		}
 	}
 
+	@Override
+	public void clearCache(Set<Serializable> primaryKeys) {
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+
+		for (Serializable primaryKey : primaryKeys) {
+			EntityCacheUtil.removeResult(
+				RatingsStatsModelImpl.ENTITY_CACHE_ENABLED,
+				RatingsStatsImpl.class, primaryKey);
+		}
+	}
+
 	protected void cacheUniqueFindersCache(
 		RatingsStatsModelImpl ratingsStatsModelImpl) {
 
@@ -862,11 +879,11 @@ public class RatingsStatsPersistenceImpl
 
 			return remove(ratingsStats);
 		}
-		catch (NoSuchStatsException nsee) {
-			throw nsee;
+		catch (NoSuchStatsException noSuchEntityException) {
+			throw noSuchEntityException;
 		}
-		catch (Exception e) {
-			throw processException(e);
+		catch (Exception exception) {
+			throw processException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -889,8 +906,8 @@ public class RatingsStatsPersistenceImpl
 				session.delete(ratingsStats);
 			}
 		}
-		catch (Exception e) {
-			throw processException(e);
+		catch (Exception exception) {
+			throw processException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -927,6 +944,30 @@ public class RatingsStatsPersistenceImpl
 		RatingsStatsModelImpl ratingsStatsModelImpl =
 			(RatingsStatsModelImpl)ratingsStats;
 
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
+
+		Date now = new Date();
+
+		if (isNew && (ratingsStats.getCreateDate() == null)) {
+			if (serviceContext == null) {
+				ratingsStats.setCreateDate(now);
+			}
+			else {
+				ratingsStats.setCreateDate(serviceContext.getCreateDate(now));
+			}
+		}
+
+		if (!ratingsStatsModelImpl.hasSetModifiedDate()) {
+			if (serviceContext == null) {
+				ratingsStats.setModifiedDate(now);
+			}
+			else {
+				ratingsStats.setModifiedDate(
+					serviceContext.getModifiedDate(now));
+			}
+		}
+
 		Session session = null;
 
 		try {
@@ -941,8 +982,8 @@ public class RatingsStatsPersistenceImpl
 				ratingsStats = (RatingsStats)session.merge(ratingsStats);
 			}
 		}
-		catch (Exception e) {
-			throw processException(e);
+		catch (Exception exception) {
+			throw processException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -1179,12 +1220,12 @@ public class RatingsStatsPersistenceImpl
 					FinderCacheUtil.putResult(finderPath, finderArgs, list);
 				}
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (useFinderCache) {
 					FinderCacheUtil.removeResult(finderPath, finderArgs);
 				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -1228,11 +1269,11 @@ public class RatingsStatsPersistenceImpl
 				FinderCacheUtil.putResult(
 					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				FinderCacheUtil.removeResult(
 					_finderPathCountAll, FINDER_ARGS_EMPTY);
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);

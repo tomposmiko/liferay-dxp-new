@@ -23,7 +23,7 @@ import com.liferay.fragment.renderer.FragmentRendererContext;
 import com.liferay.fragment.renderer.FragmentRendererController;
 import com.liferay.fragment.renderer.FragmentRendererTracker;
 import com.liferay.fragment.renderer.constants.FragmentRendererConstants;
-import com.liferay.fragment.util.FragmentEntryConfigUtil;
+import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
 import com.liferay.fragment.validator.FragmentEntryValidator;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -74,9 +74,10 @@ public class FragmentRendererControllerImpl
 			return _translateConfigurationFields(
 				jsonObject, fragmentRendererContext.getLocale());
 		}
-		catch (JSONException jsone) {
+		catch (JSONException jsonException) {
 			_log.error(
-				"Unable to parse fragment entry link configuration", jsone);
+				"Unable to parse fragment entry link configuration",
+				jsonException);
 		}
 
 		return StringPool.BLANK;
@@ -92,15 +93,19 @@ public class FragmentRendererControllerImpl
 			fragmentRendererContext.getFragmentEntryLink();
 
 		try {
-			_fragmentEntryValidator.validateConfiguration(
-				fragmentEntryLink.getConfiguration());
+			if (Validator.isNotNull(fragmentEntryLink.getConfiguration())) {
+				_fragmentEntryValidator.validateConfiguration(
+					fragmentEntryLink.getConfiguration());
+			}
 		}
-		catch (FragmentEntryConfigurationException fece) {
+		catch (FragmentEntryConfigurationException
+					fragmentEntryConfigurationException) {
+
 			SessionErrors.add(
 				httpServletRequest, "fragmentEntryContentInvalid");
 
 			return _getFragmentEntryConfigurationExceptionMessage(
-				httpServletRequest, fece);
+				httpServletRequest, fragmentEntryConfigurationException);
 		}
 
 		UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
@@ -114,28 +119,28 @@ public class FragmentRendererControllerImpl
 				new PipingServletResponse(
 					httpServletResponse, unsyncStringWriter));
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
 				_log.debug(
 					StringBundler.concat(
 						"Unable to render content of fragment entry ",
 						fragmentEntryLink.getFragmentEntryId(), ":",
-						e.getMessage()),
-					e);
+						exception.getMessage()),
+					exception);
 			}
 			else {
 				_log.error(
 					StringBundler.concat(
 						"Unable to render content of fragment entry ",
 						fragmentEntryLink.getFragmentEntryId(), ":",
-						e.getMessage()));
+						exception.getMessage()));
 			}
 
 			SessionErrors.add(
 				httpServletRequest, "fragmentEntryContentInvalid");
 
 			return _getFragmentEntryContentExceptionMessage(
-				e, httpServletRequest);
+				exception, httpServletRequest);
 		}
 
 		return unsyncStringWriter.toString();
@@ -143,7 +148,8 @@ public class FragmentRendererControllerImpl
 
 	private String _getFragmentEntryConfigurationExceptionMessage(
 		HttpServletRequest httpServletRequest,
-		FragmentEntryConfigurationException fece) {
+		FragmentEntryConfigurationException
+			fragmentEntryConfigurationException) {
 
 		StringBundler divSB = new StringBundler(3);
 
@@ -163,7 +169,8 @@ public class FragmentRendererControllerImpl
 				resourceBundle, "fragment-configuration-is-invalid"));
 		detailedErrorMessageSB.append(StringPool.NEW_LINE);
 		detailedErrorMessageSB.append(StringPool.NEW_LINE);
-		detailedErrorMessageSB.append(fece.getLocalizedMessage());
+		detailedErrorMessageSB.append(
+			fragmentEntryConfigurationException.getLocalizedMessage());
 
 		String detailedErrorMessage = detailedErrorMessageSB.toString();
 
@@ -175,7 +182,7 @@ public class FragmentRendererControllerImpl
 	}
 
 	private String _getFragmentEntryContentExceptionMessage(
-		Exception e, HttpServletRequest httpServletRequest) {
+		Exception exception, HttpServletRequest httpServletRequest) {
 
 		StringBundler sb = new StringBundler(3);
 
@@ -183,13 +190,13 @@ public class FragmentRendererControllerImpl
 
 		String errorMessage = "an-unexpected-error-occurred";
 
-		Throwable throwable = e.getCause();
+		Throwable throwable = exception.getCause();
 
 		if (throwable instanceof FragmentEntryContentException) {
-			FragmentEntryContentException fece =
+			FragmentEntryContentException fragmentEntryContentException =
 				(FragmentEntryContentException)throwable;
 
-			errorMessage = fece.getLocalizedMessage();
+			errorMessage = fragmentEntryContentException.getLocalizedMessage();
 		}
 
 		ThemeDisplay themeDisplay =
@@ -236,7 +243,7 @@ public class FragmentRendererControllerImpl
 		ResourceBundle resourceBundle = resourceBundleLoader.loadResourceBundle(
 			locale);
 
-		return FragmentEntryConfigUtil.translateConfiguration(
+		return _fragmentEntryConfigurationParser.translateConfiguration(
 			jsonObject, resourceBundle);
 	}
 
@@ -246,6 +253,9 @@ public class FragmentRendererControllerImpl
 	@Reference
 	private FragmentCollectionContributorTracker
 		_fragmentCollectionContributorTracker;
+
+	@Reference
+	private FragmentEntryConfigurationParser _fragmentEntryConfigurationParser;
 
 	@Reference
 	private FragmentEntryValidator _fragmentEntryValidator;

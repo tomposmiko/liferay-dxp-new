@@ -27,12 +27,13 @@ DDMStructure ddmStructure = journalEditArticleDisplayContext.getDDMStructure();
 <aui:input name="ddmStructureKey" type="hidden" value="<%= ddmStructure.getStructureKey() %>" />
 
 <c:if test="<%= journalWebConfiguration.changeableDefaultLanguage() %>">
-	<soy:component-renderer
-		context="<%= journalEditArticleDisplayContext.getChangeDefaultLanguageSoyContext() %>"
-		module="js/ChangeDefaultLanguage.es"
-		servletContext="<%= application %>"
-		templateNamespace="com.liferay.journal.web.ChangeDefaultLanguage.render"
-	/>
+	<div id="<%= renderResponse.getNamespace() + "-change-default-language" %>">
+		<react:component
+			data="<%= journalEditArticleDisplayContext.getChangeDefaultLanguageData() %>"
+			module="js/ChangeDefaultLanguage.es"
+			servletContext="<%= application %>"
+		/>
+	</div>
 </c:if>
 
 <p class="article-structure">
@@ -43,7 +44,7 @@ DDMStructure ddmStructure = journalEditArticleDisplayContext.getDDMStructure();
 	<p class="article-version-status">
 		<b><liferay-ui:message key="version" /></b>: <%= article.getVersion() %>
 
-		<span class="label label-<%= LabelItem.getStyleFromWorkflowStatus(article.getStatus()) %> ml-2 text-uppercase">
+		<span class="label label-<%= WorkflowConstants.getStatusStyle(article.getStatus()) %> ml-2 text-uppercase">
 			<liferay-ui:message key="<%= WorkflowConstants.getStatusLabel(article.getStatus()) %>" />
 		</span>
 	</p>
@@ -89,12 +90,13 @@ DDMStructure ddmStructure = journalEditArticleDisplayContext.getDDMStructure();
 	<liferay-ui:input-localized
 		availableLocales="<%= journalEditArticleDisplayContext.getAvailableLocales() %>"
 		cssClass="form-control"
-		defaultLanguageId="<%= journalEditArticleDisplayContext.getDefaultLanguageId() %>"
+		defaultLanguageId="<%= journalEditArticleDisplayContext.getDefaultArticleLanguageId() %>"
 		editorName="alloyeditor"
 		formName="fm"
 		ignoreRequestValue="<%= journalEditArticleDisplayContext.isChangeStructure() %>"
 		name="descriptionMapAsXML"
 		placeholder="description"
+		selectedLanguageId="<%= journalEditArticleDisplayContext.getSelectedLanguageId() %>"
 		type="editor"
 		xml="<%= (article != null) ? article.getDescriptionMapAsXML() : StringPool.BLANK %>"
 	/>

@@ -27,6 +27,7 @@ import com.liferay.segments.model.SegmentsExperimentRel;
 import com.liferay.segments.service.SegmentsExperimentRelService;
 import com.liferay.segments.service.persistence.SegmentsEntryPersistence;
 import com.liferay.segments.service.persistence.SegmentsEntryRelPersistence;
+import com.liferay.segments.service.persistence.SegmentsEntryRolePersistence;
 import com.liferay.segments.service.persistence.SegmentsExperiencePersistence;
 import com.liferay.segments.service.persistence.SegmentsExperimentFinder;
 import com.liferay.segments.service.persistence.SegmentsExperimentPersistence;
@@ -52,7 +53,7 @@ public abstract class SegmentsExperimentRelServiceBaseImpl
 	implements AopService, IdentifiableOSGiService,
 			   SegmentsExperimentRelService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>SegmentsExperimentRelService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.segments.service.SegmentsExperimentRelServiceUtil</code>.
@@ -107,8 +108,8 @@ public abstract class SegmentsExperimentRelServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 
@@ -117,6 +118,9 @@ public abstract class SegmentsExperimentRelServiceBaseImpl
 
 	@Reference
 	protected SegmentsEntryRelPersistence segmentsEntryRelPersistence;
+
+	@Reference
+	protected SegmentsEntryRolePersistence segmentsEntryRolePersistence;
 
 	@Reference
 	protected SegmentsExperiencePersistence segmentsExperiencePersistence;

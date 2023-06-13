@@ -30,16 +30,10 @@ import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
  */
 public class RepositoryServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.portal.service.impl.RepositoryServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
-	 */
-
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link RepositoryServiceUtil} to access the repository remote service. Add custom service methods to <code>com.liferay.portal.service.impl.RepositoryServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	public static com.liferay.portal.kernel.model.Repository addRepository(
 			long groupId, long classNameId, long parentFolderId, String name,
@@ -80,6 +74,13 @@ public class RepositoryServiceUtil {
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return getService().getRepository(repositoryId);
+	}
+
+	public static com.liferay.portal.kernel.model.Repository getRepository(
+			long groupId, String portletId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return getService().getRepository(groupId, portletId);
 	}
 
 	public static com.liferay.portal.kernel.util.UnicodeProperties

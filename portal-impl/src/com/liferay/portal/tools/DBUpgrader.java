@@ -14,6 +14,7 @@
 
 package com.liferay.portal.tools;
 
+import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalServiceUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.dao.orm.common.SQLTransformer;
 import com.liferay.portal.events.StartupHelperUtil;
@@ -33,6 +34,7 @@ import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.kernel.service.ReleaseLocalServiceUtil;
 import com.liferay.portal.kernel.service.ResourceActionLocalServiceUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.version.Version;
@@ -41,6 +43,7 @@ import com.liferay.portal.upgrade.PortalUpgradeProcess;
 import com.liferay.portal.util.InitUtil;
 import com.liferay.portal.util.PortalClassPathUtil;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.verify.VerifyProperties;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.ServiceRegistrar;
@@ -51,7 +54,6 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.time.StopWatch;
@@ -65,7 +67,10 @@ public class DBUpgrader {
 	public static void checkRequiredBuildNumber(int requiredBuildNumber)
 		throws PortalException {
 
-		int buildNumber = ReleaseLocalServiceUtil.getBuildNumberOrCreate();
+		Release release = ReleaseLocalServiceUtil.getRelease(
+			ReleaseConstants.DEFAULT_ID);
+
+		int buildNumber = release.getBuildNumber();
 
 		if (buildNumber > ReleaseInfo.getParentBuildNumber()) {
 			StringBundler sb = new StringBundler(6);
@@ -102,6 +107,10 @@ public class DBUpgrader {
 
 			StartupHelperUtil.printPatchLevel();
 
+			VerifyProperties verifyProperties = new VerifyProperties();
+
+			verifyProperties.verify();
+
 			upgrade();
 
 			_checkClassNamesAndResourceActions();
@@ -109,6 +118,8 @@ public class DBUpgrader {
 			verify();
 
 			DependencyManagerSyncUtil.sync();
+
+			DLFileEntryTypeLocalServiceUtil.getBasicDocumentDLFileEntryType();
 
 			_registerModuleServiceLifecycle("database.initialized");
 
@@ -126,8 +137,8 @@ public class DBUpgrader {
 				"Running modules upgrades. Connect to Gogo shell to check " +
 					"the status.");
 		}
-		catch (Exception e) {
-			e.printStackTrace();
+		catch (Exception exception) {
+			exception.printStackTrace();
 
 			System.exit(1);
 		}
@@ -155,7 +166,10 @@ public class DBUpgrader {
 
 		// Upgrade
 
-		int buildNumber = ReleaseLocalServiceUtil.getBuildNumberOrCreate();
+		Release release = ReleaseLocalServiceUtil.getRelease(
+			ReleaseConstants.DEFAULT_ID);
+
+		int buildNumber = release.getBuildNumber();
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Update build " + buildNumber);
@@ -173,10 +187,10 @@ public class DBUpgrader {
 
 			StartupHelperUtil.upgradeProcess(buildNumber);
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			_updateReleaseState(ReleaseConstants.STATE_UPGRADE_FAILURE);
 
-			throw e;
+			throw exception;
 		}
 		finally {
 			if (PropsValues.UPGRADE_DATABASE_TRANSACTIONS_DISABLED) {
@@ -245,13 +259,14 @@ public class DBUpgrader {
 		try {
 			StartupHelperUtil.verifyProcess(release.isVerified());
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			_updateReleaseState(ReleaseConstants.STATE_VERIFY_FAILURE);
 
 			_log.error(
-				"Unable to execute verify process: " + e.getMessage(), e);
+				"Unable to execute verify process: " + exception.getMessage(),
+				exception);
 
-			throw e;
+			throw exception;
 		}
 		finally {
 			if (PropsValues.VERIFY_DATABASE_TRANSACTIONS_DISABLED) {
@@ -292,11 +307,13 @@ public class DBUpgrader {
 		ServiceRegistrar<Release> serviceRegistrar =
 			registry.getServiceRegistrar(Release.class);
 
-		Map<String, Object> properties = new HashMap<>();
-
-		properties.put("build.date", release.getBuildDate());
-		properties.put("build.number", release.getBuildNumber());
-		properties.put("servlet.context.name", release.getServletContextName());
+		Map<String, Object> properties = HashMapBuilder.<String, Object>put(
+			"build.date", release.getBuildDate()
+		).put(
+			"build.number", release.getBuildNumber()
+		).put(
+			"servlet.context.name", release.getServletContextName()
+		).build();
 
 		serviceRegistrar.registerService(Release.class, release, properties);
 	}
@@ -311,6 +328,8 @@ public class DBUpgrader {
 		if (_log.isDebugEnabled()) {
 			_log.debug("Check resource actions");
 		}
+
+		StartupHelperUtil.initResourceActions();
 
 		ResourceActionLocalServiceUtil.checkResourceActions();
 	}
@@ -414,7 +433,7 @@ public class DBUpgrader {
 
 			return 0;
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			return 0;
 		}
 		finally {
@@ -427,11 +446,13 @@ public class DBUpgrader {
 
 		Registry registry = RegistryUtil.getRegistry();
 
-		Map<String, Object> properties = new HashMap<>();
-
-		properties.put("module.service.lifecycle", moduleServiceLifecycle);
-		properties.put("service.vendor", ReleaseInfo.getVendor());
-		properties.put("service.version", ReleaseInfo.getVersion());
+		Map<String, Object> properties = HashMapBuilder.<String, Object>put(
+			"module.service.lifecycle", moduleServiceLifecycle
+		).put(
+			"service.vendor", ReleaseInfo.getVendor()
+		).put(
+			"service.version", ReleaseInfo.getVersion()
+		).build();
 
 		registry.registerService(
 			ModuleServiceLifecycle.class,
@@ -443,7 +464,7 @@ public class DBUpgrader {
 	private static void _updateCompanyKey() throws Exception {
 		DB db = DBManagerUtil.getDB();
 
-		db.runSQL("update Company set key_ = null");
+		db.runSQL("update CompanyInfo set key_ = null");
 	}
 
 	private static void _updateReleaseState(int state) throws Exception {

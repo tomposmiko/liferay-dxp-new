@@ -51,13 +51,19 @@ public class DocumentLibraryDDMFormFieldValueAccessor
 	public JSONObject getValue(
 		DDMFormFieldValue ddmFormFieldValue, Locale locale) {
 
-		try {
-			Value value = ddmFormFieldValue.getValue();
+		Value value = ddmFormFieldValue.getValue();
 
+		if (value == null) {
+			return jsonFactory.createJSONObject();
+		}
+
+		try {
 			return jsonFactory.createJSONObject(value.getString(locale));
 		}
-		catch (JSONException jsone) {
-			_log.error("Unable to parse JSON object", jsone);
+		catch (JSONException jsonException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("Unable to parse JSON object", jsonException);
+			}
 
 			return jsonFactory.createJSONObject();
 		}

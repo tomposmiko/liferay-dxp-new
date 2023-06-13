@@ -36,6 +36,7 @@ String id = searchContainer.getId(request, namespace);
 String emptyResultsMessage = searchContainer.getEmptyResultsMessage();
 String emptyResultsMessageCssClass = searchContainer.getEmptyResultsMessageCssClass();
 List<String> headerNames = searchContainer.getHeaderNames();
+Map<String, String> helpMessages = searchContainer.getHelpMessages();
 List<String> normalizedHeaderNames = searchContainer.getNormalizedHeaderNames();
 Map orderableHeaders = searchContainer.getOrderableHeaders();
 RowChecker rowChecker = searchContainer.getRowChecker();

@@ -74,8 +74,10 @@ public class Service {
 		}
 	}
 
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@GraphQLField(
+		description = "A list of hours when the organization is open. This follows the [`OpeningHoursSpecification`](https://www.schema.org/OpeningHoursSpecification) specification."
+	)
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected HoursAvailable[] hoursAvailable;
 
 	@Schema(description = "The type of service the organization provides.")
@@ -102,8 +104,10 @@ public class Service {
 		}
 	}
 
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@GraphQLField(
+		description = "The type of service the organization provides."
+	)
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String serviceType;
 
 	@Override

@@ -60,6 +60,7 @@ public class FragmentEntryWrapper
 		attributes.put("js", getJs());
 		attributes.put("configuration", getConfiguration());
 		attributes.put("previewFileEntryId", getPreviewFileEntryId());
+		attributes.put("readOnly", isReadOnly());
 		attributes.put("type", getType());
 		attributes.put("lastPublishDate", getLastPublishDate());
 		attributes.put("status", getStatus());
@@ -173,6 +174,12 @@ public class FragmentEntryWrapper
 
 		if (previewFileEntryId != null) {
 			setPreviewFileEntryId(previewFileEntryId);
+		}
+
+		Boolean readOnly = (Boolean)attributes.get("readOnly");
+
+		if (readOnly != null) {
+			setReadOnly(readOnly);
 		}
 
 		Integer type = (Integer)attributes.get("type");
@@ -390,6 +397,16 @@ public class FragmentEntryWrapper
 	}
 
 	/**
+	 * Returns the read only of this fragment entry.
+	 *
+	 * @return the read only of this fragment entry
+	 */
+	@Override
+	public boolean getReadOnly() {
+		return model.getReadOnly();
+	}
+
+	/**
 	 * Returns the status of this fragment entry.
 	 *
 	 * @return the status of this fragment entry
@@ -570,6 +587,16 @@ public class FragmentEntryWrapper
 	}
 
 	/**
+	 * Returns <code>true</code> if this fragment entry is read only.
+	 *
+	 * @return <code>true</code> if this fragment entry is read only; <code>false</code> otherwise
+	 */
+	@Override
+	public boolean isReadOnly() {
+		return model.isReadOnly();
+	}
+
+	/**
 	 * Returns <code>true</code> if this fragment entry is scheduled.
 	 *
 	 * @return <code>true</code> if this fragment entry is scheduled; <code>false</code> otherwise
@@ -579,11 +606,6 @@ public class FragmentEntryWrapper
 		return model.isScheduled();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a fragment entry model instance should use the <code>FragmentEntry</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();
@@ -760,6 +782,16 @@ public class FragmentEntryWrapper
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		model.setPrimaryKey(primaryKey);
+	}
+
+	/**
+	 * Sets whether this fragment entry is read only.
+	 *
+	 * @param readOnly the read only of this fragment entry
+	 */
+	@Override
+	public void setReadOnly(boolean readOnly) {
+		model.setReadOnly(readOnly);
 	}
 
 	/**

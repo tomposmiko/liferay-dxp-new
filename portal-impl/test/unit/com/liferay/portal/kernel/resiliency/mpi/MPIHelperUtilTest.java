@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.rule.NewEnv;
 import com.liferay.portal.kernel.test.rule.NewEnvTestRule;
 import com.liferay.portal.kernel.test.util.PropsTestUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.resiliency.spi.SPIRegistryImpl;
@@ -50,7 +51,6 @@ import java.rmi.NoSuchObjectException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -79,13 +79,13 @@ public class MPIHelperUtilTest {
 
 	@Before
 	public void setUp() {
-		Map<String, Object> properties = new HashMap<>();
-
-		properties.put(
-			PropsKeys.INTRABAND_IMPL, ExecutorIntraband.class.getName());
-		properties.put(PropsKeys.INTRABAND_TIMEOUT_DEFAULT, "10000");
-		properties.put(
-			PropsKeys.INTRABAND_WELDER_IMPL, SocketWelder.class.getName());
+		Map<String, Object> properties = HashMapBuilder.<String, Object>put(
+			PropsKeys.INTRABAND_IMPL, ExecutorIntraband.class.getName()
+		).put(
+			PropsKeys.INTRABAND_TIMEOUT_DEFAULT, "10000"
+		).put(
+			PropsKeys.INTRABAND_WELDER_IMPL, SocketWelder.class.getName()
+		).build();
 
 		PropsTestUtil.setProps(properties);
 
@@ -305,7 +305,7 @@ public class MPIHelperUtilTest {
 
 			Assert.fail();
 		}
-		catch (NullPointerException npe) {
+		catch (NullPointerException nullPointerException) {
 		}
 
 		try (CaptureHandler captureHandler =
@@ -404,7 +404,7 @@ public class MPIHelperUtilTest {
 
 				Assert.fail();
 			}
-			catch (NullPointerException npe) {
+			catch (NullPointerException nullPointerException) {
 			}
 
 			// Unregister SPI provider, nonexistent name, with log
@@ -626,13 +626,13 @@ public class MPIHelperUtilTest {
 			Assert.assertTrue(
 				MPIHelperUtil.registerSPIProvider(mockSPIProvider1));
 
-			final RuntimeException runtimeException = new RuntimeException();
+			final RuntimeException runtimeException1 = new RuntimeException();
 
 			mockSPI1 = new MockSPI() {
 
 				@Override
 				public String toString() {
-					throw runtimeException;
+					throw runtimeException1;
 				}
 
 			};
@@ -648,8 +648,8 @@ public class MPIHelperUtilTest {
 
 				Assert.fail();
 			}
-			catch (RuntimeException re) {
-				Assert.assertSame(runtimeException, re);
+			catch (RuntimeException runtimeException2) {
+				Assert.assertSame(runtimeException1, runtimeException2);
 			}
 
 			Assert.assertTrue(logRecords.toString(), logRecords.isEmpty());
@@ -761,7 +761,7 @@ public class MPIHelperUtilTest {
 
 				Assert.fail();
 			}
-			catch (NullPointerException npe) {
+			catch (NullPointerException nullPointerException) {
 			}
 
 			// No such SPI provider, with log
@@ -841,7 +841,7 @@ public class MPIHelperUtilTest {
 					}
 
 					@Override
-					protected ClassLoader getOperatingClassloader() {
+					protected ClassLoader getOperatingClassLoader() {
 						return null;
 					}
 
@@ -897,8 +897,8 @@ public class MPIHelperUtilTest {
 
 				Assert.fail();
 			}
-			catch (RuntimeException re) {
-				Throwable throwable = re.getCause();
+			catch (RuntimeException runtimeException) {
+				Throwable throwable = runtimeException.getCause();
 
 				Assert.assertSame(RemoteException.class, throwable.getClass());
 			}
@@ -1113,8 +1113,8 @@ public class MPIHelperUtilTest {
 
 				Assert.fail();
 			}
-			catch (RuntimeException re) {
-				throwable = re.getCause();
+			catch (RuntimeException runtimeException) {
+				throwable = runtimeException.getCause();
 
 				Assert.assertSame(RemoteException.class, throwable.getClass());
 			}

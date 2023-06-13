@@ -114,12 +114,13 @@ public class VirtualHostFilter extends BasePortalFilter {
 					LayoutLocalServiceUtil.getFriendlyURLLayout(
 						groupId, false, friendlyURL);
 				}
-				catch (NoSuchLayoutException nsle) {
+				catch (NoSuchLayoutException noSuchLayoutException) {
 
 					// LPS-52675
 
 					if (_log.isDebugEnabled()) {
-						_log.debug(nsle, nsle);
+						_log.debug(
+							noSuchLayoutException, noSuchLayoutException);
 					}
 
 					return true;
@@ -155,26 +156,6 @@ public class VirtualHostFilter extends BasePortalFilter {
 			(code != LayoutFriendlyURLException.ENDS_WITH_SLASH)) {
 
 			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	protected boolean isValidRequestURL(StringBuffer requestURL) {
-		if (requestURL == null) {
-			return false;
-		}
-
-		String url = requestURL.toString();
-
-		for (String extension : PropsValues.VIRTUAL_HOSTS_IGNORE_EXTENSIONS) {
-			if (url.endsWith(extension)) {
-				return false;
-			}
 		}
 
 		return true;
@@ -378,8 +359,8 @@ public class VirtualHostFilter extends BasePortalFilter {
 
 			requestDispatcher.forward(httpServletRequest, httpServletResponse);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
 			processFilter(
 				VirtualHostFilter.class.getName(), httpServletRequest,

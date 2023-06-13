@@ -47,7 +47,7 @@ public abstract class BlogsEntryServiceBaseImpl
 	extends BaseServiceImpl
 	implements AopService, BlogsEntryService, IdentifiableOSGiService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>BlogsEntryService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.blogs.service.BlogsEntryServiceUtil</code>.
@@ -101,8 +101,8 @@ public abstract class BlogsEntryServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

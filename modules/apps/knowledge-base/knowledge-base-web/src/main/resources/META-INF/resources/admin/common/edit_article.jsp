@@ -92,7 +92,6 @@ if (portletTitleBasedNavigation) {
 				</div>
 			</c:if>
 
-			<liferay-ui:error exception="<%= DuplicateFileException.class %>" message="please-enter-a-unique-document-name" />
 			<liferay-ui:error exception="<%= FileNameException.class %>" message="please-enter-a-file-with-a-valid-file-name" />
 			<liferay-ui:error exception="<%= KBArticleStatusException.class %>" message="this-article-cannot-be-published-because-its-parent-has-not-been-published" />
 			<liferay-ui:error exception="<%= KBArticleUrlTitleException.MustNotBeDuplicate.class %>" message="please-enter-a-unique-friendly-url" />
@@ -150,7 +149,7 @@ if (portletTitleBasedNavigation) {
 							contents="<%= HtmlUtil.escape(title) %>"
 							editorName="alloyeditor"
 							name="titleEditor"
-							onChangeMethod='<%= (kbArticle == null) ? "OnChangeEditor" : StringPool.BLANK %>'
+							onChangeMethod='<%= (kbArticle == null) ? "onChangeEditor" : StringPool.BLANK %>'
 							placeholder="title"
 							showSource="<%= false %>"
 						/>
@@ -161,7 +160,7 @@ if (portletTitleBasedNavigation) {
 					<div class="kb-entity-body">
 
 						<%
-						Map<String, String> fileBrowserParams = new HashMap();
+						Map<String, String> fileBrowserParams = new HashMap<>();
 
 						if (kbArticle != null) {
 							fileBrowserParams.put("resourcePrimKey", String.valueOf(kbArticle.getResourcePrimKey()));
@@ -301,7 +300,7 @@ if (portletTitleBasedNavigation) {
 	<c:if test="<%= kbArticle == null %>">
 		var urlTitleInput = document.getElementById('<portlet:namespace />urlTitle');
 
-		function <portlet:namespace />OnChangeEditor(html) {
+		function <portlet:namespace />onChangeEditor(html) {
 			var customUrl = urlTitleInput.dataset.customUrl;
 
 			if (customUrl === 'false') {

@@ -125,7 +125,7 @@ public class LocalProcessLauncher {
 
 			Thread thread = new Thread(
 				new ProcessCallableDispatcher(objectInputStream),
-				"ProcessCallable-Dispatcher");
+				"Process Callable Dispatcher");
 
 			thread.setDaemon(true);
 
@@ -295,17 +295,17 @@ public class LocalProcessLauncher {
 					ProcessContext.writeProcessCallable(
 						_pringBackProcessCallable);
 				}
-				catch (InterruptedException ie) {
+				catch (InterruptedException interruptedException) {
 					if (_detach) {
 						return;
 					}
 
-					shutdownThrowable = ie;
+					shutdownThrowable = interruptedException;
 
 					shutdownCode = ShutdownHook.INTERRUPTION_CODE;
 				}
-				catch (IOException ioe) {
-					shutdownThrowable = ioe;
+				catch (IOException ioException) {
+					shutdownThrowable = ioException;
 
 					shutdownCode = ShutdownHook.BROKEN_PIPE_CODE;
 				}
@@ -411,18 +411,18 @@ public class LocalProcessLauncher {
 					ProcessCallable<?> processCallable =
 						(ProcessCallable<?>)_objectInputStream.readObject();
 
-					executorService.submit(() -> processCallable.call());
+					executorService.submit(processCallable::call);
 				}
-				catch (Exception e) {
+				catch (Exception exception) {
 					UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
 						new UnsyncByteArrayOutputStream();
 
 					UnsyncPrintWriter unsyncPrintWriter = new UnsyncPrintWriter(
 						unsyncByteArrayOutputStream);
 
-					unsyncPrintWriter.println(e);
+					unsyncPrintWriter.println(exception);
 
-					e.printStackTrace(unsyncPrintWriter);
+					exception.printStackTrace(unsyncPrintWriter);
 
 					unsyncPrintWriter.println();
 
@@ -486,10 +486,10 @@ public class LocalProcessLauncher {
 				try {
 					_objectOutputStream.writeObject(processCallable);
 				}
-				catch (NotSerializableException nse) {
+				catch (NotSerializableException notSerializableException) {
 					_objectOutputStream.reset();
 
-					throw nse;
+					throw notSerializableException;
 				}
 				finally {
 					_objectOutputStream.flush();

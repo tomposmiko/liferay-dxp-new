@@ -19,8 +19,8 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.segments.constants.SegmentsEntryConstants;
 import com.liferay.segments.constants.SegmentsExperimentConstants;
 import com.liferay.segments.criteria.Criteria;
@@ -29,11 +29,9 @@ import com.liferay.segments.model.SegmentsEntry;
 import com.liferay.segments.model.SegmentsExperience;
 import com.liferay.segments.model.SegmentsExperiment;
 import com.liferay.segments.service.SegmentsEntryLocalServiceUtil;
-import com.liferay.segments.service.SegmentsEntryRelLocalServiceUtil;
 import com.liferay.segments.service.SegmentsExperienceLocalServiceUtil;
 import com.liferay.segments.service.SegmentsExperimentLocalServiceUtil;
 
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -65,9 +63,8 @@ public class SegmentsTestUtil {
 		SegmentsEntry segmentsEntry = addSegmentsEntry(
 			groupId, _EMPTY_CRITERIA_STRING, className);
 
-		SegmentsEntryRelLocalServiceUtil.addSegmentsEntryRel(
-			segmentsEntry.getSegmentsEntryId(),
-			PortalUtil.getClassNameId(className), classPK,
+		SegmentsEntryLocalServiceUtil.addSegmentsEntryClassPKs(
+			segmentsEntry.getSegmentsEntryId(), new long[] {classPK},
 			ServiceContextTestUtil.getServiceContext(groupId));
 
 		return segmentsEntry;
@@ -110,13 +107,13 @@ public class SegmentsTestUtil {
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		Map<Locale, String> nameMap = new HashMap<>();
+		Map<Locale, String> nameMap = HashMapBuilder.put(
+			LocaleUtil.getDefault(), name
+		).build();
 
-		nameMap.put(LocaleUtil.getDefault(), name);
-
-		Map<Locale, String> descriptionMap = new HashMap<>();
-
-		descriptionMap.put(LocaleUtil.getDefault(), description);
+		Map<Locale, String> descriptionMap = HashMapBuilder.put(
+			LocaleUtil.getDefault(), description
+		).build();
 
 		return SegmentsEntryLocalServiceUtil.addSegmentsEntry(
 			segmentsEntryKey, nameMap, descriptionMap, true, criteria, source,

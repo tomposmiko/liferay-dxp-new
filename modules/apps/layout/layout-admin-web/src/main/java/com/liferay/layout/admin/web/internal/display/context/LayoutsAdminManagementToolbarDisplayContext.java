@@ -18,6 +18,7 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.display.context.SearchCon
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
+import com.liferay.layout.admin.web.internal.configuration.LayoutConverterConfiguration;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -35,6 +36,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 import java.util.List;
 import java.util.Objects;
 
+import javax.portlet.ActionRequest;
 import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
@@ -46,26 +48,71 @@ public class LayoutsAdminManagementToolbarDisplayContext
 	extends SearchContainerManagementToolbarDisplayContext {
 
 	public LayoutsAdminManagementToolbarDisplayContext(
+			HttpServletRequest httpServletRequest,
 			LiferayPortletRequest liferayPortletRequest,
 			LiferayPortletResponse liferayPortletResponse,
-			HttpServletRequest httpServletRequest,
 			LayoutsAdminDisplayContext layoutsAdminDisplayContext)
 		throws PortalException {
 
 		super(
-			liferayPortletRequest, liferayPortletResponse, httpServletRequest,
+			httpServletRequest, liferayPortletRequest, liferayPortletResponse,
 			layoutsAdminDisplayContext.getLayoutsSearchContainer());
 
 		_layoutsAdminDisplayContext = layoutsAdminDisplayContext;
+		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
 	}
 
 	@Override
 	public List<DropdownItem> getActionDropdownItems() {
 		return new DropdownItemList() {
 			{
+				LayoutConverterConfiguration layoutConverterConfiguration =
+					_layoutsAdminDisplayContext.
+						getLayoutConverterConfiguration();
+
+				if (layoutConverterConfiguration.enabled()) {
+					add(
+						dropdownItem -> {
+							dropdownItem.putData(
+								"action", "convertSelectedPages");
+
+							PortletURL convertLayoutURL =
+								liferayPortletResponse.createActionURL();
+
+							convertLayoutURL.setParameter(
+								ActionRequest.ACTION_NAME,
+								"/layout/convert_layout");
+							convertLayoutURL.setParameter(
+								"redirect", _themeDisplay.getURLCurrent());
+
+							dropdownItem.putData(
+								"convertLayoutURL",
+								convertLayoutURL.toString());
+
+							dropdownItem.setIcon("change");
+							dropdownItem.setLabel(
+								LanguageUtil.get(
+									request, "convert-to-content-page"));
+							dropdownItem.setQuickAction(true);
+						});
+				}
+
 				add(
 					dropdownItem -> {
 						dropdownItem.putData("action", "deleteSelectedPages");
+
+						PortletURL deleteLayoutURL =
+							liferayPortletResponse.createActionURL();
+
+						deleteLayoutURL.setParameter(
+							ActionRequest.ACTION_NAME, "/layout/delete_layout");
+						deleteLayoutURL.setParameter(
+							"redirect", _themeDisplay.getURLCurrent());
+
+						dropdownItem.putData(
+							"deleteLayoutURL", deleteLayoutURL.toString());
+
 						dropdownItem.setIcon("times-circle");
 						dropdownItem.setLabel(
 							LanguageUtil.get(request, "delete"));
@@ -133,6 +180,11 @@ public class LayoutsAdminManagementToolbarDisplayContext
 	}
 
 	@Override
+	public String getDefaultEventHandler() {
+		return "LAYOUTS_MANAGEMENT_TOOLBAR_DEFAULT_EVENT_HANDLER";
+	}
+
+	@Override
 	public String getSearchActionURL() {
 		PortletURL portletURL = liferayPortletResponse.createRenderURL();
 
@@ -192,9 +244,9 @@ public class LayoutsAdminManagementToolbarDisplayContext
 		try {
 			return _layoutsAdminDisplayContext.isShowAddRootLayoutButton();
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(pe, pe);
+				_log.debug(portalException, portalException);
 			}
 		}
 
@@ -215,16 +267,12 @@ public class LayoutsAdminManagementToolbarDisplayContext
 	}
 
 	private String _getLabel(boolean privateLayout) {
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)liferayPortletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
 		Layout layout = _layoutsAdminDisplayContext.getSelLayout();
 
 		if (layout != null) {
 			return LanguageUtil.format(
 				request, "add-child-page-of-x",
-				layout.getName(themeDisplay.getLocale()));
+				layout.getName(_themeDisplay.getLocale()));
 		}
 
 		if (_isSiteTemplate()) {
@@ -259,5 +307,6 @@ public class LayoutsAdminManagementToolbarDisplayContext
 		LayoutsAdminManagementToolbarDisplayContext.class);
 
 	private final LayoutsAdminDisplayContext _layoutsAdminDisplayContext;
+	private final ThemeDisplay _themeDisplay;
 
 }

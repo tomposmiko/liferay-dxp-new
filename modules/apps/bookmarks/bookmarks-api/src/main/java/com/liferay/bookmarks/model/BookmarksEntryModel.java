@@ -43,7 +43,7 @@ public interface BookmarksEntryModel
 	extends BaseModel<BookmarksEntry>, MVCCModel, ShardedModel,
 			StagedGroupedModel, TrashedModel, WorkflowedModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a bookmarks entry model instance should use the {@link BookmarksEntry} interface instead.
@@ -296,20 +296,6 @@ public interface BookmarksEntryModel
 	 * @param description the description of this bookmarks entry
 	 */
 	public void setDescription(String description);
-
-	/**
-	 * Returns the visits of this bookmarks entry.
-	 *
-	 * @return the visits of this bookmarks entry
-	 */
-	public int getVisits();
-
-	/**
-	 * Sets the visits of this bookmarks entry.
-	 *
-	 * @param visits the visits of this bookmarks entry
-	 */
-	public void setVisits(int visits);
 
 	/**
 	 * Returns the priority of this bookmarks entry.

@@ -17,6 +17,7 @@ package com.liferay.portal.search.elasticsearch7.internal.search.engine.adapter;
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchClientResolver;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchFixture;
@@ -31,15 +32,19 @@ import com.liferay.portal.search.engine.adapter.cluster.StateClusterResponse;
 import com.liferay.portal.search.engine.adapter.cluster.StatsClusterRequest;
 import com.liferay.portal.search.engine.adapter.cluster.StatsClusterResponse;
 
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequestBuilder;
-import org.elasticsearch.client.AdminClient;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.client.IndicesAdminClient;
+import java.io.IOException;
+
+import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.elasticsearch.client.IndicesClient;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -47,22 +52,37 @@ import org.junit.Test;
  */
 public class ElasticsearchSearchEngineAdapterClusterRequestTest {
 
-	@Before
-	public void setUp() throws Exception {
-		_elasticsearchFixture = new ElasticsearchFixture(getClass());
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		_elasticsearchFixture = new ElasticsearchFixture(
+			ElasticsearchSearchEngineAdapterClusterRequestTest.class.
+				getSimpleName());
 
 		_elasticsearchFixture.setUp();
+	}
+
+	@AfterClass
+	public static void tearDownClass() throws Exception {
+		_elasticsearchFixture.tearDown();
+	}
+
+	@Before
+	public void setUp() throws Exception {
+		setUpJSONFactoryUtil();
 
 		_searchEngineAdapter = createSearchEngineAdapter(_elasticsearchFixture);
 
-		createIndex();
+		RestHighLevelClient restHighLevelClient =
+			_elasticsearchFixture.getRestHighLevelClient();
+
+		_indicesClient = restHighLevelClient.indices();
+
+		_createIndex();
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		deleteIndex();
-
-		_elasticsearchFixture.tearDown();
+		_deleteIndex();
 	}
 
 	@Test
@@ -117,8 +137,7 @@ public class ElasticsearchSearchEngineAdapterClusterRequestTest {
 
 	@Test
 	public void testExecuteStatsClusterRequest() throws JSONException {
-		StatsClusterRequest statsClusterRequest = new StatsClusterRequest(
-			new String[] {_INDEX_NAME});
+		StatsClusterRequest statsClusterRequest = new StatsClusterRequest(null);
 
 		StatsClusterResponse statsClusterResponse =
 			_searchEngineAdapter.execute(statsClusterRequest);
@@ -130,11 +149,39 @@ public class ElasticsearchSearchEngineAdapterClusterRequestTest {
 			clusterHealthStatus.equals(ClusterHealthStatus.GREEN) ||
 			clusterHealthStatus.equals(ClusterHealthStatus.YELLOW));
 
-		String statusMessage = statsClusterResponse.getStatsMessage();
+		String statsMessage = statsClusterResponse.getStatsMessage();
 
 		JSONFactory jsonFactory = new JSONFactoryImpl();
 
-		JSONObject jsonObject = jsonFactory.createJSONObject(statusMessage);
+		JSONObject jsonObject = jsonFactory.createJSONObject(statsMessage);
+
+		JSONObject indicesJSONObject = jsonObject.getJSONObject("indices");
+
+		Assert.assertEquals("1", indicesJSONObject.getString("count"));
+	}
+
+	@Test
+	public void testExecuteStatsClusterRequestWithNodeId()
+		throws JSONException {
+
+		StatsClusterRequest statsClusterRequest = new StatsClusterRequest(
+			new String[] {"liferay"});
+
+		StatsClusterResponse statsClusterResponse =
+			_searchEngineAdapter.execute(statsClusterRequest);
+
+		ClusterHealthStatus clusterHealthStatus =
+			statsClusterResponse.getClusterHealthStatus();
+
+		Assert.assertTrue(
+			clusterHealthStatus.equals(ClusterHealthStatus.GREEN) ||
+			clusterHealthStatus.equals(ClusterHealthStatus.YELLOW));
+
+		String statsMessage = statsClusterResponse.getStatsMessage();
+
+		JSONFactory jsonFactory = new JSONFactoryImpl();
+
+		JSONObject jsonObject = jsonFactory.createJSONObject(statsMessage);
 
 		JSONObject indicesJSONObject = jsonObject.getJSONObject("indices");
 
@@ -167,37 +214,44 @@ public class ElasticsearchSearchEngineAdapterClusterRequestTest {
 		};
 	}
 
-	protected void createIndex() {
-		Client client = _elasticsearchFixture.getClient();
+	protected void setUpJSONFactoryUtil() {
+		JSONFactoryUtil jsonFactoryUtil = new JSONFactoryUtil();
 
-		AdminClient adminClient = client.admin();
-
-		IndicesAdminClient indicesAdminClient = adminClient.indices();
-
-		CreateIndexRequestBuilder createIndexRequestBuilder =
-			indicesAdminClient.prepareCreate(_INDEX_NAME);
-
-		createIndexRequestBuilder.get();
+		jsonFactoryUtil.setJSONFactory(_jsonFactory);
 	}
 
-	protected void deleteIndex() {
-		Client client = _elasticsearchFixture.getClient();
+	private void _createIndex() {
+		CreateIndexRequest createIndexRequest = new CreateIndexRequest(
+			_INDEX_NAME);
 
-		AdminClient adminClient = client.admin();
+		try {
+			_indicesClient.create(createIndexRequest, RequestOptions.DEFAULT);
+		}
+		catch (IOException ioException) {
+			throw new RuntimeException(ioException);
+		}
+	}
 
-		IndicesAdminClient indicesAdminClient = adminClient.indices();
+	private void _deleteIndex() {
+		DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(
+			_INDEX_NAME);
 
-		DeleteIndexRequestBuilder deleteIndexRequestBuilder =
-			indicesAdminClient.prepareDelete(_INDEX_NAME);
-
-		deleteIndexRequestBuilder.get();
+		try {
+			_indicesClient.delete(deleteIndexRequest, RequestOptions.DEFAULT);
+		}
+		catch (IOException ioException) {
+			throw new RuntimeException(ioException);
+		}
 	}
 
 	private static final String _ELASTICSEARCH_DEFAULT_NUMBER_OF_SHARDS = "1";
 
 	private static final String _INDEX_NAME = "test_request_index";
 
-	private ElasticsearchFixture _elasticsearchFixture;
+	private static ElasticsearchFixture _elasticsearchFixture;
+
+	private IndicesClient _indicesClient;
+	private final JSONFactory _jsonFactory = new JSONFactoryImpl();
 	private SearchEngineAdapter _searchEngineAdapter;
 
 }

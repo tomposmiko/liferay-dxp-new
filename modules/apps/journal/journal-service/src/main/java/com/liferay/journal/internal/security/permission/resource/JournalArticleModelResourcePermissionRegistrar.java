@@ -58,7 +58,7 @@ import org.osgi.service.component.annotations.Reference;
 public class JournalArticleModelResourcePermissionRegistrar {
 
 	@Activate
-	public void activate(BundleContext bundleContext) {
+	protected void activate(BundleContext bundleContext) {
 		Dictionary<String, Object> properties = new HashMapDictionary<>();
 
 		properties.put("model.class.name", JournalArticle.class.getName());
@@ -115,7 +115,7 @@ public class JournalArticleModelResourcePermissionRegistrar {
 	}
 
 	@Deactivate
-	public void deactivate() {
+	protected void deactivate() {
 		_serviceRegistration.unregister();
 	}
 
@@ -196,11 +196,11 @@ public class JournalArticleModelResourcePermissionRegistrar {
 					return true;
 				}
 			}
-			catch (ConfigurationException ce) {
+			catch (ConfigurationException configurationException) {
 				_log.error(
 					"Unable to get journal service configuration for company " +
 						permissionChecker.getCompanyId(),
-					ce);
+					configurationException);
 
 				return false;
 			}

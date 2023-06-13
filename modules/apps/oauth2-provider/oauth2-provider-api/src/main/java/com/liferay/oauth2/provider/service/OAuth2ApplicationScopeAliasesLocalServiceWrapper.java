@@ -35,11 +35,22 @@ public class OAuth2ApplicationScopeAliasesLocalServiceWrapper
 			oAuth2ApplicationScopeAliasesLocalService;
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link OAuth2ApplicationScopeAliasesLocalServiceUtil} to access the o auth2 application scope aliases local service. Add custom service methods to <code>com.liferay.oauth2.provider.service.impl.OAuth2ApplicationScopeAliasesLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
-	 */
+	@Override
+	public com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases
+			addOAuth2ApplicationScopeAliases(
+				long companyId, long userId, String userName,
+				long oAuth2ApplicationId,
+				java.util.function.Consumer
+					<com.liferay.oauth2.provider.util.builder.
+						OAuth2ScopeBuilder> builderConsumer)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _oAuth2ApplicationScopeAliasesLocalService.
+			addOAuth2ApplicationScopeAliases(
+				companyId, userId, userName, oAuth2ApplicationId,
+				builderConsumer);
+	}
+
 	@Override
 	public com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases
 			addOAuth2ApplicationScopeAliases(

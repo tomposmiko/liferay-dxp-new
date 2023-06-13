@@ -31,7 +31,7 @@ import com.liferay.counter.kernel.model.Counter;
 public abstract class CounterBaseImpl
 	extends CounterModelImpl implements Counter {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a counter model instance should use the <code>Counter</code> interface instead.

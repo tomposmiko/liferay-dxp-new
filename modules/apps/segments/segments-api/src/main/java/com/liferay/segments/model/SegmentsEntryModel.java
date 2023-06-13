@@ -44,7 +44,7 @@ public interface SegmentsEntryModel
 	extends BaseModel<SegmentsEntry>, LocalizedModel, MVCCModel, ShardedModel,
 			StagedGroupedModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a segments entry model instance should use the {@link SegmentsEntry} interface instead.

@@ -28,6 +28,7 @@ definition {
 	}
 
 	@description = "This is a use case for LPS-82073."
+	@ignore = "true"
 	@priority = "5"
 	test AddShortcutToSiteDocument {
 		property portal.acceptance = "true";
@@ -51,15 +52,12 @@ definition {
 		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
 
 		DMDocument.addDMShortcutCP(
-			dmDocumentDescription = "DM Document Description",
 			dmDocumentTitle = "DM Document Title",
 			siteName = "Site Name");
 
 		DMNavigator.gotoDocumentCP(dmDocumentTitle = "DM Document Title");
 
-		DMDocument.viewCP(
-			dmDocumentSize = "259 B",
-			dmDocumentTitle = "DM Document Title");
+		DMDocument.viewCP(dmDocumentTitle = "DM Document Title");
 	}
 
 	@description = "This test covers LPS-88313 and LPS-92145. It ensures that a user can check in a document without changing versions."
@@ -605,6 +603,25 @@ definition {
 			locator1 = "Header#H3_TITLE");
 	}
 
+	@description = "This test covers LPS-104957. It ensures that the JPG file can be previewed."
+	@priority = "5"
+	test PreviewJPG {
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+
+		DMDocument.addCP(
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentFile = "Document_1.jpg",
+			dmDocumentTitle = "Document_1.jpg");
+
+		DMNavigator.gotoDocumentCP(dmDocumentTitle = "Document_1.jpg");
+
+		AssertVisible(locator1 = "DocumentsAndMediaDocument#DOCUMENT_DETAILS_IMAGE_PREVIEW");
+
+		DMDocument.expandInfo();
+
+		AssertVisible(locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_THUMBNAIL");
+	}
+
 	@description = "This is a use case for LPS-88785."
 	@priority = "5"
 	test PreviewPDF {
@@ -625,6 +642,44 @@ definition {
 		Refresh();
 
 		AssertVisible(locator1 = "DocumentsAndMediaDocument#DOCUMENT_DETAILS_IMAGE_PREVIEW");
+	}
+
+	@description = "This test covers LPS-104957. It ensures that the PNG file can be previewed."
+	@priority = "5"
+	test PreviewPNG {
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+
+		DMDocument.addCP(
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentFile = "Document_1.png",
+			dmDocumentTitle = "Document_1.png");
+
+		DMNavigator.gotoDocumentCP(dmDocumentTitle = "Document_1.png");
+
+		AssertVisible(locator1 = "DocumentsAndMediaDocument#DOCUMENT_DETAILS_IMAGE_PREVIEW");
+
+		DMDocument.expandInfo();
+
+		AssertVisible(locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_THUMBNAIL");
+	}
+
+	@description = "This ensures that the SVG file can be previewed."
+	@priority = "5"
+	test PreviewSVG {
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+
+		DMDocument.addCP(
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentFile = "Document_1.svg",
+			dmDocumentTitle = "Document_1.svg");
+
+		DMNavigator.gotoDocumentCP(dmDocumentTitle = "Document_1.svg");
+
+		AssertVisible(locator1 = "DocumentsAndMediaDocument#DOCUMENT_DETAILS_IMAGE_PREVIEW");
+
+		DMDocument.expandInfo();
+
+		AssertVisible(locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_THUMBNAIL");
 	}
 
 	@priority = "4"

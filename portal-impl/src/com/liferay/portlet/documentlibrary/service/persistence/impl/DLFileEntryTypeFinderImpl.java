@@ -54,13 +54,6 @@ public class DLFileEntryTypeFinderImpl
 	public static final String FIND_BY_C_F_G_N_D_S =
 		DLFileEntryTypeFinder.class.getName() + ".findByC_F_G_N_D_S";
 
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String JOIN_BY_FILE_ENTRY_TYPE =
-		DLFileEntryTypeFinder.class.getName() + ".joinByFileEntryType";
-
 	@Override
 	public int countByKeywords(
 		long companyId, long[] groupIds, String keywords,
@@ -264,8 +257,8 @@ public class DLFileEntryTypeFinderImpl
 
 			return countValue;
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -353,8 +346,8 @@ public class DLFileEntryTypeFinderImpl
 
 			return countValue;
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -419,8 +412,8 @@ public class DLFileEntryTypeFinderImpl
 			return (List<DLFileEntryType>)QueryUtil.list(
 				q, getDialect(), start, end);
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -497,8 +490,8 @@ public class DLFileEntryTypeFinderImpl
 			return (List<DLFileEntryType>)QueryUtil.list(
 				q, getDialect(), start, end);
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);

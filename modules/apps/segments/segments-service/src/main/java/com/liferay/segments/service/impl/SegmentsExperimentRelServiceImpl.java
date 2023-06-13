@@ -16,6 +16,7 @@ package com.liferay.segments.service.impl;
 
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -35,9 +36,9 @@ import org.osgi.service.component.annotations.Reference;
  * All custom service methods should be put in this class. Whenever methods are
  * added, rerun ServiceBuilder to copy their definitions into the
  * <code>com.liferay.segments.service.SegmentsExperimentRelService</code>
- * interface.  <p> This is a remote service. Methods of this service are
- * expected to have security checks based on the propagated JAAS credentials
- * because this service can be accessed remotely.
+ * interface. <p> This is a remote service. Methods of this service are expected
+ * to have security checks based on the propagated JAAS credentials because this
+ * service can be accessed remotely.
  * </p>
  *
  * @author Eduardo García
@@ -103,8 +104,17 @@ public class SegmentsExperimentRelServiceImpl
 			long segmentsExperimentId)
 		throws PortalException {
 
-		_segmentsExperimentResourcePermission.check(
-			getPermissionChecker(), segmentsExperimentId, ActionKeys.VIEW);
+		SegmentsExperiment segmentsExperiment =
+			segmentsExperimentPersistence.findByPrimaryKey(
+				segmentsExperimentId);
+
+		if (!userLocalService.hasRoleUser(
+				segmentsExperiment.getCompanyId(),
+				RoleConstants.ANALYTICS_ADMINISTRATOR, getUserId(), true)) {
+
+			_segmentsExperimentResourcePermission.check(
+				getPermissionChecker(), segmentsExperimentId, ActionKeys.VIEW);
+		}
 
 		return segmentsExperimentRelLocalService.getSegmentsExperimentRels(
 			segmentsExperimentId);

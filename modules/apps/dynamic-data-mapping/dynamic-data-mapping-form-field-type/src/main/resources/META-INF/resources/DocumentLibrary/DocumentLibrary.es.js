@@ -16,7 +16,11 @@ import '../FieldBase/FieldBase.es';
 
 import './DocumentLibraryRegister.soy.js';
 
-import {createActionURL, createPortletURL} from 'frontend-js-web';
+import {
+	createActionURL,
+	createPortletURL,
+	ItemSelectorDialog
+} from 'frontend-js-web';
 import Component from 'metal-component';
 import Soy from 'metal-soy';
 import {Config} from 'metal-state';
@@ -24,26 +28,21 @@ import {Config} from 'metal-state';
 import templates from './DocumentLibrary.soy.js';
 
 class DocumentLibrary extends Component {
-	created() {
-		AUI().use('liferay-item-selector-dialog', A => {
-			this.A = A;
-		});
-	}
-
 	prepareStateForRender(state) {
-		let {fileEntryTitle, fileEntryURL, value} = state;
+		let {fileEntryTitle = '', fileEntryURL = ''} = state;
+		const {value} = state;
 
 		if (value) {
-			if (typeof value === 'object') {
-				fileEntryTitle = value.title;
-				fileEntryURL = value.url;
+			try {
+				const fileEntry = JSON.parse(value);
 
-				value = JSON.stringify(value);
-			} else if (typeof value === 'string') {
-				const object = JSON.parse(value);
+				fileEntryTitle = fileEntry.title;
 
-				fileEntryTitle = object.title;
-				fileEntryURL = object.url;
+				if (fileEntry.url) {
+					fileEntryURL = fileEntry.url;
+				}
+			} catch (e) {
+				console.warn('Unable to parse JSON', value);
 			}
 		}
 
@@ -56,7 +55,8 @@ class DocumentLibrary extends Component {
 	}
 
 	getDocumentLibrarySelectorURL() {
-		const {itemSelectorAuthToken, portletNamespace} = this;
+		const {itemSelectorAuthToken} = this.initialConfig_;
+		const {portletNamespace} = this;
 
 		const criterionJSON = {
 			desiredItemSelectorReturnTypes:
@@ -109,13 +109,21 @@ class DocumentLibrary extends Component {
 	}
 
 	_handleClearButtonClicked() {
-		this.setState({
-			value: ''
-		});
+		this.setState(
+			{
+				value: '{}'
+			},
+			() => {
+				this.emit('fieldEdited', {
+					fieldInstance: this,
+					value: '{}'
+				});
+			}
+		);
 	}
 
 	_handleFieldChanged(event) {
-		var selectedItem = event.newVal;
+		var selectedItem = event.selectedItem;
 
 		if (selectedItem) {
 			const {value} = selectedItem;
@@ -136,22 +144,28 @@ class DocumentLibrary extends Component {
 	}
 
 	_handleSelectButtonClicked() {
-		var {A, portletNamespace} = this;
+		var {portletNamespace} = this;
 
-		var itemSelectorDialog = new A.LiferayItemSelectorDialog({
+		const itemSelectorDialog = new ItemSelectorDialog({
 			eventName: `${portletNamespace}selectDocumentLibrary`,
-			on: {
-				selectedItemChange: this._handleFieldChanged.bind(this),
-				visibleChange: this._handleVisibleChange.bind(this)
-			},
+			singleSelect: true,
 			url: this.getDocumentLibrarySelectorURL()
 		});
+
+		itemSelectorDialog.on(
+			'selectedItemChange',
+			this._handleFieldChanged.bind(this)
+		);
+		itemSelectorDialog.on(
+			'visibleChange',
+			this._handleVisibleChange.bind(this)
+		);
 
 		itemSelectorDialog.open();
 	}
 
 	_handleVisibleChange(event) {
-		if (event.newVal) {
+		if (event.selectedItem) {
 			this.emit('fieldFocused', {
 				fieldInstance: this,
 				originalEvent: event

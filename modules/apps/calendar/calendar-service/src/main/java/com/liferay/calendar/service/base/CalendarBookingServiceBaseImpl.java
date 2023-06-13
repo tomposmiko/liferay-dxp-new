@@ -52,7 +52,7 @@ public abstract class CalendarBookingServiceBaseImpl
 	extends BaseServiceImpl
 	implements AopService, CalendarBookingService, IdentifiableOSGiService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>CalendarBookingService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.calendar.service.CalendarBookingServiceUtil</code>.
@@ -106,8 +106,8 @@ public abstract class CalendarBookingServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

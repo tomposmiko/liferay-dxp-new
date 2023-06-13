@@ -68,8 +68,8 @@ public class Phone {
 		}
 	}
 
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@GraphQLField(description = "The phone number's extension.")
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String extension;
 
 	@Schema(description = "The phone number's ID.")
@@ -94,8 +94,8 @@ public class Phone {
 		}
 	}
 
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@GraphQLField(description = "The phone number's ID.")
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Long id;
 
 	@Schema(description = "The phone number without its extension.")
@@ -122,8 +122,8 @@ public class Phone {
 		}
 	}
 
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@GraphQLField(description = "The phone number without its extension.")
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String phoneNumber;
 
 	@Schema(description = "The phone number's type.")
@@ -150,8 +150,8 @@ public class Phone {
 		}
 	}
 
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@GraphQLField(description = "The phone number's type.")
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String phoneType;
 
 	@Schema(
@@ -180,8 +180,10 @@ public class Phone {
 		}
 	}
 
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@GraphQLField(
+		description = "A flag that identifies whether this is the main phone number of the user/organization."
+	)
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Boolean primary;
 
 	@Override

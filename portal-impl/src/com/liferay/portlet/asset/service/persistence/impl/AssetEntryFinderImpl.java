@@ -25,9 +25,9 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.SQLQuery;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dao.orm.Type;
-import com.liferay.portal.kernel.dao.orm.WildcardMode;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CalendarUtil;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -36,8 +36,6 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.asset.model.impl.AssetEntryImpl;
-import com.liferay.portlet.documentlibrary.service.persistence.impl.DLFileEntryFinderImpl;
-import com.liferay.portlet.documentlibrary.service.persistence.impl.DLFolderFinderImpl;
 import com.liferay.util.dao.orm.CustomSQLUtil;
 
 import java.sql.Timestamp;
@@ -61,9 +59,6 @@ public class AssetEntryFinderImpl
 
 	public static final String FIND_BY_AND_TAG_IDS =
 		AssetEntryFinder.class.getName() + ".findByAndTagIds";
-
-	public static final String FIND_BY_CLASS_NAME_ID =
-		AssetEntryFinder.class.getName() + ".findByClassNameId";
 
 	public static final String FIND_PRIORITY_BY_C_C =
 		AssetEntryFinder.class.getName() + ".findPriorityByC_C";
@@ -89,91 +84,8 @@ public class AssetEntryFinderImpl
 
 			return 0;
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
-		}
-		finally {
-			closeSession(session);
-		}
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public List<AssetEntry> findByDLFileEntryC_T(
-		long classNameId, String treePath) {
-
-		Session session = null;
-
-		try {
-			session = openSession();
-
-			String sql = CustomSQLUtil.get(FIND_BY_CLASS_NAME_ID);
-
-			sql = StringUtil.replace(
-				sql, "[$JOIN$]",
-				CustomSQLUtil.get(
-					DLFileEntryFinderImpl.JOIN_AE_BY_DL_FILE_ENTRY));
-			sql = StringUtil.replace(
-				sql, "[$WHERE$]", "DLFileEntry.treePath LIKE ? AND");
-
-			SQLQuery q = session.createSynchronizedSQLQuery(sql);
-
-			QueryPos qPos = QueryPos.getInstance(q);
-
-			qPos.add(
-				CustomSQLUtil.keywords(treePath, WildcardMode.TRAILING)[0]);
-			qPos.add(classNameId);
-
-			q.addEntity(AssetEntryImpl.TABLE_NAME, AssetEntryImpl.class);
-
-			return q.list(true);
-		}
-		catch (Exception e) {
-			throw new SystemException(e);
-		}
-		finally {
-			closeSession(session);
-		}
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public List<AssetEntry> findByDLFolderC_T(
-		long classNameId, String treePath) {
-
-		Session session = null;
-
-		try {
-			session = openSession();
-
-			String sql = CustomSQLUtil.get(FIND_BY_CLASS_NAME_ID);
-
-			sql = StringUtil.replace(
-				sql, "[$JOIN$]",
-				CustomSQLUtil.get(DLFolderFinderImpl.JOIN_AE_BY_DL_FOLDER));
-			sql = StringUtil.replace(
-				sql, "[$WHERE$]", "DLFolder.treePath LIKE ? AND");
-
-			SQLQuery q = session.createSynchronizedSQLQuery(sql);
-
-			QueryPos qPos = QueryPos.getInstance(q);
-
-			qPos.add(
-				CustomSQLUtil.keywords(treePath, WildcardMode.TRAILING)[0]);
-			qPos.add(classNameId);
-
-			q.addEntity(AssetEntryImpl.TABLE_NAME, AssetEntryImpl.class);
-
-			return q.list(true);
-		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -192,8 +104,8 @@ public class AssetEntryFinderImpl
 			return (List<AssetEntry>)QueryUtil.list(
 				q, getDialect(), entryQuery.getStart(), entryQuery.getEnd());
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -230,8 +142,8 @@ public class AssetEntryFinderImpl
 
 			return 0;
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -347,7 +259,7 @@ public class AssetEntryFinderImpl
 	protected SQLQuery buildAssetQuerySQL(
 		AssetEntryQuery entryQuery, boolean count, Session session) {
 
-		StringBundler sb = new StringBundler(59);
+		StringBundler sb = new StringBundler(67);
 
 		if (count) {
 			sb.append("SELECT COUNT(DISTINCT AssetEntry.entryId) AS ");
@@ -357,6 +269,7 @@ public class AssetEntryFinderImpl
 			sb.append("SELECT {AssetEntry.*} ");
 
 			boolean selectRatings = false;
+			boolean selectViewCount = false;
 
 			String orderByCol1 = entryQuery.getOrderByCol1();
 			String orderByCol2 = entryQuery.getOrderByCol2();
@@ -369,10 +282,22 @@ public class AssetEntryFinderImpl
 				sb.append(", TEMP_TABLE_ASSET_ENTRY.averageScore ");
 			}
 
+			if (orderByCol1.equals("viewCount") ||
+				orderByCol2.equals("viewCount")) {
+
+				selectViewCount = true;
+
+				sb.append(", TEMP_TABLE_ASSET_ENTRY.viewCount ");
+			}
+
 			sb.append("FROM (SELECT DISTINCT AssetEntry.entryId ");
 
 			if (selectRatings) {
 				sb.append(", RatingsStats.averageScore ");
+			}
+
+			if (selectViewCount) {
+				sb.append(", ViewCountEntry.viewCount ");
 			}
 		}
 
@@ -395,6 +320,16 @@ public class AssetEntryFinderImpl
 			sb.append("(TEMP_TABLE_ASSET_LINK.entryId = AssetEntry.entryId) ");
 		}
 
+		if (entryQuery.isExcludeZeroViewCount()) {
+			sb.append("INNER JOIN ViewCountEntry ON (");
+			sb.append("ViewCountEntry.companyId = AssetEntry.companyId) AND ");
+			sb.append("(ViewCountEntry.classNameId = ");
+			sb.append(
+				ClassNameLocalServiceUtil.getClassNameId(AssetEntry.class));
+			sb.append(") AND (ViewCountEntry.classPK = AssetEntry.entryId) ");
+			sb.append("AND (ViewCountEntry.viewCount > 0) ");
+		}
+
 		String orderByCol1 = AssetEntryQuery.ORDER_BY_COLUMNS[2];
 		String orderByCol2 = AssetEntryQuery.ORDER_BY_COLUMNS[2];
 
@@ -414,6 +349,17 @@ public class AssetEntryFinderImpl
 			sb.append("AssetEntry.classPK)");
 		}
 
+		if (orderByCol1.equals("viewCount") ||
+			orderByCol2.equals("viewCount")) {
+
+			sb.append(" LEFT JOIN ViewCountEntry ON ");
+			sb.append("(ViewCountEntry.companyId = AssetEntry.companyId) AND ");
+			sb.append("(ViewCountEntry.classNameId = ");
+			sb.append(
+				ClassNameLocalServiceUtil.getClassNameId(AssetEntry.class));
+			sb.append(") AND (ViewCountEntry.classPK = AssetEntry.entryId) ");
+		}
+
 		sb.append("WHERE ");
 
 		int whereIndex = sb.index();
@@ -428,10 +374,6 @@ public class AssetEntryFinderImpl
 
 		if (entryQuery.isVisible() != null) {
 			sb.append(" AND (visible = ?)");
-		}
-
-		if (entryQuery.isExcludeZeroViewCount()) {
-			sb.append(" AND (AssetEntry.viewCount > 0)");
 		}
 
 		// Keywords
@@ -545,6 +487,11 @@ public class AssetEntryFinderImpl
 				sb.append("IS NULL THEN 0 ");
 				sb.append("ELSE TEMP_TABLE_ASSET_ENTRY.averageScore END");
 			}
+			else if (orderByCol1.equals("viewCount")) {
+				sb.append("CASE WHEN TEMP_TABLE_ASSET_ENTRY.viewCount ");
+				sb.append("IS NULL THEN 0 ");
+				sb.append("ELSE TEMP_TABLE_ASSET_ENTRY.viewCount END");
+			}
 			else {
 				sb.append("AssetEntry.");
 				sb.append(orderByCol1);
@@ -561,6 +508,12 @@ public class AssetEntryFinderImpl
 					sb.append("TEMP_TABLE_ASSET_ENTRY.averageScore IS NULL ");
 					sb.append("THEN 0 ELSE ");
 					sb.append("TEMP_TABLE_ASSET_ENTRY.averageScore END");
+				}
+				else if (orderByCol2.equals("viewCount")) {
+					sb.append(", CASE WHEN ");
+					sb.append("TEMP_TABLE_ASSET_ENTRY.viewCount IS NULL ");
+					sb.append("THEN 0 ELSE ");
+					sb.append("TEMP_TABLE_ASSET_ENTRY.viewCount END");
 				}
 				else {
 					sb.append(", AssetEntry.");

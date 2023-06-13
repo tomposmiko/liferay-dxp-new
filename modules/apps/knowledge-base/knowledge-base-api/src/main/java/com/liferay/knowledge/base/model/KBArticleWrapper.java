@@ -65,7 +65,6 @@ public class KBArticleWrapper
 		attributes.put("description", getDescription());
 		attributes.put("priority", getPriority());
 		attributes.put("sections", getSections());
-		attributes.put("viewCount", getViewCount());
 		attributes.put("latest", isLatest());
 		attributes.put("main", isMain());
 		attributes.put("sourceURL", getSourceURL());
@@ -206,12 +205,6 @@ public class KBArticleWrapper
 
 		if (sections != null) {
 			setSections(sections);
-		}
-
-		Integer viewCount = (Integer)attributes.get("viewCount");
-
-		if (viewCount != null) {
-			setViewCount(viewCount);
 		}
 
 		Boolean latest = (Boolean)attributes.get("latest");
@@ -629,13 +622,8 @@ public class KBArticleWrapper
 		return model.getVersion();
 	}
 
-	/**
-	 * Returns the view count of this kb article.
-	 *
-	 * @return the view count of this kb article
-	 */
 	@Override
-	public int getViewCount() {
+	public long getViewCount() {
 		return model.getViewCount();
 	}
 
@@ -754,11 +742,6 @@ public class KBArticleWrapper
 		return model.isScheduled();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a kb article model instance should use the <code>KBArticle</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();
@@ -1082,16 +1065,6 @@ public class KBArticleWrapper
 	@Override
 	public void setVersion(int version) {
 		model.setVersion(version);
-	}
-
-	/**
-	 * Sets the view count of this kb article.
-	 *
-	 * @param viewCount the view count of this kb article
-	 */
-	@Override
-	public void setViewCount(int viewCount) {
-		model.setViewCount(viewCount);
 	}
 
 	@Override

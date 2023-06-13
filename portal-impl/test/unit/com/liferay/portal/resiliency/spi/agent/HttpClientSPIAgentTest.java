@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.rule.NewEnv;
 import com.liferay.portal.kernel.test.util.PropsTestUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.InetAddressUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -66,7 +67,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -329,9 +329,10 @@ public class HttpClientSPIAgentTest {
 
 			Assert.fail();
 		}
-		catch (IOException ioe) {
+		catch (IOException ioException) {
 			Assert.assertEquals(
-				"Error status line: " + wrongStatusLine, ioe.getMessage());
+				"Error status line: " + wrongStatusLine,
+				ioException.getMessage());
 		}
 
 		// Wrong ending
@@ -521,8 +522,8 @@ public class HttpClientSPIAgentTest {
 
 			Assert.fail();
 		}
-		catch (PortalResiliencyException pre) {
-			Throwable throwable = pre.getCause();
+		catch (PortalResiliencyException portalResiliencyException) {
+			Throwable throwable = portalResiliencyException.getCause();
 
 			Assert.assertSame(RuntimeException.class, throwable.getClass());
 		}
@@ -531,14 +532,13 @@ public class HttpClientSPIAgentTest {
 	@NewEnv(type = NewEnv.Type.CLASSLOADER)
 	@Test
 	public void testPrepareRequest() throws Exception {
-		Map<String, Object> properties = new HashMap<>();
-
-		properties.put(
+		Map<String, Object> properties = HashMapBuilder.<String, Object>put(
 			PropsKeys.INTRABAND_MAILBOX_REAPER_THREAD_ENABLED,
-			Boolean.FALSE.toString());
-		properties.put(
+			Boolean.FALSE.toString()
+		).put(
 			PropsKeys.INTRABAND_MAILBOX_STORAGE_LIFE,
-			String.valueOf(Long.MAX_VALUE));
+			String.valueOf(Long.MAX_VALUE)
+		).build();
 
 		PropsTestUtil.setProps(properties);
 
@@ -768,8 +768,8 @@ public class HttpClientSPIAgentTest {
 
 			Assert.fail();
 		}
-		catch (PortalResiliencyException pre) {
-			Throwable throwable = pre.getCause();
+		catch (PortalResiliencyException portalResiliencyException) {
+			Throwable throwable = portalResiliencyException.getCause();
 
 			Assert.assertSame(ConnectException.class, throwable.getClass());
 		}
@@ -813,8 +813,8 @@ public class HttpClientSPIAgentTest {
 
 			Assert.fail();
 		}
-		catch (PortalResiliencyException pre) {
-			Throwable throwable = pre.getCause();
+		catch (PortalResiliencyException portalResiliencyException) {
+			Throwable throwable = portalResiliencyException.getCause();
 
 			Assert.assertSame(IOException.class, throwable.getClass());
 
@@ -855,8 +855,8 @@ public class HttpClientSPIAgentTest {
 
 				Assert.fail();
 			}
-			catch (PortalResiliencyException pre) {
-				Throwable throwable = pre.getCause();
+			catch (PortalResiliencyException portalResiliencyException) {
+				Throwable throwable = portalResiliencyException.getCause();
 
 				Assert.assertSame(IOException.class, throwable.getClass());
 			}
@@ -890,8 +890,8 @@ public class HttpClientSPIAgentTest {
 
 				Assert.fail();
 			}
-			catch (PortalResiliencyException pre) {
-				Throwable throwable = pre.getCause();
+			catch (PortalResiliencyException portalResiliencyException) {
+				Throwable throwable = portalResiliencyException.getCause();
 
 				Assert.assertSame(IOException.class, throwable.getClass());
 			}
@@ -932,8 +932,8 @@ public class HttpClientSPIAgentTest {
 					return Datagram.createResponseDatagram(
 						datagram, ByteBuffer.wrap(receiptData));
 				}
-				catch (Exception e) {
-					throw new RuntimeException(e);
+				catch (Exception exception) {
+					throw new RuntimeException(exception);
 				}
 			}
 

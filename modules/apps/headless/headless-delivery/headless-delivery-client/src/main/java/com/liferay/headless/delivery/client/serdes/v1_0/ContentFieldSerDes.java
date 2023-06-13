@@ -98,6 +98,16 @@ public class ContentFieldSerDes {
 			sb.append("\"");
 		}
 
+		if (contentField.getLabel_i18n() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"label_i18n\": ");
+
+			sb.append(_toJSON(contentField.getLabel_i18n()));
+		}
+
 		if (contentField.getName() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -155,6 +165,16 @@ public class ContentFieldSerDes {
 			sb.append(String.valueOf(contentField.getValue()));
 		}
 
+		if (contentField.getValue_i18n() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"value_i18n\": ");
+
+			sb.append(_toJSON(contentField.getValue_i18n()));
+		}
+
 		sb.append("}");
 
 		return sb.toString();
@@ -196,6 +216,13 @@ public class ContentFieldSerDes {
 			map.put("label", String.valueOf(contentField.getLabel()));
 		}
 
+		if (contentField.getLabel_i18n() == null) {
+			map.put("label_i18n", null);
+		}
+		else {
+			map.put("label_i18n", String.valueOf(contentField.getLabel_i18n()));
+		}
+
 		if (contentField.getName() == null) {
 			map.put("name", null);
 		}
@@ -224,6 +251,13 @@ public class ContentFieldSerDes {
 		}
 		else {
 			map.put("value", String.valueOf(contentField.getValue()));
+		}
+
+		if (contentField.getValue_i18n() == null) {
+			map.put("value_i18n", null);
+		}
+		else {
+			map.put("value_i18n", String.valueOf(contentField.getValue_i18n()));
 		}
 
 		return map;
@@ -262,6 +296,13 @@ public class ContentFieldSerDes {
 					contentField.setLabel((String)jsonParserFieldValue);
 				}
 			}
+			else if (Objects.equals(jsonParserFieldName, "label_i18n")) {
+				if (jsonParserFieldValue != null) {
+					contentField.setLabel_i18n(
+						(Map)ContentFieldSerDes.toMap(
+							(String)jsonParserFieldValue));
+				}
+			}
 			else if (Objects.equals(jsonParserFieldName, "name")) {
 				if (jsonParserFieldValue != null) {
 					contentField.setName((String)jsonParserFieldValue);
@@ -292,6 +333,13 @@ public class ContentFieldSerDes {
 						ValueSerDes.toDTO((String)jsonParserFieldValue));
 				}
 			}
+			else if (Objects.equals(jsonParserFieldName, "value_i18n")) {
+				if (jsonParserFieldValue != null) {
+					contentField.setValue_i18n(
+						(Map)ContentFieldSerDes.toMap(
+							(String)jsonParserFieldValue));
+				}
+			}
 			else {
 				throw new IllegalArgumentException(
 					"Unsupported field name " + jsonParserFieldName);
@@ -303,9 +351,11 @@ public class ContentFieldSerDes {
 	private static String _escape(Object object) {
 		String string = String.valueOf(object);
 
-		string = string.replace("\\", "\\\\");
+		for (String[] strings : BaseJSONParser.JSON_ESCAPE_STRINGS) {
+			string = string.replace(strings[0], strings[1]);
+		}
 
-		return string.replace("\"", "\\\"");
+		return string;
 	}
 
 	private static String _toJSON(Map<String, ?> map) {

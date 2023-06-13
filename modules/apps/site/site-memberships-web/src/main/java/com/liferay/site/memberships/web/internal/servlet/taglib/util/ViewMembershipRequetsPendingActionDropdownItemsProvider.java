@@ -72,9 +72,9 @@ public class ViewMembershipRequetsPendingActionDropdownItemsProvider {
 
 		return dropdownItem -> {
 			dropdownItem.setHref(
-				_renderResponse.createRenderURL(), "mvcPath",
-				"/reply_membership_request.jsp", "p_u_i_d",
-				_membershipRequest.getUserId(), "groupId",
+				_renderResponse.createRenderURL(), "p_u_i_d",
+				_membershipRequest.getUserId(), "mvcPath",
+				"/reply_membership_request.jsp", "groupId",
 				_themeDisplay.getSiteGroupIdOrLiveGroupId(),
 				"membershipRequestId",
 				_membershipRequest.getMembershipRequestId());

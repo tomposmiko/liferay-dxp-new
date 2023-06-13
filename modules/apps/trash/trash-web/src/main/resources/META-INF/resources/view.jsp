@@ -17,7 +17,7 @@
 <%@ include file="/init.jsp" %>
 
 <%
-TrashManagementToolbarDisplayContext trashManagementToolbarDisplayContext = new TrashManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, trashDisplayContext);
+TrashManagementToolbarDisplayContext trashManagementToolbarDisplayContext = new TrashManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, trashDisplayContext);
 %>
 
 <clay:management-toolbar
@@ -191,7 +191,7 @@ TrashManagementToolbarDisplayContext trashManagementToolbarDisplayContext = new 
 
 							<liferay-ui:search-container-column-text>
 								<clay:vertical-card
-									verticalCard="<%= new TrashEntryVerticalCard(trashEntry, trashRenderer, renderRequest, liferayPortletResponse, searchContainer.getRowChecker(), viewContentURLString) %>"
+									verticalCard="<%= new TrashEntryVerticalCard(trashEntry, trashRenderer, liferayPortletResponse, renderRequest, searchContainer.getRowChecker(), viewContentURLString) %>"
 								/>
 							</liferay-ui:search-container-column-text>
 						</c:when>

@@ -51,7 +51,7 @@ import com.liferay.portal.search.index.IndexNameBuilder;
 import java.util.List;
 import java.util.Map;
 
-import org.elasticsearch.client.Client;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.Strings;
 
 import org.osgi.service.component.annotations.Activate;
@@ -107,9 +107,10 @@ public class ElasticsearchSearchEngine extends BaseSearchEngine {
 
 		waitForYellowStatus();
 
-		Client client = _elasticsearchConnectionManager.getClient();
+		RestHighLevelClient restHighLevelClient =
+			_elasticsearchConnectionManager.getRestHighLevelClient();
 
-		_indexFactory.createIndices(client.admin(), companyId);
+		_indexFactory.createIndices(restHighLevelClient.indices(), companyId);
 
 		_elasticsearchConnectionManager.registerCompanyId(companyId);
 
@@ -133,14 +134,17 @@ public class ElasticsearchSearchEngine extends BaseSearchEngine {
 		super.removeCompany(companyId);
 
 		try {
+			RestHighLevelClient restHighLevelClient =
+				_elasticsearchConnectionManager.getRestHighLevelClient();
+
 			_indexFactory.deleteIndices(
-				_elasticsearchConnectionManager.getAdminClient(), companyId);
+				restHighLevelClient.indices(), companyId);
 
 			_elasticsearchConnectionManager.unregisterCompanyId(companyId);
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn("Unable to delete index for " + companyId, e);
+				_log.warn("Unable to delete index for " + companyId, exception);
 			}
 		}
 	}
@@ -230,8 +234,8 @@ public class ElasticsearchSearchEngine extends BaseSearchEngine {
 				return false;
 			}
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 
 		return true;

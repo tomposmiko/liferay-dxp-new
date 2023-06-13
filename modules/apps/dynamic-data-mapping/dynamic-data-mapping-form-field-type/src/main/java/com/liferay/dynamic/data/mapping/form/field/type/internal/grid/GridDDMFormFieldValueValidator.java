@@ -67,6 +67,10 @@ public class GridDDMFormFieldValueValidator
 				"Rows and columns must contain at least one alternative each");
 		}
 
+		if (value == null) {
+			return;
+		}
+
 		DDMForm ddmForm = ddmFormField.getDDMForm();
 
 		validateSelectedValue(
@@ -78,12 +82,12 @@ public class GridDDMFormFieldValueValidator
 		try {
 			return jsonFactory.createJSONObject(json);
 		}
-		catch (JSONException jsone) {
+		catch (JSONException jsonException) {
 
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(jsone, jsone);
+				_log.debug(jsonException, jsonException);
 			}
 
 			throw new IllegalStateException(

@@ -46,13 +46,13 @@ public class ViewUADEntitiesManagementToolbarDisplayContext
 	extends SearchContainerManagementToolbarDisplayContext {
 
 	public ViewUADEntitiesManagementToolbarDisplayContext(
+		HttpServletRequest httpServletRequest,
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
-		HttpServletRequest httpServletRequest,
 		ViewUADEntitiesDisplay viewUADEntitiesDisplay) {
 
 		super(
-			liferayPortletRequest, liferayPortletResponse, httpServletRequest,
+			httpServletRequest, liferayPortletRequest, liferayPortletResponse,
 			viewUADEntitiesDisplay.getSearchContainer());
 
 		_viewUADEntitiesDisplay = viewUADEntitiesDisplay;
@@ -142,9 +142,9 @@ public class ViewUADEntitiesManagementToolbarDisplayContext
 			portletURL = PortletURLUtil.clone(
 				portletURL, liferayPortletResponse);
 		}
-		catch (PortletException pe) {
+		catch (PortletException portletException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(pe, pe);
+				_log.warn(portletException, portletException);
 			}
 
 			portletURL = liferayPortletResponse.createRenderURL();

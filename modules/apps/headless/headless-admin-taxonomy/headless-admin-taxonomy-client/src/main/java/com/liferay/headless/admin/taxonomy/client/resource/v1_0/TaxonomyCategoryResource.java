@@ -18,6 +18,7 @@ import com.liferay.headless.admin.taxonomy.client.dto.v1_0.TaxonomyCategory;
 import com.liferay.headless.admin.taxonomy.client.http.HttpInvoker;
 import com.liferay.headless.admin.taxonomy.client.pagination.Page;
 import com.liferay.headless.admin.taxonomy.client.pagination.Pagination;
+import com.liferay.headless.admin.taxonomy.client.problem.Problem;
 import com.liferay.headless.admin.taxonomy.client.serdes.v1_0.TaxonomyCategorySerDes;
 
 import java.util.LinkedHashMap;
@@ -40,54 +41,54 @@ public interface TaxonomyCategoryResource {
 	}
 
 	public Page<TaxonomyCategory> getTaxonomyCategoryTaxonomyCategoriesPage(
-			Long parentTaxonomyCategoryId, String search, String filterString,
+			String parentTaxonomyCategoryId, String search, String filterString,
 			Pagination pagination, String sortString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			getTaxonomyCategoryTaxonomyCategoriesPageHttpResponse(
-				Long parentTaxonomyCategoryId, String search,
+				String parentTaxonomyCategoryId, String search,
 				String filterString, Pagination pagination, String sortString)
 		throws Exception;
 
 	public TaxonomyCategory postTaxonomyCategoryTaxonomyCategory(
-			Long parentTaxonomyCategoryId, TaxonomyCategory taxonomyCategory)
+			String parentTaxonomyCategoryId, TaxonomyCategory taxonomyCategory)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			postTaxonomyCategoryTaxonomyCategoryHttpResponse(
-				Long parentTaxonomyCategoryId,
+				String parentTaxonomyCategoryId,
 				TaxonomyCategory taxonomyCategory)
 		throws Exception;
 
-	public void deleteTaxonomyCategory(Long taxonomyCategoryId)
+	public void deleteTaxonomyCategory(String taxonomyCategoryId)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse deleteTaxonomyCategoryHttpResponse(
-			Long taxonomyCategoryId)
+			String taxonomyCategoryId)
 		throws Exception;
 
-	public TaxonomyCategory getTaxonomyCategory(Long taxonomyCategoryId)
+	public TaxonomyCategory getTaxonomyCategory(String taxonomyCategoryId)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse getTaxonomyCategoryHttpResponse(
-			Long taxonomyCategoryId)
+			String taxonomyCategoryId)
 		throws Exception;
 
 	public TaxonomyCategory patchTaxonomyCategory(
-			Long taxonomyCategoryId, TaxonomyCategory taxonomyCategory)
+			String taxonomyCategoryId, TaxonomyCategory taxonomyCategory)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse patchTaxonomyCategoryHttpResponse(
-			Long taxonomyCategoryId, TaxonomyCategory taxonomyCategory)
+			String taxonomyCategoryId, TaxonomyCategory taxonomyCategory)
 		throws Exception;
 
 	public TaxonomyCategory putTaxonomyCategory(
-			Long taxonomyCategoryId, TaxonomyCategory taxonomyCategory)
+			String taxonomyCategoryId, TaxonomyCategory taxonomyCategory)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse putTaxonomyCategoryHttpResponse(
-			Long taxonomyCategoryId, TaxonomyCategory taxonomyCategory)
+			String taxonomyCategoryId, TaxonomyCategory taxonomyCategory)
 		throws Exception;
 
 	public Page<TaxonomyCategory> getTaxonomyVocabularyTaxonomyCategoriesPage(
@@ -167,7 +168,7 @@ public interface TaxonomyCategoryResource {
 		implements TaxonomyCategoryResource {
 
 		public Page<TaxonomyCategory> getTaxonomyCategoryTaxonomyCategoriesPage(
-				Long parentTaxonomyCategoryId, String search,
+				String parentTaxonomyCategoryId, String search,
 				String filterString, Pagination pagination, String sortString)
 			throws Exception {
 
@@ -184,12 +185,21 @@ public interface TaxonomyCategoryResource {
 			_logger.fine(
 				"HTTP response status code: " + httpResponse.getStatusCode());
 
-			return Page.of(content, TaxonomyCategorySerDes::toDTO);
+			try {
+				return Page.of(content, TaxonomyCategorySerDes::toDTO);
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
 		}
 
 		public HttpInvoker.HttpResponse
 				getTaxonomyCategoryTaxonomyCategoriesPageHttpResponse(
-					Long parentTaxonomyCategoryId, String search,
+					String parentTaxonomyCategoryId, String search,
 					String filterString, Pagination pagination,
 					String sortString)
 			throws Exception {
@@ -247,7 +257,7 @@ public interface TaxonomyCategoryResource {
 		}
 
 		public TaxonomyCategory postTaxonomyCategoryTaxonomyCategory(
-				Long parentTaxonomyCategoryId,
+				String parentTaxonomyCategoryId,
 				TaxonomyCategory taxonomyCategory)
 			throws Exception {
 
@@ -271,13 +281,13 @@ public interface TaxonomyCategoryResource {
 					Level.WARNING,
 					"Unable to process HTTP response: " + content, e);
 
-				throw e;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 		}
 
 		public HttpInvoker.HttpResponse
 				postTaxonomyCategoryTaxonomyCategoryHttpResponse(
-					Long parentTaxonomyCategoryId,
+					String parentTaxonomyCategoryId,
 					TaxonomyCategory taxonomyCategory)
 			throws Exception {
 
@@ -316,7 +326,7 @@ public interface TaxonomyCategoryResource {
 			return httpInvoker.invoke();
 		}
 
-		public void deleteTaxonomyCategory(Long taxonomyCategoryId)
+		public void deleteTaxonomyCategory(String taxonomyCategoryId)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
@@ -329,10 +339,21 @@ public interface TaxonomyCategoryResource {
 			_logger.fine("HTTP response message: " + httpResponse.getMessage());
 			_logger.fine(
 				"HTTP response status code: " + httpResponse.getStatusCode());
+
+			try {
+				return;
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
 		}
 
 		public HttpInvoker.HttpResponse deleteTaxonomyCategoryHttpResponse(
-				Long taxonomyCategoryId)
+				String taxonomyCategoryId)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
@@ -368,7 +389,7 @@ public interface TaxonomyCategoryResource {
 			return httpInvoker.invoke();
 		}
 
-		public TaxonomyCategory getTaxonomyCategory(Long taxonomyCategoryId)
+		public TaxonomyCategory getTaxonomyCategory(String taxonomyCategoryId)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
@@ -390,12 +411,12 @@ public interface TaxonomyCategoryResource {
 					Level.WARNING,
 					"Unable to process HTTP response: " + content, e);
 
-				throw e;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 		}
 
 		public HttpInvoker.HttpResponse getTaxonomyCategoryHttpResponse(
-				Long taxonomyCategoryId)
+				String taxonomyCategoryId)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
@@ -432,7 +453,7 @@ public interface TaxonomyCategoryResource {
 		}
 
 		public TaxonomyCategory patchTaxonomyCategory(
-				Long taxonomyCategoryId, TaxonomyCategory taxonomyCategory)
+				String taxonomyCategoryId, TaxonomyCategory taxonomyCategory)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
@@ -455,12 +476,12 @@ public interface TaxonomyCategoryResource {
 					Level.WARNING,
 					"Unable to process HTTP response: " + content, e);
 
-				throw e;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 		}
 
 		public HttpInvoker.HttpResponse patchTaxonomyCategoryHttpResponse(
-				Long taxonomyCategoryId, TaxonomyCategory taxonomyCategory)
+				String taxonomyCategoryId, TaxonomyCategory taxonomyCategory)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
@@ -499,7 +520,7 @@ public interface TaxonomyCategoryResource {
 		}
 
 		public TaxonomyCategory putTaxonomyCategory(
-				Long taxonomyCategoryId, TaxonomyCategory taxonomyCategory)
+				String taxonomyCategoryId, TaxonomyCategory taxonomyCategory)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
@@ -522,12 +543,12 @@ public interface TaxonomyCategoryResource {
 					Level.WARNING,
 					"Unable to process HTTP response: " + content, e);
 
-				throw e;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 		}
 
 		public HttpInvoker.HttpResponse putTaxonomyCategoryHttpResponse(
-				Long taxonomyCategoryId, TaxonomyCategory taxonomyCategory)
+				String taxonomyCategoryId, TaxonomyCategory taxonomyCategory)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
@@ -585,7 +606,16 @@ public interface TaxonomyCategoryResource {
 			_logger.fine(
 				"HTTP response status code: " + httpResponse.getStatusCode());
 
-			return Page.of(content, TaxonomyCategorySerDes::toDTO);
+			try {
+				return Page.of(content, TaxonomyCategorySerDes::toDTO);
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
 		}
 
 		public HttpInvoker.HttpResponse
@@ -671,7 +701,7 @@ public interface TaxonomyCategoryResource {
 					Level.WARNING,
 					"Unable to process HTTP response: " + content, e);
 
-				throw e;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 		}
 

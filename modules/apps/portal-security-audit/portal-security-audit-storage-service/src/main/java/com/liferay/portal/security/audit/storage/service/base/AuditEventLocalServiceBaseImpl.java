@@ -63,7 +63,7 @@ public abstract class AuditEventLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements AopService, AuditEventLocalService, IdentifiableOSGiService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>AuditEventLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.security.audit.storage.service.AuditEventLocalServiceUtil</code>.
@@ -374,8 +374,8 @@ public abstract class AuditEventLocalServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

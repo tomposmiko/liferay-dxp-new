@@ -23,7 +23,6 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Locale;
@@ -48,22 +47,21 @@ public class SelectDDMFormFieldValueValidator
 	public void validate(DDMFormField ddmFormField, Value value)
 		throws DDMFormFieldValueValidationException {
 
-		String dataSourceType = GetterUtil.getString(
-			ddmFormField.getProperty("dataSourceType"), "manual");
-
-		if (Objects.equals(dataSourceType, "manual")) {
+		if (Objects.equals(ddmFormField.getDataSourceType(), "manual")) {
 			try {
 				validateDDMFormFieldOptions(ddmFormField, value);
 			}
-			catch (DDMFormFieldValueValidationException ddmffvve) {
-				throw ddmffvve;
+			catch (DDMFormFieldValueValidationException
+						ddmFormFieldValueValidationException) {
+
+				throw ddmFormFieldValueValidationException;
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(e, e);
+					_log.debug(exception, exception);
 				}
 
-				throw new DDMFormFieldValueValidationException(e);
+				throw new DDMFormFieldValueValidationException(exception);
 			}
 		}
 	}
@@ -82,9 +80,9 @@ public class SelectDDMFormFieldValueValidator
 					ddmFormField.getName()));
 		}
 
-		Set<String> optionValues = ddmFormFieldOptions.getOptionsValues();
+		Set<String> optionsValues = ddmFormFieldOptions.getOptionsValues();
 
-		if (optionValues.isEmpty()) {
+		if (optionsValues.isEmpty()) {
 			throw new DDMFormFieldValueValidationException(
 				"Options must contain at least one alternative");
 		}
@@ -92,7 +90,7 @@ public class SelectDDMFormFieldValueValidator
 		Map<Locale, String> selectedValues = value.getValues();
 
 		for (String selectedValue : selectedValues.values()) {
-			validateSelectedValue(ddmFormField, optionValues, selectedValue);
+			validateSelectedValue(ddmFormField, optionsValues, selectedValue);
 		}
 	}
 

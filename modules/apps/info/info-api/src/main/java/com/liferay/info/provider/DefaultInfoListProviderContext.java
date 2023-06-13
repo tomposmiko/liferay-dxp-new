@@ -25,7 +25,7 @@ import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import java.util.Optional;
 
 /**
- * @author Jorge Ferrer
+ * @author     Jorge Ferrer
  * @deprecated As of Mueller (7.2.x), moved to {@link
  *             com.liferay.info.list.provider.DefaultInfoListProviderContext}
  */
@@ -44,8 +44,8 @@ public class DefaultInfoListProviderContext implements InfoListProviderContext {
 		try {
 			_company = CompanyLocalServiceUtil.getCompany(group.getCompanyId());
 		}
-		catch (PortalException pe) {
-			throw new RuntimeException(pe);
+		catch (PortalException portalException) {
+			throw new RuntimeException(portalException);
 		}
 	}
 

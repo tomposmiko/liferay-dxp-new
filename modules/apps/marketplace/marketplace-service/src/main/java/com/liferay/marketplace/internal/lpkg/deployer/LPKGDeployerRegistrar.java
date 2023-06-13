@@ -61,7 +61,7 @@ import org.osgi.service.component.annotations.Reference;
 public class LPKGDeployerRegistrar {
 
 	@Activate
-	public void activate(BundleContext bundleContext) throws Exception {
+	protected void activate(BundleContext bundleContext) throws Exception {
 		bundleContext.addBundleListener(_bundleListener);
 
 		Map<Bundle, List<Bundle>> deployedLPKGBundles =
@@ -94,7 +94,7 @@ public class LPKGDeployerRegistrar {
 	}
 
 	@Deactivate
-	public void deactivate(BundleContext bundleContext) {
+	protected void deactivate(BundleContext bundleContext) {
 		bundleContext.removeBundleListener(_bundleListener);
 	}
 
@@ -209,7 +209,11 @@ public class LPKGDeployerRegistrar {
 		}
 
 		for (Tuple tuple : oldTuples) {
-			_moduleLocalService.deleteModule(tuple._moduleId);
+			Module module = _moduleLocalService.fetchModule(tuple._moduleId);
+
+			if (module != null) {
+				_moduleLocalService.deleteModule(tuple._moduleId);
+			}
 		}
 
 		for (Tuple tuple : newTuples) {
@@ -226,11 +230,11 @@ public class LPKGDeployerRegistrar {
 		try {
 			_doRegister(lpkgBundle, apps, modules);
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			_log.error(
 				"Unable to track installed app " +
 					lpkgBundle.getSymbolicName() + " with Marketplace",
-				e);
+				exception);
 		}
 	}
 

@@ -436,11 +436,6 @@ public class DDMDataProviderInstanceWrapper
 		return model.getUuid();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a ddm data provider instance model instance should use the <code>DDMDataProviderInstance</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

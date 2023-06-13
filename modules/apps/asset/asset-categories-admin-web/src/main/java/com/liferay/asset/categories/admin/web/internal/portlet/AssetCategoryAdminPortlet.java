@@ -14,8 +14,8 @@
 
 package com.liferay.asset.categories.admin.web.internal.portlet;
 
+import com.liferay.asset.categories.admin.web.constants.AssetCategoriesAdminPortletKeys;
 import com.liferay.asset.categories.admin.web.internal.configuration.AssetCategoriesAdminWebConfiguration;
-import com.liferay.asset.categories.admin.web.internal.constants.AssetCategoriesAdminPortletKeys;
 import com.liferay.asset.categories.admin.web.internal.constants.AssetCategoriesAdminWebKeys;
 import com.liferay.asset.category.property.model.AssetCategoryProperty;
 import com.liferay.asset.category.property.service.AssetCategoryPropertyLocalService;
@@ -382,8 +382,8 @@ public class AssetCategoryAdminPortlet extends MVCPortlet {
 					classTypeReader.getClassType(
 						classTypePKs[i], themeDisplay.getLocale());
 				}
-				catch (NoSuchModelException nsme) {
-					throw new NoSuchClassTypeException(nsme);
+				catch (NoSuchModelException noSuchModelException) {
+					throw new NoSuchClassTypeException(noSuchModelException);
 				}
 			}
 

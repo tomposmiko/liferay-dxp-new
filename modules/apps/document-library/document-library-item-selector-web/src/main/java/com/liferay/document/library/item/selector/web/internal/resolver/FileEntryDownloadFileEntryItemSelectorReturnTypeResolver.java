@@ -20,7 +20,6 @@ import com.liferay.item.selector.criteria.DownloadFileEntryItemSelectorReturnTyp
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.portletfilerepository.PortletFileRepository;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 
@@ -31,7 +30,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alejandro Tardín
  */
 @Component(
-	immediate = true, property = "service.ranking:Integer=100",
+	property = "service.ranking:Integer=100",
 	service = ItemSelectorReturnTypeResolver.class
 )
 public class FileEntryDownloadFileEntryItemSelectorReturnTypeResolver
@@ -68,7 +67,7 @@ public class FileEntryDownloadFileEntryItemSelectorReturnTypeResolver
 			"url",
 			_dlURLHelper.getDownloadURL(
 				fileEntry, fileEntry.getFileVersion(), themeDisplay,
-				StringPool.BLANK, true, false)
+				StringPool.BLANK, false, false)
 		).put(
 			"uuid", fileEntry.getUuid()
 		);
@@ -78,8 +77,5 @@ public class FileEntryDownloadFileEntryItemSelectorReturnTypeResolver
 
 	@Reference
 	private DLURLHelper _dlURLHelper;
-
-	@Reference
-	private PortletFileRepository _portletFileRepository;
 
 }

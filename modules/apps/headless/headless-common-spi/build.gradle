@@ -1,9 +1,9 @@
 dependencies {
-	compileOnly group: "com.liferay", name: "com.liferay.message.boards.api", version: "5.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.petra.function", version: "3.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.petra.string", version: "3.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.portal.odata.api", version: "2.3.0"
-	compileOnly group: "com.liferay", name: "com.liferay.portal.vulcan.api", version: "3.3.0"
-	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "4.34.0"
+	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "default"
 	compileOnly group: "javax.ws.rs", name: "javax.ws.rs-api", version: "2.1"
+	compileOnly project(":apps:message-boards:message-boards-api")
+	compileOnly project(":apps:portal-odata:portal-odata-api")
+	compileOnly project(":apps:portal-vulcan:portal-vulcan-api")
+	compileOnly project(":core:petra:petra-function")
+	compileOnly project(":core:petra:petra-string")
 }

@@ -43,7 +43,7 @@ public interface BlogsEntryModel
 	extends BaseModel<BlogsEntry>, MVCCModel, ShardedModel, StagedGroupedModel,
 			TrashedModel, WorkflowedModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a blogs entry model instance should use the {@link BlogsEntry} interface instead.

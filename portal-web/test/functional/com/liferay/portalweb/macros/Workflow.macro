@@ -8,6 +8,30 @@ definition {
 		MenuItem.click(menuItem = "Pending");
 	}
 
+	macro _tearDownBlog {
+		Navigator.openURL();
+
+		ProductMenu.gotoPortlet(
+			category = "Content &amp; Data",
+			panel = "Site Administration",
+			portlet = "Blogs");
+
+		if (IsElementPresent.isVisible(locator1 = "Blogs#ENTRY_TABLE_ALL_CHECKBOX")) {
+			Click(locator1 = "Blogs#ENTRY_TABLE_ALL_CHECKBOX");
+
+			Click(locator1 = "WorkflowConfiguration#BLOGS_MOVE_TO_RECYCLE_BIN");
+		}
+
+		Navigator.openURL();
+
+		ProductMenu.gotoPortlet(
+			category = "Recycle Bin",
+			panel = "Site Administration",
+			portlet = "Recycle Bin");
+
+		RecycleBin.emptyCP();
+	}
+
 	macro _tearDownWorkflow {
 		var noWorkflow = "No Workflow";
 
@@ -40,6 +64,7 @@ definition {
 	}
 
 	macro _viewActivities {
+		var key_workflowActivityComment = "${workflowActivityComment}";
 		var key_workflowAssetTitle = "${workflowAssetTitle}";
 
 		AssertClick(
@@ -51,7 +76,7 @@ definition {
 			value1 = "Activities");
 
 		AssertTextEquals.assertPartialText(
-			locator1 = "MyWorkflowTasksTask#ACTIVITIES_LINE_1",
+			locator1 = "MyWorkflowTasksTask#ACTIVITIES_LINE",
 			value1 = "${workflowActivityComment}");
 	}
 
@@ -140,6 +165,33 @@ definition {
 			workflowTask = "${workflowTask}");
 	}
 
+	macro assignBlogEntriesToUsers {
+		var iterator = "1";
+		var numberOfBlogInstances = MathUtil.sum("${numberOfBlogInstances}", "1");
+		var numberOfUsers = MathUtil.sum("${numberOfUsers}", "1");
+		var userCount = "1";
+
+		UserBar.gotoDropdownItem(dropdownItem = "My Workflow Tasks");
+
+		Navigator.gotoNavTab(navTab = "Assigned to My Roles");
+
+		while ("${iterator}" != "${numberOfBlogInstances}") {
+
+			if ("${userCount}" == "${numberOfUsers}") {
+				var userCount = "1";
+			}
+
+			Workflow.assignTaskToUser(
+				assetTitle = "Blogs Entry Title",
+				assetType = "Blogs Entry",
+				assigneeName = "${userCount}user user${userCount}",
+				workflowTask = "Review");
+
+			var iterator = MathUtil.sum("${iterator}", "1");
+			var userCount = MathUtil.sum("${userCount}", "1");
+		}
+	}
+
 	macro assignByDetails {
 		LexiconEntry.gotoEllipsisMenuItem(menuItem = "Assign to...");
 
@@ -162,6 +214,20 @@ definition {
 		Button.clickDone();
 
 		Alert.viewSuccessMessage();
+	}
+
+	macro assignTaskToUser {
+		key_assetTitle = "${assetTitle}";
+		key_assetType = "${assetType}";
+		key_assigneeName = "${assigneeName}";
+		key_workflowTask = "${workflowTask}";
+
+		Workflow.viewPendingTasks(
+			workflowAssetTitle = "${assetTitle}",
+			workflowAssetType = "${assetType}",
+			workflowTask = "${workflowTask}");
+
+		Workflow.assignByDetails(user = "${assigneeName}");
 	}
 
 	macro assignToMeTaskByActions {
@@ -349,7 +415,7 @@ definition {
 	}
 
 	macro gotoCompletedFilter {
-		Pause(locator1 = "5000");
+		Pause(locator1 = "2000");
 
 		Click(locator1 = "Dropdown#FILTER_AND_ORDER");
 
@@ -1173,8 +1239,6 @@ definition {
 
 		Navigator.gotoNavTab(navTab = "Assigned to My Roles");
 
-		Workflow._gotoPendingFilter();
-
 		AssertTextEquals(
 			locator1 = "MyWorkflowTasks#ASSIGNED_TO_MY_ROLES_TABLE_TASK",
 			value1 = "${workflowTask}");
@@ -1217,7 +1281,7 @@ definition {
 
 	macro viewTaskHeaderTitle {
 		AssertTextEquals(
-			locator1 = "Portlet#HEADER",
+			locator1 = "Portlet#H2_HEADER",
 			value1 = "${workflowTask}: ${kfProcessName}");
 	}
 

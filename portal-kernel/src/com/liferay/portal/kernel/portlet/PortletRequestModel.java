@@ -18,6 +18,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -249,23 +250,38 @@ public class PortletRequestModel implements Serializable {
 	}
 
 	public Map<String, Object> toMap() {
-		Map<String, Object> portletRequestModelMap = new HashMap<>();
-
-		portletRequestModelMap.put("auth-type", _authType);
-		portletRequestModelMap.put("container-namespace", _contextPath);
-		portletRequestModelMap.put("container-type", "portlet");
-		portletRequestModelMap.put("content-type", _contentType);
-		portletRequestModelMap.put("context-path", _contextPath);
-		portletRequestModelMap.put("lifecycle", _lifecycle);
-		portletRequestModelMap.put("locale", _locale);
-		portletRequestModelMap.put("portlet-mode", _portletMode);
-		portletRequestModelMap.put("portlet-session-id", _portletSessionId);
-		portletRequestModelMap.put("remote-user", _remoteUser);
-		portletRequestModelMap.put("scheme", _scheme);
-		portletRequestModelMap.put("secure", _secure);
-		portletRequestModelMap.put("server-name", _serverName);
-		portletRequestModelMap.put("server-port", _serverPort);
-		portletRequestModelMap.put("window-state", _windowState);
+		Map<String, Object> portletRequestModelMap =
+			HashMapBuilder.<String, Object>put(
+				"auth-type", _authType
+			).put(
+				"container-namespace", _contextPath
+			).put(
+				"container-type", "portlet"
+			).put(
+				"content-type", _contentType
+			).put(
+				"context-path", _contextPath
+			).put(
+				"lifecycle", _lifecycle
+			).put(
+				"locale", _locale
+			).put(
+				"portlet-mode", _portletMode
+			).put(
+				"portlet-session-id", _portletSessionId
+			).put(
+				"remote-user", _remoteUser
+			).put(
+				"scheme", _scheme
+			).put(
+				"secure", _secure
+			).put(
+				"server-name", _serverName
+			).put(
+				"server-port", _serverPort
+			).put(
+				"window-state", _windowState
+			).build();
 
 		if (_portletNamespace != null) {
 			portletRequestModelMap.put("portlet-namespace", _portletNamespace);
@@ -776,9 +792,9 @@ public class PortletRequestModel implements Serializable {
 			_applicationScopeSessionAttributes = portletSession.getAttributeMap(
 				PortletSession.APPLICATION_SCOPE);
 		}
-		catch (IllegalStateException ise) {
+		catch (IllegalStateException illegalStateException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(ise.getMessage());
+				_log.warn(illegalStateException.getMessage());
 			}
 		}
 	}
@@ -794,9 +810,9 @@ public class PortletRequestModel implements Serializable {
 
 				_actionURL = actionURL.toString();
 			}
-			catch (IllegalStateException ise) {
+			catch (IllegalStateException illegalStateException) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(ise.getMessage());
+					_log.warn(illegalStateException.getMessage());
 				}
 			}
 
@@ -810,7 +826,7 @@ public class PortletRequestModel implements Serializable {
 
 					_renderURLExclusive = renderURL.toString();
 				}
-				catch (WindowStateException wse) {
+				catch (WindowStateException windowStateException) {
 				}
 
 				try {
@@ -818,7 +834,7 @@ public class PortletRequestModel implements Serializable {
 
 					_renderURLMaximized = renderURL.toString();
 				}
-				catch (WindowStateException wse) {
+				catch (WindowStateException windowStateException) {
 				}
 
 				try {
@@ -826,7 +842,7 @@ public class PortletRequestModel implements Serializable {
 
 					_renderURLMinimized = renderURL.toString();
 				}
-				catch (WindowStateException wse) {
+				catch (WindowStateException windowStateException) {
 				}
 
 				try {
@@ -834,7 +850,7 @@ public class PortletRequestModel implements Serializable {
 
 					_renderURLNormal = renderURL.toString();
 				}
-				catch (WindowStateException wse) {
+				catch (WindowStateException windowStateException) {
 				}
 
 				try {
@@ -842,12 +858,12 @@ public class PortletRequestModel implements Serializable {
 
 					_renderURLPopUp = renderURL.toString();
 				}
-				catch (WindowStateException wse) {
+				catch (WindowStateException windowStateException) {
 				}
 			}
-			catch (IllegalStateException ise) {
+			catch (IllegalStateException illegalStateException) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(ise.getMessage());
+					_log.warn(illegalStateException.getMessage());
 				}
 			}
 
@@ -859,7 +875,7 @@ public class PortletRequestModel implements Serializable {
 			resourceURLString = HttpUtil.removeParameter(
 				resourceURLString, _portletNamespace + "redirect");
 
-			_resourceURL = resourceURL.toString();
+			_resourceURL = resourceURLString;
 		}
 	}
 

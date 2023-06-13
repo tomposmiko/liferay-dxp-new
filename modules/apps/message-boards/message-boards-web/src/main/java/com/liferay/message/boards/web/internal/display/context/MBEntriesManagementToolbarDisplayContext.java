@@ -64,14 +64,14 @@ import javax.servlet.http.HttpServletRequest;
 public class MBEntriesManagementToolbarDisplayContext {
 
 	public MBEntriesManagementToolbarDisplayContext(
+		HttpServletRequest httpServletRequest,
 		LiferayPortletRequest liferayPortletRequest,
-		LiferayPortletResponse liferayPortletResponse,
-		HttpServletRequest httpServletRequest, PortletURL currentURLObj,
+		LiferayPortletResponse liferayPortletResponse, PortletURL currentURLObj,
 		TrashHelper trashHelper) {
 
+		_httpServletRequest = httpServletRequest;
 		_liferayPortletRequest = liferayPortletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
-		_httpServletRequest = httpServletRequest;
 		_currentURLObj = currentURLObj;
 		_trashHelper = trashHelper;
 

@@ -47,7 +47,7 @@ public abstract class BackgroundTaskServiceBaseImpl
 	extends BaseServiceImpl
 	implements AopService, BackgroundTaskService, IdentifiableOSGiService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>BackgroundTaskService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.background.task.service.BackgroundTaskServiceUtil</code>.
@@ -101,8 +101,8 @@ public abstract class BackgroundTaskServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

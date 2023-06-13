@@ -45,6 +45,7 @@ import java.lang.reflect.InvocationHandler;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -68,7 +69,7 @@ public class FriendlyURLEntryLocalizationPersistenceImpl
 	extends BasePersistenceImpl<FriendlyURLEntryLocalization>
 	implements FriendlyURLEntryLocalizationPersistence {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>FriendlyURLEntryLocalizationUtil</code> to access the friendly url entry localization persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
@@ -252,12 +253,12 @@ public class FriendlyURLEntryLocalizationPersistenceImpl
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (useFinderCache) {
 					finderCache.removeResult(finderPath, finderArgs);
 				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -423,8 +424,8 @@ public class FriendlyURLEntryLocalizationPersistenceImpl
 
 			return array;
 		}
-		catch (Exception e) {
-			throw processException(e);
+		catch (Exception exception) {
+			throw processException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -598,10 +599,10 @@ public class FriendlyURLEntryLocalizationPersistenceImpl
 
 				finderCache.putResult(finderPath, finderArgs, count);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				finderCache.removeResult(finderPath, finderArgs);
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -771,14 +772,14 @@ public class FriendlyURLEntryLocalizationPersistenceImpl
 					cacheResult(friendlyURLEntryLocalization);
 				}
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (useFinderCache) {
 					finderCache.removeResult(
 						_finderPathFetchByFriendlyURLEntryId_LanguageId,
 						finderArgs);
 				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -872,10 +873,10 @@ public class FriendlyURLEntryLocalizationPersistenceImpl
 
 				finderCache.putResult(finderPath, finderArgs, count);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				finderCache.removeResult(finderPath, finderArgs);
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -1058,13 +1059,13 @@ public class FriendlyURLEntryLocalizationPersistenceImpl
 					cacheResult(friendlyURLEntryLocalization);
 				}
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (useFinderCache) {
 					finderCache.removeResult(
 						_finderPathFetchByG_C_U, finderArgs);
 				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -1159,10 +1160,10 @@ public class FriendlyURLEntryLocalizationPersistenceImpl
 
 				finderCache.putResult(finderPath, finderArgs, count);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				finderCache.removeResult(finderPath, finderArgs);
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -1306,6 +1307,19 @@ public class FriendlyURLEntryLocalizationPersistenceImpl
 				(FriendlyURLEntryLocalizationModelImpl)
 					friendlyURLEntryLocalization,
 				true);
+		}
+	}
+
+	@Override
+	public void clearCache(Set<Serializable> primaryKeys) {
+		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
+		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+
+		for (Serializable primaryKey : primaryKeys) {
+			entityCache.removeResult(
+				entityCacheEnabled, FriendlyURLEntryLocalizationImpl.class,
+				primaryKey);
 		}
 	}
 
@@ -1465,11 +1479,13 @@ public class FriendlyURLEntryLocalizationPersistenceImpl
 
 			return remove(friendlyURLEntryLocalization);
 		}
-		catch (NoSuchFriendlyURLEntryLocalizationException nsee) {
-			throw nsee;
+		catch (NoSuchFriendlyURLEntryLocalizationException
+					noSuchEntityException) {
+
+			throw noSuchEntityException;
 		}
-		catch (Exception e) {
-			throw processException(e);
+		catch (Exception exception) {
+			throw processException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -1496,8 +1512,8 @@ public class FriendlyURLEntryLocalizationPersistenceImpl
 				session.delete(friendlyURLEntryLocalization);
 			}
 		}
-		catch (Exception e) {
-			throw processException(e);
+		catch (Exception exception) {
+			throw processException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -1558,8 +1574,8 @@ public class FriendlyURLEntryLocalizationPersistenceImpl
 						friendlyURLEntryLocalization);
 			}
 		}
-		catch (Exception e) {
-			throw processException(e);
+		catch (Exception exception) {
+			throw processException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -1805,12 +1821,12 @@ public class FriendlyURLEntryLocalizationPersistenceImpl
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (useFinderCache) {
 					finderCache.removeResult(finderPath, finderArgs);
 				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -1857,11 +1873,11 @@ public class FriendlyURLEntryLocalizationPersistenceImpl
 				finderCache.putResult(
 					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				finderCache.removeResult(
 					_finderPathCountAll, FINDER_ARGS_EMPTY);
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -2052,8 +2068,8 @@ public class FriendlyURLEntryLocalizationPersistenceImpl
 		try {
 			Class.forName(FURLPersistenceConstants.class.getName());
 		}
-		catch (ClassNotFoundException cnfe) {
-			throw new ExceptionInInitializerError(cnfe);
+		catch (ClassNotFoundException classNotFoundException) {
+			throw new ExceptionInInitializerError(classNotFoundException);
 		}
 	}
 

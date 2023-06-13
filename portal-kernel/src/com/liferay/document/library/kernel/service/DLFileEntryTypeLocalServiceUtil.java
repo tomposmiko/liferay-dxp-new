@@ -30,16 +30,10 @@ import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
  */
 public class DLFileEntryTypeLocalServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.portlet.documentlibrary.service.impl.DLFileEntryTypeLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
-	 */
-
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link DLFileEntryTypeLocalServiceUtil} to access the document library file entry type local service. Add custom service methods to <code>com.liferay.portlet.documentlibrary.service.impl.DLFileEntryTypeLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	public static void addDDMStructureLinks(
 		long fileEntryTypeId, java.util.Set<Long> ddmStructureIds) {
@@ -129,9 +123,7 @@ public class DLFileEntryTypeLocalServiceUtil {
 	}
 
 	public static com.liferay.document.library.kernel.model.DLFileEntryType
-			createBasicDocumentDLFileEntryType()
-		throws com.liferay.document.library.kernel.exception.
-			NoSuchFileEntryTypeException {
+		createBasicDocumentDLFileEntryType() {
 
 		return getService().createBasicDocumentDLFileEntryType();
 	}

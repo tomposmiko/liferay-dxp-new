@@ -32,14 +32,14 @@ public class PortletConfigurationTemplatesManagementToolbarDisplayContext
 	extends SearchContainerManagementToolbarDisplayContext {
 
 	public PortletConfigurationTemplatesManagementToolbarDisplayContext(
+		HttpServletRequest httpServletRequest,
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
-		HttpServletRequest httpServletRequest,
 		PortletConfigurationTemplatesDisplayContext
 			portletConfigurationTemplatesDisplayContext) {
 
 		super(
-			liferayPortletRequest, liferayPortletResponse, httpServletRequest,
+			httpServletRequest, liferayPortletRequest, liferayPortletResponse,
 			portletConfigurationTemplatesDisplayContext.
 				getArchivedSettingsSearchContainer());
 	}

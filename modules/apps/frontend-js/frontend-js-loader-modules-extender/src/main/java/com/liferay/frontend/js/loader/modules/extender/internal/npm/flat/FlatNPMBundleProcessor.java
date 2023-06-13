@@ -88,23 +88,26 @@ public class FlatNPMBundleProcessor implements JSBundleProcessor {
 		URL manifestJSONURL = bundle.getEntry(
 			"META-INF/resources/manifest.json");
 
-		futures.add(
-			_executorService.submit(
-				() -> {
-					String content = StringUtil.read(
-						manifestJSONURL.openStream());
+		if (manifestJSONURL != null) {
+			futures.add(
+				_executorService.submit(
+					() -> {
+						String content = StringUtil.read(
+							manifestJSONURL.openStream());
 
-					if (!content.contains("\"flags\"")) {
+						if (!content.contains("\"flags\"")) {
+							return new AbstractMap.SimpleImmutableEntry<>(
+								manifestJSONURL, null);
+						}
+
+						JSONObject jsonObject = _jsonFactory.createJSONObject(
+							content);
+
 						return new AbstractMap.SimpleImmutableEntry<>(
-							manifestJSONURL, null);
-					}
-
-					JSONObject jsonObject = _jsonFactory.createJSONObject(
-						content);
-
-					return new AbstractMap.SimpleImmutableEntry<>(
-						manifestJSONURL, jsonObject.getJSONObject("packages"));
-				}));
+							manifestJSONURL,
+							jsonObject.getJSONObject("packages"));
+					}));
+		}
 
 		Enumeration<URL> enumeration = bundle.findEntries(
 			"META-INF/resources", "package.json", true);
@@ -157,8 +160,8 @@ public class FlatNPMBundleProcessor implements JSBundleProcessor {
 
 				moduleDependenciesMap.put(entry.getKey(), entry.getValue());
 			}
-			catch (Exception e) {
-				_log.error(e, e);
+			catch (Exception exception) {
+				_log.error(exception, exception);
 			}
 		}
 
@@ -170,8 +173,8 @@ public class FlatNPMBundleProcessor implements JSBundleProcessor {
 
 				jsonObjects.put(entry.getKey(), entry.getValue());
 			}
-			catch (Exception e) {
-				_log.error(e, e);
+			catch (Exception exception) {
+				_log.error(exception, exception);
 			}
 		}
 
@@ -274,8 +277,8 @@ public class FlatNPMBundleProcessor implements JSBundleProcessor {
 
 			return urlContent.substring(x + 1, y);
 		}
-		catch (IOException ioe) {
-			_log.error("Unable to read URL: " + url, ioe);
+		catch (IOException ioException) {
+			_log.error("Unable to read URL: " + url, ioException);
 
 			return null;
 		}
@@ -539,6 +542,18 @@ public class FlatNPMBundleProcessor implements JSBundleProcessor {
 		Map<URL, Collection<String>> moduleDependenciesMap, String location,
 		boolean root) {
 
+		String name = packageJSONObject.getString("name");
+
+		if (Validator.isNull(name)) {
+			return;
+		}
+
+		String version = packageJSONObject.getString("version");
+
+		if (Validator.isNull(version)) {
+			return;
+		}
+
 		String mainModuleName = null;
 
 		String main = packageJSONObject.getString("main");
@@ -555,8 +570,7 @@ public class FlatNPMBundleProcessor implements JSBundleProcessor {
 		}
 
 		FlatJSPackage flatJSPackage = new FlatJSPackage(
-			flatJSBundle, packageJSONObject.getString("name"),
-			packageJSONObject.getString("version"), mainModuleName, root);
+			flatJSBundle, name, version, mainModuleName, root);
 
 		if (_log.isInfoEnabled()) {
 			_log.info("Adding NPM package: " + flatJSPackage);

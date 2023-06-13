@@ -27,7 +27,7 @@ SearchContainer entriesSearchContainer = blogEntriesDisplayContext.getSearchCont
 
 PortletURL portletURL = entriesSearchContainer.getIteratorURL();
 
-BlogEntriesManagementToolbarDisplayContext blogEntriesManagementToolbarDisplayContext = new BlogEntriesManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, entriesSearchContainer, trashHelper, displayStyle);
+BlogEntriesManagementToolbarDisplayContext blogEntriesManagementToolbarDisplayContext = new BlogEntriesManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, entriesSearchContainer, trashHelper, displayStyle);
 %>
 
 <clay:management-toolbar
@@ -75,9 +75,9 @@ BlogEntriesManagementToolbarDisplayContext blogEntriesManagementToolbarDisplayCo
 				</liferay-portlet:renderURL>
 
 				<%
-				Map<String, Object> rowData = new HashMap<>();
-
-				rowData.put("actions", StringUtil.merge(blogEntriesDisplayContext.getAvailableActions(entry)));
+				Map<String, Object> rowData = HashMapBuilder.<String, Object>put(
+					"actions", StringUtil.merge(blogEntriesDisplayContext.getAvailableActions(entry))
+				).build();
 
 				row.setData(rowData);
 				%>

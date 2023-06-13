@@ -45,7 +45,7 @@ public abstract class ScreensCommentServiceBaseImpl
 	extends BaseServiceImpl
 	implements AopService, IdentifiableOSGiService, ScreensCommentService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>ScreensCommentService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.screens.service.ScreensCommentServiceUtil</code>.
@@ -91,8 +91,8 @@ public abstract class ScreensCommentServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

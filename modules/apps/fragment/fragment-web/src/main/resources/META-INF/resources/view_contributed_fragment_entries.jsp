@@ -17,7 +17,7 @@
 <%@ include file="/init.jsp" %>
 
 <%
-ContributedFragmentManagementToolbarDisplayContext contributedFragmentManagementToolbarDisplayContext = new ContributedFragmentManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, fragmentDisplayContext);
+ContributedFragmentManagementToolbarDisplayContext contributedFragmentManagementToolbarDisplayContext = new ContributedFragmentManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, fragmentDisplayContext);
 %>
 
 <clay:management-toolbar
@@ -48,7 +48,6 @@ ContributedFragmentManagementToolbarDisplayContext contributedFragmentManagement
 		<liferay-ui:search-iterator
 			displayStyle="icon"
 			markupView="lexicon"
-			resultRowSplitter="<%= fragmentDisplayContext.isSearch() ? null : new FragmentEntryResultRowSplitter() %>"
 			searchResultCssClass="card-page"
 		/>
 	</liferay-ui:search-container>

@@ -426,11 +426,6 @@ public class MessageWrapper
 		return model.hasFlag(flag);
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a message model instance should use the <code>Message</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

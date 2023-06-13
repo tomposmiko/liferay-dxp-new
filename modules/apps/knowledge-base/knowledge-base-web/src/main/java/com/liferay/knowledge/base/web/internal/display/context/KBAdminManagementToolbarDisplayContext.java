@@ -41,6 +41,7 @@ import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -50,7 +51,6 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -69,15 +69,16 @@ import javax.servlet.http.HttpServletRequest;
 public class KBAdminManagementToolbarDisplayContext {
 
 	public KBAdminManagementToolbarDisplayContext(
+			HttpServletRequest httpServletRequest,
 			LiferayPortletRequest liferayPortletRequest,
 			LiferayPortletResponse liferayPortletResponse,
-			HttpServletRequest httpServletRequest, RenderRequest renderRequest,
-			RenderResponse renderResponse, PortletConfig portletConfig)
+			RenderRequest renderRequest, RenderResponse renderResponse,
+			PortletConfig portletConfig)
 		throws PortalException, PortletException {
 
+		_httpServletRequest = httpServletRequest;
 		_liferayPortletRequest = liferayPortletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
-		_httpServletRequest = httpServletRequest;
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
 		_portletConfig = portletConfig;
@@ -456,12 +457,15 @@ public class KBAdminManagementToolbarDisplayContext {
 	private List<DropdownItem> _getOrderByDropdownItems() {
 		return new DropdownItemList() {
 			{
-				final Map<String, String> orderColumnsMap = new HashMap<>();
-
-				orderColumnsMap.put("modifiedDate", "modified-date");
-				orderColumnsMap.put("priority", "priority");
-				orderColumnsMap.put("title", "title");
-				orderColumnsMap.put("viewCount", "view-count");
+				final Map<String, String> orderColumnsMap = HashMapBuilder.put(
+					"modifiedDate", "modified-date"
+				).put(
+					"priority", "priority"
+				).put(
+					"title", "title"
+				).put(
+					"viewCount", "view-count"
+				).build();
 
 				String[] orderColumns = {
 					"priority", "modifiedDate", "title", "viewCount"

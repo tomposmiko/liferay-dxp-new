@@ -52,6 +52,7 @@ import com.liferay.portal.kernel.template.TemplateResource;
 import com.liferay.portal.kernel.template.URLTemplateResource;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -95,8 +96,8 @@ public class DDMFormEmailNotificationSender {
 
 			_mailService.sendEmail(mailMessage);
 		}
-		catch (Exception e) {
-			_log.error("Unable to send form email", e);
+		catch (Exception exception) {
+			_log.error("Unable to send form email", exception);
 		}
 	}
 
@@ -252,8 +253,6 @@ public class DDMFormEmailNotificationSender {
 	protected Map<String, Object> getField(
 		List<DDMFormFieldValue> ddmFormFieldValues, Locale locale) {
 
-		Map<String, Object> fieldMap = new HashMap<>();
-
 		String labelString = null;
 		StringBundler sb = new StringBundler(
 			(ddmFormFieldValues.size() * 2) - 1);
@@ -279,6 +278,8 @@ public class DDMFormEmailNotificationSender {
 				sb.append(StringPool.COMMA_AND_SPACE);
 			}
 		}
+
+		Map<String, Object> fieldMap = new HashMap<>();
 
 		fieldMap.put("label", labelString);
 		fieldMap.put("value", _soyDataFactory.createSoyRawData(sb.toString()));
@@ -338,19 +339,18 @@ public class DDMFormEmailNotificationSender {
 		Map<String, List<DDMFormFieldValue>> ddmFormFieldValuesMap,
 		Locale locale) {
 
-		Map<String, Object> pageMap = new HashMap<>();
-
-		pageMap.put(
+		return HashMapBuilder.<String, Object>put(
 			"fields",
 			getFields(
-				getFieldNames(ddmFormLayoutPage), ddmFormFieldValuesMap,
-				locale));
+				getFieldNames(ddmFormLayoutPage), ddmFormFieldValuesMap, locale)
+		).put(
+			"title",
+			() -> {
+				LocalizedValue title = ddmFormLayoutPage.getTitle();
 
-		LocalizedValue title = ddmFormLayoutPage.getTitle();
-
-		pageMap.put("title", title.getString(locale));
-
-		return pageMap;
+				return title.getString(locale);
+			}
+		).build();
 	}
 
 	protected List<Object> getPages(
@@ -424,17 +424,16 @@ public class DDMFormEmailNotificationSender {
 			DDMFormInstance ddmFormInstance, ThemeDisplay themeDisplay)
 		throws PortalException {
 
-		Map<String, String[]> params = new HashMap<>();
-
 		String portletNamespace = _portal.getPortletNamespace(
 			DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM_ADMIN);
 
-		params.put(
+		Map<String, String[]> params = HashMapBuilder.put(
 			portletNamespace.concat("mvcPath"),
-			new String[] {"/admin/view_form_instance_records.jsp"});
-		params.put(
+			new String[] {"/admin/view_form_instance_records.jsp"}
+		).put(
 			portletNamespace.concat("formInstanceId"),
-			new String[] {String.valueOf(ddmFormInstance.getFormInstanceId())});
+			new String[] {String.valueOf(ddmFormInstance.getFormInstanceId())}
+		).build();
 
 		return _portal.getSiteAdminURL(
 			themeDisplay, DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM_ADMIN,
@@ -447,22 +446,21 @@ public class DDMFormEmailNotificationSender {
 			ThemeDisplay themeDisplay)
 		throws PortalException {
 
-		Map<String, String[]> params = new HashMap<>();
-
 		String portletNamespace = _portal.getPortletNamespace(
 			DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM_ADMIN);
 
-		params.put(
+		Map<String, String[]> params = HashMapBuilder.put(
 			portletNamespace.concat("mvcPath"),
-			new String[] {"/admin/view_form_instance_record.jsp"});
-		params.put(
+			new String[] {"/admin/view_form_instance_record.jsp"}
+		).put(
 			portletNamespace.concat("formInstanceRecordId"),
 			new String[] {
 				String.valueOf(ddmFormInstanceRecord.getFormInstanceRecordId())
-			});
-		params.put(
+			}
+		).put(
 			portletNamespace.concat("formInstanceId"),
-			new String[] {String.valueOf(ddmFormInstance.getFormInstanceId())});
+			new String[] {String.valueOf(ddmFormInstance.getFormInstanceId())}
+		).build();
 
 		return _portal.getSiteAdminURL(
 			themeDisplay, DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM_ADMIN,

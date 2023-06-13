@@ -32,7 +32,7 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class BookmarksEntryLocalServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.bookmarks.service.impl.BookmarksEntryLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
@@ -426,16 +426,6 @@ public class BookmarksEntryLocalServiceUtil {
 			getIndexableActionableDynamicQuery() {
 
 		return getService().getIndexableActionableDynamicQuery();
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public static java.util.List<com.liferay.bookmarks.model.BookmarksEntry>
-		getNoAssetEntries() {
-
-		return getService().getNoAssetEntries();
 	}
 
 	/**

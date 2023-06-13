@@ -55,7 +55,7 @@ import org.osgi.annotation.versioning.ProviderType;
 )
 public interface MBMessageService extends BaseService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link MBMessageServiceUtil} to access the message-boards message remote service. Add custom service methods to <code>com.liferay.message.boards.service.impl.MBMessageServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -218,18 +218,6 @@ public interface MBMessageService extends BaseService {
 			long messageId, String subject, String body,
 			List<ObjectValuePair<String, InputStream>> inputStreamOVPs,
 			double priority, boolean allowPingbacks,
-			ServiceContext serviceContext)
-		throws PortalException;
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link #updateMessage(long,
-	 String, String, List, double, boolean, ServiceContext)}
-	 */
-	@Deprecated
-	public MBMessage updateMessage(
-			long messageId, String subject, String body,
-			List<ObjectValuePair<String, InputStream>> inputStreamOVPs,
-			List<String> existingFiles, double priority, boolean allowPingbacks,
 			ServiceContext serviceContext)
 		throws PortalException;
 

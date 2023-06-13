@@ -14,10 +14,12 @@
 
 package com.liferay.portal.kernel.service;
 
+import com.liferay.petra.string.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.sql.SQLException;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,15 +31,17 @@ public class SQLStateAcceptor implements RetryAcceptor {
 
 	public static final String SQLSTATE_INTEGRITY_CONSTRAINT_VIOLATION = "23";
 
+	public static final String SQLSTATE_TRANSACTION_ROLLBACK = "40";
+
 	@Override
 	public boolean acceptException(
 		Throwable throwable, Map<String, String> propertyMap) {
 
-		String sqlState = propertyMap.get(SQLSTATE);
+		List<String> sqlStates = StringUtil.split(propertyMap.get(SQLSTATE));
 
 		while (true) {
 			if ((throwable instanceof SQLException) &&
-				_scanForSQLState((SQLException)throwable, sqlState)) {
+				_scanForSQLState((SQLException)throwable, sqlStates)) {
 
 				return true;
 			}
@@ -61,28 +65,40 @@ public class SQLStateAcceptor implements RetryAcceptor {
 		return false;
 	}
 
-	private boolean _scanForSQLState(
-		SQLException sqle, String expectedSQLState) {
+	private boolean _hasSQLState(
+		String sqlState, List<String> expectedSQLStates) {
 
-		while (true) {
-			String sqlState = sqle.getSQLState();
+		if (Validator.isNull(sqlState)) {
+			return false;
+		}
 
-			if (Validator.isNotNull(sqlState) &&
-				sqlState.startsWith(expectedSQLState)) {
-
+		for (String expectedSQLState : expectedSQLStates) {
+			if (sqlState.startsWith(expectedSQLState)) {
 				return true;
 			}
-
-			SQLException nextSQLE = sqle.getNextException();
-
-			if ((nextSQLE == null) || nextSQLE.equals(sqle)) {
-				break;
-			}
-
-			sqle = nextSQLE;
 		}
 
 		return false;
+	}
+
+	private boolean _scanForSQLState(
+		SQLException sqlException1, List<String> expectedSQLStates) {
+
+		while (true) {
+			if (_hasSQLState(sqlException1.getSQLState(), expectedSQLStates)) {
+				return true;
+			}
+
+			SQLException sqlException2 = sqlException1.getNextException();
+
+			if ((sqlException2 == null) ||
+				sqlException2.equals(sqlException1)) {
+
+				return false;
+			}
+
+			sqlException1 = sqlException2;
+		}
 	}
 
 }

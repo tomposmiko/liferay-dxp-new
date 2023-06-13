@@ -30,16 +30,10 @@ import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
  */
 public class AssetVocabularyServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.portlet.asset.service.impl.AssetVocabularyServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
-	 */
-
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link AssetVocabularyServiceUtil} to access the asset vocabulary remote service. Add custom service methods to <code>com.liferay.portlet.asset.service.impl.AssetVocabularyServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	public static com.liferay.asset.kernel.model.AssetVocabulary addVocabulary(
 			long groupId, String title,
@@ -81,17 +75,6 @@ public class AssetVocabularyServiceUtil {
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return getService().fetchVocabulary(vocabularyId);
-	}
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
-	 */
-	@Deprecated
-	public static java.util.List<com.liferay.asset.kernel.model.AssetVocabulary>
-			getCompanyVocabularies(long companyId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return getService().getCompanyVocabularies(companyId);
 	}
 
 	public static java.util.List<com.liferay.asset.kernel.model.AssetVocabulary>
@@ -208,18 +191,6 @@ public class AssetVocabularyServiceUtil {
 	 */
 	public static String getOSGiServiceIdentifier() {
 		return getService().getOSGiServiceIdentifier();
-	}
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 AssetUtil#filterVocabularyIds(PermissionChecker, long[])}
-	 */
-	@Deprecated
-	public static java.util.List<com.liferay.asset.kernel.model.AssetVocabulary>
-			getVocabularies(long[] vocabularyIds)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return getService().getVocabularies(vocabularyIds);
 	}
 
 	public static com.liferay.asset.kernel.model.AssetVocabulary getVocabulary(

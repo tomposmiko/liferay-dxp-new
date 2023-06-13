@@ -1723,21 +1723,12 @@ public class UpgradeDynamicDataMappingTest {
 		Registry registry = RegistryUtil.getRegistry();
 
 		UpgradeStepRegistrator upgradeStepRegistror = registry.getService(
-			"com.liferay.dynamic.data.mapping.internal.upgrade." +
-				"DDMServiceUpgrade");
+			registry.getServiceReference(
+				"com.liferay.dynamic.data.mapping.internal.upgrade." +
+					"DDMServiceUpgrade"));
 
 		upgradeStepRegistror.register(
 			new UpgradeStepRegistrator.Registry() {
-
-				@Override
-				public void register(
-					String bundleSymbolicName, String fromSchemaVersionString,
-					String toSchemaVersionString, UpgradeStep... upgradeSteps) {
-
-					register(
-						fromSchemaVersionString, toSchemaVersionString,
-						upgradeSteps);
-				}
 
 				@Override
 				public void register(

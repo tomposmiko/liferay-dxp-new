@@ -223,16 +223,37 @@ public class WikiPageStagedModelDataHandler
 					page.getFormat(), page.isHead(), page.getParentTitle(),
 					page.getRedirectTitle(), serviceContext);
 
-				importedPageResource =
-					_wikiPageResourceLocalService.getPageResource(
-						importedPage.getResourcePrimKey());
-
 				String pageResourceUuid = GetterUtil.getString(
 					pageElement.attributeValue("page-resource-uuid"));
 
 				if (Validator.isNotNull(pageResourceUuid)) {
-					importedPageResource.setUuid(
-						pageElement.attributeValue("page-resource-uuid"));
+					WikiPageResource wikiPageResource =
+						_wikiPageResourceLocalService.
+							fetchWikiPageResourceByUuidAndGroupId(
+								pageResourceUuid,
+								portletDataContext.getScopeGroupId());
+
+					importedPageResource =
+						_wikiPageResourceLocalService.getPageResource(
+							importedPage.getResourcePrimKey());
+
+					if (wikiPageResource != null) {
+						importedPage.setResourcePrimKey(
+							wikiPageResource.getPrimaryKey());
+
+						importedPage = _wikiPageLocalService.updateWikiPage(
+							importedPage, serviceContext);
+
+						_wikiPageResourceLocalService.deleteWikiPageResource(
+							importedPageResource);
+					}
+					else {
+						importedPageResource.setUuid(
+							pageElement.attributeValue("page-resource-uuid"));
+
+						_wikiPageResourceLocalService.updateWikiPageResource(
+							importedPageResource);
+					}
 				}
 			}
 			else {
@@ -247,10 +268,10 @@ public class WikiPageStagedModelDataHandler
 						importedPage.getResourcePrimKey());
 
 				importedPageResource.setTitle(page.getTitle());
-			}
 
-			_wikiPageResourceLocalService.updateWikiPageResource(
-				importedPageResource);
+				_wikiPageResourceLocalService.updateWikiPageResource(
+					importedPageResource);
+			}
 		}
 		else {
 			existingPage = fetchStagedModelByUuidAndGroupId(
@@ -369,12 +390,12 @@ public class WikiPageStagedModelDataHandler
 			try {
 				return FileEntryUtil.getContentStream(fileEntry);
 			}
-			catch (NoSuchFileException nsfe) {
+			catch (NoSuchFileException noSuchFileException) {
 
 				// LPS-52675
 
 				if (_log.isDebugEnabled()) {
-					_log.debug(nsfe, nsfe);
+					_log.debug(noSuchFileException, noSuchFileException);
 				}
 
 				return null;

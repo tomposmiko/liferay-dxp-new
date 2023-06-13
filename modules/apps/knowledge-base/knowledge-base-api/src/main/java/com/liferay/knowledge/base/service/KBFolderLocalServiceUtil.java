@@ -32,7 +32,7 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class KBFolderLocalServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.knowledge.base.service.impl.KBFolderLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
@@ -433,22 +433,6 @@ public class KBFolderLocalServiceUtil {
 		com.liferay.knowledge.base.model.KBFolder kbFolder) {
 
 		return getService().updateKBFolder(kbFolder);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #updateKBFolder(long, long, long, String, String,
-	 ServiceContext)}
-	 */
-	@Deprecated
-	public static com.liferay.knowledge.base.model.KBFolder updateKBFolder(
-			long parentResourceClassNameId, long parentResourcePrimKey,
-			long kbFolderId, String name, String description)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return getService().updateKBFolder(
-			parentResourceClassNameId, parentResourcePrimKey, kbFolderId, name,
-			description);
 	}
 
 	public static com.liferay.knowledge.base.model.KBFolder updateKBFolder(

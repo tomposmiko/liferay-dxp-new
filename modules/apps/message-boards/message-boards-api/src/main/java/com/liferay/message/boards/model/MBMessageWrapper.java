@@ -57,6 +57,7 @@ public class MBMessageWrapper
 		attributes.put("threadId", getThreadId());
 		attributes.put("rootMessageId", getRootMessageId());
 		attributes.put("parentMessageId", getParentMessageId());
+		attributes.put("treePath", getTreePath());
 		attributes.put("subject", getSubject());
 		attributes.put("body", getBody());
 		attributes.put("format", getFormat());
@@ -159,6 +160,12 @@ public class MBMessageWrapper
 			setParentMessageId(parentMessageId);
 		}
 
+		String treePath = (String)attributes.get("treePath");
+
+		if (treePath != null) {
+			setTreePath(treePath);
+		}
+
 		String subject = (String)attributes.get("subject");
 
 		if (subject != null) {
@@ -238,6 +245,13 @@ public class MBMessageWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return model.addAttachmentsFolder();
+	}
+
+	@Override
+	public String buildTreePath()
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return model.buildTreePath();
 	}
 
 	/**
@@ -619,6 +633,16 @@ public class MBMessageWrapper
 	}
 
 	/**
+	 * Returns the tree path of this message-boards message.
+	 *
+	 * @return the tree path of this message-boards message
+	 */
+	@Override
+	public String getTreePath() {
+		return model.getTreePath();
+	}
+
+	/**
 	 * Returns the user ID of this message-boards message.
 	 *
 	 * @return the user ID of this message-boards message
@@ -823,11 +847,6 @@ public class MBMessageWrapper
 		return model.isScheduled();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a message-boards message model instance should use the <code>MBMessage</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();
@@ -1094,6 +1113,16 @@ public class MBMessageWrapper
 	}
 
 	/**
+	 * Sets the tree path of this message-boards message.
+	 *
+	 * @param treePath the tree path of this message-boards message
+	 */
+	@Override
+	public void setTreePath(String treePath) {
+		model.setTreePath(treePath);
+	}
+
+	/**
 	 * Sets the user ID of this message-boards message.
 	 *
 	 * @param userId the user ID of this message-boards message
@@ -1131,6 +1160,11 @@ public class MBMessageWrapper
 	@Override
 	public void setUuid(String uuid) {
 		model.setUuid(uuid);
+	}
+
+	@Override
+	public void updateTreePath(String treePath) {
+		model.updateTreePath(treePath);
 	}
 
 	@Override

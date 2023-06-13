@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.MimeTypes;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -85,8 +86,8 @@ public class MimeTypesImpl implements MimeTypes, MimeTypesReaderMetKeys {
 			read(url.openStream(), _extensionsMap);
 			read(customMimeTypesUrl.openStream(), _customExtensionsMap);
 		}
-		catch (Exception e) {
-			_log.error("Unable to populate extensions map", e);
+		catch (Exception exception) {
+			_log.error("Unable to populate extensions map", exception);
 		}
 	}
 
@@ -104,9 +105,9 @@ public class MimeTypesImpl implements MimeTypes, MimeTypesReaderMetKeys {
 		try (InputStream is = TikaInputStream.get(file)) {
 			return getContentType(is, fileName);
 		}
-		catch (IOException ioe) {
+		catch (IOException ioException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(ioe, ioe);
+				_log.warn(ioException, ioException);
 			}
 		}
 
@@ -129,7 +130,8 @@ public class MimeTypesImpl implements MimeTypes, MimeTypesReaderMetKeys {
 			if (ContentTypes.APPLICATION_OCTET_STREAM.equals(contentType)) {
 				Metadata metadata = new Metadata();
 
-				metadata.set(Metadata.RESOURCE_NAME_KEY, fileName);
+				metadata.set(
+					Metadata.RESOURCE_NAME_KEY, HtmlUtil.escapeURL(fileName));
 
 				MediaType mediaType = _detector.detect(
 					tikaInputStream, metadata);
@@ -153,8 +155,8 @@ public class MimeTypesImpl implements MimeTypes, MimeTypesReaderMetKeys {
 				contentType = ContentTypes.APPLICATION_OCTET_STREAM;
 			}
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
 			contentType = ContentTypes.APPLICATION_OCTET_STREAM;
 		}
@@ -176,7 +178,8 @@ public class MimeTypesImpl implements MimeTypes, MimeTypesReaderMetKeys {
 			if (ContentTypes.APPLICATION_OCTET_STREAM.equals(contentType)) {
 				Metadata metadata = new Metadata();
 
-				metadata.set(Metadata.RESOURCE_NAME_KEY, fileName);
+				metadata.set(
+					Metadata.RESOURCE_NAME_KEY, HtmlUtil.escapeURL(fileName));
 
 				MediaType mediaType = _detector.detect(null, metadata);
 
@@ -190,8 +193,8 @@ public class MimeTypesImpl implements MimeTypes, MimeTypesReaderMetKeys {
 				_log.debug("Retrieved invalid content type " + contentType);
 			}
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 
 		return ContentTypes.APPLICATION_OCTET_STREAM;
@@ -240,15 +243,6 @@ public class MimeTypesImpl implements MimeTypes, MimeTypesReaderMetKeys {
 		return ContentTypes.APPLICATION_OCTET_STREAM;
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link #read(InputStream,
-	 *             Map)}
-	 */
-	@Deprecated
-	protected void read(InputStream stream) throws Exception {
-		read(stream, _extensionsMap);
-	}
-
 	protected void read(
 			InputStream stream, Map<String, Set<String>> extensionsMap)
 		throws Exception {
@@ -282,15 +276,6 @@ public class MimeTypesImpl implements MimeTypes, MimeTypesReaderMetKeys {
 				readMimeType(childElement, extensionsMap);
 			}
 		}
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #readMimeType(Element, Map)}
-	 */
-	@Deprecated
-	protected void readMimeType(Element element) {
-		readMimeType(element, _extensionsMap);
 	}
 
 	protected void readMimeType(

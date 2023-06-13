@@ -17,7 +17,7 @@
 <%@ include file="/init.jsp" %>
 
 <%
-SiteNavigationAdminManagementToolbarDisplayContext siteNavigationAdminManagementToolbarDisplayContext = new SiteNavigationAdminManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, siteNavigationAdminDisplayContext);
+SiteNavigationAdminManagementToolbarDisplayContext siteNavigationAdminManagementToolbarDisplayContext = new SiteNavigationAdminManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, siteNavigationAdminDisplayContext);
 %>
 
 <clay:management-toolbar
@@ -142,7 +142,7 @@ SiteNavigationAdminManagementToolbarDisplayContext siteNavigationAdminManagement
 	</liferay-ui:search-container>
 </aui:form>
 
-<aui:script require="metal-dom/src/all/dom as dom,frontend-js-web/liferay/modal/commands/OpenSimpleInputModal.es as modalCommands" sandbox="<%= true %>">
+<aui:script require="metal-dom/src/all/dom as dom,frontend-js-web/liferay/modal/commands/OpenSimpleInputModal.es as openSimpleInputModal" sandbox="<%= true %>">
 	var renameSiteNavigationMenuClickHandler = dom.delegate(
 		document.body,
 		'click',
@@ -152,7 +152,7 @@ SiteNavigationAdminManagementToolbarDisplayContext siteNavigationAdminManagement
 
 			event.preventDefault();
 
-			modalCommands.openSimpleInputModal({
+			openSimpleInputModal.default({
 				dialogTitle:
 					'<liferay-ui:message key="rename-site-navigation-menu" />',
 				formSubmitURL: data.formSubmitUrl,
@@ -180,5 +180,5 @@ SiteNavigationAdminManagementToolbarDisplayContext siteNavigationAdminManagement
 
 <liferay-frontend:component
 	componentId="<%= siteNavigationAdminManagementToolbarDisplayContext.getDefaultEventHandler() %>"
-	module="js/ManagementToolbarDefaultEventHandler.es"
+	module="js/ManagementToolbarDefaultEventHandler"
 />

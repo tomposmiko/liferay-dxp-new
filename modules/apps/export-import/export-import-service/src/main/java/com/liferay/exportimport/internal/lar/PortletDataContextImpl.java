@@ -17,7 +17,6 @@ package com.liferay.exportimport.internal.lar;
 import com.liferay.asset.kernel.model.AssetLink;
 import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetLinkLocalServiceUtil;
-import com.liferay.asset.kernel.service.AssetTagLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.model.ExpandoColumn;
@@ -33,7 +32,6 @@ import com.liferay.exportimport.kernel.lar.ExportImportPathUtil;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.exportimport.kernel.lar.ManifestSummary;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
-import com.liferay.exportimport.kernel.lar.PortletDataContextListener;
 import com.liferay.exportimport.kernel.lar.PortletDataException;
 import com.liferay.exportimport.kernel.lar.PortletDataHandlerControl;
 import com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys;
@@ -110,7 +108,6 @@ import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.kernel.xml.XPath;
 import com.liferay.portal.kernel.zip.ZipReader;
 import com.liferay.portal.kernel.zip.ZipWriter;
-import com.liferay.ratings.kernel.model.RatingsEntry;
 import com.liferay.xstream.configurator.XStreamConfigurator;
 import com.liferay.xstream.configurator.XStreamConfiguratorRegistryUtil;
 
@@ -168,16 +165,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 		_lockManager = lockManager;
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             com.liferay.exportimport.kernel.lar.BaseStagedModelDataHandler#exportAssetCategories(
-	 *             PortletDataContext, StagedModel)}
-	 */
-	@Deprecated
-	@Override
-	public void addAssetCategories(Class<?> clazz, long classPK) {
-	}
-
 	@Override
 	public void addAssetCategories(
 		String className, long classPK, long[] assetCategoryIds) {
@@ -185,21 +172,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 		_assetCategoryIdsMap.put(
 			getPrimaryKeyString(className, (Serializable)classPK),
 			assetCategoryIds);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             BaseStagedModelDataHandler#exportAssetTags(
-	 *             PortletDataContext, StagedModel)}
-	 */
-	@Deprecated
-	@Override
-	public void addAssetTags(Class<?> clazz, long classPK) {
-		String[] tagNames = AssetTagLocalServiceUtil.getTagNames(
-			clazz.getName(), classPK);
-
-		_assetTagNamesMap.put(
-			getPrimaryKeyString(clazz, (Serializable)classPK), tagNames);
 	}
 
 	@Override
@@ -281,16 +253,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             com.liferay.exportimport.kernel.lar.BaseStagedModelDataHandler#exportComments(
-	 *             PortletDataContext, StagedModel)}
-	 */
-	@Deprecated
-	@Override
-	public void addComments(Class<?> clazz, long classPK) {
-	}
-
-	/**
 	 * @see #isWithinDateRange(Date)
 	 */
 	@Override
@@ -339,16 +301,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 		_locksMap.put(getPrimaryKeyString(className, (Serializable)key), lock);
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #addPermissions(Class, Serializable)}
-	 */
-	@Deprecated
-	@Override
-	public void addPermissions(Class<?> clazz, long classPK) {
-		addPermissions(clazz.getName(), Long.valueOf(classPK));
-	}
-
 	@Override
 	public void addPermissions(Class<?> clazz, Serializable classPK) {
 		addPermissions(clazz.getName(), GetterUtil.getLong(classPK));
@@ -386,8 +338,8 @@ public class PortletDataContextImpl implements PortletDataContext {
 					roleName = ExportImportPermissionUtil.getTeamRoleName(
 						role.getDescriptiveName());
 				}
-				catch (PortalException pe) {
-					_log.error(pe, pe);
+				catch (PortalException portalException) {
+					_log.error(portalException, portalException);
 				}
 			}
 
@@ -450,42 +402,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 		}
 
 		return value;
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             com.liferay.exportimport.kernel.lar.BaseStagedModelDataHandler#exportRatings(
-	 *             PortletDataContext, StagedModel)}
-	 */
-	@Deprecated
-	@Override
-	public void addRatingsEntries(Class<?> clazz, long classPK) {
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             com.liferay.exportimport.kernel.lar.BaseStagedModelDataHandler#exportRatings(
-	 *             PortletDataContext, StagedModel)}
-	 */
-	@Deprecated
-	@Override
-	public void addRatingsEntries(
-		String className, long classPK, List<RatingsEntry> ratingsEntries) {
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public Element addReferenceElement(
-		ClassedModel referrerClassedModel, Element element,
-		ClassedModel classedModel, Class<?> clazz, String referenceType,
-		boolean missing) {
-
-		return addReferenceElement(
-			referrerClassedModel, element, classedModel, clazz.getName(),
-			StringPool.BLANK, referenceType, missing);
 	}
 
 	@Override
@@ -572,14 +488,16 @@ public class PortletDataContextImpl implements PortletDataContext {
 
 			zipWriter.addEntry(path, bytes);
 		}
-		catch (IOException ioe) {
-			ExportImportIOException eiioe = new ExportImportIOException(
-				PortletDataContextImpl.class.getName(), ioe);
+		catch (IOException ioException) {
+			ExportImportIOException exportImportIOException =
+				new ExportImportIOException(
+					PortletDataContextImpl.class.getName(), ioException);
 
-			eiioe.setFileName(path);
-			eiioe.setType(ExportImportIOException.ADD_ZIP_ENTRY_BYTES);
+			exportImportIOException.setFileName(path);
+			exportImportIOException.setType(
+				ExportImportIOException.ADD_ZIP_ENTRY_BYTES);
 
-			throw new SystemException(eiioe);
+			throw new SystemException(exportImportIOException);
 		}
 	}
 
@@ -594,14 +512,16 @@ public class PortletDataContextImpl implements PortletDataContext {
 
 			zipWriter.addEntry(path, is);
 		}
-		catch (IOException ioe) {
-			ExportImportIOException eiioe = new ExportImportIOException(
-				PortletDataContextImpl.class.getName(), ioe);
+		catch (IOException ioException) {
+			ExportImportIOException exportImportIOException =
+				new ExportImportIOException(
+					PortletDataContextImpl.class.getName(), ioException);
 
-			eiioe.setFileName(path);
-			eiioe.setType(ExportImportIOException.ADD_ZIP_ENTRY_STREAM);
+			exportImportIOException.setFileName(path);
+			exportImportIOException.setType(
+				ExportImportIOException.ADD_ZIP_ENTRY_STREAM);
 
-			throw new SystemException(eiioe);
+			throw new SystemException(exportImportIOException);
 		}
 	}
 
@@ -621,14 +541,16 @@ public class PortletDataContextImpl implements PortletDataContext {
 
 			zipWriter.addEntry(path, s);
 		}
-		catch (IOException ioe) {
-			ExportImportIOException eiioe = new ExportImportIOException(
-				PortletDataContextImpl.class.getName(), ioe);
+		catch (IOException ioException) {
+			ExportImportIOException exportImportIOException =
+				new ExportImportIOException(
+					PortletDataContextImpl.class.getName(), ioException);
 
-			eiioe.setFileName(path);
-			eiioe.setType(ExportImportIOException.ADD_ZIP_ENTRY_STRING);
+			exportImportIOException.setFileName(path);
+			exportImportIOException.setType(
+				ExportImportIOException.ADD_ZIP_ENTRY_STRING);
 
-			throw new SystemException(eiioe);
+			throw new SystemException(exportImportIOException);
 		}
 	}
 
@@ -711,16 +633,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 		return _xStream.fromXML(xml);
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #getAssetCategoryIds(Class, Serializable)}
-	 */
-	@Deprecated
-	@Override
-	public long[] getAssetCategoryIds(Class<?> clazz, long classPK) {
-		return getAssetCategoryIds(clazz, Long.valueOf(classPK));
-	}
-
 	@Override
 	public long[] getAssetCategoryIds(Class<?> clazz, Serializable classPK) {
 		long[] assetCategoryIds = _assetCategoryIdsMap.get(
@@ -733,61 +645,14 @@ public class PortletDataContextImpl implements PortletDataContext {
 		return assetCategoryIds;
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public Map<String, long[]> getAssetCategoryIdsMap() {
-		return Collections.emptyMap();
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public Map<String, String[]> getAssetCategoryUuidsMap() {
-		return Collections.emptyMap();
-	}
-
 	@Override
 	public Set<Long> getAssetLinkIds() {
 		return _assetLinkIds;
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link #getAssetLinkIds()}
-	 */
-	@Deprecated
-	@Override
-	public Map<String, List<AssetLink>> getAssetLinksMap() {
-		return Collections.emptyMap();
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #getAssetTagNames(Class, Serializable)}
-	 */
-	@Deprecated
-	@Override
-	public String[] getAssetTagNames(Class<?> clazz, long classPK) {
-		return getAssetTagNames(clazz, Long.valueOf(classPK));
-	}
-
 	@Override
 	public String[] getAssetTagNames(Class<?> clazz, Serializable classPK) {
 		return getAssetTagNames(getPrimaryKeyString(clazz, classPK));
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #getAssetTagNames(String, Serializable)}
-	 */
-	@Deprecated
-	@Override
-	public String[] getAssetTagNames(String className, long classPK) {
-		return getAssetTagNames(className, Long.valueOf(classPK));
 	}
 
 	@Override
@@ -893,18 +758,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 		return getExportDataElement(
 			classedModel,
 			ExportImportClassedModelUtil.getClassSimpleName(classedModel));
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #getExportDataElement(ClassedModel, String)}
-	 */
-	@Deprecated
-	@Override
-	public Element getExportDataElement(
-		ClassedModel classedModel, Class<?> modelClass) {
-
-		return getExportDataElement(classedModel, modelClass.getSimpleName());
 	}
 
 	@Override
@@ -1066,16 +919,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 		return _missingReferencesElement;
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #getNewPrimaryKeysMap(String)}
-	 */
-	@Deprecated
-	@Override
-	public List<Layout> getNewLayouts() {
-		return _newLayouts;
-	}
-
 	@Override
 	public Object getNewPrimaryKey(Class<?> clazz, Object newPrimaryKey) {
 		return getNewPrimaryKey(clazz.getName(), newPrimaryKey);
@@ -1111,15 +954,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 		return _newPrimaryKeysMaps;
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public long getOldPlid() {
-		return _oldPlid;
-	}
-
 	@Override
 	public Map<String, String[]> getParameterMap() {
 		return _parameterMap;
@@ -1143,15 +977,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 	@Override
 	public Set<String> getPrimaryKeys() {
 		return _primaryKeys;
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public Map<String, List<RatingsEntry>> getRatingsEntries() {
-		return Collections.emptyMap();
 	}
 
 	@Override
@@ -1210,17 +1035,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 		return getReferenceDataElement(parentElement, clazz, groupId, uuid);
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public List<Element> getReferenceDataElements(
-		Element parentElement, Class<?> clazz) {
-
-		return getReferenceDataElements(parentElement, clazz, null);
-	}
-
 	@Override
 	public List<Element> getReferenceDataElements(
 		Element parentElement, Class<?> clazz, String referenceType) {
@@ -1248,16 +1062,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 		return getReferenceDataElements(referenceElements, clazz);
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #getReferenceElement(Class, Serializable)}
-	 */
-	@Deprecated
-	@Override
-	public Element getReferenceElement(Class<?> clazz, long classPK) {
-		return getReferenceElement(clazz, Long.valueOf(classPK));
-	}
-
 	@Override
 	public Element getReferenceElement(Class<?> clazz, Serializable classPK) {
 		return getReferenceElement(clazz.getName(), classPK);
@@ -1278,37 +1082,11 @@ public class PortletDataContextImpl implements PortletDataContext {
 		return null;
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #getReferenceElement(StagedModel, Class, Serializable)}
-	 */
-	@Deprecated
-	@Override
-	public Element getReferenceElement(
-		StagedModel parentStagedModel, Class<?> clazz, long classPK) {
-
-		return getReferenceElement(
-			parentStagedModel, clazz, Long.valueOf(classPK));
-	}
-
 	@Override
 	public Element getReferenceElement(
 		StagedModel parentStagedModel, Class<?> clazz, Serializable classPK) {
 
 		return getReferenceElement(parentStagedModel, clazz.getName(), classPK);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #getReferenceElement(StagedModel, String, Serializable)}
-	 */
-	@Deprecated
-	@Override
-	public Element getReferenceElement(
-		StagedModel parentStagedModel, String className, long classPK) {
-
-		return getReferenceElement(
-			parentStagedModel, className, Long.valueOf(classPK));
 	}
 
 	@Override
@@ -1323,16 +1101,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 		}
 
 		return null;
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #getReferenceElement(String, Serializable)}
-	 */
-	@Deprecated
-	@Override
-	public Element getReferenceElement(String className, long classPK) {
-		return getReferenceElement(className, Long.valueOf(classPK));
 	}
 
 	@Override
@@ -1360,15 +1128,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 	@Override
 	public String getRootPortletId() {
 		return _rootPortletId;
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public Set<String> getScopedPrimaryKeys() {
-		return _scopedPrimaryKeys;
 	}
 
 	@Override
@@ -1431,15 +1190,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 		return _userPersonalSiteGroupId;
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public List<String> getZipEntries() {
-		return getZipReader().getEntries();
-	}
-
 	@Override
 	public byte[] getZipEntryAsByteArray(String path) {
 		if (!Validator.isFilePath(path, false)) {
@@ -1487,15 +1237,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 		}
 
 		return getZipReader().getEntryAsString(path);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public List<String> getZipFolderEntries() {
-		return getZipFolderEntries(StringPool.SLASH);
 	}
 
 	@Override
@@ -1600,17 +1341,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 		importPermissions(clazz, primaryKeyObj, newPrimaryKeyObj);
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             com.liferay.exportimport.kernel.lar.BaseStagedModelDataHandler#importComments(
-	 *             PortletDataContext, StagedModel)}
-	 */
-	@Deprecated
-	@Override
-	public void importComments(
-		Class<?> clazz, long classPK, long newClassPK, long groupId) {
-	}
-
 	@Override
 	public void importLocks(Class<?> clazz, String key, String newKey)
 		throws PortalException {
@@ -1635,19 +1365,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 		_lockManager.lock(
 			userId, clazz.getName(), newKey, lock.getOwner(),
 			lock.isInheritable(), expirationTime);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #importPermissions(Class, Serializable, Serializable)}
-	 */
-	@Deprecated
-	@Override
-	public void importPermissions(Class<?> clazz, long classPK, long newClassPK)
-		throws PortalException {
-
-		importPermissions(
-			clazz, Long.valueOf(classPK), Long.valueOf(newClassPK));
 	}
 
 	@Override
@@ -1696,9 +1413,11 @@ public class PortletDataContextImpl implements PortletDataContext {
 				try {
 					team = TeamLocalServiceUtil.getTeam(_groupId, roleName);
 				}
-				catch (NoSuchTeamException nste) {
+				catch (NoSuchTeamException noSuchTeamException) {
 					if (_log.isWarnEnabled()) {
-						_log.warn("Team " + roleName + " does not exist", nste);
+						_log.warn(
+							"Team " + roleName + " does not exist",
+							noSuchTeamException);
 					}
 
 					continue;
@@ -1716,9 +1435,11 @@ public class PortletDataContextImpl implements PortletDataContext {
 					role = RoleLocalServiceUtil.getRole(_companyId, roleName);
 				}
 			}
-			catch (NoSuchRoleException nsre) {
+			catch (NoSuchRoleException noSuchRoleException) {
 				if (_log.isWarnEnabled()) {
-					_log.warn("Role " + roleName + " does not exist", nsre);
+					_log.warn(
+						"Role " + roleName + " does not exist",
+						noSuchRoleException);
 				}
 
 				continue;
@@ -1757,17 +1478,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 		throws PortalException {
 
 		importPermissions(resourceName, getSourceGroupId(), getScopeGroupId());
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             com.liferay.exportimport.kernel.lar.BaseStagedModelDataHandler#importRatings(
-	 *             PortletDataContext, StagedModel)}
-	 */
-	@Deprecated
-	@Override
-	public void importRatingsEntries(
-		Class<?> clazz, long classPK, long newClassPK) {
 	}
 
 	@Override
@@ -1813,7 +1523,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 		try {
 			group = GroupLocalServiceUtil.getGroup(getGroupId());
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 		}
 
 		if (ExportImportThreadLocal.isStagingInProcess() && (group != null) &&
@@ -1868,16 +1578,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 		return _missingReferences.contains(referenceKey);
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #isModelCounted(String, Serializable)}
-	 */
-	@Deprecated
-	@Override
-	public boolean isModelCounted(String className, long classPK) {
-		return isModelCounted(className, Long.valueOf(classPK));
-	}
-
 	@Override
 	public boolean isModelCounted(String className, Serializable classPK) {
 		String modelCountedPrimaryKey = className.concat(
@@ -1892,15 +1592,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 	@Override
 	public boolean isPathExportedInScope(String path) {
 		return addScopedPrimaryKey(String.class, path);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public boolean isPathNotExportedInScope(String path) {
-		return !isPathExportedInScope(path);
 	}
 
 	@Override
@@ -2034,11 +1725,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	@Override
-	public void setOldPlid(long oldPlid) {
-		_oldPlid = oldPlid;
-	}
-
-	@Override
 	public void setParameterMap(Map<String, String[]> parameterMap) {
 		_parameterMap = parameterMap;
 	}
@@ -2046,15 +1732,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 	@Override
 	public void setPlid(long plid) {
 		_plid = plid;
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public void setPortetDataContextListener(
-		PortletDataContextListener portletDataContextListener) {
 	}
 
 	@Override
@@ -2278,9 +1955,9 @@ public class PortletDataContextImpl implements PortletDataContext {
 						expandoBridgeAttributes);
 				}
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(e, e);
+					_log.debug(exception, exception);
 				}
 			}
 		}
@@ -2401,16 +2078,16 @@ public class PortletDataContextImpl implements PortletDataContext {
 						referenceElement.addAttribute(
 							"scope-layout-uuid", scopeLayout.getUuid());
 					}
-					catch (NoSuchLayoutException nsle) {
+					catch (NoSuchLayoutException noSuchLayoutException) {
 						if (_log.isWarnEnabled()) {
 							_log.warn(
 								"Unable to find layout " + group.getClassPK(),
-								nsle);
+								noSuchLayoutException);
 						}
 					}
 				}
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (_log.isWarnEnabled()) {
 					_log.warn("Unable to find group " + groupId);
 				}
@@ -2500,12 +2177,13 @@ public class PortletDataContextImpl implements PortletDataContext {
 
 	protected Element getExportDataGroupElement(String name) {
 		if (_exportDataRootElement == null) {
-			PortletDataException pde = new PortletDataException(
-				PortletDataException.EXPORT_DATA_GROUP_ELEMENT);
+			PortletDataException portletDataException =
+				new PortletDataException(
+					PortletDataException.EXPORT_DATA_GROUP_ELEMENT);
 
-			pde.setStagedModelClassName(name);
+			portletDataException.setStagedModelClassName(name);
 
-			throw new SystemException(pde);
+			throw new SystemException(portletDataException);
 		}
 
 		Element groupElement = _exportDataRootElement.element(name);
@@ -2519,12 +2197,13 @@ public class PortletDataContextImpl implements PortletDataContext {
 
 	protected Element getImportDataGroupElement(String name) {
 		if (_importDataRootElement == null) {
-			PortletDataException pde = new PortletDataException(
-				PortletDataException.IMPORT_DATA_GROUP_ELEMENT);
+			PortletDataException portletDataException =
+				new PortletDataException(
+					PortletDataException.IMPORT_DATA_GROUP_ELEMENT);
 
-			pde.setStagedModelClassName(name);
+			portletDataException.setStagedModelClassName(name);
 
-			throw new SystemException(pde);
+			throw new SystemException(portletDataException);
 		}
 
 		if (Validator.isNull(name)) {
@@ -2685,8 +2364,8 @@ public class PortletDataContextImpl implements PortletDataContext {
 		try {
 			return getUserId(auditedModel.getUserUuid());
 		}
-		catch (SystemException se) {
-			_log.error(se, se);
+		catch (SystemException systemException) {
+			_log.error(systemException, systemException);
 		}
 
 		return 0;
@@ -2723,7 +2402,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 
 			_xStream.alias("sql-timestamp", timestampClass);
 		}
-		catch (ClassNotFoundException cnfe) {
+		catch (ClassNotFoundException classNotFoundException) {
 			if (_log.isDebugEnabled()) {
 				_log.debug(
 					"Unable to load class com.sybase.jdbc4.tds.SybTimestamp " +
@@ -2952,12 +2631,12 @@ public class PortletDataContextImpl implements PortletDataContext {
 					WorkflowDefinitionManagerUtil.getLatestWorkflowDefinition(
 						getCompanyId(), displayName);
 			}
-			catch (WorkflowException we) {
+			catch (WorkflowException workflowException) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(
 						"Unable to get workflow definition with name " +
 							displayName,
-						we);
+						workflowException);
 				}
 
 				continue;
@@ -2993,8 +2672,9 @@ public class PortletDataContextImpl implements PortletDataContext {
 							workflowDefinition.getName(),
 							workflowDefinition.getVersion());
 				}
-				catch (PortalException pe) {
-					throw new PortletDataException(pe.getMessage(), pe);
+				catch (PortalException portalException) {
+					throw new PortletDataException(
+						portalException.getMessage(), portalException);
 				}
 			}
 		}
@@ -3039,7 +2719,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 	private transient List<Layout> _newLayouts;
 	private final Map<String, Map<?, ?>> _newPrimaryKeysMaps = new HashMap<>();
 	private final Set<String> _notUniquePerLayout = new HashSet<>();
-	private long _oldPlid;
 	private Map<String, String[]> _parameterMap;
 	private final Map<String, List<KeyValuePair>> _permissionsMap =
 		new HashMap<>();

@@ -124,7 +124,7 @@ String referringPortletResource = ParamUtil.getString(request, "referringPortlet
 									</span>
 								</c:if>
 
-								<span class="label label-<%= LabelItem.getStyleFromWorkflowStatus(curArticle.getStatus()) %> text-uppercase">
+								<span class="label label-<%= WorkflowConstants.getStatusStyle(curArticle.getStatus()) %> text-uppercase">
 									<liferay-ui:message key="<%= WorkflowConstants.getStatusLabel(curArticle.getStatus()) %>" />
 								</span>
 							</span>
@@ -150,7 +150,7 @@ String referringPortletResource = ParamUtil.getString(request, "referringPortlet
 						</liferay-ui:search-container-column-text>
 					</c:when>
 					<c:otherwise>
-						<c:if test="<%= !journalWebConfiguration.journalArticleForceAutogenerateId() %>">
+						<c:if test="<%= !journalWebConfiguration.journalArticleForceAutogenerateId() || journalWebConfiguration.journalArticleShowId() %>">
 							<liferay-ui:search-container-column-text
 								name="id"
 								value="<%= HtmlUtil.escape(curArticle.getArticleId()) %>"
@@ -194,7 +194,7 @@ String referringPortletResource = ParamUtil.getString(request, "referringPortlet
 								</span>
 							</c:if>
 
-							<span class="label label-<%= LabelItem.getStyleFromWorkflowStatus(curArticle.getStatus()) %> text-uppercase">
+							<span class="label label-<%= WorkflowConstants.getStatusStyle(curArticle.getStatus()) %> text-uppercase">
 								<liferay-ui:message key="<%= WorkflowConstants.getStatusLabel(curArticle.getStatus()) %>" />
 							</span>
 						</liferay-ui:search-container-column-text>
@@ -278,6 +278,12 @@ String referringPortletResource = ParamUtil.getString(request, "referringPortlet
 								</aui:a>
 							</p>
 
+							<c:if test="<%= journalDisplayContext.isSearch() && ((curFolder.getParentFolderId() <= 0) || JournalFolderPermission.contains(permissionChecker, curFolder.getParentFolder(), ActionKeys.VIEW)) %>">
+								<h5>
+									<%= JournalHelperUtil.getAbsolutePath(liferayPortletRequest, curFolder.getParentFolderId()) %>
+								</h5>
+							</c:if>
+
 							<span class="text-default">
 								<aui:workflow-status markupView="lexicon" showIcon="<%= false %>" showLabel="<%= false %>" status="<%= curFolder.getStatus() %>" />
 							</span>
@@ -305,7 +311,7 @@ String referringPortletResource = ParamUtil.getString(request, "referringPortlet
 						</liferay-ui:search-container-column-text>
 					</c:when>
 					<c:otherwise>
-						<c:if test="<%= !journalWebConfiguration.journalArticleForceAutogenerateId() %>">
+						<c:if test="<%= !journalWebConfiguration.journalArticleForceAutogenerateId() || journalWebConfiguration.journalArticleShowId() %>">
 							<liferay-ui:search-container-column-text
 								name="id"
 								value="<%= HtmlUtil.escape(String.valueOf(curFolder.getFolderId())) %>"
@@ -324,6 +330,14 @@ String referringPortletResource = ParamUtil.getString(request, "referringPortlet
 							name="description"
 							value="<%= HtmlUtil.escape(curFolder.getDescription()) %>"
 						/>
+
+						<c:if test="<%= journalDisplayContext.isSearch() && ((curFolder.getParentFolderId() <= 0) || JournalFolderPermission.contains(permissionChecker, curFolder.getParentFolder(), ActionKeys.VIEW)) %>">
+							<liferay-ui:search-container-column-text
+								cssClass="table-cell-expand-smallest table-cell-minw-200"
+								name="path"
+								value="<%= JournalHelperUtil.getAbsolutePath(liferayPortletRequest, curFolder.getParentFolderId()) %>"
+							/>
+						</c:if>
 
 						<liferay-ui:search-container-column-text
 							cssClass="table-cell-expand-smallest table-cell-minw-150"

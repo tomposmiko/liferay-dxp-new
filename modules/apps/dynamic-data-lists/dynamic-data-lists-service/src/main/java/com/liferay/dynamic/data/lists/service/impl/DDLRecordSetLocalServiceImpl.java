@@ -218,29 +218,6 @@ public class DDLRecordSetLocalServiceImpl
 			recordSet.getRecordSetId(), modelPermissions);
 	}
 
-	/**
-	 * Adds the model resources with the permissions to the record set.
-	 *
-	 * @param      recordSet the record set
-	 * @param      groupPermissions whether to add group permissions
-	 * @param      guestPermissions whether to add guest permissions
-	 * @throws     PortalException if a portal exception occurred
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #addRecordSetResources(DDLRecordSet, ModelPermissions)}
-	 */
-	@Deprecated
-	@Override
-	public void addRecordSetResources(
-			DDLRecordSet recordSet, String[] groupPermissions,
-			String[] guestPermissions)
-		throws PortalException {
-
-		resourceLocalService.addModelResources(
-			recordSet.getCompanyId(), recordSet.getGroupId(),
-			recordSet.getUserId(), DDLRecordSet.class.getName(),
-			recordSet.getRecordSetId(), groupPermissions, guestPermissions);
-	}
-
 	@Override
 	public void deleteDDMStructureRecordSets(long ddmStructureId)
 		throws PortalException {
@@ -425,7 +402,7 @@ public class DDLRecordSetLocalServiceImpl
 	}
 
 	public List<DDLRecordSet> getRecordSets(long groupId, int start, int end) {
-		return ddlRecordSetPersistence.filterFindByGroupId(groupId, start, end);
+		return ddlRecordSetPersistence.findByGroupId(groupId, start, end);
 	}
 
 	/**
@@ -662,9 +639,7 @@ public class DDLRecordSetLocalServiceImpl
 
 		recordSet.setMinDisplayRows(minDisplayRows);
 
-		ddlRecordSetPersistence.update(recordSet);
-
-		return recordSet;
+		return ddlRecordSetPersistence.update(recordSet);
 	}
 
 	/**
@@ -790,9 +765,7 @@ public class DDLRecordSetLocalServiceImpl
 		recordSetVersion.setStatusByUserName(user.getFullName());
 		recordSetVersion.setStatusDate(recordSet.getModifiedDate());
 
-		ddlRecordSetVersionPersistence.update(recordSetVersion);
-
-		return recordSetVersion;
+		return ddlRecordSetVersionPersistence.update(recordSetVersion);
 	}
 
 	protected DDMFormValues deserialize(String content, DDMForm ddmForm) {
@@ -976,12 +949,14 @@ public class DDLRecordSetLocalServiceImpl
 				groupId, recordSetKey);
 
 			if (recordSet != null) {
-				RecordSetDuplicateRecordSetKeyException rsdrske =
-					new RecordSetDuplicateRecordSetKeyException();
+				RecordSetDuplicateRecordSetKeyException
+					recordSetDuplicateRecordSetKeyException =
+						new RecordSetDuplicateRecordSetKeyException();
 
-				rsdrske.setRecordSetKey(recordSet.getRecordSetKey());
+				recordSetDuplicateRecordSetKeyException.setRecordSetKey(
+					recordSet.getRecordSetKey());
 
-				throw rsdrske;
+				throw recordSetDuplicateRecordSetKeyException;
 			}
 		}
 

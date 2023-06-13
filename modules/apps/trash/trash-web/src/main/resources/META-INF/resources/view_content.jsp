@@ -25,7 +25,7 @@ TrashHandler trashHandler = trashDisplayContext.getTrashHandler();
 <c:choose>
 	<c:when test="<%= trashHandler.isContainerModel() %>">
 		<clay:management-toolbar
-			displayContext="<%= new TrashContainerManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, trashDisplayContext) %>"
+			displayContext="<%= new TrashContainerManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, trashDisplayContext) %>"
 		/>
 
 		<div class="closed container-fluid-1280 sidenav-container sidenav-right" id="<portlet:namespace />infoPanelId">
@@ -103,12 +103,12 @@ TrashHandler trashHandler = trashDisplayContext.getTrashHandler();
 									<c:choose>
 										<c:when test="<%= !curTrashHandler.isContainerModel() %>">
 											<clay:vertical-card
-												verticalCard="<%= new TrashContentVerticalCard(curTrashedModel, curTrashRenderer, renderRequest, liferayPortletResponse, rowURL.toString()) %>"
+												verticalCard="<%= new TrashContentVerticalCard(curTrashedModel, curTrashRenderer, liferayPortletResponse, renderRequest, rowURL.toString()) %>"
 											/>
 										</c:when>
 										<c:otherwise>
 											<clay:horizontal-card
-												horizontalCard="<%= new TrashContentHorizontalCard(curTrashedModel, curTrashRenderer, renderRequest, liferayPortletResponse, rowURL.toString()) %>"
+												horizontalCard="<%= new TrashContentHorizontalCard(curTrashedModel, curTrashRenderer, liferayPortletResponse, renderRequest, rowURL.toString()) %>"
 											/>
 										</c:otherwise>
 									</c:choose>

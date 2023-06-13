@@ -15,6 +15,11 @@
 package com.liferay.dynamic.data.mapping.model;
 
 import com.liferay.petra.lang.HashUtil;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -129,6 +134,43 @@ public class DDMFormField implements Serializable {
 		return false;
 	}
 
+	public String getDataSourceType() {
+		Object propertyDataSourceType = _properties.get("dataSourceType");
+
+		if (propertyDataSourceType == null) {
+			return _DATA_SOURCE_TYPE_MANUAL;
+		}
+
+		String dataSourceType = StringPool.BLANK;
+
+		if (propertyDataSourceType instanceof JSONArray) {
+			JSONArray jsonArray = (JSONArray)propertyDataSourceType;
+
+			return GetterUtil.getString(
+				jsonArray.get(0), _DATA_SOURCE_TYPE_MANUAL);
+		}
+		else if (propertyDataSourceType instanceof String) {
+			dataSourceType = (String)propertyDataSourceType;
+
+			if (dataSourceType.startsWith(StringPool.OPEN_BRACKET) &&
+				dataSourceType.endsWith(StringPool.CLOSE_BRACKET)) {
+
+				try {
+					JSONArray jsonArray = JSONFactoryUtil.createJSONArray(
+						dataSourceType);
+
+					return GetterUtil.getString(
+						jsonArray.get(0), _DATA_SOURCE_TYPE_MANUAL);
+				}
+				catch (JSONException jsonException) {
+					return dataSourceType;
+				}
+			}
+		}
+
+		return dataSourceType;
+	}
+
 	public String getDataType() {
 		return MapUtil.getString(_properties, "dataType");
 	}
@@ -141,11 +183,11 @@ public class DDMFormField implements Serializable {
 		DDMFormFieldOptions ddmFormFieldOptions =
 			(DDMFormFieldOptions)_properties.get("options");
 
-		String dataSourceType = (String)_properties.get("dataSourceType");
+		String dataSourceType = getDataSourceType();
 
 		if ((ddmFormFieldOptions != null) &&
 			Validator.isNotNull(dataSourceType) &&
-			!dataSourceType.equals("manual")) {
+			!dataSourceType.equals(_DATA_SOURCE_TYPE_MANUAL)) {
 
 			Locale defaultLocale = ddmFormFieldOptions.getDefaultLocale();
 
@@ -155,14 +197,6 @@ public class DDMFormField implements Serializable {
 		}
 
 		return ddmFormFieldOptions;
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public List<DDMFormFieldRule> getDDMFormFieldRules() {
-		return _ddmFormFieldRules;
 	}
 
 	public DDMFormFieldValidation getDDMFormFieldValidation() {
@@ -312,14 +346,6 @@ public class DDMFormField implements Serializable {
 		_properties.put("options", ddmFormFieldOptions);
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public void setDDMFormFieldRules(List<DDMFormFieldRule> ddmFormFieldRules) {
-		_ddmFormFieldRules = ddmFormFieldRules;
-	}
-
 	public void setDDMFormFieldValidation(
 		DDMFormFieldValidation ddmFormFieldValidation) {
 
@@ -394,8 +420,10 @@ public class DDMFormField implements Serializable {
 		_properties.put("visibilityExpression", visibilityExpression);
 	}
 
+	private static final String _DATA_SOURCE_TYPE_MANUAL = "manual";
+
 	private DDMForm _ddmForm;
-	private List<DDMFormFieldRule> _ddmFormFieldRules;
+	private final List<DDMFormFieldRule> _ddmFormFieldRules;
 	private List<DDMFormField> _nestedDDMFormFields;
 	private final Map<String, Object> _properties;
 

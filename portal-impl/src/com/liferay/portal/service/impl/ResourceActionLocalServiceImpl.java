@@ -63,7 +63,7 @@ public class ResourceActionLocalServiceImpl
 			resourceAction.setActionId(actionId);
 			resourceAction.setBitwiseValue(bitwiseValue);
 
-			resourceActionPersistence.update(resourceAction);
+			resourceAction = resourceActionPersistence.update(resourceAction);
 		}
 
 		return resourceAction;
@@ -178,7 +178,8 @@ public class ResourceActionLocalServiceImpl
 					resourceAction.setActionId(actionId);
 					resourceAction.setBitwiseValue(bitwiseValue);
 
-					resourceActionPersistence.update(resourceAction);
+					resourceAction = resourceActionPersistence.update(
+						resourceAction);
 				}
 				catch (Throwable t) {
 					resourceAction =
@@ -285,8 +286,8 @@ public class ResourceActionLocalServiceImpl
 			try {
 				actionableDynamicQuery.performActions();
 			}
-			catch (PortalException pe) {
-				throw new SystemException(pe);
+			catch (PortalException portalException) {
+				throw new SystemException(portalException);
 			}
 		}
 

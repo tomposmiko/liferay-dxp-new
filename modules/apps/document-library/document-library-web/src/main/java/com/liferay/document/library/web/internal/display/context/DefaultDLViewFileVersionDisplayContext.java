@@ -58,7 +58,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
@@ -233,11 +232,13 @@ public class DefaultDLViewFileVersionDisplayContext
 	@Override
 	public boolean hasCustomThumbnail() {
 		if (_dlPreviewRendererProvider != null) {
-			Optional<DLPreviewRenderer> dlPreviewRendererOptional =
-				_dlPreviewRendererProvider.
-					getThumbnailDLPreviewRendererOptional(_fileVersion);
+			DLPreviewRenderer dlPreviewRenderer =
+				_dlPreviewRendererProvider.getThumbnailDLPreviewRenderer(
+					_fileVersion);
 
-			return dlPreviewRendererOptional.isPresent();
+			if (dlPreviewRenderer != null) {
+				return true;
+			}
 		}
 
 		return false;
@@ -246,11 +247,13 @@ public class DefaultDLViewFileVersionDisplayContext
 	@Override
 	public boolean hasPreview() {
 		if (_dlPreviewRendererProvider != null) {
-			Optional<DLPreviewRenderer> dlPreviewRendererOptional =
-				_dlPreviewRendererProvider.getPreviewDLPreviewRendererOptional(
+			DLPreviewRenderer dlPreviewRenderer =
+				_dlPreviewRendererProvider.getPreviewDLPreviewRenderer(
 					_fileVersion);
 
-			return dlPreviewRendererOptional.isPresent();
+			if (dlPreviewRenderer != null) {
+				return true;
+			}
 		}
 
 		return false;
@@ -286,17 +289,16 @@ public class DefaultDLViewFileVersionDisplayContext
 			HttpServletResponse httpServletResponse)
 		throws IOException, ServletException {
 
-		Optional<DLPreviewRenderer> dlPreviewRendererOptional =
-			Optional.empty();
+		DLPreviewRenderer dlPreviewRenderer = null;
 
 		if (_dlPreviewRendererProvider != null) {
-			dlPreviewRendererOptional =
-				_dlPreviewRendererProvider.
-					getThumbnailDLPreviewRendererOptional(_fileVersion);
+			dlPreviewRenderer =
+				_dlPreviewRendererProvider.getThumbnailDLPreviewRenderer(
+					_fileVersion);
 		}
 
 		_renderPreview(
-			httpServletRequest, httpServletResponse, dlPreviewRendererOptional);
+			httpServletRequest, httpServletResponse, dlPreviewRenderer);
 	}
 
 	@Override
@@ -305,17 +307,16 @@ public class DefaultDLViewFileVersionDisplayContext
 			HttpServletResponse httpServletResponse)
 		throws IOException, ServletException {
 
-		Optional<DLPreviewRenderer> dlPreviewRendererOptional =
-			Optional.empty();
+		DLPreviewRenderer dlPreviewRenderer = null;
 
 		if (_dlPreviewRendererProvider != null) {
-			dlPreviewRendererOptional =
-				_dlPreviewRendererProvider.getPreviewDLPreviewRendererOptional(
+			dlPreviewRenderer =
+				_dlPreviewRendererProvider.getPreviewDLPreviewRenderer(
 					_fileVersion);
 		}
 
 		_renderPreview(
-			httpServletRequest, httpServletResponse, dlPreviewRendererOptional);
+			httpServletRequest, httpServletResponse, dlPreviewRenderer);
 	}
 
 	private DefaultDLViewFileVersionDisplayContext(
@@ -359,11 +360,11 @@ public class DefaultDLViewFileVersionDisplayContext
 					dlTrashUtil, versioningStrategy, dlURLHelper);
 			}
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			throw new SystemException(
 				"Unable to build DefaultDLViewFileVersionDisplayContext for " +
 					fileVersion,
-				pe);
+				portalException);
 		}
 	}
 
@@ -421,7 +422,7 @@ public class DefaultDLViewFileVersionDisplayContext
 
 	private void _handleError(
 			HttpServletRequest httpServletRequest,
-			HttpServletResponse httpServletResponse, Exception e)
+			HttpServletResponse httpServletResponse, Exception exception)
 		throws IOException, ServletException {
 
 		JSPRenderer jspRenderer = new JSPRenderer(
@@ -430,9 +431,9 @@ public class DefaultDLViewFileVersionDisplayContext
 		jspRenderer.setAttribute(
 			WebKeys.DOCUMENT_LIBRARY_FILE_VERSION, _fileVersion);
 
-		if (e != null) {
+		if (exception != null) {
 			jspRenderer.setAttribute(
-				DLWebKeys.DOCUMENT_LIBRARY_PREVIEW_EXCEPTION, e);
+				DLWebKeys.DOCUMENT_LIBRARY_PREVIEW_EXCEPTION, exception);
 		}
 
 		jspRenderer.render(httpServletRequest, httpServletResponse);
@@ -441,38 +442,35 @@ public class DefaultDLViewFileVersionDisplayContext
 	private void _renderPreview(
 			HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse,
-			Optional<DLPreviewRenderer> dlPreviewRendererOptional)
+			DLPreviewRenderer dlPreviewRenderer)
 		throws IOException, ServletException {
 
 		try {
-			if (!dlPreviewRendererOptional.isPresent()) {
+			if (dlPreviewRenderer == null) {
 				_handleError(httpServletRequest, httpServletResponse, null);
 
 				return;
 			}
 
-			DLPreviewRenderer dlPreviewRenderer =
-				dlPreviewRendererOptional.get();
-
 			dlPreviewRenderer.render(httpServletRequest, httpServletResponse);
 		}
-		catch (Exception e) {
-			if (e instanceof DLFileEntryPreviewGenerationException ||
-				e instanceof DLPreviewGenerationInProcessException ||
-				e instanceof DLPreviewSizeException) {
+		catch (Exception exception) {
+			if (exception instanceof DLFileEntryPreviewGenerationException ||
+				exception instanceof DLPreviewGenerationInProcessException ||
+				exception instanceof DLPreviewSizeException) {
 
 				if (_log.isWarnEnabled()) {
-					_log.warn(e, e);
+					_log.warn(exception, exception);
 				}
 			}
 			else {
 				_log.error(
 					"Unable to render preview for file version: " +
 						_fileVersion.getTitle(),
-					e);
+					exception);
 			}
 
-			_handleError(httpServletRequest, httpServletResponse, e);
+			_handleError(httpServletRequest, httpServletResponse, exception);
 		}
 	}
 

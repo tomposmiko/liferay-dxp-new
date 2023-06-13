@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.service.LayoutPrototypeLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutSetPrototypeLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 
 import java.util.HashMap;
@@ -119,14 +120,13 @@ public abstract class BaseImporter implements Importer {
 					companyId, targetValue);
 
 				if (group != null) {
-					int privateLayoutPageCount =
+					int privateLayoutsPageCount =
 						group.getPrivateLayoutsPageCount();
-
-					int publicLayoutPageCount =
+					int publicLayoutsPageCount =
 						group.getPublicLayoutsPageCount();
 
-					if ((privateLayoutPageCount != 0) ||
-						(publicLayoutPageCount != 0)) {
+					if ((privateLayoutsPageCount != 0) ||
+						(publicLayoutsPageCount != 0)) {
 
 						existing = true;
 					}
@@ -168,13 +168,9 @@ public abstract class BaseImporter implements Importer {
 	}
 
 	public Map<Locale, String> getTargetValueMap() {
-		Map<Locale, String> targetValueMap = new HashMap<>();
-
-		Locale locale = LocaleUtil.getDefault();
-
-		targetValueMap.put(locale, targetValue);
-
-		return targetValueMap;
+		return HashMapBuilder.put(
+			LocaleUtil.getDefault(), targetValue
+		).build();
 	}
 
 	@Override
@@ -304,11 +300,9 @@ public abstract class BaseImporter implements Importer {
 	}
 
 	protected Map<Locale, String> getMap(Locale locale, String value) {
-		Map<Locale, String> map = new HashMap<>();
-
-		map.put(locale, value);
-
-		return map;
+		return HashMapBuilder.put(
+			locale, value
+		).build();
 	}
 
 	protected Map<Locale, String> getMap(String value) {

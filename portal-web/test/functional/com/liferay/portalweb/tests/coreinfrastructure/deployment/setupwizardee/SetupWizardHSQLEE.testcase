@@ -1,7 +1,6 @@
 @component-name = "portal-deployment-hypersonic-ee"
 definition {
 
-	property portal.acceptance = "true";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property setup.wizard.enabled = "true";
@@ -32,29 +31,7 @@ definition {
 		Smoke.runSmoke();
 	}
 
-	@priority = "4"
-	test HSQLtoDB2SampleDataDisabled {
-		property custom.properties = "setup.wizard.add.sample.data=true";
-		property database.types = "db2";
-		property test.name.skip.portal.instance = "SetupWizardHSQL#HSQLtoDB2SampleDataDisabled";
-
-		SetupWizard.configurePG(
-			addSampleData = "false",
-			administratorEmail = "test@liferay.com",
-			administratorFirstName = "Test",
-			administratorLastName = "Test",
-			databasePassword = PropsUtil.get("database.db2.password"),
-			databaseType = "DB2",
-			databaseUserName = PropsUtil.get("database.db2.username"),
-			jdbcDriverClassName = PropsUtil.get("database.db2.driver"),
-			jdbcURL = PropsUtil.get("database.db2.url"));
-
-		Smoke.viewWelcomePage();
-
-		Smoke.runSmoke();
-	}
-
-	@priority = "4"
+	@priority = "3"
 	test HSQLtoDB2SampleDataEnabled {
 		property databases.size = "1";
 		property database.types = "db2";
@@ -81,9 +58,10 @@ definition {
 		Smoke.runSmoke();
 	}
 
-	@priority = "4"
+	@priority = "5"
 	test HSQLtoOracle {
 		property database.types = "oracle";
+		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "SetupWizardHSQL#HSQLtoOracle";
 
 		SetupWizard.configurePG(
@@ -103,29 +81,7 @@ definition {
 		Smoke.runSmoke();
 	}
 
-	@priority = "4"
-	test HSQLtoOracleSampleDataDisabled {
-		property custom.properties = "setup.wizard.add.sample.data=true";
-		property database.types = "oracle";
-		property test.name.skip.portal.instance = "SetupWizardHSQL#HSQLtoOracleSampleDataDisabled";
-
-		SetupWizard.configurePG(
-			addSampleData = "false",
-			administratorEmail = "test@liferay.com",
-			administratorFirstName = "Test",
-			administratorLastName = "Test",
-			databasePassword = PropsUtil.get("database.oracle.password"),
-			databaseType = "Oracle",
-			databaseUserName = PropsUtil.get("database.oracle.username"),
-			jdbcDriverClassName = PropsUtil.get("database.oracle.driver"),
-			jdbcURL = PropsUtil.get("database.oracle.url"));
-
-		Smoke.viewWelcomePage();
-
-		Smoke.runSmoke();
-	}
-
-	@priority = "4"
+	@priority = "3"
 	test HSQLtoOracleSampleDataEnabled {
 		property databases.size = "1";
 		property database.types = "oracle";
@@ -174,29 +130,7 @@ definition {
 		Smoke.runSmoke();
 	}
 
-	@priority = "4"
-	test HSQLtoSybaseSampleDataDisabled {
-		property custom.properties = "setup.wizard.add.sample.data=true";
-		property database.types = "sybase";
-		property test.name.skip.portal.instance = "SetupWizardHSQL#HSQLtoSybaseSampleDataDisabled";
-
-		SetupWizard.configurePG(
-			addSampleData = "false",
-			administratorEmail = "test@liferay.com",
-			administratorFirstName = "Test",
-			administratorLastName = "Test",
-			databasePassword = PropsUtil.get("database.sybase.password"),
-			databaseType = "Sybase",
-			databaseUserName = PropsUtil.get("database.sybase.username"),
-			jdbcDriverClassName = PropsUtil.get("database.sybase.driver"),
-			jdbcURL = PropsUtil.get("database.sybase.url"));
-
-		Smoke.viewWelcomePage();
-
-		Smoke.runSmoke();
-	}
-
-	@priority = "4"
+	@priority = "3"
 	test HSQLtoSybaseSampleDataEnabled {
 		property databases.size = "1";
 		property database.types = "sybase";

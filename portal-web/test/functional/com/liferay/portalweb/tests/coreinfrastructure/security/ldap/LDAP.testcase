@@ -29,9 +29,10 @@ definition {
 	test ImportLDAPUserWithBlankPassword {
 		property apacheds.blank.user.password.enabled = "true";
 		property apacheds.enabled = "true";
-		property app.server.types = "jboss,tcserver,tomcat,weblogic,websphere,wildfly";
+		property app.server.types = "tomcat";
 		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
-		property environment.acceptance = "true";
+		property environment.acceptance = "false";
+		property operating.system.types = "centos";
 		property portal.acceptance = "true";
 		property test.name.skip.portal.instance = "LDAP#ImportLDAPUserWithBlankPassword";
 
@@ -127,19 +128,13 @@ definition {
 			userGender = "Female",
 			userName = "ldapusergivenname ldapusersn");
 
-		Navigator.gotoBack();
-
 		User.editUserJobTitleCP(
 			userJobTitle = "QA",
 			userName = "ldapusergivenname ldapusersn");
 
-		Navigator.gotoBack();
-
 		User.editUserSuffixCP(
 			userName = "ldapusergivenname ldapusersn",
 			userSuffix = "Phd");
-
-		Navigator.gotoBack();
 
 		User.editPasswordCP(
 			userEmailAddress = "ldapuseremail@liferay.com",

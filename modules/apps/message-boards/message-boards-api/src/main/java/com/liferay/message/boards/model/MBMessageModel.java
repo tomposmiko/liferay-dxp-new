@@ -43,7 +43,7 @@ public interface MBMessageModel
 	extends AttachedModel, BaseModel<MBMessage>, ShardedModel,
 			StagedGroupedModel, TrashedModel, WorkflowedModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a message-boards message model instance should use the {@link MBMessage} interface instead.
@@ -304,6 +304,21 @@ public interface MBMessageModel
 	 * @param parentMessageId the parent message ID of this message-boards message
 	 */
 	public void setParentMessageId(long parentMessageId);
+
+	/**
+	 * Returns the tree path of this message-boards message.
+	 *
+	 * @return the tree path of this message-boards message
+	 */
+	@AutoEscape
+	public String getTreePath();
+
+	/**
+	 * Sets the tree path of this message-boards message.
+	 *
+	 * @param treePath the tree path of this message-boards message
+	 */
+	public void setTreePath(String treePath);
 
 	/**
 	 * Returns the subject of this message-boards message.

@@ -172,9 +172,9 @@ if (parentOrganization != null) {
 </liferay-ui:search-container>
 
 <portlet:renderURL var="selectOrganizationRenderURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
+	<portlet:param name="p_u_i_d" value='<%= (selUser == null) ? "0" : String.valueOf(selUser.getUserId()) %>' />
 	<portlet:param name="mvcPath" value="/select_organization.jsp" />
 	<portlet:param name="organizationId" value="<%= String.valueOf(organizationId) %>" />
-	<portlet:param name="p_u_i_d" value='<%= (selUser == null) ? "0" : String.valueOf(selUser.getUserId()) %>' />
 </portlet:renderURL>
 
 <aui:script use="liferay-search-container">

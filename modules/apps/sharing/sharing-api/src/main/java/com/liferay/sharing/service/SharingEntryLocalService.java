@@ -61,7 +61,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface SharingEntryLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link SharingEntryLocalServiceUtil} to access the sharing entry local service. Add custom service methods to <code>com.liferay.sharing.service.impl.SharingEntryLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -623,9 +623,8 @@ public interface SharingEntryLocalService
 	 {@code SharingEntryAction#VIEW}, or contain a {@code null}
 	 value), or if the expiration date is a past value
 	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 SharingEntryLocalService#
-	 updateSharingEntry(long, long, Collection, boolean, Date,
-	 ServiceContext)}
+	 SharingEntryLocalService#updateSharingEntry(
+	 long, long, Collection, boolean, Date, ServiceContext)}
 	 * @review
 	 */
 	@Deprecated

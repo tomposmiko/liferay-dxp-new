@@ -21,6 +21,7 @@ import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFileVersion;
 import com.liferay.document.library.kernel.model.DLFolder;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalServiceUtil;
+import com.liferay.document.library.test.util.DLTestUtil;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
@@ -69,11 +70,13 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.Sync;
 import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
+import com.liferay.portal.kernel.test.util.DateTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.kernel.util.DateUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -85,11 +88,9 @@ import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.kernel.zip.ZipReaderFactoryUtil;
 import com.liferay.portal.kernel.zip.ZipWriter;
-import com.liferay.portal.service.test.ServiceTestUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portlet.documentlibrary.util.test.DLTestUtil;
 
 import java.io.File;
 import java.io.Serializable;
@@ -157,7 +158,7 @@ public class JournalExportImportTest extends BasePortletExportImportTestCase {
 	public void setUp() throws Exception {
 		super.setUp();
 
-		ServiceTestUtil.setUser(TestPropsValues.getUser());
+		UserTestUtil.setUser(TestPropsValues.getUser());
 	}
 
 	@Test
@@ -598,14 +599,13 @@ public class JournalExportImportTest extends BasePortletExportImportTestCase {
 	protected Map<String, String[]> getBaseParameterMap(long groupId, long plid)
 		throws Exception {
 
-		Map<String, String[]> parameterMap = new HashMap<>();
-
-		parameterMap.put(
+		Map<String, String[]> parameterMap = HashMapBuilder.put(
 			PortletDataHandlerKeys.PERMISSIONS,
-			new String[] {Boolean.TRUE.toString()});
-		parameterMap.put(
+			new String[] {Boolean.TRUE.toString()}
+		).put(
 			PortletDataHandlerKeys.PORTLET_DATA_CONTROL_DEFAULT,
-			new String[] {Boolean.FALSE.toString()});
+			new String[] {Boolean.FALSE.toString()}
+		).build();
 
 		addParameter(parameterMap, "doAsGroupId", String.valueOf(groupId));
 		addParameter(parameterMap, "feeds", true);
@@ -702,12 +702,9 @@ public class JournalExportImportTest extends BasePortletExportImportTestCase {
 			StagedModel stagedModel, StagedModel importedStagedModel)
 		throws Exception {
 
-		Assert.assertTrue(
-			stagedModel.getCreateDate() + " " +
-				importedStagedModel.getCreateDate(),
-			DateUtil.equals(
-				stagedModel.getCreateDate(),
-				importedStagedModel.getCreateDate()));
+		DateTestUtil.assertEquals(
+			stagedModel.getCreateDate(), importedStagedModel.getCreateDate());
+
 		Assert.assertEquals(
 			stagedModel.getUuid(), importedStagedModel.getUuid());
 
@@ -720,32 +717,20 @@ public class JournalExportImportTest extends BasePortletExportImportTestCase {
 		Assert.assertEquals(
 			article.getDescription(), importedArticle.getDescription());
 		Assert.assertEquals(article.getContent(), importedArticle.getContent());
-		Assert.assertTrue(
-			String.valueOf(article.getDisplayDate()) + StringPool.SPACE +
-				importedArticle.getDisplayDate(),
-			DateUtil.equals(
-				article.getDisplayDate(), importedArticle.getDisplayDate()));
-		Assert.assertTrue(
-			String.valueOf(article.getExpirationDate()) + StringPool.SPACE +
-				importedArticle.getExpirationDate(),
-			DateUtil.equals(
-				article.getExpirationDate(),
-				importedArticle.getExpirationDate()));
-		Assert.assertTrue(
-			String.valueOf(article.getReviewDate()) + StringPool.SPACE +
-				importedArticle.getReviewDate(),
-			DateUtil.equals(
-				article.getReviewDate(), importedArticle.getReviewDate()));
 		Assert.assertEquals(
 			article.isSmallImage(), importedArticle.isSmallImage());
 		Assert.assertEquals(
 			article.getSmallImageURL(), importedArticle.getSmallImageURL());
 		Assert.assertEquals(article.getStatus(), importedArticle.getStatus());
-		Assert.assertTrue(
-			String.valueOf(article.getStatusDate()) + StringPool.SPACE +
-				importedArticle.getStatusDate(),
-			DateUtil.equals(
-				article.getStatusDate(), importedArticle.getStatusDate()));
+
+		DateTestUtil.assertEquals(
+			article.getDisplayDate(), importedArticle.getDisplayDate());
+		DateTestUtil.assertEquals(
+			article.getExpirationDate(), importedArticle.getExpirationDate());
+		DateTestUtil.assertEquals(
+			article.getReviewDate(), importedArticle.getReviewDate());
+		DateTestUtil.assertEquals(
+			article.getStatusDate(), importedArticle.getStatusDate());
 
 		JournalArticleResource articleResource = article.getArticleResource();
 		JournalArticleResource importedArticleArticleResource =

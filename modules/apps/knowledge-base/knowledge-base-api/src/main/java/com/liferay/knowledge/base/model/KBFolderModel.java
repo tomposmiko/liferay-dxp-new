@@ -39,7 +39,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface KBFolderModel
 	extends BaseModel<KBFolder>, MVCCModel, ShardedModel, StagedGroupedModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a kb folder model instance should use the {@link KBFolder} interface instead.

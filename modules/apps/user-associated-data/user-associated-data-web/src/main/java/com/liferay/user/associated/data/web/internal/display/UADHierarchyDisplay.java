@@ -100,13 +100,13 @@ public class UADHierarchyDisplay {
 
 		PortletURL baseURL = renderResponse.createRenderURL();
 
+		String puid = ParamUtil.getString(httpServletRequest, "p_u_i_d");
 		String applicationKey = ParamUtil.getString(
 			httpServletRequest, "applicationKey");
-		String puid = ParamUtil.getString(httpServletRequest, "p_u_i_d");
 		String scope = ParamUtil.getString(httpServletRequest, "scope");
 
-		baseURL.setParameter("applicationKey", applicationKey);
 		baseURL.setParameter("p_u_i_d", puid);
+		baseURL.setParameter("applicationKey", applicationKey);
 
 		if (Validator.isNotNull(scope)) {
 			baseURL.setParameter("scope", scope);
@@ -295,15 +295,15 @@ public class UADHierarchyDisplay {
 
 		PortletURL portletURL = liferayPortletResponse.createRenderURL();
 
+		String puid = ParamUtil.getString(actionRequest, "p_u_i_d");
 		String applicationKey = ParamUtil.getString(
 			actionRequest, "applicationKey");
 		String primaryKey = ParamUtil.getString(
 			actionRequest, "parentContainerId");
-		String puid = ParamUtil.getString(actionRequest, "p_u_i_d");
 		String scope = ParamUtil.getString(actionRequest, "scope");
 
-		portletURL.setParameter("applicationKey", applicationKey);
 		portletURL.setParameter("p_u_i_d", puid);
+		portletURL.setParameter("applicationKey", applicationKey);
 
 		if (Validator.isNotNull(scope)) {
 			portletURL.setParameter("scope", scope);
@@ -376,13 +376,13 @@ public class UADHierarchyDisplay {
 
 		PortletURL renderURL = liferayPortletResponse.createRenderURL();
 
+		renderURL.setParameter("p_u_i_d", String.valueOf(selectedUserId));
 		renderURL.setParameter("mvcRenderCommandName", "/view_uad_hierarchy");
 		renderURL.setParameter("applicationKey", applicationKey);
 		renderURL.setParameter("parentContainerClass", typeClass.getName());
 		renderURL.setParameter(
 			"parentContainerId",
 			String.valueOf(uadDisplay.getPrimaryKey(unwrappedObject)));
-		renderURL.setParameter("p_u_i_d", String.valueOf(selectedUserId));
 
 		String scope = ParamUtil.getString(liferayPortletRequest, "scope");
 

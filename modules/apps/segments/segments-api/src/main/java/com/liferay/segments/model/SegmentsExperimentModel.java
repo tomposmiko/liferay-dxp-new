@@ -42,7 +42,7 @@ public interface SegmentsExperimentModel
 	extends AttachedModel, BaseModel<SegmentsExperiment>, GroupedModel,
 			MVCCModel, ShardedModel, StagedAuditedModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a segments experiment model instance should use the {@link SegmentsExperiment} interface instead.

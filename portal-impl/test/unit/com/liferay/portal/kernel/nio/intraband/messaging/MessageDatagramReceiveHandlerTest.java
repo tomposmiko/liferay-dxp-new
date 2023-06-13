@@ -74,11 +74,6 @@ public class MessageDatagramReceiveHandlerTest {
 	}
 
 	@Test
-	public void testDeprecatedConstructor() {
-		new MessageDatagramReceiveHandler(null);
-	}
-
-	@Test
 	public void testDoReceive1() throws Exception {
 
 		// No such destination, not synchronized
@@ -223,8 +218,9 @@ public class MessageDatagramReceiveHandlerTest {
 
 			Assert.fail();
 		}
-		catch (MessageBusException mbe) {
-			Assert.assertSame(messageListenerException, mbe.getCause());
+		catch (MessageBusException messageBusException) {
+			Assert.assertSame(
+				messageListenerException, messageBusException.getCause());
 		}
 
 		// Intraband bridge destination, not synchronized, no listener

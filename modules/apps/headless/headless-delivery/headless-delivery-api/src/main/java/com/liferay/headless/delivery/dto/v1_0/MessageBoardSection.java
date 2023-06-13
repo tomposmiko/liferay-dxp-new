@@ -88,6 +88,35 @@ public class MessageBoardSection {
 
 	}
 
+	@Schema
+	@Valid
+	public Map<String, Map> getActions() {
+		return actions;
+	}
+
+	public void setActions(Map<String, Map> actions) {
+		this.actions = actions;
+	}
+
+	@JsonIgnore
+	public void setActions(
+		UnsafeSupplier<Map<String, Map>, Exception> actionsUnsafeSupplier) {
+
+		try {
+			actions = actionsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected Map<String, Map> actions;
+
 	@Schema(description = "The section's creator.")
 	@Valid
 	public Creator getCreator() {
@@ -113,7 +142,7 @@ public class MessageBoardSection {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The section's creator.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator creator;
 
@@ -170,7 +199,7 @@ public class MessageBoardSection {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The date the section was created.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
@@ -198,7 +227,7 @@ public class MessageBoardSection {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The last time the section was changed.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateModified;
 
@@ -226,7 +255,7 @@ public class MessageBoardSection {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The section's description.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String description;
 
@@ -252,7 +281,7 @@ public class MessageBoardSection {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The section's ID.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
@@ -284,7 +313,7 @@ public class MessageBoardSection {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The number of this section's child sections.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer numberOfMessageBoardSections;
 
@@ -318,9 +347,43 @@ public class MessageBoardSection {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The number of message board threads in this section."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer numberOfMessageBoardThreads;
+
+	@Schema
+	public Long getParentMessageBoardSectionId() {
+		return parentMessageBoardSectionId;
+	}
+
+	public void setParentMessageBoardSectionId(
+		Long parentMessageBoardSectionId) {
+
+		this.parentMessageBoardSectionId = parentMessageBoardSectionId;
+	}
+
+	@JsonIgnore
+	public void setParentMessageBoardSectionId(
+		UnsafeSupplier<Long, Exception>
+			parentMessageBoardSectionIdUnsafeSupplier) {
+
+		try {
+			parentMessageBoardSectionId =
+				parentMessageBoardSectionIdUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Long parentMessageBoardSectionId;
 
 	@Schema(description = "The ID of the site to which this section is scoped.")
 	public Long getSiteId() {
@@ -346,7 +409,9 @@ public class MessageBoardSection {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The ID of the site to which this section is scoped."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long siteId;
 
@@ -402,7 +467,7 @@ public class MessageBoardSection {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The section's main title.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	@NotEmpty
 	protected String title;
@@ -443,7 +508,9 @@ public class MessageBoardSection {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A write-only property that specifies the default permissions."
+	)
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	protected ViewableBy viewableBy;
 
@@ -476,6 +543,16 @@ public class MessageBoardSection {
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+		if (actions != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"actions\": ");
+
+			sb.append(_toJSON(actions));
+		}
 
 		if (creator != null) {
 			if (sb.length() > 1) {
@@ -577,6 +654,16 @@ public class MessageBoardSection {
 			sb.append("\"numberOfMessageBoardThreads\": ");
 
 			sb.append(numberOfMessageBoardThreads);
+		}
+
+		if (parentMessageBoardSectionId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"parentMessageBoardSectionId\": ");
+
+			sb.append(parentMessageBoardSectionId);
 		}
 
 		if (siteId != null) {

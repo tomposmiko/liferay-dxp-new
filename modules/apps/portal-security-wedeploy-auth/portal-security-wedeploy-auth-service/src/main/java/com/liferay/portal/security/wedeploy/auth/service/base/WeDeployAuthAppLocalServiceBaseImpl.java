@@ -65,7 +65,7 @@ public abstract class WeDeployAuthAppLocalServiceBaseImpl
 	implements AopService, IdentifiableOSGiService,
 			   WeDeployAuthAppLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>WeDeployAuthAppLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.security.wedeploy.auth.service.WeDeployAuthAppLocalServiceUtil</code>.
@@ -382,8 +382,8 @@ public abstract class WeDeployAuthAppLocalServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

@@ -100,11 +100,11 @@ public class DefaultWorkflowEngineImpl
 						serviceContext.getCompanyId(), name);
 			}
 		}
-		catch (WorkflowException we) {
-			throw we;
+		catch (WorkflowException workflowException) {
+			throw workflowException;
 		}
-		catch (Exception e) {
-			throw new WorkflowException(e);
+		catch (Exception exception) {
+			throw new WorkflowException(exception);
 		}
 	}
 
@@ -116,30 +116,12 @@ public class DefaultWorkflowEngineImpl
 		try {
 			kaleoInstanceLocalService.deleteKaleoInstance(workflowInstanceId);
 		}
-		catch (WorkflowException we) {
-			throw we;
+		catch (WorkflowException workflowException) {
+			throw workflowException;
 		}
-		catch (Exception e) {
-			throw new WorkflowException(e);
+		catch (Exception exception) {
+			throw new WorkflowException(exception);
 		}
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #deployWorkflowDefinition(String, String, InputStream,
-	 *             ServiceContext)}
-	 */
-	@Deprecated
-	@Override
-	public WorkflowDefinition deployWorkflowDefinition(
-			String title, InputStream inputStream,
-			ServiceContext serviceContext)
-		throws WorkflowException {
-
-		Definition definition = _workflowModelParser.parse(inputStream);
-
-		return deployWorkflowDefinition(
-			title, definition.getName(), inputStream, serviceContext);
 	}
 
 	@Override
@@ -185,11 +167,11 @@ public class DefaultWorkflowEngineImpl
 
 			return workflowDefinition;
 		}
-		catch (WorkflowException we) {
-			throw we;
+		catch (WorkflowException workflowException) {
+			throw workflowException;
 		}
-		catch (PortalException pe) {
-			throw new WorkflowException(pe);
+		catch (PortalException portalException) {
+			throw new WorkflowException(portalException);
 		}
 	}
 
@@ -237,11 +219,11 @@ public class DefaultWorkflowEngineImpl
 
 			return executionContext;
 		}
-		catch (WorkflowException we) {
-			throw we;
+		catch (WorkflowException workflowException) {
+			throw workflowException;
 		}
-		catch (Exception e) {
-			throw new WorkflowException(e);
+		catch (Exception exception) {
+			throw new WorkflowException(exception);
 		}
 	}
 
@@ -263,11 +245,11 @@ public class DefaultWorkflowEngineImpl
 
 			return transitionNames;
 		}
-		catch (WorkflowException we) {
-			throw we;
+		catch (WorkflowException workflowException) {
+			throw workflowException;
 		}
-		catch (Exception e) {
-			throw new WorkflowException(e);
+		catch (Exception exception) {
+			throw new WorkflowException(exception);
 		}
 	}
 
@@ -284,11 +266,11 @@ public class DefaultWorkflowEngineImpl
 				kaleoInstance,
 				kaleoInstance.getRootKaleoInstanceToken(serviceContext));
 		}
-		catch (WorkflowException we) {
-			throw we;
+		catch (WorkflowException workflowException) {
+			throw workflowException;
 		}
-		catch (Exception e) {
-			throw new WorkflowException(e);
+		catch (Exception exception) {
+			throw new WorkflowException(exception);
 		}
 	}
 
@@ -303,8 +285,8 @@ public class DefaultWorkflowEngineImpl
 				userId, assetClassName, assetClassPK, completed,
 				serviceContext);
 		}
-		catch (Exception e) {
-			throw new WorkflowException(e);
+		catch (Exception exception) {
+			throw new WorkflowException(exception);
 		}
 	}
 
@@ -318,8 +300,8 @@ public class DefaultWorkflowEngineImpl
 			return kaleoInstanceLocalService.getKaleoInstancesCount(
 				userId, assetClassNames, completed, serviceContext);
 		}
-		catch (Exception e) {
-			throw new WorkflowException(e);
+		catch (Exception exception) {
+			throw new WorkflowException(exception);
 		}
 	}
 
@@ -334,8 +316,8 @@ public class DefaultWorkflowEngineImpl
 				workflowDefinitionName, workflowDefinitionVersion, completed,
 				serviceContext);
 		}
-		catch (Exception e) {
-			throw new WorkflowException(e);
+		catch (Exception exception) {
+			throw new WorkflowException(exception);
 		}
 	}
 
@@ -358,11 +340,11 @@ public class DefaultWorkflowEngineImpl
 
 			return toWorkflowInstances(kaleoInstances, serviceContext);
 		}
-		catch (WorkflowException we) {
-			throw we;
+		catch (WorkflowException workflowException) {
+			throw workflowException;
 		}
-		catch (Exception e) {
-			throw new WorkflowException(e);
+		catch (Exception exception) {
+			throw new WorkflowException(exception);
 		}
 	}
 
@@ -384,11 +366,11 @@ public class DefaultWorkflowEngineImpl
 
 			return toWorkflowInstances(kaleoInstances, serviceContext);
 		}
-		catch (WorkflowException we) {
-			throw we;
+		catch (WorkflowException workflowException) {
+			throw workflowException;
 		}
-		catch (Exception e) {
-			throw new WorkflowException(e);
+		catch (Exception exception) {
+			throw new WorkflowException(exception);
 		}
 	}
 
@@ -412,11 +394,11 @@ public class DefaultWorkflowEngineImpl
 
 			return toWorkflowInstances(kaleoInstances, serviceContext);
 		}
-		catch (WorkflowException we) {
-			throw we;
+		catch (WorkflowException workflowException) {
+			throw workflowException;
 		}
-		catch (Exception e) {
-			throw new WorkflowException(e);
+		catch (Exception exception) {
+			throw new WorkflowException(exception);
 		}
 	}
 
@@ -435,11 +417,11 @@ public class DefaultWorkflowEngineImpl
 			return _workflowDeployer.save(
 				title, definitionName, definition, serviceContext);
 		}
-		catch (WorkflowException we) {
-			throw we;
+		catch (WorkflowException workflowException) {
+			throw workflowException;
 		}
-		catch (Exception e) {
-			throw new WorkflowException(e);
+		catch (Exception exception) {
+			throw new WorkflowException(exception);
 		}
 	}
 
@@ -483,11 +465,11 @@ public class DefaultWorkflowEngineImpl
 
 			return toWorkflowInstances(kaleoInstances, serviceContext);
 		}
-		catch (WorkflowException we) {
-			throw we;
+		catch (WorkflowException workflowException) {
+			throw workflowException;
 		}
-		catch (Exception e) {
-			throw new WorkflowException(e);
+		catch (Exception exception) {
+			throw new WorkflowException(exception);
 		}
 	}
 
@@ -522,8 +504,8 @@ public class DefaultWorkflowEngineImpl
 				userId, assetClassName, assetTitle, assetDescription, nodeName,
 				kaleoDefinitionName, completed, serviceContext);
 		}
-		catch (Exception e) {
-			throw new WorkflowException(e);
+		catch (Exception exception) {
+			throw new WorkflowException(exception);
 		}
 	}
 
@@ -566,9 +548,9 @@ public class DefaultWorkflowEngineImpl
 							_kaleoSignaler.signalExit(
 								transitionName, executionContext);
 						}
-						catch (Exception e) {
+						catch (Exception exception) {
 							throw new WorkflowException(
-								"Unable to signal next transition", e);
+								"Unable to signal next transition", exception);
 						}
 
 						return null;
@@ -579,11 +561,11 @@ public class DefaultWorkflowEngineImpl
 			return _kaleoWorkflowModelConverter.toWorkflowInstance(
 				kaleoInstance, kaleoInstanceToken, workflowContext);
 		}
-		catch (WorkflowException we) {
-			throw we;
+		catch (WorkflowException workflowException) {
+			throw workflowException;
 		}
-		catch (Exception e) {
-			throw new WorkflowException(e);
+		catch (Exception exception) {
+			throw new WorkflowException(exception);
 		}
 	}
 
@@ -665,9 +647,9 @@ public class DefaultWorkflowEngineImpl
 							_kaleoSignaler.signalEntry(
 								transitionName, executionContext);
 						}
-						catch (Exception e) {
+						catch (Exception exception) {
 							throw new WorkflowException(
-								"Unable to start workflow", e);
+								"Unable to start workflow", exception);
 						}
 
 						return null;
@@ -678,11 +660,11 @@ public class DefaultWorkflowEngineImpl
 			return _kaleoWorkflowModelConverter.toWorkflowInstance(
 				kaleoInstance, rootKaleoInstanceToken, workflowContext);
 		}
-		catch (WorkflowException we) {
-			throw we;
+		catch (WorkflowException workflowException) {
+			throw workflowException;
 		}
-		catch (Exception e) {
-			throw new WorkflowException(e);
+		catch (Exception exception) {
+			throw new WorkflowException(exception);
 		}
 	}
 
@@ -700,8 +682,8 @@ public class DefaultWorkflowEngineImpl
 				kaleoInstance,
 				kaleoInstance.getRootKaleoInstanceToken(serviceContext));
 		}
-		catch (Exception e) {
-			throw new WorkflowException(e);
+		catch (Exception exception) {
+			throw new WorkflowException(exception);
 		}
 	}
 
@@ -716,8 +698,8 @@ public class DefaultWorkflowEngineImpl
 				_workflowValidator.validate(definition);
 			}
 		}
-		catch (Exception e) {
-			throw new WorkflowException(e);
+		catch (Exception exception) {
+			throw new WorkflowException(exception);
 		}
 	}
 
@@ -737,9 +719,13 @@ public class DefaultWorkflowEngineImpl
 			return _workflowModelParser.parse(
 				new UnsyncByteArrayInputStream(bytes));
 		}
-		catch (WorkflowDefinitionFileException wdfe) {
+		catch (WorkflowDefinitionFileException
+					workflowDefinitionFileException) {
+
 			if (_log.isDebugEnabled()) {
-				_log.debug(wdfe, wdfe);
+				_log.debug(
+					workflowDefinitionFileException,
+					workflowDefinitionFileException);
 			}
 
 			try {
@@ -747,12 +733,12 @@ public class DefaultWorkflowEngineImpl
 					StringPool.BLANK, StringPool.BLANK,
 					new String(bytes, "UTF-8"), 0);
 			}
-			catch (UnsupportedEncodingException uee) {
-				throw new WorkflowException(uee);
+			catch (UnsupportedEncodingException unsupportedEncodingException) {
+				throw new WorkflowException(unsupportedEncodingException);
 			}
 		}
-		catch (WorkflowException we) {
-			throw new WorkflowException(we);
+		catch (WorkflowException workflowException) {
+			throw new WorkflowException(workflowException);
 		}
 		finally {
 			_workflowModelParser.setValidate(true);

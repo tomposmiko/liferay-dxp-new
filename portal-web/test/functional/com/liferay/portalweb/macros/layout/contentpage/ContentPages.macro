@@ -7,9 +7,14 @@ definition {
 			LexiconCard.clickCard(card = "${pageTemplateName}");
 		}
 		else {
-			Navigator.gotoNavNested(navNested = "Basic Pages");
+			Navigator.gotoNavNested(navNested = "Basic Templates");
 
-			LexiconCard.clickCard(card = "Content Page");
+			if (isSet(masterLayoutName)) {
+				LexiconCard.clickCard(card = "${masterLayoutName}");
+			}
+			else {
+				LexiconCard.clickCard(card = "Blank");
+			}
 		}
 	}
 
@@ -30,12 +35,26 @@ definition {
 		}
 
 		ContentPages._selectCard(
+			basicTemplate = "${basicTemplate}",
 			collectionName = "${collectionName}",
+			masterLayoutName = "${masterLayoutName}",
 			pageTemplateName = "${pageTemplateName}");
 
 		SelectFrame(locator1 = "IFrame#DIALOG");
 
 		PortletEntry.inputName(name = "${pageName}");
+
+		if (isSet(categoryName)) {
+			AssetCategorization.addCategory(
+				categoryName = "${categoryName}",
+				vocabularyName = "${vocabularyName}");
+		}
+
+		if (isSet(categoryNameList)) {
+			AssetCategorization.addMultipleCategories(
+				categoryNameList = "${categoryNameList}",
+				vocabularyName = "${vocabularyName}");
+		}
 
 		Button.clickAdd();
 
@@ -46,6 +65,8 @@ definition {
 
 	macro clickPencil {
 		Click(locator1 = "Icon#EDIT_PENCIL");
+
+		Pause(locator1 = "3000");
 	}
 
 }

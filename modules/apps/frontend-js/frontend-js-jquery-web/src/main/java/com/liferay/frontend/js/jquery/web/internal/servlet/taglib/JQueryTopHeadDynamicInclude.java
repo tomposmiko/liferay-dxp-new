@@ -72,6 +72,8 @@ public class JQueryTopHeadDynamicInclude extends BaseDynamicInclude {
 				WebKeys.THEME_DISPLAY);
 
 		if (themeDisplay.isThemeJsFastLoad()) {
+			absolutePortalURLBuilder.ignoreCDNHost();
+
 			sb.append("<script data-senna-track=\"permanent\" src=\"");
 			sb.append(
 				_portal.getStaticResourceURL(
@@ -123,9 +125,10 @@ public class JQueryTopHeadDynamicInclude extends BaseDynamicInclude {
 	}
 
 	private static final String[] _FILE_NAMES = {
-		"/jquery/jquery.min.js", "/jquery/bootstrap.bundle.min.js",
-		"/jquery/collapsible_search.js", "/jquery/fm.js", "/jquery/form.js",
-		"/jquery/popper.min.js", "/jquery/side_navigation.js"
+		"/jquery/jquery.min.js", "/jquery/ajax.js",
+		"/jquery/bootstrap.bundle.min.js", "/jquery/collapsible_search.js",
+		"/jquery/fm.js", "/jquery/form.js", "/jquery/popper.min.js",
+		"/jquery/side_navigation.js"
 	};
 
 	@Reference

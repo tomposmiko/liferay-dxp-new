@@ -44,7 +44,7 @@ public interface CalendarModel
 	extends BaseModel<Calendar>, LocalizedModel, MVCCModel, ShardedModel,
 			StagedGroupedModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a calendar model instance should use the {@link Calendar} interface instead.

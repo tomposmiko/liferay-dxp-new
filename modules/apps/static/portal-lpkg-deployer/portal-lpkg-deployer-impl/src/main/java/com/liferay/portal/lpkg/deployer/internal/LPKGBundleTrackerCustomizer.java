@@ -108,8 +108,8 @@ public class LPKGBundleTrackerCustomizer
 			try (InputStream inputStream = new FileInputStream(_dataFile)) {
 				_properties.load(inputStream);
 			}
-			catch (IOException ioe) {
-				_log.error("Unable to load tracked bundles", ioe);
+			catch (IOException ioException) {
+				_log.error("Unable to load tracked bundles", ioException);
 			}
 		}
 	}
@@ -120,8 +120,9 @@ public class LPKGBundleTrackerCustomizer
 			try {
 				bundle.uninstall();
 			}
-			catch (BundleException be) {
-				_log.error("Unable to uninstall LPKG " + bundle, be);
+			catch (BundleException bundleException) {
+				_log.error(
+					"Unable to uninstall LPKG " + bundle, bundleException);
 			}
 
 			return null;
@@ -165,9 +166,10 @@ public class LPKGBundleTrackerCustomizer
 				}
 			}
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			_log.error(
-				"Unable to determine if LPKG " + bundle + " is outdated", e);
+				"Unable to determine if LPKG " + bundle + " is outdated",
+				exception);
 		}
 
 		String symbolicName = bundle.getSymbolicName();
@@ -185,9 +187,10 @@ public class LPKGBundleTrackerCustomizer
 
 			file = new File(uri.getPath());
 		}
-		catch (URISyntaxException urise) {
+		catch (URISyntaxException uriSyntaxException) {
 			throw new IllegalArgumentException(
-				"Unable to parse LPKG location " + bundle.getLocation(), urise);
+				"Unable to parse LPKG location " + bundle.getLocation(),
+				uriSyntaxException);
 		}
 
 		Set<Bundle> bundles = new HashSet<>();
@@ -316,11 +319,27 @@ public class LPKGBundleTrackerCustomizer
 				installedBundles.add(newBundle);
 			}
 
-			for (Bundle installedBundle : installedBundles) {
-				BundleStartLevelUtil.setStartLevelAndStart(
-					installedBundle,
-					PropsValues.MODULE_FRAMEWORK_DYNAMIC_INSTALL_START_LEVEL,
-					_bundleContext);
+			if (!LPKGBatchInstallThreadLocal.isBatchInstallInProcess()) {
+				for (Bundle installedBundle : installedBundles) {
+					Dictionary<String, String> headers =
+						installedBundle.getHeaders(StringPool.BLANK);
+
+					String header = headers.get("Web-ContextPath");
+
+					if (header != null) {
+						BundleStartLevelUtil.setStartLevelAndStart(
+							installedBundle,
+							PropsValues.MODULE_FRAMEWORK_WEB_START_LEVEL,
+							_bundleContext);
+					}
+					else {
+						BundleStartLevelUtil.setStartLevelAndStart(
+							installedBundle,
+							PropsValues.
+								MODULE_FRAMEWORK_DYNAMIC_INSTALL_START_LEVEL,
+							_bundleContext);
+					}
+				}
 			}
 
 			List<String> trackedBundleLocations = _reloadTrackedBundles(
@@ -339,8 +358,10 @@ public class LPKGBundleTrackerCustomizer
 				try {
 					newBundle.uninstall();
 				}
-				catch (BundleException be) {
-					_log.error("Unable to uninstall bundle " + newBundle, be);
+				catch (BundleException bundleException) {
+					_log.error(
+						"Unable to uninstall bundle " + newBundle,
+						bundleException);
 				}
 			}
 
@@ -440,15 +461,17 @@ public class LPKGBundleTrackerCustomizer
 				_recordTrackedBundles(bundle, bundleLocations);
 			}
 		}
-		catch (Exception e) {
-			_log.error("Rollback bundle refresh for " + bundles, e);
+		catch (Exception exception) {
+			_log.error("Rollback bundle refresh for " + bundles, exception);
 
 			for (Bundle newBundle : bundles) {
 				try {
 					newBundle.uninstall();
 				}
-				catch (BundleException be) {
-					_log.error("Unable to uninstall bundle " + newBundle, be);
+				catch (BundleException bundleException) {
+					_log.error(
+						"Unable to uninstall bundle " + newBundle,
+						bundleException);
 				}
 			}
 		}

@@ -60,6 +60,22 @@ definition {
 			PortletEntry.inputDescription(description = "${dmDocumentDescription}");
 		}
 
+		if (isSet(textField)) {
+			var key_fieldName = "Text";
+
+			Type(
+				locator1 = "TextInput#DDM",
+				value1 = "${textField}");
+		}
+
+		if (isSet(numberField)) {
+			var key_fieldName = "Number";
+
+			Type(
+				locator1 = "TextInput#DDM",
+				value1 = "${numberField}");
+		}
+
 		if (isSet(validationError)) {
 			Button.clickPublish();
 
@@ -75,35 +91,36 @@ definition {
 	macro addDMShortcutCP {
 		DMNavigator.gotoAddDocumentTypeCP(dmDocumentTypeName = "Shortcut");
 
-		Click(locator1 = "DocumentsAndMediaAddShortcut#SELECT_SITE_BUTTON");
+		Click(locator1 = "DocumentsAndMediaAddShortcut#SELECT_DOCUMENT_BUTTON");
 
 		var key_siteName = "${siteName}";
 
-		IFrame.selectModalFrame();
+		SelectFrame(locator1 = "ItemSelector#ITEM_SELECTOR_IFRAME");
 
-		AssertClick(
-			locator1 = "SitesSelectSite#SELECT_BUTTON",
-			value1 = "Select");
-
-		SelectFrameTop(value1 = "relative=top");
-
-		Click(locator1 = "DocumentsAndMediaAddShortcut#SELECT_DOCUMENT_BUTTON");
-
-		IFrame.selectModalFrame();
-
-		if (isSet(dmFolderName)) {
-			var key_dmFolderName = "${dmFolderName}";
-
+		if (isSet(siteName)) {
 			AssertClick(
-				locator1 = "DocumentsAndMediaAddShortcut#SELECT_FILE_FOLDER_NAME",
-				value1 = "${dmFolderName}");
+				key_breadcrumbName = "sites",
+				locator1 = "Breadcrumb#BREADCRUMB_ENTRY",
+				value1 = "sites");
+
+			LexiconCard.clickCard(card = "${siteName}");
 		}
 
-		var key_dmDocumentTitle = "${dmDocumentTitle}";
+		if (isSet(depotName)) {
+			AssertClick(
+				key_breadcrumbName = "sites",
+				locator1 = "Breadcrumb#BREADCRUMB_ENTRY",
+				value1 = "sites");
 
-		AssertClick.assertPartialTextClickAt(
-			locator1 = "DocumentsAndMediaAddShortcut#SELECT_FILE_DOCUMENT_TITLE",
-			value1 = "${dmDocumentTitle}");
+			AssertClick(
+				key_groupTab = "Repository",
+				locator1 = "ItemSelector#NAVIGATION_GROUP_TAB",
+				value1 = "Repository");
+
+			LexiconCard.clickCard(card = "${depotName}");
+		}
+
+		LexiconCard.clickCard(card = "${dmDocumentTitle}");
 
 		SelectFrameTop(value1 = "relative=top");
 
@@ -161,8 +178,8 @@ definition {
 			SelectFrame(locator1 = "IFrame#DIALOG");
 
 			AssertClick(
-				key_webContentTitle = "${webcontentField}",
-				locator1 = "Link#WEB_CONTENT_ARTICLE",
+				key_contentName = "${webcontentField}",
+				locator1 = "ItemSelector#SELECT_FILE_WEB_CONTENT",
 				value1 = "${webcontentField}");
 
 			SelectFrame(value1 = "relative=top");
@@ -212,6 +229,8 @@ definition {
 		AssertClick(
 			locator1 = "Button#PUBLISH",
 			value1 = "Publish");
+
+		AssertElementPresent(locator1 = "DocumentsAndMedia#BREADCRUMB_HOME");
 
 		AssertElementPresent(locator1 = "Message#SUCCESS");
 	}
@@ -673,7 +692,7 @@ definition {
 			locator1 = "Button#MOVE_TO_RECYCLE_BIN",
 			value1 = "Move to Recycle Bin");
 
-		AssertElementPresent(locator1 = "Message#SUCCESS");
+		Alert.viewSuccessMessage();
 	}
 
 	macro deletePGViaMG {
@@ -712,6 +731,54 @@ definition {
 		AssertClick.assertPartialTextClickAt(
 			locator1 = "Button#DOWNLOAD",
 			value1 = "Download");
+	}
+
+	macro editCategoryTags {
+		SelectFrame(value1 = "relative=top");
+
+		AssertTextEquals(
+			locator1 = "Modal#HEADER",
+			value1 = "Edit Categories");
+
+		if ("${multipleDocuments}" == "true") {
+			AssertTextEquals.assertPartialText(
+				locator1 = "Modal#BODY",
+				value1 = "You are editing the common categories for ${itemNumber} items. Select edit or replace current categories.");
+
+			Click(locator1 = "Modal#BODY");
+
+			if ("${editAction}" == "Append") {
+				FormFields.selectRadioOption(
+					fieldName = "add",
+					radioOption = "Add");
+			}
+			else if ("${editAction}" == "Replace") {
+				FormFields.selectRadioOption(
+					fieldName = "replace",
+					radioOption = "Replace");
+			}
+		}
+		else {
+			AssertTextEquals.assertPartialText(
+				locator1 = "Modal#BODY",
+				value1 = "You're editing the categories for the selected item.");
+		}
+
+		for (var categoryName : list "${categoryNameList}") {
+			Type(
+				locator1 = "DocumentsAndMedia#EDIT_TAGS_FIELD",
+				value1 = "${categoryName}");
+
+			KeyPress(
+				locator1 = "DocumentsAndMedia#EDIT_TAGS_FIELD",
+				value1 = "\RETURN");
+		}
+
+		Button.clickSave();
+
+		SelectFrame(value1 = "relative=top");
+
+		Alert.viewSuccessMessageText(successMessage = "Changes saved.");
 	}
 
 	macro editCmd {
@@ -959,7 +1026,7 @@ definition {
 
 		KeyPress(
 			locator1 = "DocumentsAndMedia#EDIT_TAGS_FIELD",
-			value1 = "\RETURN");
+			value1 = ",");
 
 		Button.clickSave();
 
@@ -1175,8 +1242,31 @@ definition {
 		Navigator.openWithAppendToBaseURL(urlAppend = "group/${siteURLKey}/~/control_panel/manage?p_p_id=com_liferay_document_library_web_portlet_DLAdminPortlet");
 	}
 
+	macro removeCategories {
+		SelectFrame(value1 = "relative=top");
+
+		for (var categoryName : list "${categoriesNameList}") {
+			Click(
+				key_categoryName = "${categoryName}",
+				locator1 = "Icon#REMOVE_CATEGORY");
+		}
+
+		Button.clickSave();
+
+		SelectFrame(value1 = "relative=top");
+
+		Alert.viewSuccessMessageText(successMessage = "Changes saved.");
+	}
+
 	macro removeTag {
-		Click(locator1 = "Button#EDIT");
+		if (IsElementPresent(locator1 = "Button#EDIT")) {
+			Click(locator1 = "Button#EDIT");
+		}
+		else {
+			LexiconEntry.gotoEntryMenuItem(
+				menuItem = "Edit",
+				rowEntry = "DM Document Title");
+		}
 
 		Panel.expandPanel(panel = "Categorization");
 
@@ -1370,6 +1460,25 @@ definition {
 
 			AssertTextEquals(
 				locator1 = "AssetCategorization#CATEGORY",
+				value1 = "${categoryName}");
+		}
+	}
+
+	macro viewCategoriesPG {
+		DMDocument.expandInfo();
+
+		if (isSet(categoryNameList)) {
+			for (var categoryName : list "${categoryNameList}") {
+				AssertTextEquals(
+					key_categoryName = "${categoryName}",
+					locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_CATEGORIES",
+					value1 = "${categoryName}");
+			}
+		}
+		else {
+			AssertTextEquals(
+				key_categoryName = "${categoryName}",
+				locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_CATEGORIES",
 				value1 = "${categoryName}");
 		}
 	}
@@ -1780,6 +1889,21 @@ definition {
 		AssertTextEquals(
 			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE",
 			value1 = "${dmDocumentTitle}");
+	}
+
+	macro viewNoCategoriesPG {
+		if (isSet(categoryNameList)) {
+			for (var categoryName : list "${categoryNameList}") {
+				AssertElementNotPresent(
+					key_categoryName = "${categoryName}",
+					locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_CATEGORIES");
+			}
+		}
+		else {
+			AssertElementNotPresent(
+				key_categoryName = "${categoryName}",
+				locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_CATEGORIES");
+		}
 	}
 
 	macro viewNoTag {

@@ -15,6 +15,8 @@
 package com.liferay.segments.provider.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.petra.string.StringPool;
+import com.liferay.petra.string.StringUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.User;
@@ -94,11 +96,11 @@ public class DefaultSegmentsEntryProviderTest {
 			_group.getGroupId(), CriteriaSerializer.serialize(criteria),
 			User.class.getName());
 
-		int segmentsEntryClassPksCount =
+		int segmentsEntryClassPKsCount =
 			_segmentsEntryProvider.getSegmentsEntryClassPKsCount(
 				segmentsEntry.getSegmentsEntryId());
 
-		Assert.assertEquals(1, segmentsEntryClassPksCount);
+		Assert.assertEquals(1, segmentsEntryClassPKsCount);
 
 		long[] segmentsEntryClassPKs =
 			_segmentsEntryProvider.getSegmentsEntryClassPKs(
@@ -134,11 +136,11 @@ public class DefaultSegmentsEntryProviderTest {
 			_group.getGroupId(), CriteriaSerializer.serialize(criteria),
 			User.class.getName());
 
-		int segmentsEntryClassPksCount =
+		int segmentsEntryClassPKsCount =
 			_segmentsEntryProvider.getSegmentsEntryClassPKsCount(
 				segmentsEntry.getSegmentsEntryId());
 
-		Assert.assertEquals(0, segmentsEntryClassPksCount);
+		Assert.assertEquals(0, segmentsEntryClassPKsCount);
 	}
 
 	@Test
@@ -155,11 +157,11 @@ public class DefaultSegmentsEntryProviderTest {
 			_portal.getClassNameId(User.class.getName()), _user1.getUserId(),
 			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
 
-		int segmentsEntryClassPksCount =
+		int segmentsEntryClassPKsCount =
 			_segmentsEntryProvider.getSegmentsEntryClassPKsCount(
 				segmentsEntry.getSegmentsEntryId());
 
-		Assert.assertEquals(1, segmentsEntryClassPksCount);
+		Assert.assertEquals(1, segmentsEntryClassPKsCount);
 
 		long[] segmentsEntryClassPKs =
 			_segmentsEntryProvider.getSegmentsEntryClassPKs(
@@ -187,11 +189,11 @@ public class DefaultSegmentsEntryProviderTest {
 			_group.getGroupId(), CriteriaSerializer.serialize(criteria),
 			User.class.getName());
 
-		int segmentsEntryClassPksCount =
+		int segmentsEntryClassPKsCount =
 			_segmentsEntryProvider.getSegmentsEntryClassPKsCount(
 				segmentsEntry.getSegmentsEntryId());
 
-		Assert.assertEquals(1, segmentsEntryClassPksCount);
+		Assert.assertEquals(1, segmentsEntryClassPKsCount);
 
 		long[] segmentsEntryClassPKs =
 			_segmentsEntryProvider.getSegmentsEntryClassPKs(
@@ -247,7 +249,8 @@ public class DefaultSegmentsEntryProviderTest {
 			context);
 
 		Assert.assertEquals(
-			segmentsEntryIds.toString(), 3, segmentsEntryIds.length);
+			StringUtil.merge(segmentsEntryIds, StringPool.COMMA), 3,
+			segmentsEntryIds.length);
 		Assert.assertTrue(
 			ArrayUtil.containsAll(
 				new long[] {
@@ -305,7 +308,8 @@ public class DefaultSegmentsEntryProviderTest {
 			_group.getGroupId(), User.class.getName(), _user1.getUserId());
 
 		Assert.assertEquals(
-			segmentsEntryIds.toString(), 2, segmentsEntryIds.length);
+			StringUtil.merge(segmentsEntryIds, StringPool.COMMA), 2,
+			segmentsEntryIds.length);
 		Assert.assertTrue(
 			ArrayUtil.containsAll(
 				new long[] {
@@ -351,7 +355,8 @@ public class DefaultSegmentsEntryProviderTest {
 			context);
 
 		Assert.assertEquals(
-			segmentsEntryIds.toString(), 2, segmentsEntryIds.length);
+			StringUtil.merge(segmentsEntryIds, StringPool.COMMA), 2,
+			segmentsEntryIds.length);
 		Assert.assertTrue(
 			ArrayUtil.containsAll(
 				segmentsEntryIds,
@@ -398,7 +403,8 @@ public class DefaultSegmentsEntryProviderTest {
 			_group.getGroupId(), User.class.getName(), _user1.getUserId());
 
 		Assert.assertEquals(
-			segmentsEntryIds.toString(), 2, segmentsEntryIds.length);
+			StringUtil.merge(segmentsEntryIds, StringPool.COMMA), 2,
+			segmentsEntryIds.length);
 		Assert.assertTrue(
 			ArrayUtil.containsAll(
 				new long[] {

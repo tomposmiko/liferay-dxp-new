@@ -57,14 +57,6 @@ public class SessionFactoryImpl implements SessionFactory {
 		return new DialectImpl(_sessionFactoryImplementor.getDialect());
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public ClassLoader getSessionFactoryClassLoader() {
-		return _sessionFactoryClassLoader;
-	}
-
 	public SessionFactoryImplementor getSessionFactoryImplementor() {
 		return _sessionFactoryImplementor;
 	}
@@ -129,8 +121,8 @@ public class SessionFactoryImpl implements SessionFactory {
 
 			return classes;
 		}
-		catch (ClassNotFoundException cnfe) {
-			throw new RuntimeException(cnfe);
+		catch (ClassNotFoundException classNotFoundException) {
+			throw new RuntimeException(classNotFoundException);
 		}
 	}
 

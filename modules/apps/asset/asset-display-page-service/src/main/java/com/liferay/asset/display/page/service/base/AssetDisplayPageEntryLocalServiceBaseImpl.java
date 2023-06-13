@@ -72,7 +72,7 @@ public abstract class AssetDisplayPageEntryLocalServiceBaseImpl
 	implements AopService, AssetDisplayPageEntryLocalService,
 			   IdentifiableOSGiService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>AssetDisplayPageEntryLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.asset.display.page.service.AssetDisplayPageEntryLocalServiceUtil</code>.
@@ -569,8 +569,8 @@ public abstract class AssetDisplayPageEntryLocalServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

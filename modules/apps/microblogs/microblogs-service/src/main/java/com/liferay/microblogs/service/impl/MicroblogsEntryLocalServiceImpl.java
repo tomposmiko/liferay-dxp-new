@@ -104,7 +104,7 @@ public class MicroblogsEntryLocalServiceImpl
 		microblogsEntry.setParentMicroblogsEntryId(parentMicroblogsEntryId);
 		microblogsEntry.setSocialRelationType(socialRelationType);
 
-		microblogsEntryPersistence.update(microblogsEntry);
+		microblogsEntry = microblogsEntryPersistence.update(microblogsEntry);
 
 		// Resources
 
@@ -155,7 +155,7 @@ public class MicroblogsEntryLocalServiceImpl
 		microblogsEntry.setParentMicroblogsEntryId(parentMicroblogsEntryId);
 		microblogsEntry.setSocialRelationType(socialRelationType);
 
-		microblogsEntryPersistence.update(microblogsEntry);
+		microblogsEntry = microblogsEntryPersistence.update(microblogsEntry);
 
 		// Resources
 
@@ -277,44 +277,6 @@ public class MicroblogsEntryLocalServiceImpl
 		return microblogsEntryPersistence.countByCompanyId(companyId);
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	@Override
-	public List<MicroblogsEntry> getMicroblogsEntries(
-		long creatorClassNameId, int type, int start, int end,
-		OrderByComparator obc) {
-
-		return microblogsEntryPersistence.findByCCNI_T(
-			creatorClassNameId, type, start, end, obc);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	@Override
-	public List<MicroblogsEntry> getMicroblogsEntries(
-		long creatorClassNameId, long creatorClassPK, int start, int end) {
-
-		return microblogsEntryPersistence.findByCCNI_CCPK(
-			creatorClassNameId, creatorClassPK, start, end);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	@Override
-	public List<MicroblogsEntry> getMicroblogsEntries(
-		long creatorClassNameId, long creatorClassPK, int type, int start,
-		int end) {
-
-		return microblogsEntryPersistence.findByCCNI_CCPK_T(
-			creatorClassNameId, creatorClassPK, type, start, end);
-	}
-
 	@Override
 	public List<MicroblogsEntry> getMicroblogsEntries(
 		long companyId, long creatorClassNameId, int type, int start, int end,
@@ -352,65 +314,6 @@ public class MicroblogsEntryLocalServiceImpl
 			andOperator, start, end);
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	@Override
-	public List<MicroblogsEntry> getMicroblogsEntries(
-		long creatorClassNameId, long creatorClassPK, String assetTagName,
-		boolean andOperator, int start, int end) {
-
-		return microblogsEntryFinder.findByCCNI_CCPK_ATN(
-			creatorClassNameId, creatorClassPK, assetTagName, andOperator,
-			start, end);
-	}
-
-	@Override
-	public List<MicroblogsEntry> getMicroblogsEntries(
-		long companyId, long creatorClassNameId, String assetTagName, int start,
-		int end) {
-
-		return microblogsEntryFinder.findByC_CCNI_ATN(
-			companyId, creatorClassNameId, assetTagName, start, end);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	@Override
-	public List<MicroblogsEntry> getMicroblogsEntries(
-		long creatorClassNameId, String assetTagName, int start, int end) {
-
-		return microblogsEntryFinder.findByCCNI_ATN(
-			creatorClassNameId, assetTagName, start, end);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	@Override
-	public int getMicroblogsEntriesCount(
-		long creatorClassNameId, long creatorClassPK) {
-
-		return microblogsEntryPersistence.countByCCNI_CCPK(
-			creatorClassNameId, creatorClassPK);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	@Override
-	public int getMicroblogsEntriesCount(
-		long creatorClassNameId, long creatorClassPK, int type) {
-
-		return microblogsEntryPersistence.countByCCNI_CCPK_T(
-			creatorClassNameId, creatorClassPK, type);
-	}
-
 	@Override
 	public int getMicroblogsEntriesCount(
 		long companyId, long creatorClassNameId, long creatorClassPK) {
@@ -444,31 +347,6 @@ public class MicroblogsEntryLocalServiceImpl
 
 		return microblogsEntryFinder.countByC_CCNI_ATN(
 			companyId, creatorClassNameId, assetTagName);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	@Override
-	public int getMicroblogsEntriesCount(
-		long creatorClassNameId, long creatorClassPK, String assetTagName,
-		boolean andOperator) {
-
-		return microblogsEntryFinder.countByCCNI_CCPK_ATN(
-			creatorClassNameId, creatorClassPK, assetTagName, andOperator);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	@Override
-	public int getMicroblogsEntriesCount(
-		long creatorClassNameId, String assetTagName) {
-
-		return microblogsEntryFinder.countByCCNI_ATN(
-			creatorClassNameId, assetTagName);
 	}
 
 	@Override
@@ -559,7 +437,7 @@ public class MicroblogsEntryLocalServiceImpl
 		microblogsEntry.setContent(content);
 		microblogsEntry.setSocialRelationType(socialRelationType);
 
-		microblogsEntryPersistence.update(microblogsEntry);
+		microblogsEntry = microblogsEntryPersistence.update(microblogsEntry);
 
 		// Asset
 
@@ -582,9 +460,9 @@ public class MicroblogsEntryLocalServiceImpl
 
 			return subscription.getSubscriptionId();
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(pe, pe);
+				_log.debug(portalException, portalException);
 			}
 		}
 
@@ -622,9 +500,9 @@ public class MicroblogsEntryLocalServiceImpl
 				serviceContext.getLiferayPortletRequest(),
 				serviceContext.getLiferayPortletResponse(), null);
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(e, e);
+				_log.debug(exception, exception);
 			}
 		}
 
@@ -757,8 +635,8 @@ public class MicroblogsEntryLocalServiceImpl
 					_receiverUserIds, _microblogsEntry,
 					_notificationEventJSONObject);
 			}
-			catch (Exception e) {
-				throw new ProcessException(e);
+			catch (Exception exception) {
+				throw new ProcessException(exception);
 			}
 
 			return null;

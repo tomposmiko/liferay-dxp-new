@@ -45,9 +45,9 @@ public class DataAccess {
 				connection.close();
 			}
 		}
-		catch (SQLException sqle) {
+		catch (SQLException sqlException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(sqle.getMessage());
+				_log.warn(sqlException.getMessage());
 			}
 		}
 	}
@@ -74,9 +74,9 @@ public class DataAccess {
 				resultSet.close();
 			}
 		}
-		catch (SQLException sqle) {
+		catch (SQLException sqlException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(sqle.getMessage());
+				_log.warn(sqlException.getMessage());
 			}
 		}
 	}
@@ -87,9 +87,9 @@ public class DataAccess {
 				statement.close();
 			}
 		}
-		catch (SQLException sqle) {
+		catch (SQLException sqlException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(sqle.getMessage());
+				_log.warn(sqlException.getMessage());
 			}
 		}
 	}
@@ -108,9 +108,9 @@ public class DataAccess {
 				cleanUp(statement.getConnection(), statement, resultSet);
 			}
 		}
-		catch (SQLException sqle) {
+		catch (SQLException sqlException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(sqle.getMessage());
+				_log.warn(sqlException.getMessage());
 			}
 		}
 	}
@@ -132,28 +132,6 @@ public class DataAccess {
 		DataSource dataSource = (DataSource)JNDIUtil.lookup(context, location);
 
 		return dataSource.getConnection();
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link #getConnection()}
-	 */
-	@Deprecated
-	public static Connection getUpgradeOptimizedConnection()
-		throws SQLException {
-
-		return getConnection();
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public interface PACL {
-
-		public DataSource getDataSource();
-
-		public DataSource getDataSource(String location) throws NamingException;
-
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(DataAccess.class);

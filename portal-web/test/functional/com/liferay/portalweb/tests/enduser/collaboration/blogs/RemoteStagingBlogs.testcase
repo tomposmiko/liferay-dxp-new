@@ -222,12 +222,12 @@ definition {
 			entryContent = "Blogs Entry Content",
 			entrySubtitle = "Blogs Entry Subtitle",
 			entryTitle = "Blogs Entry Title",
-			navTab = "Upload Image",
+			navTab = "Blog Images",
 			uploadFileName = "Document_1.jpg");
 
 		Button.clickPublish();
 
-		Pause(locator1 = "30000");
+		Pause(locator1 = "10000");
 
 		Staging.gotoPublishToLive();
 
@@ -265,13 +265,9 @@ definition {
 
 		var key_imageFileName = "Document_2.jpg";
 
-		Click(locator1 = "ItemSelector#SELECT_FILE_IMAGE_PREVIEW");
+		Click(locator1 = "ItemSelector#SELECT_FILE_IMAGE_CARD");
 
 		SelectFrameTop(value1 = "relative=top");
-
-		AssertClick(
-			locator1 = "ItemSelector#ADD_BUTTON",
-			value1 = "Add");
 
 		PortletEntry.publish();
 

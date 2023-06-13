@@ -30,16 +30,10 @@ import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
  */
 public class AssetEntryLocalServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.portlet.asset.service.impl.AssetEntryLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
-	 */
-
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link AssetEntryLocalServiceUtil} to access the asset entry local service. Add custom service methods to <code>com.liferay.portlet.asset.service.impl.AssetEntryLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	public static void addAssetCategoryAssetEntries(
 		long categoryId,
@@ -670,17 +664,20 @@ public class AssetEntryLocalServiceUtil {
 	}
 
 	public static com.liferay.asset.kernel.model.AssetEntry
-			incrementViewCounter(long userId, String className, long classPK)
+			incrementViewCounter(
+				long companyId, long userId, String className, long classPK)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
-		return getService().incrementViewCounter(userId, className, classPK);
+		return getService().incrementViewCounter(
+			companyId, userId, className, classPK);
 	}
 
 	public static void incrementViewCounter(
-		long userId, String className, long classPK, int increment) {
+		long companyId, long userId, String className, long classPK,
+		int increment) {
 
 		getService().incrementViewCounter(
-			userId, className, classPK, increment);
+			companyId, userId, className, classPK, increment);
 	}
 
 	public static void reindex(
@@ -895,57 +892,6 @@ public class AssetEntryLocalServiceUtil {
 			description, summary, url, layoutUuid, height, width, priority);
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link #updateEntry(long,
-	 long, Date, Date, String, long, String, long, long[],
-	 String[], boolean, boolean, Date, Date, Date, Date, String,
-	 String, String, String, String, String, int, int, Double)}
-	 */
-	@Deprecated
-	public static com.liferay.asset.kernel.model.AssetEntry updateEntry(
-			long userId, long groupId, java.util.Date createDate,
-			java.util.Date modifiedDate, String className, long classPK,
-			String classUuid, long classTypeId, long[] categoryIds,
-			String[] tagNames, boolean listable, boolean visible,
-			java.util.Date startDate, java.util.Date endDate,
-			java.util.Date expirationDate, String mimeType, String title,
-			String description, String summary, String url, String layoutUuid,
-			int height, int width, Double priority)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return getService().updateEntry(
-			userId, groupId, createDate, modifiedDate, className, classPK,
-			classUuid, classTypeId, categoryIds, tagNames, listable, visible,
-			startDate, endDate, expirationDate, mimeType, title, description,
-			summary, url, layoutUuid, height, width, priority);
-	}
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 #updateEntry(long, long, Date, Date, String, long, String,
-	 long, long[], String[], boolean, boolean, Date, Date, Date,
-	 Date, String, String, String, String, String, String, int,
-	 int, Double)}
-	 */
-	@Deprecated
-	public static com.liferay.asset.kernel.model.AssetEntry updateEntry(
-			long userId, long groupId, java.util.Date createDate,
-			java.util.Date modifiedDate, String className, long classPK,
-			String classUuid, long classTypeId, long[] categoryIds,
-			String[] tagNames, boolean visible, java.util.Date startDate,
-			java.util.Date endDate, java.util.Date expirationDate,
-			String mimeType, String title, String description, String summary,
-			String url, String layoutUuid, int height, int width,
-			Integer priority, boolean sync)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return getService().updateEntry(
-			userId, groupId, createDate, modifiedDate, className, classPK,
-			classUuid, classTypeId, categoryIds, tagNames, visible, startDate,
-			endDate, expirationDate, mimeType, title, description, summary, url,
-			layoutUuid, height, width, priority, sync);
-	}
-
 	public static com.liferay.asset.kernel.model.AssetEntry updateEntry(
 			long userId, long groupId, String className, long classPK,
 			long[] categoryIds, String[] tagNames)
@@ -953,34 +899,6 @@ public class AssetEntryLocalServiceUtil {
 
 		return getService().updateEntry(
 			userId, groupId, className, classPK, categoryIds, tagNames);
-	}
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 #updateEntry(String, long, Date, Date, boolean, boolean)}
-	 */
-	@Deprecated
-	public static com.liferay.asset.kernel.model.AssetEntry updateEntry(
-			String className, long classPK, java.util.Date publishDate,
-			boolean visible)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return getService().updateEntry(
-			className, classPK, publishDate, visible);
-	}
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 #updateEntry(String, long, Date, Date, boolean, boolean)}
-	 */
-	@Deprecated
-	public static com.liferay.asset.kernel.model.AssetEntry updateEntry(
-			String className, long classPK, java.util.Date publishDate,
-			java.util.Date expirationDate, boolean visible)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return getService().updateEntry(
-			className, classPK, publishDate, expirationDate, visible);
 	}
 
 	public static com.liferay.asset.kernel.model.AssetEntry updateEntry(
@@ -1022,19 +940,6 @@ public class AssetEntryLocalServiceUtil {
 
 		getService().validate(
 			groupId, className, classTypePK, categoryIds, tagNames);
-	}
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link #validate(long,
-	 String, long, long[], String[])}
-	 */
-	@Deprecated
-	public static void validate(
-			long groupId, String className, long[] categoryIds,
-			String[] tagNames)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		getService().validate(groupId, className, categoryIds, tagNames);
 	}
 
 	public static AssetEntryLocalService getService() {

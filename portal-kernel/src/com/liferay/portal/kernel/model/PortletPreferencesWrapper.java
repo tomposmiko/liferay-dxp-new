@@ -18,6 +18,8 @@ import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 /**
  * <p>
@@ -41,6 +43,7 @@ public class PortletPreferencesWrapper
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
 		attributes.put("mvccVersion", getMvccVersion());
+		attributes.put("ctCollectionId", getCtCollectionId());
 		attributes.put("portletPreferencesId", getPortletPreferencesId());
 		attributes.put("companyId", getCompanyId());
 		attributes.put("ownerId", getOwnerId());
@@ -58,6 +61,12 @@ public class PortletPreferencesWrapper
 
 		if (mvccVersion != null) {
 			setMvccVersion(mvccVersion);
+		}
+
+		Long ctCollectionId = (Long)attributes.get("ctCollectionId");
+
+		if (ctCollectionId != null) {
+			setCtCollectionId(ctCollectionId);
 		}
 
 		Long portletPreferencesId = (Long)attributes.get(
@@ -112,6 +121,16 @@ public class PortletPreferencesWrapper
 	@Override
 	public long getCompanyId() {
 		return model.getCompanyId();
+	}
+
+	/**
+	 * Returns the ct collection ID of this portlet preferences.
+	 *
+	 * @return the ct collection ID of this portlet preferences
+	 */
+	@Override
+	public long getCtCollectionId() {
+		return model.getCtCollectionId();
 	}
 
 	/**
@@ -194,11 +213,6 @@ public class PortletPreferencesWrapper
 		return model.getPrimaryKey();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a portlet preferences model instance should use the <code>PortletPreferences</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();
@@ -212,6 +226,16 @@ public class PortletPreferencesWrapper
 	@Override
 	public void setCompanyId(long companyId) {
 		model.setCompanyId(companyId);
+	}
+
+	/**
+	 * Sets the ct collection ID of this portlet preferences.
+	 *
+	 * @param ctCollectionId the ct collection ID of this portlet preferences
+	 */
+	@Override
+	public void setCtCollectionId(long ctCollectionId) {
+		model.setCtCollectionId(ctCollectionId);
 	}
 
 	/**
@@ -292,6 +316,20 @@ public class PortletPreferencesWrapper
 	@Override
 	public void setPrimaryKey(long primaryKey) {
 		model.setPrimaryKey(primaryKey);
+	}
+
+	@Override
+	public Map<String, Function<PortletPreferences, Object>>
+		getAttributeGetterFunctions() {
+
+		return model.getAttributeGetterFunctions();
+	}
+
+	@Override
+	public Map<String, BiConsumer<PortletPreferences, Object>>
+		getAttributeSetterBiConsumers() {
+
+		return model.getAttributeSetterBiConsumers();
 	}
 
 	@Override

@@ -57,6 +57,7 @@ import com.liferay.portal.kernel.servlet.taglib.ui.Menu;
 import com.liferay.portal.kernel.servlet.taglib.ui.URLMenuItem;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -68,7 +69,6 @@ import com.liferay.staging.StagingGroupHelper;
 import com.liferay.staging.StagingGroupHelperUtil;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -84,14 +84,14 @@ import javax.servlet.http.HttpServletRequest;
 public class DLAdminManagementToolbarDisplayContext {
 
 	public DLAdminManagementToolbarDisplayContext(
+		HttpServletRequest httpServletRequest,
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
-		HttpServletRequest httpServletRequest,
 		DLAdminDisplayContext dlAdminDisplayContext) {
 
+		_httpServletRequest = httpServletRequest;
 		_liferayPortletRequest = liferayPortletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
-		_httpServletRequest = httpServletRequest;
 		_dlAdminDisplayContext = dlAdminDisplayContext;
 
 		_currentURLObj = PortletURLUtil.getCurrent(
@@ -475,7 +475,7 @@ public class DLAdminManagementToolbarDisplayContext {
 							String label = String.format(
 								"%s: %s",
 								LanguageUtil.get(_httpServletRequest, "owner"),
-								user.getFullName());
+								HtmlUtil.escape(user.getFullName()));
 
 							labelItem.setLabel(label);
 						});
@@ -627,8 +627,8 @@ public class DLAdminManagementToolbarDisplayContext {
 
 			return false;
 		}
-		catch (PortalException pe) {
-			throw new SystemException(pe);
+		catch (PortalException portalException) {
+			throw new SystemException(portalException);
 		}
 	}
 
@@ -793,9 +793,9 @@ public class DLAdminManagementToolbarDisplayContext {
 	}
 
 	private List<DropdownItem> _getOrderByDropdownItems() {
-		final Map<String, String> orderColumns = new HashMap<>();
-
-		orderColumns.put("creationDate", "create-date");
+		final Map<String, String> orderColumns = HashMapBuilder.put(
+			"creationDate", "create-date"
+		).build();
 
 		if (_getFileEntryTypeId() == -1) {
 			orderColumns.put("downloads", "downloads");
@@ -874,9 +874,7 @@ public class DLAdminManagementToolbarDisplayContext {
 		return _hasValidAssetVocabularies;
 	}
 
-	private boolean _hasWorkflowDefinitionLink(FileEntry fileEntry)
-		throws PortalException {
-
+	private boolean _hasWorkflowDefinitionLink(FileEntry fileEntry) {
 		if (!(fileEntry.getModel() instanceof DLFileEntry)) {
 			return false;
 		}
@@ -893,23 +891,14 @@ public class DLAdminManagementToolbarDisplayContext {
 	}
 
 	private boolean _hasWorkflowDefinitionLink(
-			long folderId, long fileEntryTypeId)
-		throws PortalException {
+		long folderId, long fileEntryTypeId) {
 
-		try {
-			return DLUtil.hasWorkflowDefinitionLink(
-				_themeDisplay.getCompanyId(), _themeDisplay.getScopeGroupId(),
-				folderId, fileEntryTypeId);
-		}
-		catch (PortalException | RuntimeException e) {
-			throw e;
-		}
-		catch (Exception e) {
-			throw new PortalException(e);
-		}
+		return DLUtil.hasWorkflowDefinitionLink(
+			_themeDisplay.getCompanyId(), _themeDisplay.getScopeGroupId(),
+			folderId, fileEntryTypeId);
 	}
 
-	private boolean _isEnableOnBulk() throws PortalException {
+	private boolean _isEnableOnBulk() {
 		long folderId = ParamUtil.getLong(_httpServletRequest, "folderId");
 
 		if (_hasWorkflowDefinitionLink(

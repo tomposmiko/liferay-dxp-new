@@ -64,6 +64,16 @@ public class MessageBoardMessageSerDes {
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
+		if (messageBoardMessage.getActions() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"actions\": ");
+
+			sb.append(_toJSON(messageBoardMessage.getActions()));
+		}
+
 		if (messageBoardMessage.getAggregateRating() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -255,6 +265,16 @@ public class MessageBoardMessageSerDes {
 			sb.append(messageBoardMessage.getNumberOfMessageBoardMessages());
 		}
 
+		if (messageBoardMessage.getParentMessageBoardMessageId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"parentMessageBoardMessageId\": ");
+
+			sb.append(messageBoardMessage.getParentMessageBoardMessageId());
+		}
+
 		if (messageBoardMessage.getRelatedContents() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -346,6 +366,14 @@ public class MessageBoardMessageSerDes {
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+		if (messageBoardMessage.getActions() == null) {
+			map.put("actions", null);
+		}
+		else {
+			map.put(
+				"actions", String.valueOf(messageBoardMessage.getActions()));
+		}
 
 		if (messageBoardMessage.getAggregateRating() == null) {
 			map.put("aggregateRating", null);
@@ -462,6 +490,16 @@ public class MessageBoardMessageSerDes {
 					messageBoardMessage.getNumberOfMessageBoardMessages()));
 		}
 
+		if (messageBoardMessage.getParentMessageBoardMessageId() == null) {
+			map.put("parentMessageBoardMessageId", null);
+		}
+		else {
+			map.put(
+				"parentMessageBoardMessageId",
+				String.valueOf(
+					messageBoardMessage.getParentMessageBoardMessageId()));
+		}
+
 		if (messageBoardMessage.getRelatedContents() == null) {
 			map.put("relatedContents", null);
 		}
@@ -526,7 +564,14 @@ public class MessageBoardMessageSerDes {
 			MessageBoardMessage messageBoardMessage, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
 
-			if (Objects.equals(jsonParserFieldName, "aggregateRating")) {
+			if (Objects.equals(jsonParserFieldName, "actions")) {
+				if (jsonParserFieldValue != null) {
+					messageBoardMessage.setActions(
+						(Map)MessageBoardMessageSerDes.toMap(
+							(String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "aggregateRating")) {
 				if (jsonParserFieldValue != null) {
 					messageBoardMessage.setAggregateRating(
 						AggregateRatingSerDes.toDTO(
@@ -624,6 +669,14 @@ public class MessageBoardMessageSerDes {
 						Integer.valueOf((String)jsonParserFieldValue));
 				}
 			}
+			else if (Objects.equals(
+						jsonParserFieldName, "parentMessageBoardMessageId")) {
+
+				if (jsonParserFieldValue != null) {
+					messageBoardMessage.setParentMessageBoardMessageId(
+						Long.valueOf((String)jsonParserFieldValue));
+				}
+			}
 			else if (Objects.equals(jsonParserFieldName, "relatedContents")) {
 				if (jsonParserFieldValue != null) {
 					messageBoardMessage.setRelatedContents(
@@ -672,9 +725,11 @@ public class MessageBoardMessageSerDes {
 	private static String _escape(Object object) {
 		String string = String.valueOf(object);
 
-		string = string.replace("\\", "\\\\");
+		for (String[] strings : BaseJSONParser.JSON_ESCAPE_STRINGS) {
+			string = string.replace(strings[0], strings[1]);
+		}
 
-		return string.replace("\"", "\\\"");
+		return string;
 	}
 
 	private static String _toJSON(Map<String, ?> map) {

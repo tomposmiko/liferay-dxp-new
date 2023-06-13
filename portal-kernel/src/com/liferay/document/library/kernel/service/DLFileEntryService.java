@@ -58,7 +58,7 @@ import org.osgi.annotation.versioning.ProviderType;
 )
 public interface DLFileEntryService extends BaseService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link DLFileEntryServiceUtil} to access the document library file entry remote service. Add custom service methods to <code>com.liferay.portlet.documentlibrary.service.impl.DLFileEntryServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -72,17 +72,6 @@ public interface DLFileEntryService extends BaseService {
 		throws PortalException;
 
 	public DLFileVersion cancelCheckOut(long fileEntryId)
-		throws PortalException;
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #checkInFileEntry(long, DLVersionNumberIncrease, String,
-	 ServiceContext)}
-	 */
-	@Deprecated
-	public void checkInFileEntry(
-			long fileEntryId, boolean major, String changeLog,
-			ServiceContext serviceContext)
 		throws PortalException;
 
 	public void checkInFileEntry(
@@ -245,26 +234,6 @@ public interface DLFileEntryService extends BaseService {
 	public boolean isFileEntryCheckedOut(long fileEntryId)
 		throws PortalException;
 
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public boolean isKeepFileVersionLabel(
-			long fileEntryId, boolean majorVersion,
-			ServiceContext serviceContext)
-		throws PortalException;
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 #isKeepFileVersionLabel(long, boolean, ServiceContext)}
-	 */
-	@Deprecated
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public boolean isKeepFileVersionLabel(
-			long fileEntryId, ServiceContext serviceContext)
-		throws PortalException;
-
 	public DLFileEntry moveFileEntry(
 			long fileEntryId, long newFolderId, ServiceContext serviceContext)
 		throws PortalException;
@@ -286,21 +255,6 @@ public interface DLFileEntryService extends BaseService {
 	public Hits search(
 			long groupId, long creatorUserId, long folderId, String[] mimeTypes,
 			int status, int start, int end)
-		throws PortalException;
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #updateFileEntry(long, String, String, String, String,
-	 String, DLVersionNumberIncrease, long, Map, File,
-	 InputStream, long, ServiceContext)}
-	 */
-	@Deprecated
-	public DLFileEntry updateFileEntry(
-			long fileEntryId, String sourceFileName, String mimeType,
-			String title, String description, String changeLog,
-			boolean majorVersion, long fileEntryTypeId,
-			Map<String, DDMFormValues> ddmFormValuesMap, File file,
-			InputStream is, long size, ServiceContext serviceContext)
 		throws PortalException;
 
 	public DLFileEntry updateFileEntry(

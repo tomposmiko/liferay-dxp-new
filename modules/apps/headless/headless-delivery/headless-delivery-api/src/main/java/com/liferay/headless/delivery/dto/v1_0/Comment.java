@@ -50,6 +50,35 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "Comment")
 public class Comment {
 
+	@Schema
+	@Valid
+	public Map<String, Map> getActions() {
+		return actions;
+	}
+
+	public void setActions(Map<String, Map> actions) {
+		this.actions = actions;
+	}
+
+	@JsonIgnore
+	public void setActions(
+		UnsafeSupplier<Map<String, Map>, Exception> actionsUnsafeSupplier) {
+
+		try {
+			actions = actionsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected Map<String, Map> actions;
+
 	@Schema(description = "The comment's author.")
 	@Valid
 	public Creator getCreator() {
@@ -75,7 +104,7 @@ public class Comment {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The comment's author.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator creator;
 
@@ -103,7 +132,7 @@ public class Comment {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The comment's creation date.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
@@ -131,7 +160,7 @@ public class Comment {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The comment's latest modification date.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateModified;
 
@@ -157,7 +186,7 @@ public class Comment {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The comment's ID.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
@@ -185,9 +214,37 @@ public class Comment {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The number of child comments on this comment.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer numberOfComments;
+
+	@Schema
+	public Long getParentCommentId() {
+		return parentCommentId;
+	}
+
+	public void setParentCommentId(Long parentCommentId) {
+		this.parentCommentId = parentCommentId;
+	}
+
+	@JsonIgnore
+	public void setParentCommentId(
+		UnsafeSupplier<Long, Exception> parentCommentIdUnsafeSupplier) {
+
+		try {
+			parentCommentId = parentCommentIdUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Long parentCommentId;
 
 	@Schema(description = "The comment's text content.")
 	public String getText() {
@@ -211,7 +268,7 @@ public class Comment {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The comment's text content.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String text;
 
@@ -244,6 +301,16 @@ public class Comment {
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+		if (actions != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"actions\": ");
+
+			sb.append(_toJSON(actions));
+		}
 
 		if (creator != null) {
 			if (sb.length() > 1) {
@@ -301,6 +368,16 @@ public class Comment {
 			sb.append("\"numberOfComments\": ");
 
 			sb.append(numberOfComments);
+		}
+
+		if (parentCommentId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"parentCommentId\": ");
+
+			sb.append(parentCommentId);
 		}
 
 		if (text != null) {

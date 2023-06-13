@@ -30,16 +30,10 @@ import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
  */
 public class AssetEntryServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.portlet.asset.service.impl.AssetEntryServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
-	 */
-
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link AssetEntryServiceUtil} to access the asset entry remote service. Add custom service methods to <code>com.liferay.portlet.asset.service.impl.AssetEntryServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	public static com.liferay.asset.kernel.model.AssetEntry fetchEntry(
 			long entryId)
@@ -106,10 +100,10 @@ public class AssetEntryServiceUtil {
 	}
 
 	public static com.liferay.asset.kernel.model.AssetEntry
-			incrementViewCounter(String className, long classPK)
+			incrementViewCounter(long companyId, String className, long classPK)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
-		return getService().incrementViewCounter(className, classPK);
+		return getService().incrementViewCounter(companyId, className, classPK);
 	}
 
 	public static com.liferay.asset.kernel.model.AssetEntry updateEntry(
@@ -129,57 +123,6 @@ public class AssetEntryServiceUtil {
 			classTypeId, categoryIds, tagNames, listable, visible, startDate,
 			endDate, publishDate, expirationDate, mimeType, title, description,
 			summary, url, layoutUuid, height, width, priority);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link #updateEntry(long,
-	 Date, Date, String, long, String, long, long[], String[],
-	 boolean, boolean, Date, Date, Date, Date, String, String,
-	 String, String, String, String, int, int, Double)}
-	 */
-	@Deprecated
-	public static com.liferay.asset.kernel.model.AssetEntry updateEntry(
-			long groupId, java.util.Date createDate,
-			java.util.Date modifiedDate, String className, long classPK,
-			String classUuid, long classTypeId, long[] categoryIds,
-			String[] tagNames, boolean listable, boolean visible,
-			java.util.Date startDate, java.util.Date endDate,
-			java.util.Date expirationDate, String mimeType, String title,
-			String description, String summary, String url, String layoutUuid,
-			int height, int width, Double priority)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return getService().updateEntry(
-			groupId, createDate, modifiedDate, className, classPK, classUuid,
-			classTypeId, categoryIds, tagNames, listable, visible, startDate,
-			endDate, expirationDate, mimeType, title, description, summary, url,
-			layoutUuid, height, width, priority);
-	}
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 #updateEntry(long, Date, Date, String, long, String, long,
-	 long[], String[], boolean, boolean, Date, Date, Date, Date,
-	 String, String, String, String, String, String, int, int,
-	 Double)}
-	 */
-	@Deprecated
-	public static com.liferay.asset.kernel.model.AssetEntry updateEntry(
-			long groupId, java.util.Date createDate,
-			java.util.Date modifiedDate, String className, long classPK,
-			String classUuid, long classTypeId, long[] categoryIds,
-			String[] tagNames, boolean visible, java.util.Date startDate,
-			java.util.Date endDate, java.util.Date expirationDate,
-			String mimeType, String title, String description, String summary,
-			String url, String layoutUuid, int height, int width,
-			Integer priority, boolean sync)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return getService().updateEntry(
-			groupId, createDate, modifiedDate, className, classPK, classUuid,
-			classTypeId, categoryIds, tagNames, visible, startDate, endDate,
-			expirationDate, mimeType, title, description, summary, url,
-			layoutUuid, height, width, priority, sync);
 	}
 
 	public static AssetEntryService getService() {

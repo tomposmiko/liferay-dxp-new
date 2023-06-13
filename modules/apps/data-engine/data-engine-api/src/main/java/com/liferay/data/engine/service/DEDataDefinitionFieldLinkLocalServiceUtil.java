@@ -32,7 +32,7 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class DEDataDefinitionFieldLinkLocalServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.data.engine.service.impl.DEDataDefinitionFieldLinkLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
@@ -103,6 +103,23 @@ public class DEDataDefinitionFieldLinkLocalServiceUtil {
 
 		return getService().deleteDEDataDefinitionFieldLink(
 			deDataDefinitionFieldLinkId);
+	}
+
+	public static void deleteDEDataDefinitionFieldLinks(long ddmStructureId) {
+		getService().deleteDEDataDefinitionFieldLinks(ddmStructureId);
+	}
+
+	public static void deleteDEDataDefinitionFieldLinks(
+		long classNameId, long classPK) {
+
+		getService().deleteDEDataDefinitionFieldLinks(classNameId, classPK);
+	}
+
+	public static void deleteDEDataDefinitionFieldLinks(
+		long classNameId, long ddmStructureId, String fieldName) {
+
+		getService().deleteDEDataDefinitionFieldLinks(
+			classNameId, ddmStructureId, fieldName);
 	}
 
 	/**
@@ -277,6 +294,53 @@ public class DEDataDefinitionFieldLinkLocalServiceUtil {
 			getDEDataDefinitionFieldLinks(int start, int end) {
 
 		return getService().getDEDataDefinitionFieldLinks(start, end);
+	}
+
+	public static java.util.List
+		<com.liferay.data.engine.model.DEDataDefinitionFieldLink>
+			getDEDataDefinitionFieldLinks(
+				long classNameId, long ddmStructureId, String fieldName) {
+
+		return getService().getDEDataDefinitionFieldLinks(
+			classNameId, ddmStructureId, fieldName);
+	}
+
+	/**
+	 * Returns all the de data definition field links matching the UUID and company.
+	 *
+	 * @param uuid the UUID of the de data definition field links
+	 * @param companyId the primary key of the company
+	 * @return the matching de data definition field links, or an empty list if no matches were found
+	 */
+	public static java.util.List
+		<com.liferay.data.engine.model.DEDataDefinitionFieldLink>
+			getDEDataDefinitionFieldLinksByUuidAndCompanyId(
+				String uuid, long companyId) {
+
+		return getService().getDEDataDefinitionFieldLinksByUuidAndCompanyId(
+			uuid, companyId);
+	}
+
+	/**
+	 * Returns a range of de data definition field links matching the UUID and company.
+	 *
+	 * @param uuid the UUID of the de data definition field links
+	 * @param companyId the primary key of the company
+	 * @param start the lower bound of the range of de data definition field links
+	 * @param end the upper bound of the range of de data definition field links (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the range of matching de data definition field links, or an empty list if no matches were found
+	 */
+	public static java.util.List
+		<com.liferay.data.engine.model.DEDataDefinitionFieldLink>
+			getDEDataDefinitionFieldLinksByUuidAndCompanyId(
+				String uuid, long companyId, int start, int end,
+				com.liferay.portal.kernel.util.OrderByComparator
+					<com.liferay.data.engine.model.DEDataDefinitionFieldLink>
+						orderByComparator) {
+
+		return getService().getDEDataDefinitionFieldLinksByUuidAndCompanyId(
+			uuid, companyId, start, end, orderByComparator);
 	}
 
 	/**

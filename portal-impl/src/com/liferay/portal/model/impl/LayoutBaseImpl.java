@@ -14,8 +14,6 @@
 
 package com.liferay.portal.model.impl;
 
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 
@@ -33,7 +31,7 @@ import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
  */
 public abstract class LayoutBaseImpl extends LayoutModelImpl implements Layout {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a layout model instance should use the <code>Layout</code> interface instead.
@@ -44,12 +42,7 @@ public abstract class LayoutBaseImpl extends LayoutModelImpl implements Layout {
 			LayoutLocalServiceUtil.addLayout(this);
 		}
 		else {
-			try {
-				LayoutLocalServiceUtil.updateLayout(this);
-			}
-			catch (PortalException pe) {
-				throw new SystemException(pe);
-			}
+			LayoutLocalServiceUtil.updateLayout(this);
 		}
 	}
 

@@ -91,8 +91,8 @@ public class AlloyServiceInvoker {
 			updateModelMethod = serviceClass.getMethod(
 				"update" + simpleClassName, new Class<?>[] {modelClass});
 		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
+		catch (Exception exception) {
+			throw new RuntimeException(exception);
 		}
 	}
 
@@ -142,25 +142,6 @@ public class AlloyServiceInvoker {
 	public BaseModel<?> deleteModel(long classPK) throws Exception {
 		return (BaseModel<?>)deleteModelMethod.invoke(
 			identifiableOSGiService, classPK);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #executeDynamicQuery(DynamicQuery)}
-	 */
-	@Deprecated
-	@SuppressWarnings("rawtypes")
-	public List dynamicQuery(DynamicQuery dynamicQuery) throws Exception {
-		return executeDynamicQuery(dynamicQuery);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #executeDynamicQueryCount(DynamicQuery)}
-	 */
-	@Deprecated
-	public long dynamicQueryCount(DynamicQuery dynamicQuery) throws Exception {
-		return executeDynamicQueryCount(dynamicQuery);
 	}
 
 	@SuppressWarnings("rawtypes")

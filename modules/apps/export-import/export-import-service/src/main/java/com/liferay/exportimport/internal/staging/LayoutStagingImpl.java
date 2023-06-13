@@ -111,7 +111,7 @@ public class LayoutStagingImpl implements LayoutStaging {
 
 	@Override
 	public boolean isBranchingLayout(Layout layout) {
-		if ((layout == null) || layout.isSystem()) {
+		if ((layout == null) || layout.isSystem() || layout.isTypeContent()) {
 			return false;
 		}
 
@@ -165,12 +165,12 @@ public class LayoutStagingImpl implements LayoutStaging {
 
 			return true;
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(pe, pe);
+				_log.debug(portalException, portalException);
 			}
 
 			return false;

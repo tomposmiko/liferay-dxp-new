@@ -21,6 +21,8 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Alejandro Hernández
@@ -38,6 +40,18 @@ public class Page<T> {
 		Collection<T> items, Pagination pagination, long totalCount) {
 
 		return new Page<>(items, pagination, totalCount);
+	}
+
+	public static <T> Page<T> of(
+		Map<String, Map> actions, Collection<T> items, Pagination pagination,
+		long totalCount) {
+
+		return new Page<>(actions, items, pagination, totalCount);
+	}
+
+	@JsonProperty("actions")
+	public Map<String, Map> getActions() {
+		return _actions;
 	}
 
 	@JacksonXmlElementWrapper(localName = "items")
@@ -86,14 +100,22 @@ public class Page<T> {
 
 	private Page(Collection<T> items) {
 		_items = items;
+
+		_actions = new HashMap<>();
 		_page = 1;
-
 		_pageSize = items.size();
-
-		_totalCount = _pageSize;
+		_totalCount = items.size();
 	}
 
 	private Page(Collection<T> items, Pagination pagination, long totalCount) {
+		this(new HashMap<>(), items, pagination, totalCount);
+	}
+
+	private Page(
+		Map<String, Map> actions, Collection<T> items, Pagination pagination,
+		long totalCount) {
+
+		_actions = actions;
 		_items = items;
 
 		if (pagination == null) {
@@ -108,6 +130,7 @@ public class Page<T> {
 		_totalCount = totalCount;
 	}
 
+	private final Map<String, Map> _actions;
 	private final Collection<T> _items;
 	private final long _page;
 	private final long _pageSize;

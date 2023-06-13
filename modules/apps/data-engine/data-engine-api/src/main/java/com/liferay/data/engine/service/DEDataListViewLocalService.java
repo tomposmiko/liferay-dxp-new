@@ -59,7 +59,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface DEDataListViewLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link DEDataListViewLocalServiceUtil} to access the de data list view local service. Add custom service methods to <code>com.liferay.data.engine.service.impl.DEDataListViewLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -109,6 +109,8 @@ public interface DEDataListViewLocalService
 	@Indexable(type = IndexableType.DELETE)
 	public DEDataListView deleteDEDataListView(long deDataListViewId)
 		throws PortalException;
+
+	public void deleteDEDataListViews(long ddmStructureId);
 
 	/**
 	 * @throws PortalException
@@ -237,6 +239,9 @@ public interface DEDataListViewLocalService
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<DEDataListView> getDEDataListViews(int start, int end);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<DEDataListView> getDEDataListViews(long ddmStructureId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<DEDataListView> getDEDataListViews(

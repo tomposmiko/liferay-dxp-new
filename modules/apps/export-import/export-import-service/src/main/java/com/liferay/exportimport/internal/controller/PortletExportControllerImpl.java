@@ -18,7 +18,6 @@ import com.liferay.asset.kernel.model.AssetLink;
 import com.liferay.asset.kernel.model.adapter.StagedAssetLink;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.asset.kernel.service.AssetLinkLocalService;
-import com.liferay.expando.kernel.model.ExpandoColumn;
 import com.liferay.exportimport.changeset.constants.ChangesetPortletKeys;
 import com.liferay.exportimport.constants.ExportImportConstants;
 import com.liferay.exportimport.controller.PortletExportController;
@@ -49,7 +48,6 @@ import com.liferay.exportimport.portlet.preferences.processor.ExportImportPortle
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.petra.xml.DocUtil;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskThreadLocal;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.NoSuchPortletPreferencesException;
@@ -86,7 +84,6 @@ import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
-import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
@@ -238,64 +235,6 @@ public class PortletExportControllerImpl implements PortletExportController {
 			document.formattedString());
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	@Override
-	public void exportExpandoTables(PortletDataContext portletDataContext)
-		throws Exception {
-
-		Document document = SAXReaderUtil.createDocument();
-
-		Element rootElement = document.addElement("expando-tables");
-
-		Map<String, List<ExpandoColumn>> expandoColumnsMap =
-			portletDataContext.getExpandoColumns();
-
-		for (Map.Entry<String, List<ExpandoColumn>> entry :
-				expandoColumnsMap.entrySet()) {
-
-			String className = entry.getKey();
-
-			Element expandoTableElement = rootElement.addElement(
-				"expando-table");
-
-			expandoTableElement.addAttribute("class-name", className);
-
-			List<ExpandoColumn> expandoColumns = entry.getValue();
-
-			for (ExpandoColumn expandoColumn : expandoColumns) {
-				Element expandoColumnElement = expandoTableElement.addElement(
-					"expando-column");
-
-				expandoColumnElement.addAttribute(
-					"column-id", String.valueOf(expandoColumn.getColumnId()));
-				expandoColumnElement.addAttribute(
-					"name", expandoColumn.getName());
-				expandoColumnElement.addAttribute(
-					"type", String.valueOf(expandoColumn.getType()));
-
-				DocUtil.add(
-					expandoColumnElement, "default-data",
-					expandoColumn.getDefaultData());
-
-				Element typeSettingsElement = expandoColumnElement.addElement(
-					"type-settings");
-
-				UnicodeProperties typeSettingsProperties =
-					expandoColumn.getTypeSettingsProperties();
-
-				typeSettingsElement.addCDATA(typeSettingsProperties.toString());
-			}
-		}
-
-		portletDataContext.addZipEntry(
-			ExportImportPathUtil.getRootPath(portletDataContext) +
-				"/expando-tables.xml",
-			document.formattedString());
-	}
-
 	@Override
 	public void exportLocks(PortletDataContext portletDataContext)
 		throws Exception {
@@ -395,7 +334,6 @@ public class PortletExportControllerImpl implements PortletExportController {
 		portletElement.addAttribute("portlet-id", portlet.getPortletId());
 		portletElement.addAttribute(
 			"root-portlet-id", portlet.getRootPortletId());
-		portletElement.addAttribute("old-plid", String.valueOf(plid));
 		portletElement.addAttribute(
 			"scope-group-id",
 			String.valueOf(portletDataContext.getScopeGroupId()));
@@ -566,12 +504,15 @@ public class PortletExportControllerImpl implements PortletExportController {
 					groupPortletPreferences, portlet.getRootPortletId(),
 					PortletKeys.PREFS_PLID_SHARED, portletElement);
 			}
-			catch (NoSuchPortletPreferencesException nsppe) {
+			catch (NoSuchPortletPreferencesException
+						noSuchPortletPreferencesException) {
 
 				// LPS-52675
 
 				if (_log.isDebugEnabled()) {
-					_log.debug(nsppe, nsppe);
+					_log.debug(
+						noSuchPortletPreferencesException,
+						noSuchPortletPreferencesException);
 				}
 			}
 		}
@@ -642,9 +583,9 @@ public class PortletExportControllerImpl implements PortletExportController {
 		try {
 			portletDataContext.addZipEntry(path, document.formattedString());
 		}
-		catch (IOException ioe) {
+		catch (IOException ioException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(ioe.getMessage());
+				_log.warn(ioException.getMessage());
 			}
 		}
 	}
@@ -978,14 +919,17 @@ public class PortletExportControllerImpl implements PortletExportController {
 			portletDataContext.addZipEntry(
 				"/manifest.xml", document.formattedString());
 		}
-		catch (IOException ioe) {
-			ExportImportIOException eiioe = new ExportImportIOException(
-				PortletExportControllerImpl.class.getName(), ioe);
+		catch (IOException ioException) {
+			ExportImportIOException exportImportIOException =
+				new ExportImportIOException(
+					PortletExportControllerImpl.class.getName(), ioException);
 
-			eiioe.setPortletId(portletDataContext.getPortletId());
-			eiioe.setType(ExportImportIOException.PORTLET_EXPORT);
+			exportImportIOException.setPortletId(
+				portletDataContext.getPortletId());
+			exportImportIOException.setType(
+				ExportImportIOException.PORTLET_EXPORT);
 
-			throw eiioe;
+			throw exportImportIOException;
 		}
 
 		ZipWriter zipWriter = portletDataContext.getZipWriter();
@@ -1050,15 +994,6 @@ public class PortletExportControllerImpl implements PortletExportController {
 					exportImportPortletPreferencesProcessor.
 						processExportPortletPreferences(
 							portletDataContext, jxPortletPreferences);
-				}
-				else {
-					PortletDataHandler portletDataHandler =
-						portlet.getPortletDataHandlerInstance();
-
-					jxPortletPreferences =
-						portletDataHandler.processExportPortletPreferences(
-							portletDataContext, portletId,
-							jxPortletPreferences);
 				}
 			}
 			finally {
@@ -1125,12 +1060,15 @@ public class PortletExportControllerImpl implements PortletExportController {
 			portletPreferences = getPortletPreferences(
 				ownerId, ownerType, plid, portletId);
 		}
-		catch (NoSuchPortletPreferencesException nsppe) {
+		catch (NoSuchPortletPreferencesException
+					noSuchPortletPreferencesException) {
 
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(nsppe, nsppe);
+				_log.debug(
+					noSuchPortletPreferencesException,
+					noSuchPortletPreferencesException);
 			}
 
 			return;
@@ -1217,12 +1155,15 @@ public class PortletExportControllerImpl implements PortletExportController {
 			portletPreferences = getPortletPreferences(
 				ownerId, ownerType, LayoutConstants.DEFAULT_PLID, serviceName);
 		}
-		catch (NoSuchPortletPreferencesException nsppe) {
+		catch (NoSuchPortletPreferencesException
+					noSuchPortletPreferencesException) {
 
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(nsppe, nsppe);
+				_log.debug(
+					noSuchPortletPreferencesException,
+					noSuchPortletPreferencesException);
 			}
 
 			return;
@@ -1279,7 +1220,6 @@ public class PortletExportControllerImpl implements PortletExportController {
 		portletDataContext.setExportImportProcessId(
 			String.valueOf(
 				exportImportConfiguration.getExportImportConfigurationId()));
-		portletDataContext.setOldPlid(sourcePlid);
 		portletDataContext.setPlid(sourcePlid);
 		portletDataContext.setPortletId(portletId);
 		portletDataContext.setType("portlet");

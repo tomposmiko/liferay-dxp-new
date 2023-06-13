@@ -75,7 +75,7 @@ import org.osgi.service.component.annotations.Reference;
 public class FlagsRequestMessageListener extends BaseMessageListener {
 
 	@Activate
-	public void activate() {
+	protected void activate() {
 		_defaultMessagingConfigurator = new DefaultMessagingConfigurator();
 
 		_defaultMessagingConfigurator.setDestinationConfigurations(
@@ -88,7 +88,7 @@ public class FlagsRequestMessageListener extends BaseMessageListener {
 	}
 
 	@Deactivate
-	public void deactivate() {
+	protected void deactivate() {
 		_defaultMessagingConfigurator.destroy();
 	}
 
@@ -191,9 +191,9 @@ public class FlagsRequestMessageListener extends BaseMessageListener {
 					fromAddress, recipient.getFullName(),
 					recipient.getEmailAddress(), subject, body, serviceContext);
 			}
-			catch (IOException ioe) {
+			catch (IOException ioException) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(ioe, ioe);
+					_log.warn(ioException, ioException);
 				}
 			}
 		}
@@ -261,16 +261,13 @@ public class FlagsRequestMessageListener extends BaseMessageListener {
 		subscriptionSender.setBody(body);
 		subscriptionSender.setCompanyId(company.getCompanyId());
 		subscriptionSender.setContextAttributes(
-			"[$CONTENT_ID$]", contentId, "[$CONTENT_TYPE$]", contentType,
+			"[$CONTENT_ID$]", contentId, "[$CONTENT_TITLE$]", contentTitle,
+			"[$CONTENT_TYPE$]", contentType, "[$CONTENT_URL$]", contentURL,
 			"[$DATE$]", now.toString(), "[$REASON$]", reason,
 			"[$REPORTED_USER_ADDRESS$]", reportedEmailAddress,
 			"[$REPORTED_USER_NAME$]", reportedUserName, "[$REPORTED_USER_URL$]",
 			reportedUserURL, "[$REPORTER_USER_ADDRESS$]", reporterEmailAddress,
 			"[$REPORTER_USER_NAME$]", reporterUserName);
-		subscriptionSender.setContextAttribute(
-			"[$CONTENT_TITLE$]", contentTitle, false);
-		subscriptionSender.setContextAttribute(
-			"[$CONTENT_URL$]", contentURL, false);
 		subscriptionSender.setCreatorUserId(reporterUserId);
 		subscriptionSender.setFrom(fromAddress, fromName);
 		subscriptionSender.setHtmlFormat(true);
@@ -326,11 +323,11 @@ public class FlagsRequestMessageListener extends BaseMessageListener {
 		try {
 			return group.getDescriptiveName(locale);
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			_log.error(
 				"Unable to get descriptive name for group " +
 					group.getGroupId(),
-				pe);
+				portalException);
 		}
 
 		return StringPool.BLANK;

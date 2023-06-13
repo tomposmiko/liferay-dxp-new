@@ -53,14 +53,14 @@ public class JournalDDMTemplateManagementToolbarDisplayContext
 	extends SearchContainerManagementToolbarDisplayContext {
 
 	public JournalDDMTemplateManagementToolbarDisplayContext(
+			HttpServletRequest httpServletRequest,
 			LiferayPortletRequest liferayPortletRequest,
 			LiferayPortletResponse liferayPortletResponse,
-			HttpServletRequest httpServletRequest,
 			JournalDDMTemplateDisplayContext journalDDMTemplateDisplayContext)
 		throws Exception {
 
 		super(
-			liferayPortletRequest, liferayPortletResponse, httpServletRequest,
+			httpServletRequest, liferayPortletRequest, liferayPortletResponse,
 			journalDDMTemplateDisplayContext.getDDMTemplateSearch());
 
 		_journalDDMTemplateDisplayContext = journalDDMTemplateDisplayContext;
@@ -213,7 +213,7 @@ public class JournalDDMTemplateManagementToolbarDisplayContext
 				return true;
 			}
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 		}
 
 		return false;

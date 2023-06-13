@@ -43,6 +43,7 @@ import com.liferay.portal.kernel.search.SearchResultUtil;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -52,7 +53,6 @@ import com.liferay.trash.TrashHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -103,18 +103,17 @@ public class BlogEntriesDisplayContext {
 	}
 
 	public Map<String, Object> getComponentContext() throws PortalException {
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)_httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
+		return HashMapBuilder.<String, Object>put(
+			"trashEnabled",
+			() -> {
+				ThemeDisplay themeDisplay =
+					(ThemeDisplay)_httpServletRequest.getAttribute(
+						WebKeys.THEME_DISPLAY);
 
-		return new HashMap<String, Object>() {
-			{
-				put(
-					"trashEnabled",
-					_trashHelper.isTrashEnabled(
-						themeDisplay.getScopeGroupId()));
+				return _trashHelper.isTrashEnabled(
+					themeDisplay.getScopeGroupId());
 			}
-		};
+		).build();
 	}
 
 	public String getDisplayStyle() {
@@ -315,7 +314,7 @@ public class BlogEntriesDisplayContext {
 			return Optional.of(
 				BlogsEntryServiceUtil.getEntry(searchResult.getClassPK()));
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
 					"Blogs search index is stale and contains entry " +

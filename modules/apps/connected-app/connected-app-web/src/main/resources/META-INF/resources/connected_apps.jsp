@@ -34,8 +34,8 @@
 			User selUser = PortalUtil.getSelectedUser(request);
 			%>
 
-			<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 			<aui:input name="p_u_i_d" type="hidden" value="<%= selUser.getUserId() %>" />
+			<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 			<aui:input name="connectedAppKey" type="hidden" value="<%= StringPool.BLANK %>" />
 
 			<%

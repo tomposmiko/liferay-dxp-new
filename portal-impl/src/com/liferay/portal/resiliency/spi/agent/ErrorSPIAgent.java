@@ -87,8 +87,8 @@ public class ErrorSPIAgent implements SPIAgent {
 				printWriter.write("SPI is temporarily unavailable.");
 				printWriter.write("</div>");
 			}
-			catch (IOException ioe) {
-				throw new PortalResiliencyException(ioe);
+			catch (IOException ioException) {
+				throw new PortalResiliencyException(ioException);
 			}
 		}
 	}
@@ -96,7 +96,7 @@ public class ErrorSPIAgent implements SPIAgent {
 	@Override
 	public void transferResponse(
 		HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse, Exception e) {
+		HttpServletResponse httpServletResponse, Exception exception) {
 	}
 
 }

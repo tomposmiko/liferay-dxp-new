@@ -84,24 +84,24 @@ public class EditPageMVCRenderCommand implements MVCRenderCommand {
 				getPage(renderRequest);
 			}
 		}
-		catch (Exception e) {
-			if (e instanceof NoSuchNodeException ||
-				e instanceof PageTitleException ||
-				e instanceof PrincipalException) {
+		catch (Exception exception) {
+			if (exception instanceof NoSuchNodeException ||
+				exception instanceof PageTitleException ||
+				exception instanceof PrincipalException) {
 
-				SessionErrors.add(renderRequest, e.getClass());
+				SessionErrors.add(renderRequest, exception.getClass());
 
-				if (e instanceof PrincipalException) {
+				if (exception instanceof PrincipalException) {
 					return "/wiki/error.jsp";
 				}
 			}
-			else if (e instanceof NoSuchPageException) {
+			else if (exception instanceof NoSuchPageException) {
 
 				// Let edit_page.jsp handle this case
 
 			}
 			else {
-				throw new PortletException(e);
+				throw new PortletException(exception);
 			}
 		}
 
@@ -140,11 +140,11 @@ public class EditPageMVCRenderCommand implements MVCRenderCommand {
 				page = _wikiPageService.getPage(nodeId, title, version);
 			}
 		}
-		catch (NoSuchPageException nspe1) {
+		catch (NoSuchPageException noSuchPageException1) {
 			try {
 				page = _wikiPageService.getPage(nodeId, title, false);
 			}
-			catch (NoSuchPageException nspe2) {
+			catch (NoSuchPageException noSuchPageException2) {
 				WikiWebComponentProvider wikiWebComponentProvider =
 					WikiWebComponentProvider.getWikiWebComponentProvider();
 
@@ -162,7 +162,7 @@ public class EditPageMVCRenderCommand implements MVCRenderCommand {
 						serviceContext);
 				}
 				else {
-					throw nspe2;
+					throw noSuchPageException2;
 				}
 			}
 		}

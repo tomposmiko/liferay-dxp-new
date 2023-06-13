@@ -137,9 +137,10 @@ public class IMAPConnection {
 
 			return store;
 		}
-		catch (MessagingException me) {
+		catch (MessagingException messagingException) {
 			throw new MailException(
-				MailException.ACCOUNT_INCOMING_CONNECTION_FAILED, me);
+				MailException.ACCOUNT_INCOMING_CONNECTION_FAILED,
+				messagingException);
 		}
 	}
 
@@ -161,22 +162,23 @@ public class IMAPConnection {
 
 			return transport;
 		}
-		catch (MessagingException me) {
+		catch (MessagingException messagingException) {
 			throw new MailException(
-				MailException.ACCOUNT_OUTGOING_CONNECTION_FAILED, me);
+				MailException.ACCOUNT_OUTGOING_CONNECTION_FAILED,
+				messagingException);
 		}
 	}
 
 	public void testConnection() throws MailException {
-		MailException mailException = null;
+		MailException mailException1 = null;
 
 		boolean failedIncomingConnection = false;
 
 		try {
 			testIncomingConnection();
 		}
-		catch (MailException me) {
-			mailException = me;
+		catch (MailException mailException2) {
+			mailException1 = mailException2;
 
 			failedIncomingConnection = true;
 		}
@@ -186,25 +188,25 @@ public class IMAPConnection {
 		try {
 			testOutgoingConnection();
 		}
-		catch (MailException me) {
-			mailException = me;
+		catch (MailException mailException2) {
+			mailException1 = mailException2;
 
 			failedOutgoingConnection = true;
 		}
 
 		if (failedIncomingConnection && failedOutgoingConnection) {
 			throw new MailException(
-				MailException.ACCOUNT_CONNECTIONS_FAILED, mailException);
+				MailException.ACCOUNT_CONNECTIONS_FAILED, mailException1);
 		}
 		else if (failedIncomingConnection) {
 			throw new MailException(
 				MailException.ACCOUNT_INCOMING_CONNECTION_FAILED,
-				mailException);
+				mailException1);
 		}
 		else if (failedOutgoingConnection) {
 			throw new MailException(
 				MailException.ACCOUNT_OUTGOING_CONNECTION_FAILED,
-				mailException);
+				mailException1);
 		}
 	}
 
@@ -217,8 +219,9 @@ public class IMAPConnection {
 					ConfigurationProviderUtil.getCompanyConfiguration(
 						MailGroupServiceConfiguration.class, companyId);
 			}
-			catch (ConfigurationException ce) {
-				_log.error("Unable to get mail configuration", ce);
+			catch (ConfigurationException configurationException) {
+				_log.error(
+					"Unable to get mail configuration", configurationException);
 			}
 		}
 
@@ -235,9 +238,9 @@ public class IMAPConnection {
 
 			store.close();
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			throw new MailException(
-				MailException.ACCOUNT_INCOMING_CONNECTION_FAILED, e);
+				MailException.ACCOUNT_INCOMING_CONNECTION_FAILED, exception);
 		}
 		finally {
 			if (_log.isDebugEnabled()) {
@@ -262,9 +265,9 @@ public class IMAPConnection {
 
 			transport.close();
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			throw new MailException(
-				MailException.ACCOUNT_OUTGOING_CONNECTION_FAILED, e);
+				MailException.ACCOUNT_OUTGOING_CONNECTION_FAILED, exception);
 		}
 		finally {
 			if (_log.isDebugEnabled()) {

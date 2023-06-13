@@ -15,10 +15,10 @@
 package com.liferay.dynamic.data.mapping.form.web.internal.layout.type.controller;
 
 import com.liferay.dynamic.data.mapping.form.web.internal.layout.type.constants.DDMFormPortletLayoutTypeConstants;
+import com.liferay.layout.type.controller.BaseLayoutTypeControllerImpl;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutTypeController;
-import com.liferay.portal.kernel.model.impl.BaseLayoutTypeControllerImpl;
 import com.liferay.taglib.servlet.PipingServletResponse;
 
 import javax.servlet.ServletContext;
@@ -115,7 +115,7 @@ public class DDMFormPortletLayoutTypeController
 
 	private static final String _URL =
 		"${liferay:mainPath}/portal/layout?p_l_id=${liferay:plid}" +
-			"&p_v_l_s_g_id=${liferay:pvlsgid}&p_p_state=pop_up";
+			"&p_p_state=pop_up&p_v_l_s_g_id=${liferay:pvlsgid}";
 
 	private static final String _VIEW_PAGE = "/layout/view/portlet.jsp";
 

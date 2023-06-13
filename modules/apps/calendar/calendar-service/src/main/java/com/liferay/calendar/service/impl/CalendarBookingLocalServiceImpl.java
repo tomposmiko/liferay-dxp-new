@@ -157,13 +157,6 @@ public class CalendarBookingLocalServiceImpl
 		java.util.Calendar endTimeJCalendar = JCalendarUtil.getJCalendar(
 			endTime, timeZone);
 
-		if (allDay) {
-			startTimeJCalendar = JCalendarUtil.toMidnightJCalendar(
-				startTimeJCalendar);
-			endTimeJCalendar = JCalendarUtil.toLastHourJCalendar(
-				endTimeJCalendar);
-		}
-
 		if (firstReminder < secondReminder) {
 			long originalSecondReminder = secondReminder;
 
@@ -253,7 +246,7 @@ public class CalendarBookingLocalServiceImpl
 		calendarBooking.setStatus(status);
 		calendarBooking.setStatusDate(serviceContext.getModifiedDate(now));
 
-		calendarBookingPersistence.update(calendarBooking);
+		calendarBooking = calendarBookingPersistence.update(calendarBooking);
 
 		addChildCalendarBookings(
 			calendarBooking, childCalendarIds, serviceContext);
@@ -296,31 +289,6 @@ public class CalendarBookingLocalServiceImpl
 		return calendarBooking;
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #addCalendarBooking(long, long, long[], long, long, Map, Map,
-	 *             String, long, long, boolean, String, long, String, long,
-	 *             String, ServiceContext)}
-	 */
-	@Deprecated
-	@Override
-	public CalendarBooking addCalendarBooking(
-			long userId, long calendarId, long[] childCalendarIds,
-			long parentCalendarBookingId, Map<Locale, String> titleMap,
-			Map<Locale, String> descriptionMap, String location, long startTime,
-			long endTime, boolean allDay, String recurrence, long firstReminder,
-			String firstReminderType, long secondReminder,
-			String secondReminderType, ServiceContext serviceContext)
-		throws PortalException {
-
-		return calendarBookingLocalService.addCalendarBooking(
-			userId, calendarId, childCalendarIds, parentCalendarBookingId,
-			CalendarBookingConstants.RECURRING_CALENDAR_BOOKING_ID_DEFAULT,
-			titleMap, descriptionMap, location, startTime, endTime, allDay,
-			recurrence, firstReminder, firstReminderType, secondReminder,
-			secondReminderType, serviceContext);
-	}
-
 	@Override
 	public void checkCalendarBookings() throws PortalException {
 		Date now = new Date();
@@ -345,14 +313,14 @@ public class CalendarBookingLocalServiceImpl
 						calendarBooking, now.getTime());
 				}
 			}
-			catch (PortalException pe) {
-				throw pe;
+			catch (PortalException portalException) {
+				throw portalException;
 			}
-			catch (SystemException se) {
-				throw se;
+			catch (SystemException systemException) {
+				throw systemException;
 			}
-			catch (Exception e) {
-				throw new SystemException(e);
+			catch (Exception exception) {
+				throw new SystemException(exception);
 			}
 		}
 	}
@@ -471,74 +439,6 @@ public class CalendarBookingLocalServiceImpl
 			calendarBooking, allRecurringInstances);
 
 		return calendarBooking;
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #deleteCalendarBookingInstance(long, CalendarBooking, int,
-	 *             boolean)}
-	 */
-	@Deprecated
-	@Override
-	public void deleteCalendarBookingInstance(
-			CalendarBooking calendarBooking, int instanceIndex,
-			boolean allFollowing)
-		throws PortalException {
-
-		deleteCalendarBookingInstance(
-			calendarBooking.getUserId(), calendarBooking, instanceIndex,
-			allFollowing);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #deleteCalendarBookingInstance(long, CalendarBooking, int,
-	 *             boolean, boolean)}
-	 */
-	@Deprecated
-	@Override
-	public void deleteCalendarBookingInstance(
-			CalendarBooking calendarBooking, int instanceIndex,
-			boolean allFollowing, boolean deleteRecurringCalendarBookings)
-		throws PortalException {
-
-		deleteCalendarBookingInstance(
-			calendarBooking.getUserId(), calendarBooking, instanceIndex,
-			allFollowing, deleteRecurringCalendarBookings);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #deleteCalendarBookingInstance(long, CalendarBooking, long,
-	 *             boolean)}
-	 */
-	@Deprecated
-	@Override
-	public void deleteCalendarBookingInstance(
-			CalendarBooking calendarBooking, long startTime,
-			boolean allFollowing)
-		throws PortalException {
-
-		deleteCalendarBookingInstance(
-			calendarBooking.getUserId(), calendarBooking, startTime,
-			allFollowing);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #deleteCalendarBookingInstance(long, CalendarBooking, long,
-	 *             boolean, boolean)}
-	 */
-	@Deprecated
-	@Override
-	public void deleteCalendarBookingInstance(
-			CalendarBooking calendarBooking, long startTime,
-			boolean allFollowing, boolean deleteRecurringCalendarBookings)
-		throws PortalException {
-
-		deleteCalendarBookingInstance(
-			calendarBooking.getUserId(), calendarBooking, startTime,
-			allFollowing, deleteRecurringCalendarBookings);
 	}
 
 	@Override
@@ -661,24 +561,6 @@ public class CalendarBookingLocalServiceImpl
 
 		sendChildrenNotifications(
 			calendarBooking, notificationTemplateType, serviceContext);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #deleteCalendarBookingInstance(long, long, long, boolean)}
-	 */
-	@Deprecated
-	@Override
-	public void deleteCalendarBookingInstance(
-			long calendarBookingId, long startTime, boolean allFollowing)
-		throws PortalException {
-
-		CalendarBooking calendarBooking = fetchCalendarBooking(
-			calendarBookingId);
-
-		deleteCalendarBookingInstance(
-			calendarBooking.getUserId(), calendarBookingId, startTime,
-			allFollowing);
 	}
 
 	@Override
@@ -1319,13 +1201,6 @@ public class CalendarBookingLocalServiceImpl
 		java.util.Calendar endTimeJCalendar = JCalendarUtil.getJCalendar(
 			endTime, timeZone);
 
-		if (allDay) {
-			startTimeJCalendar = JCalendarUtil.toMidnightJCalendar(
-				startTimeJCalendar);
-			endTimeJCalendar = JCalendarUtil.toLastHourJCalendar(
-				endTimeJCalendar);
-		}
-
 		if (firstReminder < secondReminder) {
 			long originalSecondReminder = secondReminder;
 
@@ -1816,7 +1691,7 @@ public class CalendarBookingLocalServiceImpl
 			try {
 				calendarId = getNotLiveCalendarId(calendarId);
 			}
-			catch (NoSuchCalendarException nsce) {
+			catch (NoSuchCalendarException noSuchCalendarException) {
 				continue;
 			}
 
@@ -2216,9 +2091,9 @@ public class CalendarBookingLocalServiceImpl
 				calendarBooking, notificationType, notificationTemplateType,
 				sender, serviceContext);
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(e, e);
+				_log.warn(exception, exception);
 			}
 		}
 	}
@@ -2443,10 +2318,15 @@ public class CalendarBookingLocalServiceImpl
 				calendarBooking.getCalendarBookingId());
 
 		for (CalendarBooking childCalendarBooking : childCalendarBookings) {
-			if (childCalendarBooking.isDenied() &&
-				ArrayUtil.contains(
+			if (!childCalendarBooking.isMasterBooking() &&
+				!ArrayUtil.contains(
 					childCalendarIds, childCalendarBooking.getCalendarId())) {
 
+				deleteCalendarBooking(
+					childCalendarBooking.getCalendarBookingId());
+			}
+
+			if (childCalendarBooking.isDenied()) {
 				continue;
 			}
 
@@ -2458,7 +2338,7 @@ public class CalendarBookingLocalServiceImpl
 			try {
 				calendarId = getNotLiveCalendarId(calendarId);
 			}
-			catch (NoSuchCalendarException nsce) {
+			catch (NoSuchCalendarException noSuchCalendarException) {
 				continue;
 			}
 

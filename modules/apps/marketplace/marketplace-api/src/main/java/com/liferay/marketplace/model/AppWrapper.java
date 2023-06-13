@@ -354,11 +354,6 @@ public class AppWrapper
 		return model.isRequired();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a app model instance should use the <code>App</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

@@ -95,6 +95,7 @@ import com.liferay.portal.kernel.url.ServletContextURLContainer;
 import com.liferay.portal.kernel.util.CacheResourceBundleLoader;
 import com.liferay.portal.kernel.util.ClassResourceBundleLoader;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PropertiesUtil;
@@ -121,7 +122,6 @@ import com.liferay.portal.util.JavaScriptBundleUtil;
 import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
-import com.liferay.portlet.documentlibrary.store.StoreFactory;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.ServiceRegistration;
@@ -330,17 +330,6 @@ public class HookHotDeployListener
 			PropertiesUtil.toMap(properties));
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	protected boolean checkPermission(
-		String name, ClassLoader portletClassLoader, Object subject,
-		String message) {
-
-		return true;
-	}
-
 	protected boolean containsKey(Properties portalProperties, String key) {
 		if (_log.isDebugEnabled()) {
 			return true;
@@ -395,9 +384,7 @@ public class HookHotDeployListener
 		}
 
 		if (portalProperties.containsKey(PropsKeys.DL_STORE_IMPL)) {
-			StoreFactory storeFactory = StoreFactory.getInstance();
-
-			storeFactory.setStore(null);
+			PropsValues.DL_STORE_IMPL = PropsUtil.get(PropsKeys.DL_STORE_IMPL);
 		}
 
 		Set<String> liferayFilterClassNames =
@@ -461,9 +448,11 @@ public class HookHotDeployListener
 				servletContext, servletContextName, portletClassLoader,
 				hotDeployEvent.getPluginPackage(), rootElement);
 		}
-		catch (DuplicateCustomJspException dcje) {
+		catch (DuplicateCustomJspException duplicateCustomJspException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(servletContextName + " will be undeployed", dcje);
+				_log.warn(
+					servletContextName + " will be undeployed",
+					duplicateCustomJspException);
 			}
 
 			HotDeployUtil.fireUndeployEvent(
@@ -603,7 +592,7 @@ public class HookHotDeployListener
 		try {
 			return (BasePersistence<?>)PortalBeanLocatorUtil.locate(beanName);
 		}
-		catch (BeanLocatorException ble) {
+		catch (BeanLocatorException beanLocatorException) {
 			return (BasePersistence<?>)PortletBeanLocatorUtil.locate(
 				servletContextName, beanName);
 		}
@@ -1156,9 +1145,10 @@ public class HookHotDeployListener
 				ResourceBundle resourceBundle = new LiferayResourceBundle(
 					inputStream, StringPool.UTF8);
 
-				Map<String, Object> properties = new HashMap<>();
-
-				properties.put("language.id", LocaleUtil.toLanguageId(locale));
+				Map<String, Object> properties =
+					HashMapBuilder.<String, Object>put(
+						"language.id", LocaleUtil.toLanguageId(locale)
+					).build();
 
 				registerService(
 					servletContextName, languagePropertiesLocation,
@@ -1232,8 +1222,8 @@ public class HookHotDeployListener
 				ConfigurationFactoryUtil.getConfiguration(
 					portletClassLoader, name);
 		}
-		catch (Exception e) {
-			_log.error("Unable to read " + portalPropertiesLocation, e);
+		catch (Exception exception) {
+			_log.error("Unable to read " + portalPropertiesLocation, exception);
 		}
 
 		if (portalPropertiesConfiguration == null) {
@@ -1417,12 +1407,8 @@ public class HookHotDeployListener
 		}
 
 		if (portalProperties.containsKey(PropsKeys.DL_STORE_IMPL)) {
-			StoreFactory storeFactory = StoreFactory.getInstance();
-
-			String storeClassName = portalProperties.getProperty(
+			PropsValues.DL_STORE_IMPL = portalProperties.getProperty(
 				PropsKeys.DL_STORE_IMPL);
-
-			storeFactory.setStore(storeClassName);
 		}
 
 		if (portalProperties.containsKey(
@@ -1740,7 +1726,7 @@ public class HookHotDeployListener
 				_initServices(
 					servletContextName, serviceImplConstructor, serviceProxy);
 			}
-			catch (BeanLocatorException ble) {
+			catch (BeanLocatorException beanLocatorException) {
 				Registry registry = RegistryUtil.getRegistry();
 
 				registry.callService(
@@ -1751,39 +1737,14 @@ public class HookHotDeployListener
 								servletContextName, serviceImplConstructor,
 								registryServiceProxy);
 						}
-						catch (Exception e) {
-							ReflectionUtil.throwException(e);
+						catch (Exception exception) {
+							ReflectionUtil.throwException(exception);
 						}
 
 						return null;
 					});
 			}
 		}
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), as of 7.0.0, with no direct replacement
-	 */
-	@Deprecated
-	protected void initServices(
-			String servletContextName, ClassLoader portletClassLoader,
-			String serviceType, Class<?> serviceTypeClass,
-			Constructor<?> serviceImplConstructor, Object serviceProxy)
-		throws ReflectiveOperationException {
-
-		AopInvocationHandler aopInvocationHandler =
-			ProxyUtil.fetchInvocationHandler(
-				serviceProxy, AopInvocationHandler.class);
-
-		Object previousService = aopInvocationHandler.getTarget();
-
-		ServiceWrapper<?> serviceWrapper =
-			(ServiceWrapper<?>)serviceImplConstructor.newInstance(
-				previousService);
-
-		registerService(
-			servletContextName, serviceImplConstructor, ServiceWrapper.class,
-			serviceWrapper);
 	}
 
 	protected Filter initServletFilter(
@@ -2000,11 +1961,11 @@ public class HookHotDeployListener
 
 				field.setBoolean(null, value);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				_log.error(
 					StringBundler.concat(
 						"Error setting field ", fieldName, ": ",
-						e.getMessage()));
+						exception.getMessage()));
 			}
 		}
 
@@ -2025,11 +1986,11 @@ public class HookHotDeployListener
 
 				field.setInt(null, value);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				_log.error(
 					StringBundler.concat(
 						"Error setting field ", fieldName, ": ",
-						e.getMessage()));
+						exception.getMessage()));
 			}
 		}
 
@@ -2050,11 +2011,11 @@ public class HookHotDeployListener
 
 				field.setLong(null, value);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				_log.error(
 					StringBundler.concat(
 						"Error setting field ", fieldName, ": ",
-						e.getMessage()));
+						exception.getMessage()));
 			}
 		}
 
@@ -2074,11 +2035,11 @@ public class HookHotDeployListener
 
 				field.set(null, value);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				_log.error(
 					StringBundler.concat(
 						"Error setting field ", fieldName, ": ",
-						e.getMessage()));
+						exception.getMessage()));
 			}
 		}
 
@@ -2145,11 +2106,11 @@ public class HookHotDeployListener
 					propsValuesStringArray, stringArraysContainerMap, key,
 					fieldName);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				_log.error(
 					StringBundler.concat(
 						"Error setting field ", fieldName, ": ",
-						e.getMessage()));
+						exception.getMessage()));
 			}
 		}
 	}

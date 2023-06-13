@@ -58,10 +58,10 @@ public class FragmentRendererUtil {
 			}
 		}
 
-		Class<?> superclass = clazz.getSuperclass();
+		Class<?> superClass = clazz.getSuperclass();
 
-		if (superclass != null) {
-			return getInfoItemRenderers(superclass, infoItemRendererTracker);
+		if (superClass != null) {
+			return getInfoItemRenderers(superClass, infoItemRendererTracker);
 		}
 
 		return null;
@@ -106,9 +106,9 @@ public class FragmentRendererUtil {
 
 			printWriter.write(sb.toString());
 		}
-		catch (IOException ioe) {
+		catch (IOException ioException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(ioe, ioe);
+				_log.debug(ioException, ioException);
 			}
 		}
 	}

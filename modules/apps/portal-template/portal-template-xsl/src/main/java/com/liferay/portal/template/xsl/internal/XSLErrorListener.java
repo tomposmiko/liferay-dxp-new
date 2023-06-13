@@ -40,21 +40,21 @@ public class XSLErrorListener implements ErrorListener {
 	}
 
 	@Override
-	public void error(TransformerException exception)
+	public void error(TransformerException transformerException)
 		throws TransformerException {
 
-		setLocation(exception);
+		setLocation(transformerException);
 
-		throw exception;
+		throw transformerException;
 	}
 
 	@Override
-	public void fatalError(TransformerException exception)
+	public void fatalError(TransformerException transformerException)
 		throws TransformerException {
 
-		setLocation(exception);
+		setLocation(transformerException);
 
-		throw exception;
+		throw transformerException;
 	}
 
 	public int getColumnNumber() {
@@ -88,9 +88,10 @@ public class XSLErrorListener implements ErrorListener {
 				rootCause = cause;
 			}
 			else if (cause instanceof TransformerException) {
-				TransformerException te = (TransformerException)cause;
+				TransformerException transformerException =
+					(TransformerException)cause;
 
-				SourceLocator causeLocator = te.getLocator();
+				SourceLocator causeLocator = transformerException.getLocator();
 
 				if (causeLocator != null) {
 					locator = causeLocator;
@@ -99,19 +100,21 @@ public class XSLErrorListener implements ErrorListener {
 			}
 
 			if (cause instanceof TransformerException) {
-				TransformerException te = (TransformerException)cause;
+				TransformerException transformerException =
+					(TransformerException)cause;
 
-				cause = te.getCause();
+				cause = transformerException.getCause();
 			}
 			else if (cause instanceof WrappedRuntimeException) {
-				WrappedRuntimeException wre = (WrappedRuntimeException)cause;
+				WrappedRuntimeException wrappedRuntimeException =
+					(WrappedRuntimeException)cause;
 
-				cause = wre.getException();
+				cause = wrappedRuntimeException.getException();
 			}
 			else if (cause instanceof SAXException) {
-				SAXException saxe = (SAXException)cause;
+				SAXException saxException = (SAXException)cause;
 
-				cause = saxe.getException();
+				cause = saxException.getException();
 			}
 			else {
 				cause = null;
@@ -143,12 +146,12 @@ public class XSLErrorListener implements ErrorListener {
 	}
 
 	@Override
-	public void warning(TransformerException exception)
+	public void warning(TransformerException transformerException)
 		throws TransformerException {
 
-		setLocation(exception);
+		setLocation(transformerException);
 
-		throw exception;
+		throw transformerException;
 	}
 
 	private int _columnNumber;

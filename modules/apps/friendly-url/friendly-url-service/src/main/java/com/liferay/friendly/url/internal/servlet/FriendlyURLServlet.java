@@ -45,6 +45,7 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.struts.LastPath;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -60,7 +61,6 @@ import com.liferay.site.service.SiteFriendlyURLLocalService;
 
 import java.io.IOException;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -169,9 +169,9 @@ public class FriendlyURLServlet extends HttpServlet {
 				WebKeys.REDIRECT_TO_DEFAULT_LAYOUT, Boolean.TRUE);
 		}
 
-		Map<String, Object> requestContext = new HashMap<>();
-
-		requestContext.put("request", httpServletRequest);
+		Map<String, Object> requestContext = HashMapBuilder.<String, Object>put(
+			"request", httpServletRequest
+		).build();
 
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
@@ -258,7 +258,7 @@ public class FriendlyURLServlet extends HttpServlet {
 				}
 			}
 		}
-		catch (NoSuchLayoutException nsle) {
+		catch (NoSuchLayoutException noSuchLayoutException) {
 			List<Layout> layouts = layoutLocalService.getLayouts(
 				group.getGroupId(), _private,
 				LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
@@ -272,7 +272,7 @@ public class FriendlyURLServlet extends HttpServlet {
 				}
 			}
 
-			throw nsle;
+			throw noSuchLayoutException;
 		}
 
 		String actualURL = portal.getActualURL(
@@ -296,7 +296,7 @@ public class FriendlyURLServlet extends HttpServlet {
 				actualURL = HttpUtil.setParameter(
 					actualURL, "doAsUserId", encDoAsUserId);
 			}
-			catch (EncryptorException ee) {
+			catch (EncryptorException encryptorException) {
 				return new Redirect(actualURL);
 			}
 		}
@@ -361,17 +361,17 @@ public class FriendlyURLServlet extends HttpServlet {
 					getLastPath(httpServletRequest, pathInfo));
 			}
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(pe, pe);
+				_log.warn(portalException, portalException);
 			}
 
-			if (pe instanceof NoSuchGroupException ||
-				pe instanceof NoSuchLayoutException) {
+			if (portalException instanceof NoSuchGroupException ||
+				portalException instanceof NoSuchLayoutException) {
 
 				portal.sendError(
-					HttpServletResponse.SC_NOT_FOUND, pe, httpServletRequest,
-					httpServletResponse);
+					HttpServletResponse.SC_NOT_FOUND, portalException,
+					httpServletRequest, httpServletResponse);
 
 				return;
 			}

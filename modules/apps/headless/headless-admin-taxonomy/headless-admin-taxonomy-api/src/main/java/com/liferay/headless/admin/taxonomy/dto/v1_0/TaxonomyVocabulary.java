@@ -115,7 +115,9 @@ public class TaxonomyVocabulary {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A list of asset types that can be associated with this vocabulary."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected AssetType[] assetTypes;
 
@@ -145,7 +147,9 @@ public class TaxonomyVocabulary {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A list of languages the vocabulary has a translation for."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String[] availableLanguages;
 
@@ -174,7 +178,7 @@ public class TaxonomyVocabulary {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The vocabulary's creator.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator creator;
 
@@ -202,7 +206,7 @@ public class TaxonomyVocabulary {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The vocabulary's creation date.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
@@ -230,7 +234,9 @@ public class TaxonomyVocabulary {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The vocabulary's most recent modification date."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateModified;
 
@@ -258,9 +264,39 @@ public class TaxonomyVocabulary {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The vocabulary's text description.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String description;
+
+	@Schema
+	@Valid
+	public Map<String, String> getDescription_i18n() {
+		return description_i18n;
+	}
+
+	public void setDescription_i18n(Map<String, String> description_i18n) {
+		this.description_i18n = description_i18n;
+	}
+
+	@JsonIgnore
+	public void setDescription_i18n(
+		UnsafeSupplier<Map<String, String>, Exception>
+			description_i18nUnsafeSupplier) {
+
+		try {
+			description_i18n = description_i18nUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Map<String, String> description_i18n;
 
 	@Schema(description = "The vocabulary's ID.")
 	public Long getId() {
@@ -284,7 +320,7 @@ public class TaxonomyVocabulary {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The vocabulary's ID.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
@@ -310,10 +346,40 @@ public class TaxonomyVocabulary {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The vocabulary's name.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	@NotEmpty
 	protected String name;
+
+	@Schema
+	@Valid
+	public Map<String, String> getName_i18n() {
+		return name_i18n;
+	}
+
+	public void setName_i18n(Map<String, String> name_i18n) {
+		this.name_i18n = name_i18n;
+	}
+
+	@JsonIgnore
+	public void setName_i18n(
+		UnsafeSupplier<Map<String, String>, Exception>
+			name_i18nUnsafeSupplier) {
+
+		try {
+			name_i18n = name_i18nUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Map<String, String> name_i18n;
 
 	@Schema(
 		description = "The number of categories that directly depend on this vocabulary."
@@ -345,7 +411,9 @@ public class TaxonomyVocabulary {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The number of categories that directly depend on this vocabulary."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer numberOfTaxonomyCategories;
 
@@ -375,7 +443,9 @@ public class TaxonomyVocabulary {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The ID of the site to which this vocabulary is scoped."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long siteId;
 
@@ -415,7 +485,9 @@ public class TaxonomyVocabulary {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A write-only property that specifies the vocabulary's default permissions."
+	)
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	protected ViewableBy viewableBy;
 
@@ -545,6 +617,16 @@ public class TaxonomyVocabulary {
 			sb.append("\"");
 		}
 
+		if (description_i18n != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"description_i18n\": ");
+
+			sb.append(_toJSON(description_i18n));
+		}
+
 		if (id != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -567,6 +649,16 @@ public class TaxonomyVocabulary {
 			sb.append(_escape(name));
 
 			sb.append("\"");
+		}
+
+		if (name_i18n != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"name_i18n\": ");
+
+			sb.append(_toJSON(name_i18n));
 		}
 
 		if (numberOfTaxonomyCategories != null) {

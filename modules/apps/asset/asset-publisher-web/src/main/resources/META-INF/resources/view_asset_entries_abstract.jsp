@@ -17,8 +17,9 @@
 <%@ include file="/init.jsp" %>
 
 <%
-long previewAssetEntryId = ParamUtil.getLong(request, "previewAssetEntryId");
-int previewAssetEntryType = ParamUtil.getInteger(request, "previewAssetEntryType");
+long previewClassNameId = ParamUtil.getLong(request, "previewClassNameId");
+long previewClassPK = ParamUtil.getLong(request, "previewClassPK");
+int previewType = ParamUtil.getInteger(request, "previewType");
 
 AssetEntryResult assetEntryResult = (AssetEntryResult)request.getAttribute("view.jsp-assetEntryResult");
 
@@ -32,8 +33,8 @@ for (AssetEntry assetEntry : assetEntryResult.getAssetEntries()) {
 	AssetRenderer<?> assetRenderer = null;
 
 	try {
-		if (previewAssetEntryId == assetEntry.getEntryId()) {
-			assetRenderer = assetRendererFactory.getAssetRenderer(assetEntry.getClassPK(), previewAssetEntryType);
+		if ((previewClassNameId == assetEntry.getClassNameId()) && (previewClassPK == assetEntry.getClassPK())) {
+			assetRenderer = assetRendererFactory.getAssetRenderer(previewClassPK, previewType);
 		}
 		else {
 			assetRenderer = assetRendererFactory.getAssetRenderer(assetEntry.getClassPK());
@@ -45,7 +46,7 @@ for (AssetEntry assetEntry : assetEntryResult.getAssetEntries()) {
 		}
 	}
 
-	if ((assetRenderer == null) || (!assetRenderer.isDisplayable() && (previewAssetEntryId <= 0))) {
+	if ((assetRenderer == null) || (!assetRenderer.isDisplayable() && (previewClassPK <= 0))) {
 		continue;
 	}
 
@@ -57,13 +58,14 @@ for (AssetEntry assetEntry : assetEntryResult.getAssetEntries()) {
 
 		String viewURL = assetPublisherHelper.getAssetViewURL(liferayPortletRequest, liferayPortletResponse, assetRenderer, assetEntry, assetPublisherDisplayContext.isAssetLinkBehaviorViewInPortlet());
 
-		Map<String, Object> fragmentsEditorData = new HashMap<>();
-
-		fragmentsEditorData.put("fragments-editor-item-id", PortalUtil.getClassNameId(assetRenderer.getClassName()) + "-" + assetRenderer.getClassPK());
-		fragmentsEditorData.put("fragments-editor-item-type", "fragments-editor-mapped-item");
+		Map<String, Object> fragmentsEditorData = HashMapBuilder.<String, Object>put(
+			"fragments-editor-item-id", PortalUtil.getClassNameId(assetRenderer.getClassName()) + "-" + assetRenderer.getClassPK()
+		).put(
+			"fragments-editor-item-type", "fragments-editor-mapped-item"
+		).build();
 %>
 
-		<div class="asset-abstract mb-5 <%= assetPublisherWebUtil.isDefaultAssetPublisher(layout, portletDisplay.getId(), assetPublisherDisplayContext.getPortletResource()) ? "default-asset-publisher" : StringPool.BLANK %> <%= (previewAssetEntryId == assetEntry.getEntryId()) ? "p-1 preview-asset-entry" : StringPool.BLANK %>" <%= AUIUtil.buildData(fragmentsEditorData) %>>
+		<div class="asset-abstract mb-5 <%= assetPublisherWebUtil.isDefaultAssetPublisher(layout, portletDisplay.getId(), assetPublisherDisplayContext.getPortletResource()) ? "default-asset-publisher" : StringPool.BLANK %> <%= ((previewClassNameId == assetEntry.getClassNameId()) && (previewClassPK == assetEntry.getClassPK())) ? "p-1 preview-asset-entry" : StringPool.BLANK %>" <%= AUIUtil.buildData(fragmentsEditorData) %>>
 			<div class="mb-2">
 				<h4 class="component-title">
 					<c:choose>
@@ -283,18 +285,7 @@ for (AssetEntry assetEntry : assetEntryResult.getAssetEntries()) {
 					</c:if>
 
 					<%
-					PortletURL viewFullContentURL = renderResponse.createRenderURL();
-
-					viewFullContentURL.setParameter("mvcPath", "/view_content.jsp");
-					viewFullContentURL.setParameter("type", assetRendererFactory.getType());
-
-					if (Validator.isNotNull(assetRenderer.getUrlTitle())) {
-						if (assetRenderer.getGroupId() != scopeGroupId) {
-							viewFullContentURL.setParameter("groupId", String.valueOf(assetRenderer.getGroupId()));
-						}
-
-						viewFullContentURL.setParameter("urlTitle", assetRenderer.getUrlTitle());
-					}
+					PortletURL viewFullContentURL = assetPublisherHelper.getBaseAssetViewURL(liferayPortletRequest, liferayPortletResponse, assetRenderer, assetEntry);
 					%>
 
 					<div class="autofit-col">
@@ -348,11 +339,11 @@ for (AssetEntry assetEntry : assetEntryResult.getAssetEntries()) {
 						exportAssetURL.setWindowState(LiferayWindowState.EXCLUSIVE);
 
 						for (String extension : assetPublisherDisplayContext.getExtensions(assetRenderer)) {
-							Map<String, Object> data = new HashMap<>();
-
 							exportAssetURL.setParameter("targetExtension", extension);
 
-							data.put("resource-href", exportAssetURL.toString());
+							Map<String, Object> data = HashMapBuilder.<String, Object>put(
+								"resource-href", exportAssetURL.toString()
+							).build();
 						%>
 
 							<div class="autofit-col export-action">

@@ -14,16 +14,14 @@
 
 package com.liferay.data.engine.taglib.servlet.taglib.util;
 
-import com.liferay.data.engine.field.type.FieldType;
-import com.liferay.data.engine.field.type.FieldTypeTracker;
 import com.liferay.data.engine.renderer.DataLayoutRenderer;
 import com.liferay.data.engine.renderer.DataLayoutRendererContext;
-import com.liferay.data.engine.rest.client.dto.v1_0.DataDefinition;
-import com.liferay.data.engine.rest.client.dto.v1_0.DataLayout;
-import com.liferay.data.engine.rest.client.dto.v1_0.DataRecord;
-import com.liferay.data.engine.rest.client.resource.v1_0.DataDefinitionResource;
-import com.liferay.data.engine.rest.client.resource.v1_0.DataLayoutResource;
-import com.liferay.data.engine.rest.client.resource.v1_0.DataRecordResource;
+import com.liferay.data.engine.rest.client.dto.v2_0.DataDefinition;
+import com.liferay.data.engine.rest.client.dto.v2_0.DataLayout;
+import com.liferay.data.engine.rest.client.dto.v2_0.DataRecord;
+import com.liferay.data.engine.rest.client.resource.v2_0.DataDefinitionResource;
+import com.liferay.data.engine.rest.client.resource.v2_0.DataLayoutResource;
+import com.liferay.data.engine.rest.client.resource.v2_0.DataRecordResource;
 import com.liferay.dynamic.data.mapping.form.builder.context.DDMFormBuilderContextFactory;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldType;
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTypeServicesTracker;
@@ -63,29 +61,22 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.AuthTokenUtil;
-import com.liferay.portal.kernel.util.AggregateResourceBundle;
 import com.liferay.portal.kernel.util.CookieKeys;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
-import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -111,6 +102,26 @@ public class DataLayoutTaglibUtil {
 			dataLayoutId, httpServletRequest);
 	}
 
+	public static long getDataDefinitionId(
+		long dataLayoutId, HttpServletRequest httpServletRequest) {
+
+		try {
+			DataLayout dataLayout = _dataLayoutTaglibUtil._getDataLayout(
+				dataLayoutId, httpServletRequest);
+
+			return dataLayout.getDataDefinitionId();
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
+
+			exception.printStackTrace();
+		}
+
+		return 0L;
+	}
+
 	public static JSONObject getDataLayoutJSONObject(
 		Set<Locale> availableLocales, Long dataLayoutId,
 		HttpServletRequest httpServletRequest,
@@ -130,10 +141,10 @@ public class DataLayoutTaglibUtil {
 	}
 
 	public static JSONArray getFieldTypesJSONArray(
-		HttpServletRequest httpServletRequest) {
+		HttpServletRequest httpServletRequest, Set<String> scopes) {
 
 		return _dataLayoutTaglibUtil._getFieldTypesJSONArray(
-			httpServletRequest);
+			httpServletRequest, scopes);
 	}
 
 	public static String renderDataLayout(
@@ -163,50 +174,6 @@ public class DataLayoutTaglibUtil {
 		_dataLayoutTaglibUtil = null;
 	}
 
-	private JSONObject _createFieldContext(
-		HttpServletRequest httpServletRequest, Locale locale, String type) {
-
-		try {
-			Class<?> ddmFormFieldTypeSettings = _getDDMFormFieldTypeSettings(
-				type);
-
-			DDMForm ddmFormFieldTypeSettingsDDMForm = DDMFormFactory.create(
-				ddmFormFieldTypeSettings);
-
-			DDMFormRenderingContext ddmFormRenderingContext =
-				new DDMFormRenderingContext();
-
-			ddmFormRenderingContext.setContainerId("settings");
-
-			DDMFormValues ddmFormValues = _ddmFormValuesFactory.create(
-				httpServletRequest, ddmFormFieldTypeSettingsDDMForm);
-
-			_setTypeDDMFormFieldValue(ddmFormValues, type);
-
-			ddmFormRenderingContext.setDDMFormValues(ddmFormValues);
-
-			ddmFormRenderingContext.setHttpServletRequest(httpServletRequest);
-			ddmFormRenderingContext.setLocale(locale);
-			ddmFormRenderingContext.setPortletNamespace(
-				ParamUtil.getString(httpServletRequest, "portletNamespace"));
-			ddmFormRenderingContext.setReturnFullContext(true);
-
-			return _jsonFactory.createJSONObject(
-				_jsonFactory.looseSerializeDeep(
-					_ddmFormTemplateContextFactory.create(
-						ddmFormFieldTypeSettingsDDMForm,
-						DDMFormLayoutFactory.create(ddmFormFieldTypeSettings),
-						ddmFormRenderingContext)));
-		}
-		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(e, e);
-			}
-		}
-
-		return null;
-	}
-
 	private Set<Locale> _getAvailableLocales(
 		long dataLayoutId, HttpServletRequest httpServletRequest) {
 
@@ -233,7 +200,7 @@ public class DataLayoutTaglibUtil {
 				Collectors.toSet()
 			);
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			return new HashSet() {
 				{
 					add(LocaleThreadLocal.getDefaultLocale());
@@ -267,6 +234,10 @@ public class DataLayoutTaglibUtil {
 	private DataLayout _getDataLayout(
 			long dataLayoutId, HttpServletRequest httpServletRequest)
 		throws Exception {
+
+		if (dataLayoutId <= 0) {
+			return new DataLayout();
+		}
 
 		DataLayoutResource dataLayoutResource = DataLayoutResource.builder(
 		).endpoint(
@@ -303,9 +274,9 @@ public class DataLayoutTaglibUtil {
 
 			return dataLayoutDDMFormAdapter.toJSONObject();
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(e, e);
+				_log.debug(exception, exception);
 			}
 
 			return _jsonFactory.createJSONObject();
@@ -337,124 +308,76 @@ public class DataLayoutTaglibUtil {
 		return dataRecord.getDataRecordValues();
 	}
 
-	private Class<?> _getDDMFormFieldTypeSettings(String type) {
-		DDMFormFieldType ddmFormFieldType =
-			_ddmFormFieldTypeServicesTracker.getDDMFormFieldType(type);
-
-		return ddmFormFieldType.getDDMFormFieldTypeSettings();
-	}
-
-	private JSONObject _getFieldTypeMetadataJSONObject(
-		FieldType fieldType, HttpServletRequest httpServletRequest) {
-
-		Map<String, Object> fieldTypeProperties =
-			_fieldTypeTracker.getFieldTypeProperties(fieldType.getName());
-
-		return JSONUtil.put(
-			"description",
-			_getLanguageTerm(
-				MapUtil.getString(
-					fieldTypeProperties, "data.engine.field.type.description"),
-				LocaleThreadLocal.getThemeDisplayLocale())
-		).put(
-			"displayOrder",
-			MapUtil.getInteger(
-				fieldTypeProperties, "data.engine.field.type.display.order")
-		).put(
-			"group",
-			MapUtil.getString(
-				fieldTypeProperties, "data.engine.field.type.group")
-		).put(
-			"icon",
-			MapUtil.getString(
-				fieldTypeProperties, "data.engine.field.type.icon")
-		).put(
-			"javaScriptModule",
-			_getJavaScriptModule(
-				MapUtil.getString(
-					fieldTypeProperties, "data.engine.field.type.js.module"))
-		).put(
-			"label",
-			_getLanguageTerm(
-				MapUtil.getString(
-					fieldTypeProperties, "data.engine.field.type.label"),
-				LocaleThreadLocal.getThemeDisplayLocale())
-		).put(
-			"name", fieldType.getName()
-		).put(
-			"settingsContext",
-			_createFieldContext(
-				httpServletRequest, LocaleThreadLocal.getThemeDisplayLocale(),
-				fieldType.getName())
-		).put(
-			"system",
-			MapUtil.getBoolean(
-				fieldTypeProperties, "data.engine.field.type.system")
-		);
-	}
-
 	private JSONArray _getFieldTypesJSONArray(
-		HttpServletRequest httpServletRequest) {
+		HttpServletRequest httpServletRequest, Set<String> scopes) {
 
-		Collection<FieldType> fieldTypes = _fieldTypeTracker.getFieldTypes();
+		JSONArray fieldTypesJSONArray = _jsonFactory.createJSONArray();
 
-		JSONArray jsonArray = _jsonFactory.createJSONArray();
+		String cookie = CookieKeys.getCookie(
+			httpServletRequest, CookieKeys.JSESSIONID);
 
-		Stream<FieldType> stream = fieldTypes.stream();
+		DataDefinitionResource dataDefinitionResource =
+			DataDefinitionResource.builder(
+			).endpoint(
+				_portal.getHost(httpServletRequest),
+				httpServletRequest.getServerPort(),
+				httpServletRequest.getScheme()
+			).header(
+				"Cookie", "JSESSIONID=" + cookie
+			).parameter(
+				"p_auth", AuthTokenUtil.getToken(httpServletRequest)
+			).build();
 
-		stream.map(
-			fieldType -> _dataLayoutTaglibUtil._getFieldTypeMetadataJSONObject(
-				fieldType, httpServletRequest)
-		).forEach(
-			jsonArray::put
-		);
+		try {
+			JSONArray jsonArray = _jsonFactory.createJSONArray(
+				dataDefinitionResource.
+					getDataDefinitionDataDefinitionFieldFieldTypes());
 
-		return jsonArray;
-	}
+			if (SetUtil.isEmpty(scopes)) {
+				return jsonArray;
+			}
 
-	private String _getJavaScriptModule(String moduleName) {
-		if (Validator.isNull(moduleName)) {
-			return StringPool.BLANK;
+			for (JSONObject jsonObject : (Iterable<JSONObject>)jsonArray) {
+				String[] fieldTypeScopes = StringUtil.split(
+					jsonObject.getString("scope"));
+
+				boolean anyMatch = Stream.of(
+					fieldTypeScopes
+				).anyMatch(
+					scope -> scopes.contains(scope)
+				);
+
+				if (anyMatch) {
+					fieldTypesJSONArray.put(jsonObject);
+				}
+			}
+
+			return fieldTypesJSONArray;
 		}
-
-		return _npmResolver.resolveModuleName(moduleName);
-	}
-
-	private String _getLanguageTerm(String key, Locale locale) {
-		if (Validator.isNull(key)) {
-			return StringPool.BLANK;
+		catch (Exception exception) {
+			return fieldTypesJSONArray;
 		}
-
-		return GetterUtil.getString(
-			ResourceBundleUtil.getString(_getResourceBundle(locale), key), key);
 	}
 
-	private ResourceBundle _getResourceBundle(Locale locale) {
-		return new AggregateResourceBundle(
-			ResourceBundleUtil.getBundle(
-				"content.Language", locale, getClass()),
-			_portal.getResourceBundle(locale));
+	private boolean _hasJavascriptModule(String name) {
+		DDMFormFieldType ddmFormFieldType =
+			_ddmFormFieldTypeServicesTracker.getDDMFormFieldType(name);
+
+		return Validator.isNotNull(ddmFormFieldType.getModuleName());
 	}
 
-	private boolean _hasJavascriptModule(FieldType fieldType) {
-		Map<String, Object> fieldTypeProperties =
-			_fieldTypeTracker.getFieldTypeProperties(fieldType.getName());
+	private String _resolveFieldTypeModule(String name) {
+		DDMFormFieldType ddmFormFieldType =
+			_ddmFormFieldTypeServicesTracker.getDDMFormFieldType(name);
 
-		return fieldTypeProperties.containsKey(
-			"data.engine.field.type.js.module");
-	}
-
-	private String _resolveFieldTypeModule(FieldType fieldType) {
-		return _getJavaScriptModule(
-			MapUtil.getString(
-				_fieldTypeTracker.getFieldTypeProperties(fieldType.getName()),
-				"data.engine.field.type.js.module"));
+		return _resolveModuleName(ddmFormFieldType.getModuleName());
 	}
 
 	private String _resolveFieldTypesModules() {
-		Collection<FieldType> fieldTypes = _fieldTypeTracker.getFieldTypes();
+		Set<String> ddmFormFieldTypeNames =
+			_ddmFormFieldTypeServicesTracker.getDDMFormFieldTypeNames();
 
-		Stream<FieldType> stream = fieldTypes.stream();
+		Stream<String> stream = ddmFormFieldTypeNames.stream();
 
 		return stream.filter(
 			_dataLayoutTaglibUtil::_hasJavascriptModule
@@ -465,18 +388,12 @@ public class DataLayoutTaglibUtil {
 		);
 	}
 
-	private void _setTypeDDMFormFieldValue(
-		DDMFormValues ddmFormValues, String type) {
+	private String _resolveModuleName(String moduleName) {
+		if (Validator.isNull(moduleName)) {
+			return StringPool.BLANK;
+		}
 
-		Map<String, List<DDMFormFieldValue>> ddmFormFieldValuesMap =
-			ddmFormValues.getDDMFormFieldValuesMap();
-
-		List<DDMFormFieldValue> ddmFormFieldValues = ddmFormFieldValuesMap.get(
-			"type");
-
-		DDMFormFieldValue ddmFormFieldValue = ddmFormFieldValues.get(0);
-
-		ddmFormFieldValue.setValue(new UnlocalizedValue(type));
+		return _npmResolver.resolveModuleName(moduleName);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -504,9 +421,6 @@ public class DataLayoutTaglibUtil {
 
 	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;
-
-	@Reference
-	private FieldTypeTracker _fieldTypeTracker;
 
 	@Reference(target = "(ddm.form.deserializer.type=json)")
 	private DDMFormDeserializer _jsonDDMFormDeserializer;
@@ -737,10 +651,6 @@ public class DataLayoutTaglibUtil {
 				"defaultLanguageId", ddmStructure.getDefaultLanguageId()
 			);
 
-			_transformOptions(jsonObject, "columns");
-			_transformOptions(jsonObject, "options");
-			_transformOptions(jsonObject, "rows");
-
 			return _deserializeDDMForm(jsonObject.toJSONString());
 		}
 
@@ -796,69 +706,6 @@ public class DataLayoutTaglibUtil {
 						}
 					}
 				}
-			}
-		}
-
-		private void _transformOptions(JSONObject jsonObject, String key)
-			throws Exception {
-
-			JSONArray jsonArray = jsonObject.getJSONArray("fields");
-
-			if (jsonArray == null) {
-				return;
-			}
-
-			for (int i = 0; i < jsonArray.length(); i++) {
-				JSONObject fieldJSONObject = jsonArray.getJSONObject(i);
-
-				if (!fieldJSONObject.has(key)) {
-					continue;
-				}
-
-				Map<String, JSONObject> optionLabelsJSONObjects =
-					new TreeMap<>();
-
-				JSONObject optionsJSONObject = fieldJSONObject.getJSONObject(
-					key);
-
-				Iterator<String> keys = optionsJSONObject.keys();
-
-				while (keys.hasNext()) {
-					String languageId = keys.next();
-
-					JSONArray localizedOptionsJSONArray =
-						optionsJSONObject.getJSONArray(languageId);
-
-					for (int j = 0; j < localizedOptionsJSONArray.length();
-						 j++) {
-
-						JSONObject localizedOptionJSONObject =
-							localizedOptionsJSONArray.getJSONObject(j);
-
-						JSONObject optionLabelsJSONObject =
-							optionLabelsJSONObjects.getOrDefault(
-								localizedOptionJSONObject.getString("value"),
-								_jsonFactory.createJSONObject());
-
-						optionLabelsJSONObject.put(
-							languageId,
-							localizedOptionJSONObject.getString("label"));
-
-						optionLabelsJSONObjects.putIfAbsent(
-							localizedOptionJSONObject.getString("value"),
-							optionLabelsJSONObject);
-					}
-				}
-
-				fieldJSONObject.put(
-					key,
-					JSONUtil.toJSONArray(
-						optionLabelsJSONObjects.entrySet(),
-						entry -> JSONUtil.put(
-							"label", entry.getValue()
-						).put(
-							"value", entry.getKey()
-						)));
 			}
 		}
 

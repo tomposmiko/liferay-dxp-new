@@ -31,7 +31,7 @@ import com.liferay.portal.kernel.workflow.WorkflowHandler;
 import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
 import com.liferay.portal.kernel.workflow.WorkflowInstance;
 import com.liferay.portal.kernel.workflow.WorkflowInstanceManagerUtil;
-import com.liferay.portal.workflow.web.internal.constants.WorkflowPortletKeys;
+import com.liferay.portal.workflow.constants.WorkflowPortletKeys;
 
 import java.io.Serializable;
 
@@ -98,11 +98,11 @@ public class DeleteWorkflowInstanceMVCActionCommand
 
 			deleteWorkflowInstance(workflowContext);
 		}
-		catch (Exception e) {
-			if (e instanceof PrincipalException ||
-				e instanceof WorkflowException) {
+		catch (Exception exception) {
+			if (exception instanceof PrincipalException ||
+				exception instanceof WorkflowException) {
 
-				SessionErrors.add(actionRequest, e.getClass());
+				SessionErrors.add(actionRequest, exception.getClass());
 
 				PortletSession portletSession =
 					actionRequest.getPortletSession();
@@ -116,7 +116,7 @@ public class DeleteWorkflowInstanceMVCActionCommand
 				portletRequestDispatcher.include(actionRequest, actionResponse);
 			}
 			else {
-				throw e;
+				throw exception;
 			}
 		}
 	}

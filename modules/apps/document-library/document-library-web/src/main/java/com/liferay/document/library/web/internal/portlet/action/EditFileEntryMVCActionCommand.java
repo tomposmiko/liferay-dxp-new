@@ -78,8 +78,10 @@ import com.liferay.portal.kernel.upload.UploadException;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.upload.UploadRequestSizeException;
 import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.KeyValuePair;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -97,7 +99,6 @@ import java.io.InputStream;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -207,7 +208,7 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 						portletConfig, actionRequest, actionResponse,
 						uploadPortletRequest);
 				}
-				catch (PortalException pe) {
+				catch (PortalException portalException) {
 					if (!cmd.equals(Constants.ADD_DYNAMIC) &&
 						Validator.isNotNull(sourceFileName)) {
 
@@ -215,7 +216,7 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 							actionRequest, RequiredFileException.class);
 					}
 
-					throw pe;
+					throw portalException;
 				}
 			}
 			else if (cmd.equals(Constants.ADD_MULTIPLE)) {
@@ -252,6 +253,8 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 
 			if (cmd.equals(Constants.ADD_TEMP) ||
 				cmd.equals(Constants.DELETE_TEMP)) {
+
+				hideDefaultSuccessMessage(actionRequest);
 
 				actionResponse.setRenderParameter("mvcPath", "/null.jsp");
 			}
@@ -308,9 +311,20 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 					}
 				}
 			}
+
+			String portletResource = ParamUtil.getString(
+				actionRequest, "portletResource");
+
+			if (Validator.isNotNull(portletResource)) {
+				hideDefaultSuccessMessage(actionRequest);
+
+				MultiSessionMessages.add(
+					actionRequest, portletResource + "requestProcessed");
+			}
 		}
-		catch (Exception e) {
-			_handleUploadException(actionRequest, actionResponse, cmd, e);
+		catch (Exception exception) {
+			_handleUploadException(
+				actionRequest, actionResponse, cmd, exception);
 		}
 	}
 
@@ -410,15 +424,15 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 				serviceContext);
 
 			_assetDisplayPageEntryFormProcessor.process(
-				DLFileEntry.class.getName(), fileEntry.getFileEntryId(),
+				FileEntry.class.getName(), fileEntry.getFileEntryId(),
 				actionRequest);
 
 			validFileNameKVPs.add(
 				new KeyValuePair(uniqueFileName, selectedFileName));
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			String errorMessage = _getAddMultipleFileEntriesErrorMessage(
-				portletConfig, actionRequest, e);
+				portletConfig, actionRequest, exception);
 
 			invalidFileNameKVPs.add(
 				new KeyValuePair(selectedFileName, errorMessage));
@@ -609,13 +623,10 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 
 		fileEntry = _dlTrashService.moveFileEntryToTrash(fileEntryId);
 
-		List<TrashedModel> trashedModels = new ArrayList<>();
-
-		trashedModels.add((TrashedModel)fileEntry.getModel());
-
-		Map<String, Object> data = new HashMap<>();
-
-		data.put("trashedModels", trashedModels);
+		Map<String, Object> data = HashMapBuilder.<String, Object>put(
+			"trashedModels",
+			ListUtil.fromArray((TrashedModel)fileEntry.getModel())
+		).build();
 
 		addDeleteSuccessData(actionRequest, data);
 	}
@@ -639,7 +650,7 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 
 			jsonObject.put("deleted", Boolean.TRUE);
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			String errorMessage = themeDisplay.translate(
 				"an-unexpected-error-occurred-while-deleting-the-file");
 
@@ -656,7 +667,7 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 
 	private String _getAddMultipleFileEntriesErrorMessage(
 			PortletConfig portletConfig, ActionRequest actionRequest,
-			Exception e)
+			Exception exception)
 		throws PortalException {
 
 		String errorMessage = null;
@@ -664,15 +675,19 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		if (e instanceof AntivirusScannerException) {
-			AntivirusScannerException ase = (AntivirusScannerException)e;
+		if (exception instanceof AntivirusScannerException) {
+			AntivirusScannerException antivirusScannerException =
+				(AntivirusScannerException)exception;
 
-			errorMessage = themeDisplay.translate(ase.getMessageKey());
+			errorMessage = themeDisplay.translate(
+				antivirusScannerException.getMessageKey());
 		}
-		else if (e instanceof AssetCategoryException) {
-			AssetCategoryException ace = (AssetCategoryException)e;
+		else if (exception instanceof AssetCategoryException) {
+			AssetCategoryException assetCategoryException =
+				(AssetCategoryException)exception;
 
-			AssetVocabulary assetVocabulary = ace.getVocabulary();
+			AssetVocabulary assetVocabulary =
+				assetCategoryException.getVocabulary();
 
 			String vocabularyTitle = StringPool.BLANK;
 
@@ -681,12 +696,14 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 					themeDisplay.getLocale());
 			}
 
-			if (ace.getType() == AssetCategoryException.AT_LEAST_ONE_CATEGORY) {
+			if (assetCategoryException.getType() ==
+					AssetCategoryException.AT_LEAST_ONE_CATEGORY) {
+
 				errorMessage = themeDisplay.translate(
 					"please-select-at-least-one-category-for-x",
 					vocabularyTitle);
 			}
-			else if (ace.getType() ==
+			else if (assetCategoryException.getType() ==
 						AssetCategoryException.TOO_MANY_CATEGORIES) {
 
 				errorMessage = themeDisplay.translate(
@@ -694,29 +711,29 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 					vocabularyTitle);
 			}
 		}
-		else if (e instanceof DuplicateFileEntryException) {
+		else if (exception instanceof DuplicateFileEntryException) {
 			errorMessage = themeDisplay.translate(
 				"the-folder-you-selected-already-has-an-entry-with-this-" +
 					"name.-please-select-a-different-folder");
 		}
-		else if (e instanceof FileExtensionException) {
+		else if (exception instanceof FileExtensionException) {
 			errorMessage = themeDisplay.translate(
 				"please-enter-a-file-with-a-valid-extension-x",
 				StringUtil.merge(
 					_getAllowedFileExtensions(portletConfig, actionRequest)));
 		}
-		else if (e instanceof FileNameException) {
+		else if (exception instanceof FileNameException) {
 			errorMessage = themeDisplay.translate(
 				"please-enter-a-file-with-a-valid-file-name");
 		}
-		else if (e instanceof FileSizeException) {
+		else if (exception instanceof FileSizeException) {
 			errorMessage = themeDisplay.translate(
 				"please-enter-a-file-with-a-valid-file-size-no-larger-than-x",
 				TextFormatter.formatStorageSize(
 					_dlValidator.getMaxAllowableSize(),
 					themeDisplay.getLocale()));
 		}
-		else if (e instanceof InvalidFileEntryTypeException) {
+		else if (exception instanceof InvalidFileEntryTypeException) {
 			errorMessage = themeDisplay.translate(
 				"the-document-type-you-selected-is-not-valid-for-this-folder");
 		}
@@ -784,36 +801,37 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 
 	private void _handleUploadException(
 			ActionRequest actionRequest, ActionResponse actionResponse,
-			String cmd, Exception e)
+			String cmd, Exception exception)
 		throws Exception {
 
-		if (e instanceof AssetCategoryException ||
-			e instanceof AssetTagException) {
+		if (exception instanceof AssetCategoryException ||
+			exception instanceof AssetTagException) {
 
-			SessionErrors.add(actionRequest, e.getClass(), e);
+			SessionErrors.add(actionRequest, exception.getClass(), exception);
 		}
-		else if (e instanceof AntivirusScannerException ||
-				 e instanceof DuplicateFileEntryException ||
-				 e instanceof DuplicateFolderNameException ||
-				 e instanceof FileExtensionException ||
-				 e instanceof FileMimeTypeException ||
-				 e instanceof FileNameException ||
-				 e instanceof FileSizeException ||
-				 e instanceof LiferayFileItemException ||
-				 e instanceof NoSuchFolderException ||
-				 e instanceof SourceFileNameException ||
-				 e instanceof StorageFieldRequiredException ||
-				 e instanceof UploadRequestSizeException) {
+		else if (exception instanceof AntivirusScannerException ||
+				 exception instanceof DuplicateFileEntryException ||
+				 exception instanceof DuplicateFolderNameException ||
+				 exception instanceof FileExtensionException ||
+				 exception instanceof FileMimeTypeException ||
+				 exception instanceof FileNameException ||
+				 exception instanceof FileSizeException ||
+				 exception instanceof LiferayFileItemException ||
+				 exception instanceof NoSuchFolderException ||
+				 exception instanceof SourceFileNameException ||
+				 exception instanceof StorageFieldRequiredException ||
+				 exception instanceof UploadRequestSizeException) {
 
 			if (!cmd.equals(Constants.ADD_DYNAMIC) &&
 				!cmd.equals(Constants.ADD_MULTIPLE) &&
 				!cmd.equals(Constants.ADD_TEMP)) {
 
-				if (e instanceof AntivirusScannerException) {
-					SessionErrors.add(actionRequest, e.getClass(), e);
+				if (exception instanceof AntivirusScannerException) {
+					SessionErrors.add(
+						actionRequest, exception.getClass(), exception);
 				}
 				else {
-					SessionErrors.add(actionRequest, e.getClass());
+					SessionErrors.add(actionRequest, exception.getClass());
 				}
 
 				return;
@@ -822,55 +840,59 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 				hideDefaultErrorMessage(actionRequest);
 			}
 
-			if (e instanceof AntivirusScannerException ||
-				e instanceof DuplicateFileEntryException ||
-				e instanceof FileExtensionException ||
-				e instanceof FileNameException ||
-				e instanceof FileSizeException ||
-				e instanceof UploadRequestSizeException) {
+			if (exception instanceof AntivirusScannerException ||
+				exception instanceof DuplicateFileEntryException ||
+				exception instanceof FileExtensionException ||
+				exception instanceof FileNameException ||
+				exception instanceof FileSizeException ||
+				exception instanceof UploadRequestSizeException) {
 
 				JSONObject jsonObject =
 					_multipleUploadResponseHandler.onFailure(
-						actionRequest, (PortalException)e);
+						actionRequest, (PortalException)exception);
 
 				JSONPortletResponseUtil.writeJSON(
 					actionRequest, actionResponse, jsonObject);
 			}
 
-			if (e instanceof AntivirusScannerException) {
-				SessionErrors.add(actionRequest, e.getClass(), e);
+			if (exception instanceof AntivirusScannerException) {
+				SessionErrors.add(
+					actionRequest, exception.getClass(), exception);
 			}
 			else {
-				SessionErrors.add(actionRequest, e.getClass());
+				SessionErrors.add(actionRequest, exception.getClass());
 			}
 		}
-		else if (e instanceof DuplicateLockException ||
-				 e instanceof FileEntryLockException.MustOwnLock ||
-				 e instanceof InvalidFileVersionException ||
-				 e instanceof NoSuchFileEntryException ||
-				 e instanceof PrincipalException) {
+		else if (exception instanceof DuplicateLockException ||
+				 exception instanceof FileEntryLockException.MustOwnLock ||
+				 exception instanceof InvalidFileVersionException ||
+				 exception instanceof NoSuchFileEntryException ||
+				 exception instanceof PrincipalException) {
 
-			if (e instanceof DuplicateLockException) {
-				DuplicateLockException dle = (DuplicateLockException)e;
+			if (exception instanceof DuplicateLockException) {
+				DuplicateLockException duplicateLockException =
+					(DuplicateLockException)exception;
 
-				SessionErrors.add(actionRequest, dle.getClass(), dle.getLock());
+				SessionErrors.add(
+					actionRequest, duplicateLockException.getClass(),
+					duplicateLockException.getLock());
 			}
 			else {
-				SessionErrors.add(actionRequest, e.getClass());
+				SessionErrors.add(actionRequest, exception.getClass());
 			}
 
 			actionResponse.setRenderParameter(
 				"mvcPath", "/document_library/error.jsp");
 		}
 		else {
-			Throwable cause = e.getCause();
+			Throwable cause = exception.getCause();
 
 			if (cause instanceof DuplicateFileEntryException) {
 				SessionErrors.add(
 					actionRequest, DuplicateFileEntryException.class);
 			}
 			else {
-				throw e;
+				throw exception;
 			}
 		}
 	}
@@ -1015,7 +1037,7 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 			}
 
 			_assetDisplayPageEntryFormProcessor.process(
-				DLFileEntry.class.getName(), fileEntry.getFileEntryId(),
+				FileEntry.class.getName(), fileEntry.getFileEntryId(),
 				actionRequest);
 
 			String portletResource = ParamUtil.getString(

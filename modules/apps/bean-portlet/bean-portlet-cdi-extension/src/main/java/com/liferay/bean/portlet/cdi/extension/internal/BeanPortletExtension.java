@@ -299,8 +299,8 @@ public class BeanPortletExtension implements Extension {
 				descriptorDisplayCategories = DisplayDescriptorParser.parse(
 					displayDescriptorURL);
 			}
-			catch (Exception e) {
-				_log.error(e, e);
+			catch (Exception exception) {
+				_log.error(exception, exception);
 			}
 		}
 
@@ -315,8 +315,8 @@ public class BeanPortletExtension implements Extension {
 				descriptorLiferayConfigurations = LiferayDescriptorParser.parse(
 					liferayDescriptorURL);
 			}
-			catch (Exception e) {
-				_log.error(e, e);
+			catch (Exception exception) {
+				_log.error(exception, exception);
 			}
 		}
 
@@ -336,8 +336,8 @@ public class BeanPortletExtension implements Extension {
 					preferencesValidatorFunction, descriptorDisplayCategories,
 					descriptorLiferayConfigurations);
 			}
-			catch (Exception e) {
-				_log.error(e, e);
+			catch (Exception exception) {
+				_log.error(exception, exception);
 			}
 		}
 
@@ -468,11 +468,11 @@ public class BeanPortletExtension implements Extension {
 									bean, bean.getBeanClass(),
 									beanManager.createCreationalContext(bean)));
 						}
-						catch (Exception e) {
+						catch (Exception exception) {
 							throw new PortletException(
 								"Unable to create an instance of " +
 									clazz.getName(),
-								e);
+								exception);
 						}
 					}
 
@@ -518,7 +518,7 @@ public class BeanPortletExtension implements Extension {
 			try {
 				serviceRegistration.unregister();
 			}
-			catch (IllegalStateException ise) {
+			catch (IllegalStateException illegalStateException) {
 
 				// Ignore since the service has been unregistered
 
@@ -1073,13 +1073,11 @@ public class BeanPortletExtension implements Extension {
 		}
 
 		BeanPortlet mergedBeanPortlet = new BeanPortletImpl(
-			portletConfiguration.portletName(), beanMethodMap, displayNames,
-			beanPortletClass.getName(), initParams,
-			portletConfiguration.cacheExpirationTime(), supportedPortletModes,
-			supportedWindowStates, supportedLocales,
-			portletConfiguration.resourceBundle(), titles, shortTitles,
-			keywords, descriptions, preferences, preferencesValidator,
-			securityRoleRefs, supportedProcessingEvents,
+			portletName, beanMethodMap, displayNames, portletClassName,
+			initParams, expirationCache, supportedPortletModes,
+			supportedWindowStates, supportedLocales, resourceBundle, titles,
+			shortTitles, keywords, descriptions, preferences,
+			preferencesValidator, securityRoleRefs, supportedProcessingEvents,
 			supportedPublishingEvents, supportedPublicRenderParameters,
 			containerRuntimeOptions, portletDependencies, asyncSupport,
 			multipartConfig, displayCategory, liferayConfiguration);

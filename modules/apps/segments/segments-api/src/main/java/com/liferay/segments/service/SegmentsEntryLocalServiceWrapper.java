@@ -51,6 +51,20 @@ public class SegmentsEntryLocalServiceWrapper
 			String segmentsEntryKey,
 			java.util.Map<java.util.Locale, String> nameMap,
 			java.util.Map<java.util.Locale, String> descriptionMap,
+			boolean active, String criteria, String type,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _segmentsEntryLocalService.addSegmentsEntry(
+			segmentsEntryKey, nameMap, descriptionMap, active, criteria, type,
+			serviceContext);
+	}
+
+	@Override
+	public com.liferay.segments.model.SegmentsEntry addSegmentsEntry(
+			String segmentsEntryKey,
+			java.util.Map<java.util.Locale, String> nameMap,
+			java.util.Map<java.util.Locale, String> descriptionMap,
 			boolean active, String criteria, String source, String type,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -58,6 +72,16 @@ public class SegmentsEntryLocalServiceWrapper
 		return _segmentsEntryLocalService.addSegmentsEntry(
 			segmentsEntryKey, nameMap, descriptionMap, active, criteria, source,
 			type, serviceContext);
+	}
+
+	@Override
+	public void addSegmentsEntryClassPKs(
+			long segmentsEntryId, long[] classPKs,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		_segmentsEntryLocalService.addSegmentsEntryClassPKs(
+			segmentsEntryId, classPKs, serviceContext);
 	}
 
 	/**
@@ -126,6 +150,15 @@ public class SegmentsEntryLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _segmentsEntryLocalService.deleteSegmentsEntry(segmentsEntry);
+	}
+
+	@Override
+	public void deleteSegmentsEntryClassPKs(
+			long segmentsEntryId, long[] classPKs)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		_segmentsEntryLocalService.deleteSegmentsEntryClassPKs(
+			segmentsEntryId, classPKs);
 	}
 
 	@Override
@@ -443,6 +476,12 @@ public class SegmentsEntryLocalServiceWrapper
 			uuid, groupId);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #searchSegmentsEntries(long, long, String, boolean,
+	 LinkedHashMap, int, int, Sort)}
+	 */
+	@Deprecated
 	@Override
 	public com.liferay.portal.kernel.search.BaseModelSearchResult
 		<com.liferay.segments.model.SegmentsEntry> searchSegmentsEntries(
@@ -454,6 +493,20 @@ public class SegmentsEntryLocalServiceWrapper
 		return _segmentsEntryLocalService.searchSegmentsEntries(
 			companyId, groupId, keywords, includeAncestorSegmentsEntries, start,
 			end, sort);
+	}
+
+	@Override
+	public com.liferay.portal.kernel.search.BaseModelSearchResult
+		<com.liferay.segments.model.SegmentsEntry> searchSegmentsEntries(
+				long companyId, long groupId, String keywords,
+				boolean includeAncestorSegmentsEntries,
+				java.util.LinkedHashMap<String, Object> params, int start,
+				int end, com.liferay.portal.kernel.search.Sort sort)
+			throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _segmentsEntryLocalService.searchSegmentsEntries(
+			companyId, groupId, keywords, includeAncestorSegmentsEntries,
+			params, start, end, sort);
 	}
 
 	@Override

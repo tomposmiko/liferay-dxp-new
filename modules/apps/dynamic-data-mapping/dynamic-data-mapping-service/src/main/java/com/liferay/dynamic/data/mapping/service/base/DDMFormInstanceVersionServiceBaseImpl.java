@@ -47,7 +47,7 @@ public abstract class DDMFormInstanceVersionServiceBaseImpl
 	implements AopService, DDMFormInstanceVersionService,
 			   IdentifiableOSGiService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>DDMFormInstanceVersionService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.dynamic.data.mapping.service.DDMFormInstanceVersionServiceUtil</code>.
@@ -102,8 +102,8 @@ public abstract class DDMFormInstanceVersionServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

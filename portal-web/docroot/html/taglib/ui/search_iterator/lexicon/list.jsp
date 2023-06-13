@@ -142,6 +142,12 @@ if (fixedHeader) {
 						if (Validator.isNull(headerNameValue)) {
 							headerNameValue = StringPool.NBSP;
 						}
+
+						String helpMessage = null;
+
+						if (helpMessages != null) {
+							helpMessage = helpMessages.get(headerName);
+						}
 						%>
 
 						<c:choose>
@@ -151,12 +157,20 @@ if (fixedHeader) {
 								</span>
 							</c:when>
 							<c:when test="<%= truncate %>">
-								<span class="truncate-text">
+								<span class="text-truncate">
 									<%= headerNameValue %>
+
+									<c:if test="<%= Validator.isNotNull(helpMessage) %>">
+										<liferay-ui:icon-help message="<%= helpMessage %>" />
+									</c:if>
 								</span>
 							</c:when>
 							<c:otherwise>
 								<%= headerNameValue %>
+
+								<c:if test="<%= Validator.isNotNull(helpMessage) %>">
+									<liferay-ui:icon-help message="<%= helpMessage %>" />
+								</c:if>
 							</c:otherwise>
 						</c:choose>
 					</th>
@@ -277,7 +291,7 @@ if (fixedHeader) {
 							String columnClassName = entry.getCssClass();
 
 							if (!Validator.isBlank(entry.getAlign())) {
-								columnClassName += " text-"+ entry.getAlign();
+								columnClassName += " text-" + entry.getAlign();
 							}
 
 							if (!Validator.isBlank(entry.getValign())) {
@@ -308,7 +322,7 @@ if (fixedHeader) {
 							<td class="<%= columnClassName %>" colspan="<%= entry.getColspan() %>">
 								<c:choose>
 									<c:when test="<%= truncate %>">
-										<span class="truncate-text">
+										<span class="text-truncate">
 
 											<%
 											entry.print(pageContext.getOut(), request, response);

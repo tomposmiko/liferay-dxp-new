@@ -22,8 +22,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.lucene.util.SetOnce;
-
 import org.elasticsearch.analysis.common.CommonAnalysisPlugin;
 import org.elasticsearch.common.logging.LogConfigurator;
 import org.elasticsearch.common.settings.Settings;
@@ -42,7 +40,7 @@ public class EmbeddedElasticsearchNode extends Node {
 
 	public static Node newInstance(Settings settings) {
 		Environment environment = InternalSettingsPreparer.prepareEnvironment(
-			settings, Collections.emptyMap(), null, () -> "liferay");
+			settings, Collections.emptyMap(), null, null);
 
 		List<Class<? extends Plugin>> classpathPlugins = Arrays.asList(
 			CommonAnalysisPlugin.class, Netty4Plugin.class,
@@ -53,9 +51,9 @@ public class EmbeddedElasticsearchNode extends Node {
 
 			LogConfigurator.configure(environment);
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug("Unable to find log4j2.properties", e);
+				_log.debug("Unable to find log4j2.properties", exception);
 			}
 		}
 
@@ -68,17 +66,6 @@ public class EmbeddedElasticsearchNode extends Node {
 		Collection<Class<? extends Plugin>> classpathPlugins) {
 
 		super(environment, classpathPlugins, false);
-	}
-
-	protected void registerDerivedNodeNameWithLogger(String nodeName) {
-		try {
-			LogConfigurator.setNodeName(nodeName);
-		}
-		catch (SetOnce.AlreadySetException soase) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Node name has already been set");
-			}
-		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

@@ -45,13 +45,13 @@ public class ExportTemplatesToolbarDisplayContext
 	extends BaseManagementToolbarDisplayContext {
 
 	public ExportTemplatesToolbarDisplayContext(
+		HttpServletRequest httpServletRequest,
 		LiferayPortletRequest liferayPortletRequest,
-		LiferayPortletResponse liferayPortletResponse,
-		HttpServletRequest httpServletRequest, long liveGroupId,
+		LiferayPortletResponse liferayPortletResponse, long liveGroupId,
 		Company company, PortletURL iteratorURL) {
 
 		super(
-			liferayPortletRequest, liferayPortletResponse, httpServletRequest);
+			httpServletRequest, liferayPortletRequest, liferayPortletResponse);
 
 		searchContainer = _createSearchContainer(
 			liveGroupId, company, iteratorURL);

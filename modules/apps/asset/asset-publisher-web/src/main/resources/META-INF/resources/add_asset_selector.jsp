@@ -55,11 +55,7 @@ String redirect = PortalUtil.getLayoutFullURL(layout, themeDisplay);
 
 						<%
 						for (AssetPublisherAddItemHolder assetPublisherAddItemHolder : assetPublisherAddItemHolders) {
-							Map<String, Object> data = new HashMap<String, Object>();
-
 							String message = assetPublisherAddItemHolder.getModelResource();
-
-							data.put("title", LanguageUtil.format((HttpServletRequest)pageContext.getRequest(), "new-x", HtmlUtil.escape(message), false));
 
 							long curGroupId = groupId;
 
@@ -73,7 +69,11 @@ String redirect = PortalUtil.getLayoutFullURL(layout, themeDisplay);
 
 							portletURL.setParameter("redirect", redirect);
 
-							data.put("url", assetHelper.getAddURLPopUp(curGroupId, plid, portletURL, false, null));
+							Map<String, Object> data = HashMapBuilder.<String, Object>put(
+								"title", LanguageUtil.format((HttpServletRequest)pageContext.getRequest(), "new-x", HtmlUtil.escape(message), false)
+							).put(
+								"url", assetHelper.getAddURLPopUp(curGroupId, plid, portletURL, false, null)
+							).build();
 						%>
 
 							<aui:option data="<%= data %>" label="<%= HtmlUtil.escape(message) %>" />
@@ -109,13 +109,13 @@ String redirect = PortalUtil.getLayoutFullURL(layout, themeDisplay);
 
 <aui:script>
 	function <portlet:namespace />addAssetEntry() {
-		const visibleItem = document.querySelector('.asset-entry-type:not(.hide)');
+		var visibleItem = document.querySelector('.asset-entry-type:not(.hide)');
 
-		const assetEntryTypeSelector = visibleItem.querySelector(
+		var assetEntryTypeSelector = visibleItem.querySelector(
 			'.asset-entry-type-select'
 		);
 
-		const selectedOption =
+		var selectedOption =
 			assetEntryTypeSelector.options[assetEntryTypeSelector.selectedIndex];
 
 		Liferay.Util.navigate(selectedOption.dataset.url);

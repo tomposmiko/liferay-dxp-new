@@ -14,6 +14,8 @@
 
 package com.liferay.portal.search.elasticsearch7.internal;
 
+import com.liferay.portal.kernel.messaging.DestinationFactory;
+import com.liferay.portal.kernel.messaging.MessageBus;
 import com.liferay.portal.kernel.search.BaseSearchEngineConfigurator;
 import com.liferay.portal.kernel.search.IndexSearcher;
 import com.liferay.portal.kernel.search.IndexWriter;
@@ -22,12 +24,9 @@ import com.liferay.portal.kernel.search.SearchEngineConfigurator;
 import com.liferay.portal.kernel.search.SearchEngineHelper;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnection;
-import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchConnectionManager;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.FutureTask;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -42,16 +41,6 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class ElasticsearchEngineConfigurator
 	extends BaseSearchEngineConfigurator {
-
-	@Override
-	public void destroy() {
-		ElasticsearchConnection elasticsearchConnection =
-			_elasticsearchConnectionManager.getElasticsearchConnection();
-
-		elasticsearchConnection.close();
-
-		super.destroy();
-	}
 
 	@Activate
 	protected void activate() {
@@ -74,7 +63,7 @@ public class ElasticsearchEngineConfigurator
 	}
 
 	@Override
-	protected ClassLoader getOperatingClassloader() {
+	protected ClassLoader getOperatingClassLoader() {
 		Class<?> clazz = getClass();
 
 		return clazz.getClassLoader();
@@ -83,33 +72,6 @@ public class ElasticsearchEngineConfigurator
 	@Override
 	protected SearchEngineHelper getSearchEngineHelper() {
 		return searchEngineHelper;
-	}
-
-	@Override
-	protected void initialize() {
-		FutureTask<Void> futureTask = new FutureTask<Void>(
-			() -> {
-				_elasticsearchConnectionManager.connect();
-
-				return null;
-			});
-
-		Thread thread = new Thread(
-			futureTask, "Elasticsearch initialization thread");
-
-		thread.setDaemon(true);
-
-		thread.start();
-
-		try {
-			futureTask.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(
-				"Unable to initialize Elasticsearch engine", e);
-		}
-
-		super.initialize();
 	}
 
 	@Reference(
@@ -141,13 +103,16 @@ public class ElasticsearchEngineConfigurator
 	protected SearchEngineHelper searchEngineHelper;
 
 	@Reference
-	private ElasticsearchConnectionManager _elasticsearchConnectionManager;
+	private DestinationFactory _destinationFactory;
 
 	@Reference(target = "(!(search.engine.impl=*))")
 	private IndexSearcher _indexSearcher;
 
 	@Reference(target = "(!(search.engine.impl=*))")
 	private IndexWriter _indexWriter;
+
+	@Reference
+	private MessageBus _messageBus;
 
 	private final Map<String, SearchEngine> _searchEngines =
 		new ConcurrentHashMap<>();

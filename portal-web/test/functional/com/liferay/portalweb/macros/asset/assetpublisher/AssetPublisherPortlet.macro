@@ -38,6 +38,8 @@ definition {
 
 		SelectFrame(locator1 = "IFrame#SELECT_SITES");
 
+		Navigator.gotoNavTab(navTab = "My Sites");
+
 		SiteSelector.viewSite(site = "${siteName}");
 	}
 
@@ -68,6 +70,8 @@ definition {
 			SelectFrame(value1 = "relative=top");
 
 			SelectFrame(locator1 = "IFrame#SELECT_SITES");
+
+			Navigator.gotoNavTab(navTab = "My Sites");
 
 			SiteSelector.selectSite(site = "${otherSite}");
 		}
@@ -172,16 +176,18 @@ definition {
 				locator1 = "APConfiguration#SOURCE_SCOPE_ASSET_SUBTYPE_SELECT",
 				value1 = "Select More Than One...");
 
-			for (var contentName : list "${selectContent}") {
-				var key_contentName = "${contentName}";
+			if (isSet(selectContent)) {
+				for (var contentName : list "${selectContent}") {
+					var key_contentName = "${contentName}";
 
-				Click(locator1 = "APConfiguration#SELECT_MORE_THAN_ONE_ASSET_TYPE_CONTENT");
+					Click(locator1 = "APConfiguration#SELECT_MORE_THAN_ONE_ASSET_TYPE_CONTENT");
 
-				if ("${moveSelected}" == "true") {
-					Click(locator1 = "APConfiguration#SELECT_MORE_THAN_ONE_ASSET_SUBTYPE_MOVE_SELECTED");
-				}
-				else {
-					Click(locator1 = "APConfiguration#SELECT_MORE_THAN_ONE_ASSET_SUBTYPE_MOVE_AVAILABLE");
+					if ("${moveSelected}" == "true") {
+						Click(locator1 = "APConfiguration#SELECT_MORE_THAN_ONE_ASSET_SUBTYPE_MOVE_SELECTED");
+					}
+					else {
+						Click(locator1 = "APConfiguration#SELECT_MORE_THAN_ONE_ASSET_SUBTYPE_MOVE_AVAILABLE");
+					}
 				}
 			}
 		}
@@ -367,7 +373,24 @@ definition {
 	}
 
 	macro configureManualAssetSelectionPG {
-		AssetPublisherPortlet.gotoConfigurationPG(portletName = "${portletName}");
+		if ("${contentPage}" == "true") {
+			MouseOver(
+				key_portletName = "Asset Publisher",
+				locator1 = "PageEditor#CONTENT_PAGE_TEXT_CONTENT");
+
+			Click(
+				key_portletName = "Asset Publisher",
+				locator1 = "Portlet#SPECIFIC_BORDERLESS_ELLIPSIS_ICON");
+
+			Click(
+				key_menuItem = "Configuration",
+				locator1 = "Fragment#FRAGMENT_FLOATING_MENU_ITEM");
+
+			SelectFrame(locator1 = "IFrame#DIALOG");
+		}
+		else {
+			AssetPublisherPortlet.gotoConfigurationPG(portletName = "${portletName}");
+		}
 
 		Navigator.gotoNavTab(navTab = "Asset Selection");
 
@@ -525,7 +548,7 @@ definition {
 
 			AssertTextEquals(
 				locator1 = "APConfigurationSites#SITES_TABLE_NAME",
-				value1 = "${siteName}");
+				value1 = "${siteName} (Opens New Window)");
 
 			AssertTextEquals(
 				locator1 = "APConfigurationSites#SITES_TABLE_TYPE",
@@ -1129,7 +1152,7 @@ definition {
 			else {
 				AssertTextEquals(
 					locator1 = "APConfigurationSites#SITES_TABLE_NAME",
-					value1 = "${liferaySiteName}");
+					value1 = "${liferaySiteName} (Opens New Window)");
 
 				AssertTextEquals(
 					locator1 = "APConfigurationSites#SITES_TABLE_TYPE",
@@ -1520,6 +1543,14 @@ definition {
 		AssertClick(
 			locator1 = "APAsset#ASSET_TITLE",
 			value1 = "${assetTitle}");
+
+		if (isSet(assetPriority)) {
+			var key_assetPriority = "${assetPriority}";
+
+			AssertTextEquals.assertPartialText(
+				locator1 = "AP#METADATA_PRIORITY",
+				value1 = "${assetPriority}");
+		}
 
 		if (isSet(relatedAssetTitles)) {
 			AssetPublisherPortlet.viewAssetRelatedAssets(relatedAssetTitles = "${relatedAssetTitles}");

@@ -47,13 +47,13 @@ public class StagingProcessesWebPublishTemplatesToolbarDisplayContext
 	extends BaseManagementToolbarDisplayContext {
 
 	public StagingProcessesWebPublishTemplatesToolbarDisplayContext(
+		HttpServletRequest httpServletRequest,
 		LiferayPortletRequest liferayPortletRequest,
-		LiferayPortletResponse liferayPortletResponse,
-		HttpServletRequest httpServletRequest, PageContext pageContext,
+		LiferayPortletResponse liferayPortletResponse, PageContext pageContext,
 		PortletURL iteratorURL) {
 
 		super(
-			liferayPortletRequest, liferayPortletResponse, httpServletRequest);
+			httpServletRequest, liferayPortletRequest, liferayPortletResponse);
 
 		long companyId = PortalUtil.getCompanyId(liferayPortletRequest);
 		long groupId = (long)pageContext.getAttribute("groupId");

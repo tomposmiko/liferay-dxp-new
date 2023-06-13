@@ -59,6 +59,7 @@ import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.tree.TreeModelTasksAdapter;
 import com.liferay.portal.kernel.tree.TreePathUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -117,8 +118,8 @@ public class OrganizationLocalServiceImpl
 		try {
 			reindexUsers(organizationId);
 		}
-		catch (PortalException pe) {
-			throw new SystemException(pe);
+		catch (PortalException portalException) {
+			throw new SystemException(portalException);
 		}
 	}
 
@@ -135,8 +136,8 @@ public class OrganizationLocalServiceImpl
 		try {
 			reindexUsers(organization);
 		}
-		catch (PortalException pe) {
-			throw new SystemException(pe);
+		catch (PortalException portalException) {
+			throw new SystemException(portalException);
 		}
 	}
 
@@ -155,8 +156,8 @@ public class OrganizationLocalServiceImpl
 		try {
 			reindexUsers(organizations);
 		}
-		catch (PortalException pe) {
-			throw new SystemException(pe);
+		catch (PortalException portalException) {
+			throw new SystemException(portalException);
 		}
 	}
 
@@ -173,8 +174,8 @@ public class OrganizationLocalServiceImpl
 		try {
 			reindexUsers(organizationIds);
 		}
-		catch (PortalException pe) {
-			throw new SystemException(pe);
+		catch (PortalException portalException) {
+			throw new SystemException(portalException);
 		}
 	}
 
@@ -276,7 +277,7 @@ public class OrganizationLocalServiceImpl
 		organization.setComments(comments);
 		organization.setExpandoBridgeAttributes(serviceContext);
 
-		organizationPersistence.update(organization);
+		organization = organizationPersistence.update(organization);
 
 		// Group
 
@@ -409,10 +410,10 @@ public class OrganizationLocalServiceImpl
 		throws PortalException {
 
 		if (!CompanyThreadLocal.isDeleteInProcess()) {
-			LinkedHashMap<String, Object> params = new LinkedHashMap<>();
-
-			params.put(
-				"usersOrgs", Long.valueOf(organization.getOrganizationId()));
+			LinkedHashMap<String, Object> params =
+				LinkedHashMapBuilder.<String, Object>put(
+					"usersOrgs", Long.valueOf(organization.getOrganizationId())
+				).build();
 
 			int count1 = organizationPersistence.countByC_P(
 				organization.getCompanyId(), organization.getOrganizationId());
@@ -470,7 +471,7 @@ public class OrganizationLocalServiceImpl
 		if (group.isSite()) {
 			group.setSite(false);
 
-			groupPersistence.update(group);
+			group = groupPersistence.update(group);
 		}
 
 		groupLocalService.deleteGroup(group);
@@ -1096,9 +1097,10 @@ public class OrganizationLocalServiceImpl
 		}
 
 		if (!ListUtil.isEmpty(organizationsTree)) {
-			LinkedHashMap<String, Object> params = new LinkedHashMap<>();
-
-			params.put("usersOrgsTree", organizationsTree);
+			LinkedHashMap<String, Object> params =
+				LinkedHashMapBuilder.<String, Object>put(
+					"usersOrgsTree", organizationsTree
+				).build();
 
 			if (userFinder.countByUser(userId, params) > 0) {
 				return true;
@@ -1175,16 +1177,13 @@ public class OrganizationLocalServiceImpl
 	 * @param  keywords the keywords (space separated), which may occur in the
 	 *         organization's name, street, city, zipcode, type, region or
 	 *         country (optionally <code>null</code>)
-	 * @param  params the finder parameters (optionally <code>null</code>). For
-	 *         more information see {@link
-	 *         com.liferay.portlet.usersadmin.util.OrganizationIndexer}
+	 * @param  params the finder parameters (optionally <code>null</code>).
 	 * @param  start the lower bound of the range of organizations to return
 	 * @param  end the upper bound of the range of organizations to return (not
 	 *         inclusive)
 	 * @param  sort the field and direction by which to sort (optionally
 	 *         <code>null</code>)
 	 * @return the matching organizations ordered by name
-	 * @see    com.liferay.portlet.usersadmin.util.OrganizationIndexer
 	 */
 	@Override
 	public Hits search(
@@ -1473,9 +1472,7 @@ public class OrganizationLocalServiceImpl
 	 * @param  zip the zipcode keywords (optionally <code>null</code>)
 	 * @param  region the region keywords (optionally <code>null</code>)
 	 * @param  country the country keywords (optionally <code>null</code>)
-	 * @param  params the finder parameters (optionally <code>null</code>). For
-	 *         more information see {@link
-	 *         com.liferay.portlet.usersadmin.util.OrganizationIndexer}.
+	 * @param  params the finder parameters (optionally <code>null</code>).
 	 * @param  andSearch whether every field must match its keywords or just one
 	 *         field
 	 * @param  start the lower bound of the range of organizations to return
@@ -1484,7 +1481,6 @@ public class OrganizationLocalServiceImpl
 	 * @param  sort the field and direction by which to sort (optionally
 	 *         <code>null</code>)
 	 * @return the matching organizations ordered by <code>sort</code>
-	 * @see    com.liferay.portlet.usersadmin.util.OrganizationIndexer
 	 */
 	@Override
 	public Hits search(
@@ -1503,8 +1499,8 @@ public class OrganizationLocalServiceImpl
 
 			return indexer.search(searchContext);
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 
@@ -1582,8 +1578,8 @@ public class OrganizationLocalServiceImpl
 
 			return (int)indexer.searchCount(searchContext);
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 
@@ -1650,8 +1646,8 @@ public class OrganizationLocalServiceImpl
 
 			return (int)indexer.searchCount(searchContext);
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 
@@ -1803,8 +1799,8 @@ public class OrganizationLocalServiceImpl
 		try {
 			reindexUsers(organizationIds);
 		}
-		catch (PortalException pe) {
-			throw new SystemException(pe);
+		catch (PortalException portalException) {
+			throw new SystemException(portalException);
 		}
 	}
 
@@ -1916,7 +1912,7 @@ public class OrganizationLocalServiceImpl
 
 		organization.setExpandoBridgeAttributes(serviceContext);
 
-		organizationPersistence.update(organization);
+		organization = organizationPersistence.update(organization);
 
 		// Group
 
@@ -2238,7 +2234,7 @@ public class OrganizationLocalServiceImpl
 
 			curOrganization.setTreePath(curOrganization.buildTreePath());
 
-			organizationPersistence.update(curOrganization);
+			curOrganization = organizationPersistence.update(curOrganization);
 
 			organizationIds[i] = curOrganization.getOrganizationId();
 		}
@@ -2333,10 +2329,11 @@ public class OrganizationLocalServiceImpl
 						indexableActionableDynamicQuery.addDocuments(
 							indexer.getDocument(user));
 					}
-					catch (PortalException pe) {
+					catch (PortalException portalException) {
 						if (_log.isWarnEnabled()) {
 							_log.warn(
-								"Unable to index user " + user.getUserId(), pe);
+								"Unable to index user " + user.getUserId(),
+								portalException);
 						}
 					}
 				}

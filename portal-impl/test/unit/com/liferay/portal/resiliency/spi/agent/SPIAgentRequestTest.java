@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.upload.FileItem;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.CookieUtil;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.KeyValuePair;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -104,8 +105,8 @@ public class SPIAgentRequestTest {
 						return File.createTempFile(
 							SPIAgentRequestTest.class.getName(), null);
 					}
-					catch (IOException ioe) {
-						throw new RuntimeException(ioe);
+					catch (IOException ioException) {
+						throw new RuntimeException(ioException);
 					}
 				}
 
@@ -249,13 +250,14 @@ public class SPIAgentRequestTest {
 
 		// Upload servlet request with multipart data
 
-		Map<String, FileItem[]> fileParameters = new HashMap<>();
-
 		String fileParameter = "fileParameter";
 
 		FileItem[] fileItems = new FileItem[0];
 
-		fileParameters.put(fileParameter, fileItems);
+		Map<String, FileItem[]> fileParameters =
+			HashMapBuilder.<String, FileItem[]>put(
+				fileParameter, fileItems
+			).build();
 
 		spiAgentRequest = new SPIAgentRequest(
 			new UploadServletRequestImpl(
@@ -291,13 +293,14 @@ public class SPIAgentRequestTest {
 
 		// Upload servlet request with multipart and regular data
 
-		Map<String, List<String>> regularParameters = new HashMap<>();
-
 		String regularParameter = "regularParameter";
 
 		List<String> parameters = new ArrayList<>();
 
-		regularParameters.put(regularParameter, parameters);
+		Map<String, List<String>> regularParameters =
+			HashMapBuilder.<String, List<String>>put(
+				regularParameter, parameters
+			).build();
 
 		spiAgentRequest = new SPIAgentRequest(
 			new UploadServletRequestImpl(
@@ -411,8 +414,9 @@ public class SPIAgentRequestTest {
 
 			Assert.fail();
 		}
-		catch (IllegalArgumentException iae) {
-			Assert.assertEquals("Input stream is null", iae.getMessage());
+		catch (IllegalArgumentException illegalArgumentException) {
+			Assert.assertEquals(
+				"Input stream is null", illegalArgumentException.getMessage());
 		}
 	}
 
@@ -931,11 +935,14 @@ public class SPIAgentRequestTest {
 
 		MockHttpSession originalHttpSession = new MockHttpSession();
 
-		Map<String, Serializable> portletSessionAttributes = new HashMap<>();
-
-		portletSessionAttributes.put("key1", "value1");
-		portletSessionAttributes.put("key2", "value2");
-		portletSessionAttributes.put("key3", "value3");
+		Map<String, Serializable> portletSessionAttributes =
+			HashMapBuilder.<String, Serializable>put(
+				"key1", "value1"
+			).put(
+				"key2", "value2"
+			).put(
+				"key3", "value3"
+			).build();
 
 		originalHttpSession.setAttribute(
 			WebKeys.PORTLET_SESSION_ATTRIBUTES.concat(servletContextName),

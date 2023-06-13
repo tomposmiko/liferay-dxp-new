@@ -30,11 +30,6 @@ public class KBFolderServiceWrapper
 		_kbFolderService = kbFolderService;
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link KBFolderServiceUtil} to access the kb folder remote service. Add custom service methods to <code>com.liferay.knowledge.base.service.impl.KBFolderServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
-	 */
 	@Override
 	public com.liferay.knowledge.base.model.KBFolder addKBFolder(
 			long groupId, long parentResourceClassNameId,
@@ -159,23 +154,6 @@ public class KBFolderServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_kbFolderService.moveKBFolder(kbFolderId, parentKBFolderId);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #updateKBFolder(long, long, long, String, String,
-	 ServiceContext)}
-	 */
-	@Deprecated
-	@Override
-	public com.liferay.knowledge.base.model.KBFolder updateKBFolder(
-			long parentResourceClassNameId, long parentResourcePrimKey,
-			long kbFolderId, String name, String description)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _kbFolderService.updateKBFolder(
-			parentResourceClassNameId, parentResourcePrimKey, kbFolderId, name,
-			description);
 	}
 
 	@Override

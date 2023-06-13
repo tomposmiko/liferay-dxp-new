@@ -92,6 +92,27 @@ public class WorkflowTaskAssignToUser {
 
 	protected Date dueDate;
 
+	public Long getWorkflowTaskId() {
+		return workflowTaskId;
+	}
+
+	public void setWorkflowTaskId(Long workflowTaskId) {
+		this.workflowTaskId = workflowTaskId;
+	}
+
+	public void setWorkflowTaskId(
+		UnsafeSupplier<Long, Exception> workflowTaskIdUnsafeSupplier) {
+
+		try {
+			workflowTaskId = workflowTaskIdUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected Long workflowTaskId;
+
 	@Override
 	public boolean equals(Object object) {
 		if (this == object) {

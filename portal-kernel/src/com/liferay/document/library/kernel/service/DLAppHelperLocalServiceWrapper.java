@@ -33,11 +33,6 @@ public class DLAppHelperLocalServiceWrapper
 		_dlAppHelperLocalService = dlAppHelperLocalService;
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link DLAppHelperLocalServiceUtil} to access the dl app helper local service. Add custom service methods to <code>com.liferay.portlet.documentlibrary.service.impl.DLAppHelperLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
-	 */
 	@Override
 	public void addFolder(
 			long userId,
@@ -167,20 +162,6 @@ public class DLAppHelperLocalServiceWrapper
 		_dlAppHelperLocalService.moveDependentsToTrash(dlFolder);
 	}
 
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 #moveDependentsToTrash(DLFolder)}
-	 */
-	@Deprecated
-	@Override
-	public void moveDependentsToTrash(
-			java.util.List<Object> dlFileEntriesAndDLFolders, long trashEntryId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_dlAppHelperLocalService.moveDependentsToTrash(
-			dlFileEntriesAndDLFolders, trashEntryId);
-	}
-
 	@Override
 	public com.liferay.portal.kernel.repository.model.FileEntry
 			moveFileEntryFromTrash(
@@ -286,34 +267,6 @@ public class DLAppHelperLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_dlAppHelperLocalService.restoreDependentsFromTrash(dlFolder);
-	}
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 #restoreDependentsFromTrash(DLFolder)}
-	 */
-	@Deprecated
-	@Override
-	public void restoreDependentsFromTrash(
-			java.util.List<Object> dlFileEntriesAndDLFolders)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_dlAppHelperLocalService.restoreDependentsFromTrash(
-			dlFileEntriesAndDLFolders);
-	}
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 #restoreDependentsFromTrash(List)}
-	 */
-	@Deprecated
-	@Override
-	public void restoreDependentsFromTrash(
-			java.util.List<Object> dlFileEntriesAndDLFolders, long trashEntryId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_dlAppHelperLocalService.restoreDependentsFromTrash(
-			dlFileEntriesAndDLFolders, trashEntryId);
 	}
 
 	@Override

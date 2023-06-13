@@ -30,16 +30,10 @@ import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
  */
 public class AssetCategoryServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.portlet.asset.service.impl.AssetCategoryServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
-	 */
-
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link AssetCategoryServiceUtil} to access the asset category remote service. Add custom service methods to <code>com.liferay.portlet.asset.service.impl.AssetCategoryServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	public static com.liferay.asset.kernel.model.AssetCategory addCategory(
 			long groupId, long parentCategoryId,
@@ -67,20 +61,6 @@ public class AssetCategoryServiceUtil {
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		getService().deleteCategories(categoryIds);
-	}
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), Replaced by {@link
-	 #deleteCategories(long[])}
-	 */
-	@Deprecated
-	public static java.util.List<com.liferay.asset.kernel.model.AssetCategory>
-			deleteCategories(
-				long[] categoryIds,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return getService().deleteCategories(categoryIds, serviceContext);
 	}
 
 	public static void deleteCategory(long categoryId)

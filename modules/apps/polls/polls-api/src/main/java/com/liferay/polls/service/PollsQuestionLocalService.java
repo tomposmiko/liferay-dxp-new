@@ -64,7 +64,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface PollsQuestionLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link PollsQuestionLocalServiceUtil} to access the polls question local service. Add custom service methods to <code>com.liferay.polls.service.impl.PollsQuestionLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -98,16 +98,6 @@ public interface PollsQuestionLocalService
 			long questionId, ModelPermissions modelPermissions)
 		throws PortalException;
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #addQuestionResources(long, ModelPermissions)}
-	 */
-	@Deprecated
-	public void addQuestionResources(
-			long questionId, String[] groupPermissions,
-			String[] guestPermissions)
-		throws PortalException;
-
 	public void addQuestionResources(
 			PollsQuestion question, boolean addGroupPermissions,
 			boolean addGuestPermissions)
@@ -115,16 +105,6 @@ public interface PollsQuestionLocalService
 
 	public void addQuestionResources(
 			PollsQuestion question, ModelPermissions modelPermissions)
-		throws PortalException;
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #addQuestionResources(PollsQuestion, ModelPermissions)}
-	 */
-	@Deprecated
-	public void addQuestionResources(
-			PollsQuestion question, String[] groupPermissions,
-			String[] guestPermissions)
 		throws PortalException;
 
 	/**

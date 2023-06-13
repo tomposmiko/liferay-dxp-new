@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.messaging.MessageBus;
 import com.liferay.portal.kernel.messaging.MessageBusEventListener;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.servlet.ServletContextClassLoaderPool;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.registry.Filter;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
@@ -95,7 +96,7 @@ public abstract class BaseMessagingConfigurator
 		ClassLoader contextClassLoader = currentThread.getContextClassLoader();
 
 		try {
-			currentThread.setContextClassLoader(getOperatingClassloader());
+			currentThread.setContextClassLoader(getOperatingClassLoader());
 
 			for (Map.Entry<String, List<MessageListener>> messageListeners :
 					_messageListeners.entrySet()) {
@@ -153,7 +154,7 @@ public abstract class BaseMessagingConfigurator
 
 		String servletContextName =
 			ServletContextClassLoaderPool.getServletContextName(
-				getOperatingClassloader());
+				getOperatingClassLoader());
 
 		if (servletContextName != null) {
 			MessagingConfiguratorRegistry.unregisterMessagingConfigurator(
@@ -223,7 +224,7 @@ public abstract class BaseMessagingConfigurator
 
 					continue;
 				}
-				catch (Exception e) {
+				catch (Exception exception) {
 				}
 
 				try {
@@ -235,7 +236,7 @@ public abstract class BaseMessagingConfigurator
 
 					setMessageBusMethod.invoke(messageListener, _messageBus);
 				}
-				catch (Exception e) {
+				catch (Exception exception) {
 				}
 			}
 		}
@@ -243,14 +244,23 @@ public abstract class BaseMessagingConfigurator
 		_messageListeners.putAll(messageListeners);
 	}
 
-	protected abstract ClassLoader getOperatingClassloader();
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getOperatingClassLoader()}
+	 */
+	@Deprecated
+	protected ClassLoader getOperatingClassloader() {
+		return getOperatingClassLoader();
+	}
+
+	protected abstract ClassLoader getOperatingClassLoader();
 
 	protected void initialize() {
 		Thread currentThread = Thread.currentThread();
 
 		ClassLoader contextClassLoader = currentThread.getContextClassLoader();
 
-		ClassLoader operatingClassLoader = getOperatingClassloader();
+		ClassLoader operatingClassLoader = getOperatingClassLoader();
 
 		if (contextClassLoader == operatingClassLoader) {
 			_portalMessagingConfigurator = true;
@@ -297,9 +307,10 @@ public abstract class BaseMessagingConfigurator
 
 					@Override
 					public void dependenciesFulfilled() {
-						Map<String, Object> properties = new HashMap<>();
-
-						properties.put("destination.name", destinationName);
+						Map<String, Object> properties =
+							HashMapBuilder.<String, Object>put(
+								"destination.name", destinationName
+							).build();
 
 						for (DestinationEventListener destinationEventListener :
 								entry.getValue()) {
@@ -345,9 +356,9 @@ public abstract class BaseMessagingConfigurator
 			Destination.class);
 
 		for (Destination destination : _destinations) {
-			Map<String, Object> properties = new HashMap<>();
-
-			properties.put("destination.name", destination.getName());
+			Map<String, Object> properties = HashMapBuilder.<String, Object>put(
+				"destination.name", destination.getName()
+			).build();
 
 			_destinationServiceRegistrar.registerService(
 				Destination.class, destination, properties);
@@ -402,14 +413,12 @@ public abstract class BaseMessagingConfigurator
 
 		@Override
 		public void dependenciesFulfilled() {
-			ClassLoader operatingClassLoader = getOperatingClassloader();
-
-			Map<String, Object> properties = new HashMap<>();
-
-			properties.put("destination.name", _destinationName);
-			properties.put(
+			Map<String, Object> properties = HashMapBuilder.<String, Object>put(
+				"destination.name", _destinationName
+			).put(
 				"message.listener.operating.class.loader",
-				operatingClassLoader);
+				getOperatingClassLoader()
+			).build();
 
 			for (MessageListener messageListener : _messageListeners) {
 				_messageListenerServiceRegistrar.registerService(

@@ -49,7 +49,7 @@ public abstract class WikiPageServiceBaseImpl
 	extends BaseServiceImpl
 	implements AopService, IdentifiableOSGiService, WikiPageService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>WikiPageService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.wiki.service.WikiPageServiceUtil</code>.
@@ -103,8 +103,8 @@ public abstract class WikiPageServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

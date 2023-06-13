@@ -25,8 +25,6 @@ import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.increment.BufferedIncrement;
-import com.liferay.portal.kernel.increment.NumberIncrement;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.search.Hits;
@@ -65,7 +63,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface MBThreadLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link MBThreadLocalServiceUtil} to access the message boards thread local service. Add custom service methods to <code>com.liferay.message.boards.service.impl.MBThreadLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -337,13 +335,6 @@ public interface MBThreadLocalService
 	public int getMBThreadsCount();
 
 	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<MBThread> getNoAssetThreads();
-
-	/**
 	 * Returns the OSGi service identifier.
 	 *
 	 * @return the OSGi service identifier
@@ -377,11 +368,8 @@ public interface MBThreadLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public boolean hasAnswerMessage(long threadId);
 
-	@BufferedIncrement(
-		configuration = "MBThread", incrementClass = NumberIncrement.class
-	)
-	public void incrementViewCounter(long threadId, int increment)
-		throws PortalException;
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public void incrementViewCounter(long threadId, int increment);
 
 	public void moveDependentsToTrash(
 			long groupId, long threadId, long trashEntryId)

@@ -44,7 +44,7 @@ public interface MDRRuleModel
 	extends BaseModel<MDRRule>, LocalizedModel, MVCCModel, ShardedModel,
 			StagedGroupedModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a mdr rule model instance should use the {@link MDRRule} interface instead.

@@ -32,7 +32,7 @@ import com.liferay.asset.list.service.AssetListEntryLocalServiceUtil;
 public abstract class AssetListEntryBaseImpl
 	extends AssetListEntryModelImpl implements AssetListEntry {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a asset list entry model instance should use the <code>AssetListEntry</code> interface instead.

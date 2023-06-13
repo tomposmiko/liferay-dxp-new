@@ -81,7 +81,7 @@ public abstract class FragmentEntryLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements AopService, FragmentEntryLocalService, IdentifiableOSGiService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>FragmentEntryLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.fragment.service.FragmentEntryLocalServiceUtil</code>.
@@ -587,8 +587,8 @@ public abstract class FragmentEntryLocalServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

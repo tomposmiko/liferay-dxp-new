@@ -40,7 +40,7 @@ public interface SiteNavigationMenuItemModel
 	extends BaseModel<SiteNavigationMenuItem>, MVCCModel, ShardedModel,
 			StagedGroupedModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a site navigation menu item model instance should use the {@link SiteNavigationMenuItem} interface instead.

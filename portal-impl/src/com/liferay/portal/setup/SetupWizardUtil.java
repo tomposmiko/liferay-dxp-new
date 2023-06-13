@@ -48,6 +48,7 @@ import java.sql.Connection;
 
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -81,7 +82,7 @@ public class SetupWizardUtil {
 
 			return defaultUser.getTimeZoneId();
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			return PropsValues.COMPANY_DEFAULT_TIME_ZONE;
 		}
 	}
@@ -188,6 +189,8 @@ public class SetupWizardUtil {
 
 		_updateAdminUser(
 			httpServletRequest, httpServletResponse, unicodeProperties);
+
+		_updateCompanyWebId(httpServletRequest, unicodeProperties);
 
 		HttpSession session = httpServletRequest.getSession();
 
@@ -421,6 +424,37 @@ public class SetupWizardUtil {
 		themeDisplay.setCompany(company);
 	}
 
+	private static void _updateCompanyWebId(
+			HttpServletRequest httpServletRequest,
+			UnicodeProperties unicodeProperties)
+		throws Exception {
+
+		String companyDefaultWebId = unicodeProperties.get(
+			PropsKeys.COMPANY_DEFAULT_WEB_ID);
+
+		if (Validator.isNull(companyDefaultWebId)) {
+			return;
+		}
+
+		Company company = CompanyLocalServiceUtil.getCompanyById(
+			PortalInstances.getDefaultCompanyId());
+
+		if (Objects.equals(companyDefaultWebId, company.getWebId())) {
+			return;
+		}
+
+		company.setWebId(companyDefaultWebId);
+		company.setMx(companyDefaultWebId);
+
+		company = CompanyLocalServiceUtil.updateCompany(company);
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		themeDisplay.setCompany(company);
+	}
+
 	private static boolean _writePropertiesFile(
 		UnicodeProperties unicodeProperties) {
 
@@ -436,8 +470,8 @@ public class SetupWizardUtil {
 				return true;
 			}
 		}
-		catch (IOException ioe) {
-			_log.error(ioe, ioe);
+		catch (IOException ioException) {
+			_log.error(ioException, ioException);
 		}
 
 		return false;

@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.rule.NewEnv;
 import com.liferay.portal.kernel.test.util.PropsTestUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.KeyValuePair;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -60,7 +61,6 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
@@ -515,14 +515,13 @@ public class SPIAgentSerializableTest {
 
 		// Unable to send
 
-		Map<String, Object> properties = new HashMap<>();
-
-		properties.put(
+		Map<String, Object> properties = HashMapBuilder.<String, Object>put(
 			PropsKeys.INTRABAND_MAILBOX_REAPER_THREAD_ENABLED,
-			Boolean.FALSE.toString());
-		properties.put(
+			Boolean.FALSE.toString()
+		).put(
 			PropsKeys.INTRABAND_MAILBOX_STORAGE_LIFE,
-			String.valueOf(Long.MAX_VALUE));
+			String.valueOf(Long.MAX_VALUE)
+		).build();
 
 		PropsTestUtil.setProps(properties);
 
@@ -547,8 +546,8 @@ public class SPIAgentSerializableTest {
 					return Datagram.createResponseDatagram(
 						datagram, ByteBuffer.wrap(data));
 				}
-				catch (Exception e) {
-					throw new RuntimeException(e);
+				catch (Exception exception) {
+					throw new RuntimeException(exception);
 				}
 			}
 
@@ -557,9 +556,9 @@ public class SPIAgentSerializableTest {
 		SPIAgentSerializable agentSerializable = new SPIAgentSerializable(
 			_SERVLET_CONTEXT_NAME);
 
-		IOException ioException = new IOException();
+		IOException ioException1 = new IOException();
 
-		mockIntraband.setIOException(ioException);
+		mockIntraband.setIOException(ioException1);
 
 		try {
 			agentSerializable.writeTo(
@@ -568,11 +567,11 @@ public class SPIAgentSerializableTest {
 
 			Assert.fail();
 		}
-		catch (IOException ioe) {
-			Throwable throwable = ioe.getCause();
+		catch (IOException ioException2) {
+			Throwable throwable = ioException2.getCause();
 
 			Assert.assertSame(MailboxException.class, throwable.getClass());
-			Assert.assertSame(ioException, throwable.getCause());
+			Assert.assertSame(ioException1, throwable.getCause());
 		}
 
 		// Successfully send
@@ -599,7 +598,7 @@ public class SPIAgentSerializableTest {
 
 			Assert.fail();
 		}
-		catch (EOFException eofe) {
+		catch (EOFException eofException) {
 		}
 
 		// No such receipt
@@ -614,10 +613,10 @@ public class SPIAgentSerializableTest {
 
 			Assert.fail();
 		}
-		catch (IllegalArgumentException iae) {
+		catch (IllegalArgumentException illegalArgumentException) {
 			Assert.assertEquals(
 				"No mail with receipt " + (actualReceipt + 1),
-				iae.getMessage());
+				illegalArgumentException.getMessage());
 		}
 
 		// Class not found
@@ -659,8 +658,8 @@ public class SPIAgentSerializableTest {
 
 			Assert.fail();
 		}
-		catch (IOException ioe) {
-			Throwable throwable = ioe.getCause();
+		catch (IOException ioException2) {
+			Throwable throwable = ioException2.getCause();
 
 			Assert.assertSame(
 				ClassNotFoundException.class, throwable.getClass());

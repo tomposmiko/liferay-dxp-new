@@ -27,6 +27,12 @@ components:
                         An additional name for the user. This can be used for a middle name.
                     readOnly: true
                     type: string
+                contentType:
+                    # @review
+                    description:
+                        The type of the content.
+                    readOnly: true
+                    type: string
                 familyName:
                     description:
                         The user's surname (last name).
@@ -142,16 +148,25 @@ components:
                     description:
                         The category's text description.
                     type: string
+                description_i18n:
+                    additionalProperties:
+                        type: string
+                    type: object
+                externalReferenceCode:
+                    type: string
                 id:
                     description:
                         The category's ID.
-                    format: int64
                     readOnly: true
-                    type: integer
+                    type: string
                 name:
                     description:
                         The category's name.
                     type: string
+                name_i18n:
+                    additionalProperties:
+                        type: string
+                    type: object
                 numberOfTaxonomyCategories:
                     description:
                         The number of times this category has been used in other assets.
@@ -228,6 +243,10 @@ components:
                     description:
                         The vocabulary's text description.
                     type: string
+                description_i18n:
+                    additionalProperties:
+                        type: string
+                    type: object
                 id:
                     description:
                         The vocabulary's ID.
@@ -238,6 +257,10 @@ components:
                     description:
                         The vocabulary's name.
                     type: string
+                name_i18n:
+                    additionalProperties:
+                        type: string
+                    type: object
                 numberOfTaxonomyCategories:
                     description:
                         The number of categories that directly depend on this vocabulary.
@@ -284,6 +307,7 @@ paths:
                 204:
                     content:
                         application/json: {}
+                        application/xml: {}
                     description:
                         ""
             tags: ["Keyword"]
@@ -511,8 +535,7 @@ paths:
                   name: parentTaxonomyCategoryId
                   required: true
                   schema:
-                      format: int64
-                      type: integer
+                      type: string
                 - in: query
                   name: filter
                   schema:
@@ -558,8 +581,7 @@ paths:
                   name: parentTaxonomyCategoryId
                   required: true
                   schema:
-                      format: int64
-                      type: integer
+                      type: string
             requestBody:
                 content:
                     application/json:
@@ -590,12 +612,12 @@ paths:
                   name: taxonomyCategoryId
                   required: true
                   schema:
-                      format: int64
-                      type: integer
+                      type: string
             responses:
                 204:
                     content:
                         application/json: {}
+                        application/xml: {}
                     description:
                         ""
             tags: ["TaxonomyCategory"]
@@ -608,8 +630,7 @@ paths:
                   name: taxonomyCategoryId
                   required: true
                   schema:
-                      format: int64
-                      type: integer
+                      type: string
             responses:
                 200:
                     content:
@@ -631,8 +652,7 @@ paths:
                   name: taxonomyCategoryId
                   required: true
                   schema:
-                      format: int64
-                      type: integer
+                      type: string
             requestBody:
                 content:
                     application/json:
@@ -663,8 +683,7 @@ paths:
                   name: taxonomyCategoryId
                   required: true
                   schema:
-                      format: int64
-                      type: integer
+                      type: string
             requestBody:
                 content:
                     application/json:
@@ -701,6 +720,7 @@ paths:
                 204:
                     content:
                         application/json: {}
+                        application/xml: {}
                     description:
                         ""
             tags: ["TaxonomyVocabulary"]

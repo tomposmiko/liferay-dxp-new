@@ -163,13 +163,13 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 
 			return hits;
 		}
-		catch (RuntimeException re) {
-			if (!handle(re)) {
+		catch (RuntimeException runtimeException) {
+			if (!handle(runtimeException)) {
 				if (_logExceptionsOnly) {
-					_log.error(re, re);
+					_log.error(runtimeException, runtimeException);
 				}
 				else {
-					throw re;
+					throw runtimeException;
 				}
 			}
 
@@ -213,13 +213,13 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 
 			return countSearchResponse.getCount();
 		}
-		catch (RuntimeException re) {
-			if (!handle(re)) {
+		catch (RuntimeException runtimeException) {
+			if (!handle(runtimeException)) {
 				if (_logExceptionsOnly) {
-					_log.error(re, re);
+					_log.error(runtimeException, runtimeException);
 				}
 				else {
-					throw re;
+					throw runtimeException;
 				}
 			}
 
@@ -282,6 +282,11 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 
 		searchSearchRequest.putAllFacets(searchContext.getFacets());
 
+		searchSearchRequest.setFetchSource(searchRequest.getFetchSource());
+		searchSearchRequest.setFetchSourceExcludes(
+			searchRequest.getFetchSourceExcludes());
+		searchSearchRequest.setFetchSourceIncludes(
+			searchRequest.getFetchSourceIncludes());
 		searchSearchRequest.setGroupBy(searchContext.getGroupBy());
 		searchSearchRequest.setGroupByRequests(
 			searchRequest.getGroupByRequests());
@@ -350,8 +355,8 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 		return searchRequestBuilder.build();
 	}
 
-	protected boolean handle(Exception e) {
-		Throwable throwable = e.getCause();
+	protected boolean handle(Exception exception) {
+		Throwable throwable = exception.getCause();
 
 		if (throwable == null) {
 			return false;
@@ -366,7 +371,8 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 		if (message.contains(
 				"Fielddata is disabled on text fields by default.")) {
 
-			_log.error("Unable to aggregate facet on a nonkeyword field", e);
+			_log.error(
+				"Unable to aggregate facet on a nonkeyword field", exception);
 
 			return true;
 		}

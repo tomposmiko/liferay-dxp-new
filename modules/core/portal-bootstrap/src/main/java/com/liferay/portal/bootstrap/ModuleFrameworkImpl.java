@@ -111,7 +111,6 @@ import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
 import org.osgi.framework.FrameworkEvent;
-import org.osgi.framework.FrameworkListener;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.framework.Version;
@@ -180,8 +179,8 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 			return null;
 		}
-		catch (IOException ioe) {
-			throw new PortalException(ioe);
+		catch (IOException ioException) {
+			throw new PortalException(ioException);
 		}
 	}
 
@@ -367,10 +366,10 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		try {
 			bundle.start(options);
 		}
-		catch (BundleException be) {
-			_log.error(be, be);
+		catch (BundleException bundleException) {
+			_log.error(bundleException, bundleException);
 
-			throw new PortalException(be);
+			throw new PortalException(bundleException);
 		}
 	}
 
@@ -454,10 +453,10 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		try {
 			bundle.stop(options);
 		}
-		catch (BundleException be) {
-			_log.error(be, be);
+		catch (BundleException bundleException) {
+			_log.error(bundleException, bundleException);
 
-			throw new PortalException(be);
+			throw new PortalException(bundleException);
 		}
 	}
 
@@ -517,8 +516,18 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		FrameworkStartLevel frameworkStartLevel = _framework.adapt(
 			FrameworkStartLevel.class);
 
+		DefaultNoticeableFuture<FrameworkEvent> defaultNoticeableFuture =
+			new DefaultNoticeableFuture<>();
+
 		frameworkStartLevel.setStartLevel(
-			PropsValues.MODULE_FRAMEWORK_BEGINNING_START_LEVEL);
+			PropsValues.MODULE_FRAMEWORK_BEGINNING_START_LEVEL,
+			frameworkEvent -> defaultNoticeableFuture.set(frameworkEvent));
+
+		FrameworkEvent frameworkEvent = defaultNoticeableFuture.get();
+
+		if (frameworkEvent.getType() != FrameworkEvent.STARTLEVEL_CHANGED) {
+			ReflectionUtil.throwException(frameworkEvent.getThrowable());
+		}
 	}
 
 	@Override
@@ -534,10 +543,10 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		try {
 			bundle.uninstall();
 		}
-		catch (BundleException be) {
-			_log.error(be, be);
+		catch (BundleException bundleException) {
+			_log.error(bundleException, bundleException);
 
-			throw new PortalException(be);
+			throw new PortalException(bundleException);
 		}
 	}
 
@@ -582,10 +591,10 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		try {
 			bundle.update(inputStream);
 		}
-		catch (BundleException be) {
-			_log.error(be, be);
+		catch (BundleException bundleException) {
+			_log.error(bundleException, bundleException);
 
-			throw new PortalException(be);
+			throw new PortalException(bundleException);
 		}
 	}
 
@@ -653,8 +662,8 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			try {
 				unsyncBufferedInputStream.reset();
 			}
-			catch (IOException ioe) {
-				throw new PortalException(ioe);
+			catch (IOException ioException) {
+				throw new PortalException(ioException);
 			}
 
 			if (bundle != null) {
@@ -667,10 +676,10 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		try {
 			return bundleContext.installBundle(location, inputStream);
 		}
-		catch (BundleException be) {
-			_log.error(be, be);
+		catch (BundleException bundleException) {
+			_log.error(bundleException, bundleException);
 
-			throw new PortalException(be);
+			throw new PortalException(bundleException);
 		}
 	}
 
@@ -681,9 +690,9 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			_log.debug("Building OSGi framework properties");
 		}
 
-		Map<String, String> properties = new HashMap<>();
-
 		// Release
+
+		Map<String, String> properties = new HashMap<>();
 
 		properties.put(
 			Constants.BUNDLE_DESCRIPTION, ReleaseInfo.getReleaseInfo());
@@ -706,6 +715,9 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		properties.put(
 			FrameworkPropsKeys.FELIX_FILEINSTALL_TMPDIR,
 			SystemProperties.get(SystemProperties.TMP_DIR));
+		properties.put(
+			FrameworkPropsKeys.FELIX_FILEINSTALL_WEB_START_LEVEL,
+			String.valueOf(PropsValues.MODULE_FRAMEWORK_WEB_START_LEVEL));
 
 		// Framework
 
@@ -843,7 +855,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 				@Override
 				public FileVisitResult postVisitDirectory(
-						Path dirPath, IOException ioe)
+						Path dirPath, IOException ioException)
 					throws IOException {
 
 					String name = dirPath.toString();
@@ -1021,8 +1033,8 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 			return manifest.getMainAttributes();
 		}
-		catch (IOException ioe) {
-			return ReflectionUtil.throwException(ioe);
+		catch (IOException ioException) {
+			return ReflectionUtil.throwException(ioException);
 		}
 	}
 
@@ -1101,8 +1113,8 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 			return null;
 		}
-		catch (Exception e) {
-			throw new PortalException(e);
+		catch (Exception exception) {
+			throw new PortalException(exception);
 		}
 	}
 
@@ -1188,15 +1200,28 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 				BundleStartLevel bundleStartLevel = bundle.adapt(
 					BundleStartLevel.class);
 
-				bundleStartLevel.setStartLevel(
-					PropsValues.MODULE_FRAMEWORK_DYNAMIC_INSTALL_START_LEVEL);
+				Dictionary<String, String> headers = bundle.getHeaders(
+					StringPool.BLANK);
+
+				String header = headers.get("Web-ContextPath");
+
+				if (header == null) {
+					bundleStartLevel.setStartLevel(
+						PropsValues.
+							MODULE_FRAMEWORK_DYNAMIC_INSTALL_START_LEVEL);
+				}
+				else {
+					bundleStartLevel.setStartLevel(
+						PropsValues.MODULE_FRAMEWORK_WEB_START_LEVEL);
+				}
 
 				if (!_isFragmentBundle(bundle)) {
 					bundle.start();
 				}
 			}
-			catch (BundleException be) {
-				_log.error("Unable to install bundle at " + location, be);
+			catch (BundleException bundleException) {
+				_log.error(
+					"Unable to install bundle at " + location, bundleException);
 			}
 		}
 	}
@@ -1277,8 +1302,8 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 			return bundle;
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
 			return null;
 		}
@@ -1329,19 +1354,12 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		FrameworkWiring frameworkWiring = _framework.adapt(
 			FrameworkWiring.class);
 
-		final DefaultNoticeableFuture<FrameworkEvent> defaultNoticeableFuture =
+		DefaultNoticeableFuture<FrameworkEvent> defaultNoticeableFuture =
 			new DefaultNoticeableFuture<>();
 
 		frameworkWiring.refreshBundles(
 			refreshBundles,
-			new FrameworkListener() {
-
-				@Override
-				public void frameworkEvent(FrameworkEvent frameworkEvent) {
-					defaultNoticeableFuture.set(frameworkEvent);
-				}
-
-			});
+			frameworkEvent -> defaultNoticeableFuture.set(frameworkEvent));
 
 		try {
 			FrameworkEvent frameworkEvent = defaultNoticeableFuture.get();
@@ -1377,10 +1395,10 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 				try {
 					bean = configurableApplicationContext.getBean(beanName);
 				}
-				catch (BeanIsAbstractException biae) {
+				catch (BeanIsAbstractException beanIsAbstractException) {
 				}
-				catch (Exception e) {
-					_log.error(e, e);
+				catch (Exception exception) {
+					_log.error(exception, exception);
 				}
 
 				if (bean != null) {
@@ -1545,7 +1563,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 			URI uri = new URI(location);
 
-			if (jarPaths.contains(
+			if (Files.exists(
 					Paths.get(
 						new URI(
 							uri.getScheme(), uri.getAuthority(), uri.getPath(),
@@ -1659,19 +1677,12 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		FrameworkStartLevel frameworkStartLevel = _framework.adapt(
 			FrameworkStartLevel.class);
 
-		final DefaultNoticeableFuture<FrameworkEvent> defaultNoticeableFuture =
+		DefaultNoticeableFuture<FrameworkEvent> defaultNoticeableFuture =
 			new DefaultNoticeableFuture<>();
 
 		frameworkStartLevel.setStartLevel(
 			PropsValues.MODULE_FRAMEWORK_BEGINNING_START_LEVEL,
-			new FrameworkListener() {
-
-				@Override
-				public void frameworkEvent(FrameworkEvent frameworkEvent) {
-					defaultNoticeableFuture.set(frameworkEvent);
-				}
-
-			});
+			frameworkEvent -> defaultNoticeableFuture.set(frameworkEvent));
 
 		FrameworkEvent frameworkEvent = defaultNoticeableFuture.get();
 
@@ -1721,11 +1732,11 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 				try {
 					future.get();
 				}
-				catch (ExecutionException ee) {
-					throwableCollector.collect(ee.getCause());
+				catch (ExecutionException executionException) {
+					throwableCollector.collect(executionException.getCause());
 				}
-				catch (InterruptedException ie) {
-					throwableCollector.collect(ie);
+				catch (InterruptedException interruptedException) {
+					throwableCollector.collect(interruptedException);
 				}
 			}
 		}
@@ -1815,24 +1826,39 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		FrameworkStartLevel frameworkStartLevel = _framework.adapt(
 			FrameworkStartLevel.class);
 
-		final DefaultNoticeableFuture<FrameworkEvent> defaultNoticeableFuture =
+		DefaultNoticeableFuture<FrameworkEvent> defaultNoticeableFuture =
 			new DefaultNoticeableFuture<>();
 
 		frameworkStartLevel.setStartLevel(
 			PropsValues.MODULE_FRAMEWORK_DYNAMIC_INSTALL_START_LEVEL,
-			new FrameworkListener() {
-
-				@Override
-				public void frameworkEvent(FrameworkEvent fe) {
-					defaultNoticeableFuture.set(fe);
-				}
-
-			});
+			frameworkEvent -> defaultNoticeableFuture.set(frameworkEvent));
 
 		FrameworkEvent frameworkEvent = defaultNoticeableFuture.get();
 
 		if (frameworkEvent.getType() == FrameworkEvent.ERROR) {
 			ReflectionUtil.throwException(frameworkEvent.getThrowable());
+		}
+
+		if (_log.isInfoEnabled()) {
+			_log.info("Started dynamic bundles");
+		}
+
+		DefaultNoticeableFuture<FrameworkEvent> webDefaultNoticeableFuture =
+			new DefaultNoticeableFuture<>();
+
+		if (_log.isInfoEnabled()) {
+			_log.info("Starting web bundles");
+		}
+
+		frameworkStartLevel.setStartLevel(
+			PropsValues.MODULE_FRAMEWORK_WEB_START_LEVEL,
+			webFrameworkEvent -> webDefaultNoticeableFuture.set(
+				webFrameworkEvent));
+
+		FrameworkEvent webFrameworkEvent = webDefaultNoticeableFuture.get();
+
+		if (webFrameworkEvent.getType() == FrameworkEvent.ERROR) {
+			ReflectionUtil.throwException(webFrameworkEvent.getThrowable());
 		}
 
 		if (dynamicBundleChecksums.isEmpty()) {
@@ -1855,9 +1881,10 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 						dynamicBundleChecksums,
 						currentBundle.getBundleContext());
 				}
-				catch (Exception e) {
+				catch (Exception exception) {
 					_log.error(
-						"Unable to register dynamic bundle checksums", e);
+						"Unable to register dynamic bundle checksums",
+						exception);
 				}
 			};
 
@@ -1874,7 +1901,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		}
 
 		if (_log.isInfoEnabled()) {
-			_log.info("Started dynamic bundles");
+			_log.info("Started web bundles");
 		}
 	}
 
@@ -1894,7 +1921,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			try {
 				serviceRegistration.unregister();
 			}
-			catch (IllegalStateException ise) {
+			catch (IllegalStateException illegalStateException) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(
 						"Service registration " + serviceRegistration +

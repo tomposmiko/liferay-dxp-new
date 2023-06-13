@@ -32,16 +32,10 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class WikiNodeLocalServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.wiki.service.impl.WikiNodeLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
-	 */
-
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link WikiNodeLocalServiceUtil} to access the wiki node local service. Add custom service methods to <code>com.liferay.wiki.service.impl.WikiNodeLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	public static com.liferay.wiki.model.WikiNode addDefaultNode(
 			long userId,
@@ -68,19 +62,6 @@ public class WikiNodeLocalServiceUtil {
 			nodeId, addGroupPermissions, addGuestPermissions);
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #addNodeResources(WikiNode, ModelPermissions)}
-	 */
-	@Deprecated
-	public static void addNodeResources(
-			long nodeId, String[] groupPermissions, String[] guestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		getService().addNodeResources(
-			nodeId, groupPermissions, guestPermissions);
-	}
-
 	public static void addNodeResources(
 			com.liferay.wiki.model.WikiNode node, boolean addGroupPermissions,
 			boolean addGuestPermissions)
@@ -97,19 +78,6 @@ public class WikiNodeLocalServiceUtil {
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		getService().addNodeResources(node, modelPermissions);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #addNodeResources(WikiNode, ModelPermissions)}
-	 */
-	@Deprecated
-	public static void addNodeResources(
-			com.liferay.wiki.model.WikiNode node, String[] groupPermissions,
-			String[] guestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		getService().addNodeResources(node, groupPermissions, guestPermissions);
 	}
 
 	/**

@@ -14,12 +14,15 @@
 
 package com.liferay.portal.template.soy.internal;
 
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.cache.SingleVMPool;
 import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.template.TemplateManager;
 import com.liferay.portal.kernel.template.TemplateResource;
+import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.template.BaseTemplateManager;
 import com.liferay.portal.template.TemplateContextHelper;
 import com.liferay.portal.template.soy.SoyTemplateResource;
@@ -27,6 +30,7 @@ import com.liferay.portal.template.soy.SoyTemplateResourceFactory;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.osgi.framework.Bundle;
@@ -47,6 +51,16 @@ import org.osgi.util.tracker.BundleTracker;
 )
 public class SoyManager extends BaseTemplateManager {
 
+	public void clearCache(String languageId) {
+		if (Validator.isNull(languageId)) {
+			_soyTofuCacheHandler.removeIfAny(new Locale(StringPool.BLANK));
+		}
+		else {
+			_soyTofuCacheHandler.removeIfAny(
+				LocaleUtil.fromLanguageId(languageId, true));
+		}
+	}
+
 	@Override
 	public void destroy() {
 		templateContextHelper.removeAllHelperUtilities();
@@ -55,14 +69,6 @@ public class SoyManager extends BaseTemplateManager {
 	@Override
 	public void destroy(ClassLoader classLoader) {
 		templateContextHelper.removeHelperUtilities(classLoader);
-	}
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), with no direct replacement
-	 */
-	@Deprecated
-	public List<TemplateResource> getAllTemplateResources() {
-		return _soyCapabilityBundleTrackerCustomizer.getAllTemplateResources();
 	}
 
 	@Override

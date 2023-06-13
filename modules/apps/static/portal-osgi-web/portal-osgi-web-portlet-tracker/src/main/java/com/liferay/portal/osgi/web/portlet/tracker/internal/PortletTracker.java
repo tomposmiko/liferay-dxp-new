@@ -50,6 +50,7 @@ import com.liferay.portal.kernel.service.ResourceActionLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -215,7 +216,7 @@ public class PortletTracker
 		try {
 			_bundleContext.ungetService(serviceReference);
 		}
-		catch (IllegalStateException ise) {
+		catch (IllegalStateException illegalStateException) {
 
 			// We still need to remove the service so we can ignore this and
 			// keep going
@@ -230,7 +231,12 @@ public class PortletTracker
 			PortletCategory portletCategory = (PortletCategory)WebAppPool.get(
 				company.getCompanyId(), WebKeys.PORTLET_CATEGORY);
 
-			portletCategory.separate(portletModel.getRootPortletId());
+			if (portletCategory == null) {
+				_log.error("Unable to get portlet category for " + company);
+			}
+			else {
+				portletCategory.separate(portletModel.getRootPortletId());
+			}
 		}
 
 		serviceRegistrations.removeServiceReference(serviceReference);
@@ -351,12 +357,12 @@ public class PortletTracker
 
 			return portletModel;
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			_log.error(
 				StringBundler.concat(
 					"Portlet ", portletId, " from ", bundle,
 					" failed to initialize"),
-				e);
+				exception);
 
 			return null;
 		}
@@ -398,7 +404,7 @@ public class PortletTracker
 
 				applicationTypes.add(applicationType);
 			}
-			catch (IllegalArgumentException iae) {
+			catch (IllegalArgumentException illegalArgumentException) {
 				_log.error("Application type " + applicationTypeValue);
 			}
 		}
@@ -883,11 +889,11 @@ public class PortletTracker
 		ServiceReference<Portlet> serviceReference,
 		com.liferay.portal.kernel.model.Portlet portletModel) {
 
-		Map<String, Set<String>> portletModes = new HashMap<>();
-
-		portletModes.put(
-			ContentTypes.TEXT_HTML,
-			SetUtil.fromArray(new String[] {toLowerCase(PortletMode.VIEW)}));
+		Map<String, Set<String>> portletModes =
+			HashMapBuilder.<String, Set<String>>put(
+				ContentTypes.TEXT_HTML,
+				SetUtil.fromArray(new String[] {toLowerCase(PortletMode.VIEW)})
+			).build();
 
 		List<String> portletModesStrings = StringPlus.asList(
 			serviceReference.getProperty("javax.portlet.portlet-mode"));
@@ -933,8 +939,8 @@ public class PortletTracker
 				try {
 					defaultPreferences = StringUtil.read(url.openStream());
 				}
-				catch (IOException ioe) {
-					_log.error(ioe, ioe);
+				catch (IOException ioException) {
+					_log.error(ioException, ioException);
 				}
 			}
 		}
@@ -1121,18 +1127,18 @@ public class PortletTracker
 		ServiceReference<Portlet> serviceReference,
 		com.liferay.portal.kernel.model.Portlet portletModel) {
 
-		Map<String, Set<String>> windowStates = new HashMap<>();
-
-		windowStates.put(
-			ContentTypes.TEXT_HTML,
-			SetUtil.fromArray(
-				new String[] {
-					toLowerCase(LiferayWindowState.EXCLUSIVE),
-					toLowerCase(LiferayWindowState.POP_UP),
-					toLowerCase(WindowState.MAXIMIZED),
-					toLowerCase(WindowState.MINIMIZED),
-					toLowerCase(WindowState.NORMAL)
-				}));
+		Map<String, Set<String>> windowStates =
+			HashMapBuilder.<String, Set<String>>put(
+				ContentTypes.TEXT_HTML,
+				SetUtil.fromArray(
+					new String[] {
+						toLowerCase(LiferayWindowState.EXCLUSIVE),
+						toLowerCase(LiferayWindowState.POP_UP),
+						toLowerCase(WindowState.MAXIMIZED),
+						toLowerCase(WindowState.MINIMIZED),
+						toLowerCase(WindowState.NORMAL)
+					})
+			).build();
 
 		List<String> windowStatesStrings = StringPlus.asList(
 			serviceReference.getProperty("javax.portlet.window-state"));
@@ -1295,8 +1301,8 @@ public class PortletTracker
 					properties.getProperty(
 						PropsKeys.RESOURCE_ACTIONS_CONFIGS)));
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 	}
 

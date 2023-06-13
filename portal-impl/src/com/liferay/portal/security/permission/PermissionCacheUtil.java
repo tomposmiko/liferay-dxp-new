@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.cache.PortalCacheHelperUtil;
 import com.liferay.portal.kernel.cache.PortalCacheManagerNames;
 import com.liferay.portal.kernel.cache.index.IndexEncoder;
 import com.liferay.portal.kernel.cache.index.PortalCacheIndexer;
+import com.liferay.portal.kernel.change.tracking.CTCollectionThreadLocal;
 import com.liferay.portal.kernel.cluster.ClusterExecutorUtil;
 import com.liferay.portal.kernel.cluster.ClusterInvokeThreadLocal;
 import com.liferay.portal.kernel.cluster.ClusterRequest;
@@ -28,7 +29,6 @@ import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
-import com.liferay.portal.kernel.security.permission.ResourceBlockIdsBag;
 import com.liferay.portal.kernel.security.permission.UserBag;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
@@ -55,13 +55,6 @@ public class PermissionCacheUtil {
 
 	public static final String PERMISSION_CHECKER_BAG_CACHE_NAME =
 		PermissionCacheUtil.class.getName() + "_PERMISSION_CHECKER_BAG";
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public static final String RESOURCE_BLOCK_IDS_BAG_CACHE_NAME =
-		PermissionCacheUtil.class.getName() + "_RESOURCE_BLOCK_IDS_BAG";
 
 	public static final String USER_BAG_CACHE_NAME =
 		PermissionCacheUtil.class.getName() + "_USER_BAG";
@@ -117,14 +110,6 @@ public class PermissionCacheUtil {
 		_userPrimaryKeyRolePortalCache.removeAll();
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public static void clearResourceBlockCache(
-		long companyId, long groupId, String name) {
-	}
-
 	public static void clearResourceCache() {
 		if (!ExportImportThreadLocal.isImportInProcess()) {
 			_permissionPortalCache.removeAll();
@@ -168,20 +153,14 @@ public class PermissionCacheUtil {
 		long groupId, String name, String primKey, long[] roleIds,
 		String actionId) {
 
+		if (!CTCollectionThreadLocal.isProductionMode()) {
+			return null;
+		}
+
 		PermissionKey permissionKey = new PermissionKey(
 			groupId, name, primKey, roleIds, actionId);
 
 		return _permissionPortalCache.get(permissionKey);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public static ResourceBlockIdsBag getResourceBlockIdsBag(
-		long companyId, long groupId, long userId, String name) {
-
-		return null;
 	}
 
 	public static UserBag getUserBag(long userId) {
@@ -231,16 +210,15 @@ public class PermissionCacheUtil {
 		long groupId, String name, String primKey, long[] roleIds,
 		String actionId, Boolean value) {
 
+		if (!CTCollectionThreadLocal.isProductionMode()) {
+			return;
+		}
+
 		PermissionKey permissionKey = new PermissionKey(
 			groupId, name, primKey, roleIds, actionId);
 
 		PortalCacheHelperUtil.putWithoutReplicator(
 			_permissionPortalCache, permissionKey, value);
-	}
-
-	public static void putResourceBlockIdsBag(
-		long companyId, long groupId, long userId, String name,
-		ResourceBlockIdsBag resourceBlockIdsBag) {
 	}
 
 	public static void putUserBag(long userId, UserBag userBag) {
@@ -295,14 +273,6 @@ public class PermissionCacheUtil {
 			groupId, name, primKey, roleIds, actionId);
 
 		_permissionPortalCache.remove(permissionKey);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public static void removeResourceBlockIdsBag(
-		long companyId, long groupId, long userId, String name) {
 	}
 
 	public static void removeUserBag(long userId) {

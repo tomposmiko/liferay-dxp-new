@@ -18,8 +18,7 @@
 
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 
-<%@ taglib uri="http://liferay.com/tld/asset" prefix="liferay-asset" %><%@
-taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
+<%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %><%@
 taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
 taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %><%@
 taglib uri="http://liferay.com/tld/social-activities" prefix="liferay-social-activities" %><%@
@@ -39,7 +38,6 @@ page import="com.liferay.contacts.util.ContactsExtensionsUtil" %><%@
 page import="com.liferay.contacts.util.ContactsUtil" %><%@
 page import="com.liferay.contacts.web.internal.constants.ContactsPortletKeys" %><%@
 page import="com.liferay.petra.string.CharPool" %><%@
-page import="com.liferay.petra.string.StringBundler" %><%@
 page import="com.liferay.petra.string.StringPool" %><%@
 page import="com.liferay.portal.kernel.dao.orm.QueryUtil" %><%@
 page import="com.liferay.portal.kernel.language.LanguageUtil" %><%@
@@ -50,9 +48,9 @@ page import="com.liferay.portal.kernel.model.Contact" %><%@
 page import="com.liferay.portal.kernel.model.EmailAddress" %><%@
 page import="com.liferay.portal.kernel.model.Group" %><%@
 page import="com.liferay.portal.kernel.model.GroupConstants" %><%@
+page import="com.liferay.portal.kernel.model.Layout" %><%@
 page import="com.liferay.portal.kernel.model.Phone" %><%@
 page import="com.liferay.portal.kernel.model.User" %><%@
-page import="com.liferay.portal.kernel.model.UserConstants" %><%@
 page import="com.liferay.portal.kernel.model.Website" %><%@
 page import="com.liferay.portal.kernel.portlet.LiferayPortletResponse" %><%@
 page import="com.liferay.portal.kernel.portlet.LiferayWindowState" %><%@
@@ -63,7 +61,6 @@ page import="com.liferay.portal.kernel.security.permission.ActionKeys" %><%@
 page import="com.liferay.portal.kernel.service.AddressServiceUtil" %><%@
 page import="com.liferay.portal.kernel.service.EmailAddressServiceUtil" %><%@
 page import="com.liferay.portal.kernel.service.GroupLocalServiceUtil" %><%@
-page import="com.liferay.portal.kernel.service.LayoutLocalServiceUtil" %><%@
 page import="com.liferay.portal.kernel.service.PhoneServiceUtil" %><%@
 page import="com.liferay.portal.kernel.service.UserLocalServiceUtil" %><%@
 page import="com.liferay.portal.kernel.service.WebsiteServiceUtil" %><%@
@@ -75,20 +72,16 @@ page import="com.liferay.portal.kernel.util.ParamUtil" %><%@
 page import="com.liferay.portal.kernel.util.PortalUtil" %><%@
 page import="com.liferay.portal.kernel.util.PortletKeys" %><%@
 page import="com.liferay.portal.kernel.util.PrefsParamUtil" %><%@
-page import="com.liferay.portal.kernel.util.PrefsPropsUtil" %><%@
-page import="com.liferay.portal.kernel.util.PropsKeys" %><%@
 page import="com.liferay.portal.kernel.util.StringUtil" %><%@
-page import="com.liferay.portal.kernel.util.TextFormatter" %><%@
 page import="com.liferay.portal.kernel.util.Validator" %><%@
 page import="com.liferay.portal.kernel.util.comparator.UserLastNameComparator" %><%@
 page import="com.liferay.portal.kernel.workflow.WorkflowConstants" %><%@
+page import="com.liferay.product.navigation.personal.menu.util.PersonalApplicationURLUtil" %><%@
 page import="com.liferay.social.kernel.model.SocialRelationConstants" %><%@
 page import="com.liferay.social.kernel.model.SocialRequestConstants" %><%@
 page import="com.liferay.social.kernel.service.SocialActivityLocalServiceUtil" %><%@
 page import="com.liferay.social.kernel.service.SocialRelationLocalServiceUtil" %><%@
-page import="com.liferay.social.kernel.service.SocialRequestLocalServiceUtil" %><%@
-page import="com.liferay.users.admin.configuration.UserFileUploadsConfiguration" %><%@
-page import="com.liferay.users.admin.kernel.util.UsersAdminUtil" %>
+page import="com.liferay.social.kernel.service.SocialRequestLocalServiceUtil" %>
 
 <%@ page import="java.util.ArrayList" %><%@
 page import="java.util.LinkedHashMap" %><%@
@@ -136,4 +129,8 @@ boolean showSocialNetwork = PrefsParamUtil.getBoolean(portletPreferences, reques
 boolean showTags = PrefsParamUtil.getBoolean(portletPreferences, request, "showTags", false);
 boolean showUsersInformation = PrefsParamUtil.getBoolean(portletPreferences, request, "showUsersInformation", true);
 boolean showWebsites = PrefsParamUtil.getBoolean(portletPreferences, request, "showWebsites", true);
+
+Group scopeGroup = themeDisplay.getScopeGroup();
+
+Layout embeddedPersonalApplicationLayout = PersonalApplicationURLUtil.getOrAddEmbeddedPersonalApplicationLayout(themeDisplay.getDefaultUser(), scopeGroup, layout.isPrivateLayout());
 %>

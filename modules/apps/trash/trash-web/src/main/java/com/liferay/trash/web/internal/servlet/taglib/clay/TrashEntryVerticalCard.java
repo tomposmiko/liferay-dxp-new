@@ -42,18 +42,19 @@ public class TrashEntryVerticalCard extends BaseVerticalCard {
 
 	public TrashEntryVerticalCard(
 		TrashEntry trashEntry, TrashRenderer trashRenderer,
-		RenderRequest renderRequest,
-		LiferayPortletResponse liferayPortletResponse, RowChecker rowChecker,
+		LiferayPortletResponse liferayPortletResponse,
+		RenderRequest renderRequest, RowChecker rowChecker,
 		String viewContentURL) {
 
 		super(trashEntry, renderRequest, rowChecker);
 
 		_trashEntry = trashEntry;
 		_trashRenderer = trashRenderer;
-		_liferayPortletRequest = PortalUtil.getLiferayPortletRequest(
-			renderRequest);
 		_liferayPortletResponse = liferayPortletResponse;
 		_viewContentURL = viewContentURL;
+
+		_liferayPortletRequest = PortalUtil.getLiferayPortletRequest(
+			renderRequest);
 	}
 
 	@Override
@@ -80,8 +81,8 @@ public class TrashEntryVerticalCard extends BaseVerticalCard {
 			return trashViewContentActionDropdownItemsProvider.
 				getActionDropdownItems();
 		}
-		catch (Exception e) {
-			_log.error("Unable to get trash entry actions", e);
+		catch (Exception exception) {
+			_log.error("Unable to get trash entry actions", exception);
 		}
 
 		return Collections.emptyList();
@@ -102,8 +103,9 @@ public class TrashEntryVerticalCard extends BaseVerticalCard {
 		try {
 			return _trashRenderer.getIconCssClass();
 		}
-		catch (PortalException pe) {
-			_log.error("Unable to get trash renderer icon css class", pe);
+		catch (PortalException portalException) {
+			_log.error(
+				"Unable to get trash renderer icon css class", portalException);
 		}
 
 		return "magic";

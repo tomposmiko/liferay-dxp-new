@@ -48,7 +48,7 @@ import org.osgi.annotation.versioning.ProviderType;
 )
 public interface KBFolderService extends BaseService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link KBFolderServiceUtil} to access the kb folder remote service. Add custom service methods to <code>com.liferay.knowledge.base.service.impl.KBFolderServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -112,17 +112,6 @@ public interface KBFolderService extends BaseService {
 	public String getOSGiServiceIdentifier();
 
 	public void moveKBFolder(long kbFolderId, long parentKBFolderId)
-		throws PortalException;
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #updateKBFolder(long, long, long, String, String,
-	 ServiceContext)}
-	 */
-	@Deprecated
-	public KBFolder updateKBFolder(
-			long parentResourceClassNameId, long parentResourcePrimKey,
-			long kbFolderId, String name, String description)
 		throws PortalException;
 
 	public KBFolder updateKBFolder(

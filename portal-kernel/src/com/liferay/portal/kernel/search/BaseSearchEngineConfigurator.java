@@ -15,9 +15,6 @@
 package com.liferay.portal.kernel.search;
 
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.concurrent.CallerRunsPolicy;
-import com.liferay.portal.kernel.concurrent.RejectedExecutionHandler;
-import com.liferay.portal.kernel.concurrent.ThreadPoolExecutor;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Destination;
@@ -32,6 +29,7 @@ import com.liferay.portal.kernel.search.messaging.BaseSearchEngineMessageListene
 import com.liferay.portal.kernel.search.messaging.SearchReaderMessageListener;
 import com.liferay.portal.kernel.search.messaging.SearchWriterMessageListener;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.PortalRunMode;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -44,11 +42,12 @@ import com.liferay.registry.dependency.ServiceDependencyListener;
 import com.liferay.registry.dependency.ServiceDependencyManager;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * @author Michael C. Han
@@ -172,7 +171,7 @@ public abstract class BaseSearchEngineConfigurator
 				_INDEX_SEARCH_WRITER_MAX_QUEUE_SIZE);
 
 			RejectedExecutionHandler rejectedExecutionHandler =
-				new CallerRunsPolicy() {
+				new ThreadPoolExecutor.CallerRunsPolicy() {
 
 					@Override
 					public void rejectedExecution(
@@ -259,7 +258,16 @@ public abstract class BaseSearchEngineConfigurator
 
 	protected abstract IndexWriter getIndexWriter();
 
-	protected abstract ClassLoader getOperatingClassloader();
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getOperatingClassLoader()}
+	 */
+	@Deprecated
+	protected ClassLoader getOperatingClassloader() {
+		return getOperatingClassLoader();
+	}
+
+	protected abstract ClassLoader getOperatingClassLoader();
 
 	protected abstract SearchEngineHelper getSearchEngineHelper();
 
@@ -404,7 +412,7 @@ public abstract class BaseSearchEngineConfigurator
 		baseSearchEngineMessageListener.setSearchEngineId(searchEngineId);
 
 		destination.register(
-			baseSearchEngineMessageListener, getOperatingClassloader());
+			baseSearchEngineMessageListener, getOperatingClassLoader());
 	}
 
 	protected void savePreviousSearchEngineListeners(
@@ -452,9 +460,9 @@ public abstract class BaseSearchEngineConfigurator
 	private void _registerSearchEngineDestination(
 		String searchEngineId, Destination destination) {
 
-		Map<String, Object> properties = new HashMap<>();
-
-		properties.put("destination.name", destination.getName());
+		Map<String, Object> properties = HashMapBuilder.<String, Object>put(
+			"destination.name", destination.getName()
+		).build();
 
 		Registry registry = RegistryUtil.getRegistry();
 

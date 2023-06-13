@@ -541,14 +541,12 @@ $section-header-bg: #cce6f7;
 		}
 
 		.lexicon-icon-pencil {
-			left: 100%;
 			position: absolute;
+			right: 5px;
 			top: 5px;
 		}
 
 		&:hover {
-			cursor: pointer;
-
 			.lexicon-icon-pencil {
 				display: block;
 			}
@@ -702,7 +700,7 @@ $section-header-bg: #cce6f7;
 	}
 }
 
-/* ---------- Extras ---------- */
+// ---------- Extras ----------
 
 .contacts-portlet {
 	.contacts-container .alert.alert-success {
@@ -714,7 +712,7 @@ $section-header-bg: #cce6f7;
 	}
 }
 
-/* ---------- Responsive ---------- */
+// ---------- Responsive ----------
 
 @include media-breakpoint-down(sm) {
 	.contacts-portlet {

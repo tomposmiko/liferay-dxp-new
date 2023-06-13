@@ -988,7 +988,7 @@ public abstract class BaseDocumentResourceTestCase {
 					{
 						put("page", 1);
 						put("pageSize", 2);
-						put("siteId", testGroup.getGroupId());
+						put("siteKey", "\"" + testGroup.getGroupId() + "\"");
 					}
 				},
 				graphQLFields.toArray(new GraphQLField[0])));
@@ -1291,7 +1291,7 @@ public abstract class BaseDocumentResourceTestCase {
 				"createSiteDocument",
 				new HashMap<String, Object>() {
 					{
-						put("siteId", testGroup.getGroupId());
+						put("siteKey", "\"" + testGroup.getGroupId() + "\"");
 						put("document", sb.toString());
 					}
 				},
@@ -1400,6 +1400,14 @@ public abstract class BaseDocumentResourceTestCase {
 
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
+
+			if (Objects.equals("actions", additionalAssertFieldName)) {
+				if (document.getActions() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
 
 			if (Objects.equals("adaptedImages", additionalAssertFieldName)) {
 				if (document.getAdaptedImages() == null) {
@@ -1592,6 +1600,14 @@ public abstract class BaseDocumentResourceTestCase {
 		for (String additionalAssertFieldName :
 				getAdditionalRatingAssertFieldNames()) {
 
+			if (Objects.equals("actions", additionalAssertFieldName)) {
+				if (rating.getActions() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("bestRating", additionalAssertFieldName)) {
 				if (rating.getBestRating() == null) {
 					valid = false;
@@ -1663,6 +1679,16 @@ public abstract class BaseDocumentResourceTestCase {
 
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
+
+			if (Objects.equals("actions", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						document1.getActions(), document2.getActions())) {
+
+					return false;
+				}
+
+				continue;
+			}
 
 			if (Objects.equals("adaptedImages", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
@@ -1895,6 +1921,16 @@ public abstract class BaseDocumentResourceTestCase {
 
 		for (String additionalAssertFieldName :
 				getAdditionalRatingAssertFieldNames()) {
+
+			if (Objects.equals("actions", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						rating1.getActions(), rating2.getActions())) {
+
+					return false;
+				}
+
+				continue;
+			}
 
 			if (Objects.equals("bestRating", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
@@ -2129,6 +2165,11 @@ public abstract class BaseDocumentResourceTestCase {
 		sb.append(" ");
 		sb.append(operator);
 		sb.append(" ");
+
+		if (entityFieldName.equals("actions")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
 
 		if (entityFieldName.equals("adaptedImages")) {
 			throw new IllegalArgumentException(

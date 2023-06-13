@@ -81,8 +81,8 @@ public class ViewUADHierarchyMVCRenderCommand implements MVCRenderCommand {
 					applicationKey, renderRequest, renderResponse, uadDisplay,
 					uadHierarchyDisplay));
 		}
-		catch (Exception e) {
-			throw new PortletException(e);
+		catch (Exception exception) {
+			throw new PortletException(exception);
 		}
 
 		return "/view_uad_hierarchy.jsp";
@@ -130,9 +130,8 @@ public class ViewUADHierarchyMVCRenderCommand implements MVCRenderCommand {
 		viewUADEntitiesDisplay.setScope(scope);
 		viewUADEntitiesDisplay.setSearchContainer(
 			_uadSearchContainerBuilder.getSearchContainer(
-				renderRequest,
 				_portal.getLiferayPortletResponse(renderResponse),
-				applicationKey,
+				renderRequest, applicationKey,
 				PortletURLUtil.getCurrent(renderRequest, renderResponse),
 				groupIds, uadDisplay.getTypeClass(),
 				ParamUtil.getLong(renderRequest, "parentContainerId"),

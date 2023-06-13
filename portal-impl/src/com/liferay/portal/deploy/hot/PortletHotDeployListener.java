@@ -39,6 +39,7 @@ import com.liferay.portal.kernel.servlet.FileTimestampUtil;
 import com.liferay.portal.kernel.servlet.PortletServlet;
 import com.liferay.portal.kernel.servlet.ServletContextPool;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
@@ -127,27 +128,18 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 			ResourceBundleUtil.getResourceBundleLoader(
 				portlet.getResourceBundle(), classLoader);
 
-		Map<String, Object> properties = new HashMap<>();
-
-		properties.put(
-			"resource.bundle.base.name", portlet.getResourceBundle());
-		properties.put("service.ranking", Integer.MIN_VALUE);
-		properties.put("servlet.context.name", portlet.getContextName());
+		Map<String, Object> properties = HashMapBuilder.<String, Object>put(
+			"resource.bundle.base.name", portlet.getResourceBundle()
+		).put(
+			"service.ranking", Integer.MIN_VALUE
+		).put(
+			"servlet.context.name", portlet.getContextName()
+		).build();
 
 		_resourceBundleLoaderServiceRegistrations.put(
 			portlet.getPortletId(),
 			registry.registerService(
 				ResourceBundleLoader.class, resourceBundleLoader, properties));
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	protected void destroyPortlet(Portlet portlet, Set<String> portletIds)
-		throws Exception {
-
-		_destroyPortlet(portlet, portletIds);
 	}
 
 	protected void doInvokeDeploy(HotDeployEvent hotDeployEvent)
@@ -190,8 +182,8 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 				}
 			}
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 
 		String servletContextName = servletContext.getServletContextName();
@@ -331,42 +323,6 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 		List<Portlet> portlets = _portlets.remove(servletContextName);
 
 		if (portlets == null) {
-			List<String> beanFilterNames =
-				(List<String>)servletContext.getAttribute(
-					WebKeys.BEAN_FILTER_NAMES);
-
-			if ((beanFilterNames != null) && _log.isInfoEnabled()) {
-				if (beanFilterNames.size() == 1) {
-					_log.info(
-						"1 bean filter for " + servletContextName +
-							" was unregistered");
-				}
-				else {
-					_log.info(
-						StringBundler.concat(
-							beanFilterNames.size(), " bean filters for ",
-							servletContextName, " were unregistered"));
-				}
-			}
-
-			List<String> beanPortletIds =
-				(List<String>)servletContext.getAttribute(
-					WebKeys.BEAN_PORTLET_IDS);
-
-			if ((beanPortletIds != null) && _log.isInfoEnabled()) {
-				if (beanPortletIds.size() == 1) {
-					_log.info(
-						"1 bean portlet for " + servletContextName +
-							" was unregistered");
-				}
-				else {
-					_log.info(
-						StringBundler.concat(
-							beanPortletIds.size(), " bean portlets for ",
-							servletContextName, " were unregistered"));
-				}
-			}
-
 			return;
 		}
 
@@ -503,7 +459,7 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 				ConfigurationFactoryUtil.getConfiguration(
 					classLoader, "portlet");
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
 				_log.debug("Unable to read portlet.properties");
 			}
@@ -545,7 +501,7 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 
 				context.unbind(_JNDI_JDBC_LIFERAY_POOL);
 			}
-			catch (NamingException ne) {
+			catch (NamingException namingException) {
 			}
 
 			try {
@@ -553,14 +509,14 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 
 				context.destroySubcontext(_JNDI_JDBC);
 			}
-			catch (NamingException ne) {
+			catch (NamingException namingException) {
 			}
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
 					"Unable to dynamically unbind the Liferay data source: " +
-						e.getMessage());
+						exception.getMessage());
 			}
 		}
 	}

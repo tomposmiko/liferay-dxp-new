@@ -188,6 +188,8 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 		TaxonomyCategory taxonomyCategory = randomTaxonomyCategory();
 
 		taxonomyCategory.setDescription(regex);
+		taxonomyCategory.setExternalReferenceCode(regex);
+		taxonomyCategory.setId(regex);
 		taxonomyCategory.setName(regex);
 
 		String json = TaxonomyCategorySerDes.toJSON(taxonomyCategory);
@@ -197,6 +199,8 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 		taxonomyCategory = TaxonomyCategorySerDes.toDTO(json);
 
 		Assert.assertEquals(regex, taxonomyCategory.getDescription());
+		Assert.assertEquals(regex, taxonomyCategory.getExternalReferenceCode());
+		Assert.assertEquals(regex, taxonomyCategory.getId());
 		Assert.assertEquals(regex, taxonomyCategory.getName());
 	}
 
@@ -211,9 +215,9 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 
 		Assert.assertEquals(0, page.getTotalCount());
 
-		Long parentTaxonomyCategoryId =
+		String parentTaxonomyCategoryId =
 			testGetTaxonomyCategoryTaxonomyCategoriesPage_getParentTaxonomyCategoryId();
-		Long irrelevantParentTaxonomyCategoryId =
+		String irrelevantParentTaxonomyCategoryId =
 			testGetTaxonomyCategoryTaxonomyCategoriesPage_getIrrelevantParentTaxonomyCategoryId();
 
 		if ((irrelevantParentTaxonomyCategoryId != null)) {
@@ -274,7 +278,7 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 			return;
 		}
 
-		Long parentTaxonomyCategoryId =
+		String parentTaxonomyCategoryId =
 			testGetTaxonomyCategoryTaxonomyCategoriesPage_getParentTaxonomyCategoryId();
 
 		TaxonomyCategory taxonomyCategory1 = randomTaxonomyCategory();
@@ -309,7 +313,7 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 			return;
 		}
 
-		Long parentTaxonomyCategoryId =
+		String parentTaxonomyCategoryId =
 			testGetTaxonomyCategoryTaxonomyCategoriesPage_getParentTaxonomyCategoryId();
 
 		TaxonomyCategory taxonomyCategory1 =
@@ -339,7 +343,7 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 	public void testGetTaxonomyCategoryTaxonomyCategoriesPageWithPagination()
 		throws Exception {
 
-		Long parentTaxonomyCategoryId =
+		String parentTaxonomyCategoryId =
 			testGetTaxonomyCategoryTaxonomyCategoriesPage_getParentTaxonomyCategoryId();
 
 		TaxonomyCategory taxonomyCategory1 =
@@ -461,7 +465,7 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 			return;
 		}
 
-		Long parentTaxonomyCategoryId =
+		String parentTaxonomyCategoryId =
 			testGetTaxonomyCategoryTaxonomyCategoriesPage_getParentTaxonomyCategoryId();
 
 		TaxonomyCategory taxonomyCategory1 = randomTaxonomyCategory();
@@ -505,7 +509,7 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 
 	protected TaxonomyCategory
 			testGetTaxonomyCategoryTaxonomyCategoriesPage_addTaxonomyCategory(
-				Long parentTaxonomyCategoryId,
+				String parentTaxonomyCategoryId,
 				TaxonomyCategory taxonomyCategory)
 		throws Exception {
 
@@ -513,7 +517,7 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 			parentTaxonomyCategoryId, taxonomyCategory);
 	}
 
-	protected Long
+	protected String
 			testGetTaxonomyCategoryTaxonomyCategoriesPage_getParentTaxonomyCategoryId()
 		throws Exception {
 
@@ -521,7 +525,7 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 			"This method needs to be implemented");
 	}
 
-	protected Long
+	protected String
 			testGetTaxonomyCategoryTaxonomyCategoriesPage_getIrrelevantParentTaxonomyCategoryId()
 		throws Exception {
 
@@ -566,7 +570,7 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 				taxonomyCategory.getId()));
 
 		assertHttpResponseStatusCode(
-			404, taxonomyCategoryResource.getTaxonomyCategoryHttpResponse(0L));
+			404, taxonomyCategoryResource.getTaxonomyCategoryHttpResponse("-"));
 	}
 
 	protected TaxonomyCategory testDeleteTaxonomyCategory_addTaxonomyCategory()
@@ -587,7 +591,9 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 				"deleteTaxonomyCategory",
 				new HashMap<String, Object>() {
 					{
-						put("taxonomyCategoryId", taxonomyCategory.getId());
+						put(
+							"taxonomyCategoryId",
+							"\"" + taxonomyCategory.getId() + "\"");
 					}
 				}));
 
@@ -609,7 +615,9 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 					"taxonomyCategory",
 					new HashMap<String, Object>() {
 						{
-							put("taxonomyCategoryId", taxonomyCategory.getId());
+							put(
+								"taxonomyCategoryId",
+								"\"" + taxonomyCategory.getId() + "\"");
 						}
 					},
 					new GraphQLField("id")));
@@ -656,7 +664,9 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 				"taxonomyCategory",
 				new HashMap<String, Object>() {
 					{
-						put("taxonomyCategoryId", taxonomyCategory.getId());
+						put(
+							"taxonomyCategoryId",
+							"\"" + taxonomyCategory.getId() + "\"");
 					}
 				},
 				graphQLFields.toArray(new GraphQLField[0])));
@@ -1215,8 +1225,34 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("description_i18n", additionalAssertFieldName)) {
+				if (taxonomyCategory.getDescription_i18n() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"externalReferenceCode", additionalAssertFieldName)) {
+
+				if (taxonomyCategory.getExternalReferenceCode() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("name", additionalAssertFieldName)) {
 				if (taxonomyCategory.getName() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("name_i18n", additionalAssertFieldName)) {
+				if (taxonomyCategory.getName_i18n() == null) {
 					valid = false;
 				}
 
@@ -1375,6 +1411,30 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("description_i18n", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						taxonomyCategory1.getDescription_i18n(),
+						taxonomyCategory2.getDescription_i18n())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"externalReferenceCode", additionalAssertFieldName)) {
+
+				if (!Objects.deepEquals(
+						taxonomyCategory1.getExternalReferenceCode(),
+						taxonomyCategory2.getExternalReferenceCode())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("id", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						taxonomyCategory1.getId(), taxonomyCategory2.getId())) {
@@ -1389,6 +1449,17 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 				if (!Objects.deepEquals(
 						taxonomyCategory1.getName(),
 						taxonomyCategory2.getName())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("name_i18n", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						taxonomyCategory1.getName_i18n(),
+						taxonomyCategory2.getName_i18n())) {
 
 					return false;
 				}
@@ -1469,9 +1540,20 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("externalReferenceCode", fieldName)) {
+				if (!Objects.deepEquals(
+						taxonomyCategory.getExternalReferenceCode(),
+						jsonObject.getString("externalReferenceCode"))) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("id", fieldName)) {
 				if (!Objects.deepEquals(
-						taxonomyCategory.getId(), jsonObject.getLong("id"))) {
+						taxonomyCategory.getId(), jsonObject.getString("id"))) {
 
 					return false;
 				}
@@ -1645,9 +1727,26 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 			return sb.toString();
 		}
 
-		if (entityFieldName.equals("id")) {
+		if (entityFieldName.equals("description_i18n")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("externalReferenceCode")) {
+			sb.append("'");
+			sb.append(
+				String.valueOf(taxonomyCategory.getExternalReferenceCode()));
+			sb.append("'");
+
+			return sb.toString();
+		}
+
+		if (entityFieldName.equals("id")) {
+			sb.append("'");
+			sb.append(String.valueOf(taxonomyCategory.getId()));
+			sb.append("'");
+
+			return sb.toString();
 		}
 
 		if (entityFieldName.equals("name")) {
@@ -1656,6 +1755,11 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 			sb.append("'");
 
 			return sb.toString();
+		}
+
+		if (entityFieldName.equals("name_i18n")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("numberOfTaxonomyCategories")) {
@@ -1705,7 +1809,8 @@ public abstract class BaseTaxonomyCategoryResourceTestCase {
 				dateCreated = RandomTestUtil.nextDate();
 				dateModified = RandomTestUtil.nextDate();
 				description = RandomTestUtil.randomString();
-				id = RandomTestUtil.randomLong();
+				externalReferenceCode = RandomTestUtil.randomString();
+				id = RandomTestUtil.randomString();
 				name = RandomTestUtil.randomString();
 				numberOfTaxonomyCategories = RandomTestUtil.randomInt();
 			}

@@ -43,7 +43,7 @@ public interface DLFileEntryModel
 	extends AttachedModel, BaseModel<DLFileEntry>, MVCCModel, ShardedModel,
 			StagedGroupedModel, TrashedModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a document library file entry model instance should use the {@link DLFileEntry} interface instead.
@@ -455,20 +455,6 @@ public interface DLFileEntryModel
 	 * @param size the size of this document library file entry
 	 */
 	public void setSize(long size);
-
-	/**
-	 * Returns the read count of this document library file entry.
-	 *
-	 * @return the read count of this document library file entry
-	 */
-	public int getReadCount();
-
-	/**
-	 * Sets the read count of this document library file entry.
-	 *
-	 * @param readCount the read count of this document library file entry
-	 */
-	public void setReadCount(int readCount);
 
 	/**
 	 * Returns the small image ID of this document library file entry.

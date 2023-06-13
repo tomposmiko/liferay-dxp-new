@@ -58,12 +58,12 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.xml.Element;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -138,11 +138,11 @@ public class DDMStructureStagedModelDataHandler
 	public Map<String, String> getReferenceAttributes(
 		PortletDataContext portletDataContext, DDMStructure structure) {
 
-		Map<String, String> referenceAttributes = new HashMap<>();
-
-		referenceAttributes.put(
-			"referenced-class-name", structure.getClassName());
-		referenceAttributes.put("structure-key", structure.getStructureKey());
+		Map<String, String> referenceAttributes = HashMapBuilder.put(
+			"referenced-class-name", structure.getClassName()
+		).put(
+			"structure-key", structure.getStructureKey()
+		).build();
 
 		long defaultUserId = 0;
 
@@ -150,7 +150,7 @@ public class DDMStructureStagedModelDataHandler
 			defaultUserId = _userLocalService.getDefaultUserId(
 				structure.getCompanyId());
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			return referenceAttributes;
 		}
 
@@ -588,7 +588,7 @@ public class DDMStructureStagedModelDataHandler
 
 			return jsonArray.getLong(0);
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			return GetterUtil.getLong(value);
 		}
 	}
@@ -713,8 +713,8 @@ public class DDMStructureStagedModelDataHandler
 					structure.getStructureId(),
 					DDMStructureConstants.VERSION_DEFAULT);
 		}
-		catch (PortalException pe) {
-			_log.error(pe, pe);
+		catch (PortalException portalException) {
+			_log.error(portalException, portalException);
 		}
 
 		if ((ddmStructureVersion != null) &&

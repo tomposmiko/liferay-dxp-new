@@ -14,11 +14,11 @@
 
 package com.liferay.external.data.source.test.model;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.portal.kernel.annotation.ImplementationClassName;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.util.Accessor;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * The extended model interface for the TestEntity service. Represents a row in the &quot;TestEntity&quot; database table, with each column mapped to a property of this class.
@@ -33,7 +33,7 @@ import com.liferay.portal.kernel.util.Accessor;
 @ProviderType
 public interface TestEntity extends PersistedModel, TestEntityModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.external.data.source.test.model.impl.TestEntityImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

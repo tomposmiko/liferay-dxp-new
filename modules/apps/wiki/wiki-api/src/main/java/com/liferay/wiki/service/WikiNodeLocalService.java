@@ -63,7 +63,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface WikiNodeLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link WikiNodeLocalServiceUtil} to access the wiki node local service. Add custom service methods to <code>com.liferay.wiki.service.impl.WikiNodeLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -82,15 +82,6 @@ public interface WikiNodeLocalService
 			boolean addGuestPermissions)
 		throws PortalException;
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #addNodeResources(WikiNode, ModelPermissions)}
-	 */
-	@Deprecated
-	public void addNodeResources(
-			long nodeId, String[] groupPermissions, String[] guestPermissions)
-		throws PortalException;
-
 	public void addNodeResources(
 			WikiNode node, boolean addGroupPermissions,
 			boolean addGuestPermissions)
@@ -98,15 +89,6 @@ public interface WikiNodeLocalService
 
 	public void addNodeResources(
 			WikiNode node, ModelPermissions modelPermissions)
-		throws PortalException;
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #addNodeResources(WikiNode, ModelPermissions)}
-	 */
-	@Deprecated
-	public void addNodeResources(
-			WikiNode node, String[] groupPermissions, String[] guestPermissions)
 		throws PortalException;
 
 	/**

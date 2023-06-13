@@ -174,11 +174,6 @@ public class ServiceComponentWrapper
 		return model.getTablesSQL();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a service component model instance should use the <code>ServiceComponent</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

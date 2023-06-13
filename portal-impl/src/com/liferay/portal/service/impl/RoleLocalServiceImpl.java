@@ -61,6 +61,7 @@ import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -158,7 +159,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 		role.setSubtype(subtype);
 		role.setExpandoBridgeAttributes(serviceContext);
 
-		rolePersistence.update(role);
+		role = rolePersistence.update(role);
 
 		// Resources
 
@@ -280,7 +281,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 		try {
 			roles = roleFinder.findBySystem(companyId);
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 
 			// LPS-34324
 
@@ -303,14 +304,15 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 		String[] systemRoles = PortalUtil.getSystemRoles();
 
 		for (String name : systemRoles) {
-			String key =
-				"system.role." +
-					StringUtil.replace(name, CharPool.SPACE, CharPool.PERIOD) +
-						".description";
-
-			Map<Locale, String> descriptionMap = new HashMap<>();
-
-			descriptionMap.put(LocaleUtil.getDefault(), PropsUtil.get(key));
+			Map<Locale, String> descriptionMap = HashMapBuilder.put(
+				LocaleUtil.getDefault(),
+				PropsUtil.get(
+					StringBundler.concat(
+						"system.role.",
+						StringUtil.replace(
+							name, CharPool.SPACE, CharPool.PERIOD),
+						".description"))
+			).build();
 
 			int type = RoleConstants.TYPE_REGULAR;
 
@@ -323,14 +325,15 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 			PortalUtil.getSystemOrganizationRoles();
 
 		for (String name : systemOrganizationRoles) {
-			String key =
-				"system.organization.role." +
-					StringUtil.replace(name, CharPool.SPACE, CharPool.PERIOD) +
-						".description";
-
-			Map<Locale, String> descriptionMap = new HashMap<>();
-
-			descriptionMap.put(LocaleUtil.getDefault(), PropsUtil.get(key));
+			Map<Locale, String> descriptionMap = HashMapBuilder.put(
+				LocaleUtil.getDefault(),
+				PropsUtil.get(
+					StringBundler.concat(
+						"system.organization.role.",
+						StringUtil.replace(
+							name, CharPool.SPACE, CharPool.PERIOD),
+						".description"))
+			).build();
 
 			int type = RoleConstants.TYPE_ORGANIZATION;
 
@@ -342,14 +345,15 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 		String[] systemSiteRoles = PortalUtil.getSystemSiteRoles();
 
 		for (String name : systemSiteRoles) {
-			String key =
-				"system.site.role." +
-					StringUtil.replace(name, CharPool.SPACE, CharPool.PERIOD) +
-						".description";
-
-			Map<Locale, String> descriptionMap = new HashMap<>();
-
-			descriptionMap.put(LocaleUtil.getDefault(), PropsUtil.get(key));
+			Map<Locale, String> descriptionMap = HashMapBuilder.put(
+				LocaleUtil.getDefault(),
+				PropsUtil.get(
+					StringBundler.concat(
+						"system.site.role.",
+						StringUtil.replace(
+							name, CharPool.SPACE, CharPool.PERIOD),
+						".description"))
+			).build();
 
 			int type = RoleConstants.TYPE_SITE;
 
@@ -754,17 +758,6 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	}
 
 	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public List<Role> getResourceBlockRoles(
-		long resourceBlockId, String className, String actionId) {
-
-		return roleFinder.findByR_N_A(resourceBlockId, className, actionId);
-	}
-
-	/**
 	 * Returns a map of role names to associated action IDs for the named
 	 * resource in the company within the permission scope.
 	 *
@@ -864,6 +857,14 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	@Override
 	public List<Role> getRoles(long companyId, int[] types) {
 		return rolePersistence.findByC_T(companyId, types);
+	}
+
+	@Override
+	public List<Role> getRoles(
+		long companyId, long classNameId, long[] classPKs, int type) {
+
+		return rolePersistence.findByC_C_C_T(
+			companyId, classNameId, classPKs, type);
 	}
 
 	/**
@@ -1546,9 +1547,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 		role.setSubtype(subtype);
 		role.setExpandoBridgeAttributes(serviceContext);
 
-		rolePersistence.update(role);
-
-		return role;
+		return rolePersistence.update(role);
 	}
 
 	protected void checkSystemRole(
@@ -1573,12 +1572,12 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 				roleLocalService.updateRole(role);
 			}
 		}
-		catch (NoSuchRoleException nsre) {
+		catch (NoSuchRoleException noSuchRoleException) {
 
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(nsre, nsre);
+				_log.debug(noSuchRoleException, noSuchRoleException);
 			}
 
 			User user = userLocalService.getDefaultUser(companyId);
@@ -1747,12 +1746,12 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 				throw new DuplicateRoleException("{roleId=" + roleId + "}");
 			}
 		}
-		catch (NoSuchRoleException nsre) {
+		catch (NoSuchRoleException noSuchRoleException) {
 
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(nsre, nsre);
+				_log.debug(noSuchRoleException, noSuchRoleException);
 			}
 		}
 

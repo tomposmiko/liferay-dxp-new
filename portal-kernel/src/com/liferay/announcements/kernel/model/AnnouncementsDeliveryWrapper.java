@@ -43,6 +43,7 @@ public class AnnouncementsDeliveryWrapper
 	public Map<String, Object> getModelAttributes() {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
+		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put("deliveryId", getDeliveryId());
 		attributes.put("companyId", getCompanyId());
 		attributes.put("userId", getUserId());
@@ -56,6 +57,12 @@ public class AnnouncementsDeliveryWrapper
 
 	@Override
 	public void setModelAttributes(Map<String, Object> attributes) {
+		Long mvccVersion = (Long)attributes.get("mvccVersion");
+
+		if (mvccVersion != null) {
+			setMvccVersion(mvccVersion);
+		}
+
 		Long deliveryId = (Long)attributes.get("deliveryId");
 
 		if (deliveryId != null) {
@@ -127,6 +134,16 @@ public class AnnouncementsDeliveryWrapper
 	@Override
 	public boolean getEmail() {
 		return model.getEmail();
+	}
+
+	/**
+	 * Returns the mvcc version of this announcements delivery.
+	 *
+	 * @return the mvcc version of this announcements delivery
+	 */
+	@Override
+	public long getMvccVersion() {
+		return model.getMvccVersion();
 	}
 
 	/**
@@ -219,11 +236,6 @@ public class AnnouncementsDeliveryWrapper
 		return model.isWebsite();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a announcements delivery model instance should use the <code>AnnouncementsDelivery</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();
@@ -257,6 +269,16 @@ public class AnnouncementsDeliveryWrapper
 	@Override
 	public void setEmail(boolean email) {
 		model.setEmail(email);
+	}
+
+	/**
+	 * Sets the mvcc version of this announcements delivery.
+	 *
+	 * @param mvccVersion the mvcc version of this announcements delivery
+	 */
+	@Override
+	public void setMvccVersion(long mvccVersion) {
+		model.setMvccVersion(mvccVersion);
 	}
 
 	/**

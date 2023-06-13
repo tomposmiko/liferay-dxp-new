@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.template.TemplateException;
 import com.liferay.portal.kernel.template.TemplateResource;
 import com.liferay.portal.kernel.template.TemplateResourceCache;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.template.TemplateContextHelper;
 
 import freemarker.cache.TemplateCache;
@@ -36,7 +37,6 @@ import java.io.Reader;
 import java.io.StringReader;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -164,8 +164,8 @@ public class FreeMarkerTemplateTest {
 
 			Assert.fail();
 		}
-		catch (TemplateException te) {
-			String message = te.getMessage();
+		catch (TemplateException templateException) {
+			String message = templateException.getMessage();
 
 			Assert.assertTrue(message, message.contains(_WRONG_TEMPLATE_ID));
 		}
@@ -248,8 +248,8 @@ public class FreeMarkerTemplateTest {
 
 			Assert.fail();
 		}
-		catch (TemplateException te) {
-			String message = te.getMessage();
+		catch (TemplateException templateException) {
+			String message = templateException.getMessage();
 
 			Assert.assertTrue(
 				message, message.contains(_WRONG_ERROR_TEMPLATE_ID));
@@ -279,9 +279,9 @@ public class FreeMarkerTemplateTest {
 
 	@Test
 	public void testProcessTemplate8() throws Exception {
-		Map<String, Object> context = new HashMap<>();
-
-		context.put(_TEST_KEY, _TEST_VALUE);
+		Map<String, Object> context = HashMapBuilder.<String, Object>put(
+			_TEST_KEY, _TEST_VALUE
+		).build();
 
 		Template template = new FreeMarkerTemplate(
 			new MockTemplateResource(_TEMPLATE_FILE_NAME), context,

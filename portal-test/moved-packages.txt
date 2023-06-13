@@ -1,2 +1,0 @@
-com.liferay.portlet.ratings.test
-com.liferay.portlet.ratings.util.test

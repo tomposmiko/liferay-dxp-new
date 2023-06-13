@@ -20,6 +20,7 @@ import com.liferay.oauth2.provider.model.OAuth2ScopeGrant;
 import com.liferay.oauth2.provider.service.base.OAuth2AuthorizationLocalServiceBaseImpl;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.util.OrderByComparator;
 
 import java.util.Collection;
@@ -100,14 +101,6 @@ public class OAuth2AuthorizationLocalServiceImpl
 			long oAuth2AuthorizationId)
 		throws PortalException {
 
-		Collection<OAuth2ScopeGrant> oAuth2ScopeGrants =
-			oAuth2AuthorizationLocalService.getOAuth2ScopeGrants(
-				oAuth2AuthorizationId);
-
-		for (OAuth2ScopeGrant oAuth2ScopeGrant : oAuth2ScopeGrants) {
-			oAuth2ScopeGrantPersistence.remove(oAuth2ScopeGrant);
-		}
-
 		return oAuth2AuthorizationPersistence.remove(oAuth2AuthorizationId);
 	}
 
@@ -117,6 +110,7 @@ public class OAuth2AuthorizationLocalServiceImpl
 
 		List<OAuth2Authorization> oAuth2Authorizations =
 			oAuth2AuthorizationPersistence.findByAccessTokenContentHash(
+				CompanyThreadLocal.getCompanyId(),
 				accessTokenContent.hashCode());
 
 		for (OAuth2Authorization oAuth2Authorization : oAuth2Authorizations) {
@@ -136,6 +130,7 @@ public class OAuth2AuthorizationLocalServiceImpl
 
 		List<OAuth2Authorization> oAuth2Authorizations =
 			oAuth2AuthorizationPersistence.findByRefreshTokenContentHash(
+				CompanyThreadLocal.getCompanyId(),
 				refreshTokenContent.hashCode());
 
 		for (OAuth2Authorization oAuth2Authorization : oAuth2Authorizations) {

@@ -32,7 +32,7 @@ import com.liferay.asset.auto.tagger.service.AssetAutoTaggerEntryLocalServiceUti
 public abstract class AssetAutoTaggerEntryBaseImpl
 	extends AssetAutoTaggerEntryModelImpl implements AssetAutoTaggerEntry {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a asset auto tagger entry model instance should use the <code>AssetAutoTaggerEntry</code> interface instead.

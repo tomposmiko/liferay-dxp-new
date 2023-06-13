@@ -116,8 +116,8 @@ public class ExtRepositoryFileEntryAdapter
 
 			return extRepositoryFileVersionAdapters.get(0);
 		}
-		catch (PortalException pe) {
-			throw new SystemException(pe);
+		catch (PortalException portalException) {
+			throw new SystemException(portalException);
 		}
 	}
 
@@ -151,8 +151,8 @@ public class ExtRepositoryFileEntryAdapter
 			try {
 				return (List)_getExtRepositoryFileVersionAdapters();
 			}
-			catch (PortalException pe) {
-				throw new SystemException(pe);
+			catch (PortalException portalException) {
+				throw new SystemException(portalException);
 			}
 		}
 		else {
@@ -174,8 +174,8 @@ public class ExtRepositoryFileEntryAdapter
 		try {
 			parentFolder = getParentFolder();
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 
 		return parentFolder;
@@ -249,22 +249,22 @@ public class ExtRepositoryFileEntryAdapter
 		try {
 			fileVersion = getFileVersion(version);
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
 					StringBundler.concat(
 						"Unable to obtain version ", version, " for external ",
 						"repository file entry ", getTitle()),
-					pe);
+					portalException);
 			}
 		}
-		catch (SystemException se) {
+		catch (SystemException systemException) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
 					StringBundler.concat(
 						"Unable to obtain version ", version, " for external ",
 						"repository file entry ", getTitle()),
-					se);
+					systemException);
 			}
 		}
 
@@ -290,7 +290,7 @@ public class ExtRepositoryFileEntryAdapter
 	}
 
 	@Override
-	public int getReadCount() {
+	public long getReadCount() {
 		return 0;
 	}
 
@@ -324,24 +324,9 @@ public class ExtRepositoryFileEntryAdapter
 
 			return fileVersion.getVersion();
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			return null;
 		}
-	}
-
-	@Override
-	public long getVersionUserId() {
-		return getUserId();
-	}
-
-	@Override
-	public String getVersionUserName() {
-		return getUserName();
-	}
-
-	@Override
-	public String getVersionUserUuid() {
-		return getUserUuid();
 	}
 
 	@Override

@@ -15,6 +15,7 @@
 package com.liferay.portal.service.persistence.impl;
 
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
@@ -29,6 +30,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.PortletPreferences;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.persistence.PortletPreferencesPersistence;
+import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelperUtil;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
@@ -40,9 +42,16 @@ import java.io.Serializable;
 
 import java.lang.reflect.InvocationHandler;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * The persistence implementation for the portlet preferences service.
@@ -58,7 +67,7 @@ public class PortletPreferencesPersistenceImpl
 	extends BasePersistenceImpl<PortletPreferences>
 	implements PortletPreferencesPersistence {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>PortletPreferencesUtil</code> to access the portlet preferences persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
@@ -151,25 +160,28 @@ public class PortletPreferencesPersistenceImpl
 		OrderByComparator<PortletPreferences> orderByComparator,
 		boolean useFinderCache) {
 
+		boolean productionMode = CTPersistenceHelperUtil.isProductionMode(
+			PortletPreferences.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			if (useFinderCache) {
+			if (useFinderCache && productionMode) {
 				finderPath = _finderPathWithoutPaginationFindByOwnerId;
 				finderArgs = new Object[] {ownerId};
 			}
 		}
-		else if (useFinderCache) {
+		else if (useFinderCache && productionMode) {
 			finderPath = _finderPathWithPaginationFindByOwnerId;
 			finderArgs = new Object[] {ownerId, start, end, orderByComparator};
 		}
 
 		List<PortletPreferences> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<PortletPreferences>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 
@@ -225,16 +237,16 @@ public class PortletPreferencesPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					FinderCacheUtil.putResult(finderPath, finderArgs, list);
 				}
 			}
-			catch (Exception e) {
-				if (useFinderCache) {
+			catch (Exception exception) {
+				if (useFinderCache && productionMode) {
 					FinderCacheUtil.removeResult(finderPath, finderArgs);
 				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -393,8 +405,8 @@ public class PortletPreferencesPersistenceImpl
 
 			return array;
 		}
-		catch (Exception e) {
-			throw processException(e);
+		catch (Exception exception) {
+			throw processException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -534,12 +546,22 @@ public class PortletPreferencesPersistenceImpl
 	 */
 	@Override
 	public int countByOwnerId(long ownerId) {
-		FinderPath finderPath = _finderPathCountByOwnerId;
+		boolean productionMode = CTPersistenceHelperUtil.isProductionMode(
+			PortletPreferences.class);
 
-		Object[] finderArgs = new Object[] {ownerId};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathCountByOwnerId;
+
+			finderArgs = new Object[] {ownerId};
+
+			count = (Long)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
+		}
 
 		if (count == null) {
 			StringBundler query = new StringBundler(2);
@@ -563,12 +585,16 @@ public class PortletPreferencesPersistenceImpl
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, count);
+				}
 			}
-			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+			catch (Exception exception) {
+				if (productionMode) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -654,25 +680,28 @@ public class PortletPreferencesPersistenceImpl
 		OrderByComparator<PortletPreferences> orderByComparator,
 		boolean useFinderCache) {
 
+		boolean productionMode = CTPersistenceHelperUtil.isProductionMode(
+			PortletPreferences.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			if (useFinderCache) {
+			if (useFinderCache && productionMode) {
 				finderPath = _finderPathWithoutPaginationFindByPlid;
 				finderArgs = new Object[] {plid};
 			}
 		}
-		else if (useFinderCache) {
+		else if (useFinderCache && productionMode) {
 			finderPath = _finderPathWithPaginationFindByPlid;
 			finderArgs = new Object[] {plid, start, end, orderByComparator};
 		}
 
 		List<PortletPreferences> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<PortletPreferences>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 
@@ -728,16 +757,16 @@ public class PortletPreferencesPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					FinderCacheUtil.putResult(finderPath, finderArgs, list);
 				}
 			}
-			catch (Exception e) {
-				if (useFinderCache) {
+			catch (Exception exception) {
+				if (useFinderCache && productionMode) {
 					FinderCacheUtil.removeResult(finderPath, finderArgs);
 				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -894,8 +923,8 @@ public class PortletPreferencesPersistenceImpl
 
 			return array;
 		}
-		catch (Exception e) {
-			throw processException(e);
+		catch (Exception exception) {
+			throw processException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -1034,12 +1063,22 @@ public class PortletPreferencesPersistenceImpl
 	 */
 	@Override
 	public int countByPlid(long plid) {
-		FinderPath finderPath = _finderPathCountByPlid;
+		boolean productionMode = CTPersistenceHelperUtil.isProductionMode(
+			PortletPreferences.class);
 
-		Object[] finderArgs = new Object[] {plid};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathCountByPlid;
+
+			finderArgs = new Object[] {plid};
+
+			count = (Long)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
+		}
 
 		if (count == null) {
 			StringBundler query = new StringBundler(2);
@@ -1063,12 +1102,16 @@ public class PortletPreferencesPersistenceImpl
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, count);
+				}
 			}
-			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+			catch (Exception exception) {
+				if (productionMode) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -1159,18 +1202,21 @@ public class PortletPreferencesPersistenceImpl
 
 		portletId = Objects.toString(portletId, "");
 
+		boolean productionMode = CTPersistenceHelperUtil.isProductionMode(
+			PortletPreferences.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			if (useFinderCache) {
+			if (useFinderCache && productionMode) {
 				finderPath = _finderPathWithoutPaginationFindByPortletId;
 				finderArgs = new Object[] {portletId};
 			}
 		}
-		else if (useFinderCache) {
+		else if (useFinderCache && productionMode) {
 			finderPath = _finderPathWithPaginationFindByPortletId;
 			finderArgs = new Object[] {
 				portletId, start, end, orderByComparator
@@ -1179,7 +1225,7 @@ public class PortletPreferencesPersistenceImpl
 
 		List<PortletPreferences> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<PortletPreferences>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 
@@ -1246,16 +1292,16 @@ public class PortletPreferencesPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					FinderCacheUtil.putResult(finderPath, finderArgs, list);
 				}
 			}
-			catch (Exception e) {
-				if (useFinderCache) {
+			catch (Exception exception) {
+				if (useFinderCache && productionMode) {
 					FinderCacheUtil.removeResult(finderPath, finderArgs);
 				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -1420,8 +1466,8 @@ public class PortletPreferencesPersistenceImpl
 
 			return array;
 		}
-		catch (Exception e) {
-			throw processException(e);
+		catch (Exception exception) {
+			throw processException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -1575,12 +1621,22 @@ public class PortletPreferencesPersistenceImpl
 	public int countByPortletId(String portletId) {
 		portletId = Objects.toString(portletId, "");
 
-		FinderPath finderPath = _finderPathCountByPortletId;
+		boolean productionMode = CTPersistenceHelperUtil.isProductionMode(
+			PortletPreferences.class);
 
-		Object[] finderArgs = new Object[] {portletId};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathCountByPortletId;
+
+			finderArgs = new Object[] {portletId};
+
+			count = (Long)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
+		}
 
 		if (count == null) {
 			StringBundler query = new StringBundler(2);
@@ -1615,12 +1671,16 @@ public class PortletPreferencesPersistenceImpl
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, count);
+				}
 			}
-			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+			catch (Exception exception) {
+				if (productionMode) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -1719,18 +1779,21 @@ public class PortletPreferencesPersistenceImpl
 
 		portletId = Objects.toString(portletId, "");
 
+		boolean productionMode = CTPersistenceHelperUtil.isProductionMode(
+			PortletPreferences.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			if (useFinderCache) {
+			if (useFinderCache && productionMode) {
 				finderPath = _finderPathWithoutPaginationFindByO_P;
 				finderArgs = new Object[] {ownerType, portletId};
 			}
 		}
-		else if (useFinderCache) {
+		else if (useFinderCache && productionMode) {
 			finderPath = _finderPathWithPaginationFindByO_P;
 			finderArgs = new Object[] {
 				ownerType, portletId, start, end, orderByComparator
@@ -1739,7 +1802,7 @@ public class PortletPreferencesPersistenceImpl
 
 		List<PortletPreferences> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<PortletPreferences>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 
@@ -1812,16 +1875,16 @@ public class PortletPreferencesPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					FinderCacheUtil.putResult(finderPath, finderArgs, list);
 				}
 			}
-			catch (Exception e) {
-				if (useFinderCache) {
+			catch (Exception exception) {
+				if (useFinderCache && productionMode) {
 					FinderCacheUtil.removeResult(finderPath, finderArgs);
 				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -1997,8 +2060,8 @@ public class PortletPreferencesPersistenceImpl
 
 			return array;
 		}
-		catch (Exception e) {
-			throw processException(e);
+		catch (Exception exception) {
+			throw processException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -2159,12 +2222,22 @@ public class PortletPreferencesPersistenceImpl
 	public int countByO_P(int ownerType, String portletId) {
 		portletId = Objects.toString(portletId, "");
 
-		FinderPath finderPath = _finderPathCountByO_P;
+		boolean productionMode = CTPersistenceHelperUtil.isProductionMode(
+			PortletPreferences.class);
 
-		Object[] finderArgs = new Object[] {ownerType, portletId};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathCountByO_P;
+
+			finderArgs = new Object[] {ownerType, portletId};
+
+			count = (Long)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
+		}
 
 		if (count == null) {
 			StringBundler query = new StringBundler(3);
@@ -2203,12 +2276,16 @@ public class PortletPreferencesPersistenceImpl
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, count);
+				}
 			}
-			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+			catch (Exception exception) {
+				if (productionMode) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -2309,18 +2386,21 @@ public class PortletPreferencesPersistenceImpl
 
 		portletId = Objects.toString(portletId, "");
 
+		boolean productionMode = CTPersistenceHelperUtil.isProductionMode(
+			PortletPreferences.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			if (useFinderCache) {
+			if (useFinderCache && productionMode) {
 				finderPath = _finderPathWithoutPaginationFindByP_P;
 				finderArgs = new Object[] {plid, portletId};
 			}
 		}
-		else if (useFinderCache) {
+		else if (useFinderCache && productionMode) {
 			finderPath = _finderPathWithPaginationFindByP_P;
 			finderArgs = new Object[] {
 				plid, portletId, start, end, orderByComparator
@@ -2329,7 +2409,7 @@ public class PortletPreferencesPersistenceImpl
 
 		List<PortletPreferences> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<PortletPreferences>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 
@@ -2402,16 +2482,16 @@ public class PortletPreferencesPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					FinderCacheUtil.putResult(finderPath, finderArgs, list);
 				}
 			}
-			catch (Exception e) {
-				if (useFinderCache) {
+			catch (Exception exception) {
+				if (useFinderCache && productionMode) {
 					FinderCacheUtil.removeResult(finderPath, finderArgs);
 				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -2587,8 +2667,8 @@ public class PortletPreferencesPersistenceImpl
 
 			return array;
 		}
-		catch (Exception e) {
-			throw processException(e);
+		catch (Exception exception) {
+			throw processException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -2749,12 +2829,22 @@ public class PortletPreferencesPersistenceImpl
 	public int countByP_P(long plid, String portletId) {
 		portletId = Objects.toString(portletId, "");
 
-		FinderPath finderPath = _finderPathCountByP_P;
+		boolean productionMode = CTPersistenceHelperUtil.isProductionMode(
+			PortletPreferences.class);
 
-		Object[] finderArgs = new Object[] {plid, portletId};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathCountByP_P;
+
+			finderArgs = new Object[] {plid, portletId};
+
+			count = (Long)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
+		}
 
 		if (count == null) {
 			StringBundler query = new StringBundler(3);
@@ -2793,12 +2883,16 @@ public class PortletPreferencesPersistenceImpl
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, count);
+				}
 			}
-			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+			catch (Exception exception) {
+				if (productionMode) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -2905,18 +2999,21 @@ public class PortletPreferencesPersistenceImpl
 		OrderByComparator<PortletPreferences> orderByComparator,
 		boolean useFinderCache) {
 
+		boolean productionMode = CTPersistenceHelperUtil.isProductionMode(
+			PortletPreferences.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			if (useFinderCache) {
+			if (useFinderCache && productionMode) {
 				finderPath = _finderPathWithoutPaginationFindByO_O_P;
 				finderArgs = new Object[] {ownerId, ownerType, plid};
 			}
 		}
-		else if (useFinderCache) {
+		else if (useFinderCache && productionMode) {
 			finderPath = _finderPathWithPaginationFindByO_O_P;
 			finderArgs = new Object[] {
 				ownerId, ownerType, plid, start, end, orderByComparator
@@ -2925,7 +3022,7 @@ public class PortletPreferencesPersistenceImpl
 
 		List<PortletPreferences> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<PortletPreferences>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 
@@ -2992,16 +3089,16 @@ public class PortletPreferencesPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					FinderCacheUtil.putResult(finderPath, finderArgs, list);
 				}
 			}
-			catch (Exception e) {
-				if (useFinderCache) {
+			catch (Exception exception) {
+				if (useFinderCache && productionMode) {
 					FinderCacheUtil.removeResult(finderPath, finderArgs);
 				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -3186,8 +3283,8 @@ public class PortletPreferencesPersistenceImpl
 
 			return array;
 		}
-		catch (Exception e) {
-			throw processException(e);
+		catch (Exception exception) {
+			throw processException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -3341,12 +3438,22 @@ public class PortletPreferencesPersistenceImpl
 	 */
 	@Override
 	public int countByO_O_P(long ownerId, int ownerType, long plid) {
-		FinderPath finderPath = _finderPathCountByO_O_P;
+		boolean productionMode = CTPersistenceHelperUtil.isProductionMode(
+			PortletPreferences.class);
 
-		Object[] finderArgs = new Object[] {ownerId, ownerType, plid};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathCountByO_O_P;
+
+			finderArgs = new Object[] {ownerId, ownerType, plid};
+
+			count = (Long)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
+		}
 
 		if (count == null) {
 			StringBundler query = new StringBundler(4);
@@ -3378,12 +3485,16 @@ public class PortletPreferencesPersistenceImpl
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, count);
+				}
 			}
-			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+			catch (Exception exception) {
+				if (productionMode) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -3492,18 +3603,21 @@ public class PortletPreferencesPersistenceImpl
 
 		portletId = Objects.toString(portletId, "");
 
+		boolean productionMode = CTPersistenceHelperUtil.isProductionMode(
+			PortletPreferences.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			if (useFinderCache) {
+			if (useFinderCache && productionMode) {
 				finderPath = _finderPathWithoutPaginationFindByO_O_PI;
 				finderArgs = new Object[] {ownerId, ownerType, portletId};
 			}
 		}
-		else if (useFinderCache) {
+		else if (useFinderCache && productionMode) {
 			finderPath = _finderPathWithPaginationFindByO_O_PI;
 			finderArgs = new Object[] {
 				ownerId, ownerType, portletId, start, end, orderByComparator
@@ -3512,7 +3626,7 @@ public class PortletPreferencesPersistenceImpl
 
 		List<PortletPreferences> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<PortletPreferences>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 
@@ -3590,16 +3704,16 @@ public class PortletPreferencesPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					FinderCacheUtil.putResult(finderPath, finderArgs, list);
 				}
 			}
-			catch (Exception e) {
-				if (useFinderCache) {
+			catch (Exception exception) {
+				if (useFinderCache && productionMode) {
 					FinderCacheUtil.removeResult(finderPath, finderArgs);
 				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -3787,8 +3901,8 @@ public class PortletPreferencesPersistenceImpl
 
 			return array;
 		}
-		catch (Exception e) {
-			throw processException(e);
+		catch (Exception exception) {
+			throw processException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -3955,12 +4069,22 @@ public class PortletPreferencesPersistenceImpl
 	public int countByO_O_PI(long ownerId, int ownerType, String portletId) {
 		portletId = Objects.toString(portletId, "");
 
-		FinderPath finderPath = _finderPathCountByO_O_PI;
+		boolean productionMode = CTPersistenceHelperUtil.isProductionMode(
+			PortletPreferences.class);
 
-		Object[] finderArgs = new Object[] {ownerId, ownerType, portletId};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathCountByO_O_PI;
+
+			finderArgs = new Object[] {ownerId, ownerType, portletId};
+
+			count = (Long)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
+		}
 
 		if (count == null) {
 			StringBundler query = new StringBundler(4);
@@ -4003,12 +4127,16 @@ public class PortletPreferencesPersistenceImpl
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, count);
+				}
 			}
-			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+			catch (Exception exception) {
+				if (productionMode) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -4120,18 +4248,21 @@ public class PortletPreferencesPersistenceImpl
 
 		portletId = Objects.toString(portletId, "");
 
+		boolean productionMode = CTPersistenceHelperUtil.isProductionMode(
+			PortletPreferences.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			if (useFinderCache) {
+			if (useFinderCache && productionMode) {
 				finderPath = _finderPathWithoutPaginationFindByO_P_P;
 				finderArgs = new Object[] {ownerType, plid, portletId};
 			}
 		}
-		else if (useFinderCache) {
+		else if (useFinderCache && productionMode) {
 			finderPath = _finderPathWithPaginationFindByO_P_P;
 			finderArgs = new Object[] {
 				ownerType, plid, portletId, start, end, orderByComparator
@@ -4140,7 +4271,7 @@ public class PortletPreferencesPersistenceImpl
 
 		List<PortletPreferences> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<PortletPreferences>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 
@@ -4218,16 +4349,16 @@ public class PortletPreferencesPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					FinderCacheUtil.putResult(finderPath, finderArgs, list);
 				}
 			}
-			catch (Exception e) {
-				if (useFinderCache) {
+			catch (Exception exception) {
+				if (useFinderCache && productionMode) {
 					FinderCacheUtil.removeResult(finderPath, finderArgs);
 				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -4415,8 +4546,8 @@ public class PortletPreferencesPersistenceImpl
 
 			return array;
 		}
-		catch (Exception e) {
-			throw processException(e);
+		catch (Exception exception) {
+			throw processException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -4583,12 +4714,22 @@ public class PortletPreferencesPersistenceImpl
 	public int countByO_P_P(int ownerType, long plid, String portletId) {
 		portletId = Objects.toString(portletId, "");
 
-		FinderPath finderPath = _finderPathCountByO_P_P;
+		boolean productionMode = CTPersistenceHelperUtil.isProductionMode(
+			PortletPreferences.class);
 
-		Object[] finderArgs = new Object[] {ownerType, plid, portletId};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathCountByO_P_P;
+
+			finderArgs = new Object[] {ownerType, plid, portletId};
+
+			count = (Long)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
+		}
 
 		if (count == null) {
 			StringBundler query = new StringBundler(4);
@@ -4631,12 +4772,16 @@ public class PortletPreferencesPersistenceImpl
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, count);
+				}
 			}
-			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+			catch (Exception exception) {
+				if (productionMode) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -4756,6 +4901,9 @@ public class PortletPreferencesPersistenceImpl
 
 		portletId = Objects.toString(portletId, "");
 
+		boolean productionMode = CTPersistenceHelperUtil.isProductionMode(
+			PortletPreferences.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
@@ -4767,7 +4915,7 @@ public class PortletPreferencesPersistenceImpl
 
 		List<PortletPreferences> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<PortletPreferences>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 
@@ -4852,16 +5000,16 @@ public class PortletPreferencesPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					FinderCacheUtil.putResult(finderPath, finderArgs, list);
 				}
 			}
-			catch (Exception e) {
-				if (useFinderCache) {
+			catch (Exception exception) {
+				if (useFinderCache && productionMode) {
 					FinderCacheUtil.removeResult(finderPath, finderArgs);
 				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -5062,8 +5210,8 @@ public class PortletPreferencesPersistenceImpl
 
 			return array;
 		}
-		catch (Exception e) {
-			throw processException(e);
+		catch (Exception exception) {
+			throw processException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -5240,14 +5388,24 @@ public class PortletPreferencesPersistenceImpl
 
 		portletId = Objects.toString(portletId, "");
 
-		FinderPath finderPath = _finderPathWithPaginationCountByC_O_O_LikeP;
+		boolean productionMode = CTPersistenceHelperUtil.isProductionMode(
+			PortletPreferences.class);
 
-		Object[] finderArgs = new Object[] {
-			companyId, ownerId, ownerType, portletId
-		};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathWithPaginationCountByC_O_O_LikeP;
+
+			finderArgs = new Object[] {
+				companyId, ownerId, ownerType, portletId
+			};
+
+			count = (Long)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
+		}
 
 		if (count == null) {
 			StringBundler query = new StringBundler(5);
@@ -5294,12 +5452,16 @@ public class PortletPreferencesPersistenceImpl
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, count);
+				}
 			}
-			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+			catch (Exception exception) {
+				if (productionMode) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -5407,15 +5569,18 @@ public class PortletPreferencesPersistenceImpl
 
 		portletId = Objects.toString(portletId, "");
 
+		boolean productionMode = CTPersistenceHelperUtil.isProductionMode(
+			PortletPreferences.class);
+
 		Object[] finderArgs = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			finderArgs = new Object[] {ownerId, ownerType, plid, portletId};
 		}
 
 		Object result = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			result = FinderCacheUtil.getResult(
 				_finderPathFetchByO_O_P_P, finderArgs, this);
 		}
@@ -5478,7 +5643,7 @@ public class PortletPreferencesPersistenceImpl
 				List<PortletPreferences> list = q.list();
 
 				if (list.isEmpty()) {
-					if (useFinderCache) {
+					if (useFinderCache && productionMode) {
 						FinderCacheUtil.putResult(
 							_finderPathFetchByO_O_P_P, finderArgs, list);
 					}
@@ -5491,13 +5656,13 @@ public class PortletPreferencesPersistenceImpl
 					cacheResult(portletPreferences);
 				}
 			}
-			catch (Exception e) {
-				if (useFinderCache) {
+			catch (Exception exception) {
+				if (useFinderCache && productionMode) {
 					FinderCacheUtil.removeResult(
 						_finderPathFetchByO_O_P_P, finderArgs);
 				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -5547,14 +5712,22 @@ public class PortletPreferencesPersistenceImpl
 
 		portletId = Objects.toString(portletId, "");
 
-		FinderPath finderPath = _finderPathCountByO_O_P_P;
+		boolean productionMode = CTPersistenceHelperUtil.isProductionMode(
+			PortletPreferences.class);
 
-		Object[] finderArgs = new Object[] {
-			ownerId, ownerType, plid, portletId
-		};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)FinderCacheUtil.getResult(
-			finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathCountByO_O_P_P;
+
+			finderArgs = new Object[] {ownerId, ownerType, plid, portletId};
+
+			count = (Long)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
+		}
 
 		if (count == null) {
 			StringBundler query = new StringBundler(5);
@@ -5601,12 +5774,16 @@ public class PortletPreferencesPersistenceImpl
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					FinderCacheUtil.putResult(finderPath, finderArgs, count);
+				}
 			}
-			catch (Exception e) {
-				FinderCacheUtil.removeResult(finderPath, finderArgs);
+			catch (Exception exception) {
+				if (productionMode) {
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
+				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -5646,6 +5823,12 @@ public class PortletPreferencesPersistenceImpl
 	 */
 	@Override
 	public void cacheResult(PortletPreferences portletPreferences) {
+		if (portletPreferences.getCtCollectionId() != 0) {
+			portletPreferences.resetOriginalValues();
+
+			return;
+		}
+
 		EntityCacheUtil.putResult(
 			PortletPreferencesModelImpl.ENTITY_CACHE_ENABLED,
 			PortletPreferencesImpl.class, portletPreferences.getPrimaryKey(),
@@ -5671,6 +5854,12 @@ public class PortletPreferencesPersistenceImpl
 	@Override
 	public void cacheResult(List<PortletPreferences> portletPreferenceses) {
 		for (PortletPreferences portletPreferences : portletPreferenceses) {
+			if (portletPreferences.getCtCollectionId() != 0) {
+				portletPreferences.resetOriginalValues();
+
+				continue;
+			}
+
 			if (EntityCacheUtil.getResult(
 					PortletPreferencesModelImpl.ENTITY_CACHE_ENABLED,
 					PortletPreferencesImpl.class,
@@ -5733,6 +5922,19 @@ public class PortletPreferencesPersistenceImpl
 
 			clearUniqueFindersCache(
 				(PortletPreferencesModelImpl)portletPreferences, true);
+		}
+	}
+
+	@Override
+	public void clearCache(Set<Serializable> primaryKeys) {
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+
+		for (Serializable primaryKey : primaryKeys) {
+			EntityCacheUtil.removeResult(
+				PortletPreferencesModelImpl.ENTITY_CACHE_ENABLED,
+				PortletPreferencesImpl.class, primaryKey);
 		}
 	}
 
@@ -5847,11 +6049,11 @@ public class PortletPreferencesPersistenceImpl
 
 			return remove(portletPreferences);
 		}
-		catch (NoSuchPortletPreferencesException nsee) {
-			throw nsee;
+		catch (NoSuchPortletPreferencesException noSuchEntityException) {
+			throw noSuchEntityException;
 		}
-		catch (Exception e) {
-			throw processException(e);
+		catch (Exception exception) {
+			throw processException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -5861,6 +6063,10 @@ public class PortletPreferencesPersistenceImpl
 	@Override
 	protected PortletPreferences removeImpl(
 		PortletPreferences portletPreferences) {
+
+		if (!CTPersistenceHelperUtil.isRemove(portletPreferences)) {
+			return portletPreferences;
+		}
 
 		Session session = null;
 
@@ -5877,8 +6083,8 @@ public class PortletPreferencesPersistenceImpl
 				session.delete(portletPreferences);
 			}
 		}
-		catch (Exception e) {
-			throw processException(e);
+		catch (Exception exception) {
+			throw processException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -5922,7 +6128,18 @@ public class PortletPreferencesPersistenceImpl
 		try {
 			session = openSession();
 
-			if (portletPreferences.isNew()) {
+			if (CTPersistenceHelperUtil.isInsert(portletPreferences)) {
+				if (!isNew) {
+					PortletPreferences oldPortletPreferences =
+						(PortletPreferences)session.get(
+							PortletPreferencesImpl.class,
+							portletPreferences.getPrimaryKeyObj());
+
+					if (oldPortletPreferences != null) {
+						session.evict(oldPortletPreferences);
+					}
+				}
+
 				session.save(portletPreferences);
 
 				portletPreferences.setNew(false);
@@ -5932,11 +6149,17 @@ public class PortletPreferencesPersistenceImpl
 					portletPreferences);
 			}
 		}
-		catch (Exception e) {
-			throw processException(e);
+		catch (Exception exception) {
+			throw processException(exception);
 		}
 		finally {
 			closeSession(session);
+		}
+
+		if (portletPreferences.getCtCollectionId() != 0) {
+			portletPreferences.resetOriginalValues();
+
+			return portletPreferences;
 		}
 
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -6256,12 +6479,127 @@ public class PortletPreferencesPersistenceImpl
 	/**
 	 * Returns the portlet preferences with the primary key or returns <code>null</code> if it could not be found.
 	 *
+	 * @param primaryKey the primary key of the portlet preferences
+	 * @return the portlet preferences, or <code>null</code> if a portlet preferences with the primary key could not be found
+	 */
+	@Override
+	public PortletPreferences fetchByPrimaryKey(Serializable primaryKey) {
+		if (CTPersistenceHelperUtil.isProductionMode(
+				PortletPreferences.class)) {
+
+			return super.fetchByPrimaryKey(primaryKey);
+		}
+
+		PortletPreferences portletPreferences = null;
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			portletPreferences = (PortletPreferences)session.get(
+				PortletPreferencesImpl.class, primaryKey);
+
+			if (portletPreferences != null) {
+				cacheResult(portletPreferences);
+			}
+		}
+		catch (Exception exception) {
+			throw processException(exception);
+		}
+		finally {
+			closeSession(session);
+		}
+
+		return portletPreferences;
+	}
+
+	/**
+	 * Returns the portlet preferences with the primary key or returns <code>null</code> if it could not be found.
+	 *
 	 * @param portletPreferencesId the primary key of the portlet preferences
 	 * @return the portlet preferences, or <code>null</code> if a portlet preferences with the primary key could not be found
 	 */
 	@Override
 	public PortletPreferences fetchByPrimaryKey(long portletPreferencesId) {
 		return fetchByPrimaryKey((Serializable)portletPreferencesId);
+	}
+
+	@Override
+	public Map<Serializable, PortletPreferences> fetchByPrimaryKeys(
+		Set<Serializable> primaryKeys) {
+
+		if (CTPersistenceHelperUtil.isProductionMode(
+				PortletPreferences.class)) {
+
+			return super.fetchByPrimaryKeys(primaryKeys);
+		}
+
+		if (primaryKeys.isEmpty()) {
+			return Collections.emptyMap();
+		}
+
+		Map<Serializable, PortletPreferences> map =
+			new HashMap<Serializable, PortletPreferences>();
+
+		if (primaryKeys.size() == 1) {
+			Iterator<Serializable> iterator = primaryKeys.iterator();
+
+			Serializable primaryKey = iterator.next();
+
+			PortletPreferences portletPreferences = fetchByPrimaryKey(
+				primaryKey);
+
+			if (portletPreferences != null) {
+				map.put(primaryKey, portletPreferences);
+			}
+
+			return map;
+		}
+
+		StringBundler query = new StringBundler(primaryKeys.size() * 2 + 1);
+
+		query.append(getSelectSQL());
+		query.append(" WHERE ");
+		query.append(getPKDBName());
+		query.append(" IN (");
+
+		for (Serializable primaryKey : primaryKeys) {
+			query.append((long)primaryKey);
+
+			query.append(",");
+		}
+
+		query.setIndex(query.index() - 1);
+
+		query.append(")");
+
+		String sql = query.toString();
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			Query q = session.createQuery(sql);
+
+			for (PortletPreferences portletPreferences :
+					(List<PortletPreferences>)q.list()) {
+
+				map.put(
+					portletPreferences.getPrimaryKeyObj(), portletPreferences);
+
+				cacheResult(portletPreferences);
+			}
+		}
+		catch (Exception exception) {
+			throw processException(exception);
+		}
+		finally {
+			closeSession(session);
+		}
+
+		return map;
 	}
 
 	/**
@@ -6329,25 +6667,28 @@ public class PortletPreferencesPersistenceImpl
 		OrderByComparator<PortletPreferences> orderByComparator,
 		boolean useFinderCache) {
 
+		boolean productionMode = CTPersistenceHelperUtil.isProductionMode(
+			PortletPreferences.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			if (useFinderCache) {
+			if (useFinderCache && productionMode) {
 				finderPath = _finderPathWithoutPaginationFindAll;
 				finderArgs = FINDER_ARGS_EMPTY;
 			}
 		}
-		else if (useFinderCache) {
+		else if (useFinderCache && productionMode) {
 			finderPath = _finderPathWithPaginationFindAll;
 			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<PortletPreferences> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<PortletPreferences>)FinderCacheUtil.getResult(
 				finderPath, finderArgs, this);
 		}
@@ -6385,16 +6726,16 @@ public class PortletPreferencesPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					FinderCacheUtil.putResult(finderPath, finderArgs, list);
 				}
 			}
-			catch (Exception e) {
-				if (useFinderCache) {
+			catch (Exception exception) {
+				if (useFinderCache && productionMode) {
 					FinderCacheUtil.removeResult(finderPath, finderArgs);
 				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -6422,8 +6763,15 @@ public class PortletPreferencesPersistenceImpl
 	 */
 	@Override
 	public int countAll() {
-		Long count = (Long)FinderCacheUtil.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+		boolean productionMode = CTPersistenceHelperUtil.isProductionMode(
+			PortletPreferences.class);
+
+		Long count = null;
+
+		if (productionMode) {
+			count = (Long)FinderCacheUtil.getResult(
+				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+		}
 
 		if (count == null) {
 			Session session = null;
@@ -6435,14 +6783,18 @@ public class PortletPreferencesPersistenceImpl
 
 				count = (Long)q.uniqueResult();
 
-				FinderCacheUtil.putResult(
-					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
+				if (productionMode) {
+					FinderCacheUtil.putResult(
+						_finderPathCountAll, FINDER_ARGS_EMPTY, count);
+				}
 			}
-			catch (Exception e) {
-				FinderCacheUtil.removeResult(
-					_finderPathCountAll, FINDER_ARGS_EMPTY);
+			catch (Exception exception) {
+				if (productionMode) {
+					FinderCacheUtil.removeResult(
+						_finderPathCountAll, FINDER_ARGS_EMPTY);
+				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -6468,8 +6820,68 @@ public class PortletPreferencesPersistenceImpl
 	}
 
 	@Override
-	protected Map<String, Integer> getTableColumnsMap() {
+	public Set<String> getCTColumnNames(
+		CTColumnResolutionType ctColumnResolutionType) {
+
+		return _ctColumnNamesMap.get(ctColumnResolutionType);
+	}
+
+	@Override
+	public List<String> getMappingTableNames() {
+		return _mappingTableNames;
+	}
+
+	@Override
+	public Map<String, Integer> getTableColumnsMap() {
 		return PortletPreferencesModelImpl.TABLE_COLUMNS_MAP;
+	}
+
+	@Override
+	public String getTableName() {
+		return "PortletPreferences";
+	}
+
+	@Override
+	public List<String[]> getUniqueIndexColumnNames() {
+		return _uniqueIndexColumnNames;
+	}
+
+	private static final Map<CTColumnResolutionType, Set<String>>
+		_ctColumnNamesMap = new EnumMap<CTColumnResolutionType, Set<String>>(
+			CTColumnResolutionType.class);
+	private static final List<String> _mappingTableNames =
+		new ArrayList<String>();
+	private static final List<String[]> _uniqueIndexColumnNames =
+		new ArrayList<String[]>();
+
+	static {
+		Set<String> ctControlColumnNames = new HashSet<String>();
+		Set<String> ctIgnoreColumnNames = new HashSet<String>();
+		Set<String> ctMergeColumnNames = new HashSet<String>();
+		Set<String> ctStrictColumnNames = new HashSet<String>();
+
+		ctControlColumnNames.add("mvccVersion");
+		ctControlColumnNames.add("ctCollectionId");
+		ctStrictColumnNames.add("companyId");
+		ctStrictColumnNames.add("ownerId");
+		ctStrictColumnNames.add("ownerType");
+		ctStrictColumnNames.add("plid");
+		ctStrictColumnNames.add("portletId");
+		ctStrictColumnNames.add("preferences");
+
+		_ctColumnNamesMap.put(
+			CTColumnResolutionType.CONTROL, ctControlColumnNames);
+		_ctColumnNamesMap.put(
+			CTColumnResolutionType.IGNORE, ctIgnoreColumnNames);
+		_ctColumnNamesMap.put(CTColumnResolutionType.MERGE, ctMergeColumnNames);
+		_ctColumnNamesMap.put(
+			CTColumnResolutionType.PK,
+			Collections.singleton("portletPreferencesId"));
+		_ctColumnNamesMap.put(
+			CTColumnResolutionType.STRICT, ctStrictColumnNames);
+
+		_uniqueIndexColumnNames.add(
+			new String[] {"ownerId", "ownerType", "plid", "portletId"});
 	}
 
 	/**

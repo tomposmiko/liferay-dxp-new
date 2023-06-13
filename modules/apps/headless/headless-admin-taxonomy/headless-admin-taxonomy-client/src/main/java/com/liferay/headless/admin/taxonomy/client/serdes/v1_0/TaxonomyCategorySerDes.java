@@ -143,6 +143,30 @@ public class TaxonomyCategorySerDes {
 			sb.append("\"");
 		}
 
+		if (taxonomyCategory.getDescription_i18n() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"description_i18n\": ");
+
+			sb.append(_toJSON(taxonomyCategory.getDescription_i18n()));
+		}
+
+		if (taxonomyCategory.getExternalReferenceCode() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"externalReferenceCode\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(taxonomyCategory.getExternalReferenceCode()));
+
+			sb.append("\"");
+		}
+
 		if (taxonomyCategory.getId() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -150,7 +174,11 @@ public class TaxonomyCategorySerDes {
 
 			sb.append("\"id\": ");
 
-			sb.append(taxonomyCategory.getId());
+			sb.append("\"");
+
+			sb.append(_escape(taxonomyCategory.getId()));
+
+			sb.append("\"");
 		}
 
 		if (taxonomyCategory.getName() != null) {
@@ -165,6 +193,16 @@ public class TaxonomyCategorySerDes {
 			sb.append(_escape(taxonomyCategory.getName()));
 
 			sb.append("\"");
+		}
+
+		if (taxonomyCategory.getName_i18n() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"name_i18n\": ");
+
+			sb.append(_toJSON(taxonomyCategory.getName_i18n()));
 		}
 
 		if (taxonomyCategory.getNumberOfTaxonomyCategories() != null) {
@@ -268,6 +306,24 @@ public class TaxonomyCategorySerDes {
 				String.valueOf(taxonomyCategory.getDescription()));
 		}
 
+		if (taxonomyCategory.getDescription_i18n() == null) {
+			map.put("description_i18n", null);
+		}
+		else {
+			map.put(
+				"description_i18n",
+				String.valueOf(taxonomyCategory.getDescription_i18n()));
+		}
+
+		if (taxonomyCategory.getExternalReferenceCode() == null) {
+			map.put("externalReferenceCode", null);
+		}
+		else {
+			map.put(
+				"externalReferenceCode",
+				String.valueOf(taxonomyCategory.getExternalReferenceCode()));
+		}
+
 		if (taxonomyCategory.getId() == null) {
 			map.put("id", null);
 		}
@@ -280,6 +336,14 @@ public class TaxonomyCategorySerDes {
 		}
 		else {
 			map.put("name", String.valueOf(taxonomyCategory.getName()));
+		}
+
+		if (taxonomyCategory.getName_i18n() == null) {
+			map.put("name_i18n", null);
+		}
+		else {
+			map.put(
+				"name_i18n", String.valueOf(taxonomyCategory.getName_i18n()));
 		}
 
 		if (taxonomyCategory.getNumberOfTaxonomyCategories() == null) {
@@ -369,15 +433,36 @@ public class TaxonomyCategorySerDes {
 						(String)jsonParserFieldValue);
 				}
 			}
+			else if (Objects.equals(jsonParserFieldName, "description_i18n")) {
+				if (jsonParserFieldValue != null) {
+					taxonomyCategory.setDescription_i18n(
+						(Map)TaxonomyCategorySerDes.toMap(
+							(String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(
+						jsonParserFieldName, "externalReferenceCode")) {
+
+				if (jsonParserFieldValue != null) {
+					taxonomyCategory.setExternalReferenceCode(
+						(String)jsonParserFieldValue);
+				}
+			}
 			else if (Objects.equals(jsonParserFieldName, "id")) {
 				if (jsonParserFieldValue != null) {
-					taxonomyCategory.setId(
-						Long.valueOf((String)jsonParserFieldValue));
+					taxonomyCategory.setId((String)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "name")) {
 				if (jsonParserFieldValue != null) {
 					taxonomyCategory.setName((String)jsonParserFieldValue);
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "name_i18n")) {
+				if (jsonParserFieldValue != null) {
+					taxonomyCategory.setName_i18n(
+						(Map)TaxonomyCategorySerDes.toMap(
+							(String)jsonParserFieldValue));
 				}
 			}
 			else if (Objects.equals(
@@ -424,9 +509,11 @@ public class TaxonomyCategorySerDes {
 	private static String _escape(Object object) {
 		String string = String.valueOf(object);
 
-		string = string.replace("\\", "\\\\");
+		for (String[] strings : BaseJSONParser.JSON_ESCAPE_STRINGS) {
+			string = string.replace(strings[0], strings[1]);
+		}
 
-		return string.replace("\"", "\\\"");
+		return string;
 	}
 
 	private static String _toJSON(Map<String, ?> map) {

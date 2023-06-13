@@ -261,19 +261,23 @@ definition {
 
 		FormFields.editText(
 			fieldName = "loginURL",
-			fieldValue = "${casLoginURL}");
+			fieldValue = "http://localhost:8080/cas-web/login");
 
 		FormFields.editText(
 			fieldName = "logoutURL",
-			fieldValue = "${casLogoutURL}");
+			fieldValue = "http://localhost:8080/cas-web/logout");
 
 		FormFields.editText(
-			fieldName = "ServerURL",
-			fieldValue = "${casServerURL}");
+			fieldName = "serverName",
+			fieldValue = "http://localhost:8080");
 
-		FormFields.editTextMultiline(
+		FormFields.editText(
+			fieldName = "serverURL",
+			fieldValue = "http://localhost:8080/cas-web");
+
+		FormFields.editText(
 			fieldName = "serviceURL",
-			fieldValue = "${casServiceURL}");
+			fieldValue = "http://localhost:8080/c/portal/login");
 
 		Click.waitForMenuToggleJSClick(locator1 = "PortalSettingsAuthentication#VERTICAL_ELLIPSIS");
 
@@ -455,13 +459,13 @@ definition {
 			configurationScope = "Virtual Instance Scope");
 
 		if ("${emailVerificationURL}" == "true") {
-			Type.typeEditor(
-				locator1 = "PortalSettingsEmailNotifications#NAVIGATION_EMAIL_VERIFICATION_NOTIFICATION_BODY",
+			Type.typeCKEditor(
+				locator1 = "CKEditor#BODY_FIELD",
 				value1 = "[$EMAIL_VERIFICATION_URL$]");
 		}
 		else {
-			Type.typeEditor(
-				locator1 = "PortalSettingsEmailNotifications#NAVIGATION_EMAIL_VERIFICATION_NOTIFICATION_BODY",
+			Type.typeCKEditor(
+				locator1 = "CKEditor#BODY_FIELD",
 				value1 = "[$EMAIL_VERIFICATION_CODE$]");
 		}
 

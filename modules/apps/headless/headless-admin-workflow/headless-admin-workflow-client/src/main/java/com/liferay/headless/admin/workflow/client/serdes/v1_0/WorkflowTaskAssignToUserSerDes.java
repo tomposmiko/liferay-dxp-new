@@ -103,6 +103,16 @@ public class WorkflowTaskAssignToUserSerDes {
 			sb.append("\"");
 		}
 
+		if (workflowTaskAssignToUser.getWorkflowTaskId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"workflowTaskId\": ");
+
+			sb.append(workflowTaskAssignToUser.getWorkflowTaskId());
+		}
+
 		sb.append("}");
 
 		return sb.toString();
@@ -150,6 +160,15 @@ public class WorkflowTaskAssignToUserSerDes {
 			liferayToJSONDateFormat.format(
 				workflowTaskAssignToUser.getDueDate()));
 
+		if (workflowTaskAssignToUser.getWorkflowTaskId() == null) {
+			map.put("workflowTaskId", null);
+		}
+		else {
+			map.put(
+				"workflowTaskId",
+				String.valueOf(workflowTaskAssignToUser.getWorkflowTaskId()));
+		}
+
 		return map;
 	}
 
@@ -189,6 +208,12 @@ public class WorkflowTaskAssignToUserSerDes {
 						toDate((String)jsonParserFieldValue));
 				}
 			}
+			else if (Objects.equals(jsonParserFieldName, "workflowTaskId")) {
+				if (jsonParserFieldValue != null) {
+					workflowTaskAssignToUser.setWorkflowTaskId(
+						Long.valueOf((String)jsonParserFieldValue));
+				}
+			}
 			else {
 				throw new IllegalArgumentException(
 					"Unsupported field name " + jsonParserFieldName);
@@ -200,9 +225,11 @@ public class WorkflowTaskAssignToUserSerDes {
 	private static String _escape(Object object) {
 		String string = String.valueOf(object);
 
-		string = string.replace("\\", "\\\\");
+		for (String[] strings : BaseJSONParser.JSON_ESCAPE_STRINGS) {
+			string = string.replace(strings[0], strings[1]);
+		}
 
-		return string.replace("\"", "\\\"");
+		return string;
 	}
 
 	private static String _toJSON(Map<String, ?> map) {

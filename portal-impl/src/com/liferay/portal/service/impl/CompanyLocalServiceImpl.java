@@ -62,8 +62,6 @@ import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchEngineHelperUtil;
 import com.liferay.portal.kernel.search.SearchException;
-import com.liferay.portal.kernel.search.facet.Facet;
-import com.liferay.portal.kernel.search.facet.ScopeFacet;
 import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcher;
 import com.liferay.portal.kernel.search.facet.faceted.searcher.FacetedSearcherManagerUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
@@ -81,6 +79,7 @@ import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TimeZoneUtil;
+import com.liferay.portal.kernel.util.TreeMapBuilder;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -100,6 +99,8 @@ import com.liferay.registry.ServiceTrackerCustomizer;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+
+import java.net.IDN;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -133,6 +134,13 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 			new PortalInstanceLifecycleManagerServiceTrackerCustomizer());
 
 		_serviceTracker.open();
+	}
+
+	@Override
+	public Company addCompany(Company company) {
+		companyInfoPersistence.update(company.getCompanyInfo());
+
+		return super.addCompany(company);
 	}
 
 	/**
@@ -178,7 +186,7 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		company.setMaxUsers(maxUsers);
 		company.setActive(active);
 
-		companyPersistence.update(company);
+		company = companyPersistence.update(company);
 
 		// Virtual host
 
@@ -237,8 +245,8 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 			try {
 				company.setKey(Encryptor.serializeKey(Encryptor.generateKey()));
 			}
-			catch (EncryptorException ee) {
-				throw new SystemException(ee);
+			catch (EncryptorException encryptorException) {
+				throw new SystemException(encryptorException);
 			}
 
 			company.setWebId(webId);
@@ -267,6 +275,10 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 			updateAccount(
 				company, name, legalName, legalId, legalType, sicCode,
 				tickerSymbol, industry, type, size);
+
+			// Company info
+
+			companyInfoPersistence.update(company.getCompanyInfo());
 
 			// Virtual host
 
@@ -297,11 +309,11 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 
 					preferences.store();
 				}
-				catch (IOException ioe) {
-					throw new SystemException(ioe);
+				catch (IOException ioException) {
+					throw new SystemException(ioException);
 				}
-				catch (PortletException pe) {
-					throw new SystemException(pe);
+				catch (PortletException portletException) {
+					throw new SystemException(portletException);
 				}
 			}
 		}
@@ -335,7 +347,7 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 				if (!defaultUser.isAgreedToTermsOfUse()) {
 					defaultUser.setAgreedToTermsOfUse(true);
 
-					userPersistence.update(defaultUser);
+					defaultUser = userPersistence.update(defaultUser);
 				}
 			}
 			else {
@@ -375,7 +387,7 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 				defaultUser.setAgreedToTermsOfUse(true);
 				defaultUser.setStatus(WorkflowConstants.STATUS_APPROVED);
 
-				userPersistence.update(defaultUser);
+				defaultUser = userPersistence.update(defaultUser);
 
 				// Contact
 
@@ -482,11 +494,11 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		try {
 			company.setKey(Encryptor.serializeKey(Encryptor.generateKey()));
 		}
-		catch (EncryptorException ee) {
-			throw new SystemException(ee);
+		catch (EncryptorException encryptorException) {
+			throw new SystemException(encryptorException);
 		}
 
-		companyPersistence.update(company);
+		companyInfoPersistence.update(company.getCompanyInfo());
 	}
 
 	@Override
@@ -509,12 +521,12 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 
 			return doDeleteCompany(companyId);
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(pe, pe);
+				_log.debug(portalException, portalException);
 			}
 
-			throw pe;
+			throw portalException;
 		}
 		finally {
 			CompanyThreadLocal.setCompanyId(currentCompanyId);
@@ -563,6 +575,11 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 
 		VirtualHost virtualHost = virtualHostPersistence.fetchByHostname(
 			virtualHostname);
+
+		if ((virtualHost == null) && virtualHostname.contains("xn--")) {
+			virtualHost = virtualHostPersistence.fetchByHostname(
+				IDN.toUnicode(virtualHostname));
+		}
 
 		if ((virtualHost == null) || (virtualHost.getLayoutSetId() != 0)) {
 			return null;
@@ -660,6 +677,11 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 			VirtualHost virtualHost = virtualHostPersistence.findByHostname(
 				virtualHostname);
 
+			if ((virtualHost == null) && virtualHostname.contains("xn--")) {
+				virtualHost = virtualHostPersistence.findByHostname(
+					IDN.toUnicode(virtualHostname));
+			}
+
 			if (virtualHost.getLayoutSetId() != 0) {
 				throw new CompanyVirtualHostException(
 					"Virtual host is associated with layout set " +
@@ -669,8 +691,8 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 			return companyPersistence.findByPrimaryKey(
 				virtualHost.getCompanyId());
 		}
-		catch (NoSuchVirtualHostException nsvhe) {
-			throw new CompanyVirtualHostException(nsvhe);
+		catch (NoSuchVirtualHostException noSuchVirtualHostException) {
+			throw new CompanyVirtualHostException(noSuchVirtualHostException);
 		}
 	}
 
@@ -709,10 +731,11 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 
 				companyId = user.getCompanyId();
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (_log.isWarnEnabled()) {
 					_log.warn(
-						"Unable to get the company id for user " + userId, e);
+						"Unable to get the company id for user " + userId,
+						exception);
 				}
 			}
 		}
@@ -742,8 +765,8 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 
 			preferences.store();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 
@@ -803,9 +826,16 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		try {
 			return facetedSearcher.search(searchContext);
 		}
-		catch (SearchException se) {
-			throw new SystemException(se);
+		catch (SearchException searchException) {
+			throw new SystemException(searchException);
 		}
+	}
+
+	@Override
+	public Company updateCompany(Company company) {
+		companyInfoPersistence.update(company.getCompanyInfo());
+
+		return super.updateCompany(company);
 	}
 
 	/**
@@ -847,7 +877,7 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		company.setMaxUsers(maxUsers);
 		company.setActive(active);
 
-		companyPersistence.update(company);
+		company = companyPersistence.update(company);
 
 		// Virtual host
 
@@ -914,7 +944,7 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		PortalUtil.updateImageId(
 			company, hasLogo, logoBytes, "logoId", 0, 0, 0);
 
-		companyPersistence.update(company);
+		company = companyPersistence.update(company);
 
 		// Account
 
@@ -1149,11 +1179,11 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 
 			portletPreferences.store();
 		}
-		catch (LocaleException le) {
-			throw le;
+		catch (LocaleException localeException) {
+			throw localeException;
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 
 		_clearCompanyCache(companyId);
@@ -1206,26 +1236,14 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 
 			preferences.store();
 		}
-		catch (IOException | PortletException e) {
-			throw new SystemException(e);
+		catch (IOException | PortletException exception) {
+			throw new SystemException(exception);
 		}
 
 		_clearCompanyCache(companyId);
 	}
 
 	protected void addAssetEntriesFacet(SearchContext searchContext) {
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	protected void addScopeFacet(SearchContext searchContext) {
-		Facet scopeFacet = new ScopeFacet(searchContext);
-
-		scopeFacet.setStatic(true);
-
-		searchContext.addFacet(scopeFacet);
 	}
 
 	protected Company checkLogo(long companyId) throws PortalException {
@@ -1285,6 +1303,10 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 		// Account
 
 		accountLocalService.deleteAccount(company.getAccountId());
+
+		// Company info
+
+		companyInfoPersistence.remove(company.getCompanyInfo());
 
 		// Expando
 
@@ -1542,8 +1564,11 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 				virtualHostname);
 
 			if (virtualHost == null) {
-				virtualHostLocalService.updateVirtualHost(
-					companyId, 0, virtualHostname);
+				virtualHostLocalService.updateVirtualHosts(
+					companyId, 0,
+					TreeMapBuilder.put(
+						virtualHostname, StringPool.BLANK
+					).build());
 			}
 			else {
 				if ((virtualHost.getCompanyId() != companyId) ||
@@ -1554,11 +1579,13 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 			}
 		}
 		else {
-			VirtualHost virtualHost = virtualHostPersistence.fetchByC_L(
+			List<VirtualHost> virtualHosts = virtualHostPersistence.findByC_L(
 				companyId, 0);
 
-			if (virtualHost != null) {
-				virtualHostPersistence.remove(virtualHost);
+			if (!virtualHosts.isEmpty()) {
+				for (VirtualHost virtualHost : virtualHosts) {
+					virtualHostPersistence.remove(virtualHost);
+				}
 			}
 		}
 
@@ -1573,17 +1600,17 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 
 		for (String languageId : languageIdsArray) {
 			if (!ArrayUtil.contains(PropsValues.LOCALES, languageId)) {
-				LocaleException le = new LocaleException(
+				LocaleException localeException = new LocaleException(
 					LocaleException.TYPE_DISPLAY_SETTINGS);
 
-				le.setSourceAvailableLocales(
+				localeException.setSourceAvailableLocales(
 					Arrays.asList(
 						LocaleUtil.fromLanguageIds(PropsValues.LOCALES)));
-				le.setTargetAvailableLocales(
+				localeException.setTargetAvailableLocales(
 					Arrays.asList(
 						LocaleUtil.fromLanguageIds(languageIdsArray)));
 
-				throw le;
+				throw localeException;
 			}
 		}
 	}
@@ -1643,12 +1670,13 @@ public class CompanyLocalServiceImpl extends CompanyLocalServiceBaseImpl {
 					throw new CompanyVirtualHostException();
 				}
 			}
-			catch (NoSuchVirtualHostException nsvhe) {
+			catch (NoSuchVirtualHostException noSuchVirtualHostException) {
 
 				// LPS-52675
 
 				if (_log.isDebugEnabled()) {
-					_log.debug(nsvhe, nsvhe);
+					_log.debug(
+						noSuchVirtualHostException, noSuchVirtualHostException);
 				}
 			}
 		}

@@ -67,9 +67,8 @@ import org.osgi.service.component.annotations.Reference;
 public class UADSearchContainerBuilder {
 
 	public SearchContainer<UADEntity> getSearchContainer(
-			RenderRequest renderRequest,
 			LiferayPortletResponse liferayPortletResponse,
-			PortletURL currentURL,
+			RenderRequest renderRequest, PortletURL currentURL,
 			List<UADApplicationSummaryDisplay> uadApplicationSummaryDisplays)
 		throws PortletException {
 
@@ -92,7 +91,7 @@ public class UADSearchContainerBuilder {
 
 			uadEntities.add(
 				_constructUADEntity(
-					renderRequest, liferayPortletResponse, currentURL,
+					liferayPortletResponse, renderRequest, currentURL,
 					uadApplicationSummaryDisplay));
 		}
 
@@ -120,9 +119,9 @@ public class UADSearchContainerBuilder {
 	}
 
 	public SearchContainer<UADEntity> getSearchContainer(
-		RenderRequest renderRequest,
-		LiferayPortletResponse liferayPortletResponse, PortletURL currentURL,
-		long[] groupIds, User selectedUser, UADDisplay uadDisplay) {
+		LiferayPortletResponse liferayPortletResponse,
+		RenderRequest renderRequest, PortletURL currentURL, long[] groupIds,
+		User selectedUser, UADDisplay uadDisplay) {
 
 		SearchContainer<UADEntity> searchContainer = _constructSearchContainer(
 			renderRequest, currentURL, "modifiedDate",
@@ -156,9 +155,9 @@ public class UADSearchContainerBuilder {
 					selectedUser.getUserId(), groupIds,
 					displayTerms.getKeywords()));
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(e, e);
+				_log.warn(exception, exception);
 			}
 
 			searchContainer.setResults(Collections.emptyList());
@@ -174,8 +173,8 @@ public class UADSearchContainerBuilder {
 	}
 
 	public SearchContainer<UADEntity> getSearchContainer(
-		RenderRequest renderRequest,
-		LiferayPortletResponse liferayPortletResponse, String applicationKey,
+		LiferayPortletResponse liferayPortletResponse,
+		RenderRequest renderRequest, String applicationKey,
 		PortletURL currentURL, long[] groupIds, Class<?> parentContainerClass,
 		Serializable parentContainerId, User selectedUser,
 		UADHierarchyDisplay uadHierarchyDisplay) {
@@ -237,9 +236,9 @@ public class UADSearchContainerBuilder {
 
 			searchContainer.setTotal(entities.size());
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(e, e);
+				_log.warn(exception, exception);
 			}
 
 			searchContainer.setResults(Collections.emptyList());
@@ -362,9 +361,8 @@ public class UADSearchContainerBuilder {
 	}
 
 	private <T> UADEntity<T> _constructUADEntity(
-			RenderRequest renderRequest,
 			LiferayPortletResponse liferayPortletResponse,
-			PortletURL currentURL,
+			RenderRequest renderRequest, PortletURL currentURL,
 			UADApplicationSummaryDisplay uadApplicationSummaryDisplay)
 		throws PortletException {
 
@@ -415,7 +413,7 @@ public class UADSearchContainerBuilder {
 					try {
 						return Long.valueOf((String)entry);
 					}
-					catch (NumberFormatException nfe) {
+					catch (NumberFormatException numberFormatException) {
 						return 0L;
 					}
 				});

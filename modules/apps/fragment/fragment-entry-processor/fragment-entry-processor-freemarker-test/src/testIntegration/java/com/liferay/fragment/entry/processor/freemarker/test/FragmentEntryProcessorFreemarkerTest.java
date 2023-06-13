@@ -15,6 +15,8 @@
 package com.liferay.fragment.entry.processor.freemarker.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.document.library.kernel.model.DLFolderConstants;
+import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.fragment.exception.FragmentEntryContentException;
 import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.fragment.model.FragmentEntry;
@@ -35,6 +37,8 @@ import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.Theme;
+import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.LayoutSetLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -46,6 +50,9 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -57,7 +64,6 @@ import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 
 import java.io.IOException;
 
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -156,47 +162,33 @@ public class FragmentEntryProcessorFreemarkerTest {
 	}
 
 	@Test
-	public void testProcessFragmentEntryLinkHTMLWithConfigurationItemSelector()
+	public void testProcessFragmentEntryLinkHTMLWithConfigurationItemSelectorFileEntry()
 		throws Exception {
 
-		Map<Locale, String> titleMap = new HashMap<Locale, String>() {
-			{
-				put(LocaleUtil.SPAIN, "t1-es");
-				put(LocaleUtil.US, "t1");
-			}
-		};
+		String fileName = RandomTestUtil.randomString() + ".jpg";
 
-		Map<Locale, String> contentMap = new HashMap<Locale, String>() {
-			{
-				put(LocaleUtil.SPAIN, "c1-es");
-				put(LocaleUtil.US, "c1");
-			}
-		};
+		FileEntry fileEntry = _dlAppLocalService.addFileEntry(
+			TestPropsValues.getUserId(), _group.getGroupId(),
+			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, fileName,
+			ContentTypes.IMAGE_JPEG,
+			FileUtil.getBytes(
+				FragmentEntryProcessorFreemarkerTest.class,
+				"dependencies/image.jpg"),
+			new ServiceContext());
 
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(
-				_group.getGroupId(), TestPropsValues.getUserId());
-
-		JournalArticle journalArticle = JournalTestUtil.addArticle(
-			_group.getGroupId(), 0,
-			PortalUtil.getClassNameId(JournalArticle.class), titleMap, null,
-			contentMap, LocaleUtil.getSiteDefault(), false, true,
-			serviceContext);
-
-		Map<String, String> configurationDefaultValues =
-			new HashMap<String, String>() {
-				{
-					put(
-						"classNameId",
-						String.valueOf(journalArticle.getClassNameId()));
-					put(
-						"classPK",
-						String.valueOf(journalArticle.getResourcePrimKey()));
-				}
-			};
+		Map<String, String> configurationDefaultValues = HashMapBuilder.put(
+			"className", FileEntry.class.getName()
+		).put(
+			"classNameId",
+			String.valueOf(
+				_classNameLocalService.getClassNameId(
+					fileEntry.getModelClassName()))
+		).put(
+			"classPK", String.valueOf(fileEntry.getPrimaryKey())
+		).build();
 
 		FragmentEntry fragmentEntry = _addFragmentEntry(
-			"fragment_entry_with_configuration_itemselector.html",
+			"fragment_entry_with_configuration_itemselector_file_entry.html",
 			"configuration_itemselector.json", configurationDefaultValues);
 
 		FragmentEntryLink fragmentEntryLink =
@@ -219,61 +211,137 @@ public class FragmentEntryProcessorFreemarkerTest {
 			_fragmentEntryProcessorRegistry.processFragmentEntryLinkHTML(
 				fragmentEntryLink, defaultFragmentEntryProcessorContext));
 
-		Map<String, String> expectedValues = new HashMap<String, String>() {
-			{
-				put(
-					"classNameId",
-					String.valueOf(journalArticle.getClassNameId()));
-				put(
-					"classPK",
-					String.valueOf(journalArticle.getResourcePrimKey()));
-				put("contentES", "c1-es");
-				put("contentUS", "c1");
-				put("titleES", "t1-es");
-				put("titleUS", "t1");
-			}
-		};
+		Map<String, String> expectedValues = HashMapBuilder.put(
+			"className", FileEntry.class.getName()
+		).put(
+			"classNameId",
+			String.valueOf(
+				_classNameLocalService.getClassNameId(
+					fileEntry.getModelClassName()))
+		).put(
+			"classPK", String.valueOf(fileEntry.getPrimaryKey())
+		).put(
+			"fileName", fileName
+		).build();
 
 		String expectedProcessedHTML = _getProcessedHTML(
 			_getFileAsString(
 				"expected_processed_fragment_entry_with_configuration_" +
-					"itemselector.html",
+					"itemselector_file_entry.html",
 				expectedValues));
 
 		Assert.assertEquals(expectedProcessedHTML, actualProcessedHTML);
 	}
 
 	@Test
-	public void testProcessFragmentEntryLinkHTMLWithConfigurationItemSelectorNondefaultSegmentId()
+	public void testProcessFragmentEntryLinkHTMLWithConfigurationItemSelectorJournalArticle()
 		throws Exception {
 
-		Map<Locale, String> titleMap = new HashMap<Locale, String>() {
-			{
-				put(LocaleUtil.SPAIN, RandomTestUtil.randomString(10));
-				put(LocaleUtil.US, RandomTestUtil.randomString(10));
-			}
-		};
+		Map<Locale, String> titleMap = HashMapBuilder.put(
+			LocaleUtil.SPAIN, "t1-es"
+		).put(
+			LocaleUtil.US, "t1"
+		).build();
 
-		Map<Locale, String> contentMap = new HashMap<Locale, String>() {
-			{
-				put(LocaleUtil.SPAIN, RandomTestUtil.randomString(10));
-				put(LocaleUtil.US, RandomTestUtil.randomString(10));
-			}
-		};
+		Map<Locale, String> contentMap = HashMapBuilder.put(
+			LocaleUtil.SPAIN, "c1-es"
+		).put(
+			LocaleUtil.US, "c1"
+		).build();
 
-		Map<Locale, String> titleMap2 = new HashMap<Locale, String>() {
-			{
-				put(LocaleUtil.SPAIN, "t2-es");
-				put(LocaleUtil.US, "t2");
-			}
-		};
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_group.getGroupId(), TestPropsValues.getUserId());
 
-		Map<Locale, String> contentMap2 = new HashMap<Locale, String>() {
-			{
-				put(LocaleUtil.SPAIN, "c2-es");
-				put(LocaleUtil.US, "c2");
-			}
-		};
+		JournalArticle journalArticle = JournalTestUtil.addArticle(
+			_group.getGroupId(), 0,
+			PortalUtil.getClassNameId(JournalArticle.class), titleMap, null,
+			contentMap, LocaleUtil.getSiteDefault(), false, true,
+			serviceContext);
+
+		Map<String, String> configurationDefaultValues = HashMapBuilder.put(
+			"className", journalArticle.getModelClassName()
+		).put(
+			"classNameId", String.valueOf(journalArticle.getClassNameId())
+		).put(
+			"classPK", String.valueOf(journalArticle.getResourcePrimKey())
+		).build();
+
+		FragmentEntry fragmentEntry = _addFragmentEntry(
+			"fragment_entry_with_configuration_itemselector_journal_article." +
+				"html",
+			"configuration_itemselector.json", configurationDefaultValues);
+
+		FragmentEntryLink fragmentEntryLink =
+			_fragmentEntryLinkLocalService.createFragmentEntryLink(0);
+
+		fragmentEntryLink.setHtml(fragmentEntry.getHtml());
+		fragmentEntryLink.setConfiguration(fragmentEntry.getConfiguration());
+		fragmentEntryLink.setEditableValues(
+			_getJsonFileAsString(
+				"fragment_entry_link_editable_values_with_configuration_" +
+					"itemselector.json"));
+
+		DefaultFragmentEntryProcessorContext
+			defaultFragmentEntryProcessorContext =
+				new DefaultFragmentEntryProcessorContext(
+					_getMockHttpServletRequest(), new MockHttpServletResponse(),
+					null, null);
+
+		String actualProcessedHTML = _getProcessedHTML(
+			_fragmentEntryProcessorRegistry.processFragmentEntryLinkHTML(
+				fragmentEntryLink, defaultFragmentEntryProcessorContext));
+
+		Map<String, String> expectedValues = HashMapBuilder.put(
+			"classNameId", String.valueOf(journalArticle.getClassNameId())
+		).put(
+			"classPK", String.valueOf(journalArticle.getResourcePrimKey())
+		).put(
+			"contentES", "c1-es"
+		).put(
+			"contentUS", "c1"
+		).put(
+			"titleES", "t1-es"
+		).put(
+			"titleUS", "t1"
+		).build();
+
+		String expectedProcessedHTML = _getProcessedHTML(
+			_getFileAsString(
+				"expected_processed_fragment_entry_with_configuration_" +
+					"itemselector_journal_article.html",
+				expectedValues));
+
+		Assert.assertEquals(expectedProcessedHTML, actualProcessedHTML);
+	}
+
+	@Test
+	public void testProcessFragmentEntryLinkHTMLWithConfigurationItemSelectorJournalArticleNondefaultSegmentId()
+		throws Exception {
+
+		Map<Locale, String> titleMap = HashMapBuilder.put(
+			LocaleUtil.SPAIN, RandomTestUtil.randomString(10)
+		).put(
+			LocaleUtil.US, RandomTestUtil.randomString(10)
+		).build();
+
+		Map<Locale, String> contentMap = HashMapBuilder.put(
+			LocaleUtil.SPAIN, RandomTestUtil.randomString(10)
+		).put(
+			LocaleUtil.US, RandomTestUtil.randomString(10)
+		).build();
+
+		Map<Locale, String> titleMap2 = HashMapBuilder.put(
+			LocaleUtil.SPAIN, "t2-es"
+		).put(
+			LocaleUtil.US, "t2"
+		).build();
+
+		Map<Locale, String> contentMap2 = HashMapBuilder.put(
+			LocaleUtil.SPAIN, "c2-es"
+		).put(
+			LocaleUtil.US, "c2"
+		).build();
 
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(
@@ -291,32 +359,21 @@ public class FragmentEntryProcessorFreemarkerTest {
 			contentMap2, LocaleUtil.getSiteDefault(), false, true,
 			serviceContext);
 
-		Map<String, String> configurationDefaultValues =
-			new HashMap<String, String>() {
-				{
-					put(
-						"classNameId",
-						String.valueOf(journalArticle1.getClassNameId()));
-					put(
-						"classPK",
-						String.valueOf(journalArticle1.getResourcePrimKey()));
-				}
-			};
+		Map<String, String> configurationDefaultValues = HashMapBuilder.put(
+			"classNameId", String.valueOf(journalArticle1.getClassNameId())
+		).put(
+			"classPK", String.valueOf(journalArticle1.getResourcePrimKey())
+		).build();
 
-		Map<String, String> editableValuesValues =
-			new HashMap<String, String>() {
-				{
-					put(
-						"classNameId",
-						String.valueOf(journalArticle2.getClassNameId()));
-					put(
-						"classPK",
-						String.valueOf(journalArticle2.getResourcePrimKey()));
-				}
-			};
+		Map<String, String> editableValuesValues = HashMapBuilder.put(
+			"classNameId", String.valueOf(journalArticle2.getClassNameId())
+		).put(
+			"classPK", String.valueOf(journalArticle2.getResourcePrimKey())
+		).build();
 
 		FragmentEntry fragmentEntry = _addFragmentEntry(
-			"fragment_entry_with_configuration_itemselector.html",
+			"fragment_entry_with_configuration_itemselector_journal_article." +
+				"html",
 			"configuration_itemselector.json", configurationDefaultValues);
 
 		FragmentEntryLink fragmentEntryLink =
@@ -327,7 +384,7 @@ public class FragmentEntryProcessorFreemarkerTest {
 		fragmentEntryLink.setEditableValues(
 			_getJsonFileAsString(
 				"fragment_entry_link_editable_values_with_configuration_" +
-					"itemselector_nondefault_segment_id.json",
+					"itemselector_journal_article_nondefault_segment_id.json",
 				editableValuesValues));
 
 		DefaultFragmentEntryProcessorContext
@@ -343,25 +400,24 @@ public class FragmentEntryProcessorFreemarkerTest {
 			_fragmentEntryProcessorRegistry.processFragmentEntryLinkHTML(
 				fragmentEntryLink, defaultFragmentEntryProcessorContext));
 
-		Map<String, String> expectedValues = new HashMap<String, String>() {
-			{
-				put(
-					"classNameId",
-					String.valueOf(journalArticle2.getClassNameId()));
-				put(
-					"classPK",
-					String.valueOf(journalArticle2.getResourcePrimKey()));
-				put("contentES", "c2-es");
-				put("contentUS", "c2");
-				put("titleES", "t2-es");
-				put("titleUS", "t2");
-			}
-		};
+		Map<String, String> expectedValues = HashMapBuilder.put(
+			"classNameId", String.valueOf(journalArticle2.getClassNameId())
+		).put(
+			"classPK", String.valueOf(journalArticle2.getResourcePrimKey())
+		).put(
+			"contentES", "c2-es"
+		).put(
+			"contentUS", "c2"
+		).put(
+			"titleES", "t2-es"
+		).put(
+			"titleUS", "t2"
+		).build();
 
 		String expectedProcessedHTML = _getProcessedHTML(
 			_getFileAsString(
 				"expected_processed_fragment_entry_with_configuration_" +
-					"itemselector.html",
+					"itemselector_journal_article.html",
 				expectedValues));
 
 		Assert.assertEquals(expectedProcessedHTML, actualProcessedHTML);
@@ -558,10 +614,16 @@ public class FragmentEntryProcessorFreemarkerTest {
 		return themeDisplay;
 	}
 
+	@Inject
+	private ClassNameLocalService _classNameLocalService;
+
 	private Company _company;
 
 	@Inject
 	private CompanyLocalService _companyLocalService;
+
+	@Inject
+	private DLAppLocalService _dlAppLocalService;
 
 	@Inject
 	private FragmentCollectionService _fragmentCollectionService;

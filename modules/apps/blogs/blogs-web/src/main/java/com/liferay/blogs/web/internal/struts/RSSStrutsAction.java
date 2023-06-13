@@ -75,8 +75,9 @@ public class RSSStrutsAction implements StrutsAction {
 
 			return null;
 		}
-		catch (Exception e) {
-			_portal.sendError(e, httpServletRequest, httpServletResponse);
+		catch (Exception exception) {
+			_portal.sendError(
+				exception, httpServletRequest, httpServletResponse);
 
 			return null;
 		}
@@ -165,7 +166,8 @@ public class RSSStrutsAction implements StrutsAction {
 
 		long groupId = ParamUtil.getLong(httpServletRequest, "groupId");
 
-		if (GroupPermissionUtil.contains(
+		if ((groupId == 0) ||
+			GroupPermissionUtil.contains(
 				themeDisplay.getPermissionChecker(), groupId,
 				ActionKeys.VIEW)) {
 

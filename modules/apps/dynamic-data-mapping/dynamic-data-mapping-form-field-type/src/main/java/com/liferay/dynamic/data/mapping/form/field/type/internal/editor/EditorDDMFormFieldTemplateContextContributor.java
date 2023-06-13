@@ -19,8 +19,8 @@ import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.render.DDMFormFieldRenderingContext;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
@@ -43,21 +43,20 @@ public class EditorDDMFormFieldTemplateContextContributor
 		DDMFormField ddmFormField,
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
 
-		Map<String, Object> parameters = new HashMap<>();
+		return HashMapBuilder.<String, Object>put(
+			"placeholder",
+			() -> {
+				LocalizedValue placeholder =
+					(LocalizedValue)ddmFormField.getProperty("placeholder");
 
-		LocalizedValue placeholder = (LocalizedValue)ddmFormField.getProperty(
-			"placeholder");
+				if (placeholder != null) {
+					return placeholder.getString(
+						ddmFormFieldRenderingContext.getLocale());
+				}
 
-		String placeholderString = StringPool.BLANK;
-
-		if (placeholder != null) {
-			placeholderString = placeholder.getString(
-				ddmFormFieldRenderingContext.getLocale());
-		}
-
-		parameters.put("placeholder", placeholderString);
-
-		return parameters;
+				return StringPool.BLANK;
+			}
+		).build();
 	}
 
 }

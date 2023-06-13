@@ -118,13 +118,15 @@ public class AuthVerifierPipeline {
 
 		String contextPath = httpServletRequest.getContextPath();
 
-		requestURI = requestURI.substring(contextPath.length());
+		if (requestURI.equals(contextPath)) {
+			requestURI += "/";
+		}
 
 		for (AuthVerifierConfiguration authVerifierConfiguration :
 				_authVerifierConfigurations) {
 
 			authVerifierConfiguration = _mergeAuthVerifierConfiguration(
-				authVerifierConfiguration, accessControlContext);
+				authVerifierConfiguration, accessControlContext, contextPath);
 
 			if (_isMatchingRequestURI(authVerifierConfiguration, requestURI)) {
 				authVerifierConfigurations.add(authVerifierConfiguration);
@@ -165,7 +167,7 @@ public class AuthVerifierPipeline {
 
 	private AuthVerifierConfiguration _mergeAuthVerifierConfiguration(
 		AuthVerifierConfiguration authVerifierConfiguration,
-		AccessControlContext accessControlContext) {
+		AccessControlContext accessControlContext, String contextPath) {
 
 		Map<String, Object> settings = accessControlContext.getSettings();
 
@@ -211,8 +213,22 @@ public class AuthVerifierPipeline {
 					String propertiesKey = settingsKey.substring(
 						authVerifierSettingsKey.length());
 
-					mergedProperties.setProperty(
-						propertiesKey, (String)settingsValue);
+					if (propertiesKey.equals("urls.includes") ||
+						propertiesKey.equals("urls.excludes")) {
+
+						String settingsValueString = (String)settingsValue;
+
+						if (settingsValueString.charAt(0) != '/') {
+							settingsValueString = "/" + settingsValueString;
+						}
+
+						mergedProperties.setProperty(
+							propertiesKey, contextPath + settingsValueString);
+					}
+					else {
+						mergedProperties.setProperty(
+							propertiesKey, (String)settingsValue);
+					}
 				}
 			}
 		}
@@ -262,11 +278,12 @@ public class AuthVerifierPipeline {
 				authVerifierResult = authVerifier.verify(
 					accessControlContext, properties);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
 					Class<?> authVerifierClass = authVerifier.getClass();
 
-					_log.debug("Skipping " + authVerifierClass.getName(), e);
+					_log.debug(
+						"Skipping " + authVerifierClass.getName(), exception);
 				}
 
 				continue;

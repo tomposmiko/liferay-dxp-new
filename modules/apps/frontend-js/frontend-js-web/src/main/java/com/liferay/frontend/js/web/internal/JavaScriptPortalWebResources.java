@@ -17,6 +17,8 @@ package com.liferay.frontend.js.web.internal;
 import com.liferay.portal.kernel.servlet.PortalWebResourceConstants;
 import com.liferay.portal.kernel.servlet.PortalWebResources;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 import javax.servlet.ServletContext;
 
 import org.osgi.framework.Bundle;
@@ -28,7 +30,10 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Peter Fellwock
  */
-@Component(immediate = true, service = PortalWebResources.class)
+@Component(
+	immediate = true,
+	service = {JavaScriptPortalWebResources.class, PortalWebResources.class}
+)
 public class JavaScriptPortalWebResources implements PortalWebResources {
 
 	@Override
@@ -38,7 +43,7 @@ public class JavaScriptPortalWebResources implements PortalWebResources {
 
 	@Override
 	public long getLastModified() {
-		return _bundle.getLastModified();
+		return _lastModified.get();
 	}
 
 	@Override
@@ -51,9 +56,15 @@ public class JavaScriptPortalWebResources implements PortalWebResources {
 		return _servletContext;
 	}
 
+	public void updateLastModifed(long lastModified) {
+		_lastModified.accumulateAndGet(lastModified, Math::max);
+	}
+
 	@Activate
 	protected void activate(BundleContext bundleContext) {
-		_bundle = bundleContext.getBundle();
+		Bundle bundle = bundleContext.getBundle();
+
+		_lastModified.set(bundle.getLastModified());
 	}
 
 	@Reference(
@@ -64,7 +75,7 @@ public class JavaScriptPortalWebResources implements PortalWebResources {
 		_servletContext = servletContext;
 	}
 
-	private Bundle _bundle;
+	private final AtomicLong _lastModified = new AtomicLong();
 	private ServletContext _servletContext;
 
 }

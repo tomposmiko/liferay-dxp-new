@@ -52,7 +52,7 @@ public abstract class CalendarResourceServiceBaseImpl
 	extends BaseServiceImpl
 	implements AopService, CalendarResourceService, IdentifiableOSGiService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>CalendarResourceService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.calendar.service.CalendarResourceServiceUtil</code>.
@@ -106,8 +106,8 @@ public abstract class CalendarResourceServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

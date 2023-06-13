@@ -48,6 +48,7 @@ public class DEDataDefinitionFieldLinkWrapper
 		attributes.put(
 			"deDataDefinitionFieldLinkId", getDeDataDefinitionFieldLinkId());
 		attributes.put("groupId", getGroupId());
+		attributes.put("companyId", getCompanyId());
 		attributes.put("classNameId", getClassNameId());
 		attributes.put("classPK", getClassPK());
 		attributes.put("ddmStructureId", getDdmStructureId());
@@ -75,6 +76,12 @@ public class DEDataDefinitionFieldLinkWrapper
 
 		if (groupId != null) {
 			setGroupId(groupId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
 		}
 
 		Long classNameId = (Long)attributes.get("classNameId");
@@ -130,6 +137,16 @@ public class DEDataDefinitionFieldLinkWrapper
 	@Override
 	public long getClassPK() {
 		return model.getClassPK();
+	}
+
+	/**
+	 * Returns the company ID of this de data definition field link.
+	 *
+	 * @return the company ID of this de data definition field link
+	 */
+	@Override
+	public long getCompanyId() {
+		return model.getCompanyId();
 	}
 
 	/**
@@ -192,11 +209,6 @@ public class DEDataDefinitionFieldLinkWrapper
 		return model.getUuid();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a de data definition field link model instance should use the <code>DEDataDefinitionFieldLink</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();
@@ -225,6 +237,16 @@ public class DEDataDefinitionFieldLinkWrapper
 	@Override
 	public void setClassPK(long classPK) {
 		model.setClassPK(classPK);
+	}
+
+	/**
+	 * Sets the company ID of this de data definition field link.
+	 *
+	 * @param companyId the company ID of this de data definition field link
+	 */
+	@Override
+	public void setCompanyId(long companyId) {
+		model.setCompanyId(companyId);
 	}
 
 	/**

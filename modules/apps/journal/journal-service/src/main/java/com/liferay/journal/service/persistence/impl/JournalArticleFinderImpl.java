@@ -415,18 +415,6 @@ public class JournalArticleFinderImpl
 			queryDefinition, true);
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), use filterFindByG_F_L instead
-	 */
-	@Deprecated
-	@Override
-	public List<JournalArticle> filterFindByG_F(
-		long groupId, List<Long> folderIds,
-		QueryDefinition<JournalArticle> queryDefinition) {
-
-		return doFindByG_F(groupId, folderIds, queryDefinition, true);
-	}
-
 	@Override
 	public List<JournalArticle> filterFindByG_ST(
 		long groupId, int status,
@@ -591,8 +579,8 @@ public class JournalArticleFinderImpl
 
 			return q.list(true);
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -657,8 +645,8 @@ public class JournalArticleFinderImpl
 
 			return q.list(true);
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -684,8 +672,8 @@ public class JournalArticleFinderImpl
 
 			return q.list(true);
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -719,8 +707,8 @@ public class JournalArticleFinderImpl
 
 			return q.list(true);
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -756,8 +744,8 @@ public class JournalArticleFinderImpl
 				return articles.get(0);
 			}
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -772,18 +760,6 @@ public class JournalArticleFinderImpl
 		sb.append("}");
 
 		throw new NoSuchArticleException(sb.toString());
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), use findByG_F_L instead
-	 */
-	@Deprecated
-	@Override
-	public List<JournalArticle> findByG_F(
-		long groupId, List<Long> folderIds,
-		QueryDefinition<JournalArticle> queryDefinition) {
-
-		return doFindByG_F(groupId, folderIds, queryDefinition, false);
 	}
 
 	@Override
@@ -967,8 +943,8 @@ public class JournalArticleFinderImpl
 
 			return 0;
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -1015,8 +991,8 @@ public class JournalArticleFinderImpl
 
 			return 0;
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -1080,8 +1056,8 @@ public class JournalArticleFinderImpl
 
 			return 0;
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -1129,16 +1105,16 @@ public class JournalArticleFinderImpl
 			qPos.add(groupId);
 			qPos.add(classNameId);
 
+			for (long folderId : folderIds) {
+				qPos.add(folderId);
+			}
+
 			if (queryDefinition.getOwnerUserId() > 0) {
 				qPos.add(queryDefinition.getOwnerUserId());
 
 				if (queryDefinition.isIncludeOwner()) {
 					qPos.add(WorkflowConstants.STATUS_IN_TRASH);
 				}
-			}
-
-			for (long folderId : folderIds) {
-				qPos.add(folderId);
 			}
 
 			qPos.add(queryDefinition.getStatus());
@@ -1155,8 +1131,8 @@ public class JournalArticleFinderImpl
 
 			return 0;
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -1309,8 +1285,8 @@ public class JournalArticleFinderImpl
 
 			return 0;
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -1363,8 +1339,8 @@ public class JournalArticleFinderImpl
 				q, getDialect(), queryDefinition.getStart(),
 				queryDefinition.getEnd());
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -1407,8 +1383,8 @@ public class JournalArticleFinderImpl
 				q, getDialect(), queryDefinition.getStart(),
 				queryDefinition.getEnd());
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -1452,8 +1428,8 @@ public class JournalArticleFinderImpl
 				q, getDialect(), queryDefinition.getStart(),
 				queryDefinition.getEnd());
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -1508,8 +1484,8 @@ public class JournalArticleFinderImpl
 				q, getDialect(), queryDefinition.getStart(),
 				queryDefinition.getEnd());
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -1569,8 +1545,8 @@ public class JournalArticleFinderImpl
 				q, getDialect(), queryDefinition.getStart(),
 				queryDefinition.getEnd());
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -1639,8 +1615,8 @@ public class JournalArticleFinderImpl
 				q, getDialect(), queryDefinition.getStart(),
 				queryDefinition.getEnd());
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -1702,8 +1678,8 @@ public class JournalArticleFinderImpl
 				q, getDialect(), queryDefinition.getStart(),
 				queryDefinition.getEnd());
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -1774,8 +1750,8 @@ public class JournalArticleFinderImpl
 				q, getDialect(), queryDefinition.getStart(),
 				queryDefinition.getEnd());
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -1936,8 +1912,8 @@ public class JournalArticleFinderImpl
 				q, getDialect(), queryDefinition.getStart(),
 				queryDefinition.getEnd());
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -2019,8 +1995,8 @@ public class JournalArticleFinderImpl
 				ConfigurationProviderUtil.getCompanyConfiguration(
 					JournalServiceConfiguration.class, companyId);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 
 		if (journalServiceConfiguration == null) {

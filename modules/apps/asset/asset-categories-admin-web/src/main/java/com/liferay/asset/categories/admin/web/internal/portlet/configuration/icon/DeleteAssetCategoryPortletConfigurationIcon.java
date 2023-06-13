@@ -14,7 +14,7 @@
 
 package com.liferay.asset.categories.admin.web.internal.portlet.configuration.icon;
 
-import com.liferay.asset.categories.admin.web.internal.constants.AssetCategoriesAdminPortletKeys;
+import com.liferay.asset.categories.admin.web.constants.AssetCategoriesAdminPortletKeys;
 import com.liferay.asset.categories.admin.web.internal.display.context.AssetCategoriesDisplayContext;
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -86,7 +86,7 @@ public class DeleteAssetCategoryPortletConfigurationIcon
 	public boolean isShow(PortletRequest portletRequest) {
 		AssetCategoriesDisplayContext assetCategoriesDisplayContext =
 			new AssetCategoriesDisplayContext(
-				null, null, _portal.getHttpServletRequest(portletRequest));
+				_portal.getHttpServletRequest(portletRequest), null, null);
 
 		AssetCategory category = assetCategoriesDisplayContext.getCategory();
 
@@ -98,9 +98,9 @@ public class DeleteAssetCategoryPortletConfigurationIcon
 			return assetCategoriesDisplayContext.hasPermission(
 				category, ActionKeys.DELETE);
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(pe, pe);
+				_log.debug(portalException, portalException);
 			}
 		}
 

@@ -75,37 +75,10 @@ public class AnnouncementsDeliveryServiceSoap {
 			return com.liferay.announcements.kernel.model.
 				AnnouncementsDeliverySoap.toSoapModel(returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #updateDelivery(long, String, boolean, boolean)}
-	 */
-	@Deprecated
-	public static
-		com.liferay.announcements.kernel.model.AnnouncementsDeliverySoap
-				updateDelivery(
-					long userId, String type, boolean email, boolean sms,
-					boolean website)
-			throws RemoteException {
-
-		try {
-			com.liferay.announcements.kernel.model.AnnouncementsDelivery
-				returnValue = AnnouncementsDeliveryServiceUtil.updateDelivery(
-					userId, type, email, sms, website);
-
-			return com.liferay.announcements.kernel.model.
-				AnnouncementsDeliverySoap.toSoapModel(returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 

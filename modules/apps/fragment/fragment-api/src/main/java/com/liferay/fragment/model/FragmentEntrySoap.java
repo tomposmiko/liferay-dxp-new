@@ -48,6 +48,7 @@ public class FragmentEntrySoap implements Serializable {
 		soapModel.setJs(model.getJs());
 		soapModel.setConfiguration(model.getConfiguration());
 		soapModel.setPreviewFileEntryId(model.getPreviewFileEntryId());
+		soapModel.setReadOnly(model.isReadOnly());
 		soapModel.setType(model.getType());
 		soapModel.setLastPublishDate(model.getLastPublishDate());
 		soapModel.setStatus(model.getStatus());
@@ -243,6 +244,18 @@ public class FragmentEntrySoap implements Serializable {
 		_previewFileEntryId = previewFileEntryId;
 	}
 
+	public boolean getReadOnly() {
+		return _readOnly;
+	}
+
+	public boolean isReadOnly() {
+		return _readOnly;
+	}
+
+	public void setReadOnly(boolean readOnly) {
+		_readOnly = readOnly;
+	}
+
 	public int getType() {
 		return _type;
 	}
@@ -308,6 +321,7 @@ public class FragmentEntrySoap implements Serializable {
 	private String _js;
 	private String _configuration;
 	private long _previewFileEntryId;
+	private boolean _readOnly;
 	private int _type;
 	private Date _lastPublishDate;
 	private int _status;

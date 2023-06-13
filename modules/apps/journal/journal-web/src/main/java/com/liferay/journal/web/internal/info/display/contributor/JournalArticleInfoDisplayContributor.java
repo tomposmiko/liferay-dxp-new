@@ -85,6 +85,16 @@ public class JournalArticleInfoDisplayContributor
 
 	@Override
 	public Set<InfoDisplayField> getInfoDisplayFields(
+			JournalArticle article, Locale locale)
+		throws PortalException {
+
+		DDMStructure ddmStructure = article.getDDMStructure();
+
+		return getInfoDisplayFields(ddmStructure.getStructureId(), locale);
+	}
+
+	@Override
+	public Set<InfoDisplayField> getInfoDisplayFields(
 			long classTypeId, Locale locale)
 		throws PortalException {
 
@@ -278,9 +288,9 @@ public class JournalArticleInfoDisplayContributor
 						journalArticleDDMFormValuesReader.getDDMFormValues(),
 						locale));
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(pe, pe);
+				_log.debug(portalException, portalException);
 			}
 		}
 

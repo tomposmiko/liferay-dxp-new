@@ -186,24 +186,6 @@ public class DDMFormInstanceLocalServiceImpl
 			ddmFormInstance.getFormInstanceId(), modelPermissions);
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #addFormInstanceResources(DDMFormInstance, ModelPermissions)}
-	 */
-	@Deprecated
-	@Override
-	public void addFormInstanceResources(
-			DDMFormInstance ddmFormInstance, String[] groupPermissions,
-			String[] guestPermissions)
-		throws PortalException {
-
-		resourceLocalService.addModelResources(
-			ddmFormInstance.getCompanyId(), ddmFormInstance.getGroupId(),
-			ddmFormInstance.getUserId(), DDMFormInstance.class.getName(),
-			ddmFormInstance.getFormInstanceId(), groupPermissions,
-			guestPermissions);
-	}
-
 	@Override
 	@SystemEvent(
 		action = SystemEventConstants.ACTION_SKIP,
@@ -211,8 +193,6 @@ public class DDMFormInstanceLocalServiceImpl
 	)
 	public void deleteFormInstance(DDMFormInstance ddmFormInstance)
 		throws PortalException {
-
-		deleteDDMFormInstance(ddmFormInstance);
 
 		resourceLocalService.deleteResource(
 			ddmFormInstance.getCompanyId(), DDMFormInstance.class.getName(),
@@ -235,6 +215,11 @@ public class DDMFormInstanceLocalServiceImpl
 			ddmFormInstance.getCompanyId(), ddmFormInstance.getGroupId(),
 			DDMFormInstance.class.getName(),
 			ddmFormInstance.getFormInstanceId(), 0);
+
+		// See LPS-97208 and
+		// DDMFormInstanceRecordSearchTest#testBasicSearchWithDefaultUser.
+
+		deleteDDMFormInstance(ddmFormInstance);
 	}
 
 	@Override
@@ -428,9 +413,7 @@ public class DDMFormInstanceLocalServiceImpl
 		ddmFormInstanceVersion.setStatusByUserName(user.getFullName());
 		ddmFormInstanceVersion.setStatusDate(ddmFormInstance.getModifiedDate());
 
-		ddmFormInstanceVersionPersistence.update(ddmFormInstanceVersion);
-
-		return ddmFormInstanceVersion;
+		return ddmFormInstanceVersionPersistence.update(ddmFormInstanceVersion);
 	}
 
 	protected DDMFormInstance doUpdateFormInstance(

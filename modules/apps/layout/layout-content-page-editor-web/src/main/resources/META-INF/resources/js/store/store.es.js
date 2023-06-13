@@ -12,6 +12,7 @@
  * details.
  */
 
+import {debounce} from 'frontend-js-web';
 import State, {Config} from 'metal-state';
 
 import {DEFAULT_INITIAL_STATE} from './state.es';
@@ -31,17 +32,27 @@ import {DEFAULT_INITIAL_STATE} from './state.es';
 const STORE_DEVTOOLS_ID = '__REDUX_DEVTOOLS_EXTENSION__';
 
 /**
+ * Internal store instance
+ * @type {Store}
+ */
+let _store;
+
+/**
  * Connects a given component to a given store, syncing it's properties with it.
  * @param {Component} component
  * @param {Store} store
+ * @param {function} mapStateToProps
  * @review
  */
-const connect = function(component, store) {
-	component._storeChangeListener = store.on('change', () =>
-		syncStoreState(component, store)
-	);
+const connect = function(component, store, mapStateToProps) {
+	const debouncedSync = debounce(() => {
+		if (!component.disposed_) {
+			syncStoreState(component, store, mapStateToProps);
+		}
+	}, 100);
 
-	syncStoreState(component, store);
+	component._storeChangeListener = store.on('change', debouncedSync);
+	component.on('stateChanged', debouncedSync);
 };
 
 /**
@@ -66,36 +77,51 @@ const disconnect = function(component) {
  * @review
  */
 const createStore = function(initialState, reducer, componentIds = []) {
-	const store = new Store(initialState, reducer);
+	_store = new Store(initialState, reducer);
 
 	componentIds.forEach(componentId => {
 		Liferay.componentReady(componentId).then(component => {
-			component.store = store;
+			component.store = _store;
 
-			connect(
-				component,
-				store
-			);
+			connect(component, _store, state => state);
 		});
 	});
 
-	return store;
+	return _store;
+};
+
+/**
+ * Returns the existing store state.
+ * Warning: this is a workaround to get constants from DisplayContext
+ * until we split them into another module.
+ * @return {object}
+ */
+const getState = function() {
+	return _store ? _store.getState() : {};
 };
 
 /**
  * @param {ConnectedComponent} component
  * @param {Store} store
+ * @param {function} mapStateToProps
  */
-const syncStoreState = function(component, store) {
-	const state = store.getState();
+const syncStoreState = function(component, store, mapStateToProps) {
+	const state = mapStateToProps(store.getState(), component);
 
-	component
+	const changedKeys = component
 		.getStateKeys()
 		.filter(key => key in state)
-		.filter(key => component[key] !== state[key])
-		.forEach(key => {
-			component[key] = state[key];
+		.filter(key => component[key] !== state[key]);
+
+	if (changedKeys.length) {
+		const newState = {};
+
+		changedKeys.forEach(key => {
+			newState[key] = state[key];
 		});
+
+		component.setState(newState);
+	}
 };
 
 /**
@@ -260,7 +286,10 @@ class Store extends State {
 
 		this._state = this._getFrozenState({
 			...DEFAULT_INITIAL_STATE,
-			...initialState
+			...initialState,
+			selectedSidebarPanelId: initialState.lockedSegmentsExperience
+				? null
+				: initialState.selectedSidebarPanelId
 		});
 
 		return this._state;
@@ -323,5 +352,5 @@ Store.STATE = {
 		.value(null)
 };
 
-export {connect, disconnect, createStore, Store};
+export {connect, disconnect, createStore, getState, Store};
 export default Store;

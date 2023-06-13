@@ -33,7 +33,7 @@ else {
 <h1 class="h4 text-default"><liferay-ui:message key="current-theme" /></h1>
 
 <div class="card-horizontal main-content-card">
-	<div class="card-row card-row-padded">
+	<div class="card-body">
 		<div id="<portlet:namespace />themeContainer">
 			<liferay-util:include page="/look_and_feel_theme_details.jsp" servletContext="<%= application %>" />
 		</div>
@@ -42,7 +42,7 @@ else {
 	</div>
 </div>
 
-<aui:button cssClass="btn btn-default" id="changeTheme" value="change-current-theme" />
+<aui:button cssClass="btn btn-secondary" id="changeTheme" value="change-current-theme" />
 
 <aui:script use="aui-parse-content">
 	var Util = Liferay.Util;
@@ -94,7 +94,6 @@ else {
 							return response.text();
 						})
 						.then(function(responseData) {
-							debugger;
 							themeContainer.plug(A.Plugin.ParseContent);
 
 							themeContainer.setContent(responseData);

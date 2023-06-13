@@ -12,7 +12,7 @@
  * details.
  */
 
-export const ADD_MAPPED_ASSET_ENTRY = 'addMappedAssetEntry';
+export const ADD_MAPPED_INFO_ITEM = 'addMappedInfoItem';
 
 export const UPDATE_PAGE_CONTENTS = 'updatePageContents';
 
@@ -57,6 +57,8 @@ export const TOGGLE_SHOW_RESOLVED_COMMENTS = 'TOGGLE_SHOW_RESOLVED_COMMENTS';
 
 export const UPDATE_EDITABLE_VALUE_ERROR = 'UPDATE_EDITABLE_VALUE_ERROR';
 export const UPDATE_EDITABLE_VALUE_LOADING = 'UPDATE_EDITABLE_VALUE_LOADING';
+
+export const UPDATE_FRAGMENT_ENTRY_KEYS = 'UPDATE_FRAGMENT_ENTRY_KEYS';
 
 export const UPDATE_FRAGMENT_ENTRY_LINK_CONTENT =
 	'updateFragmentEntryLinkContent';

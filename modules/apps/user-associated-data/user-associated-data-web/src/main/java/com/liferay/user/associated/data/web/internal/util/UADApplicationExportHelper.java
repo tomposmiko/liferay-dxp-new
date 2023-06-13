@@ -81,8 +81,8 @@ public class UADApplicationExportHelper {
 			try {
 				applicationDataCount += (int)uadExporter.count(userId);
 			}
-			catch (PortalException pe) {
-				_log.error(pe, pe);
+			catch (PortalException portalException) {
+				_log.error(portalException, portalException);
 			}
 		}
 
@@ -94,10 +94,10 @@ public class UADApplicationExportHelper {
 	public List<UADApplicationExportDisplay> getUADApplicationExportDisplays(
 		long groupId, long userId) {
 
-		Set<String> applicationUADDisplayKeySet =
+		Set<String> applicationUADDisplaysKeySet =
 			_uadRegistry.getApplicationUADDisplaysKeySet();
 
-		Iterator<String> iterator = applicationUADDisplayKeySet.iterator();
+		Iterator<String> iterator = applicationUADDisplaysKeySet.iterator();
 
 		List<UADApplicationExportDisplay> uadApplicationExportDisplays =
 			new ArrayList<>();

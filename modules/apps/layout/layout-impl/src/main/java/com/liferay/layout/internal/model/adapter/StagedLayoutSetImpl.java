@@ -26,7 +26,6 @@ import com.liferay.portal.kernel.model.ColorScheme;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.LayoutSetPrototype;
-import com.liferay.portal.kernel.model.LayoutSetVersion;
 import com.liferay.portal.kernel.model.Theme;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.LayoutSetPrototypeLocalServiceUtil;
@@ -45,6 +44,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.TreeMap;
 
 /**
  * @author Máté Thurzó
@@ -99,12 +99,12 @@ public class StagedLayoutSetImpl implements StagedLayoutSet {
 			_userName = user.getFullName();
 			_userUuid = user.getUuid();
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(pe, pe);
+				_log.debug(portalException, portalException);
 			}
 		}
 	}
@@ -162,11 +162,6 @@ public class StagedLayoutSetImpl implements StagedLayoutSet {
 	@Override
 	public long getGroupId() {
 		return _layoutSet.getGroupId();
-	}
-
-	@Override
-	public long getHeadId() {
-		return _layoutSet.getHeadId();
 	}
 
 	@Override
@@ -314,9 +309,19 @@ public class StagedLayoutSetImpl implements StagedLayoutSet {
 		return String.valueOf(_layoutSet.isPrivateLayout());
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             #getVirtualHostnames()}
+	 */
+	@Deprecated
 	@Override
 	public String getVirtualHostname() {
 		return _layoutSet.getVirtualHostname();
+	}
+
+	@Override
+	public TreeMap<String, String> getVirtualHostnames() {
+		return _layoutSet.getVirtualHostnames();
 	}
 
 	@Override
@@ -375,11 +380,6 @@ public class StagedLayoutSetImpl implements StagedLayoutSet {
 	}
 
 	@Override
-	public void populateVersionModel(LayoutSetVersion layoutSetVersion) {
-		_layoutSet.populateVersionModel(layoutSetVersion);
-	}
-
-	@Override
 	public void resetOriginalValues() {
 		_layoutSet.resetOriginalValues();
 	}
@@ -435,11 +435,6 @@ public class StagedLayoutSetImpl implements StagedLayoutSet {
 	@Override
 	public void setGroupId(long groupId) {
 		_layoutSet.setGroupId(groupId);
-	}
-
-	@Override
-	public void setHeadId(long headId) {
-		_layoutSet.setHeadId(headId);
 	}
 
 	@Override
@@ -504,11 +499,6 @@ public class StagedLayoutSetImpl implements StagedLayoutSet {
 	}
 
 	@Override
-	public void setPageCount(int pageCount) {
-		_layoutSet.setPageCount(pageCount);
-	}
-
-	@Override
 	public void setPrimaryKey(long primaryKey) {
 		_layoutSet.setPrimaryKey(primaryKey);
 	}
@@ -558,9 +548,19 @@ public class StagedLayoutSetImpl implements StagedLayoutSet {
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             #setVirtualHostnames(TreeMap)}
+	 */
+	@Deprecated
 	@Override
 	public void setVirtualHostname(String virtualHostname) {
 		_layoutSet.setVirtualHostname(virtualHostname);
+	}
+
+	@Override
+	public void setVirtualHostnames(TreeMap virtualHostnames) {
+		_layoutSet.setVirtualHostnames(virtualHostnames);
 	}
 
 	@Override

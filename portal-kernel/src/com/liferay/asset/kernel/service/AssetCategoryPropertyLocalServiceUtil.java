@@ -33,7 +33,7 @@ import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 @Deprecated
 public class AssetCategoryPropertyLocalServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.portlet.asset.service.impl.AssetCategoryPropertyLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.

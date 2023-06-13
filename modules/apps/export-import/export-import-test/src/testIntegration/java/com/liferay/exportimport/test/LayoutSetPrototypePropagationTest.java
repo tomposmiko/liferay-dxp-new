@@ -57,6 +57,7 @@ import com.liferay.portal.kernel.test.util.RoleTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.UnicodeProperties;
@@ -66,7 +67,6 @@ import com.liferay.sites.kernel.util.Sites;
 import com.liferay.sites.kernel.util.SitesUtil;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -147,7 +147,7 @@ public class LayoutSetPrototypePropagationTest
 			_initialPrototypeLayoutCount + 1, getGroupLayoutCount());
 
 		LayoutLocalServiceUtil.deleteLayout(
-			layout, true, ServiceContextTestUtil.getServiceContext());
+			layout, ServiceContextTestUtil.getServiceContext());
 
 		Layout newLayout = LayoutTestUtil.addLayout(
 			_layoutSetPrototypeGroup.getGroupId(), "test", true);
@@ -321,9 +321,9 @@ public class LayoutSetPrototypePropagationTest
 			_layoutSetPrototypeLayout = LayoutTestUtil.addLayout(
 				_layoutSetPrototypeGroup, true, layoutPrototype, true);
 
-			Map<String, String[]> preferenceMap = new HashMap<>();
-
-			preferenceMap.put("bulletStyle", new String[] {"Dots"});
+			Map<String, String[]> preferenceMap = HashMapBuilder.put(
+				"bulletStyle", new String[] {"Dots"}
+			).build();
 
 			String testPortletId1 = LayoutTestUtil.addPortletToLayout(
 				TestPropsValues.getUserId(), _layoutSetPrototypeLayout,
@@ -484,7 +484,7 @@ public class LayoutSetPrototypePropagationTest
 				"The user should not be able to reset another user's " +
 					"dashboard");
 		}
-		catch (PrincipalException pe) {
+		catch (PrincipalException principalException) {
 		}
 	}
 
@@ -635,7 +635,7 @@ public class LayoutSetPrototypePropagationTest
 		}
 
 		LayoutLocalServiceUtil.deleteLayout(
-			layout, true, ServiceContextTestUtil.getServiceContext());
+			layout, ServiceContextTestUtil.getServiceContext());
 
 		if (linkEnabled) {
 			Assert.assertEquals(
@@ -786,19 +786,15 @@ public class LayoutSetPrototypePropagationTest
 		if ((layout != null) && (_layout != null)) {
 			layout = LayoutLocalServiceUtil.getLayout(layout.getPlid());
 
-			Layout draftLayout = LayoutLocalServiceUtil.getDraft(layout);
+			layout.setLayoutPrototypeLinkEnabled(linkEnabled);
 
-			draftLayout.setLayoutPrototypeLinkEnabled(linkEnabled);
-
-			layout = LayoutLocalServiceUtil.publishDraft(draftLayout);
+			LayoutLocalServiceUtil.updateLayout(layout);
 
 			_layout = LayoutLocalServiceUtil.getLayout(_layout.getPlid());
 
-			draftLayout = LayoutLocalServiceUtil.getDraft(_layout);
+			_layout.setLayoutPrototypeLinkEnabled(linkEnabled);
 
-			draftLayout.setLayoutPrototypeLinkEnabled(linkEnabled);
-
-			_layout = LayoutLocalServiceUtil.updateLayout(draftLayout);
+			LayoutLocalServiceUtil.updateLayout(_layout);
 		}
 
 		MergeLayoutPrototypesThreadLocal.clearMergeComplete();
@@ -823,7 +819,7 @@ public class LayoutSetPrototypePropagationTest
 					"template with link enabled",
 				layoutSetPrototypeLinkEnabled);
 		}
-		catch (LayoutParentLayoutIdException lplie) {
+		catch (LayoutParentLayoutIdException layoutParentLayoutIdException) {
 			Assert.assertTrue(
 				"Unable to add a child page to a page associated to a " +
 					"template with link disabled",

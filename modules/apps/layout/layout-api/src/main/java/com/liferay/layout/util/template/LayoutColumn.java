@@ -21,10 +21,14 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutTypePortlet;
+import com.liferay.portal.kernel.model.LayoutTypePortletConstants;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.PortletKeys;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,11 +46,22 @@ public class LayoutColumn {
 		try {
 			unsafeConsumer.accept(layoutColumn);
 		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
+		catch (Exception exception) {
+			throw new RuntimeException(exception);
 		}
 
 		return layoutColumn;
+	}
+
+	public void addAllPortlets() throws PortalException {
+		LayoutTypePortlet layoutTypePortlet =
+			(LayoutTypePortlet)_layout.getLayoutType();
+
+		for (String portletId : layoutTypePortlet.getPortletIds()) {
+			if (!portletId.startsWith(PortletKeys.NESTED_PORTLETS)) {
+				_addPortlet(portletId);
+			}
+		}
 	}
 
 	public void addPortlets(String columnId) throws PortalException {
@@ -54,7 +69,16 @@ public class LayoutColumn {
 			_layout.getTypeSettingsProperties(), columnId);
 
 		for (String portletId : portletIds) {
-			_addPortlet(portletId);
+			if (portletId.startsWith(PortletKeys.NESTED_PORTLETS)) {
+				for (String portletNestedColumnId :
+						_getNestedColumnIds(portletId)) {
+
+					addPortlets(portletNestedColumnId);
+				}
+			}
+			else {
+				_addPortlet(portletId);
+			}
 		}
 	}
 
@@ -92,6 +116,25 @@ public class LayoutColumn {
 				StringPool.BLANK, 0, null, serviceContext);
 
 		_fragmentEntryLinkIds.add(fragmentEntryLink.getFragmentEntryLinkId());
+	}
+
+	private List<String> _getNestedColumnIds(String portletId) {
+		List<String> portletNestedColumnIds = new ArrayList<>();
+
+		String property = _layout.getTypeSettingsProperty(
+			LayoutTypePortletConstants.NESTED_COLUMN_IDS, StringPool.BLANK);
+
+		String[] nestedColumnIds = property.split(StringPool.COMMA);
+
+		for (String nestedColumnId : nestedColumnIds) {
+			if (Validator.isNotNull(nestedColumnId) &&
+				nestedColumnId.startsWith(StringPool.UNDERLINE + portletId)) {
+
+				portletNestedColumnIds.add(nestedColumnId);
+			}
+		}
+
+		return portletNestedColumnIds;
 	}
 
 	private final List<Long> _fragmentEntryLinkIds = new ArrayList<>();

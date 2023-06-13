@@ -37,12 +37,12 @@ long[] groupIds = viewUADEntitiesDisplay.getGroupIds();
 %>
 
 <clay:management-toolbar
-	displayContext="<%= new ViewUADEntitiesManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, viewUADEntitiesDisplay) %>"
+	displayContext="<%= new ViewUADEntitiesManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, viewUADEntitiesDisplay) %>"
 />
 
 <aui:form method="post" name="viewUADEntitiesFm">
-	<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 	<aui:input name="p_u_i_d" type="hidden" value="<%= String.valueOf(selectedUser.getUserId()) %>" />
+	<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 	<aui:input name="groupIds" type="hidden" value='<%= (groupIds != null) ? StringUtil.merge(groupIds) : "" %>' />
 	<aui:input name="parentContainerClass" type="hidden" value="<%= parentContainerClass %>" />
 	<aui:input name="parentContainerId" type="hidden" value="<%= String.valueOf(parentContainerId) %>" />

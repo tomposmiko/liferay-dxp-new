@@ -30,11 +30,6 @@ public class MessageLocalServiceWrapper
 		_messageLocalService = messageLocalService;
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link MessageLocalServiceUtil} to access the message local service. Add custom service methods to <code>com.liferay.mail.reader.service.impl.MessageLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
-	 */
 	@Override
 	public com.liferay.mail.reader.model.Message addMessage(
 			long userId, long folderId, String sender, String to, String cc,

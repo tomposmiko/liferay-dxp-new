@@ -44,7 +44,6 @@ public class CompanyWrapper
 		attributes.put("companyId", getCompanyId());
 		attributes.put("accountId", getAccountId());
 		attributes.put("webId", getWebId());
-		attributes.put("key", getKey());
 		attributes.put("mx", getMx());
 		attributes.put("homeURL", getHomeURL());
 		attributes.put("logoId", getLogoId());
@@ -79,12 +78,6 @@ public class CompanyWrapper
 
 		if (webId != null) {
 			setWebId(webId);
-		}
-
-		String key = (String)attributes.get("key");
-
-		if (key != null) {
-			setKey(key);
 		}
 
 		String mx = (String)attributes.get("mx");
@@ -177,6 +170,11 @@ public class CompanyWrapper
 	}
 
 	@Override
+	public CompanyInfo getCompanyInfo() {
+		return model.getCompanyInfo();
+	}
+
+	@Override
 	public User getDefaultUser()
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -217,11 +215,6 @@ public class CompanyWrapper
 		return model.getHomeURL();
 	}
 
-	/**
-	 * Returns the key of this company.
-	 *
-	 * @return the key of this company
-	 */
 	@Override
 	public String getKey() {
 		return model.getKey();
@@ -406,11 +399,6 @@ public class CompanyWrapper
 		return model.isSystem();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a company model instance should use the <code>Company</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();
@@ -456,11 +444,6 @@ public class CompanyWrapper
 		model.setHomeURL(homeURL);
 	}
 
-	/**
-	 * Sets the key of this company.
-	 *
-	 * @param key the key of this company
-	 */
 	@Override
 	public void setKey(String key) {
 		model.setKey(key);

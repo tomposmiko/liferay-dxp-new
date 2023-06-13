@@ -434,7 +434,7 @@ body > .lfr-menu-list ul,
 	}
 }
 
-/* ---------- Switches ---------- */
+// ---------- Switches ----------
 
 input.switch {
 	&:focus ~ .switch-bar:before {
@@ -452,10 +452,10 @@ input.switch {
 	}
 }
 
-/* ---------- Image selector ---------- */
+// ---------- Image selector ----------
 
 .taglib-image-selector {
-	.icon-check {
+	.selection-status {
 		@include transition(opacity 0.2s ease-in-out);
 
 		border-radius: 30px;
@@ -466,7 +466,7 @@ input.switch {
 	}
 }
 
-/* ---------- Drop here info ---------- */
+// ---------- Drop here info ----------
 
 .drop-here-info {
 	@include transition(all 0.2s ease-in-out);

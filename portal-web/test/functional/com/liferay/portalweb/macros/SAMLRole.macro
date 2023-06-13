@@ -56,6 +56,8 @@ definition {
 			locator1 = "Button#SUBMIT",
 			value1 = "Save");
 
+		WaitForElementNotPresent(locator1 = "IFrame#DIALOG");
+
 		AssertElementPresent(
 			key_certificateUsage = "${certificateUsage}",
 			locator1 = "Button#DOWNLOAD_CERTIFICATE");

@@ -562,11 +562,6 @@ public class SyncDLObjectWrapper
 		return model.getVersionId();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a sync dl object model instance should use the <code>SyncDLObject</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

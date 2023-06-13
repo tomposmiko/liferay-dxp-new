@@ -146,10 +146,10 @@ MDRRuleGroupInstance ruleGroupInstance = (MDRRuleGroupInstance)renderRequest.get
 			formData.append('<portlet:namespace />type', type.value);
 		}
 
-		formData.append('<portlet:namespace /><%= actionId %>', '<%= actionId %>');
+		formData.append('<portlet:namespace />actionId', '<%= actionId %>');
 
 		Liferay.Util.fetch('<%= HtmlUtil.escapeJS(editorURL.toString()) %>', {
-			data: formData,
+			body: formData,
 			method: 'POST'
 		})
 			.then(function(response) {

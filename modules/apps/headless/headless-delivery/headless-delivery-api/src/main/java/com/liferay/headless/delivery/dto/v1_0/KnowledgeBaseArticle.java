@@ -88,6 +88,35 @@ public class KnowledgeBaseArticle {
 
 	}
 
+	@Schema
+	@Valid
+	public Map<String, Map> getActions() {
+		return actions;
+	}
+
+	public void setActions(Map<String, Map> actions) {
+		this.actions = actions;
+	}
+
+	@JsonIgnore
+	public void setActions(
+		UnsafeSupplier<Map<String, Map>, Exception> actionsUnsafeSupplier) {
+
+		try {
+			actions = actionsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected Map<String, Map> actions;
+
 	@Schema(description = "The article's average rating.")
 	@Valid
 	public AggregateRating getAggregateRating() {
@@ -114,7 +143,7 @@ public class KnowledgeBaseArticle {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The article's average rating.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected AggregateRating aggregateRating;
 
@@ -142,7 +171,7 @@ public class KnowledgeBaseArticle {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The article's main content.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	@NotEmpty
 	protected String articleBody;
@@ -172,7 +201,7 @@ public class KnowledgeBaseArticle {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The article's author.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator creator;
 
@@ -229,7 +258,7 @@ public class KnowledgeBaseArticle {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The date the article was created.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
@@ -259,7 +288,9 @@ public class KnowledgeBaseArticle {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The last time the article's content or metadata changed."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateModified;
 
@@ -287,7 +318,7 @@ public class KnowledgeBaseArticle {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The article's description.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String description;
 
@@ -317,7 +348,9 @@ public class KnowledgeBaseArticle {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The article's media type (e.g., HTML, BBCode, etc.)."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String encodingFormat;
 
@@ -345,7 +378,7 @@ public class KnowledgeBaseArticle {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The article's relative URL.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String friendlyUrlPath;
 
@@ -371,7 +404,7 @@ public class KnowledgeBaseArticle {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The article's ID.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
@@ -399,7 +432,7 @@ public class KnowledgeBaseArticle {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "A list of keywords describing the article.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String[] keywords;
 
@@ -427,7 +460,7 @@ public class KnowledgeBaseArticle {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The article's number attachments.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer numberOfAttachments;
 
@@ -459,7 +492,7 @@ public class KnowledgeBaseArticle {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The number of this article's child articles.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer numberOfKnowledgeBaseArticles;
 
@@ -492,7 +525,7 @@ public class KnowledgeBaseArticle {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The article's parent folder, if it exists.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected ParentKnowledgeBaseFolder parentKnowledgeBaseFolder;
 
@@ -526,7 +559,9 @@ public class KnowledgeBaseArticle {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The ID of the article's parent folder, if that folder exists."
+	)
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	protected Long parentKnowledgeBaseFolderId;
 
@@ -584,7 +619,9 @@ public class KnowledgeBaseArticle {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The ID of the site to which this article is scoped."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long siteId;
 
@@ -642,7 +679,7 @@ public class KnowledgeBaseArticle {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The categories associated with this article.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected TaxonomyCategory[] taxonomyCategories;
 
@@ -672,7 +709,9 @@ public class KnowledgeBaseArticle {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A write-only field that adds taxonomy categories to this article."
+	)
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	protected Long[] taxonomyCategoryIds;
 
@@ -700,7 +739,7 @@ public class KnowledgeBaseArticle {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The article's main title.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	@NotEmpty
 	protected String title;
@@ -741,7 +780,9 @@ public class KnowledgeBaseArticle {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A write-only property that specifies the article's default permissions."
+	)
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	protected ViewableBy viewableBy;
 
@@ -775,6 +816,16 @@ public class KnowledgeBaseArticle {
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+		if (actions != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"actions\": ");
+
+			sb.append(_toJSON(actions));
+		}
 
 		if (aggregateRating != null) {
 			if (sb.length() > 1) {

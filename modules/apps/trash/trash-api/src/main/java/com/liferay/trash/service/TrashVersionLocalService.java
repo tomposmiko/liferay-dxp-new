@@ -56,7 +56,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface TrashVersionLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link TrashVersionLocalServiceUtil} to access the trash version local service. Add custom service methods to <code>com.liferay.trash.service.impl.TrashVersionLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -180,15 +180,6 @@ public interface TrashVersionLocalService
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public TrashVersion fetchTrashVersion(long versionId);
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #fetchVersion(String, long)}
-	 */
-	@Deprecated
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public TrashVersion fetchVersion(
-		long entryId, String className, long classPK);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public TrashVersion fetchVersion(String className, long classPK);

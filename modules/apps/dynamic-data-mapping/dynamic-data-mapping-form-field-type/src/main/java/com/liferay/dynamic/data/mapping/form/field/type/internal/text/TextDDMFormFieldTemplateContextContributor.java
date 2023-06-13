@@ -24,6 +24,7 @@ import com.liferay.dynamic.data.mapping.render.DDMFormFieldRenderingContext;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -103,21 +104,18 @@ public class TextDDMFormFieldTemplateContextContributor
 				ddmFormField, ddmFormFieldRenderingContext);
 
 		for (String optionValue : ddmFormFieldOptions.getOptionsValues()) {
-			Map<String, String> optionMap = new HashMap<>();
+			Map<String, String> optionMap = HashMapBuilder.put(
+				"label",
+				() -> {
+					LocalizedValue optionLabel =
+						ddmFormFieldOptions.getOptionLabels(optionValue);
 
-			LocalizedValue optionLabel = ddmFormFieldOptions.getOptionLabels(
-				optionValue);
-
-			String optionLabelString = optionLabel.getString(
-				ddmFormFieldRenderingContext.getLocale());
-
-			if (ddmFormFieldRenderingContext.isViewMode()) {
-				optionLabelString = HtmlUtil.extractText(optionLabelString);
-			}
-
-			optionMap.put("label", optionLabelString);
-
-			optionMap.put("value", optionValue);
+					return optionLabel.getString(
+						ddmFormFieldRenderingContext.getLocale());
+				}
+			).put(
+				"value", optionValue
+			).build();
 
 			options.add(optionMap);
 		}
@@ -147,14 +145,8 @@ public class TextDDMFormFieldTemplateContextContributor
 			return null;
 		}
 
-		String predefinedValueString = predefinedValue.getString(
+		return predefinedValue.getString(
 			ddmFormFieldRenderingContext.getLocale());
-
-		if (ddmFormFieldRenderingContext.isViewMode()) {
-			predefinedValueString = HtmlUtil.extractText(predefinedValueString);
-		}
-
-		return predefinedValueString;
 	}
 
 	protected String getTooltip(
@@ -190,13 +182,7 @@ public class TextDDMFormFieldTemplateContextContributor
 			return StringPool.BLANK;
 		}
 
-		String valueString = value.getString(locale);
-
-		if (ddmFormFieldRenderingContext.isViewMode()) {
-			valueString = HtmlUtil.extractText(valueString);
-		}
-
-		return valueString;
+		return value.getString(locale);
 	}
 
 	protected boolean isAutocompleteEnabled(DDMFormField ddmFormField) {

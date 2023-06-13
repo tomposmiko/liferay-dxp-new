@@ -56,44 +56,46 @@ public class DefaultUploadResponseHandler implements UploadResponseHandler {
 
 	@Override
 	public JSONObject onFailure(
-			PortletRequest portletRequest, PortalException pe)
+			PortletRequest portletRequest, PortalException portalException)
 		throws PortalException {
 
 		JSONObject jsonObject = JSONUtil.put("success", Boolean.FALSE);
 
-		if (pe instanceof AntivirusScannerException ||
-			pe instanceof FileExtensionException ||
-			pe instanceof FileNameException ||
-			pe instanceof FileSizeException ||
-			pe instanceof UploadRequestSizeException) {
+		if (portalException instanceof AntivirusScannerException ||
+			portalException instanceof FileExtensionException ||
+			portalException instanceof FileNameException ||
+			portalException instanceof FileSizeException ||
+			portalException instanceof UploadRequestSizeException) {
 
 			String errorMessage = StringPool.BLANK;
 			int errorType = 0;
 
-			if (pe instanceof AntivirusScannerException) {
+			if (portalException instanceof AntivirusScannerException) {
 				errorType =
 					ServletResponseConstants.SC_FILE_ANTIVIRUS_EXCEPTION;
-				AntivirusScannerException ase = (AntivirusScannerException)pe;
+				AntivirusScannerException antivirusScannerException =
+					(AntivirusScannerException)portalException;
 
 				ThemeDisplay themeDisplay =
 					(ThemeDisplay)portletRequest.getAttribute(
 						WebKeys.THEME_DISPLAY);
 
-				errorMessage = themeDisplay.translate(ase.getMessageKey());
+				errorMessage = themeDisplay.translate(
+					antivirusScannerException.getMessageKey());
 			}
-			else if (pe instanceof FileExtensionException) {
+			else if (portalException instanceof FileExtensionException) {
 				errorType =
 					ServletResponseConstants.SC_FILE_EXTENSION_EXCEPTION;
 
 				errorMessage = _getAllowedFileExtensions();
 			}
-			else if (pe instanceof FileNameException) {
+			else if (portalException instanceof FileNameException) {
 				errorType = ServletResponseConstants.SC_FILE_NAME_EXCEPTION;
 			}
-			else if (pe instanceof FileSizeException) {
+			else if (portalException instanceof FileSizeException) {
 				errorType = ServletResponseConstants.SC_FILE_SIZE_EXCEPTION;
 			}
-			else if (pe instanceof UploadRequestSizeException) {
+			else if (portalException instanceof UploadRequestSizeException) {
 				errorType =
 					ServletResponseConstants.SC_UPLOAD_REQUEST_SIZE_EXCEPTION;
 			}

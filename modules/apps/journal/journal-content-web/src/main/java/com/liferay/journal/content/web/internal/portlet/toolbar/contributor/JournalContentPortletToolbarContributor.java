@@ -15,6 +15,7 @@
 package com.liferay.journal.content.web.internal.portlet.toolbar.contributor;
 
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.journal.constants.JournalConstants;
 import com.liferay.journal.constants.JournalContentPortletKeys;
 import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.content.web.internal.configuration.JournalContentPortletInstanceConfiguration;
@@ -28,12 +29,13 @@ import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.toolbar.contributor.BasePortletToolbarContributor;
 import com.liferay.portal.kernel.portlet.toolbar.contributor.PortletToolbarContributor;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
-import com.liferay.portal.kernel.security.permission.ResourcePermissionChecker;
+import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
 import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
 import com.liferay.portal.kernel.servlet.taglib.ui.MenuItem;
 import com.liferay.portal.kernel.servlet.taglib.ui.URLMenuItem;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.Portal;
@@ -41,7 +43,6 @@ import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -122,19 +123,16 @@ public class JournalContentPortletToolbarContributor
 
 			URLMenuItem urlMenuItem = new URLMenuItem();
 
-			String ddmStructureName = ddmStructure.getName(
-				themeDisplay.getLocale());
-
-			String title = LanguageUtil.format(
-				themeDisplay.getLocale(), "new-x", ddmStructureName);
-
-			Map<String, Object> data = new HashMap<>();
-
-			data.put(
+			Map<String, Object> data = HashMapBuilder.<String, Object>put(
 				"id",
-				HtmlUtil.escape(portletDisplay.getNamespace()) + "editAsset");
-
-			data.put("title", HtmlUtil.escape(title));
+				HtmlUtil.escape(portletDisplay.getNamespace()) + "editAsset"
+			).put(
+				"title",
+				HtmlUtil.escape(
+					LanguageUtil.format(
+						themeDisplay.getLocale(), "new-x",
+						ddmStructure.getName(themeDisplay.getLocale())))
+			).build();
 
 			urlMenuItem.setData(data);
 
@@ -174,18 +172,17 @@ public class JournalContentPortletToolbarContributor
 			addPortletTitleAddJournalArticleMenuItems(
 				menuItems, themeDisplay, portletRequest);
 		}
-		catch (Exception e) {
-			_log.error("Unable to add folder menu item", e);
+		catch (Exception exception) {
+			_log.error("Unable to add folder menu item", exception);
 		}
 
 		return menuItems;
 	}
 
 	private boolean _hasAddArticlePermission(ThemeDisplay themeDisplay) {
-		boolean hasResourcePermission =
-			_resourcePermissionChecker.checkResource(
-				themeDisplay.getPermissionChecker(),
-				themeDisplay.getScopeGroupId(), ActionKeys.ADD_ARTICLE);
+		boolean hasResourcePermission = _portletResourcePermission.contains(
+			themeDisplay.getPermissionChecker(), themeDisplay.getScopeGroupId(),
+			ActionKeys.ADD_ARTICLE);
 
 		boolean hasPortletPermission = false;
 
@@ -196,10 +193,11 @@ public class JournalContentPortletToolbarContributor
 				themeDisplay.getPermissionChecker(), themeDisplay.getLayout(),
 				portletDisplay.getId(), ActionKeys.CONFIGURATION);
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
 				_log.debug(
-					"Unable to check Journal Content portlet permission", pe);
+					"Unable to check Journal Content portlet permission",
+					portalException);
 			}
 		}
 
@@ -224,7 +222,9 @@ public class JournalContentPortletToolbarContributor
 	@Reference
 	private Portal _portal;
 
-	@Reference(target = "(resource.name=com.liferay.journal)", unbind = "-")
-	private ResourcePermissionChecker _resourcePermissionChecker;
+	@Reference(
+		target = "(resource.name=" + JournalConstants.RESOURCE_NAME + ")"
+	)
+	private PortletResourcePermission _portletResourcePermission;
 
 }

@@ -541,9 +541,11 @@ public class PortletPermissionImpl implements PortletPermission {
 			return controlPanelEntry.hasAccessPermission(
 				permissionChecker, group, portlet);
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn("Cannot process control panel access permission", e);
+				_log.warn(
+					"Cannot process control panel access permission",
+					exception);
 			}
 
 			return false;
@@ -575,8 +577,8 @@ public class PortletPermissionImpl implements PortletPermission {
 
 			return layoutManagerActions.contains(actionId);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
 			return false;
 		}
@@ -622,24 +624,6 @@ public class PortletPermissionImpl implements PortletPermission {
 			ActionKeys.CONFIGURE_PORTLETS);
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #hasConfigurePermission(PermissionChecker, Layout, Portlet,
-	 *             String)}
-	 */
-	@Deprecated
-	protected boolean hasConfigurePermission(
-			PermissionChecker permissionChecker, Layout layout,
-			String portletId, String actionId)
-		throws PortalException {
-
-		Portlet portlet = PortletLocalServiceUtil.getPortletById(
-			layout.getCompanyId(), portletId);
-
-		return hasConfigurePermission(
-			permissionChecker, layout, portlet, actionId);
-	}
-
 	protected boolean hasCustomizePermission(
 			PermissionChecker permissionChecker, Layout layout, Portlet portlet,
 			String actionId)
@@ -666,24 +650,6 @@ public class PortletPermissionImpl implements PortletPermission {
 		}
 
 		return false;
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #hasCustomizePermission(PermissionChecker, Layout, Portlet,
-	 *             String)}
-	 */
-	@Deprecated
-	protected boolean hasCustomizePermission(
-			PermissionChecker permissionChecker, Layout layout,
-			String portletId, String actionId)
-		throws PortalException {
-
-		Portlet portlet = PortletLocalServiceUtil.getPortletById(
-			layout.getCompanyId(), portletId);
-
-		return hasCustomizePermission(
-			permissionChecker, layout, portlet, actionId);
 	}
 
 	private boolean _contains(

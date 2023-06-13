@@ -21,20 +21,18 @@ definition {
 
 		Click(locator1 = "SitePagesEditPage#PAGE_TYPE_PANEL_CHECKBOX");
 
-		AssertChecked.assertCheckedNotVisible(locator1 = "SitePagesEditPage#PAGE_TYPE_PANEL_CHECKBOX_INPUT");
+		var key_componentOrPortletName = StringUtil.lowerCase("${componentName}");
+
+		AssertElementPresent(locator1 = "SitePagesEditPage#PAGE_TYPE_PANEL_CHECKBOX_INPUT");
 	}
 
 	macro addCategory {
-		Navigator.gotoNavTab(navTab = "SEO");
-
 		AssetCategorization.addCategory(
 			categoryName = "${categoryName}",
 			vocabularyName = "${vocabularyName}");
 	}
 
 	macro addFriendlyURLLocalizedPG {
-		Navigator.gotoNavTab(navTab = "General");
-
 		PortletEntry.changeLocale(
 			fieldName = "Friendly URL",
 			locale = "${friendlyUrlLocalized}");
@@ -875,14 +873,19 @@ definition {
 			Click(locator1 = "SitePages#DETAILS_PAGE_TYPE_PANEL_COMPONENT_TREE_ARROW");
 		}
 
-		var key_componentOrPortletName = "${componentName}";
-
-		AssertChecked.assertCheckedNotVisible(locator1 = "SitePages#DETAILS_PAGE_TYPE_PANEL_CHECKBOX_INPUT");
+		AssertElementPresent(locator1 = "SitePages#DETAILS_PAGE_TYPE_PANEL_COMPONENT_TREE_EXPANDED");
 
 		for (var portletName : list "${portletNameList}") {
-			var key_componentOrPortletName = "${portletName}";
 
-			AssertChecked.assertCheckedNotVisible(locator1 = "SitePages#DETAILS_PAGE_TYPE_PANEL_CHECKBOX_INPUT");
+			if ("${portletName}" == "Portal Directory") {
+				var key_componentOrPortletName ="Directory";
+			}
+
+			else {
+				var key_componentOrPortletName = StringUtil.extractChars("${portletName}");
+			}
+
+			AssertElementPresent(locator1 = "SitePagesEditPage#PAGE_TYPE_PANEL_CHECKBOX_INPUT");
 		}
 	}
 
@@ -909,6 +912,82 @@ definition {
 			AssertTextEquals(
 				locator1 = "Panel#MENU_ITEM",
 				value1 = "${portletName}");
+		}
+	}
+
+	macro viewPreview {
+		if (isSet(key_imageName)) {
+			AssertVisible(locator1 = "SitePagesEditPage#PREVIEW_IMAGE");
+		}
+
+		AssertTextEquals(
+			locator1 = "SitePagesEditPage#PREVIEW_TITLE",
+			value1 = "${htmlTitle}");
+
+		var pageNameURL = StringUtil.lowerCase("${pageName}");
+
+		var pageNameURL = StringUtil.replace("${pageNameURL}", " ", "-");
+
+		var url = "${portalURL}/web/guest/${pageNameURL}";
+
+		if (isSet(siteNameURL)) {
+			if (isSet(pageName)) {
+				var url = "${portalURL}/web/${siteNameURL}/${pageNameURL}";
+			}
+			else {
+				var url = "${portalURL}/web/${siteNameURL}";
+			}
+		}
+
+		if (isSet(openGraph)) {
+			var url = StringUtil.upperCase("${url}");
+		}
+
+		if (isSet(locale)) {
+			var languageName = StringUtil.extractFirst("${locale}", "-");
+
+			if (isSet(openGraph)) {
+				var languageName = StringUtil.upperCase("${languageName}");
+				var portalURL = StringUtil.upperCase("${portalURL}");
+			}
+
+			var url = StringUtil.replace("${url}","${portalURL}","${portalURL}/${languageName}");
+		}
+
+		AssertTextEquals(
+			locator1 = "SitePagesEditPage#PREVIEW_URL",
+			value1 = "${url}");
+
+		if (isSet(description)) {
+			AssertTextEquals(
+				locator1 = "SitePagesEditPage#PREVIEW_DESCRIPTION",
+				value1 = "${description}");
+		}
+
+		if (isSet(truncatedHTMLTitle)) {
+			ProductMenuHelper.closeProductMenu();
+
+			if (isSet(openGraph)) {
+				SikuliAssertElementPresent(locator1 = "SitePagesEditPage#PREVIEW_TITLE_ELLIPSES_OG");
+			}
+			else {
+				ScrollWebElementIntoView(locator1 = "//label[contains(.,'Change Frequency')]");
+
+				SikuliAssertElementPresent(locator1 = "SitePagesEditPage#PREVIEW_TITLE_ELLIPSES");
+			}
+		}
+
+		if (isSet(truncatedURL)) {
+			if (isSet(openGraph)) {
+				SikuliAssertElementPresent(locator1 = "SitePagesEditPage#PREVIEW_URL_ELLIPSES_OG");
+			}
+			else {
+				ScrollWebElementIntoView(locator1 = "//label[contains(.,'Change Frequency')]");
+
+				ProductMenuHelper.closeProductMenu();
+
+				SikuliAssertElementPresent(locator1 = "SitePagesEditPage#PREVIEW_URL_ELLIPSES");
+			}
 		}
 	}
 

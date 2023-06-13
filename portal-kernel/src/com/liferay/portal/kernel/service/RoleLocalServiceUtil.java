@@ -30,16 +30,10 @@ import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
  */
 public class RoleLocalServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.portal.service.impl.RoleLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
-	 */
-
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link RoleLocalServiceUtil} to access the role local service. Add custom service methods to <code>com.liferay.portal.service.impl.RoleLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	public static void addGroupRole(long groupId, long roleId) {
 		getService().addGroupRole(groupId, roleId);
@@ -539,18 +533,6 @@ public class RoleLocalServiceUtil {
 	}
 
 	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public static java.util.List<com.liferay.portal.kernel.model.Role>
-		getResourceBlockRoles(
-			long resourceBlockId, String className, String actionId) {
-
-		return getService().getResourceBlockRoles(
-			resourceBlockId, className, actionId);
-	}
-
-	/**
 	 * Returns a map of role names to associated action IDs for the named
 	 * resource in the company within the permission scope.
 	 *
@@ -691,6 +673,12 @@ public class RoleLocalServiceUtil {
 		long companyId, int[] types) {
 
 		return getService().getRoles(companyId, types);
+	}
+
+	public static java.util.List<com.liferay.portal.kernel.model.Role> getRoles(
+		long companyId, long classNameId, long[] classPKs, int type) {
+
+		return getService().getRoles(companyId, classNameId, classPKs, type);
 	}
 
 	/**

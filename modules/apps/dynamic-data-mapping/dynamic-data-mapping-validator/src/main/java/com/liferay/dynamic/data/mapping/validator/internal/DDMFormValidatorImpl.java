@@ -14,8 +14,11 @@
 
 package com.liferay.dynamic.data.mapping.validator.internal;
 
+import com.liferay.dynamic.data.mapping.expression.CreateExpressionRequest;
 import com.liferay.dynamic.data.mapping.expression.DDMExpressionException;
 import com.liferay.dynamic.data.mapping.expression.DDMExpressionFactory;
+import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldValueValidationException;
+import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldValueValidator;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
@@ -44,7 +47,6 @@ import com.liferay.dynamic.data.mapping.validator.DDMFormValidator;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -68,7 +70,10 @@ import org.osgi.service.component.annotations.Reference;
 public class DDMFormValidatorImpl implements DDMFormValidator {
 
 	@Override
-	public void validate(DDMForm ddmForm) throws DDMFormValidationException {
+	public void validate(DDMForm ddmForm)
+		throws DDMFormFieldValueValidationException,
+			   DDMFormValidationException {
+
 		validateDDMFormLocales(ddmForm);
 
 		List<DDMFormField> ddmFormFields = ddmForm.getDDMFormFields();
@@ -100,12 +105,14 @@ public class DDMFormValidatorImpl implements DDMFormValidator {
 		}
 
 		try {
-			_ddmExpressionFactory.createBooleanDDMExpression(
-				ddmExpressionString);
+			_ddmExpressionFactory.createExpression(
+				CreateExpressionRequest.Builder.newBuilder(
+					ddmExpressionString
+				).build());
 		}
-		catch (DDMExpressionException ddmee) {
+		catch (DDMExpressionException ddmExpressionException) {
 			throw new MustSetValidFormRuleExpression(
-				expressionType, ddmExpressionString, ddmee);
+				expressionType, ddmExpressionString, ddmExpressionException);
 		}
 	}
 
@@ -119,6 +126,16 @@ public class DDMFormValidatorImpl implements DDMFormValidator {
 
 		if (!availableLocales.contains(defaultLocale)) {
 			throw new MustSetDefaultLocaleAsAvailableLocale(defaultLocale);
+		}
+	}
+
+	protected void validateDDMFormFieldGrid(DDMFormField ddmFormField)
+		throws DDMFormFieldValueValidationException {
+
+		String fieldType = ddmFormField.getType();
+
+		if (fieldType.equals(DDMFormFieldType.GRID)) {
+			_ddmFormFieldValueValidator.validate(ddmFormField, null);
 		}
 	}
 
@@ -167,23 +184,20 @@ public class DDMFormValidatorImpl implements DDMFormValidator {
 			return;
 		}
 
-		String dataSourceType = GetterUtil.getString(
-			ddmFormField.getProperty("dataSourceType"), "manual");
-
-		if (!Objects.equals(dataSourceType, "manual")) {
+		if (!Objects.equals(ddmFormField.getDataSourceType(), "manual")) {
 			return;
 		}
 
 		DDMFormFieldOptions ddmFormFieldOptions =
 			ddmFormField.getDDMFormFieldOptions();
 
-		Set<String> optionValues = Collections.emptySet();
+		Set<String> optionsValues = Collections.emptySet();
 
 		if (ddmFormFieldOptions != null) {
-			optionValues = ddmFormFieldOptions.getOptionsValues();
+			optionsValues = ddmFormFieldOptions.getOptionsValues();
 		}
 
-		if (optionValues.isEmpty()) {
+		if (optionsValues.isEmpty()) {
 			throw new MustSetOptionsForField(ddmFormField.getName());
 		}
 
@@ -218,7 +232,8 @@ public class DDMFormValidatorImpl implements DDMFormValidator {
 	protected void validateDDMFormFields(
 			List<DDMFormField> ddmFormFields, Set<String> ddmFormFieldNames,
 			Set<Locale> ddmFormAvailableLocales, Locale ddmFormDefaultLocale)
-		throws DDMFormValidationException {
+		throws DDMFormFieldValueValidationException,
+			   DDMFormValidationException {
 
 		for (DDMFormField ddmFormField : ddmFormFields) {
 			validateDDMFormFieldName(ddmFormField, ddmFormFieldNames);
@@ -229,6 +244,8 @@ public class DDMFormValidatorImpl implements DDMFormValidator {
 
 			validateDDMFormFieldOptions(
 				ddmFormField, ddmFormAvailableLocales, ddmFormDefaultLocale);
+
+			validateDDMFormFieldGrid(ddmFormField);
 
 			validateOptionalDDMFormFieldLocalizedProperty(
 				ddmFormField, "label", ddmFormAvailableLocales,
@@ -286,8 +303,10 @@ public class DDMFormValidatorImpl implements DDMFormValidator {
 
 		try {
 			if (ddmFormFieldValidation.getParameterLocalizedValue() == null) {
-				_ddmExpressionFactory.createBooleanDDMExpression(
-					ddmFormFieldValidationExpression.getValue());
+				_ddmExpressionFactory.createExpression(
+					CreateExpressionRequest.Builder.newBuilder(
+						ddmFormFieldValidationExpression.getValue()
+					).build());
 			}
 			else {
 				String value = ddmFormFieldValidationExpression.getValue();
@@ -296,14 +315,16 @@ public class DDMFormValidatorImpl implements DDMFormValidator {
 					ddmFormFieldValidation.getParameterLocalizedValue();
 
 				for (Locale locale : locales) {
-					_ddmExpressionFactory.createBooleanDDMExpression(
-						StringUtil.replace(
-							value, "{parameter}",
-							parameterLocalizedValue.getString(locale)));
+					_ddmExpressionFactory.createExpression(
+						CreateExpressionRequest.Builder.newBuilder(
+							StringUtil.replace(
+								value, "{parameter}",
+								parameterLocalizedValue.getString(locale))
+						).build());
 				}
 			}
 		}
-		catch (DDMExpressionException ddmee) {
+		catch (DDMExpressionException ddmExpressionException) {
 			throw new MustSetValidValidationExpression(
 				ddmFormField.getName(),
 				ddmFormFieldValidationExpression.getValue());
@@ -321,10 +342,12 @@ public class DDMFormValidatorImpl implements DDMFormValidator {
 		}
 
 		try {
-			_ddmExpressionFactory.createBooleanDDMExpression(
-				visibilityExpression);
+			_ddmExpressionFactory.createExpression(
+				CreateExpressionRequest.Builder.newBuilder(
+					visibilityExpression
+				).build());
 		}
-		catch (DDMExpressionException ddmee) {
+		catch (DDMExpressionException ddmExpressionException) {
 			throw new MustSetValidVisibilityExpression(
 				ddmFormField.getName(), visibilityExpression);
 		}
@@ -389,5 +412,8 @@ public class DDMFormValidatorImpl implements DDMFormValidator {
 		"([^\\p{Punct}|\\p{Space}$]|[-_])+");
 
 	private DDMExpressionFactory _ddmExpressionFactory;
+
+	@Reference(target = "(ddm.form.field.type.name=grid)")
+	private DDMFormFieldValueValidator _ddmFormFieldValueValidator;
 
 }

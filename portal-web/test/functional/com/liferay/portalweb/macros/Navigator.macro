@@ -57,15 +57,7 @@ definition {
 	}
 
 	macro gotoAccountSettings {
-		Click(locator1 = "UserBar#USER_AVATAR_IMAGE");
-
-		if (IsElementNotPresent(locator1 = "UserBar#USER_AVATAR_DROPDOWN_PORTAL_OPEN")) {
-			Click(locator1 = "UserBar#USER_AVATAR_IMAGE");
-		}
-
-		var key_dropdownItem = "Account Settings";
-
-		Click(locator1 = "UserBar#USER_AVATAR_DROPDOWN_ITEM");
+		UserBar.gotoDropdownItem(dropdownItem = "Account Settings");
 	}
 
 	macro gotoBack {
@@ -127,11 +119,7 @@ definition {
 	}
 
 	macro gotoNotifications {
-		Click(locator1 = "UserBar#USER_AVATAR_IMAGE");
-
-		var key_dropdownItem = "Notifications";
-
-		Click(locator1 = "UserBar#USER_AVATAR_DROPDOWN_ITEM");
+		UserBar.gotoDropdownItem(dropdownItem = "Notifications");
 	}
 
 	@summary = "Navigate to the page named '${pageName}'"
@@ -162,12 +150,6 @@ definition {
 			siteNameURL = "${siteName}");
 
 		Navigator._gotoPage(pageName = "${pageName}");
-	}
-
-	macro gotoSEOPanel {
-		Navigator.gotoNavTab(navTab = "SEO");
-
-		Panel.expandPanel(panel = "SEO");
 	}
 
 	macro gotoSitePage {

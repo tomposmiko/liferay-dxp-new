@@ -18,6 +18,7 @@ import com.liferay.headless.delivery.client.dto.v1_0.WikiNode;
 import com.liferay.headless.delivery.client.http.HttpInvoker;
 import com.liferay.headless.delivery.client.pagination.Page;
 import com.liferay.headless.delivery.client.pagination.Pagination;
+import com.liferay.headless.delivery.client.problem.Problem;
 import com.liferay.headless.delivery.client.serdes.v1_0.WikiNodeSerDes;
 
 import java.util.LinkedHashMap;
@@ -56,18 +57,6 @@ public interface WikiNodeResource {
 			Long siteId, WikiNode wikiNode)
 		throws Exception;
 
-	public void putWikiNodeSubscribe(Long wikiNodeId) throws Exception;
-
-	public HttpInvoker.HttpResponse putWikiNodeSubscribeHttpResponse(
-			Long wikiNodeId)
-		throws Exception;
-
-	public void putWikiNodeUnsubscribe(Long wikiNodeId) throws Exception;
-
-	public HttpInvoker.HttpResponse putWikiNodeUnsubscribeHttpResponse(
-			Long wikiNodeId)
-		throws Exception;
-
 	public void deleteWikiNode(Long wikiNodeId) throws Exception;
 
 	public HttpInvoker.HttpResponse deleteWikiNodeHttpResponse(Long wikiNodeId)
@@ -83,6 +72,18 @@ public interface WikiNodeResource {
 
 	public HttpInvoker.HttpResponse putWikiNodeHttpResponse(
 			Long wikiNodeId, WikiNode wikiNode)
+		throws Exception;
+
+	public void putWikiNodeSubscribe(Long wikiNodeId) throws Exception;
+
+	public HttpInvoker.HttpResponse putWikiNodeSubscribeHttpResponse(
+			Long wikiNodeId)
+		throws Exception;
+
+	public void putWikiNodeUnsubscribe(Long wikiNodeId) throws Exception;
+
+	public HttpInvoker.HttpResponse putWikiNodeUnsubscribeHttpResponse(
+			Long wikiNodeId)
 		throws Exception;
 
 	public static class Builder {
@@ -157,7 +158,16 @@ public interface WikiNodeResource {
 			_logger.fine(
 				"HTTP response status code: " + httpResponse.getStatusCode());
 
-			return Page.of(content, WikiNodeSerDes::toDTO);
+			try {
+				return Page.of(content, WikiNodeSerDes::toDTO);
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
 		}
 
 		public HttpInvoker.HttpResponse getSiteWikiNodesPageHttpResponse(
@@ -208,7 +218,7 @@ public interface WikiNodeResource {
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
 					_builder._port +
-						"/o/headless-delivery/v1.0/sites/{siteId}/wiki-nodes/",
+						"/o/headless-delivery/v1.0/sites/{siteId}/wiki-nodes",
 				siteId);
 
 			httpInvoker.userNameAndPassword(
@@ -239,7 +249,7 @@ public interface WikiNodeResource {
 					Level.WARNING,
 					"Unable to process HTTP response: " + content, e);
 
-				throw e;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 		}
 
@@ -273,112 +283,8 @@ public interface WikiNodeResource {
 			httpInvoker.path(
 				_builder._scheme + "://" + _builder._host + ":" +
 					_builder._port +
-						"/o/headless-delivery/v1.0/sites/{siteId}/wiki-nodes/",
+						"/o/headless-delivery/v1.0/sites/{siteId}/wiki-nodes",
 				siteId);
-
-			httpInvoker.userNameAndPassword(
-				_builder._login + ":" + _builder._password);
-
-			return httpInvoker.invoke();
-		}
-
-		public void putWikiNodeSubscribe(Long wikiNodeId) throws Exception {
-			HttpInvoker.HttpResponse httpResponse =
-				putWikiNodeSubscribeHttpResponse(wikiNodeId);
-
-			String content = httpResponse.getContent();
-
-			_logger.fine("HTTP response content: " + content);
-
-			_logger.fine("HTTP response message: " + httpResponse.getMessage());
-			_logger.fine(
-				"HTTP response status code: " + httpResponse.getStatusCode());
-		}
-
-		public HttpInvoker.HttpResponse putWikiNodeSubscribeHttpResponse(
-				Long wikiNodeId)
-			throws Exception {
-
-			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
-
-			httpInvoker.body(wikiNodeId.toString(), "application/json");
-
-			if (_builder._locale != null) {
-				httpInvoker.header(
-					"Accept-Language", _builder._locale.toLanguageTag());
-			}
-
-			for (Map.Entry<String, String> entry :
-					_builder._headers.entrySet()) {
-
-				httpInvoker.header(entry.getKey(), entry.getValue());
-			}
-
-			for (Map.Entry<String, String> entry :
-					_builder._parameters.entrySet()) {
-
-				httpInvoker.parameter(entry.getKey(), entry.getValue());
-			}
-
-			httpInvoker.httpMethod(HttpInvoker.HttpMethod.PUT);
-
-			httpInvoker.path(
-				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port +
-						"/o/headless-delivery/v1.0/wiki-node/{wikiNodeId}/subscribe",
-				wikiNodeId);
-
-			httpInvoker.userNameAndPassword(
-				_builder._login + ":" + _builder._password);
-
-			return httpInvoker.invoke();
-		}
-
-		public void putWikiNodeUnsubscribe(Long wikiNodeId) throws Exception {
-			HttpInvoker.HttpResponse httpResponse =
-				putWikiNodeUnsubscribeHttpResponse(wikiNodeId);
-
-			String content = httpResponse.getContent();
-
-			_logger.fine("HTTP response content: " + content);
-
-			_logger.fine("HTTP response message: " + httpResponse.getMessage());
-			_logger.fine(
-				"HTTP response status code: " + httpResponse.getStatusCode());
-		}
-
-		public HttpInvoker.HttpResponse putWikiNodeUnsubscribeHttpResponse(
-				Long wikiNodeId)
-			throws Exception {
-
-			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
-
-			httpInvoker.body(wikiNodeId.toString(), "application/json");
-
-			if (_builder._locale != null) {
-				httpInvoker.header(
-					"Accept-Language", _builder._locale.toLanguageTag());
-			}
-
-			for (Map.Entry<String, String> entry :
-					_builder._headers.entrySet()) {
-
-				httpInvoker.header(entry.getKey(), entry.getValue());
-			}
-
-			for (Map.Entry<String, String> entry :
-					_builder._parameters.entrySet()) {
-
-				httpInvoker.parameter(entry.getKey(), entry.getValue());
-			}
-
-			httpInvoker.httpMethod(HttpInvoker.HttpMethod.PUT);
-
-			httpInvoker.path(
-				_builder._scheme + "://" + _builder._host + ":" +
-					_builder._port +
-						"/o/headless-delivery/v1.0/wiki-node/{wikiNodeId}/unsubscribe",
-				wikiNodeId);
 
 			httpInvoker.userNameAndPassword(
 				_builder._login + ":" + _builder._password);
@@ -397,6 +303,17 @@ public interface WikiNodeResource {
 			_logger.fine("HTTP response message: " + httpResponse.getMessage());
 			_logger.fine(
 				"HTTP response status code: " + httpResponse.getStatusCode());
+
+			try {
+				return;
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
 		}
 
 		public HttpInvoker.HttpResponse deleteWikiNodeHttpResponse(
@@ -456,7 +373,7 @@ public interface WikiNodeResource {
 					Level.WARNING,
 					"Unable to process HTTP response: " + content, e);
 
-				throw e;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 		}
 
@@ -518,7 +435,7 @@ public interface WikiNodeResource {
 					Level.WARNING,
 					"Unable to process HTTP response: " + content, e);
 
-				throw e;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 		}
 
@@ -553,6 +470,132 @@ public interface WikiNodeResource {
 				_builder._scheme + "://" + _builder._host + ":" +
 					_builder._port +
 						"/o/headless-delivery/v1.0/wiki-nodes/{wikiNodeId}",
+				wikiNodeId);
+
+			httpInvoker.userNameAndPassword(
+				_builder._login + ":" + _builder._password);
+
+			return httpInvoker.invoke();
+		}
+
+		public void putWikiNodeSubscribe(Long wikiNodeId) throws Exception {
+			HttpInvoker.HttpResponse httpResponse =
+				putWikiNodeSubscribeHttpResponse(wikiNodeId);
+
+			String content = httpResponse.getContent();
+
+			_logger.fine("HTTP response content: " + content);
+
+			_logger.fine("HTTP response message: " + httpResponse.getMessage());
+			_logger.fine(
+				"HTTP response status code: " + httpResponse.getStatusCode());
+
+			try {
+				return;
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
+		}
+
+		public HttpInvoker.HttpResponse putWikiNodeSubscribeHttpResponse(
+				Long wikiNodeId)
+			throws Exception {
+
+			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+			httpInvoker.body(wikiNodeId.toString(), "application/json");
+
+			if (_builder._locale != null) {
+				httpInvoker.header(
+					"Accept-Language", _builder._locale.toLanguageTag());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._headers.entrySet()) {
+
+				httpInvoker.header(entry.getKey(), entry.getValue());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._parameters.entrySet()) {
+
+				httpInvoker.parameter(entry.getKey(), entry.getValue());
+			}
+
+			httpInvoker.httpMethod(HttpInvoker.HttpMethod.PUT);
+
+			httpInvoker.path(
+				_builder._scheme + "://" + _builder._host + ":" +
+					_builder._port +
+						"/o/headless-delivery/v1.0/wiki-nodes/{wikiNodeId}/subscribe",
+				wikiNodeId);
+
+			httpInvoker.userNameAndPassword(
+				_builder._login + ":" + _builder._password);
+
+			return httpInvoker.invoke();
+		}
+
+		public void putWikiNodeUnsubscribe(Long wikiNodeId) throws Exception {
+			HttpInvoker.HttpResponse httpResponse =
+				putWikiNodeUnsubscribeHttpResponse(wikiNodeId);
+
+			String content = httpResponse.getContent();
+
+			_logger.fine("HTTP response content: " + content);
+
+			_logger.fine("HTTP response message: " + httpResponse.getMessage());
+			_logger.fine(
+				"HTTP response status code: " + httpResponse.getStatusCode());
+
+			try {
+				return;
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
+		}
+
+		public HttpInvoker.HttpResponse putWikiNodeUnsubscribeHttpResponse(
+				Long wikiNodeId)
+			throws Exception {
+
+			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+			httpInvoker.body(wikiNodeId.toString(), "application/json");
+
+			if (_builder._locale != null) {
+				httpInvoker.header(
+					"Accept-Language", _builder._locale.toLanguageTag());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._headers.entrySet()) {
+
+				httpInvoker.header(entry.getKey(), entry.getValue());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._parameters.entrySet()) {
+
+				httpInvoker.parameter(entry.getKey(), entry.getValue());
+			}
+
+			httpInvoker.httpMethod(HttpInvoker.HttpMethod.PUT);
+
+			httpInvoker.path(
+				_builder._scheme + "://" + _builder._host + ":" +
+					_builder._port +
+						"/o/headless-delivery/v1.0/wiki-nodes/{wikiNodeId}/unsubscribe",
 				wikiNodeId);
 
 			httpInvoker.userNameAndPassword(

@@ -87,9 +87,9 @@ public class UserActionDropdownItemsProvider {
 
 		PortletURL assignSiteRolesURL = _renderResponse.createRenderURL();
 
-		assignSiteRolesURL.setParameter("mvcPath", "/users_roles.jsp");
 		assignSiteRolesURL.setParameter(
 			"p_u_i_d", String.valueOf(_user.getUserId()));
+		assignSiteRolesURL.setParameter("mvcPath", "/users_roles.jsp");
 		assignSiteRolesURL.setParameter(
 			"groupId",
 			String.valueOf(_themeDisplay.getSiteGroupIdOrLiveGroupId()));

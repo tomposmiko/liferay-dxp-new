@@ -41,7 +41,7 @@ public interface FragmentEntryModel
 	extends BaseModel<FragmentEntry>, MVCCModel, ShardedModel,
 			StagedGroupedModel, WorkflowedModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a fragment entry model instance should use the {@link FragmentEntry} interface instead.
@@ -338,6 +338,27 @@ public interface FragmentEntryModel
 	 * @param previewFileEntryId the preview file entry ID of this fragment entry
 	 */
 	public void setPreviewFileEntryId(long previewFileEntryId);
+
+	/**
+	 * Returns the read only of this fragment entry.
+	 *
+	 * @return the read only of this fragment entry
+	 */
+	public boolean getReadOnly();
+
+	/**
+	 * Returns <code>true</code> if this fragment entry is read only.
+	 *
+	 * @return <code>true</code> if this fragment entry is read only; <code>false</code> otherwise
+	 */
+	public boolean isReadOnly();
+
+	/**
+	 * Sets whether this fragment entry is read only.
+	 *
+	 * @param readOnly the read only of this fragment entry
+	 */
+	public void setReadOnly(boolean readOnly);
 
 	/**
 	 * Returns the type of this fragment entry.

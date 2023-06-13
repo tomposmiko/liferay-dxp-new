@@ -27,7 +27,7 @@ import com.liferay.fragment.renderer.constants.FragmentRendererConstants;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.fragment.service.FragmentEntryLinkService;
 import com.liferay.fragment.service.FragmentEntryLocalService;
-import com.liferay.fragment.util.FragmentEntryConfigUtil;
+import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.PortletIdException;
@@ -184,8 +184,9 @@ public class DuplicateFragmentEntryLinkMVCActionCommand
 						fragmentRendererContext))
 			).put(
 				"defaultConfigurationValues",
-				FragmentEntryConfigUtil.getConfigurationDefaultValuesJSONObject(
-					duplicateFragmentEntryLink.getConfiguration())
+				_fragmentEntryConfigurationParser.
+					getConfigurationDefaultValuesJSONObject(
+						duplicateFragmentEntryLink.getConfiguration())
 			).put(
 				"editableValues",
 				JSONFactoryUtil.createJSONObject(
@@ -241,15 +242,15 @@ public class DuplicateFragmentEntryLinkMVCActionCommand
 
 			SessionMessages.add(actionRequest, "fragmentEntryLinkDuplicated");
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			String errorMessage = "an-unexpected-error-occurred";
 
-			if (pe instanceof NoSuchEntryLinkException) {
+			if (portalException instanceof NoSuchEntryLinkException) {
 				errorMessage =
 					"the-section-could-not-be-duplicated-because-it-has-been-" +
 						"deleted";
 			}
-			else if (pe instanceof PortletIdException) {
+			else if (portalException instanceof PortletIdException) {
 				errorMessage = "uninstanceable-widget-cannot-be-duplicated";
 			}
 
@@ -291,6 +292,9 @@ public class DuplicateFragmentEntryLinkMVCActionCommand
 	@Reference
 	private FragmentCollectionContributorTracker
 		_fragmentCollectionContributorTracker;
+
+	@Reference
+	private FragmentEntryConfigurationParser _fragmentEntryConfigurationParser;
 
 	@Reference
 	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;

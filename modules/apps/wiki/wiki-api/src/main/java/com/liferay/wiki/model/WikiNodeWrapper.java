@@ -564,11 +564,6 @@ public class WikiNodeWrapper
 		return model.isScheduled();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a wiki node model instance should use the <code>WikiNode</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

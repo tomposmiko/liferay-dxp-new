@@ -176,11 +176,12 @@ public class AcceptLanguageContextProviderTest {
 
 			Assert.fail("The locale  " + locale + " should not be available");
 		}
-		catch (Exception e) {
-			Assert.assertEquals(ClientErrorException.class, e.getClass());
+		catch (Exception exception) {
 			Assert.assertEquals(
-				"No available locale matches the accepted languages: es-ES",
-				e.getMessage());
+				ClientErrorException.class, exception.getClass());
+			Assert.assertEquals(
+				"No available locale matches the accepted languages: es-es",
+				exception.getMessage());
 		}
 	}
 

@@ -61,7 +61,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface RatingsEntryLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link RatingsEntryLocalServiceUtil} to access the ratings entry local service. Add custom service methods to <code>com.liferay.portlet.ratings.service.impl.RatingsEntryLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -204,14 +204,6 @@ public interface RatingsEntryLocalService
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ActionableDynamicQuery getActionableDynamicQuery();
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<RatingsEntry> getEntries(
-		long userId, String className, List<Long> classPKs);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public Map<Long, RatingsEntry> getEntries(

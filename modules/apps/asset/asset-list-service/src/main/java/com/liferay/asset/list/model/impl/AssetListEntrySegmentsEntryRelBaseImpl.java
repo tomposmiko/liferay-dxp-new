@@ -33,7 +33,7 @@ public abstract class AssetListEntrySegmentsEntryRelBaseImpl
 	extends AssetListEntrySegmentsEntryRelModelImpl
 	implements AssetListEntrySegmentsEntryRel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a asset list entry segments entry rel model instance should use the <code>AssetListEntrySegmentsEntryRel</code> interface instead.

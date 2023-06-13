@@ -238,11 +238,6 @@ public class EntryWrapper
 		return model.getUserUuid();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a entry model instance should use the <code>Entry</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

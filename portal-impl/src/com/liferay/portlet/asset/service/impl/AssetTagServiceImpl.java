@@ -207,6 +207,15 @@ public class AssetTagServiceImpl extends AssetTagServiceBaseImpl {
 	}
 
 	@Override
+	public int getTagsCount(long[] groupIds, String name) {
+		if (Validator.isNull(name)) {
+			return assetTagPersistence.countByGroupId(groupIds);
+		}
+
+		return assetTagPersistence.countByG_LikeN(groupIds, name);
+	}
+
+	@Override
 	public int getVisibleAssetsTagsCount(
 		long groupId, long classNameId, String name) {
 
@@ -277,8 +286,8 @@ public class AssetTagServiceImpl extends AssetTagServiceBaseImpl {
 				return tag;
 			}
 		}
-		catch (PrincipalException pe) {
-			_log.error(pe, pe);
+		catch (PrincipalException principalException) {
+			_log.error(principalException, principalException);
 		}
 
 		tag.setUserId(0);

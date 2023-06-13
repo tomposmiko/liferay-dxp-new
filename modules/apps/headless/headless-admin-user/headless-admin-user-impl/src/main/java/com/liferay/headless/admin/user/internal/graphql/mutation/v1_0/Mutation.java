@@ -14,11 +14,11 @@
 
 package com.liferay.headless.admin.user.internal.graphql.mutation.v1_0;
 
+import com.liferay.headless.admin.user.dto.v1_0.Organization;
+import com.liferay.headless.admin.user.resource.v1_0.OrganizationResource;
 import com.liferay.headless.admin.user.resource.v1_0.SubscriptionResource;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeFunction;
-import com.liferay.portal.kernel.model.Company;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLField;
 import com.liferay.portal.vulcan.graphql.annotation.GraphQLName;
@@ -39,12 +39,76 @@ import org.osgi.service.component.ComponentServiceObjects;
 @Generated("")
 public class Mutation {
 
+	public static void setOrganizationResourceComponentServiceObjects(
+		ComponentServiceObjects<OrganizationResource>
+			organizationResourceComponentServiceObjects) {
+
+		_organizationResourceComponentServiceObjects =
+			organizationResourceComponentServiceObjects;
+	}
+
 	public static void setSubscriptionResourceComponentServiceObjects(
 		ComponentServiceObjects<SubscriptionResource>
 			subscriptionResourceComponentServiceObjects) {
 
 		_subscriptionResourceComponentServiceObjects =
 			subscriptionResourceComponentServiceObjects;
+	}
+
+	@GraphQLField(description = "Creates a new organization")
+	public Organization createOrganization(
+			@GraphQLName("organization") Organization organization)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_organizationResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			organizationResource -> organizationResource.postOrganization(
+				organization));
+	}
+
+	@GraphQLField(description = "Deletes an organization.")
+	public boolean deleteOrganization(
+			@GraphQLName("organizationId") String organizationId)
+		throws Exception {
+
+		_applyVoidComponentServiceObjects(
+			_organizationResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			organizationResource -> organizationResource.deleteOrganization(
+				organizationId));
+
+		return true;
+	}
+
+	@GraphQLField(
+		description = "Updates the organization with the information sent in the request body. Fields not present in the request body are left unchanged."
+	)
+	public Organization patchOrganization(
+			@GraphQLName("organizationId") String organizationId,
+			@GraphQLName("organization") Organization organization)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_organizationResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			organizationResource -> organizationResource.patchOrganization(
+				organizationId, organization));
+	}
+
+	@GraphQLField(
+		description = "Replaces the organization with information sent in the request body. Any missing fields are deleted unless they are required."
+	)
+	public Organization updateOrganization(
+			@GraphQLName("organizationId") String organizationId,
+			@GraphQLName("organization") Organization organization)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_organizationResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			organizationResource -> organizationResource.putOrganization(
+				organizationId, organization));
 	}
 
 	@GraphQLField
@@ -101,6 +165,19 @@ public class Mutation {
 	}
 
 	private void _populateResourceContext(
+			OrganizationResource organizationResource)
+		throws Exception {
+
+		organizationResource.setContextAcceptLanguage(_acceptLanguage);
+		organizationResource.setContextCompany(_company);
+		organizationResource.setContextHttpServletRequest(_httpServletRequest);
+		organizationResource.setContextHttpServletResponse(
+			_httpServletResponse);
+		organizationResource.setContextUriInfo(_uriInfo);
+		organizationResource.setContextUser(_user);
+	}
+
+	private void _populateResourceContext(
 			SubscriptionResource subscriptionResource)
 		throws Exception {
 
@@ -113,14 +190,16 @@ public class Mutation {
 		subscriptionResource.setContextUser(_user);
 	}
 
+	private static ComponentServiceObjects<OrganizationResource>
+		_organizationResourceComponentServiceObjects;
 	private static ComponentServiceObjects<SubscriptionResource>
 		_subscriptionResourceComponentServiceObjects;
 
 	private AcceptLanguage _acceptLanguage;
-	private Company _company;
+	private com.liferay.portal.kernel.model.Company _company;
+	private com.liferay.portal.kernel.model.User _user;
 	private HttpServletRequest _httpServletRequest;
 	private HttpServletResponse _httpServletResponse;
 	private UriInfo _uriInfo;
-	private User _user;
 
 }

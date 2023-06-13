@@ -32,6 +32,7 @@ create table FragmentEntry (
 	js TEXT null,
 	configuration TEXT null,
 	previewFileEntryId LONG,
+	readOnly BOOLEAN,
 	type_ INTEGER,
 	lastPublishDate DATE null,
 	status INTEGER,

@@ -76,7 +76,7 @@ public class WeDeployAuthTokenPersistenceImpl
 	extends BasePersistenceImpl<WeDeployAuthToken>
 	implements WeDeployAuthTokenPersistence {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>WeDeployAuthTokenUtil</code> to access the we deploy auth token persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
@@ -248,12 +248,12 @@ public class WeDeployAuthTokenPersistenceImpl
 					cacheResult(weDeployAuthToken);
 				}
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (useFinderCache) {
 					finderCache.removeResult(_finderPathFetchByT_T, finderArgs);
 				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -340,10 +340,10 @@ public class WeDeployAuthTokenPersistenceImpl
 
 				finderCache.putResult(finderPath, finderArgs, count);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				finderCache.removeResult(finderPath, finderArgs);
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -546,13 +546,13 @@ public class WeDeployAuthTokenPersistenceImpl
 					cacheResult(weDeployAuthToken);
 				}
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (useFinderCache) {
 					finderCache.removeResult(
 						_finderPathFetchByCI_T_T, finderArgs);
 				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -659,10 +659,10 @@ public class WeDeployAuthTokenPersistenceImpl
 
 				finderCache.putResult(finderPath, finderArgs, count);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				finderCache.removeResult(finderPath, finderArgs);
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -797,6 +797,18 @@ public class WeDeployAuthTokenPersistenceImpl
 
 			clearUniqueFindersCache(
 				(WeDeployAuthTokenModelImpl)weDeployAuthToken, true);
+		}
+	}
+
+	@Override
+	public void clearCache(Set<Serializable> primaryKeys) {
+		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
+		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+
+		for (Serializable primaryKey : primaryKeys) {
+			entityCache.removeResult(
+				entityCacheEnabled, WeDeployAuthTokenImpl.class, primaryKey);
 		}
 	}
 
@@ -939,11 +951,11 @@ public class WeDeployAuthTokenPersistenceImpl
 
 			return remove(weDeployAuthToken);
 		}
-		catch (NoSuchTokenException nsee) {
-			throw nsee;
+		catch (NoSuchTokenException noSuchEntityException) {
+			throw noSuchEntityException;
 		}
-		catch (Exception e) {
-			throw processException(e);
+		catch (Exception exception) {
+			throw processException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -969,8 +981,8 @@ public class WeDeployAuthTokenPersistenceImpl
 				session.delete(weDeployAuthToken);
 			}
 		}
-		catch (Exception e) {
-			throw processException(e);
+		catch (Exception exception) {
+			throw processException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -1047,8 +1059,8 @@ public class WeDeployAuthTokenPersistenceImpl
 					weDeployAuthToken);
 			}
 		}
-		catch (Exception e) {
-			throw processException(e);
+		catch (Exception exception) {
+			throw processException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -1252,12 +1264,12 @@ public class WeDeployAuthTokenPersistenceImpl
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (useFinderCache) {
 					finderCache.removeResult(finderPath, finderArgs);
 				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -1301,11 +1313,11 @@ public class WeDeployAuthTokenPersistenceImpl
 				finderCache.putResult(
 					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				finderCache.removeResult(
 					_finderPathCountAll, FINDER_ARGS_EMPTY);
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -1472,8 +1484,8 @@ public class WeDeployAuthTokenPersistenceImpl
 		try {
 			Class.forName(WeDeployAuthPersistenceConstants.class.getName());
 		}
-		catch (ClassNotFoundException cnfe) {
-			throw new ExceptionInInitializerError(cnfe);
+		catch (ClassNotFoundException classNotFoundException) {
+			throw new ExceptionInInitializerError(classNotFoundException);
 		}
 	}
 

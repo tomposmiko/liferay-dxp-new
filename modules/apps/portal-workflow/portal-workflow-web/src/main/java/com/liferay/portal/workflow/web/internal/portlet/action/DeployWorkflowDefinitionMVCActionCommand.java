@@ -32,8 +32,8 @@ import com.liferay.portal.kernel.workflow.WorkflowDefinitionFileException;
 import com.liferay.portal.kernel.workflow.WorkflowDefinitionManager;
 import com.liferay.portal.kernel.workflow.WorkflowDefinitionTitleException;
 import com.liferay.portal.kernel.workflow.WorkflowException;
+import com.liferay.portal.workflow.constants.WorkflowPortletKeys;
 import com.liferay.portal.workflow.constants.WorkflowWebKeys;
-import com.liferay.portal.workflow.web.internal.constants.WorkflowPortletKeys;
 
 import java.util.Locale;
 import java.util.Map;
@@ -116,9 +116,9 @@ public class DeployWorkflowDefinitionMVCActionCommand
 			return unproxiedWorkflowDefinitionManager.
 				getLatestWorkflowDefinition(companyId, name);
 		}
-		catch (WorkflowException we) {
+		catch (WorkflowException workflowException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(we, we);
+				_log.debug(workflowException, workflowException);
 			}
 
 			return null;
@@ -175,12 +175,13 @@ public class DeployWorkflowDefinitionMVCActionCommand
 			unproxiedWorkflowDefinitionManager.validateWorkflowDefinition(
 				bytes);
 		}
-		catch (WorkflowException we) {
+		catch (WorkflowException workflowException) {
 			String message = LanguageUtil.get(
 				getResourceBundle(actionRequest),
 				"please-enter-a-valid-definition-before-publishing");
 
-			throw new WorkflowDefinitionFileException(message, we);
+			throw new WorkflowDefinitionFileException(
+				message, workflowException);
 		}
 	}
 

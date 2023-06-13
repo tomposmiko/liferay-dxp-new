@@ -23,6 +23,7 @@ Layout selLayout = layoutsAdminDisplayContext.getSelLayout();
 LayoutType selLayoutType = selLayout.getLayoutType();
 
 Locale defaultLocale = LocaleUtil.getDefault();
+
 String defaultLanguageId = LocaleUtil.toLanguageId(defaultLocale);
 %>
 
@@ -34,22 +35,13 @@ String defaultLanguageId = LocaleUtil.toLanguageId(defaultLocale);
 <aui:model-context bean="<%= selLayout %>" model="<%= Layout.class %>" />
 
 <%
-StringBuilder friendlyURLBase = new StringBuilder();
+String friendlyURLBase = StringPool.BLANK;
 %>
 
-<c:if test="<%= !group.isLayoutPrototype() && selLayoutType.isURLFriendliable() && !layoutsAdminDisplayContext.isDraft() %>">
+<c:if test="<%= !group.isLayoutPrototype() && selLayoutType.isURLFriendliable() && !layoutsAdminDisplayContext.isDraft() && !selLayout.isSystem() %>">
 
 	<%
-	friendlyURLBase.append(themeDisplay.getPortalURL());
-
-	LayoutSet layoutSet = selLayout.getLayoutSet();
-
-	String virtualHostname = layoutSet.getVirtualHostname();
-
-	if (Validator.isNull(virtualHostname) || (friendlyURLBase.indexOf(virtualHostname) == -1)) {
-		friendlyURLBase.append(group.getPathFriendlyURL(layoutsAdminDisplayContext.isPrivateLayout(), themeDisplay));
-		friendlyURLBase.append(HttpUtil.decodeURL(group.getFriendlyURL()));
-	}
+	friendlyURLBase = layoutsAdminDisplayContext.getFriendlyURLBase();
 	%>
 
 	<liferay-ui:error exception="<%= LayoutFriendlyURLException.class %>" focusField="friendlyURL">
@@ -87,7 +79,7 @@ StringBuilder friendlyURLBase = new StringBuilder();
 
 <c:choose>
 	<c:when test="<%= !group.isLayoutPrototype() %>">
-		<c:if test="<%= !layoutsAdminDisplayContext.isDraft() %>">
+		<c:if test="<%= !layoutsAdminDisplayContext.isDraft() && !selLayout.isSystem() %>">
 			<aui:input name="name" />
 
 			<div class="form-group">
@@ -96,7 +88,7 @@ StringBuilder friendlyURLBase = new StringBuilder();
 		</c:if>
 
 		<c:choose>
-			<c:when test="<%= selLayoutType.isURLFriendliable() && !layoutsAdminDisplayContext.isDraft() %>">
+			<c:when test="<%= selLayoutType.isURLFriendliable() && !layoutsAdminDisplayContext.isDraft() && !selLayout.isSystem() %>">
 				<div class="form-group friendly-url">
 					<label for="<portlet:namespace />friendlyURL"><liferay-ui:message key="friendly-url" /> <liferay-ui:icon-help message='<%= LanguageUtil.format(request, "for-example-x", "<em>/news</em>", false) %>' /></label>
 
@@ -164,6 +156,14 @@ StringBuilder friendlyURLBase = new StringBuilder();
 		<liferay-util:param name="type" value="<%= selLayout.getType() %>" />
 	</liferay-util:include>
 </div>
+
+<c:if test="<%= !selLayout.isTypeAssetDisplay() %>">
+	<div class="sheet-section">
+		<h3 class="sheet-subtitle"><liferay-ui:message key="categorization" /></h3>
+
+		<liferay-util:include page="/layout/categorization.jsp" servletContext="<%= application %>" />
+	</div>
+</c:if>
 
 <aui:script require="metal-dom/src/dom as dom">
 	Liferay.Util.toggleBoxes(

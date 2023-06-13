@@ -88,6 +88,35 @@ public class DocumentFolder {
 
 	}
 
+	@Schema
+	@Valid
+	public Map<String, Map> getActions() {
+		return actions;
+	}
+
+	public void setActions(Map<String, Map> actions) {
+		this.actions = actions;
+	}
+
+	@JsonIgnore
+	public void setActions(
+		UnsafeSupplier<Map<String, Map>, Exception> actionsUnsafeSupplier) {
+
+		try {
+			actions = actionsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected Map<String, Map> actions;
+
 	@Schema(description = "The folder's creator.")
 	@Valid
 	public Creator getCreator() {
@@ -113,7 +142,7 @@ public class DocumentFolder {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The folder's creator.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator creator;
 
@@ -170,7 +199,7 @@ public class DocumentFolder {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The folder's creation date.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
@@ -198,7 +227,7 @@ public class DocumentFolder {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The last time a field of the folder changed.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateModified;
 
@@ -226,7 +255,7 @@ public class DocumentFolder {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The folder's description.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String description;
 
@@ -252,7 +281,7 @@ public class DocumentFolder {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The folder's ID.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
@@ -278,7 +307,7 @@ public class DocumentFolder {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The folder's main title/name.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	@NotEmpty
 	protected String name;
@@ -309,7 +338,7 @@ public class DocumentFolder {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The number of this folder's child folders.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer numberOfDocumentFolders;
 
@@ -337,9 +366,37 @@ public class DocumentFolder {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The number of documents in this folder.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer numberOfDocuments;
+
+	@Schema
+	public Long getParentDocumentFolderId() {
+		return parentDocumentFolderId;
+	}
+
+	public void setParentDocumentFolderId(Long parentDocumentFolderId) {
+		this.parentDocumentFolderId = parentDocumentFolderId;
+	}
+
+	@JsonIgnore
+	public void setParentDocumentFolderId(
+		UnsafeSupplier<Long, Exception> parentDocumentFolderIdUnsafeSupplier) {
+
+		try {
+			parentDocumentFolderId = parentDocumentFolderIdUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Long parentDocumentFolderId;
 
 	@Schema(description = "The ID of the site to which this folder is scoped.")
 	public Long getSiteId() {
@@ -365,7 +422,9 @@ public class DocumentFolder {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The ID of the site to which this folder is scoped."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long siteId;
 
@@ -433,7 +492,9 @@ public class DocumentFolder {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A write-only property that specifies the folder's default permissions."
+	)
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	protected ViewableBy viewableBy;
 
@@ -466,6 +527,16 @@ public class DocumentFolder {
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+		if (actions != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"actions\": ");
+
+			sb.append(_toJSON(actions));
+		}
 
 		if (creator != null) {
 			if (sb.length() > 1) {
@@ -581,6 +652,16 @@ public class DocumentFolder {
 			sb.append("\"numberOfDocuments\": ");
 
 			sb.append(numberOfDocuments);
+		}
+
+		if (parentDocumentFolderId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"parentDocumentFolderId\": ");
+
+			sb.append(parentDocumentFolderId);
 		}
 
 		if (siteId != null) {

@@ -99,7 +99,14 @@ public class LayoutSEOEntryStagedModelDataHandler
 			_layoutSEOEntryLocalService.updateLayoutSEOEntry(
 				layoutSEOEntry.getUserId(), layout.getGroupId(),
 				layout.isPrivateLayout(), layout.getLayoutId(),
-				layoutSEOEntry.isEnabled(), layoutSEOEntry.getCanonicalURLMap(),
+				layoutSEOEntry.isCanonicalURLEnabled(),
+				layoutSEOEntry.getCanonicalURLMap(),
+				layoutSEOEntry.isOpenGraphDescriptionEnabled(),
+				layoutSEOEntry.getOpenGraphDescriptionMap(),
+				layoutSEOEntry.getOpenGraphImageAltMap(),
+				layoutSEOEntry.getOpenGraphImageFileEntryId(),
+				layoutSEOEntry.isOpenGraphTitleEnabled(),
+				layoutSEOEntry.getOpenGraphTitleMap(),
 				portletDataContext.createServiceContext(layoutSEOEntry));
 		}
 		else {
@@ -108,7 +115,14 @@ public class LayoutSEOEntryStagedModelDataHandler
 				portletDataContext.getScopeGroupId(),
 				layoutSEOEntry.isPrivateLayout(),
 				existingLayoutSEOEntry.getLayoutId(),
-				layoutSEOEntry.isEnabled(), layoutSEOEntry.getCanonicalURLMap(),
+				layoutSEOEntry.isCanonicalURLEnabled(),
+				layoutSEOEntry.getCanonicalURLMap(),
+				layoutSEOEntry.isOpenGraphDescriptionEnabled(),
+				layoutSEOEntry.getOpenGraphDescriptionMap(),
+				layoutSEOEntry.getOpenGraphImageAltMap(),
+				layoutSEOEntry.getOpenGraphImageFileEntryId(),
+				layoutSEOEntry.isOpenGraphTitleEnabled(),
+				layoutSEOEntry.getOpenGraphTitleMap(),
 				portletDataContext.createServiceContext(layoutSEOEntry));
 		}
 	}

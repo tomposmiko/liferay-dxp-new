@@ -32,11 +32,6 @@ public class WikiNodeLocalServiceWrapper
 		_wikiNodeLocalService = wikiNodeLocalService;
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link WikiNodeLocalServiceUtil} to access the wiki node local service. Add custom service methods to <code>com.liferay.wiki.service.impl.WikiNodeLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
-	 */
 	@Override
 	public com.liferay.wiki.model.WikiNode addDefaultNode(
 			long userId,
@@ -66,20 +61,6 @@ public class WikiNodeLocalServiceWrapper
 			nodeId, addGroupPermissions, addGuestPermissions);
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #addNodeResources(WikiNode, ModelPermissions)}
-	 */
-	@Deprecated
-	@Override
-	public void addNodeResources(
-			long nodeId, String[] groupPermissions, String[] guestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_wikiNodeLocalService.addNodeResources(
-			nodeId, groupPermissions, guestPermissions);
-	}
-
 	@Override
 	public void addNodeResources(
 			com.liferay.wiki.model.WikiNode node, boolean addGroupPermissions,
@@ -98,21 +79,6 @@ public class WikiNodeLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_wikiNodeLocalService.addNodeResources(node, modelPermissions);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #addNodeResources(WikiNode, ModelPermissions)}
-	 */
-	@Deprecated
-	@Override
-	public void addNodeResources(
-			com.liferay.wiki.model.WikiNode node, String[] groupPermissions,
-			String[] guestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		_wikiNodeLocalService.addNodeResources(
-			node, groupPermissions, guestPermissions);
 	}
 
 	/**

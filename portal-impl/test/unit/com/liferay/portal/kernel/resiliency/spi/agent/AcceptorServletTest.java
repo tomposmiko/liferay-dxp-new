@@ -100,7 +100,7 @@ public class AcceptorServletTest {
 		final AtomicBoolean failOnForward = new AtomicBoolean();
 		final AtomicReference<String> forwardPathReference =
 			new AtomicReference<>();
-		final IOException ioException = new IOException("Unable to forward");
+		final IOException ioException1 = new IOException("Unable to forward");
 
 		MockServletContext mockServletContext = new MockServletContext() {
 
@@ -117,7 +117,7 @@ public class AcceptorServletTest {
 						forwardPathReference.set(path);
 
 						if (failOnForward.get()) {
-							throw ioException;
+							throw ioException1;
 						}
 					}
 
@@ -198,9 +198,10 @@ public class AcceptorServletTest {
 
 				Assert.fail();
 			}
-			catch (IOException ioe) {
+			catch (IOException ioException2) {
 				Assert.assertEquals(
-					"IOException on prepare request", ioe.getMessage());
+					"IOException on prepare request",
+					ioException2.getMessage());
 			}
 
 			Assert.assertEquals(logRecords.toString(), 1, logRecords.size());
@@ -226,9 +227,10 @@ public class AcceptorServletTest {
 
 				Assert.fail();
 			}
-			catch (RuntimeException re) {
+			catch (RuntimeException runtimeException) {
 				Assert.assertEquals(
-					"RuntimeException on prepare request", re.getMessage());
+					"RuntimeException on prepare request",
+					runtimeException.getMessage());
 			}
 
 			Assert.assertEquals(logRecords.toString(), 1, logRecords.size());
@@ -261,7 +263,7 @@ public class AcceptorServletTest {
 		Assert.assertSame(
 			mockHttpServletResponse,
 			_recordSPIAgent._originalHttpServletResponse);
-		Assert.assertSame(ioException, _recordSPIAgent._exception);
+		Assert.assertSame(ioException1, _recordSPIAgent._exception);
 		Assert.assertTrue(_mockHttpSession.isInvalid());
 	}
 
@@ -327,12 +329,12 @@ public class AcceptorServletTest {
 		@Override
 		public void transferResponse(
 			HttpServletRequest httpServletRequest,
-			HttpServletResponse httpServletResponse, Exception e) {
+			HttpServletResponse httpServletResponse, Exception exception) {
 
 			Assert.assertSame(_preparedRequest, httpServletRequest);
 			Assert.assertSame(_preparedResponse, httpServletResponse);
 
-			_exception = e;
+			_exception = exception;
 		}
 
 		private Exception _exception;

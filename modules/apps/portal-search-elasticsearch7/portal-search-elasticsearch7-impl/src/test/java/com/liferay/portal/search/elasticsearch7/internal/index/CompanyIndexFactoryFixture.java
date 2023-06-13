@@ -20,6 +20,8 @@ import com.liferay.portal.search.elasticsearch7.internal.connection.Elasticsearc
 import com.liferay.portal.search.elasticsearch7.internal.connection.IndexName;
 import com.liferay.portal.search.index.IndexNameBuilder;
 
+import org.elasticsearch.client.RestHighLevelClient;
+
 /**
  * @author Adam Brandizzi
  */
@@ -32,12 +34,24 @@ public class CompanyIndexFactoryFixture {
 		_indexName = indexName;
 	}
 
-	public void createIndices() throws Exception {
+	public void createIndices() {
 		CompanyIndexFactory companyIndexFactory = getCompanyIndexFactory();
 
+		RestHighLevelClient restHighLevelClient =
+			_elasticsearchFixture.getRestHighLevelClient();
+
 		companyIndexFactory.createIndices(
-			_elasticsearchFixture.getAdminClient(),
-			RandomTestUtil.randomLong());
+			restHighLevelClient.indices(), RandomTestUtil.randomLong());
+	}
+
+	public void deleteIndices() {
+		CompanyIndexFactory companyIndexFactory = getCompanyIndexFactory();
+
+		RestHighLevelClient restHighLevelClient =
+			_elasticsearchFixture.getRestHighLevelClient();
+
+		companyIndexFactory.deleteIndices(
+			restHighLevelClient.indices(), RandomTestUtil.randomLong());
 	}
 
 	public CompanyIndexFactory getCompanyIndexFactory() {

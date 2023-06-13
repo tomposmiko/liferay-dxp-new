@@ -201,11 +201,6 @@ public class SocialActivityAchievementWrapper
 		return model.isFirstInGroup();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a social activity achievement model instance should use the <code>SocialActivityAchievement</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

@@ -118,11 +118,6 @@ public class ClassNameWrapper
 		return model.getValue();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a class name model instance should use the <code>ClassName</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

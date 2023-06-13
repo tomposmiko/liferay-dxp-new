@@ -67,6 +67,16 @@ public class ValidationSerDes {
 			sb.append("\"");
 		}
 
+		if (validation.getErrorMessage_i18n() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"errorMessage_i18n\": ");
+
+			sb.append(_toJSON(validation.getErrorMessage_i18n()));
+		}
+
 		if (validation.getExpression() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -117,6 +127,15 @@ public class ValidationSerDes {
 				"errorMessage", String.valueOf(validation.getErrorMessage()));
 		}
 
+		if (validation.getErrorMessage_i18n() == null) {
+			map.put("errorMessage_i18n", null);
+		}
+		else {
+			map.put(
+				"errorMessage_i18n",
+				String.valueOf(validation.getErrorMessage_i18n()));
+		}
+
 		if (validation.getExpression() == null) {
 			map.put("expression", null);
 		}
@@ -157,6 +176,13 @@ public class ValidationSerDes {
 					validation.setErrorMessage((String)jsonParserFieldValue);
 				}
 			}
+			else if (Objects.equals(jsonParserFieldName, "errorMessage_i18n")) {
+				if (jsonParserFieldValue != null) {
+					validation.setErrorMessage_i18n(
+						(Map)ValidationSerDes.toMap(
+							(String)jsonParserFieldValue));
+				}
+			}
 			else if (Objects.equals(jsonParserFieldName, "expression")) {
 				if (jsonParserFieldValue != null) {
 					validation.setExpression((String)jsonParserFieldValue);
@@ -179,9 +205,11 @@ public class ValidationSerDes {
 	private static String _escape(Object object) {
 		String string = String.valueOf(object);
 
-		string = string.replace("\\", "\\\\");
+		for (String[] strings : BaseJSONParser.JSON_ESCAPE_STRINGS) {
+			string = string.replace(strings[0], strings[1]);
+		}
 
-		return string.replace("\"", "\\\"");
+		return string;
 	}
 
 	private static String _toJSON(Map<String, ?> map) {

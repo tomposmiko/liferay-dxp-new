@@ -21,7 +21,6 @@ import com.liferay.petra.json.web.service.client.server.simulator.SimulatorConst
 
 import java.security.KeyStore;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Assert;
@@ -38,16 +37,10 @@ public class JSONWebServiceClientImplSSLGetTest
 		JSONWebServiceClientImpl jsonWebServiceClientImpl =
 			_createJsonWebServiceClient();
 
-		Map<String, String> params = new HashMap<String, String>();
-
-		params.put(
-			SimulatorConstants.HTTP_PARAMETER_RESPOND_WITH_STATUS, "200");
-		params.put(
-			SimulatorConstants.HTTP_PARAMETER_RETURN_PARMS_IN_JSON, "true");
-
 		HTTPSServerSimulator.start("TLSv1.1");
 
-		String json = jsonWebServiceClientImpl.doGet("/testGet/", params);
+		String json = jsonWebServiceClientImpl.doGet(
+			"/testGet/", getParameters("200"));
 
 		HTTPSServerSimulator.stop();
 
@@ -62,16 +55,10 @@ public class JSONWebServiceClientImplSSLGetTest
 		JSONWebServiceClientImpl jsonWebServiceClientImpl =
 			_createJsonWebServiceClient();
 
-		Map<String, String> params = new HashMap<String, String>();
-
-		params.put(
-			SimulatorConstants.HTTP_PARAMETER_RESPOND_WITH_STATUS, "200");
-		params.put(
-			SimulatorConstants.HTTP_PARAMETER_RETURN_PARMS_IN_JSON, "true");
-
 		HTTPSServerSimulator.start("TLSv1.2");
 
-		String json = jsonWebServiceClientImpl.doGet("/testGet/", params);
+		String json = jsonWebServiceClientImpl.doGet(
+			"/testGet/", getParameters("200"));
 
 		HTTPSServerSimulator.stop();
 
@@ -88,17 +75,11 @@ public class JSONWebServiceClientImplSSLGetTest
 		JSONWebServiceClientImpl jsonWebServiceClientImpl =
 			_createJsonWebServiceClient();
 
-		Map<String, String> params = new HashMap<String, String>();
-
-		params.put(
-			SimulatorConstants.HTTP_PARAMETER_RESPOND_WITH_STATUS, "200");
-		params.put(
-			SimulatorConstants.HTTP_PARAMETER_RETURN_PARMS_IN_JSON, "true");
-
 		HTTPSServerSimulator.start("TLSv1");
 
 		try {
-			String json = jsonWebServiceClientImpl.doGet("/testGet/", params);
+			String json = jsonWebServiceClientImpl.doGet(
+				"/testGet/", getParameters("200"));
 
 			Assert.assertTrue(
 				json,
@@ -124,7 +105,7 @@ public class JSONWebServiceClientImplSSLGetTest
 
 		KeyStoreLoader keyStoreLoader = new KeyStoreLoader();
 
-		KeyStore keyStore = keyStoreLoader.getKeystore(
+		KeyStore keyStore = keyStoreLoader.getKeyStore(
 			"localhost.jks", "liferay");
 
 		properties.put("keyStore", keyStore);

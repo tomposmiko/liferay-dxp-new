@@ -64,7 +64,7 @@ data.put("qa-id", "info");
 					%>
 
 					<span class="button-info">
-						<aui:button cssClass="btn-link" name="submit" onClick="<%= taglibURL %>" type="submit" value='<%= LanguageUtil.get(resourceBundle, "reset-changes") %>' />
+						<aui:button name="submit" onClick="<%= taglibURL %>" type="submit" value='<%= LanguageUtil.get(resourceBundle, "reset-changes") %>' />
 					</span>
 				</div>
 			</c:if>
@@ -106,7 +106,7 @@ data.put("qa-id", "info");
 
 	var DOC = A.getDoc();
 
-	new A.Popover({
+	var popover = new A.Popover({
 		align: {
 			node: trigger,
 			points: [A.WidgetPositionAlign.TC, A.WidgetPositionAlign.BC]
@@ -129,5 +129,15 @@ data.put("qa-id", "info");
 		visible: false,
 		width: 300,
 		zIndex: Liferay.zIndex.POPOVER
-	}).render();
+	});
+
+	popover.render();
+
+	function removeListener() {
+		popover.destroy();
+
+		Liferay.detach('beforeScreenFlip', removeListener);
+	}
+
+	Liferay.on('beforeScreenFlip', removeListener);
 </aui:script>

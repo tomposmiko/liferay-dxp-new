@@ -21,6 +21,7 @@ import com.liferay.configuration.admin.web.internal.display.ConfigurationEntry;
 import com.liferay.configuration.admin.web.internal.display.ConfigurationModelConfigurationEntry;
 import com.liferay.configuration.admin.web.internal.display.ConfigurationScreenConfigurationEntry;
 import com.liferay.configuration.admin.web.internal.display.context.ConfigurationScopeDisplayContext;
+import com.liferay.configuration.admin.web.internal.display.context.ConfigurationScopeDisplayContextFactory;
 import com.liferay.configuration.admin.web.internal.model.ConfigurationModel;
 import com.liferay.configuration.admin.web.internal.search.ConfigurationModelIndexer;
 import com.liferay.configuration.admin.web.internal.search.FieldNames;
@@ -74,6 +75,7 @@ import org.osgi.util.tracker.BundleTrackerCustomizer;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + ConfigurationAdminPortletKeys.INSTANCE_SETTINGS,
+		"javax.portlet.name=" + ConfigurationAdminPortletKeys.SITE_SETTINGS,
 		"javax.portlet.name=" + ConfigurationAdminPortletKeys.SYSTEM_SETTINGS,
 		"mvc.command.name=/search"
 	},
@@ -120,7 +122,7 @@ public class SearchMVCRenderCommand implements MVCRenderCommand {
 			Document[] documents = hits.getDocs();
 
 			ConfigurationScopeDisplayContext configurationScopeDisplayContext =
-				new ConfigurationScopeDisplayContext(renderRequest);
+				ConfigurationScopeDisplayContextFactory.create(renderRequest);
 
 			Map<String, ConfigurationModel> configurationModels =
 				_configurationModelRetriever.getConfigurationModels(
@@ -194,8 +196,8 @@ public class SearchMVCRenderCommand implements MVCRenderCommand {
 				ConfigurationAdminWebKeys.RESOURCE_BUNDLE_LOADER_PROVIDER,
 				_resourceBundleLoaderProvider);
 		}
-		catch (Exception e) {
-			throw new PortletException(e);
+		catch (Exception exception) {
+			throw new PortletException(exception);
 		}
 
 		return "/search_results.jsp";
@@ -221,9 +223,9 @@ public class SearchMVCRenderCommand implements MVCRenderCommand {
 		try {
 			_indexWriterHelper.commit(indexer.getSearchEngineId());
 		}
-		catch (SearchException se) {
+		catch (SearchException searchException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn("Unable to commit", se);
+				_log.warn("Unable to commit", searchException);
 			}
 		}
 	}
@@ -363,9 +365,9 @@ public class SearchMVCRenderCommand implements MVCRenderCommand {
 				try {
 					_configurationModelIndexer.delete(configurationModel);
 				}
-				catch (SearchException se) {
+				catch (SearchException searchException) {
 					if (_log.isWarnEnabled()) {
-						_log.warn("Unable to reindex models", se);
+						_log.warn("Unable to reindex models", searchException);
 					}
 				}
 			}

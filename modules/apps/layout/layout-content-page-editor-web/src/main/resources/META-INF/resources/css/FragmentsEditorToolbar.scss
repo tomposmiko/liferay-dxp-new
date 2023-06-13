@@ -27,6 +27,8 @@
 
 	button {
 		color: #6b6c7e;
+		margin-left: 0.25rem;
+		margin-right: 0.25rem;
 	}
 
 	button.btn-primary {
@@ -34,7 +36,8 @@
 	}
 
 	button.btn-secondary {
-		color: #6b6c7e;
+		background-color: #fff;
+		color: #6b6c7e !important;
 	}
 
 	& > .container-fluid {
@@ -66,6 +69,11 @@
 		border: none;
 		color: #fff;
 		padding: 0;
+	}
+
+	&__master-layout {
+		background-color: #f0f5ff;
+		border-bottom: 1px solid #80acff;
 	}
 
 	&__translation-status-button {

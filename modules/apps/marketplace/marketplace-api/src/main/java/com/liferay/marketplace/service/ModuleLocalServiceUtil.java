@@ -32,26 +32,11 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class ModuleLocalServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.marketplace.service.impl.ModuleLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link #addModule(long,
-	 String, String, String)}
-	 */
-	@Deprecated
-	public static com.liferay.marketplace.model.Module addModule(
-			long userId, long appId, String bundleSymbolicName,
-			String bundleVersion, String contextName)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return getService().addModule(
-			userId, appId, bundleSymbolicName, bundleVersion, contextName);
-	}
-
 	public static com.liferay.marketplace.model.Module addModule(
 			long appId, String bundleSymbolicName, String bundleVersion,
 			String contextName)

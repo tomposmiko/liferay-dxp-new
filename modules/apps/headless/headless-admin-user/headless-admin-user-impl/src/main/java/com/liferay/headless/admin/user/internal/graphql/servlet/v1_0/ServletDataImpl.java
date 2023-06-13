@@ -48,6 +48,8 @@ public class ServletDataImpl implements ServletData {
 
 	@Activate
 	public void activate(BundleContext bundleContext) {
+		Mutation.setOrganizationResourceComponentServiceObjects(
+			_organizationResourceComponentServiceObjects);
 		Mutation.setSubscriptionResourceComponentServiceObjects(
 			_subscriptionResourceComponentServiceObjects);
 
@@ -80,11 +82,7 @@ public class ServletDataImpl implements ServletData {
 		return new Mutation();
 	}
 
-	/**
-	 * @deprecated
-	 */
 	@Override
-	@Deprecated
 	public String getPath() {
 		return "/headless-admin-user-graphql/v1_0";
 	}
@@ -95,16 +93,16 @@ public class ServletDataImpl implements ServletData {
 	}
 
 	@Reference(scope = ReferenceScope.PROTOTYPE_REQUIRED)
+	private ComponentServiceObjects<OrganizationResource>
+		_organizationResourceComponentServiceObjects;
+
+	@Reference(scope = ReferenceScope.PROTOTYPE_REQUIRED)
 	private ComponentServiceObjects<SubscriptionResource>
 		_subscriptionResourceComponentServiceObjects;
 
 	@Reference(scope = ReferenceScope.PROTOTYPE_REQUIRED)
 	private ComponentServiceObjects<EmailAddressResource>
 		_emailAddressResourceComponentServiceObjects;
-
-	@Reference(scope = ReferenceScope.PROTOTYPE_REQUIRED)
-	private ComponentServiceObjects<OrganizationResource>
-		_organizationResourceComponentServiceObjects;
 
 	@Reference(scope = ReferenceScope.PROTOTYPE_REQUIRED)
 	private ComponentServiceObjects<PhoneResource>

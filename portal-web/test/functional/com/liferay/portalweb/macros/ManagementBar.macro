@@ -34,7 +34,9 @@ definition {
 		var browserType = PropsUtil.get("browser.type");
 
 		if ("${browserType}" == "internetexplorer") {
-			Click.clickNoMouseOver(locator1 = "Icon#INFO_IE");
+			Click.clickAt(locator1 = "Icon#INFO_IE");
+
+			Pause(locator1 = "3000");
 		}
 		else {
 			Click.clickNoMouseOver(locator1 = "Icon#INFO");
@@ -78,6 +80,14 @@ definition {
 		AssertVisible(
 			key_displayStyle = "${displayStyleKey}",
 			locator1 = "Icon#CURRENT_DISPLAY_STYLE_ACTIVE");
+	}
+
+	macro viewFilterAndOrder {
+		Click(locator1 = "ManagementBar#FILTER_AND_ORDER");
+
+		AssertElementPresent(
+			key_menuItem = "${menuItem}",
+			locator1 = "ManagementBar#FILTER_AND_ORDER_ACTIVE_ITEM");
 	}
 
 }

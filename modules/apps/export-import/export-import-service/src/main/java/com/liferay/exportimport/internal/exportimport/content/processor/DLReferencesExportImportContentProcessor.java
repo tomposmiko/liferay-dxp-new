@@ -47,11 +47,11 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.uuid.PortalUUID;
 import com.liferay.portal.kernel.xml.Element;
 
 import java.util.HashMap;
@@ -129,14 +129,13 @@ public class DLReferencesExportImportContentProcessor
 		sb.replace(beginPos + 1, endPos, urlParams);
 	}
 
-	protected Map<String, String[]> getDLReferenceParameters(
-		long groupId, String content, int beginPos, int endPos) {
+	protected ObjectValuePair<String, Integer>
+		getDLReferenceEndPosObjectValuePair(
+			String content, int beginPos, int endPos) {
 
-		boolean legacyURL = true;
 		String[] stopStrings = _DL_REFERENCE_LEGACY_STOP_STRINGS;
 
-		if (content.startsWith("/documents/", beginPos)) {
-			legacyURL = false;
+		if (!isLegacyURL(content, beginPos)) {
 			stopStrings = _DL_REFERENCE_STOP_STRINGS;
 		}
 
@@ -146,9 +145,23 @@ public class DLReferencesExportImportContentProcessor
 			return null;
 		}
 
+		return new ObjectValuePair<>(
+			content.substring(beginPos, endPos), endPos);
+	}
+
+	protected Map<String, String[]> getDLReferenceParameters(
+		long groupId, String content, int beginPos, int endPos) {
+
+		boolean legacyURL = isLegacyURL(content, beginPos);
+
 		Map<String, String[]> map = new HashMap<>();
 
-		String dlReference = content.substring(beginPos, endPos);
+		ObjectValuePair<String, Integer> dlReferenceEndPosObjectValuePair =
+			getDLReferenceEndPosObjectValuePair(content, beginPos, endPos);
+
+		String dlReference = dlReferenceEndPosObjectValuePair.getKey();
+
+		endPos = dlReferenceEndPosObjectValuePair.getValue();
 
 		while (dlReference.contains(StringPool.AMPERSAND_ENCODED)) {
 			dlReference = StringUtil.replace(
@@ -266,16 +279,24 @@ public class DLReferencesExportImportContentProcessor
 				}
 			}
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(e, e);
+				_log.debug(exception, exception);
 			}
 			else if (_log.isWarnEnabled()) {
-				_log.warn(e.getMessage());
+				_log.warn(exception.getMessage());
 			}
 		}
 
 		return fileEntry;
+	}
+
+	protected boolean isLegacyURL(String content, int beginPos) {
+		if (content.startsWith("/documents/", beginPos)) {
+			return false;
+		}
+
+		return true;
 	}
 
 	protected boolean isValidateDLReferences() {
@@ -287,8 +308,8 @@ public class DLReferencesExportImportContentProcessor
 
 			return configuration.validateFileEntryReferences();
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 
 		return true;
@@ -399,7 +420,7 @@ public class DLReferencesExportImportContentProcessor
 
 				deleteTimestampParameters(sb, deleteTimestampParametersOffset);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				StringBundler exceptionSB = new StringBundler(6);
 
 				exceptionSB.append("Unable to process file entry ");
@@ -409,12 +430,15 @@ public class DLReferencesExportImportContentProcessor
 				exceptionSB.append(" with primary key ");
 				exceptionSB.append(stagedModel.getPrimaryKeyObj());
 
-				ExportImportContentProcessorException eicpe =
-					new ExportImportContentProcessorException(
-						exceptionSB.toString(), e);
+				ExportImportContentProcessorException
+					exportImportContentProcessorException =
+						new ExportImportContentProcessorException(
+							exceptionSB.toString(), exception);
 
 				if (_log.isDebugEnabled()) {
-					_log.debug(exceptionSB.toString(), eicpe);
+					_log.debug(
+						exceptionSB.toString(),
+						exportImportContentProcessorException);
 				}
 				else if (_log.isWarnEnabled()) {
 					_log.warn(exceptionSB.toString());
@@ -466,7 +490,7 @@ public class DLReferencesExportImportContentProcessor
 						portletDataContext, stagedModel, DLFileEntry.class,
 						classPK);
 				}
-				catch (Exception e) {
+				catch (Exception exception) {
 					StringBundler exceptionSB = new StringBundler(6);
 
 					exceptionSB.append("Unable to process file entry ");
@@ -476,12 +500,15 @@ public class DLReferencesExportImportContentProcessor
 					exceptionSB.append(" with primary key ");
 					exceptionSB.append(stagedModel.getPrimaryKeyObj());
 
-					ExportImportContentProcessorException eicpe =
-						new ExportImportContentProcessorException(
-							exceptionSB.toString(), e);
+					ExportImportContentProcessorException
+						exportImportContentProcessorException =
+							new ExportImportContentProcessorException(
+								exceptionSB.toString(), exception);
 
 					if (_log.isDebugEnabled()) {
-						_log.debug(exceptionSB.toString(), eicpe);
+						_log.debug(
+							exceptionSB.toString(),
+							exportImportContentProcessorException);
 					}
 					else if (_log.isWarnEnabled()) {
 						_log.warn(exceptionSB.toString());
@@ -505,12 +532,12 @@ public class DLReferencesExportImportContentProcessor
 					importedFileEntry = _dlAppLocalService.getFileEntry(
 						fileEntryId);
 				}
-				catch (PortalException pe) {
+				catch (PortalException portalException) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(pe, pe);
+						_log.debug(portalException, portalException);
 					}
 					else if (_log.isWarnEnabled()) {
-						_log.warn(pe.getMessage());
+						_log.warn(portalException.getMessage());
 					}
 
 					if (content.startsWith("[#dl-reference=", endPos)) {
@@ -652,18 +679,29 @@ public class DLReferencesExportImportContentProcessor
 				}
 
 				if (absolutePortalURL || relativePortalURL) {
-					ExportImportContentValidationException eicve =
-						new ExportImportContentValidationException(
-							DLReferencesExportImportContentProcessor.class.
-								getName(),
-							new NoSuchFileEntryException());
+					ExportImportContentValidationException
+						exportImportContentValidationException =
+							new ExportImportContentValidationException(
+								DLReferencesExportImportContentProcessor.class.
+									getName(),
+								new NoSuchFileEntryException());
 
-					eicve.setDlReferenceParameters(dlReferenceParameters);
-					eicve.setType(
+					exportImportContentValidationException.
+						setDlReferenceParameters(dlReferenceParameters);
+
+					ObjectValuePair<String, Integer>
+						dlReferenceEndPosObjectValuePair =
+							getDLReferenceEndPosObjectValuePair(
+								content, beginPos, endPos);
+
+					exportImportContentValidationException.setDlReference(
+						dlReferenceEndPosObjectValuePair.getKey());
+
+					exportImportContentValidationException.setType(
 						ExportImportContentValidationException.
 							FILE_ENTRY_NOT_FOUND);
 
-					throw eicve;
+					throw exportImportContentValidationException;
 				}
 			}
 
@@ -732,8 +770,5 @@ public class DLReferencesExportImportContentProcessor
 
 	@Reference
 	private Portal _portal;
-
-	@Reference
-	private PortalUUID _portalUUID;
 
 }

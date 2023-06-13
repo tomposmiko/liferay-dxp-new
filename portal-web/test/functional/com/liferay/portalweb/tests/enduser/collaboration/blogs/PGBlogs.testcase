@@ -47,7 +47,7 @@ definition {
 
 			Organization.tearDownCP();
 
-			User.tearDownCP();
+			JSONUser.tearDownNonAdminUsers();
 
 			ServerAdministration.tearDownMailServerSettings();
 		}
@@ -55,6 +55,8 @@ definition {
 
 	@priority = "5"
 	test AddBlogsEntry {
+		property testray.component.names = "WYSIWYG";
+
 		Blogs.addEntry(
 			entryContent = "Blogs Entry Content",
 			entryTitle = "Blogs Entry Title");
@@ -769,6 +771,8 @@ definition {
 	@description = "This is a usecase for LPS-75241"
 	@priority = "5"
 	test EmbedVideo {
+		property testray.component.names = "WYSIWYG";
+
 		Blogs.addEntry(
 			embedVideo = "https://www.youtube.com/watch?v=2EPZxIC5ogU",
 			entryContent = "video",
@@ -847,6 +851,8 @@ definition {
 	@description = "This is a usecase for LPS-83229. This is the only small image test for blogs."
 	@priority = "5"
 	test RemoveSmallImage {
+		property testray.component.names = "WYSIWYG";
+
 		BlogsNavigator.gotoAddEntry();
 
 		BlogsEntry.addEntryContent(
@@ -1115,6 +1121,7 @@ definition {
 
 	@priority = "5"
 	test UserSubscribeToBlogsAndViewEntryEmails {
+		property custom.properties = "jsonws.web.service.paths.excludes=";
 		property test.smtp.server.enabled = "true";
 
 		var siteName = TestCase.getSiteName(siteName = "${siteName}");
@@ -1125,14 +1132,10 @@ definition {
 			userLastName = "userln",
 			userScreenName = "usersn");
 
-		ProductMenu.gotoPortlet(
-			category = "Users",
-			panel = "Control Panel",
-			portlet = "Users and Organizations");
-
-		User.editPasswordCP(
-			userEmailAddress = "userea@liferay.com",
-			userScreenName = "usersn");
+		JSONUser.setFirstPassword(
+			agreeToTermsAndAnswerReminderQuery = "true",
+			requireReset = "false",
+			userEmailAddress = "userea@liferay.com");
 
 		ProductMenu.gotoPortlet(
 			category = "Users",
@@ -1307,6 +1310,8 @@ definition {
 
 	@priority = "3"
 	test ViewBlogsEntryDraftNoAsUser {
+		property custom.properties = "jsonws.web.service.paths.excludes=";
+
 		Blogs.addDraft(
 			entryContent = "Blogs Entry Content",
 			entrySubtitle = "Blogs Entry Subtitle",
@@ -1318,14 +1323,10 @@ definition {
 			userLastName = "userln",
 			userScreenName = "usersn");
 
-		ProductMenu.gotoPortlet(
-			category = "Users",
-			panel = "Control Panel",
-			portlet = "Users and Organizations");
-
-		User.editPasswordCP(
-			userEmailAddress = "userea@liferay.com",
-			userScreenName = "usersn");
+		JSONUser.setFirstPassword(
+			agreeToTermsAndAnswerReminderQuery = "true",
+			requireReset = "false",
+			userEmailAddress = "userea@liferay.com");
 
 		User.logoutPG();
 
@@ -1614,12 +1615,12 @@ definition {
 			entryContent = "Blogs Entry Content",
 			entrySubtitle = "Blogs Entry Subtitle",
 			entryTitle = "Blogs Entry Title",
-			navTab = "Upload Image",
+			navTab = "Blog Images",
 			uploadFileName = "Document_1.jpg");
 
 		Button.clickPublish();
 
-		Pause(locator1 = "30000");
+		Pause(locator1 = "10000");
 
 		Navigator.gotoPage(pageName = "Blogs Page");
 

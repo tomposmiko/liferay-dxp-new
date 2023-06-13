@@ -32,32 +32,15 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class WikiPageResourceLocalServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.wiki.service.impl.WikiPageResourceLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
-	 */
-
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link WikiPageResourceLocalServiceUtil} to access the wiki page resource local service. Add custom service methods to <code>com.liferay.wiki.service.impl.WikiPageResourceLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	public static com.liferay.wiki.model.WikiPageResource addPageResource(
 		long groupId, long nodeId, String title) {
 
 		return getService().addPageResource(groupId, nodeId, title);
-	}
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 #addPageResource(long, long, String)}
-	 */
-	@Deprecated
-	public static com.liferay.wiki.model.WikiPageResource addPageResource(
-		long nodeId, String title) {
-
-		return getService().addPageResource(nodeId, title);
 	}
 
 	/**
@@ -285,15 +268,6 @@ public class WikiPageResourceLocalServiceUtil {
 		long groupId, long nodeId, String title) {
 
 		return getService().getPageResourcePrimKey(groupId, nodeId, title);
-	}
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 #getPageResourcePrimKey(long, long, String)}
-	 */
-	@Deprecated
-	public static long getPageResourcePrimKey(long nodeId, String title) {
-		return getService().getPageResourcePrimKey(nodeId, title);
 	}
 
 	public static com.liferay.portal.kernel.model.PersistedModel

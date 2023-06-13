@@ -75,7 +75,7 @@ public interface WikiPageLocalService
 	extends BaseLocalService, PersistedModelLocalService,
 			PersistedResourcedModelLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link WikiPageLocalServiceUtil} to access the wiki page local service. Add custom service methods to <code>com.liferay.wiki.service.impl.WikiPageLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -112,16 +112,6 @@ public interface WikiPageLocalService
 			boolean addGuestPermissions)
 		throws PortalException;
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #addPageResources(WikiPage, ModelPermissions)}
-	 */
-	@Deprecated
-	public void addPageResources(
-			long nodeId, String title, String[] groupPermissions,
-			String[] guestPermissions)
-		throws PortalException;
-
 	public void addPageResources(
 			WikiPage page, boolean addGroupPermissions,
 			boolean addGuestPermissions)
@@ -131,28 +121,8 @@ public interface WikiPageLocalService
 			WikiPage page, ModelPermissions modelPermissions)
 		throws PortalException;
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #addPageResources(WikiPage, ModelPermissions)}
-	 */
-	@Deprecated
-	public void addPageResources(
-			WikiPage page, String[] groupPermissions, String[] guestPermissions)
-		throws PortalException;
-
 	public FileEntry addTempFileEntry(
 			long groupId, long userId, String folderName, String fileName,
-			InputStream inputStream, String mimeType)
-		throws PortalException;
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 #addTempFileEntry(long, long, String, String, InputStream,
-	 String)}
-	 */
-	@Deprecated
-	public void addTempPageAttachment(
-			long groupId, long userId, String fileName, String tempFolderName,
 			InputStream inputStream, String mimeType)
 		throws PortalException;
 
@@ -405,13 +375,6 @@ public interface WikiPageLocalService
 			long nodeId, String title, int status, boolean preferApproved)
 		throws PortalException;
 
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<WikiPage> getNoAssetPages();
-
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<WikiPage> getOrphans(List<WikiPage> pages)
 		throws PortalException;
@@ -659,16 +622,6 @@ public interface WikiPageLocalService
 	public void moveDependentToTrash(WikiPage page, long trashEntryId)
 		throws PortalException;
 
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 #renamePage(long, long, String, String, ServiceContext)}
-	 */
-	@Deprecated
-	public void movePage(
-			long userId, long nodeId, String title, String newTitle,
-			ServiceContext serviceContext)
-		throws PortalException;
-
 	public FileEntry movePageAttachmentToTrash(
 			long userId, long nodeId, String title, String fileName)
 		throws PortalException;
@@ -676,16 +629,6 @@ public interface WikiPageLocalService
 	public WikiPage movePageFromTrash(
 			long userId, long nodeId, String title, long newNodeId,
 			String newParentTitle)
-		throws PortalException;
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 #movePageFromTrash(long, long, String, long, String)} *
-	 */
-	@Deprecated
-	public WikiPage movePageFromTrash(
-			long userId, long nodeId, String title, String newParentTitle,
-			ServiceContext serviceContext)
 		throws PortalException;
 
 	public WikiPage movePageToTrash(long userId, long nodeId, String title)
@@ -748,16 +691,6 @@ public interface WikiPageLocalService
 			ServiceContext serviceContext)
 		throws PortalException;
 
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 #updateStatus(long, WikiPage, int, ServiceContext, Map)}
-	 */
-	@Deprecated
-	public WikiPage updateStatus(
-			long userId, WikiPage page, int status,
-			ServiceContext serviceContext)
-		throws PortalException;
-
 	public WikiPage updateStatus(
 			long userId, WikiPage page, int status,
 			ServiceContext serviceContext,
@@ -773,11 +706,7 @@ public interface WikiPageLocalService
 	@Indexable(type = IndexableType.REINDEX)
 	public WikiPage updateWikiPage(WikiPage wikiPage);
 
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 WikiPageTitleValidator#validate(String)}
-	 */
-	@Deprecated
-	public void validateTitle(String title) throws PortalException;
+	public WikiPage updateWikiPage(
+		WikiPage wikiPage, ServiceContext serviceContext);
 
 }

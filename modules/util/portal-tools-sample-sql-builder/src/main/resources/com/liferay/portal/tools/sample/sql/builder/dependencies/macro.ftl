@@ -14,15 +14,38 @@
 		<#list assetCategoryIds as assetCategoryId>
 			<#local assetEntryAssetCategoryRelId = dataFactory.getCounterNext()>
 
-			insert into AssetEntryAssetCategoryRel values (0, ${assetEntryAssetCategoryRelId}, ${assetEntryModel.entryId}, ${assetCategoryId}, 0);
+			insert into AssetEntryAssetCategoryRel values (0, ${assetEntryAssetCategoryRelId}, ${assetEntryModel.companyId}, ${assetEntryModel.entryId}, ${assetCategoryId}, 0);
 		</#list>
 
 		<#local assetTagIds = dataFactory.getAssetTagIds(assetEntryModel)>
 
 		<#list assetTagIds as assetTagId>
-			insert into AssetEntries_AssetTags values (${assetEntryModel.companyId}, ${assetEntryModel.entryId}, ${assetTagId});
+			insert into AssetEntries_AssetTags values (${assetEntryModel.companyId}, ${assetEntryModel.entryId}, ${assetTagId}, 0, null);
 		</#list>
 	</#if>
+</#macro>
+
+<#macro insertContentLayout
+	_layoutModel
+	_fragmentEntryModel
+>
+	${dataFactory.toInsertSQL(_layoutModel)}
+
+	${dataFactory.toInsertSQL(dataFactory.newLayoutFriendlyURLModel(_layoutModel))}
+
+	<#local fragmentEntryLinkModel = dataFactory.newFragmentEntryLinkModel(_layoutModel, _fragmentEntryModel)>
+
+	${dataFactory.toInsertSQL(fragmentEntryLinkModel)}
+
+	${dataFactory.toInsertSQL(dataFactory.newJournalContentPortletPreferencesModel(fragmentEntryLinkModel))}
+
+	<#local layoutPageTemplateStructureModel = dataFactory.newLayoutPageTemplateStructureModel(_layoutModel)>
+
+	${dataFactory.toInsertSQL(layoutPageTemplateStructureModel)}
+
+	<#local layoutPageTemplateStructureRelModel = dataFactory.newLayoutPageTemplateStructureRelModel(_layoutModel, layoutPageTemplateStructureModel, fragmentEntryLinkModel)>
+
+	${dataFactory.toInsertSQL(layoutPageTemplateStructureRelModel)}
 </#macro>
 
 <#macro insertDDMContent
@@ -104,7 +127,7 @@
 
 				${dataFactory.toInsertSQL(dataFactory.newDDMStructureLinkModel(dlFileEntryMetadataModel))}
 
-				${dataFactory.getCSVWriter("documentLibrary").write(dlFileEntryModel.uuid + "," + dlFolderModel.folderId + "," + dlFileEntryModel.name + "," + dlFileEntryModel.fileEntryId + "," + dataFactory.getDateLong(dlFileEntryModel.createDate) + "," + dataFactory.getDateLong(dlFolderModel.createDate) + "\n")}
+				${dataFactory.getCSVWriter("documentLibrary").write(dlFileEntryModel.uuid + "," + dlFolderModel.folderId + "," + dlFileEntryModel.name + "," + dlFileEntryModel.fileEntryId + "\n")}
 			</#list>
 
 			<@insertDLFolder
@@ -119,20 +142,13 @@
 
 <#macro insertGroup
 	_groupModel
-	_publicPageCount
 >
 	${dataFactory.toInsertSQL(_groupModel)}
 
-	<#local layoutSetModels = dataFactory.newLayoutSetModels(_groupModel.groupId, _publicPageCount)>
+	<#local layoutSetModels = dataFactory.newLayoutSetModels(_groupModel.groupId)>
 
 	<#list layoutSetModels as layoutSetModel>
 		${dataFactory.toInsertSQL(layoutSetModel)}
-	</#list>
-
-	<#local layoutSetVersionModels = dataFactory.newLayoutSetVersionModels(layoutSetModels)>
-
-	<#list layoutSetVersionModels as layoutSetVersionModel>
-		${dataFactory.toInsertSQL(layoutSetVersionModel)}
 	</#list>
 </#macro>
 
@@ -142,8 +158,6 @@
 	${dataFactory.toInsertSQL(_layoutModel)}
 
 	${dataFactory.toInsertSQL(dataFactory.newLayoutFriendlyURLModel(_layoutModel))}
-
-	${dataFactory.toInsertSQL(dataFactory.newLayoutVersionModel(_layoutModel))}
 </#macro>
 
 <#macro insertMBDiscussion

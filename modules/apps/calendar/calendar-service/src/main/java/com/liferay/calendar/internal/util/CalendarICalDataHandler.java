@@ -41,6 +41,7 @@ import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -112,18 +113,6 @@ import org.osgi.service.component.annotations.Deactivate;
 )
 public class CalendarICalDataHandler implements CalendarDataHandler {
 
-	@Activate
-	public void activate() {
-		CalendarDataHandlerFactory.registerCalendarDataHandler(
-			CalendarDataFormat.ICAL, this);
-	}
-
-	@Deactivate
-	public void deactivate() {
-		CalendarDataHandlerFactory.unregisterCalendarDataHandler(
-			CalendarDataFormat.ICAL);
-	}
-
 	@Override
 	public String exportCalendar(long calendarId) throws Exception {
 		int[] statuses = {
@@ -168,6 +157,18 @@ public class CalendarICalDataHandler implements CalendarDataHandler {
 		for (VEvent vEvent : vEvents) {
 			importICalEvent(calendarId, vEvent);
 		}
+	}
+
+	@Activate
+	protected void activate() {
+		CalendarDataHandlerFactory.registerCalendarDataHandler(
+			CalendarDataFormat.ICAL, this);
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		CalendarDataHandlerFactory.unregisterCalendarDataHandler(
+			CalendarDataFormat.ICAL);
 	}
 
 	protected void importICalEvent(long calendarId, VEvent vEvent)
@@ -460,7 +461,7 @@ public class CalendarICalDataHandler implements CalendarDataHandler {
 		try {
 			NotificationType.parse(value);
 		}
-		catch (IllegalArgumentException iae) {
+		catch (IllegalArgumentException illegalArgumentException) {
 			return false;
 		}
 
@@ -670,15 +671,17 @@ public class CalendarICalDataHandler implements CalendarDataHandler {
 		Company company = CompanyLocalServiceUtil.getCompany(
 			calendarBooking.getCompanyId());
 
-		String calendarBookingDescription = StringUtil.replace(
-			calendarBooking.getDescription(user.getLocale()),
-			new String[] {"href=\"/", "src=\"/"},
-			new String[] {
-				"href=\"" + company.getPortalURL(calendarBooking.getGroupId()) +
-					"/",
-				"src=\"" + company.getPortalURL(calendarBooking.getGroupId()) +
-					"/"
-			});
+		String calendarBookingDescription = HtmlUtil.stripHtml(
+			StringUtil.replace(
+				calendarBooking.getDescription(user.getLocale()),
+				new String[] {"href=\"/", "src=\"/"},
+				new String[] {
+					"href=\"" +
+						company.getPortalURL(calendarBooking.getGroupId()) +
+							"/",
+					"src=\"" +
+						company.getPortalURL(calendarBooking.getGroupId()) + "/"
+				}));
 
 		Description description = new Description(calendarBookingDescription);
 

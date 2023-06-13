@@ -45,13 +45,13 @@ public class SiteNavigationAdminManagementToolbarDisplayContext
 	extends SearchContainerManagementToolbarDisplayContext {
 
 	public SiteNavigationAdminManagementToolbarDisplayContext(
+		HttpServletRequest httpServletRequest,
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
-		HttpServletRequest httpServletRequest,
 		SiteNavigationAdminDisplayContext siteNavigationAdminDisplayContext) {
 
 		super(
-			liferayPortletRequest, liferayPortletResponse, httpServletRequest,
+			httpServletRequest, liferayPortletRequest, liferayPortletResponse,
 			siteNavigationAdminDisplayContext.getSearchContainer());
 
 		_siteNavigationAdminDisplayContext = siteNavigationAdminDisplayContext;

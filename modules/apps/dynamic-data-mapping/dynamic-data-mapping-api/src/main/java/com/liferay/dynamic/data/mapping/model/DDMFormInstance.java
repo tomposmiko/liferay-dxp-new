@@ -33,7 +33,7 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface DDMFormInstance extends DDMFormInstanceModel, PersistedModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.dynamic.data.mapping.model.impl.DDMFormInstanceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -71,6 +71,9 @@ public interface DDMFormInstance extends DDMFormInstanceModel, PersistedModel {
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public DDMFormInstanceSettings getSettingsModel()
+		throws com.liferay.portal.kernel.exception.PortalException;
+
+	public String getStorageType()
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public DDMStructure getStructure()

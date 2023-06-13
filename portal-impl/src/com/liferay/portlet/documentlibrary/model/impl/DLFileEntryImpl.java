@@ -45,10 +45,12 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Repository;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
+import com.liferay.portal.kernel.service.ClassNameLocalServiceUtil;
 import com.liferay.portal.kernel.service.RepositoryLocalServiceUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.kernel.view.count.ViewCountManagerUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.IOException;
@@ -143,9 +145,9 @@ public class DLFileEntryImpl extends DLFileEntryBaseImpl {
 
 			return dlFileVersion.getExpandoBridge();
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(pe, pe);
+				_log.warn(portalException, portalException);
 			}
 		}
 
@@ -169,8 +171,8 @@ public class DLFileEntryImpl extends DLFileEntryBaseImpl {
 			try {
 				_extraSettingsProperties.load(super.getExtraSettings());
 			}
-			catch (IOException ioe) {
-				_log.error(ioe, ioe);
+			catch (IOException ioException) {
+				_log.error(ioException, ioException);
 			}
 		}
 
@@ -266,6 +268,14 @@ public class DLFileEntryImpl extends DLFileEntryBaseImpl {
 	}
 
 	@Override
+	public long getReadCount() {
+		return ViewCountManagerUtil.getViewCount(
+			getCompanyId(),
+			ClassNameLocalServiceUtil.getClassNameId(DLFileEntry.class),
+			getPrimaryKey());
+	}
+
+	@Override
 	public StagedModelType getStagedModelType() {
 		return new StagedModelType(DLFileEntryConstants.getClassName());
 	}
@@ -277,7 +287,7 @@ public class DLFileEntryImpl extends DLFileEntryBaseImpl {
 
 			return dlFileVersion.getStatus();
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			return WorkflowConstants.STATUS_APPROVED;
 		}
 	}
@@ -294,9 +304,9 @@ public class DLFileEntryImpl extends DLFileEntryBaseImpl {
 			return DLFileEntryServiceUtil.isFileEntryCheckedOut(
 				getFileEntryId());
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(pe, pe);
+				_log.warn(portalException, portalException);
 			}
 		}
 
@@ -320,9 +330,9 @@ public class DLFileEntryImpl extends DLFileEntryBaseImpl {
 
 			return dlFolder.isHidden();
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(pe, pe);
+				_log.warn(portalException, portalException);
 			}
 		}
 

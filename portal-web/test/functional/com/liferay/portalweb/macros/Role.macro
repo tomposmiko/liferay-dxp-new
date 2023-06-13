@@ -1,13 +1,19 @@
 definition {
 
 	macro add {
+		if ((!(isSet(roleKey))) && (!(isSet(roleTitle)))) {
+			fail("Please declear the roleKey or roleTitle when refering this macro.");
+		}
+
 		LexiconEntry.gotoAdd();
 
 		AssertTextEquals(
 			locator1 = "Portlet#HEADER",
 			value1 = "New Role");
 
-		PortletEntry.inputTitle(title = "${roleTitle}");
+		if (isSet(roleTitle)) {
+			PortletEntry.inputTitle(title = "${roleTitle}");
+		}
 
 		if (isSet(roleDescription)) {
 			PortletEntry.inputDescription(description = "${roleDescription}");
@@ -48,27 +54,6 @@ definition {
 			value1 = "Add");
 
 		Alert.viewSuccessMessage();
-	}
-
-	macro addStagingAdminRole {
-		var roleTitle = "Staging Admin";
-
-		RoleNavigator.gotoRoleType(roleType = "Site");
-
-		Role.add(
-			roleDescription = "${roleDescription}",
-			roleKey = "${roleKey}",
-			roleTitle = "${roleTitle}");
-
-		ProductMenu.gotoPortlet(
-			category = "Users",
-			panel = "Control Panel",
-			portlet = "Roles");
-
-		Role.definePermissionsCP(
-			permissionDefinitionKeys = "SITE_ADMIN_PAGES_SITE_PAGES_GENERAL_PERMISSIONS_ACTION_CHECKBOX,SITE_ADMIN_PAGES_SITE_PAGES_RESOURCE_PERMISSIONS_SITE_ACTION_CHECKBOX,SITE_ADMIN_PAGES_SITE_PAGES_RESOURCE_PERMISSIONS_PAGE_ACTION_CHECKBOX,SITE_ADMIN_PAGES_SITE_PAGES_RESOURCE_PERMISSIONS_PAGE_VARIATION_ACTION_CHECKBOX,SITE_ADMIN_PAGES_SITE_PAGES_RESOURCE_PERMISSIONS_SITE_PAGES_VARIATION_ACTION_CHECKBOX",
-			roleTitle = "${roleTitle}",
-			roleType = "Site");
 	}
 
 	macro assignRegRoleCP {
@@ -199,20 +184,12 @@ definition {
 		if (isSet(roleUser)) {
 			var key_itemName = "${roleUser}";
 
-			AssertTextEquals(
-				locator1 = "ListGroupItem#ITEM_NAME",
-				value1 = "${roleUser}");
-
 			AssertClick(
 				locator1 = "ListGroupItem#ITEM_NAME_LINK",
 				value1 = "${roleUser}");
 		}
 		else {
 			var key_itemName = "${roleTitle}";
-
-			AssertTextEquals(
-				locator1 = "ListGroupItem#ITEM_NAME",
-				value1 = "${roleTitle}");
 
 			AssertClick(
 				locator1 = "ListGroupItem#ITEM_NAME_LINK",
@@ -405,6 +382,23 @@ definition {
 		Navigator.openWithAppendToBaseURL(urlAppend = "group/control_panel/manage?p_p_id=com_liferay_roles_admin_web_portlet_RolesAdminPortlet");
 	}
 
+	macro removeAssignee {
+		ProductMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Roles");
+
+		RoleNavigator.gotoAssignees(roleTitle = "${roleTitle}");
+
+		RoleNavigator.gotoAssigneeType(assigneeType = "${assigneeType}");
+
+		Search.searchCP(searchTerm = "${assigneeName}");
+
+		LexiconEntry.selectEntry(key_rowEntry = "${assigneeName}");
+
+		ClickNoError(locator1 = "Icon#DELETE");
+	}
+
 	macro removePermissionCP {
 		Role.editPermissionCmdCP(
 			permissionDefinitionKey = "${permissionDefinitionKey}",
@@ -481,6 +475,14 @@ definition {
 		}
 	}
 
+	macro viewAssignee {
+		RoleNavigator.gotoAssignees(roleTitle = "${roleTitle}");
+
+		RoleNavigator.gotoAssigneeType(assigneeType = "${assigneeType}");
+
+		LexiconEntry.viewEntryName(rowEntry = "${assigneeName}");
+	}
+
 	macro viewCP {
 		if (contains("Organization,Site", "${roleType}")) {
 			Navigator.gotoNavItem(navItem = "${roleType} Roles");
@@ -489,17 +491,40 @@ definition {
 			Navigator.gotoNavItem(navItem = "Regular Roles");
 		}
 
-		var key_itemName = "${roleTitle}";
+		if ((isSet(roleKey)) && (!(isSet(roleTitle)))) {
+			var rowEntry = "${roleKey}";
+			var roleTitle = "";
+		}
+		else {
+			var rowEntry = "${roleTitle}";
+		}
 
-		LexiconEntry.gotoEntryMenuItem(
-			menuItem = "Edit",
-			rowEntry = "${roleTitle}");
+		if (!(isSet(roleKey))) {
+			var roleKey = "${roleTitle}";
+		}
 
-		SiteAdmin.viewPortletTitle(portletTitle = "${roleTitle}");
+		AssertClick(
+			key_itemName = "${rowEntry}",
+			locator1 = "ListGroupItem#ITEM_NAME_LINK",
+			value1 = "${rowEntry}");
+
+		SiteAdmin.viewPortletTitle(portletTitle = "${rowEntry}");
+
+		if (isSet(toolTip)) {
+			MouseOver(locator1 = "Icon#TOOLTIP");
+
+			AssertTextEquals.assertPartialText(
+				locator1 = "Message#TOOLTIP",
+				value1 = "${toolTip}");
+		}
 
 		AssertTextEquals(
 			locator1 = "TextInput#TITLE",
 			value1 = "${roleTitle}");
+
+		AssertTextEquals(
+			locator1 = "TextInput#KEY",
+			value1 = "${roleKey}");
 	}
 
 	macro viewDefaultCP {
@@ -641,6 +666,28 @@ definition {
 		}
 		else if ("${permissionFlagged}" == "false") {
 			AssertNotChecked(locator1 = "Permissions#${permissionDefinitionKey}");
+		}
+	}
+
+	macro viewPermissionSubdirectory {
+		var key_navItem = "${navItem}";
+
+		if (IsElementPresent(locator1 = "RolesPermissionsNavigation#PERMISSIONS_NAVITEM_COLLAPSED")) {
+			Click.clickAt(locator1 = "RolesPermissionsNavigation#PERMISSIONS_NAVITEM_COLLAPSED");
+
+			AssertElementNotPresent(locator1 = "RolesPermissionsNavigation#PERMISSIONS_NAVITEM_COLLAPSED");
+		}
+
+		for (var subItem : list "${subItemList}") {
+			var key_subItem = "${subItem}";
+
+			AssertElementPresent(locator1 = "RolesPermissionsNavigation#PERMISSIONS_NAVITEM_SUBITEM");
+
+			if (IsElementPresent(locator1 = "RolesPermissionsNavigation#PERMISSIONS_NAVITEM_SUBITEM_COLLAPSED")) {
+				Click.clickAt(locator1 = "RolesPermissionsNavigation#PERMISSIONS_NAVITEM_SUBITEM_COLLAPSED");
+
+				AssertElementNotPresent(locator1 = "RolesPermissionsNavigation#PERMISSIONS_NAVITEM_SUBITEM_COLLAPSED");
+			}
 		}
 	}
 

@@ -64,7 +64,7 @@ public abstract class DLFileRankLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements AopService, DLFileRankLocalService, IdentifiableOSGiService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>DLFileRankLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.document.library.file.rank.service.DLFileRankLocalServiceUtil</code>.
@@ -372,8 +372,8 @@ public abstract class DLFileRankLocalServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

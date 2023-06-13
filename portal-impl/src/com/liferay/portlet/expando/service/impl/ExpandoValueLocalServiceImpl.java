@@ -703,7 +703,7 @@ public class ExpandoValueLocalServiceImpl
 			row.setTableId(tableId);
 			row.setClassPK(classPK);
 
-			expandoRowPersistence.update(row);
+			row = expandoRowPersistence.update(row);
 		}
 
 		boolean rowModified = false;
@@ -906,10 +906,11 @@ public class ExpandoValueLocalServiceImpl
 			try {
 				expandoRowPersistence.remove(value.getRowId());
 			}
-			catch (NoSuchRowException nsre) {
+			catch (NoSuchRowException noSuchRowException) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(
-						"Row " + value.getRowId() + " does not exist", nsre);
+						"Row " + value.getRowId() + " does not exist",
+						noSuchRowException);
 				}
 			}
 		}
@@ -1718,7 +1719,7 @@ public class ExpandoValueLocalServiceImpl
 			row.setTableId(tableId);
 			row.setClassPK(classPK);
 
-			expandoRowPersistence.update(row);
+			row = expandoRowPersistence.update(row);
 		}
 
 		ExpandoValue value = expandoValuePersistence.fetchByC_R(
@@ -1740,7 +1741,7 @@ public class ExpandoValueLocalServiceImpl
 		if (value.isNew() || !Objects.equals(value.getData(), data)) {
 			value.setData(data);
 
-			expandoValuePersistence.update(value);
+			value = expandoValuePersistence.update(value);
 
 			row.setModifiedDate(new Date());
 

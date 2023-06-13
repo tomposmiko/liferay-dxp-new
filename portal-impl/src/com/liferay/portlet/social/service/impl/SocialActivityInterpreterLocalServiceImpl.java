@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.util.PropsValues;
@@ -77,13 +78,15 @@ public class SocialActivityInterpreterLocalServiceImpl
 
 		Registry registry = RegistryUtil.getRegistry();
 
-		Map<String, Object> properties = new HashMap<>();
+		Map<String, Object> properties = HashMapBuilder.<String, Object>put(
+			"javax.portlet.name",
+			() -> {
+				SocialActivityInterpreterImpl socialActivityInterpreterImpl =
+					(SocialActivityInterpreterImpl)activityInterpreter;
 
-		SocialActivityInterpreterImpl socialActivityInterpreterImpl =
-			(SocialActivityInterpreterImpl)activityInterpreter;
-
-		properties.put(
-			"javax.portlet.name", socialActivityInterpreterImpl.getPortletId());
+				return socialActivityInterpreterImpl.getPortletId();
+			}
+		).build();
 
 		ServiceRegistration<SocialActivityInterpreter> serviceRegistration =
 			registry.registerService(
@@ -177,8 +180,8 @@ public class SocialActivityInterpreterLocalServiceImpl
 				return null;
 			}
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 
 		if (activity.getMirrorActivityId() > 0) {
@@ -188,7 +191,7 @@ public class SocialActivityInterpreterLocalServiceImpl
 				mirrorActivity = socialActivityLocalService.getActivity(
 					activity.getMirrorActivityId());
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 			}
 
 			if (mirrorActivity != null) {
@@ -248,8 +251,8 @@ public class SocialActivityInterpreterLocalServiceImpl
 				return null;
 			}
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 
 		List<SocialActivityInterpreter> activityInterpreters =

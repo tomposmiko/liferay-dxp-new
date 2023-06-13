@@ -72,69 +72,68 @@ public class DefaultTaskManagerImpl
 
 	@Override
 	public WorkflowTask assignWorkflowTaskToRole(
-			long workflowTaskInstanceId, long roleId, String comment,
-			Date dueDate, Map<String, Serializable> workflowContext,
+			long workflowTaskId, long roleId, String comment, Date dueDate,
+			Map<String, Serializable> workflowContext,
 			ServiceContext serviceContext)
 		throws WorkflowException {
 
 		try {
 			return assignWorkflowTask(
-				workflowTaskInstanceId, Role.class.getName(), roleId, comment,
-				dueDate, workflowContext, serviceContext);
+				workflowTaskId, Role.class.getName(), roleId, comment, dueDate,
+				workflowContext, serviceContext);
 		}
-		catch (Exception e) {
-			throw new WorkflowException(e);
+		catch (Exception exception) {
+			throw new WorkflowException(exception);
 		}
 	}
 
 	@Override
 	public WorkflowTask assignWorkflowTaskToUser(
-			long workflowTaskInstanceId, long assigneeUserId, String comment,
+			long workflowTaskId, long assigneeUserId, String comment,
 			Date dueDate, Map<String, Serializable> workflowContext,
 			ServiceContext serviceContext)
 		throws WorkflowException {
 
 		try {
 			return assignWorkflowTask(
-				workflowTaskInstanceId, User.class.getName(), assigneeUserId,
-				comment, dueDate, workflowContext, serviceContext);
+				workflowTaskId, User.class.getName(), assigneeUserId, comment,
+				dueDate, workflowContext, serviceContext);
 		}
-		catch (Exception e) {
-			throw new WorkflowException(e);
+		catch (Exception exception) {
+			throw new WorkflowException(exception);
 		}
 	}
 
 	@Override
 	public WorkflowTask completeWorkflowTask(
-			long workflowTaskInstanceId, long workflowTaskFormId,
-			String formValues, Map<String, Serializable> workflowContext,
+			long workflowTaskId, long workflowTaskFormId, String formValues,
+			Map<String, Serializable> workflowContext,
 			ServiceContext serviceContext)
 		throws WorkflowException {
 
 		return completeWorkflowTask(
-			workflowTaskInstanceId, workflowTaskFormId, formValues, null,
+			workflowTaskId, workflowTaskFormId, formValues, null,
 			workflowContext, serviceContext);
 	}
 
 	@Override
 	public WorkflowTask completeWorkflowTask(
-			long workflowTaskInstanceId, long workflowTaskFormId,
-			String formValues, String transitionName,
-			Map<String, Serializable> workflowContext,
+			long workflowTaskId, long workflowTaskFormId, String formValues,
+			String transitionName, Map<String, Serializable> workflowContext,
 			ServiceContext serviceContext)
 		throws WorkflowException {
 
 		try {
 			KaleoTaskInstanceToken kaleoTaskInstanceToken =
 				kaleoTaskInstanceTokenLocalService.getKaleoTaskInstanceToken(
-					workflowTaskInstanceId);
+					workflowTaskId);
 
 			kaleoTaskFormInstanceLocalService.addKaleoTaskFormInstance(
 				kaleoTaskInstanceToken.getGroupId(), workflowTaskFormId,
 				formValues, kaleoTaskInstanceToken, serviceContext);
 
 			if (kaleoTaskInstanceTokenLocalService.hasPendingKaleoTaskForms(
-					workflowTaskInstanceId)) {
+					workflowTaskId)) {
 
 				return _kaleoWorkflowModelConverter.toWorkflowTask(
 					kaleoTaskInstanceToken, workflowContext);
@@ -163,40 +162,40 @@ public class DefaultTaskManagerImpl
 			}
 
 			return doCompleteWorkflowTask(
-				workflowTaskInstanceId, transitionName, null, workflowContext,
+				workflowTaskId, transitionName, null, workflowContext,
 				serviceContext);
 		}
-		catch (Exception e) {
-			throw new WorkflowException(e);
+		catch (Exception exception) {
+			throw new WorkflowException(exception);
 		}
 	}
 
 	@Override
 	public WorkflowTask completeWorkflowTask(
-			long workflowTaskInstanceId, String transitionName, String comment,
+			long workflowTaskId, String transitionName, String comment,
 			Map<String, Serializable> workflowContext,
 			ServiceContext serviceContext)
 		throws WorkflowException {
 
 		try {
 			return doCompleteWorkflowTask(
-				workflowTaskInstanceId, transitionName, comment,
-				workflowContext, serviceContext);
+				workflowTaskId, transitionName, comment, workflowContext,
+				serviceContext);
 		}
-		catch (Exception e) {
-			throw new WorkflowException(e);
+		catch (Exception exception) {
+			throw new WorkflowException(exception);
 		}
 	}
 
 	@Override
 	public List<String> getWorkflowTaskFormDefinitions(
-			long workflowTaskInstanceId, ServiceContext serviceContext)
+			long workflowTaskId, ServiceContext serviceContext)
 		throws WorkflowException {
 
 		try {
 			KaleoTaskInstanceToken kaleoTaskInstanceToken =
 				kaleoTaskInstanceTokenLocalService.getKaleoTaskInstanceToken(
-					workflowTaskInstanceId);
+					workflowTaskId);
 
 			List<KaleoTaskForm> kaleoTaskForms =
 				kaleoTaskFormLocalService.getKaleoTaskForms(
@@ -231,26 +230,26 @@ public class DefaultTaskManagerImpl
 
 			return kaleoTaskFormDefinitions;
 		}
-		catch (PortalException pe) {
-			throw new WorkflowException(pe);
+		catch (PortalException portalException) {
+			throw new WorkflowException(portalException);
 		}
 	}
 
 	@Override
 	public WorkflowTask updateDueDate(
-			long workflowTaskInstanceId, String comment, Date dueDate,
+			long workflowTaskId, String comment, Date dueDate,
 			ServiceContext serviceContext)
 		throws WorkflowException {
 
 		try {
 			KaleoTaskInstanceToken kaleoTaskInstanceToken =
 				kaleoTaskInstanceTokenLocalService.getKaleoTaskInstanceToken(
-					workflowTaskInstanceId);
+					workflowTaskId);
 
 			if (kaleoTaskInstanceToken.isCompleted()) {
 				throw new WorkflowException(
 					"Cannot update due date for completed task " +
-						workflowTaskInstanceId);
+						workflowTaskId);
 			}
 
 			if (dueDate != null) {
@@ -262,7 +261,7 @@ public class DefaultTaskManagerImpl
 
 				kaleoTaskInstanceToken =
 					kaleoTaskInstanceTokenLocalService.updateDueDate(
-						workflowTaskInstanceId, dueDate, serviceContext);
+						workflowTaskId, dueDate, serviceContext);
 			}
 
 			Map<String, Serializable> workflowContext =
@@ -276,21 +275,21 @@ public class DefaultTaskManagerImpl
 			return _kaleoWorkflowModelConverter.toWorkflowTask(
 				kaleoTaskInstanceToken, workflowContext);
 		}
-		catch (Exception e) {
-			throw new WorkflowException(e);
+		catch (Exception exception) {
+			throw new WorkflowException(exception);
 		}
 	}
 
 	protected WorkflowTask assignWorkflowTask(
-			long workflowTaskInstanceId, String assigneeClassName,
-			long assigneeClassPK, String comment, Date dueDate,
+			long workflowTaskId, String assigneeClassName, long assigneeClassPK,
+			String comment, Date dueDate,
 			Map<String, Serializable> workflowContext,
 			ServiceContext serviceContext)
 		throws Exception {
 
 		KaleoTaskInstanceToken kaleoTaskInstanceToken =
 			kaleoTaskInstanceTokenLocalService.getKaleoTaskInstanceToken(
-				workflowTaskInstanceId);
+				workflowTaskId);
 
 		List<KaleoTaskAssignmentInstance> previousTaskAssignmentInstances =
 			kaleoTaskInstanceToken.getKaleoTaskAssignmentInstances();
@@ -300,13 +299,13 @@ public class DefaultTaskManagerImpl
 
 		if (kaleoTaskInstanceToken.isCompleted()) {
 			throw new WorkflowException(
-				"Cannot reassign a completed task " + workflowTaskInstanceId);
+				"Cannot reassign a completed task " + workflowTaskId);
 		}
 
 		if (dueDate != null) {
 			kaleoTaskInstanceToken =
 				kaleoTaskInstanceTokenLocalService.updateDueDate(
-					workflowTaskInstanceId, dueDate, serviceContext);
+					workflowTaskId, dueDate, serviceContext);
 		}
 
 		kaleoTaskInstanceToken =
@@ -350,14 +349,14 @@ public class DefaultTaskManagerImpl
 	}
 
 	protected WorkflowTask doCompleteWorkflowTask(
-			long workflowTaskInstanceId, String transitionName, String comment,
+			long workflowTaskId, String transitionName, String comment,
 			Map<String, Serializable> workflowContext,
 			ServiceContext serviceContext)
 		throws Exception {
 
 		KaleoTaskInstanceToken kaleoTaskInstanceToken =
 			kaleoTaskInstanceTokenLocalService.getKaleoTaskInstanceToken(
-				workflowTaskInstanceId);
+				workflowTaskId);
 
 		if (Validator.isNotNull(transitionName)) {
 
@@ -378,8 +377,7 @@ public class DefaultTaskManagerImpl
 			throw new WorkflowException(
 				StringBundler.concat(
 					"Cannot complete an already completed task ",
-					workflowTaskInstanceId, " for user ",
-					serviceContext.getUserId()));
+					workflowTaskId, " for user ", serviceContext.getUserId()));
 		}
 
 		serviceContext.setScopeGroupId(kaleoTaskInstanceToken.getGroupId());

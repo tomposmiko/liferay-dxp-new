@@ -39,14 +39,14 @@ public class EditSiteTeamAssignmentsUserGroupsManagementToolbarDisplayContext
 	extends SearchContainerManagementToolbarDisplayContext {
 
 	public EditSiteTeamAssignmentsUserGroupsManagementToolbarDisplayContext(
+		HttpServletRequest httpServletRequest,
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
-		HttpServletRequest httpServletRequest,
 		EditSiteTeamAssignmentsUserGroupsDisplayContext
 			editSiteTeamAssignmentsUserGroupsDisplayContext) {
 
 		super(
-			liferayPortletRequest, liferayPortletResponse, httpServletRequest,
+			httpServletRequest, liferayPortletRequest, liferayPortletResponse,
 			editSiteTeamAssignmentsUserGroupsDisplayContext.
 				getUserGroupSearchContainer());
 
@@ -123,7 +123,7 @@ public class EditSiteTeamAssignmentsUserGroupsManagementToolbarDisplayContext
 				}
 			};
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			return null;
 		}
 	}

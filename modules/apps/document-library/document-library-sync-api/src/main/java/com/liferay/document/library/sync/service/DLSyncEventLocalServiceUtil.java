@@ -32,7 +32,7 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class DLSyncEventLocalServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.document.library.sync.service.impl.DLSyncEventLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.

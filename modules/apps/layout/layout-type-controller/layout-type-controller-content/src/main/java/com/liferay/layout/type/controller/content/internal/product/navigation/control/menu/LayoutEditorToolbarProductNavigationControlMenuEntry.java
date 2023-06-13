@@ -16,7 +16,6 @@ package com.liferay.layout.type.controller.content.internal.product.navigation.c
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -65,10 +64,7 @@ public class LayoutEditorToolbarProductNavigationControlMenuEntry
 
 		Layout layout = themeDisplay.getLayout();
 
-		if (!Objects.equals(
-				layout.getType(), LayoutConstants.TYPE_ASSET_DISPLAY) &&
-			!Objects.equals(layout.getType(), LayoutConstants.TYPE_CONTENT)) {
-
+		if (!layout.isTypeAssetDisplay() && !layout.isTypeContent()) {
 			return false;
 		}
 
@@ -79,9 +75,17 @@ public class LayoutEditorToolbarProductNavigationControlMenuEntry
 			return false;
 		}
 
-		return LayoutPermissionUtil.contains(
-			themeDisplay.getPermissionChecker(), themeDisplay.getLayout(),
-			ActionKeys.UPDATE);
+		if (!LayoutPermissionUtil.contains(
+				themeDisplay.getPermissionChecker(), themeDisplay.getLayout(),
+				ActionKeys.UPDATE) &&
+			!LayoutPermissionUtil.contains(
+				themeDisplay.getPermissionChecker(), themeDisplay.getLayout(),
+				ActionKeys.UPDATE_LAYOUT_CONTENT)) {
+
+			return false;
+		}
+
+		return true;
 	}
 
 	@Override

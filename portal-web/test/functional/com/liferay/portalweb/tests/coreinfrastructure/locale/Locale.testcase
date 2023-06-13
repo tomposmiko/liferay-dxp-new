@@ -24,8 +24,140 @@ definition {
 		}
 	}
 
+	@priority = "5"
+	test ChangesToInstanceTimeZoneDoNotPropagateToExistingUsers {
+		property portal.acceptance = "true";
+		property custom.properties = "company.default.time.zone=America/Los_Angeles";
+
+		User.firstLoginPG();
+
+		ProductMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Control Panel",
+			portlet = "Instance Settings");
+
+		PortalSettings.gotoConfiguration(
+			configurationCategory = "Localization",
+			configurationName = "Time Zone",
+			configurationScope = "Virtual Instance Scope");
+
+		task ("Assert current time displays in user's selected time zone by asserting time zone specific label") {
+			AssertSelectedLabel(
+				locator1 = "Select#TIME_ZONE",
+				value1 = "(UTC -08:00) Pacific Standard Time");
+		}
+
+		JSONUser.addUser(
+			userEmailAddress = "userea@liferay.com",
+			userFirstName = "userfn",
+			userLastName = "userln",
+			userScreenName = "usersn");
+
+		ProductMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		User.gotoEditCP(userScreenName = "usersn");
+
+		UserNavigator.gotoDisplaySettings();
+
+		task ("Assert current time displays in user's selected time zone by asserting time zone specific label") {
+			AssertSelectedLabel(
+				locator1 = "Select#TIME_ZONE",
+				value1 = "(UTC -08:00) Pacific Standard Time");
+		}
+
+		PortalSettings.gotoConfiguration(
+			configurationCategory = "Localization",
+			configurationName = "Time Zone",
+			configurationScope = "Virtual Instance Scope");
+
+		PortalSettings.configureTimeZone(timeZone = "(UTC) Coordinated Universal Time");
+
+		ProductMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		User.gotoEditCP(userScreenName = "usersn");
+
+		UserNavigator.gotoDisplaySettings();
+
+		task ("Assert current time displays in user's selected time zone by asserting time zone specific label") {
+			AssertSelectedLabel(
+				locator1 = "Select#TIME_ZONE",
+				value1 = "(UTC -08:00) Pacific Standard Time");
+		}
+	}
+
+	@description = "This is a use case for LPS-103369."
+	@ignore = "true"
+	@priority = "5"
+	test GuestUserViewSiteChangedLocalePersistsFriendlyURL {
+		property portal.acceptance = "true";
+
+		User.firstLoginPG();
+
+		JSONLayout.addPublicLayout(
+			groupName = "Test Site Name",
+			layoutName = "Test Page");
+
+		Navigator.gotoSitePage(
+			pageName = "Test Page",
+			siteName = "Test Site Name");
+
+		Portlet.addPG(portletName = "Hello World");
+
+		Site.openSiteSettingsAdmin(siteURLKey = "test-site-name");
+
+		Site.configureCurrentLanguagesCP(
+			currentSiteLanguages = "English (United States),Spanish (Spain)",
+			defaultSiteLanguage = "English (United States)");
+
+		User.logoutPG();
+
+		Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name");
+
+		Portlet.viewTitle(portletName = "Hello World");
+
+		Navigator.openWithAppendToBaseURL(urlAppend = "es/web/test-site-name");
+
+		Portlet.viewTitle(portletName = "Hola Mundo");
+
+		Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name");
+
+		Portlet.viewTitle(portletName = "Hello World");
+	}
+
 	@priority = "4"
+	test RestrictAvailableLocales {
+		property custom.properties = "locales=ca_ES,zh_CN,nl_NL,en_AU,en_GB,en_US,fi_FI,fr_FR,de_DE,it_IT,iw_IL,hu_HU,ja_JP,pt_BR,es_ES";
+		property test.name.skip.portal.instance = "Locale#RestrictAvailableLocales";
+
+		User.firstLoginPG();
+
+		PortalSettings.gotoConfiguration(
+			configurationCategory = "Localization",
+			configurationName = "Language",
+			configurationScope = "Virtual Instance Scope");
+
+		task ("Assert there is at least one language available in current languages") {
+			AssertElementPresent(locator1 = "LanguageConfiguration#LANGUAGES_CURRENT_SELECT");
+		}
+
+		task ("Assert that some of the configured languages are available in available languages") {
+			for (var language : list "English (Australia),English (United Kingdom),Italian (Italy)") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "LanguageConfiguration#LANGUAGES_AVAILABLE",
+					value1 = "${language}");
+			}
+		}
+	}
+
+	@priority = "5"
 	test RestrictDefaultLocale {
+		property portal.acceptance = "true";
 		property custom.properties = "company.default.locale=es_ES";
 
 		User.firstLoginPG(
@@ -51,7 +183,126 @@ definition {
 	}
 
 	@priority = "4"
+	test RestrictEnabledLocales {
+		property custom.properties = "locales.enabled=zh_CN,en_US,fr_FR,de_DE,es_ES${line.separator}locales=zh_CN-en_US,fr_FR,de_DE,es_ES,pt_BR,hu_HU";
+		property test.name.skip.portal.instance = "Locale#RestrictEnabledLocales";
+
+		User.firstLoginPG();
+
+		PortalSettings.gotoConfiguration(
+			configurationCategory = "Localization",
+			configurationName = "Language",
+			configurationScope = "Virtual Instance Scope");
+
+		task ("Assert that some of the configured languages are available in available languages") {
+			for (var language : list "Hungarian (Hungary),Portuguese (Brazil)") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "LanguageConfiguration#LANGUAGES_AVAILABLE",
+					value1 = "${language}");
+			}
+		}
+
+		task ("Assert that some of the configured languages are available in current languages") {
+			for (var language : list "Chinese (China),English (United States),French (France),German (Germany),Spanish (Spain)") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "LanguageConfiguration#LANGUAGES_CURRENT",
+					value1 = "${language}");
+			}
+		}
+	}
+
+	@priority = "4"
+	test VerifyFriendlyURLRedirectToEnableDefualtLocale {
+		property custom.properties = "locales.enabled=en_US,zh_CN,fr_FR${line.separator}locale.use.default.if.not.available=true";
+		property custom.system.properties = "user.country=US${line.separator}user.language=en";
+
+		User.firstLoginPG();
+
+		Navigator.openWithAppendToBaseURL(urlAppend = "fr/web/guest");
+
+		task ("Assert preferred locale persists by asserting Widget name.") {
+			AssertElementPresent(
+				key_portletName = "Bonjour le monde",
+				locator1 = "Portlet#TITLE");
+		}
+
+		Navigator.openWithAppendToBaseURL(urlAppend = "es/web/guest");
+
+		task ("Assert default locale returned by asserting Widget name.") {
+			AssertElementPresent(
+				key_portletName = "Hello World",
+				locator1 = "Portlet#TITLE");
+		}
+	}
+
+	@priority = "4"
+	test ViewDefaultAvailableTimeZonesForInstancesAndUsers {
+		property test.name.skip.portal.instance = "Locale#ViewDefaultAvailableTimeZonesForInstancesAndUsers";
+
+		User.firstLoginPG();
+
+		PortalSettings.gotoConfiguration(
+			configurationCategory = "Localization",
+			configurationName = "Time Zone",
+			configurationScope = "Virtual Instance Scope");
+
+		task ("Assert some default available time zones for instances and users") {
+			for (var timeZone : list "(UTC) Coordinated Universal Time,(UTC +08:00) China Standard Time") {
+				AssertElementPresent(
+					locator1 = "Select#TIME_ZONE",
+					value1 = "${timeZone}");
+			}
+		}
+
+		ProductMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		User.gotoEditCP(userScreenName = "test");
+
+		UserNavigator.gotoDisplaySettings();
+
+		task ("Assert some default available time zones for instances and users") {
+			for (var timeZone : list "(UTC) Coordinated Universal Time,(UTC +08:00) China Standard Time") {
+				AssertElementPresent(
+					locator1 = "Select#TIME_ZONE",
+					value1 = "${timeZone}");
+			}
+		}
+	}
+
+	@priority = "4"
+	test ViewDefaultEnabledLocales {
+		User.firstLoginPG();
+
+		Site.openSiteSettingsAdmin(siteURLKey = "guest");
+
+		Navigator.gotoNavTab(navTab = "Languages");
+
+		task ("Assert the default language options radio box is checked") {
+			AssertChecked(locator1 = "SiteSettingsDisplaySettings#DEFAULT_LANGUAGES_RADIO");
+		}
+
+		WebContentNavigator.openWebContentAdmin(siteURLKey = "guest");
+
+		WebContentNavigator.gotoAddCP();
+
+		task ("Assert the default enabled locales in Web Content match what is normally available") {
+			Click(locator1 = "Button#LOCALIZATION_GENERIC");
+
+			for (var language : list "ar_SA,ca_ES,zh_CN,nl_NL,fi_FI,fr_FR,de_DE,hu_HU,ja_JP,pt_BR,es_ES,sv_SE") {
+				AssertElementPresent(
+					key_locale = "${language}",
+					locator1 = "Translation#LOCALIZATION_NAME");
+			}
+		}
+	}
+
+	@priority = "5"
 	test ViewSiteLocaleWithoutUserPreferredLocale {
+		property portal.acceptance = "true";
+
 		User.firstLoginPG();
 
 		JSONLayout.addPublicLayout(
@@ -75,8 +326,10 @@ definition {
 		}
 	}
 
-	@priority = "4"
+	@priority = "5"
 	test ViewUserPreferredLocale {
+		property portal.acceptance = "true";
+
 		User.firstLoginPG();
 
 		ProductMenu.gotoPortlet(
@@ -153,8 +406,10 @@ definition {
 
 	@description = "This is a use case for LPS-103369."
 	@ignore = "true"
-	@priority = "4"
+	@priority = "5"
 	test ViewUserPreferredLocalePersistsFriendlyURL {
+		property portal.acceptance = "true";
+
 		User.firstLoginPG();
 
 		JSONLayout.addPublicLayout(

@@ -125,7 +125,7 @@ public class ConfigurationModelToDDMFormConverter {
 			try {
 				return DDMFormFactory.create(formClass);
 			}
-			catch (IllegalArgumentException iae) {
+			catch (IllegalArgumentException illegalArgumentException) {
 			}
 		}
 
@@ -137,10 +137,16 @@ public class ConfigurationModelToDDMFormConverter {
 
 		DDMFormFieldOptions ddmFormFieldOptions = new DDMFormFieldOptions();
 
+		String pid = _configurationModel.getID();
+
+		if (_configurationModel.isFactory()) {
+			pid = _configurationModel.getFactoryPid();
+		}
+
 		ConfigurationFieldOptionsProvider configurationFieldOptionsProvider =
 			ConfigurationFieldOptionsProviderUtil.
 				getConfigurationFieldOptionsProvider(
-					_configurationModel.getID(), attributeDefinition.getID());
+					pid, attributeDefinition.getID());
 
 		if (configurationFieldOptionsProvider != null) {
 			for (ConfigurationFieldOptionsProvider.Option option :

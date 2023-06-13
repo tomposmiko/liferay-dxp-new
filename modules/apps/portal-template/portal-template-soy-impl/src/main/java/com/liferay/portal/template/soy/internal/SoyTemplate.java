@@ -254,11 +254,11 @@ public class SoyTemplate extends BaseTemplate {
 	@Override
 	protected void handleException(
 			TemplateResource templateResource,
-			TemplateResource errorTemplateResource, Exception exception,
+			TemplateResource errorTemplateResource, Exception exception1,
 			Writer writer)
 		throws TemplateException {
 
-		put("exception", exception.getMessage());
+		put("exception", exception1.getMessage());
 
 		SoyTemplateResource soyTemplateResource =
 			(SoyTemplateResource)templateResource;
@@ -281,11 +281,11 @@ public class SoyTemplate extends BaseTemplate {
 		try {
 			processTemplate(errorTemplateResource, writer);
 		}
-		catch (Exception e) {
+		catch (Exception exception2) {
 			throw new TemplateException(
 				"Unable to process Soy template " +
 					errorTemplateResource.getTemplateId(),
-				e);
+				exception2);
 		}
 	}
 
@@ -356,12 +356,12 @@ public class SoyTemplate extends BaseTemplate {
 
 				templateResourceBundles.add(templateResourceBundle);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
 					_log.debug(
 						"Unable to get language resource bundle for template " +
 							StringUtil.quote(templateResource.getTemplateId()),
-						e);
+						exception);
 				}
 			}
 		}

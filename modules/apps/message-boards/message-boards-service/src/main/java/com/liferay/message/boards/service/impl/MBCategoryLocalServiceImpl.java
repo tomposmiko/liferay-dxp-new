@@ -42,8 +42,10 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.subscription.service.SubscriptionLocalService;
 import com.liferay.trash.kernel.exception.RestoreEntryException;
 import com.liferay.trash.kernel.exception.TrashEntryException;
-import com.liferay.trash.kernel.model.TrashEntry;
-import com.liferay.trash.kernel.model.TrashVersion;
+import com.liferay.trash.model.TrashEntry;
+import com.liferay.trash.model.TrashVersion;
+import com.liferay.trash.service.TrashEntryLocalService;
+import com.liferay.trash.service.TrashVersionLocalService;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -112,7 +114,7 @@ public class MBCategoryLocalServiceImpl extends MBCategoryLocalServiceBaseImpl {
 		category.setDisplayStyle(displayStyle);
 		category.setExpandoBridgeAttributes(serviceContext);
 
-		mbCategoryPersistence.update(category);
+		category = mbCategoryPersistence.update(category);
 
 		// Resources
 
@@ -284,11 +286,11 @@ public class MBCategoryLocalServiceImpl extends MBCategoryLocalServiceBaseImpl {
 		// Trash
 
 		if (category.isInTrashExplicitly()) {
-			trashEntryLocalService.deleteEntry(
+			_trashEntryLocalService.deleteEntry(
 				MBCategory.class.getName(), category.getCategoryId());
 		}
 		else {
-			trashVersionLocalService.deleteTrashVersion(
+			_trashVersionLocalService.deleteTrashVersion(
 				MBCategory.class.getName(), category.getCategoryId());
 		}
 
@@ -626,7 +628,7 @@ public class MBCategoryLocalServiceImpl extends MBCategoryLocalServiceBaseImpl {
 
 			// Category
 
-			TrashVersion trashVersion = trashVersionLocalService.fetchVersion(
+			TrashVersion trashVersion = _trashVersionLocalService.fetchVersion(
 				MBCategory.class.getName(), category.getCategoryId());
 
 			int status = WorkflowConstants.STATUS_APPROVED;
@@ -640,7 +642,7 @@ public class MBCategoryLocalServiceImpl extends MBCategoryLocalServiceBaseImpl {
 			// Trash
 
 			if (trashVersion != null) {
-				trashVersionLocalService.deleteTrashVersion(trashVersion);
+				_trashVersionLocalService.deleteTrashVersion(trashVersion);
 			}
 
 			// Categories and threads
@@ -675,7 +677,7 @@ public class MBCategoryLocalServiceImpl extends MBCategoryLocalServiceBaseImpl {
 
 		// Trash
 
-		TrashEntry trashEntry = trashEntryLocalService.addTrashEntry(
+		TrashEntry trashEntry = _trashEntryLocalService.addTrashEntry(
 			userId, category.getGroupId(), MBCategory.class.getName(),
 			categoryId, category.getUuid(), null,
 			WorkflowConstants.STATUS_APPROVED, null, null);
@@ -707,7 +709,7 @@ public class MBCategoryLocalServiceImpl extends MBCategoryLocalServiceBaseImpl {
 				RestoreEntryException.INVALID_STATUS);
 		}
 
-		TrashEntry trashEntry = trashEntryLocalService.getEntry(
+		TrashEntry trashEntry = _trashEntryLocalService.getEntry(
 			MBCategory.class.getName(), categoryId);
 
 		category = updateStatus(
@@ -725,7 +727,7 @@ public class MBCategoryLocalServiceImpl extends MBCategoryLocalServiceBaseImpl {
 
 		// Trash
 
-		trashEntryLocalService.deleteEntry(trashEntry.getEntryId());
+		_trashEntryLocalService.deleteEntry(trashEntry.getEntryId());
 	}
 
 	@Override
@@ -804,7 +806,7 @@ public class MBCategoryLocalServiceImpl extends MBCategoryLocalServiceBaseImpl {
 
 		category.setExpandoBridgeAttributes(serviceContext);
 
-		mbCategoryPersistence.update(category);
+		category = mbCategoryPersistence.update(category);
 
 		// Mailing list
 
@@ -891,9 +893,7 @@ public class MBCategoryLocalServiceImpl extends MBCategoryLocalServiceBaseImpl {
 		category.setStatusByUserName(user.getFullName());
 		category.setStatusDate(new Date());
 
-		mbCategoryPersistence.update(category);
-
-		return category;
+		return mbCategoryPersistence.update(category);
 	}
 
 	@Override
@@ -1053,7 +1053,7 @@ public class MBCategoryLocalServiceImpl extends MBCategoryLocalServiceBaseImpl {
 				// Trash
 
 				if (oldStatus != WorkflowConstants.STATUS_APPROVED) {
-					trashVersionLocalService.addTrashVersion(
+					_trashVersionLocalService.addTrashVersion(
 						trashEntryId, MBThread.class.getName(),
 						thread.getThreadId(), oldStatus, null);
 				}
@@ -1084,12 +1084,12 @@ public class MBCategoryLocalServiceImpl extends MBCategoryLocalServiceBaseImpl {
 
 				category.setStatus(WorkflowConstants.STATUS_IN_TRASH);
 
-				mbCategoryPersistence.update(category);
+				category = mbCategoryPersistence.update(category);
 
 				// Trash
 
 				if (oldStatus != WorkflowConstants.STATUS_APPROVED) {
-					trashVersionLocalService.addTrashVersion(
+					_trashVersionLocalService.addTrashVersion(
 						trashEntryId, MBCategory.class.getName(),
 						category.getCategoryId(), oldStatus, null);
 				}
@@ -1121,7 +1121,7 @@ public class MBCategoryLocalServiceImpl extends MBCategoryLocalServiceBaseImpl {
 				}
 
 				TrashVersion trashVersion =
-					trashVersionLocalService.fetchVersion(
+					_trashVersionLocalService.fetchVersion(
 						MBThread.class.getName(), thread.getThreadId());
 
 				int oldStatus = WorkflowConstants.STATUS_APPROVED;
@@ -1142,7 +1142,7 @@ public class MBCategoryLocalServiceImpl extends MBCategoryLocalServiceBaseImpl {
 				// Trash
 
 				if (trashVersion != null) {
-					trashVersionLocalService.deleteTrashVersion(trashVersion);
+					_trashVersionLocalService.deleteTrashVersion(trashVersion);
 				}
 
 				// Indexer
@@ -1163,7 +1163,7 @@ public class MBCategoryLocalServiceImpl extends MBCategoryLocalServiceBaseImpl {
 				}
 
 				TrashVersion trashVersion =
-					trashVersionLocalService.fetchVersion(
+					_trashVersionLocalService.fetchVersion(
 						MBCategory.class.getName(), category.getCategoryId());
 
 				int oldStatus = WorkflowConstants.STATUS_APPROVED;
@@ -1174,7 +1174,7 @@ public class MBCategoryLocalServiceImpl extends MBCategoryLocalServiceBaseImpl {
 
 				category.setStatus(oldStatus);
 
-				mbCategoryPersistence.update(category);
+				category = mbCategoryPersistence.update(category);
 
 				// Categories and threads
 
@@ -1187,7 +1187,7 @@ public class MBCategoryLocalServiceImpl extends MBCategoryLocalServiceBaseImpl {
 				// Trash
 
 				if (trashVersion != null) {
-					trashVersionLocalService.deleteTrashVersion(trashVersion);
+					_trashVersionLocalService.deleteTrashVersion(trashVersion);
 				}
 			}
 		}
@@ -1227,5 +1227,11 @@ public class MBCategoryLocalServiceImpl extends MBCategoryLocalServiceBaseImpl {
 
 	@Reference
 	private SubscriptionLocalService _subscriptionLocalService;
+
+	@Reference
+	private TrashEntryLocalService _trashEntryLocalService;
+
+	@Reference
+	private TrashVersionLocalService _trashVersionLocalService;
 
 }

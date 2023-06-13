@@ -48,7 +48,7 @@ public abstract class AssetListEntryServiceBaseImpl
 	extends BaseServiceImpl
 	implements AopService, AssetListEntryService, IdentifiableOSGiService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>AssetListEntryService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.asset.list.service.AssetListEntryServiceUtil</code>.
@@ -102,8 +102,8 @@ public abstract class AssetListEntryServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

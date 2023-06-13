@@ -119,6 +119,8 @@ String treeId = (String)request.getAttribute("liferay-layout:layouts-tree:treeId
 		urls: <%= portletURLsJSONArray.toString() %>
 	}).render();
 
+	Liferay.component('<%= namespace + treeId %>', treeview);
+
 	Liferay.once('screenLoad', function() {
 		treeview.destroy();
 	});

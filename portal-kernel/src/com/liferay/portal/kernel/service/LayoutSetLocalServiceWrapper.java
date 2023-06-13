@@ -51,39 +51,17 @@ public class LayoutSetLocalServiceWrapper
 		return _layoutSetLocalService.addLayoutSet(groupId, privateLayout);
 	}
 
-	@Override
-	public com.liferay.portal.kernel.model.LayoutSet checkout(
-			com.liferay.portal.kernel.model.LayoutSet publishedLayoutSet,
-			int version)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _layoutSetLocalService.checkout(publishedLayoutSet, version);
-	}
-
 	/**
-	 * Creates a new layout set. Does not add the layout set to the database.
+	 * Creates a new layout set with the primary key. Does not add the layout set to the database.
 	 *
+	 * @param layoutSetId the primary key for the new layout set
 	 * @return the new layout set
 	 */
 	@Override
-	public com.liferay.portal.kernel.model.LayoutSet create() {
-		return _layoutSetLocalService.create();
-	}
+	public com.liferay.portal.kernel.model.LayoutSet createLayoutSet(
+		long layoutSetId) {
 
-	@Override
-	public com.liferay.portal.kernel.model.LayoutSet delete(
-			com.liferay.portal.kernel.model.LayoutSet publishedLayoutSet)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _layoutSetLocalService.delete(publishedLayoutSet);
-	}
-
-	@Override
-	public com.liferay.portal.kernel.model.LayoutSet deleteDraft(
-			com.liferay.portal.kernel.model.LayoutSet draftLayoutSet)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _layoutSetLocalService.deleteDraft(draftLayoutSet);
+		return _layoutSetLocalService.createLayoutSet(layoutSetId);
 	}
 
 	/**
@@ -132,14 +110,6 @@ public class LayoutSetLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _layoutSetLocalService.deletePersistedModel(persistedModel);
-	}
-
-	@Override
-	public com.liferay.portal.kernel.model.LayoutSetVersion deleteVersion(
-			com.liferay.portal.kernel.model.LayoutSetVersion layoutSetVersion)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _layoutSetLocalService.deleteVersion(layoutSetVersion);
 	}
 
 	@Override
@@ -233,27 +203,6 @@ public class LayoutSetLocalServiceWrapper
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.LayoutSet fetchDraft(
-		com.liferay.portal.kernel.model.LayoutSet layoutSet) {
-
-		return _layoutSetLocalService.fetchDraft(layoutSet);
-	}
-
-	@Override
-	public com.liferay.portal.kernel.model.LayoutSet fetchDraft(
-		long primaryKey) {
-
-		return _layoutSetLocalService.fetchDraft(primaryKey);
-	}
-
-	@Override
-	public com.liferay.portal.kernel.model.LayoutSetVersion fetchLatestVersion(
-		com.liferay.portal.kernel.model.LayoutSet layoutSet) {
-
-		return _layoutSetLocalService.fetchLatestVersion(layoutSet);
-	}
-
-	@Override
 	public com.liferay.portal.kernel.model.LayoutSet fetchLayoutSet(
 		long layoutSetId) {
 
@@ -284,39 +233,10 @@ public class LayoutSetLocalServiceWrapper
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.LayoutSet fetchPublished(
-		com.liferay.portal.kernel.model.LayoutSet layoutSet) {
-
-		return _layoutSetLocalService.fetchPublished(layoutSet);
-	}
-
-	@Override
-	public com.liferay.portal.kernel.model.LayoutSet fetchPublished(
-		long primaryKey) {
-
-		return _layoutSetLocalService.fetchPublished(primaryKey);
-	}
-
-	@Override
 	public com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery
 		getActionableDynamicQuery() {
 
 		return _layoutSetLocalService.getActionableDynamicQuery();
-	}
-
-	@Override
-	public com.liferay.portal.kernel.model.LayoutSet getDraft(
-			com.liferay.portal.kernel.model.LayoutSet layoutSet)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _layoutSetLocalService.getDraft(layoutSet);
-	}
-
-	@Override
-	public com.liferay.portal.kernel.model.LayoutSet getDraft(long primaryKey)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _layoutSetLocalService.getDraft(primaryKey);
 	}
 
 	@Override
@@ -405,6 +325,11 @@ public class LayoutSetLocalServiceWrapper
 	}
 
 	@Override
+	public int getPageCount(long groupId, boolean privateLayout) {
+		return _layoutSetLocalService.getPageCount(groupId, privateLayout);
+	}
+
+	@Override
 	public com.liferay.portal.kernel.model.PersistedModel getPersistedModel(
 			java.io.Serializable primaryKeyObj)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -412,70 +337,17 @@ public class LayoutSetLocalServiceWrapper
 		return _layoutSetLocalService.getPersistedModel(primaryKeyObj);
 	}
 
-	@Override
-	public com.liferay.portal.kernel.model.LayoutSetVersion getVersion(
-			com.liferay.portal.kernel.model.LayoutSet layoutSet, int version)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _layoutSetLocalService.getVersion(layoutSet, version);
-	}
-
-	@Override
-	public java.util.List<com.liferay.portal.kernel.model.LayoutSetVersion>
-		getVersions(com.liferay.portal.kernel.model.LayoutSet layoutSet) {
-
-		return _layoutSetLocalService.getVersions(layoutSet);
-	}
-
-	@Override
-	public com.liferay.portal.kernel.model.LayoutSet publishDraft(
-			com.liferay.portal.kernel.model.LayoutSet draftLayoutSet)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _layoutSetLocalService.publishDraft(draftLayoutSet);
-	}
-
-	@Override
-	public void registerListener(
-		com.liferay.portal.kernel.service.version.VersionServiceListener
-			<com.liferay.portal.kernel.model.LayoutSet,
-			 com.liferay.portal.kernel.model.LayoutSetVersion>
-				versionServiceListener) {
-
-		_layoutSetLocalService.registerListener(versionServiceListener);
-	}
-
-	@Override
-	public void unregisterListener(
-		com.liferay.portal.kernel.service.version.VersionServiceListener
-			<com.liferay.portal.kernel.model.LayoutSet,
-			 com.liferay.portal.kernel.model.LayoutSetVersion>
-				versionServiceListener) {
-
-		_layoutSetLocalService.unregisterListener(versionServiceListener);
-	}
-
-	@Override
-	public com.liferay.portal.kernel.model.LayoutSet updateDraft(
-			com.liferay.portal.kernel.model.LayoutSet draftLayoutSet)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _layoutSetLocalService.updateDraft(draftLayoutSet);
-	}
-
 	/**
 	 * Updates the layout set in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	 *
 	 * @param layoutSet the layout set
 	 * @return the layout set that was updated
-	 * @throws PortalException
 	 */
 	@Override
 	public com.liferay.portal.kernel.model.LayoutSet updateLayoutSet(
-			com.liferay.portal.kernel.model.LayoutSet draftLayoutSet)
-		throws com.liferay.portal.kernel.exception.PortalException {
+		com.liferay.portal.kernel.model.LayoutSet layoutSet) {
 
-		return _layoutSetLocalService.updateLayoutSet(draftLayoutSet);
+		return _layoutSetLocalService.updateLayoutSet(layoutSet);
 	}
 
 	/**
@@ -560,14 +432,6 @@ public class LayoutSetLocalServiceWrapper
 	}
 
 	@Override
-	public com.liferay.portal.kernel.model.LayoutSet updatePageCount(
-			long groupId, boolean privateLayout)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _layoutSetLocalService.updatePageCount(groupId, privateLayout);
-	}
-
-	@Override
 	public com.liferay.portal.kernel.model.LayoutSet updateSettings(
 			long groupId, boolean privateLayout, java.lang.String settings)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -576,6 +440,11 @@ public class LayoutSetLocalServiceWrapper
 			groupId, privateLayout, settings);
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #updateVirtualHosts(long, boolean, TreeMap)}
+	 */
+	@Deprecated
 	@Override
 	public com.liferay.portal.kernel.model.LayoutSet updateVirtualHost(
 			long groupId, boolean privateLayout,
@@ -584,6 +453,17 @@ public class LayoutSetLocalServiceWrapper
 
 		return _layoutSetLocalService.updateVirtualHost(
 			groupId, privateLayout, virtualHostname);
+	}
+
+	@Override
+	public com.liferay.portal.kernel.model.LayoutSet updateVirtualHosts(
+			long groupId, boolean privateLayout,
+			java.util.TreeMap<java.lang.String, java.lang.String>
+				virtualHostnames)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _layoutSetLocalService.updateVirtualHosts(
+			groupId, privateLayout, virtualHostnames);
 	}
 
 	@Override

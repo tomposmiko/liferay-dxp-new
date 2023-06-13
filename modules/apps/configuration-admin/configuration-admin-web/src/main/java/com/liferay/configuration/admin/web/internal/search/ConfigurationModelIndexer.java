@@ -69,7 +69,8 @@ import org.osgi.service.metatype.ObjectClassDefinition;
  * @author Michael C. Han
  */
 @Component(
-	immediate = true, property = "index.on.startup=false",
+	immediate = true,
+	property = {"index.on.startup=false", "system.index=true"},
 	service = {ConfigurationModelIndexer.class, Indexer.class}
 )
 public class ConfigurationModelIndexer extends BaseIndexer<ConfigurationModel> {
@@ -96,11 +97,11 @@ public class ConfigurationModelIndexer extends BaseIndexer<ConfigurationModel> {
 
 			return fullQuery;
 		}
-		catch (SearchException se) {
-			throw se;
+		catch (SearchException searchException) {
+			throw searchException;
 		}
-		catch (Exception e) {
-			throw new SearchException(e);
+		catch (Exception exception) {
+			throw new SearchException(exception);
 		}
 	}
 
@@ -127,9 +128,10 @@ public class ConfigurationModelIndexer extends BaseIndexer<ConfigurationModel> {
 			_indexWriterHelper.updateDocuments(
 				getSearchEngineId(), CompanyConstants.SYSTEM, documents, false);
 		}
-		catch (SearchException se) {
+		catch (SearchException searchException) {
 			_log.error(
-				"Unable to index documents for " + configurationModels, se);
+				"Unable to index documents for " + configurationModels,
+				searchException);
 		}
 	}
 
@@ -142,11 +144,11 @@ public class ConfigurationModelIndexer extends BaseIndexer<ConfigurationModel> {
 
 			return hits;
 		}
-		catch (SearchException se) {
-			throw se;
+		catch (SearchException searchException) {
+			throw searchException;
 		}
-		catch (Exception e) {
-			throw new SearchException(e);
+		catch (Exception exception) {
+			throw new SearchException(exception);
 		}
 	}
 
@@ -207,15 +209,9 @@ public class ConfigurationModelIndexer extends BaseIndexer<ConfigurationModel> {
 	protected void doDelete(ConfigurationModel configurationModel)
 		throws Exception {
 
-		Document document = newDocument();
-
-		document.addUID(
-			ConfigurationAdminPortletKeys.SYSTEM_SETTINGS,
-			configurationModel.getFactoryPid());
-
 		_indexWriterHelper.deleteDocument(
 			getSearchEngineId(), CompanyConstants.SYSTEM,
-			document.get(Field.UID), isCommitImmediately());
+			_getUID(configurationModel), isCommitImmediately());
 	}
 
 	@Override
@@ -224,9 +220,8 @@ public class ConfigurationModelIndexer extends BaseIndexer<ConfigurationModel> {
 
 		Document document = newDocument();
 
-		document.addUID(
-			ConfigurationAdminPortletKeys.SYSTEM_SETTINGS,
-			configurationModel.getFactoryPid());
+		_setUID(document, configurationModel);
+
 		document.addKeyword(
 			FieldNames.CONFIGURATION_MODEL_FACTORY_PID,
 			configurationModel.getFactoryPid());
@@ -405,6 +400,20 @@ public class ConfigurationModelIndexer extends BaseIndexer<ConfigurationModel> {
 		}
 
 		return resourceBundleLoader.loadResourceBundle(LocaleUtil.getDefault());
+	}
+
+	private String _getUID(ConfigurationModel configurationModel) {
+		return Field.getUID(
+			ConfigurationAdminPortletKeys.SYSTEM_SETTINGS,
+			configurationModel.getFactoryPid());
+	}
+
+	private void _setUID(
+		Document document, ConfigurationModel configurationModel) {
+
+		document.addUID(
+			ConfigurationAdminPortletKeys.SYSTEM_SETTINGS,
+			configurationModel.getFactoryPid());
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

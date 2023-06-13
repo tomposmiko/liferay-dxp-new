@@ -242,11 +242,6 @@ public class TicketWrapper
 		return model.isExpired();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a ticket model instance should use the <code>Ticket</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

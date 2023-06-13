@@ -20,10 +20,13 @@ import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.util.DLURLHelper;
-import com.liferay.dynamic.data.mapping.io.DDMFormJSONDeserializer;
-import com.liferay.dynamic.data.mapping.io.DDMFormLayoutJSONDeserializer;
+import com.liferay.dynamic.data.mapping.io.DDMFormDeserializer;
+import com.liferay.dynamic.data.mapping.io.DDMFormDeserializerDeserializeRequest;
+import com.liferay.dynamic.data.mapping.io.DDMFormDeserializerDeserializeResponse;
+import com.liferay.dynamic.data.mapping.io.DDMFormLayoutDeserializer;
+import com.liferay.dynamic.data.mapping.io.DDMFormLayoutDeserializerDeserializeRequest;
+import com.liferay.dynamic.data.mapping.io.DDMFormLayoutDeserializerDeserializeResponse;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
-import com.liferay.dynamic.data.mapping.model.DDMFormLayout;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMStructureConstants;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
@@ -72,6 +75,7 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.util.CamelCaseUtil;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -173,10 +177,10 @@ public class PorygonSiteInitializer implements SiteInitializer {
 
 			_addLayouts(ddmStructure, ddmTemplates, serviceContext);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new InitializationException(e);
+			throw new InitializationException(exception);
 		}
 	}
 
@@ -204,12 +208,11 @@ public class PorygonSiteInitializer implements SiteInitializer {
 
 			String script = StringUtil.read(url.openStream());
 
-			String fileName = FileUtil.stripExtension(
-				FileUtil.getShortFileName(url.getPath()));
-
-			Map<Locale, String> nameMap = new HashMap<>();
-
-			nameMap.put(LocaleUtil.getSiteDefault(), fileName);
+			Map<Locale, String> nameMap = HashMapBuilder.put(
+				LocaleUtil.getSiteDefault(),
+				FileUtil.stripExtension(
+					FileUtil.getShortFileName(url.getPath()))
+			).build();
 
 			DDMTemplate ddmTemplate = _ddmTemplateLocalService.addTemplate(
 				serviceContext.getUserId(), serviceContext.getScopeGroupId(),
@@ -461,36 +464,50 @@ public class PorygonSiteInitializer implements SiteInitializer {
 
 		Locale siteDefaultLocale = LocaleUtil.getSiteDefault();
 
-		Map<Locale, String> nameMap = new HashMap<>();
+		Map<Locale, String> nameMap = HashMapBuilder.put(
+			siteDefaultLocale, "Porygon Entry"
+		).build();
 
-		nameMap.put(siteDefaultLocale, "Porygon Entry");
-
-		Map<Locale, String> descriptionMap = new HashMap<>();
-
-		descriptionMap.put(siteDefaultLocale, "Porygon Entry");
+		Map<Locale, String> descriptionMap = HashMapBuilder.put(
+			siteDefaultLocale, "Porygon Entry"
+		).build();
 
 		URL definitionURL = _bundle.getEntry(
 			_PATH + "/journal/structures/porygon_entry/definition.json");
 
-		String definition = StringUtil.read(definitionURL.openStream());
+		DDMFormDeserializerDeserializeRequest.Builder
+			ddmFormDeserializerDeserializeRequestBuilder =
+				DDMFormDeserializerDeserializeRequest.Builder.newBuilder(
+					StringUtil.read(definitionURL.openStream()));
 
-		DDMForm ddmForm = _ddmFormJSONDeserializer.deserialize(definition);
+		DDMFormDeserializerDeserializeResponse
+			ddmFormDeserializerDeserializeResponse =
+				_jsonDDMFormDeserializer.deserialize(
+					ddmFormDeserializerDeserializeRequestBuilder.build());
+
+		DDMForm ddmForm = ddmFormDeserializerDeserializeResponse.getDDMForm();
 
 		ddmForm = _ddm.updateDDMFormDefaultLocale(ddmForm, siteDefaultLocale);
 
 		URL layoutURL = _bundle.getEntry(
 			_PATH + "/journal/structures/porygon_entry/layout.json");
 
-		String layout = StringUtil.read(layoutURL.openStream());
+		DDMFormLayoutDeserializerDeserializeRequest.Builder
+			ddmFormLayoutDeserializerDeserializeRequestBuilder =
+				DDMFormLayoutDeserializerDeserializeRequest.Builder.newBuilder(
+					StringUtil.read(layoutURL.openStream()));
 
-		DDMFormLayout ddmFormLayout =
-			_ddmFormLayoutJSONDeserializer.deserialize(layout);
+		DDMFormLayoutDeserializerDeserializeResponse
+			ddmFormLayoutDeserializerDeserializeResponse =
+				_jsonDDMFormLayoutDeserializer.deserialize(
+					ddmFormLayoutDeserializerDeserializeRequestBuilder.build());
 
 		return _ddmStructureLocalService.addStructure(
 			serviceContext.getUserId(), serviceContext.getScopeGroupId(),
 			DDMStructureConstants.DEFAULT_PARENT_STRUCTURE_ID,
 			_portal.getClassNameId(JournalArticle.class), "PORYGON_ENTRY",
-			nameMap, descriptionMap, ddmForm, ddmFormLayout,
+			nameMap, descriptionMap, ddmForm,
+			ddmFormLayoutDeserializerDeserializeResponse.getDDMFormLayout(),
 			StorageType.JSON.toString(), DDMStructureConstants.TYPE_DEFAULT,
 			serviceContext);
 	}
@@ -510,12 +527,11 @@ public class PorygonSiteInitializer implements SiteInitializer {
 			String ddmTemplateKey = FileUtil.stripExtension(
 				FileUtil.getShortFileName(url.getPath()));
 
-			String ddmTemplateName = StringUtil.upperCaseFirstLetter(
-				StringUtil.replace(ddmTemplateKey, '_', ' '));
-
-			Map<Locale, String> nameMap = new HashMap<>();
-
-			nameMap.put(LocaleUtil.getSiteDefault(), ddmTemplateName);
+			Map<Locale, String> nameMap = HashMapBuilder.put(
+				LocaleUtil.getSiteDefault(),
+				StringUtil.upperCaseFirstLetter(
+					StringUtil.replace(ddmTemplateKey, '_', ' '))
+			).build();
 
 			_ddmTemplateLocalService.addTemplate(
 				serviceContext.getUserId(), serviceContext.getScopeGroupId(),
@@ -553,17 +569,15 @@ public class PorygonSiteInitializer implements SiteInitializer {
 				StringUtil.read(url.openStream()), StringPool.DOLLAR,
 				StringPool.DOLLAR, fileEntriesMap);
 
-			String fileName = FileUtil.stripExtension(
-				FileUtil.getShortFileName(url.getPath()));
-
-			String articleName = StringUtil.upperCaseFirstLetter(
-				CamelCaseUtil.toCamelCase(
-					StringUtil.replace(
-						fileName, CharPool.UNDERLINE, CharPool.SPACE)));
-
-			Map<Locale, String> nameMap = new HashMap<>();
-
-			nameMap.put(LocaleUtil.getSiteDefault(), articleName);
+			Map<Locale, String> nameMap = HashMapBuilder.put(
+				LocaleUtil.getSiteDefault(),
+				StringUtil.upperCaseFirstLetter(
+					CamelCaseUtil.toCamelCase(
+						StringUtil.replace(
+							FileUtil.stripExtension(
+								FileUtil.getShortFileName(url.getPath())),
+							CharPool.UNDERLINE, CharPool.SPACE)))
+			).build();
 
 			JournalArticle article = _journalArticleLocalService.addArticle(
 				serviceContext.getUserId(), serviceContext.getScopeGroupId(), 0,
@@ -585,9 +599,9 @@ public class PorygonSiteInitializer implements SiteInitializer {
 	private Layout _addLayout(String name, ServiceContext serviceContext)
 		throws Exception {
 
-		Map<Locale, String> nameMap = new HashMap<>();
-
-		nameMap.put(LocaleUtil.getSiteDefault(), name);
+		Map<Locale, String> nameMap = HashMapBuilder.put(
+			LocaleUtil.getSiteDefault(), name
+		).build();
 
 		UnicodeProperties typeSettingsProperties = new UnicodeProperties();
 
@@ -945,12 +959,6 @@ public class PorygonSiteInitializer implements SiteInitializer {
 	private DDM _ddm;
 
 	@Reference
-	private DDMFormJSONDeserializer _ddmFormJSONDeserializer;
-
-	@Reference
-	private DDMFormLayoutJSONDeserializer _ddmFormLayoutJSONDeserializer;
-
-	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;
 
 	@Reference
@@ -973,6 +981,12 @@ public class PorygonSiteInitializer implements SiteInitializer {
 
 	@Reference
 	private JournalArticleLocalService _journalArticleLocalService;
+
+	@Reference(target = "(ddm.form.deserializer.type=json)")
+	private DDMFormDeserializer _jsonDDMFormDeserializer;
+
+	@Reference(target = "(ddm.form.layout.deserializer.type=json)")
+	private DDMFormLayoutDeserializer _jsonDDMFormLayoutDeserializer;
 
 	@Reference
 	private LayoutLocalService _layoutLocalService;

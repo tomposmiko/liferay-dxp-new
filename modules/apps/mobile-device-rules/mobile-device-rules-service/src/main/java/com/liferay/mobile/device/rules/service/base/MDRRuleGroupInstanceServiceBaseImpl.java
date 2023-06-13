@@ -47,7 +47,7 @@ public abstract class MDRRuleGroupInstanceServiceBaseImpl
 	implements AopService, IdentifiableOSGiService,
 			   MDRRuleGroupInstanceService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>MDRRuleGroupInstanceService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.mobile.device.rules.service.MDRRuleGroupInstanceServiceUtil</code>.
@@ -102,8 +102,8 @@ public abstract class MDRRuleGroupInstanceServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

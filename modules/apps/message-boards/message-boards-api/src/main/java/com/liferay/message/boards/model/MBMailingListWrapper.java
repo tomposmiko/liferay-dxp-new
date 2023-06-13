@@ -562,11 +562,6 @@ public class MBMailingListWrapper
 		return model.isOutUseSSL();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a message boards mailing list model instance should use the <code>MBMailingList</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

@@ -131,7 +131,7 @@
 	{@param? _handleClearButtonClicked: any}
 	{@param? _handleSelectButtonClicked: any}
 	{@param? readOnly: bool}
-	{@param? fileEntryURL: string}
+	{@param? fileEntryTitle: string}
 	{@param spritemap: string}
 
 	<div class="input-group-append input-group-item input-group-item-shrink">
@@ -149,7 +149,7 @@
 		</button>
 	</div>
 
-	{if $fileEntryURL}
+	{if $fileEntryTitle}
 		<div class="input-group-append input-group-item input-group-item-shrink">
 			<button
 				class="btn btn-secondary clear-button"
@@ -173,9 +173,9 @@
 	{@param? fileEntryURL: string}
 
 	<div class="card card-horizontal">
-		<div class="card-row card-row-padded">
+		<div class="card-body">
 			<div class="card-col-content card-col-gutters">
-				<h4 class="truncate-text" title="{$fileEntryTitle}">{$fileEntryTitle}</h4>
+				<h4 class="text-truncate" title="{$fileEntryTitle}">{$fileEntryTitle}</h4>
 			</div>
 
 			<div class="card-col-field">

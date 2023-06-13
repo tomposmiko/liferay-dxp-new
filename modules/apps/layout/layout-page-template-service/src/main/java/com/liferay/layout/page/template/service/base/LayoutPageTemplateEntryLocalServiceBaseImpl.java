@@ -79,7 +79,7 @@ public abstract class LayoutPageTemplateEntryLocalServiceBaseImpl
 	implements AopService, IdentifiableOSGiService,
 			   LayoutPageTemplateEntryLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>LayoutPageTemplateEntryLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalServiceUtil</code>.
@@ -646,8 +646,8 @@ public abstract class LayoutPageTemplateEntryLocalServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

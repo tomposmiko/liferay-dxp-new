@@ -50,6 +50,7 @@ import org.osgi.service.component.annotations.Reference;
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=portlet-category-facet",
 		"com.liferay.portlet.display-category=category.search",
+		"com.liferay.portlet.header-portlet-css=/css/main.css",
 		"com.liferay.portlet.icon=/icons/search.png",
 		"com.liferay.portlet.instanceable=true",
 		"com.liferay.portlet.layout-cacheable=true",
@@ -112,7 +113,7 @@ public class CategoryFacetPortlet extends MVCPortlet {
 
 		AssetCategoriesSearchFacetDisplayBuilder
 			assetCategoriesSearchFacetDisplayBuilder =
-				new AssetCategoriesSearchFacetDisplayBuilder();
+				new AssetCategoriesSearchFacetDisplayBuilder(renderRequest);
 
 		assetCategoriesSearchFacetDisplayBuilder.setAssetCategoryLocalService(
 			assetCategoryLocalService);
@@ -155,6 +156,8 @@ public class CategoryFacetPortlet extends MVCPortlet {
 			() -> portletSharedSearchResponse.getParameterValues(
 				parameterName, renderRequest),
 			assetCategoriesSearchFacetDisplayBuilder::setParameterValues);
+
+		assetCategoriesSearchFacetDisplayBuilder.setPortal(portal);
 
 		return assetCategoriesSearchFacetDisplayBuilder.build();
 	}

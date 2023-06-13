@@ -112,7 +112,8 @@ public class KaleoTimerInstanceTokenLocalServiceImpl
 		kaleoTimerInstanceToken.setWorkflowContext(
 			WorkflowContextUtil.convert(workflowContext));
 
-		kaleoTimerInstanceTokenPersistence.update(kaleoTimerInstanceToken);
+		kaleoTimerInstanceToken = kaleoTimerInstanceTokenPersistence.update(
+			kaleoTimerInstanceToken);
 
 		scheduleTimer(kaleoTimerInstanceToken, kaleoTimer);
 
@@ -168,7 +169,8 @@ public class KaleoTimerInstanceTokenLocalServiceImpl
 		kaleoTimerInstanceToken.setCompleted(true);
 		kaleoTimerInstanceToken.setCompletionDate(new Date());
 
-		kaleoTimerInstanceTokenPersistence.update(kaleoTimerInstanceToken);
+		kaleoTimerInstanceToken = kaleoTimerInstanceTokenPersistence.update(
+			kaleoTimerInstanceToken);
 
 		deleteScheduledTimer(kaleoTimerInstanceToken);
 
@@ -232,10 +234,11 @@ public class KaleoTimerInstanceTokenLocalServiceImpl
 			try {
 				deleteScheduledTimer(kaleoTimerInstanceToken);
 			}
-			catch (PortalException pe) {
+			catch (PortalException portalException) {
 				if (_log.isWarnEnabled()) {
 					_log.warn(
-						"Unable to unschedule " + kaleoTimerInstanceToken, pe);
+						"Unable to unschedule " + kaleoTimerInstanceToken,
+						portalException);
 				}
 			}
 

@@ -103,9 +103,6 @@ public class RoleFinderImpl extends RoleFinderBaseImpl implements RoleFinder {
 	public static final String FIND_BY_U_G =
 		RoleFinder.class.getName() + ".findByU_G";
 
-	public static final String FIND_BY_R_N_A =
-		RoleFinder.class.getName() + ".findByR_N_A";
-
 	public static final String FIND_BY_C_N_D_T =
 		RoleFinder.class.getName() + ".findByC_N_D_T";
 
@@ -187,8 +184,8 @@ public class RoleFinderImpl extends RoleFinderBaseImpl implements RoleFinder {
 
 			return 0;
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -216,8 +213,8 @@ public class RoleFinderImpl extends RoleFinderBaseImpl implements RoleFinder {
 
 			return roles.size();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -255,8 +252,8 @@ public class RoleFinderImpl extends RoleFinderBaseImpl implements RoleFinder {
 
 			return 0;
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -458,8 +455,8 @@ public class RoleFinderImpl extends RoleFinderBaseImpl implements RoleFinder {
 
 			return q.list(true);
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -488,8 +485,8 @@ public class RoleFinderImpl extends RoleFinderBaseImpl implements RoleFinder {
 
 			return q.list(true);
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -524,8 +521,8 @@ public class RoleFinderImpl extends RoleFinderBaseImpl implements RoleFinder {
 
 			return (List<Role>)QueryUtil.list(q, getDialect(), start, end);
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -552,8 +549,8 @@ public class RoleFinderImpl extends RoleFinderBaseImpl implements RoleFinder {
 
 			return q.list(true);
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -588,8 +585,8 @@ public class RoleFinderImpl extends RoleFinderBaseImpl implements RoleFinder {
 				return roles.get(0);
 			}
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -647,48 +644,8 @@ public class RoleFinderImpl extends RoleFinderBaseImpl implements RoleFinder {
 
 			return q.list(true);
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
-		}
-		finally {
-			closeSession(session);
-		}
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public List<Role> findByR_N_A(
-		long resourceBlockId, String className, String actionId) {
-
-		Session session = null;
-
-		try {
-			session = openSession();
-
-			String sql = CustomSQLUtil.get(FIND_BY_R_N_A);
-
-			SQLQuery q = session.createSynchronizedSQLQuery(sql);
-
-			q.addEntity("Role_", RoleImpl.class);
-
-			QueryPos qPos = QueryPos.getInstance(q);
-
-			qPos.add(resourceBlockId);
-			qPos.add(className);
-
-			ResourceAction resourceAction =
-				ResourceActionLocalServiceUtil.getResourceAction(
-					className, actionId);
-
-			qPos.add(resourceAction.getBitwiseValue());
-
-			return q.list(true);
-		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -766,8 +723,8 @@ public class RoleFinderImpl extends RoleFinderBaseImpl implements RoleFinder {
 
 			return roleMap;
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -806,8 +763,8 @@ public class RoleFinderImpl extends RoleFinderBaseImpl implements RoleFinder {
 
 			return q.list(true);
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -893,8 +850,8 @@ public class RoleFinderImpl extends RoleFinderBaseImpl implements RoleFinder {
 
 			return 0;
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -963,8 +920,8 @@ public class RoleFinderImpl extends RoleFinderBaseImpl implements RoleFinder {
 
 			return 0;
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -1040,8 +997,8 @@ public class RoleFinderImpl extends RoleFinderBaseImpl implements RoleFinder {
 
 			return (List<Role>)QueryUtil.list(q, getDialect(), start, end);
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -1101,8 +1058,8 @@ public class RoleFinderImpl extends RoleFinderBaseImpl implements RoleFinder {
 
 			return (List<Role>)QueryUtil.list(q, getDialect(), start, end);
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);

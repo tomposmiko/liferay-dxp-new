@@ -43,7 +43,7 @@ JournalViewMoreMenuItemsDisplayContext journalViewMoreMenuItemsDisplayContext = 
 />
 
 <clay:management-toolbar
-	displayContext="<%= new JournalViewMoreMenuItemsManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, journalViewMoreMenuItemsDisplayContext) %>"
+	displayContext="<%= new JournalViewMoreMenuItemsManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, journalViewMoreMenuItemsDisplayContext) %>"
 />
 
 <aui:form cssClass="container-fluid-1280" name="addMenuItemFm">
@@ -98,7 +98,7 @@ JournalViewMoreMenuItemsDisplayContext journalViewMoreMenuItemsDisplayContext = 
 <aui:script require="metal-dom/src/all/dom as dom">
 	var Util = Liferay.Util;
 
-	const addMenuItemFm = document.getElementById(
+	var addMenuItemFm = document.getElementById(
 		'<portlet:namespace />addMenuItemFm'
 	);
 

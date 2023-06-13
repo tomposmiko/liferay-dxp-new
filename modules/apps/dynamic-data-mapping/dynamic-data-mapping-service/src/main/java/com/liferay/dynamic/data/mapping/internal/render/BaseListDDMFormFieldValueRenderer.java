@@ -38,7 +38,7 @@ public abstract class BaseListDDMFormFieldValueRenderer
 	extends BaseDDMFormFieldValueRenderer {
 
 	@Override
-	protected ValueAccessor getValueAcessor(Locale locale) {
+	protected ValueAccessor getValueAccessor(Locale locale) {
 		return new ValueAccessor(locale) {
 
 			@Override
@@ -78,8 +78,8 @@ public abstract class BaseListDDMFormFieldValueRenderer
 				try {
 					return JSONFactoryUtil.createJSONArray(json);
 				}
-				catch (JSONException jsone) {
-					throw new ValueAccessorException(jsone);
+				catch (JSONException jsonException) {
+					throw new ValueAccessorException(jsonException);
 				}
 			}
 

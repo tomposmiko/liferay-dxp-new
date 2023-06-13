@@ -62,8 +62,8 @@ public class AssetAutoTagProviderConfigurationVisibilityController
 
 			return assetAutoTaggerConfiguration.isAvailable();
 		}
-		catch (PortalException pe) {
-			_log.error(pe, pe);
+		catch (PortalException portalException) {
+			_log.error(portalException, portalException);
 
 			return false;
 		}
@@ -82,6 +82,12 @@ public class AssetAutoTagProviderConfigurationVisibilityController
 			return _assetAutoTaggerConfigurationFactory.
 				getCompanyAssetAutoTaggerConfiguration(
 					_companyLocalService.getCompany((long)scopePK));
+		}
+
+		if (ExtendedObjectClassDefinition.Scope.GROUP.equals(scope)) {
+			return _assetAutoTaggerConfigurationFactory.
+				getGroupAssetAutoTaggerConfiguration(
+					_groupLocalService.getGroup((long)scopePK));
 		}
 
 		throw new IllegalArgumentException("Unrecognized scope: " + scope);

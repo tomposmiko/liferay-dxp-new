@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.segments.constants.SegmentsExperienceConstants;
@@ -33,6 +34,7 @@ import com.liferay.segments.service.SegmentsExperienceLocalService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -49,6 +51,11 @@ public class LayoutPageTemplateStructureDataHandlerUtil {
 			PortletDataContext portletDataContext, long classNameId,
 			long classPK, Element layoutPageTemplateStructureElement)
 		throws Exception {
+
+		layoutPageTemplateStructureElement.addAttribute(
+			"className", String.valueOf(_portal.getClassName(classNameId)));
+		layoutPageTemplateStructureElement.addAttribute(
+			"classPK", String.valueOf(classPK));
 
 		StagedModelDataHandlerUtil.importStagedModel(
 			portletDataContext, layoutPageTemplateStructureElement);
@@ -75,13 +82,6 @@ public class LayoutPageTemplateStructureDataHandlerUtil {
 		if (existingLayoutPageTemplateStructure == null) {
 			return;
 		}
-
-		existingLayoutPageTemplateStructure.setClassNameId(classNameId);
-		existingLayoutPageTemplateStructure.setClassPK(classPK);
-
-		_layoutPageTemplateStructureLocalService.
-			updateLayoutPageTemplateStructure(
-				existingLayoutPageTemplateStructure);
 
 		List<LayoutPageTemplateStructureRel>
 			existingLayoutPageTemplateStructureRels =
@@ -142,6 +142,16 @@ public class LayoutPageTemplateStructureDataHandlerUtil {
 				for (int k = 0; k < fragmentEntryLinkIdsJSONArray.length();
 					 k++) {
 
+					if (Objects.equals(
+							fragmentEntryLinkIdsJSONArray.getString(k),
+							"drop-zone")) {
+
+						newFragmentEntryLinkIdsJSONArray.put(
+							fragmentEntryLinkIdsJSONArray.getString(k));
+
+						continue;
+					}
+
 					long fragmentEntryLinkId = MapUtil.getLong(
 						fragmentEntryLinkIds,
 						fragmentEntryLinkIdsJSONArray.getLong(k),
@@ -200,6 +210,9 @@ public class LayoutPageTemplateStructureDataHandlerUtil {
 	@Reference
 	private LayoutPageTemplateStructureRelLocalService
 		_layoutPageTemplateStructureRelLocalService;
+
+	@Reference
+	private Portal _portal;
 
 	@Reference
 	private SegmentsExperienceLocalService _segmentsExperienceLocalService;

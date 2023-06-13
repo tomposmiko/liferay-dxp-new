@@ -186,12 +186,35 @@
 									}
 								);
 							}
+
+							var title = instance.get('node');
+
+							instance._titleListener = title.on(
+								'mouseupoutside',
+								event => {
+									var editable = Util._getEditableInstance(
+										title
+									);
+
+									if (
+										!editable
+											.get('boundingBox')
+											.contains(event.target)
+									) {
+										editable.save();
+									}
+								}
+							);
 						},
 						stopEditing() {
 							var instance = this;
 
 							if (instance._dragListener) {
 								instance._dragListener.detach();
+							}
+
+							if (instance._titleListener) {
+								instance._titleListener.detach();
 							}
 						}
 					},
@@ -274,9 +297,18 @@
 		checkAll(form, name, allBox, selectClassName) {
 			if (form) {
 				form = Util.getDOM(form);
+
+				if (typeof form === 'string') {
+					form = document.querySelector(form);
+				}
+
 				allBox = Util.getDOM(allBox);
 
-				var selector;
+				if (typeof allBox === 'string') {
+					allBox = document.querySelector(allBox);
+				}
+
+				let selector;
 
 				if (Array.isArray(name)) {
 					selector =
@@ -287,66 +319,73 @@
 					selector = 'input[name=' + name + STR_RIGHT_SQUARE_BRACKET;
 				}
 
-				form = $(form);
+				const allBoxChecked = allBox.checked;
 
-				var allBoxChecked = $(allBox).prop(STR_CHECKED);
+				const uploadedItems = Array.from(
+					form.querySelectorAll(selector)
+				);
 
-				form.find(selector).each((index, item) => {
-					item = $(item);
-
-					if (!item.prop('disabled')) {
-						item.prop(STR_CHECKED, allBoxChecked);
+				uploadedItems.forEach(item => {
+					if (!item.disabled) {
+						item.checked = allBoxChecked;
 					}
 				});
 
 				if (selectClassName) {
-					form.find(selectClassName).toggleClass(
-						'info',
-						allBoxChecked
-					);
+					const selectItem = form.querySelector(selectClassName);
+
+					if (allBoxChecked) {
+						selectItem.classList.add('info');
+					} else {
+						selectItem.classList.remove('info');
+					}
 				}
 			}
 		},
 
 		checkAllBox(form, name, allBox) {
-			var totalOn = 0;
+			let totalOn = 0;
 
 			if (form) {
 				form = Util.getDOM(form);
-				allBox = Util.getDOM(allBox);
 
-				form = $(form);
-
-				var allBoxNodes = $(allBox);
-
-				if (!allBoxNodes.length) {
-					allBoxNodes = form.find('input[name="' + allBox + '"]');
+				if (typeof form === 'string') {
+					form = document.querySelector(form);
 				}
 
-				var totalBoxes = 0;
+				allBox = Util.getDOM(allBox);
 
-				var inputs = form.find('input[type=checkbox]');
+				if (typeof allBox === 'string') {
+					allBox =
+						document.querySelector(allBox) ||
+						form.querySelector(`input[name="${allBox}"]`);
+				}
+
+				const inputs = Array.from(
+					form.querySelectorAll('input[type=checkbox]')
+				);
 
 				if (!Array.isArray(name)) {
 					name = [name];
 				}
 
-				inputs.each((index, item) => {
-					item = $(item);
+				let totalBoxes = 0;
 
+				inputs.forEach(input => {
 					if (
-						!item.is(allBoxNodes) &&
-						name.indexOf(item.attr('name')) > -1
+						input.id !== allBox.id ||
+						(input.id !== allBox.name &&
+							name.indexOf(input.name) > -1)
 					) {
 						totalBoxes++;
 
-						if (item.prop(STR_CHECKED)) {
+						if (input.checked) {
 							totalOn++;
 						}
 					}
 				});
 
-				allBoxNodes.prop(STR_CHECKED, totalBoxes == totalOn);
+				allBox.checked = totalBoxes === totalOn;
 			}
 
 			return totalOn;
@@ -417,17 +456,16 @@
 		},
 
 		disableToggleBoxes(checkBoxId, toggleBoxId, checkDisabled) {
-			var checkBox = $('#' + checkBoxId);
-			var toggleBox = $('#' + toggleBoxId);
+			const checkBox = document.getElementById(checkBoxId);
+			const toggleBox = document.getElementById(toggleBoxId);
 
-			toggleBox.prop(
-				'disabled',
-				checkDisabled && checkBox.prop(STR_CHECKED)
-			);
+			if (checkBox && toggleBox) {
+				toggleBox.disabled = checkDisabled && checkBox.checked;
 
-			checkBox.on(EVENT_CLICK, () => {
-				toggleBox.prop('disabled', !toggleBox.prop('disabled'));
-			});
+				checkBox.addEventListener(EVENT_CLICK, () => {
+					toggleBox.disabled = !toggleBox.disabled;
+				});
+			}
 		},
 
 		enableFormButtons(inputs) {
@@ -810,27 +848,29 @@
 		listCheckboxesExcept(form, except, name, checked) {
 			form = Util.getDOM(form);
 
-			var selector = 'input[type=checkbox]';
+			if (typeof form === 'string') {
+				form = document.querySelector(form);
+			}
+
+			let selector = 'input[type=checkbox]';
 
 			if (name) {
 				selector += '[name=' + name + ']';
 			}
 
-			return $(form)
-				.find(selector)
-				.toArray()
-				.reduce((prev, item) => {
-					item = $(item);
+			const checkboxes = Array.from(form.querySelectorAll(selector));
 
-					var val = item.val();
+			return checkboxes
+				.reduce((prev, item) => {
+					const value = item.value;
 
 					if (
-						val &&
-						item.attr('name') != except &&
-						item.prop('checked') == checked &&
-						!item.prop('disabled')
+						value &&
+						item.name !== except &&
+						item.checked === checked &&
+						!item.disabled
 					) {
-						prev.push(val);
+						prev.push(value);
 					}
 
 					return prev;
@@ -999,14 +1039,17 @@
 				...params
 			};
 
-			$.ajax(params.url, {
-				data: {
-					doAsUserId: params.doAsUserId,
-					p_auth: Liferay.authToken,
-					p_l_id: params.plid,
-					portletId: params.portletId,
-					title: params.title
-				}
+			var data = {
+				doAsUserId: params.doAsUserId,
+				p_auth: Liferay.authToken,
+				p_l_id: params.plid,
+				portletId: params.portletId,
+				title: params.title
+			};
+
+			Liferay.Util.fetch(params.url, {
+				body: Liferay.Util.objectToFormData(data),
+				method: 'POST'
 			});
 		},
 
@@ -1356,7 +1399,6 @@
 					config.doAsGroupId || themeDisplay.getScopeGroupId(),
 				eventName: config.eventName,
 				groupId: config.groupId,
-				mode: config.mode,
 				mvcPath: config.mvcPath || '/view.jsp',
 				p_p_state: 'pop_up',
 				portletResourceNamespace: config.portletResourceNamespace,
@@ -1365,6 +1407,10 @@
 				structureAvailableFields: config.structureAvailableFields,
 				templateId: config.templateId
 			};
+
+			if ('mode' in config) {
+				params.mode = config.mode;
+			}
 
 			if ('navigationStartsOn' in config) {
 				params.navigationStartsOn = config.navigationStartsOn;
@@ -1425,9 +1471,15 @@
 				config.dialog = dialogConfig;
 			}
 
-			var eventHandles = [Liferay.once(config.eventName, callback)];
+			var eventHandles = [];
+
+			if (callback) {
+				eventHandles.push(Liferay.once(config.eventName, callback));
+			}
 
 			var detachSelectionOnHideFn = function(event) {
+				Liferay.fire(config.eventName);
+
 				if (!event.newVal) {
 					new A.EventHandle(eventHandles).detach();
 				}
@@ -1476,6 +1528,8 @@
 		options => {
 			var obj = options.obj;
 
+			A.Event.defineOutside('mouseup');
+
 			if (obj) {
 				var title = obj.one('.portlet-title-text');
 
@@ -1518,7 +1572,7 @@
 				}
 			}
 		},
-		['aui-editable-deprecated']
+		['aui-editable-deprecated', 'event-outside']
 	);
 
 	Liferay.provide(

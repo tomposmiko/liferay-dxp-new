@@ -35,8 +35,8 @@ if (message.isAnonymous() || thread.isInTrash()) {
 
 <div class="card panel">
 	<div class="panel-heading">
-		<div class="card-row card-row-padded">
-			<div class="card-col-field">
+		<div class="autofit-padded autofit-row card-body">
+			<div class="autofit-col">
 				<div class="list-group-card-icon">
 					<liferay-ui:user-portrait
 						userId="<%= !message.isAnonymous() ? message.getUserId() : 0 %>"
@@ -44,7 +44,7 @@ if (message.isAnonymous() || thread.isInTrash()) {
 				</div>
 			</div>
 
-			<div class="card-col-content card-col-gutters">
+			<div class="autofit-col autofit-col-expand">
 
 				<%
 				String messageUserName = "anonymous";
@@ -172,7 +172,7 @@ if (message.isAnonymous() || thread.isInTrash()) {
 								className="<%= MBMessage.class.getName() %>"
 								classPK="<%= message.getMessageId() %>"
 								contentTitle="<%= message.getSubject() %>"
-								contentURL="<%= MBUtil.getMBMessageURL(message.getMessageId(), renderResponse) %>"
+								contentURL="<%= MBUtil.getMBMessageURL(message.getMessageId(), request) %>"
 								enabled="<%= !message.isInTrash() %>"
 								label="<%= false %>"
 								message='<%= message.isInTrash() ? "flags-are-disabled-because-this-entry-is-in-the-recycle-bin" : null %>'
@@ -183,7 +183,7 @@ if (message.isAnonymous() || thread.isInTrash()) {
 				</c:if>
 			</div>
 
-			<div class="card-col-field">
+			<div class="autofit-col">
 				<c:if test="<%= editable %>">
 
 					<%
@@ -399,7 +399,7 @@ if (message.isAnonymous() || thread.isInTrash()) {
 		}
 		%>
 
-		<div class="card-row card-row-padded message-content">
+		<div class="card-body message-content">
 			<%= msgBody %>
 		</div>
 
@@ -407,7 +407,7 @@ if (message.isAnonymous() || thread.isInTrash()) {
 		String assetTagNames = (String)request.getAttribute("edit_message.jsp-assetTagNames");
 		%>
 
-		<div class="card-row card-row-padded tags">
+		<div class="card-body tags">
 			<liferay-asset:asset-tags-summary
 				assetTagNames="<%= assetTagNames %>"
 				className="<%= MBMessage.class.getName() %>"
@@ -419,7 +419,7 @@ if (message.isAnonymous() || thread.isInTrash()) {
 		<liferay-expando:custom-attributes-available
 			className="<%= MBMessage.class.getName() %>"
 		>
-			<div class="card-row card-row-padded custom-attributes">
+			<div class="card-body custom-attributes">
 				<liferay-expando:custom-attribute-list
 					className="<%= MBMessage.class.getName() %>"
 					classPK="<%= message.getMessageId() %>"
@@ -429,7 +429,7 @@ if (message.isAnonymous() || thread.isInTrash()) {
 			</div>
 		</liferay-expando:custom-attributes-available>
 
-		<div class="card-row card-row-padded entry-links">
+		<div class="card-body entry-links">
 			<liferay-asset:asset-links
 				className="<%= MBMessage.class.getName() %>"
 				classPK="<%= message.getMessageId() %>"
@@ -443,7 +443,7 @@ if (message.isAnonymous() || thread.isInTrash()) {
 			%>
 
 			<c:if test="<%= attachmentsFileEntriesCount > 0 %>">
-				<div class="card-row card-row-padded message-attachments">
+				<div class="card-body message-attachments">
 					<h3><liferay-ui:message key="attachments" />:</h3>
 
 					<ul>

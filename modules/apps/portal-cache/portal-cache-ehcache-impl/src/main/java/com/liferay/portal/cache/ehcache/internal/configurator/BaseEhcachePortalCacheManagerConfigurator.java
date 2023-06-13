@@ -83,8 +83,6 @@ public abstract class BaseEhcachePortalCacheManagerConfigurator {
 			return;
 		}
 
-		cacheConfiguration.bootstrapCacheLoaderFactory(null);
-
 		List<?> factoryConfigurations =
 			cacheConfiguration.getCacheEventListenerConfigurations();
 
@@ -215,7 +213,7 @@ public abstract class BaseEhcachePortalCacheManagerConfigurator {
 
 		return new EhcachePortalCacheConfiguration(
 			cacheConfiguration.getName(), portalCacheListenerPropertiesSet,
-			null, requireSerialization);
+			requireSerialization);
 	}
 
 	protected Set<Properties> parseCacheManagerEventListenerConfigurations(
@@ -301,8 +299,8 @@ public abstract class BaseEhcachePortalCacheManagerConfigurator {
 		try {
 			properties.load(new UnsyncStringReader(propertyLines));
 		}
-		catch (IOException ioe) {
-			throw new RuntimeException(ioe);
+		catch (IOException ioException) {
+			throw new RuntimeException(ioException);
 		}
 
 		return properties;

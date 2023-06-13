@@ -14,11 +14,7 @@
 
 package com.liferay.portal.kernel.search;
 
-import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
-import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetEntry;
-import com.liferay.asset.kernel.model.AssetRendererFactory;
-import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
@@ -36,7 +32,6 @@ import com.liferay.portal.kernel.model.Country;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Region;
 import com.liferay.portal.kernel.model.ResourcedModel;
-import com.liferay.portal.kernel.model.TrashedModel;
 import com.liferay.portal.kernel.model.WorkflowedModel;
 import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.search.facet.MultiValueFacet;
@@ -72,7 +67,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -99,11 +93,11 @@ public abstract class BaseIndexer<T> implements Indexer<T> {
 			IndexWriterHelperUtil.deleteDocument(
 				getSearchEngineId(), companyId, uid, _commitImmediately);
 		}
-		catch (SearchException se) {
-			throw se;
+		catch (SearchException searchException) {
+			throw searchException;
 		}
-		catch (Exception e) {
-			throw new SearchException(e);
+		catch (Exception exception) {
+			throw new SearchException(exception);
 		}
 	}
 
@@ -116,11 +110,11 @@ public abstract class BaseIndexer<T> implements Indexer<T> {
 		try {
 			doDelete(object);
 		}
-		catch (SearchException se) {
-			throw se;
+		catch (SearchException searchException) {
+			throw searchException;
 		}
-		catch (Exception e) {
-			throw new SearchException(e);
+		catch (Exception exception) {
+			throw new SearchException(exception);
 		}
 	}
 
@@ -166,11 +160,11 @@ public abstract class BaseIndexer<T> implements Indexer<T> {
 
 			return document;
 		}
-		catch (SearchException se) {
-			throw se;
+		catch (SearchException searchException) {
+			throw searchException;
 		}
-		catch (Exception e) {
-			throw new SearchException(e);
+		catch (Exception exception) {
+			throw new SearchException(exception);
 		}
 	}
 
@@ -227,11 +221,11 @@ public abstract class BaseIndexer<T> implements Indexer<T> {
 
 			return fullQuery;
 		}
-		catch (SearchException se) {
-			throw se;
+		catch (SearchException searchException) {
+			throw searchException;
 		}
-		catch (Exception e) {
-			throw new SearchException(e);
+		catch (Exception exception) {
+			throw new SearchException(exception);
 		}
 	}
 
@@ -299,23 +293,6 @@ public abstract class BaseIndexer<T> implements Indexer<T> {
 		return sortField;
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             com.liferay.portal.search.sort.SortFieldBuilder
-	 *             #getSortField}
-	 */
-	@Deprecated
-	@Override
-	public String getSortField(String orderByCol, int sortType) {
-		if ((sortType == Sort.DOUBLE_TYPE) || (sortType == Sort.FLOAT_TYPE) ||
-			(sortType == Sort.INT_TYPE) || (sortType == Sort.LONG_TYPE)) {
-
-			return Field.getSortableFieldName(orderByCol);
-		}
-
-		return getSortField(orderByCol);
-	}
-
 	@Override
 	public Summary getSummary(
 			Document document, String snippet, PortletRequest portletRequest,
@@ -337,11 +314,11 @@ public abstract class BaseIndexer<T> implements Indexer<T> {
 
 			return summary;
 		}
-		catch (SearchException se) {
-			throw se;
+		catch (SearchException searchException) {
+			throw searchException;
 		}
-		catch (Exception e) {
-			throw new SearchException(e);
+		catch (Exception exception) {
+			throw new SearchException(exception);
 		}
 	}
 
@@ -401,22 +378,6 @@ public abstract class BaseIndexer<T> implements Indexer<T> {
 
 	@Override
 	public boolean isVisible(long classPK, int status) throws Exception {
-		return true;
-	}
-
-	/**
-	 * @param      classPK
-	 * @param      status
-	 * @return
-	 * @throws     Exception
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             RelatedEntryIndexer.isVisibleRelatedEntry(long, int)}
-	 */
-	@Deprecated
-	@Override
-	public boolean isVisibleRelatedEntry(long classPK, int status)
-		throws Exception {
-
 		return true;
 	}
 
@@ -489,8 +450,9 @@ public abstract class BaseIndexer<T> implements Indexer<T> {
 			try {
 				reindex(element);
 			}
-			catch (SearchException se) {
-				_log.error("Unable to index object: " + element, se);
+			catch (SearchException searchException) {
+				_log.error(
+					"Unable to index object: " + element, searchException);
 			}
 		}
 	}
@@ -507,19 +469,19 @@ public abstract class BaseIndexer<T> implements Indexer<T> {
 
 			doReindex(className, classPK);
 		}
-		catch (NoSuchModelException nsme) {
+		catch (NoSuchModelException noSuchModelException) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
 					StringBundler.concat(
 						"Unable to index ", className, " ", classPK),
-					nsme);
+					noSuchModelException);
 			}
 		}
-		catch (SearchException se) {
-			throw se;
+		catch (SearchException searchException) {
+			throw searchException;
 		}
-		catch (Exception e) {
-			throw new SearchException(e);
+		catch (Exception exception) {
+			throw new SearchException(exception);
 		}
 	}
 
@@ -543,11 +505,11 @@ public abstract class BaseIndexer<T> implements Indexer<T> {
 
 			doReindex(ids);
 		}
-		catch (SearchException se) {
-			throw se;
+		catch (SearchException searchException) {
+			throw searchException;
 		}
-		catch (Exception e) {
-			throw new SearchException(e);
+		catch (Exception exception) {
+			throw new SearchException(exception);
 		}
 		finally {
 			CompanyThreadLocal.setCompanyId(companyThreadLocalCompanyId);
@@ -570,11 +532,11 @@ public abstract class BaseIndexer<T> implements Indexer<T> {
 
 			doReindex(object);
 		}
-		catch (SearchException se) {
-			throw se;
+		catch (SearchException searchException) {
+			throw searchException;
 		}
-		catch (Exception e) {
-			throw new SearchException(e);
+		catch (Exception exception) {
+			throw new SearchException(exception);
 		}
 	}
 
@@ -617,11 +579,11 @@ public abstract class BaseIndexer<T> implements Indexer<T> {
 
 			return hits;
 		}
-		catch (SearchException se) {
-			throw se;
+		catch (SearchException searchException) {
+			throw searchException;
 		}
-		catch (Exception e) {
-			throw new SearchException(e);
+		catch (Exception exception) {
+			throw new SearchException(exception);
 		}
 	}
 
@@ -693,67 +655,6 @@ public abstract class BaseIndexer<T> implements Indexer<T> {
 
 		_indexerPostProcessors = indexerPostProcessorsList.toArray(
 			new IndexerPostProcessor[0]);
-	}
-
-	/**
-	 * @param      document
-	 * @param      className
-	 * @param      classPK
-	 * @deprecated As of Judson (7.1.x), no direct replacement. Logic now
-	 *             encapsulated in {@link
-	 *             com.liferay.portal.search.internal.contributor.
-	 *             document.AssetDocumentContrbutor}
-	 */
-	@Deprecated
-	protected void addAssetFields(
-		Document document, String className, long classPK) {
-
-		AssetRendererFactory<?> assetRendererFactory =
-			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
-				className);
-
-		if ((assetRendererFactory == null) ||
-			!assetRendererFactory.isSelectable()) {
-
-			return;
-		}
-
-		AssetEntry assetEntry = AssetEntryLocalServiceUtil.fetchEntry(
-			className, classPK);
-
-		if (assetEntry == null) {
-			return;
-		}
-
-		if (!document.hasField(Field.CREATE_DATE)) {
-			document.addDate(Field.CREATE_DATE, assetEntry.getCreateDate());
-		}
-
-		if (assetEntry.getExpirationDate() != null) {
-			document.addDate(
-				Field.EXPIRATION_DATE, assetEntry.getExpirationDate());
-		}
-		else {
-			document.addDate(Field.EXPIRATION_DATE, new Date(Long.MAX_VALUE));
-		}
-
-		if (!document.hasField(Field.MODIFIED_DATE)) {
-			document.addDate(Field.MODIFIED_DATE, assetEntry.getModifiedDate());
-		}
-
-		document.addNumber(Field.PRIORITY, assetEntry.getPriority());
-
-		if (assetEntry.getPublishDate() != null) {
-			document.addDate(Field.PUBLISH_DATE, assetEntry.getPublishDate());
-		}
-		else {
-			document.addDate(Field.PUBLISH_DATE, new Date(0));
-		}
-
-		document.addLocalizedKeyword(
-			"localized_title",
-			populateMap(assetEntry, assetEntry.getTitleMap()), true, true);
-		document.addKeyword("visible", assetEntry.isVisible());
 	}
 
 	protected void addDefaultHighlightFieldNames(QueryConfig queryConfig) {
@@ -892,70 +793,6 @@ public abstract class BaseIndexer<T> implements Indexer<T> {
 		searchContext.addFacet(multiValueFacet);
 	}
 
-	/**
-	 * @param      document
-	 * @param      field
-	 * @param      assetCategories
-	 * @deprecated As of Judson (7.1.x), no direct replacement. Logic not
-	 *             encapsulated in {@link
-	 *             com.liferay.portal.search.internal.contributor.
-	 *             document.AssetCategoryDocumentContrbutor}
-	 */
-	@Deprecated
-	protected void addSearchAssetCategoryTitles(
-		Document document, String field, List<AssetCategory> assetCategories) {
-
-		Map<Locale, List<String>> assetCategoryTitles = new HashMap<>();
-
-		Locale defaultLocale = LocaleUtil.getDefault();
-
-		for (AssetCategory assetCategory : assetCategories) {
-			Map<Locale, String> titleMap = assetCategory.getTitleMap();
-
-			for (Map.Entry<Locale, String> entry : titleMap.entrySet()) {
-				String title = entry.getValue();
-
-				if (Validator.isNull(title)) {
-					continue;
-				}
-
-				Locale locale = entry.getKey();
-
-				List<String> titles = assetCategoryTitles.get(locale);
-
-				if (titles == null) {
-					titles = new ArrayList<>();
-
-					assetCategoryTitles.put(locale, titles);
-				}
-
-				titles.add(StringUtil.toLowerCase(title));
-			}
-		}
-
-		for (Map.Entry<Locale, List<String>> entry :
-				assetCategoryTitles.entrySet()) {
-
-			Locale locale = entry.getKey();
-
-			List<String> titles = entry.getValue();
-
-			String[] titlesArray = titles.toArray(new String[0]);
-
-			if (locale.equals(defaultLocale)) {
-				document.addText(field, titlesArray);
-			}
-
-			document.addText(
-				field.concat(
-					StringPool.UNDERLINE
-				).concat(
-					locale.toString()
-				),
-				titlesArray);
-		}
-	}
-
 	protected void addSearchAssetTagNames(
 			BooleanFilter queryBooleanFilter, SearchContext searchContext)
 		throws Exception {
@@ -1025,15 +862,6 @@ public abstract class BaseIndexer<T> implements Indexer<T> {
 		searchContext.addFacet(multiValueFacet);
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	protected void addSearchGroupId(
-			BooleanFilter queryBooleanFilter, SearchContext searchContext)
-		throws Exception {
-	}
-
 	protected Map<String, Query> addSearchKeywords(
 			BooleanQuery searchQuery, SearchContext searchContext)
 		throws Exception {
@@ -1061,9 +889,8 @@ public abstract class BaseIndexer<T> implements Indexer<T> {
 
 		Map<String, Query> queries = new HashMap<>();
 
-		Query query = addSearchTerm(searchQuery, searchContext, field, like);
-
-		queries.put(field, query);
+		queries.put(
+			field, addSearchTerm(searchQuery, searchContext, field, like));
 
 		String localizedFieldName = Field.getLocalizedName(
 			searchContext.getLocale(), field);
@@ -1203,14 +1030,6 @@ public abstract class BaseIndexer<T> implements Indexer<T> {
 		}
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	protected void addTrashFields(
-		Document document, TrashedModel trashedModel) {
-	}
-
 	protected BooleanQuery createFullQuery(
 			BooleanFilter fullQueryBooleanFilter, SearchContext searchContext)
 		throws Exception {
@@ -1324,8 +1143,7 @@ public abstract class BaseIndexer<T> implements Indexer<T> {
 
 	/**
 	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             com.liferay.portal.search.contributor.sort.
-	 *             SortFieldTranslator}
+	 *             com.liferay.portal.search.contributor.sort.SortFieldTranslator}
 	 */
 	@Deprecated
 	protected String doGetSortField(String orderByCol) {
@@ -1497,9 +1315,9 @@ public abstract class BaseIndexer<T> implements Indexer<T> {
 				group = group.getParentGroup();
 			}
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug("Unable to get site group", pe);
+				_log.debug("Unable to get site group", portalException);
 			}
 		}
 
@@ -1586,9 +1404,9 @@ public abstract class BaseIndexer<T> implements Indexer<T> {
 					getLocalizedCountryNames(
 						CountryServiceUtil.getCountry(countryId)));
 			}
-			catch (NoSuchCountryException nsce) {
+			catch (NoSuchCountryException noSuchCountryException) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(nsce.getMessage());
+					_log.warn(noSuchCountryException.getMessage());
 				}
 			}
 		}
@@ -1601,9 +1419,9 @@ public abstract class BaseIndexer<T> implements Indexer<T> {
 
 				regions.add(StringUtil.toLowerCase(region.getName()));
 			}
-			catch (NoSuchRegionException nsre) {
+			catch (NoSuchRegionException noSuchRegionException) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(nsre.getMessage());
+					_log.warn(noSuchRegionException.getMessage());
 				}
 			}
 		}

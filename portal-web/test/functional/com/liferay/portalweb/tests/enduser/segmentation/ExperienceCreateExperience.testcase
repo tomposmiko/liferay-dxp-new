@@ -30,9 +30,12 @@ definition {
 		LexiconEntry.gotoAdd();
 
 		Segmentation.addProperties(propertyOption = "Email Address");
+
 		Segmentation.fillTitle(titleField = "AddSegmentUserEmailAddressContains Test");
+
 		Segmentation.changeCriterionInputEmailAddress(criterionInputOption = "Contains");
-		Segmentation.fillEmailAddress(emailAddressField = "liferay");
+
+		Segmentation.fillProperty(PropertyField = "liferay");
 
 		Button.clickSave();
 
@@ -57,8 +60,9 @@ definition {
 
 		ContentPages.clickPencil();
 
-		Experience.clickBasicSections();
-		Experience.addBannerCenterElement();
+		PageEditor.addFragment(
+			collectionName = "Featured Content",
+			fragmentName = "Banner Center");
 
 		Button.clickPublish();
 

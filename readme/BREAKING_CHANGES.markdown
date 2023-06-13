@@ -1,4 +1,4 @@
-# What are the Breaking Changes for Liferay 7.2?
+# What are the Breaking Changes for Liferay 7.3?
 
 This document presents a chronological list of changes that break existing
 functionality, APIs, or contracts with third party Liferay developers or users.
@@ -20,7 +20,7 @@ Here are some of the types of changes documented in this file:
   replaces an old API, in spite of the old API being kept in Liferay Portal for
   backwards compatibility.
 
-*This document has been reviewed through commit `77cef15df6f0`.*
+*This document has been reviewed through commit ``.*
 
 ## Breaking Changes Contribution Guidelines
 
@@ -73,655 +73,302 @@ in ascending chronological order.
 
 ## Breaking Changes List
 
-### Removed Support for JSP Templates in Themes
-- **Date:** 2018-Nov-14
-- **JIRA Ticket:** [LPS-87064](https://issues.liferay.com/browse/LPS-87064)
+### Removed Portal Property user.groups.copy.layouts.to.user.personal.site
+- **Date:** 2019-Dec-26
+- **JIRA Ticket:** [LPS-106339](https://issues.liferay.com/browse/LPS-106339)
 
 #### What changed?
 
-Themes can no longer leverage JSP templates. Also, related logic has been
-removed from the public APIs `com.liferay.portal.kernel.util.ThemeHelper` and
-`com.liferay.taglib.util.ThemeUtil`.
+The portal property `user.groups.copy.layouts.to.user.personal.site` and the
+behavior associated with it have been removed.
 
 #### Who is affected?
 
-This affects anyone who has themes using JSP templates or is using the removed
-methods.
+This affects any one who set the property to `true` to copy user group pages to
+user personal sites.
 
 #### How should I update my code?
 
-If you have a theme using JSP templates, consider migrating it to FreeMarker.
+There's no direct replacement for this property. If you have anything that
+depends on the behavior, you can copy the old implementations of
+`UserGroupLocalServiceImpl#copyUserGroupLayouts` to your own project.
 
 #### Why was this change made?
 
-JSP is not a real template engine and is rarely used. FreeMarker is the
-recommended template engine moving forward.
-
-The removal of JSP templates allows for an increased focus on existing and new
-template engines.
+The behavior associated with this property has been deprecated since 6.2.
 
 ---------------------------------------
 
-### Lodash Is No Longer Included by Default
-- **Date:** 2018-Nov-27
-- **JIRA Ticket:** [LPS-87677](https://issues.liferay.com/browse/LPS-87677)
+### Liferay FontAwesome Is No Longer Included by Default
+- **Date:** 2019-Aug-21
+- **JIRA Ticket:** [LPS-100021](https://issues.liferay.com/browse/LPS-100021)
 
 #### What changed?
 
-Previously, Lodash was included in every page by default and made available
-through the global `window._` and scoped `AUI._` variables. Lodash is no longer
-included by default and those variables are now undefined.
+Previously, Liferay FontAwesome that included icon fonts for Font Awesome,
+Glyphicon and custom Liferay icons was included by default. These icon fonts are
+no longer included out of the box.
 
 #### Who is affected?
 
-This affects any developer who used the `AUI._` or `window._` variables in their
-custom scripts.
+This affects any content or code that relies on such icon fonts in pages or
+sites where a theme that does not include the fonts is applied.
 
 #### How should I update my code?
 
-You should provide your own Lodash version for your custom developments to use
-following any of the possible strategies to add third party libraries.
+Depending on how you're using icon fonts, you might need to take different
+approaches:
 
-As a temporary measure, you can bring back the old behavior by setting the
-*Enable Lodash* property in Liferay Portal's *Control Panel* &rarr;
-*Configuration* &rarr; *System Settings* &rarr; *Third Party* &rarr; *Lodash* to
-`true`.
+##### For liferay-ui:icon usage
 
-#### Why was this change made?
+Replace `<liferay-ui:icon iconCssClass="icon-user">` with
+`<liferay-ui:icon icon="user" markupView="lexicon" />`
 
-This change was made to avoid bundling and serving additional library code on
-every page that was mostly unused and redundant.
+##### For JS generated icons
 
----------------------------------------
+Those manually generating fontawesome icon html, can use the
+`Liferay.Util.getLexiconIconTpl('user')` API. For example the previous call
+would return the html code for a user svg icon
 
-### Moved Two Staging Properties to OSGi Configuration
-- **Date:** 2018-Dec-12
-- **JIRA Ticket:** [LPS-88018](https://issues.liferay.com/browse/LPS-88018)
+##### For direct html within jsps
 
-#### What changed?
-
-Two Staging properties have been moved from `portal.properties` to an
-OSGi configuration named `ExportImportServiceConfiguration.java` in the
-`export-import-service` module.
-
-#### Who is affected?
-
-This affects anyone using the following portal properties:
-
-- `staging.delete.temp.lar.on.failure`
-- `staging.delete.temp.lar.on.success`
-
-#### How should I update my code?
-
-Instead of overriding the `portal.properties` file, you can manage the
-properties from Portal's configuration administrator. This can be accessed by
-navigating to Liferay Portal's *Control Panel* &rarr; *Configuration* &rarr;
-*System Settings* &rarr; *Infrastructure* &rarr; *Export/Import* and editing
-the settings there.
-
-If you would like to include the new configuration in your application, follow
-the instructions for
-[making applications configurable](https://dev.liferay.com/develop/tutorials/-/knowledge_base/7-1/making-applications-configurable).
-
-#### Why was this change made?
-
-This change was made as part of the modularization efforts to ease portal
-configuration changes.
-
----------------------------------------
-
-### Remove Link Application URLs to Page Functionality
-- **Date:** 2018-Dec-14
-- **JIRA Ticket:** [LPS-85948](https://issues.liferay.com/browse/LPS-85948)
-
-#### What changed?
-
-The *Link Portlet URLs to Page* option in the Look and Feel portlet was marked
-as deprecated in Liferay Portal 7.1, allowing the user to show and hide the
-option through a configuration property. In Liferay Portal 7.2, this has been
-removed and can no longer be configured.
-
-#### Who is affected?
-
-This affects administrators who used the option in the UI and developers who
-leveraged the option in the portlet.
-
-#### How should I update my code?
-
-You should update any portlets leveraging this feature, since any preconfigured
-reference to the property is ignored in the portal.
-
-#### Why was this change made?
-
-A limited number of portlets use this property; there are better ways to achieve
-the same results.
-
----------------------------------------
-
-### Moved TermsOfUseContentProvider out of kernel.util
-- **Date:** 2019-Jan-07
-- **JIRA Ticket:** [LPS-88869](https://issues.liferay.com/browse/LPS-88869)
-
-#### What changed?
-
-The `TermsOfUseContentProvider` interface's package changed:
-
-`com.liferay.portal.kernel.util` &rarr; `com.liferay.portal.kernel.term.of.use`
-
-The `TermsOfUseContentProviderRegistryUtil` class' name and package changed:
-
-`TermsOfUseContentProviderRegistryUtil` &rarr; `TermsOfUseContentProviderUtil`
-
-and
-
-`com.liferay.portal.kernel.util` &rarr; `com.liferay.portal.internal.terms.of.use`
-
-The logic of getting `TermsOfUseContentProvider` was also changed. Instead of
-always returning the first service registered, which is random and depends on
-the order of registered services, the `TermsOfUseContentProvider` service is
-tracked and updated with `com.liferay.portal.kernel.util.ServiceProxyFactory`.
-As a result, the `TermsOfUseContentProvider` now respects service ranking.
-
-#### Who is affected?
-
-This affects anyone who used
-`com.liferay.portal.kernel.util.TermsOfUseContentProviderRegistryUtil` to lookup
-the `com.liferay.portal.kernel.util.TermsOfUseContentProvider` service.
-
-#### How should I update my code?
-
-If `com.liferay.portal.kernel.util.TermsOfUseContentProvider` is used, update
-the import package name. If there is any usage in `portal-web`, update
-`com.liferay.portal.kernel.util.TermsOfUseContentProviderRegistryUtil` to
-`com.liferay.portal.kernel.term.of.use.TermsOfUseContentProviderUtil`. Remove
-usages of `com.liferay.portal.kernel.util.TermsOfUseContentProviderRegistryUtil`
-in modules and use the `@Reference` annotation to fetch the
-`com.liferay.portal.kernel.term.of.use.TermsOfUseContentProvider` service
+Developers directly using icons in jsps, can either use the `liferay-ui:icon`
+tag as explained above or the `clay:icon` one to generate svg-based icons
 instead.
 
+##### For non-controlled code
+
+People who don't have access to the content that uses icon fonts or if that
+don't want to update those occurrences can reintroduce the icon fonts in their
+themes.
+
+During the 7.2 upgrade process, the theme upgrade assistant prompted developers
+to keep fontawesome as part of the theme. Themes that already include the icon
+fonts won't be affected and will continue to work in 7.3.
+
 #### Why was this change made?
 
-This is one of several steps to clean up kernel provider interfaces to reduce
-the chance of package version lock down.
+This change was made to avoid serving unnecessary files saving bandwidth and
+increasing performance of your sites by default.
 
 ---------------------------------------
 
-### Removed HibernateConfigurationConverter and Converter
-- **Date:** 2019-Jan-07
-- **JIRA Ticket:** [LPS-88870](https://issues.liferay.com/browse/LPS-88870)
+### Removed com.liferay.asset.taglib.servlet.taglib.soy.AssetTagsSelectorTag
+- **Date:** 2019-Oct-15
+- **JIRA Ticket:** [LPS-100144](https://issues.liferay.com/browse/LPS-100144)
 
 #### What changed?
 
-The interface `com.liferay.portal.kernel.util.Converter` and its implementation
-`com.liferay.portal.spring.hibernate.HibernateConfigurationConverter` were
+The Java class
+`com.liferay.asset.taglib.servlet.taglib.soy.AssetTagsSelectorTag` has been
 removed.
 
 #### Who is affected?
 
-This removes the support of generating customized `portlet-hbm.xml` files
-implemented by `HibernateConfigurationConverter`. Refer to
-[LPS-5363](https://issues.liferay.com/browse/LPS-5363) for more information.
+This affects any code that directly instantiates or extends this class.
 
 #### How should I update my code?
 
-You should remove usages of `HibernateConfigurationConverter`. Make sure the
-generated `portlet-hbm.xml` is accurate.
+There's no direct replacement for the removed class. If you have code that
+depends on it, you would need to copy over the old implementation to your own
+project and change the dependency to rely on your local version.
 
 #### Why was this change made?
 
-This is one of several steps to clean up kernel provider interfaces to reduce
-the chance of package version lock down.
+The `asset:asset-tags-selector` and its components have been migrated to React,
+making the old tag and its soy infrastructure unnecessary.
 
 ---------------------------------------
 
-### Switched to Use JDK Function and Supplier
-- **Date:** 2019-Jan-08
-- **JIRA Ticket:** [LPS-88911](https://issues.liferay.com/browse/LPS-88911)
+### Removed liferay.frontend.Slider
+- **Date:** 2019-Oct-10
+- **JIRA Ticket:** [LPS-100124](https://issues.liferay.com/browse/LPS-100124)
 
 #### What changed?
 
-The `Function` and `Supplier` interfaces in package
-`com.liferay.portal.kernel.util` were removed. Their usages were replaced with
-`java.util.function.Function` and `java.util.function.Supplier`.
+The legacy metal+soy `liferay.frontend.Slider` component has been removed.
 
 #### Who is affected?
 
-This affects anyone who implemented the `Function` and `Supplier` interfaces in
-package `com.liferay.portal.kernel.util`.
+This affects any code that relies on such component, which is usually done via
+`soy` as `{call liferay.frontend.Slider /}`
 
 #### How should I update my code?
 
-You should replace usages of `com.liferay.portal.kernel.util.Function` and
-`com.liferay.portal.kernel.util.Supplier` with `java.util.function.Function` and
-`java.util.function.Supplier`, respectively.
+There's no direct replacement for `liferay.frontend.Slider` component which was
+simply being used as a temporary bridge for legacy behaviour.
+
+If you have a component that relies on it, you can choose to co-locate a copy of
+the old implementation and use it locally within your module.
 
 #### Why was this change made?
 
-This is one of several steps to clean up kernel provider interfaces to reduce
-the chance of package version lock down.
+The compatibility `liferay.frontend.Slider` component is no longer used and was
+already deprecated in `7.2`.
 
 ---------------------------------------
 
-### Deprecated com.liferay.portal.service.InvokableService Interface
-- **Date:** 2019-Jan-08
-- **JIRA Ticket:** [LPS-88912](https://issues.liferay.com/browse/LPS-88912)
+### Removed liferay.frontend.ProgressBar
+- **Date:** 2019-Aug-28
+- **JIRA Ticket:** [LPS-100122](https://issues.liferay.com/browse/LPS-100122)
 
 #### What changed?
 
-The `InvokableService` and `InvokableLocalService` interfaces in package
-`com.liferay.portal.kernel.service` were removed.
+The legacy metal+soy `liferay.frontend.ProgressBar` component has been removed.
 
 #### Who is affected?
 
-This affects anyone who used `InvokableService` and `InvokableLocalService` in
-package `com.liferay.portal.kernel.service`.
+This affects any code that relies on such component, which is usually done via
+`soy` as `{call liferay.frontend.ProgressBar /}`
 
 #### How should I update my code?
 
-You should remove usages of `InvokableService` and `InvokableLocalService`. Make
-sure to use the latest version of Service Builder to generate implementations
-for services in case there is any compile errors after removal.
+There's no direct replacement for `liferay.frontend.ProgressBar` component
+which was simply being used as a temporary bridge for legacy behaviour.
+
+If you have a component that relies on it, you can choose to co-locate a copy of
+the old implementation and use it locally within your module.
 
 #### Why was this change made?
 
-This is one of several steps to clean up kernel provider interfaces to reduce
-the chance of package version lock down.
+The compatibility `liferay.frontend.ProgessBar` component is no longer used and
+was already deprecated in `7.2`.
 
 ---------------------------------------
 
-### Dropped Support of ServiceLoaderCondition
-- **Date:** 2019-Jan-08
-- **JIRA Ticket:** [LPS-88913](https://issues.liferay.com/browse/LPS-88913)
+### Removed cache bootstrap feature
+- **Date:** 2020-Jan-8
+- **JIRA Ticket:** [LPS-96563](https://issues.liferay.com/browse/LPS-96563)
 
 #### What changed?
 
-The interface `ServiceLoaderCondition` and its implementation
-`DefaultServiceLoaderCondition` in package `com.liferay.portal.kernel.util` were
-removed.
+The cache bootstrap feature has been removed, which means you can not use the
+following properties to enable/configure cache bootstrap:
+`ehcache.bootstrap.cache.loader.enabled`,
+`ehcache.bootstrap.cache.loader.properties.default`,
+`ehcache.bootstrap.cache.loader.properties.${specific.cache.name}`.
 
 #### Who is affected?
 
-This affects anyone using `ServiceLoaderCondition` and
-`DefaultServiceLoaderCondition`.
+This affects who is using the properties listed above.
 
 #### How should I update my code?
 
-You should remove usages of `ServiceLoaderCondition`. Update usages of `load`
-methods in `com.liferay.portal.kernel.util.ServiceLoader` according to the
-updated method signatures.
+There's no direct replacement for the removed feature. If you have code that
+depends on it, you would need to implement it by yourself.
 
 #### Why was this change made?
 
-This is one of several steps to clean up kernel provider interfaces to reduce
-the chance of package version lock down.
+This change was made to avoid security issues.
 
 ---------------------------------------
 
-### Switched to Use JDK Predicate
-- **Date:** 2019-Jan-14
-- **JIRA Ticket:** [LPS-89139](https://issues.liferay.com/browse/LPS-89139)
+### Removed support for auto deploying EXT plugins
+- **Date:** 2019-Dec-31
+- **JIRA Ticket:** [LPS-106008](https://issues.liferay.com/browse/LPS-106008)
 
 #### What changed?
 
-The interface `com.liferay.portal.kernel.util.PredicateFilter` was removed and
-replaced with `java.util.function.Predicate`. As a result, the following
-implementations were removed:
-
-- `com.liferay.portal.kernel.util.AggregatePredicateFilter`
-- `com.liferay.portal.kernel.util.PrefixPredicateFilter`
-- `com.liferay.portal.kernel.portlet.JavaScriptPortletResourcePredicateFilter`
-- `com.liferay.dynamic.data.mapping.form.values.query.internal.model.DDMFormFieldValuePredicateFilter`
-
-The `com.liferay.portal.kernel.util.ArrayUtil_IW` class was regenerated.
+The support for deploying EXT plugins using Auto Deployer (via
+liferay-home/deploy folder) has been removed. EXT plugins copied to the deploy
+folder will not be recognized any more.
 
 #### Who is affected?
 
-This affects anyone who used `PredicateFilter`, `AggregatePredicateFilter`,
-`PrefixPredicateFilter`, `JavaScriptPortletResourcePredicateFilter`, and
-`DDMFormFieldValuePredicateFilter`.
+This affects who is deploying EXT plugins via the Auto Deployer.
 
 #### How should I update my code?
 
-You should replace usages of `com.liferay.portal.kernel.util.PredicateFilter`
-with `java.util.function.Predicate`. Additionally, remove usages of
-`AggregatePredicateFilter`, `PrefixPredicateFilter`,
-`JavaScriptPortletResourcePredicateFilter`, and
-`DDMFormFieldValuePredicateFilter`.
+There's no direct replacement for the removed feature. If you have EXT plugin,
+you would need to deploy it manually or using [`ant direct-deploy`](https://github.com/liferay/liferay-plugins-ee/blob/7.0.x/ext/build-common-ext.xml#L211).
 
 #### Why was this change made?
 
-This is one of several steps to clean up kernel provider interfaces to reduce
-the chance of package version lock down.
+This feature has been deprecated since 7.1.
+
+---------------------------------------
+### Removed liferay-frontend:cards-treeview tag
+- **Date:** 2020-Jan-10
+- **JIRA Ticket:** [LPS-106899](https://issues.liferay.com/browse/LPS-106899)
+
+#### What changed?
+
+The liferay-frontend:cards-treeview tag has been removed.
+
+#### Who is affected?
+
+This affects anyone using the tag from a jsp or some of its components inside
+a SOY (Closure Templates) template.
+
+#### How should I update my code?
+
+There's no direct replacement for the removed feature. If you have code that
+depends on it, you would need to implement it by yourself.
+
+#### Why was this change made?
+
+This change was made because the UI tag was mostly internal and very specific
+and local usage did not grant keeping it around
 
 ---------------------------------------
 
-### Removed Unsafe Functional Interfaces in Package com.liferay.portal.kernel.util
-- **Date:** 2019-Jan-15
-- **JIRA Ticket:** [LPS-89223](https://issues.liferay.com/browse/LPS-89223)
+### Removed liferay-frontend:contextual-sidebar tag
+- **Date:** 2020-Jan-10
+- **JIRA Ticket:** [LPS-100146](https://issues.liferay.com/browse/LPS-100146)
 
 #### What changed?
 
-The `com.liferay.portal.osgi.util.test.OSGiServiceUtil` class was removed. Also,
-the following interfaces were removed from the `com.liferay.portal.kernel.util`
-package:
-
-- `UnsafeConsumer`
-- `UnsafeFunction`
-- `UnsafeRunnable`
+The liferay-frontend:contextual-sidebar tag has been removed.
 
 #### Who is affected?
 
-This affects anyone using the class/interfaces mentioned above.
+This affects anyone using the tag from a jsp or some of its components inside
+a SOY (Closure Templates) template.
 
 #### How should I update my code?
 
-The `com.liferay.portal.osgi.util.test.OSGiServiceUtil` class has been
-deprecated since Liferay Portal 7.1. If usages for this class still exist,
-replace it with its direct replacement:
-`com.liferay.osgi.util.service.OSGiServiceUtil`. Replace usages of
-`UnsafeConsumer`, `UnsafeFunction` and `UnsafeRunnable` with their corresponding
-interfaces in package `com.liferay.petra.function`.
+There's no direct replacement for the removed feature. If you have code that
+depends on it, you would need to implement it by yourself.
 
 #### Why was this change made?
 
-This is one of several steps to clean up kernel provider interfaces to reduce
-the chance of package version lock down.
+This change was made because the UI tag was mostly internal and very specific
+and local usage did not grant keeping it around
 
 ---------------------------------------
 
-### Deprecated NTLM in Portal Distribution
-- **Date:** 2019-Jan-21
-- **JIRA Ticket:** [LPS-88300](https://issues.liferay.com/browse/LPS-88300)
+### Replace OSGi configuration autoUpgrade by portal property
+### upgrade.database.auto.run
+- **Date:** 2020-Jan-03
+- **JIRA Ticket:** [LPS-102842](https://issues.liferay.com/browse/LPS-102842)
 
 #### What changed?
 
-NTLM modules have been moved from the `portal-security-sso` project to a new
-project named `portal-security-sso-ntlm`. This new project is deprecated and
-available to download from Liferay Marketplace.
+The OSGi property `autoUpgrade` defined in
+`com.liferay.portal.upgrade.internal.configuration.ReleaseManagerConfiguration.config`
+has been replaced by the portal property `upgrade.database.auto.run`.
+
+Unlike the old property, which only controlled the upgrade processes in
+modules, the new one also affects to Core upgrade processes. The default value
+is now false so upgrade processes won't run on startup or module deployment.
+Remember that you can execute module upgrade processes anytime via Gogo
+console.
 
 #### Who is affected?
 
-This affects anyone using NTLM as an authentication system.
+This only affects development environments where we don't want to run the
+upgrade anytime we deploy a new process. Setting this property as true in
+production environments is not supported. In these cases the use of the
+upgrade tool to execute minor and major schema version changes is mandatory.
 
 #### How should I update my code?
 
-If you want to continue using NTLM as an authentication system, you must
-download the corresponding modules from Liferay Marketplace. Alternatively, you
-can migrate to Kerberos (recommended), which requires no changes and is
-compatible with Liferay Portal 7.0+.
+It does not impact your code.
 
 #### Why was this change made?
 
-This change was made to avoid using an old proprietary solution (NTLM). Kerberos
-is now recommended, which is a standard protocol and a more secure method of
-authentication compared to NTLM.
-
----------------------------------------
-
-### Deprecated OpenID in Portal Distribution
-- **Date:** 2019-Jan-21
-- **JIRA Ticket:** [LPS-88906](https://issues.liferay.com/browse/LPS-88906)
-
-#### What changed?
-
-OpenID modules have been moved to a new project named
-`portal-security-sso-openid`. This new project is deprecated and available to
-download from Liferay Marketplace.
-
-#### Who is affected?
-
-This affects anyone using OpenID as an authentication system.
-
-#### How should I update my code?
-
-If you want to continue using OpenID as an authentication system, you must
-download the corresponding module from Liferay Marketplace. Alternatively, you
-should migrate to OpenID Connect, available on Liferay Portal Distribution.
-
-#### Why was this change made?
-
-This change was made to avoid using a deprecated solution (OpenID). OpenID
-Connect is now recommended, which is a more secure method of authentication
-since it runs on top of OAuth.
-
----------------------------------------
-
-### Deprecated Google SSO in Portal Distribution
-- **Date:** 2019-Jan-21
-- **JIRA Ticket:** [LPS-88905](https://issues.liferay.com/browse/LPS-88905)
-
-#### What changed?
-
-Google SSO modules have been moved from the `portal-security-sso` project to a
-new project named `portal-security-sso-google`. This new project is deprecated
-and available to download from Liferay Marketplace.
-
-#### Who is affected?
-
-This affects anyone using Google SSO as an authentication system.
-
-#### How should I update my code?
-
-If you want to continue using Google SSO as an authentication system, you must
-download the corresponding module from Liferay Marketplace. Alternatively, you
-can use OpenID Connect.
-
-#### Why was this change made?
-
-This change was made to avoid using an old solution for authentication (Google
-SSO). OpenID Connect is the recommended specification to use Google
-implementation for authentication.
-
----------------------------------------
-
-### Updated AlloyEditor v2.0 Includes New Major Version of React
-- **Date:** 2019-Feb-04
-- **JIRA Ticket:** [LPS-90079](https://issues.liferay.com/browse/LPS-90079)
-
-#### What changed?
-
-AlloyEditor was upgraded to version 2.0.0, which includes a major upgrade from
-React v15 to v16.
-
-The `React.createClass` was
-[deprecated in React v15.5.0](https://reactjs.org/blog/2017/04/07/react-v15.5.0.html)
-(April 2017) and
-[removed in React v16.0.0](https://reactjs.org/blog/2017/09/26/react-v16.0.html)
-(September 2017). All the buttons bundled with AlloyEditor have been
-updated to use the ES6 class syntax instead of `React.createClass`.
-
-#### Who is affected?
-
-This affects anyone who built their own buttons using `React.createClass`. The
-`createClass` function is no longer available and attempts to access it at
-runtime will trigger an error.
-
-#### How should I update my code?
-
-You should update your code in one of two ways:
-
-1. Port custom buttons from the `React.createClass` API to use the ES6 `class`
-   API as described in
-   [the React documentation](https://reactjs.org/docs/react-component.html). For
-   example, see the changes made in moving to an
-   [ES6 class-based button](https://github.com/liferay/alloy-editor/blob/b082c312179ae6626cb2ddcc04ad3ebc5b355e1b/src/components/buttons/button-ol.jsx),
-   from
-   [the previous `createClass`-based implementation](https://github.com/liferay/alloy-editor/blob/2826ab9ceabe17c6ba0d38985baf8a787c23db43/src/ui/react/src/components/buttons/button-ol.jsx).
-
-2. Provide a compatibility adapter. The
-   [create-react-class package](https://www.npmjs.com/package/create-react-class)
-   (described [here](https://reactjs.org/docs/react-without-es6.html)) can be
-   injected into the page to restore the `createClass` API.
-
-#### Why was this change made?
-
-Moving to a newer major version of React
-
-- brings performance and compatibility improvements
-- reduces the bundle size due to the removal of deprecated APIs
-
----------------------------------------
-
-### Deprecated dl.tabs.visible property
-- **Date:** 2019-Apr-10
-- **JIRA Ticket:** [LPS-93948](https://issues.liferay.com/browse/LPS-93948)
-
-#### What changed?
-
-The `dl.tabs.visible` property let users toggle the visibility of a Documents
-and Media widget's navigation tabs when placed on a widget page. This
-configuration option has been removed, so the navigation tab will never appear
-on widget pages.
-
-#### Who is affected?
-
-This affects anyone who set the `dl.tabs.visible` property to `true`.
-
-#### How should I update my code?
-
-No code changes are necessary.
-
-#### Why was this change made?
-
-Documents & Media has been reviewed from a UX perspective, and removing the
-navigation tabs in widget pages was part of a UI clean up process.
-
----------------------------------------
-
-### Move the User Menu out of the Product Menu
-- **Date:** 2019-Apr-19
-- **JIRA Ticket:** [LPS-87868](https://issues.liferay.com/browse/LPS-87868)
-
-#### What changed?
-
-The User Menu was removed from the Product Menu, and the user menu entries were
-moved to the new Personal Menu, a dropdown menu triggered by the user avatar.
-
-#### Who is affected?
-
-This affects anyone who has customized the User Menu section of the Product
-Menu.
-
-#### How should I update my code?
-
-If you would like to keep your custom user menu entries and have them available
-in the Personal Menu, you need to implement the `PersonalMenuEntry` interface.
-All panel apps registered with the `PanelCategoryKeys.USER`,
-`PanelCategoryKeys.USER_MY_ACCOUNT`, and `PanelCategoryKeys.USER_SIGN_OUT` panel
-category keys should be converted to `PersonalMenuEntry`.
-
-#### Why was this change made?
-
-Product navigation has been reviewed from a UX perspective, and removing the
-User Menu from the Product Menu and splitting the menu to its own provides a
-better user experience.
-
----------------------------------------
-
-### Removed Hong Kong and Macau from the List of Countries
-- **Date:** 2019-Apr-26
-- **JIRA Ticket:** [LPS-82203](https://issues.liferay.com/browse/LPS-82203)
-
-#### What changed?
-
-Hong Kong and Macau have been removed from the list of countries and listed as
-regions of China as Xianggang (region code: CN-91) and Aomen (region code:
-CN-92), respectively.
-
-#### Who is affected?
-
-This affects anyone who used Hong Kong or Macau in their addresses.
-
-#### How should I update my code?
-
-No code changes are necessary. However, if you have hardcoded the `countryId` of
-Hong Kong and Macau in your code, they should be updated to China's `countryId`.
-References to Hong Kong and Macau should be done with their corresponding
-`regionId`.
-
-#### Why was this change made?
-
-After the handover of Hong Kong in 1997 and of Macau in 1999, Hong Kong and
-Macau are now the special administrative regions of China.
-
----------------------------------------
-
-### Upgraded JGroups from 3.6.16 to 4.1.1
-- **Date:** 2019-Aug-15
-- **JIRA Ticket:** [LPS-97897](https://issues.liferay.com/browse/LPS-97897)
-
-#### What changed?
-
-JGroups was upgraded from version 3.6.16 to 4.1.1.
-
-#### Who is affected?
-
-This affects anyone who is using Cluster Link.
-
-#### How should I update my code?
-
-The `cluster.link.channel.properties.*` property in `portal.properties` no
-longer accepts a connection string as a value; it now requires a file path to a
-configuration XML file. Some of the protocol properties from 3.6.16 are removed
-and no longer parsed by 4.1.1; you should update the protocol properties
-accordingly.
-
-#### Why was this change made?
-
-This upgrade is needed to fix a security issue.
-
----------------------------------------
-
-### Auto Tagging Needs To Be Reconfigured Manually
-- **Date: 2019-Oct-2**
-- **JIRA Ticket: LPS-97123**
-
-#### What changed?
-
-Auto Tagging configurations were renamed and reorganized. There's no
-automatic upgrade process, things need to be reconfigured manually again.
-
-#### Who is affected?
-
-This affects any installation of DXP 7.2 upgrading to SP1 that has Auto
-Tagging configured and enabled.
-
-#### How should I update my code?
-
-Changes need to be made in System Settings (please consult the official
-documentation for the details). Any code referencing the old configuration
-interfaces must be updated to use the new ones.
-
-#### Why was this change made?
-
-The old configuration UI was very confusing, split between different
-configuration interfaces. This change unifies the configuration interfaces.
-
----------------------------------------
-
-### Blogs Image Properties Moved To System Settings
-- **Date: 2019-Oct-2**
-- **JIRA Ticket: LPS-95298**
-
-#### What changed?
-
-Configuration of Blogs images was moved from portal.properties to System
-Settings. There's no automatic upgrade process, so if there was a custom
-property, it needs to be reconfigured manually again.
-
-#### Who is affected?
-
-This affects any installation of DXP 7.2 upgrading to SP1 that has custom
-values for the blogs.image.max.size and blogs.image.extensions properties.
-
-#### How should I update my code?
-
-Changes need to be made in System Settings, in the configuration section
-Blogs > File Uploads. Any code referencing the old properties must be updated
-to use the new configuration interfaces.
-
-#### Why was this change made?
-
-The ability to change these configuration options dynamically (i.e. without a restart) was considered as a valuable feature.
+To unify the auto-upgrade feature between the Core and modules. The default
+value has also changed to avoid the execution of new upgrade processes on
+startup in production environments.
 
 ---------------------------------------

@@ -67,7 +67,7 @@ public abstract class ExpandoValueLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements ExpandoValueLocalService, IdentifiableOSGiService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>ExpandoValueLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.expando.kernel.service.ExpandoValueLocalServiceUtil</code>.
@@ -691,8 +691,8 @@ public abstract class ExpandoValueLocalServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

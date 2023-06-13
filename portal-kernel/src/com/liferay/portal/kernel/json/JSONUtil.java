@@ -145,6 +145,17 @@ public class JSONUtil {
 		return false;
 	}
 
+	public static boolean isValid(String json) {
+		try {
+			_createJSONObject(json);
+
+			return true;
+		}
+		catch (JSONException jsonException) {
+			return false;
+		}
+	}
+
 	public static JSONObject merge(
 			JSONObject jsonObject1, JSONObject jsonObject2)
 		throws JSONException {

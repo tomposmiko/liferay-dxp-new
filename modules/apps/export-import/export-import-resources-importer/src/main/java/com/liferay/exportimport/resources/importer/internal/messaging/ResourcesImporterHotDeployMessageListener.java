@@ -39,11 +39,11 @@ import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -190,7 +190,7 @@ public class ResourcesImporterHotDeployMessageListener
 	}
 
 	@Reference(
-		target = "(&(release.bundle.symbolic.name=com.liferay.exportimport.service)(release.schema.version=1.0.0))",
+		target = "(&(release.bundle.symbolic.name=com.liferay.exportimport.service)(release.schema.version=1.0.1))",
 		unbind = "-"
 	)
 	protected void setRelease(Release release) {
@@ -258,9 +258,10 @@ public class ResourcesImporterHotDeployMessageListener
 			message.put("targetClassPK", importer.getTargetClassPK());
 
 			if (Validator.isNotNull(messageResponseId)) {
-				Map<String, Object> responseMap = new HashMap<>();
-
-				responseMap.put("groupId", importer.getTargetClassPK());
+				Map<String, Object> responseMap =
+					HashMapBuilder.<String, Object>put(
+						"groupId", importer.getTargetClassPK()
+					).build();
 
 				message.setPayload(responseMap);
 
@@ -269,11 +270,11 @@ public class ResourcesImporterHotDeployMessageListener
 
 			_messageBus.sendMessage("liferay/resources_importer", message);
 		}
-		catch (ImporterException ie) {
+		catch (ImporterException importerException) {
 			Message message = new Message();
 
 			message.put("companyId", company.getCompanyId());
-			message.put("error", ie.getMessage());
+			message.put("error", importerException.getMessage());
 			message.put(
 				"servletContextName", servletContext.getServletContextName());
 			message.put(

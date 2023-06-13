@@ -60,7 +60,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface KaleoTaskInstanceTokenLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link KaleoTaskInstanceTokenLocalServiceUtil} to access the kaleo task instance token local service. Add custom service methods to <code>com.liferay.portal.workflow.kaleo.service.impl.KaleoTaskInstanceTokenLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -367,6 +367,15 @@ public interface KaleoTaskInstanceTokenLocalService
 		ServiceContext serviceContext);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<KaleoTaskInstanceToken> search(
+		String assetTitle, String[] taskNames, String[] assetTypes,
+		Long[] assetPrimaryKeys, Long[] assigneeClassPKs, Date dueDateGT,
+		Date dueDateLT, Boolean completed, Long[] kaleoInstanceIds,
+		Boolean searchByUserRoles, boolean andOperator, int start, int end,
+		OrderByComparator<KaleoTaskInstanceToken> orderByComparator,
+		ServiceContext serviceContext);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int searchCount(
 		long kaleoInstanceId, Boolean completed, Boolean searchByUserRoles,
 		ServiceContext serviceContext);
@@ -394,6 +403,14 @@ public interface KaleoTaskInstanceTokenLocalService
 	public int searchCount(
 		String keywords, String[] assetTypes, Boolean completed,
 		Boolean searchByUserRoles, ServiceContext serviceContext);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int searchCount(
+		String assetTitle, String[] taskNames, String[] assetTypes,
+		Long[] assetPrimaryKeys, Long[] assigneeClassPKs, Date dueDateGT,
+		Date dueDateLT, Boolean completed, Long[] kaleoInstanceIds,
+		Boolean searchByUserRoles, boolean andOperator,
+		ServiceContext serviceContext);
 
 	public KaleoTaskInstanceToken updateDueDate(
 			long kaleoTaskInstanceTokenId, Date dueDate,

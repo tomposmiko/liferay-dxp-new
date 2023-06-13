@@ -207,6 +207,20 @@ public class DDMStructureLayoutWrapper
 	}
 
 	@Override
+	public DDMStructure getDDMStructure()
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return model.getDDMStructure();
+	}
+
+	@Override
+	public long getDDMStructureId()
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return model.getDDMStructureId();
+	}
+
+	@Override
 	public String getDefaultLanguageId() {
 		return model.getDefaultLanguageId();
 	}
@@ -483,11 +497,6 @@ public class DDMStructureLayoutWrapper
 		return model.getUuid();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a ddm structure layout model instance should use the <code>DDMStructureLayout</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

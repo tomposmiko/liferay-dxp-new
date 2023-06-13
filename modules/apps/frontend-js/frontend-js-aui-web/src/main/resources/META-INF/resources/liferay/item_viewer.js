@@ -12,6 +12,11 @@
  * details.
  */
 
+/**
+ * @deprecated As of Athanasius(7.3.x), replaced by ItemSelectorPreview.es.js
+ * @module liferay-item-viewer
+ */
+
 AUI.add(
 	'liferay-item-viewer',
 	A => {
@@ -98,7 +103,7 @@ AUI.add(
 			CSS_ICON_MONOSPACED +
 			'">' +
 			Liferay.Util.getLexiconIconTpl('angle-left') +
-			'</span><span class="lfr-item-viewer-close-text truncate-text">{0}</span></button>';
+			'</span><span class="lfr-item-viewer-close-text text-truncate">{0}</span></button>';
 
 		var TPL_EDIT_DIALOG_TITLE = '{edit} {title} ({copy})';
 
@@ -651,7 +656,7 @@ AUI.add(
 					'<div class="sidebar-header">' +
 					'<a class="' +
 					CSS_ICON_MONOSPACED +
-					' image-viewer-sidenav-close sidenav-close visible-xs" href="">' +
+					' d-block d-sm-none image-viewer-sidenav-close sidenav-close " href="">' +
 					Liferay.Util.getLexiconIconTpl('times') +
 					'</a>' +
 					'<h4 class="image-viewer-sidenav-header">' +
@@ -814,6 +819,8 @@ AUI.add(
 
 						link.setData('value', JSON.stringify(imageValue));
 					}
+
+					return link;
 				}
 			}
 		});

@@ -396,11 +396,6 @@ public class ExpandoValueWrapper
 		return model.getValueId();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a expando value model instance should use the <code>ExpandoValue</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

@@ -33,7 +33,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface BookmarksEntry
 	extends BookmarksEntryModel, PersistedModel, TreeModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.bookmarks.model.impl.BookmarksEntryImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -64,5 +64,7 @@ public interface BookmarksEntry
 
 	public BookmarksFolder getFolder()
 		throws com.liferay.portal.kernel.exception.PortalException;
+
+	public long getVisits();
 
 }

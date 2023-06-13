@@ -58,16 +58,16 @@ import javax.servlet.http.HttpServletRequest;
 public class BookmarksManagementToolbarDisplayContext {
 
 	public BookmarksManagementToolbarDisplayContext(
+		HttpServletRequest httpServletRequest,
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
-		HttpServletRequest httpServletRequest,
 		BookmarksGroupServiceOverriddenConfiguration
 			bookmarksGroupServiceOverriddenConfiguration,
 		PortalPreferences portalPreferences, TrashHelper trashHelper) {
 
+		_httpServletRequest = httpServletRequest;
 		_liferayPortletRequest = liferayPortletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
-		_httpServletRequest = httpServletRequest;
 		_bookmarksGroupServiceOverriddenConfiguration =
 			bookmarksGroupServiceOverriddenConfiguration;
 		_portalPreferences = portalPreferences;

@@ -39,7 +39,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface PollsVoteModel
 	extends BaseModel<PollsVote>, MVCCModel, ShardedModel, StagedGroupedModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a polls vote model instance should use the {@link PollsVote} interface instead.

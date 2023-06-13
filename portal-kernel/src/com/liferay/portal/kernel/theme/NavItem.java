@@ -18,13 +18,14 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutType;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -37,7 +38,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -63,8 +63,7 @@ public class NavItem implements Serializable {
 		}
 
 		Map<Long, List<Layout>> layoutChildLayouts =
-			LayoutLocalServiceUtil.getLayoutChildLayouts(
-				themeDisplay.getLayoutSet(), parentLayouts);
+			LayoutLocalServiceUtil.getLayoutChildLayouts(parentLayouts);
 
 		for (List<Layout> childLayouts : layoutChildLayouts.values()) {
 			Iterator<Layout> iterator = childLayouts.iterator();
@@ -392,15 +391,25 @@ public class NavItem implements Serializable {
 	}
 
 	private static boolean _isContentLayoutDraft(Layout layout) {
-		if (!Objects.equals(layout.getType(), LayoutConstants.TYPE_CONTENT)) {
+		if (!layout.isTypeContent()) {
 			return false;
 		}
 
-		if (Objects.equals(layout.getCreateDate(), layout.getPublishDate())) {
-			return true;
+		Layout draftLayout = LayoutLocalServiceUtil.fetchLayout(
+			PortalUtil.getClassNameId(Layout.class), layout.getPlid());
+
+		if (draftLayout != null) {
+			boolean published = GetterUtil.getBoolean(
+				draftLayout.getTypeSettingsProperty("published"));
+
+			return !published;
 		}
 
-		return false;
+		if (layout.isApproved() && !layout.isHidden() && !layout.isSystem()) {
+			return false;
+		}
+
+		return true;
 	}
 
 	private NavItem(

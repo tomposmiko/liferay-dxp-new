@@ -18,6 +18,7 @@ import com.liferay.headless.delivery.client.dto.v1_0.KnowledgeBaseArticle;
 import com.liferay.headless.delivery.client.http.HttpInvoker;
 import com.liferay.headless.delivery.client.pagination.Page;
 import com.liferay.headless.delivery.client.pagination.Pagination;
+import com.liferay.headless.delivery.client.problem.Problem;
 import com.liferay.headless.delivery.client.serdes.v1_0.KnowledgeBaseArticleSerDes;
 
 import java.util.LinkedHashMap;
@@ -131,14 +132,16 @@ public interface KnowledgeBaseArticleResource {
 
 	public Page<KnowledgeBaseArticle>
 			getKnowledgeBaseArticleKnowledgeBaseArticlesPage(
-				Long parentKnowledgeBaseArticleId, String search,
-				String filterString, Pagination pagination, String sortString)
+				Long parentKnowledgeBaseArticleId, Boolean flatten,
+				String search, String filterString, Pagination pagination,
+				String sortString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			getKnowledgeBaseArticleKnowledgeBaseArticlesPageHttpResponse(
-				Long parentKnowledgeBaseArticleId, String search,
-				String filterString, Pagination pagination, String sortString)
+				Long parentKnowledgeBaseArticleId, Boolean flatten,
+				String search, String filterString, Pagination pagination,
+				String sortString)
 		throws Exception;
 
 	public KnowledgeBaseArticle postKnowledgeBaseArticleKnowledgeBaseArticle(
@@ -277,6 +280,17 @@ public interface KnowledgeBaseArticleResource {
 			_logger.fine("HTTP response message: " + httpResponse.getMessage());
 			_logger.fine(
 				"HTTP response status code: " + httpResponse.getStatusCode());
+
+			try {
+				return;
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
 		}
 
 		public HttpInvoker.HttpResponse deleteKnowledgeBaseArticleHttpResponse(
@@ -339,7 +353,7 @@ public interface KnowledgeBaseArticleResource {
 					Level.WARNING,
 					"Unable to process HTTP response: " + content, e);
 
-				throw e;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 		}
 
@@ -405,7 +419,7 @@ public interface KnowledgeBaseArticleResource {
 					Level.WARNING,
 					"Unable to process HTTP response: " + content, e);
 
-				throw e;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 		}
 
@@ -475,7 +489,7 @@ public interface KnowledgeBaseArticleResource {
 					Level.WARNING,
 					"Unable to process HTTP response: " + content, e);
 
-				throw e;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 		}
 
@@ -535,6 +549,17 @@ public interface KnowledgeBaseArticleResource {
 			_logger.fine("HTTP response message: " + httpResponse.getMessage());
 			_logger.fine(
 				"HTTP response status code: " + httpResponse.getStatusCode());
+
+			try {
+				return;
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
 		}
 
 		public HttpInvoker.HttpResponse
@@ -600,7 +625,7 @@ public interface KnowledgeBaseArticleResource {
 					Level.WARNING,
 					"Unable to process HTTP response: " + content, e);
 
-				throw e;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 		}
 
@@ -669,7 +694,7 @@ public interface KnowledgeBaseArticleResource {
 					Level.WARNING,
 					"Unable to process HTTP response: " + content, e);
 
-				throw e;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 		}
 
@@ -741,7 +766,7 @@ public interface KnowledgeBaseArticleResource {
 					Level.WARNING,
 					"Unable to process HTTP response: " + content, e);
 
-				throw e;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 		}
 
@@ -801,6 +826,17 @@ public interface KnowledgeBaseArticleResource {
 			_logger.fine("HTTP response message: " + httpResponse.getMessage());
 			_logger.fine(
 				"HTTP response status code: " + httpResponse.getStatusCode());
+
+			try {
+				return;
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
 		}
 
 		public HttpInvoker.HttpResponse
@@ -859,6 +895,17 @@ public interface KnowledgeBaseArticleResource {
 			_logger.fine("HTTP response message: " + httpResponse.getMessage());
 			_logger.fine(
 				"HTTP response status code: " + httpResponse.getStatusCode());
+
+			try {
+				return;
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
 		}
 
 		public HttpInvoker.HttpResponse
@@ -904,14 +951,14 @@ public interface KnowledgeBaseArticleResource {
 
 		public Page<KnowledgeBaseArticle>
 				getKnowledgeBaseArticleKnowledgeBaseArticlesPage(
-					Long parentKnowledgeBaseArticleId, String search,
-					String filterString, Pagination pagination,
+					Long parentKnowledgeBaseArticleId, Boolean flatten,
+					String search, String filterString, Pagination pagination,
 					String sortString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				getKnowledgeBaseArticleKnowledgeBaseArticlesPageHttpResponse(
-					parentKnowledgeBaseArticleId, search, filterString,
+					parentKnowledgeBaseArticleId, flatten, search, filterString,
 					pagination, sortString);
 
 			String content = httpResponse.getContent();
@@ -922,13 +969,22 @@ public interface KnowledgeBaseArticleResource {
 			_logger.fine(
 				"HTTP response status code: " + httpResponse.getStatusCode());
 
-			return Page.of(content, KnowledgeBaseArticleSerDes::toDTO);
+			try {
+				return Page.of(content, KnowledgeBaseArticleSerDes::toDTO);
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
 		}
 
 		public HttpInvoker.HttpResponse
 				getKnowledgeBaseArticleKnowledgeBaseArticlesPageHttpResponse(
-					Long parentKnowledgeBaseArticleId, String search,
-					String filterString, Pagination pagination,
+					Long parentKnowledgeBaseArticleId, Boolean flatten,
+					String search, String filterString, Pagination pagination,
 					String sortString)
 			throws Exception {
 
@@ -952,6 +1008,10 @@ public interface KnowledgeBaseArticleResource {
 			}
 
 			httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
+
+			if (flatten != null) {
+				httpInvoker.parameter("flatten", String.valueOf(flatten));
+			}
 
 			if (search != null) {
 				httpInvoker.parameter("search", String.valueOf(search));
@@ -1010,7 +1070,7 @@ public interface KnowledgeBaseArticleResource {
 					Level.WARNING,
 					"Unable to process HTTP response: " + content, e);
 
-				throw e;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 		}
 
@@ -1076,7 +1136,16 @@ public interface KnowledgeBaseArticleResource {
 			_logger.fine(
 				"HTTP response status code: " + httpResponse.getStatusCode());
 
-			return Page.of(content, KnowledgeBaseArticleSerDes::toDTO);
+			try {
+				return Page.of(content, KnowledgeBaseArticleSerDes::toDTO);
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
 		}
 
 		public HttpInvoker.HttpResponse
@@ -1167,7 +1236,7 @@ public interface KnowledgeBaseArticleResource {
 					Level.WARNING,
 					"Unable to process HTTP response: " + content, e);
 
-				throw e;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 		}
 
@@ -1231,7 +1300,16 @@ public interface KnowledgeBaseArticleResource {
 			_logger.fine(
 				"HTTP response status code: " + httpResponse.getStatusCode());
 
-			return Page.of(content, KnowledgeBaseArticleSerDes::toDTO);
+			try {
+				return Page.of(content, KnowledgeBaseArticleSerDes::toDTO);
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
 		}
 
 		public HttpInvoker.HttpResponse
@@ -1321,7 +1399,7 @@ public interface KnowledgeBaseArticleResource {
 					Level.WARNING,
 					"Unable to process HTTP response: " + content, e);
 
-				throw e;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 		}
 
@@ -1379,6 +1457,17 @@ public interface KnowledgeBaseArticleResource {
 			_logger.fine("HTTP response message: " + httpResponse.getMessage());
 			_logger.fine(
 				"HTTP response status code: " + httpResponse.getStatusCode());
+
+			try {
+				return;
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
 		}
 
 		public HttpInvoker.HttpResponse
@@ -1433,6 +1522,17 @@ public interface KnowledgeBaseArticleResource {
 			_logger.fine("HTTP response message: " + httpResponse.getMessage());
 			_logger.fine(
 				"HTTP response status code: " + httpResponse.getStatusCode());
+
+			try {
+				return;
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
 		}
 
 		public HttpInvoker.HttpResponse

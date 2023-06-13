@@ -98,42 +98,6 @@ public class StagedModelDataHandlerUtil {
 			stagedModel, PortletDataContext.REFERENCE_TYPE_DEPENDENCY, false);
 	}
 
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             #exportReferenceStagedModel(PortletDataContext, StagedModel,
-	 *             StagedModel, String)}
-	 */
-	@Deprecated
-	public static <T extends StagedModel, U extends StagedModel> Element
-			exportReferenceStagedModel(
-				PortletDataContext portletDataContext, T referrerStagedModel,
-				Class<?> referrerStagedModelClass, U stagedModel,
-				Class<?> stagedModelClass, String referenceType)
-		throws PortletDataException {
-
-		return exportReferenceStagedModel(
-			portletDataContext, referrerStagedModel, stagedModel,
-			referenceType);
-	}
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             #exportReferenceStagedModel(PortletDataContext, StagedModel,
-	 *             StagedModel, String)}
-	 */
-	@Deprecated
-	public static <T extends StagedModel, U extends StagedModel> Element
-			exportReferenceStagedModel(
-				PortletDataContext portletDataContext, T referrerStagedModel,
-				Element referrerStagedModelElement, U stagedModel,
-				Class<?> stagedModelClass, String referenceType)
-		throws PortletDataException {
-
-		return exportReferenceStagedModel(
-			portletDataContext, referrerStagedModel, stagedModel,
-			referenceType);
-	}
-
 	public static <T extends StagedModel, U extends StagedModel> Element
 			exportReferenceStagedModel(
 				PortletDataContext portletDataContext, T referrerStagedModel,
@@ -207,21 +171,6 @@ public class StagedModelDataHandlerUtil {
 	}
 
 	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #importReferenceStagedModel(PortletDataContext, Class,
-	 *             Serializable)}
-	 */
-	@Deprecated
-	public static void importReferenceStagedModel(
-			PortletDataContext portletDataContext, Class<?> stagedModelClass,
-			long classPK)
-		throws PortletDataException {
-
-		importReferenceStagedModel(
-			portletDataContext, stagedModelClass, Long.valueOf(classPK));
-	}
-
-	/**
 	 * Imports the staged model that is referenced by a portlet. To import a
 	 * staged model referenced by another staged model, use {@link
 	 * #importReferenceStagedModel(PortletDataContext, StagedModel, Class,
@@ -245,25 +194,10 @@ public class StagedModelDataHandlerUtil {
 	}
 
 	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #importReferenceStagedModel(PortletDataContext, String,
-	 *             Serializable)}
-	 */
-	@Deprecated
-	public static void importReferenceStagedModel(
-			PortletDataContext portletDataContext, String stagedModelClassName,
-			long classPK)
-		throws PortletDataException {
-
-		importReferenceStagedModel(
-			portletDataContext, stagedModelClassName, Long.valueOf(classPK));
-	}
-
-	/**
 	 * Imports the staged model that is referenced by a portlet. To import a
 	 * staged model referenced by another staged model, use {@link
 	 * #importReferenceStagedModel(PortletDataContext, StagedModel, String,
-	 * long)}.
+	 * Serializable)}.
 	 *
 	 * @param  portletDataContext the portlet data context of the current
 	 *         process
@@ -283,22 +217,6 @@ public class StagedModelDataHandlerUtil {
 
 		doImportReferenceStagedModel(
 			portletDataContext, referenceElement, stagedModelClassName);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #importReferenceStagedModel(PortletDataContext, StagedModel,
-	 *             Class, Serializable)}
-	 */
-	@Deprecated
-	public static <T extends StagedModel> void importReferenceStagedModel(
-			PortletDataContext portletDataContext, T referrerStagedModel,
-			Class<?> stagedModelClass, long classPK)
-		throws PortletDataException {
-
-		importReferenceStagedModel(
-			portletDataContext, referrerStagedModel, stagedModelClass,
-			Long.valueOf(classPK));
 	}
 
 	/**
@@ -327,25 +245,9 @@ public class StagedModelDataHandlerUtil {
 	}
 
 	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #importReferenceStagedModel(PortletDataContext, StagedModel,
-	 *             String, Serializable)}
-	 */
-	@Deprecated
-	public static <T extends StagedModel> void importReferenceStagedModel(
-			PortletDataContext portletDataContext, T referrerStagedModel,
-			String stagedModelClassName, long classPK)
-		throws PortletDataException {
-
-		importReferenceStagedModel(
-			portletDataContext, referrerStagedModel, stagedModelClassName,
-			Long.valueOf(classPK));
-	}
-
-	/**
 	 * Imports the staged model that is referenced by another staged model. To
 	 * import a staged model referenced by a portlet, use {@link
-	 * #importReferenceStagedModel(PortletDataContext, String, long)}.
+	 * #importReferenceStagedModel(PortletDataContext, String, Serializable)}.
 	 *
 	 * @param  portletDataContext the portlet data context of the current
 	 *         process
@@ -509,8 +411,8 @@ public class StagedModelDataHandlerUtil {
 
 						importStagedModel(portletDataContext, referenceElement);
 					}
-					catch (DocumentException de) {
-						throw new RuntimeException(de);
+					catch (DocumentException documentException) {
+						throw new RuntimeException(documentException);
 					}
 					finally {
 						portletDataContext.setImportDataRootElement(
@@ -527,8 +429,10 @@ public class StagedModelDataHandlerUtil {
 		try {
 			importStagedModel(portletDataContext, referenceElement);
 		}
-		catch (PortletDataException pde) {
-			if (pde.getCause() instanceof NullPointerException) {
+		catch (PortletDataException portletDataException) {
+			if (portletDataException.getCause() instanceof
+					NullPointerException) {
+
 				findReference = true;
 			}
 		}
@@ -573,20 +477,22 @@ public class StagedModelDataHandlerUtil {
 
 						return;
 					}
-					catch (Exception e) {
+					catch (Exception exception) {
 						if (_log.isDebugEnabled()) {
-							_log.debug(e, e);
+							_log.debug(exception, exception);
 						}
 					}
 				}
 			}
 
-			PortletDataException pde = new PortletDataException();
+			PortletDataException portletDataException =
+				new PortletDataException();
 
-			pde.setStagedModel(stagedModel);
-			pde.setType(PortletDataException.MISSING_REFERENCE);
+			portletDataException.setStagedModel(stagedModel);
+			portletDataException.setType(
+				PortletDataException.MISSING_REFERENCE);
 
-			throw pde;
+			throw portletDataException;
 		}
 		finally {
 			portletDataContext.setImportDataRootElement(importDataRootElement);
@@ -621,9 +527,9 @@ public class StagedModelDataHandlerUtil {
 				}
 			}
 		}
-		catch (XMLStreamException xmlse) {
+		catch (XMLStreamException xmlStreamException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(xmlse, xmlse);
+				_log.debug(xmlStreamException, xmlStreamException);
 			}
 		}
 

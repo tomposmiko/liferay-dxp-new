@@ -33,7 +33,7 @@ import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
 @Deprecated
 public class SubscriptionLocalServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.portal.service.impl.SubscriptionLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.

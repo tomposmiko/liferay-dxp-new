@@ -55,7 +55,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface AnnouncementsDeliveryLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link AnnouncementsDeliveryLocalServiceUtil} to access the announcements delivery local service. Add custom service methods to <code>com.liferay.portlet.announcements.service.impl.AnnouncementsDeliveryLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -264,16 +264,6 @@ public interface AnnouncementsDeliveryLocalService
 
 	public AnnouncementsDelivery updateDelivery(
 			long userId, String type, boolean email, boolean sms)
-		throws PortalException;
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #updateDelivery(long, String, boolean, boolean)}
-	 */
-	@Deprecated
-	public AnnouncementsDelivery updateDelivery(
-			long userId, String type, boolean email, boolean sms,
-			boolean website)
 		throws PortalException;
 
 }

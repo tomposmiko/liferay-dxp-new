@@ -17,11 +17,11 @@
 <%@ include file="/init.jsp" %>
 
 <%
-SelectUsersDisplayContext selectUsersDisplayContext = new SelectUsersDisplayContext(renderRequest, renderResponse, request);
+SelectUsersDisplayContext selectUsersDisplayContext = new SelectUsersDisplayContext(request, renderRequest, renderResponse);
 %>
 
 <clay:management-toolbar
-	displayContext="<%= new SelectUsersManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, selectUsersDisplayContext) %>"
+	displayContext="<%= new SelectUsersManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, selectUsersDisplayContext) %>"
 />
 
 <aui:form cssClass="container-fluid-1280 portlet-site-teams-select-users" name="selectUserFm">

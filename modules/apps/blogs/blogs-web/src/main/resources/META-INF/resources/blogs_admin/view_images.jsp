@@ -45,7 +45,7 @@ BlogImagesDisplayContext blogImagesDisplayContext = new BlogImagesDisplayContext
 
 blogImagesDisplayContext.populateResults(blogImagesSearchContainer);
 
-BlogImagesManagementToolbarDisplayContext blogImagesManagementToolbarDisplayContext = new BlogImagesManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, currentURLObj);
+BlogImagesManagementToolbarDisplayContext blogImagesManagementToolbarDisplayContext = new BlogImagesManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, currentURLObj);
 
 String displayStyle = blogImagesManagementToolbarDisplayContext.getDisplayStyle();
 %>
@@ -90,9 +90,9 @@ String displayStyle = blogImagesManagementToolbarDisplayContext.getDisplayStyle(
 				</liferay-portlet:renderURL>
 
 				<%
-				Map<String, Object> rowData = new HashMap<>();
-
-				rowData.put("actions", StringUtil.merge(blogImagesManagementToolbarDisplayContext.getAvailableActions(fileEntry)));
+				Map<String, Object> rowData = HashMapBuilder.<String, Object>put(
+					"actions", StringUtil.merge(blogImagesManagementToolbarDisplayContext.getAvailableActions(fileEntry))
+				).build();
 
 				row.setData(rowData);
 				%>

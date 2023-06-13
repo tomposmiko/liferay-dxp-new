@@ -16,7 +16,12 @@ package com.liferay.headless.admin.workflow.internal.graphql.servlet.v1_0;
 
 import com.liferay.headless.admin.workflow.internal.graphql.mutation.v1_0.Mutation;
 import com.liferay.headless.admin.workflow.internal.graphql.query.v1_0.Query;
+import com.liferay.headless.admin.workflow.resource.v1_0.AssigneeResource;
+import com.liferay.headless.admin.workflow.resource.v1_0.TransitionResource;
+import com.liferay.headless.admin.workflow.resource.v1_0.WorkflowDefinitionResource;
+import com.liferay.headless.admin.workflow.resource.v1_0.WorkflowInstanceResource;
 import com.liferay.headless.admin.workflow.resource.v1_0.WorkflowLogResource;
+import com.liferay.headless.admin.workflow.resource.v1_0.WorkflowTaskAssignableUsersResource;
 import com.liferay.headless.admin.workflow.resource.v1_0.WorkflowTaskResource;
 import com.liferay.portal.vulcan.graphql.servlet.ServletData;
 
@@ -39,13 +44,27 @@ public class ServletDataImpl implements ServletData {
 
 	@Activate
 	public void activate(BundleContext bundleContext) {
+		Mutation.setWorkflowDefinitionResourceComponentServiceObjects(
+			_workflowDefinitionResourceComponentServiceObjects);
+		Mutation.setWorkflowInstanceResourceComponentServiceObjects(
+			_workflowInstanceResourceComponentServiceObjects);
 		Mutation.setWorkflowTaskResourceComponentServiceObjects(
 			_workflowTaskResourceComponentServiceObjects);
 
+		Query.setAssigneeResourceComponentServiceObjects(
+			_assigneeResourceComponentServiceObjects);
+		Query.setTransitionResourceComponentServiceObjects(
+			_transitionResourceComponentServiceObjects);
+		Query.setWorkflowDefinitionResourceComponentServiceObjects(
+			_workflowDefinitionResourceComponentServiceObjects);
+		Query.setWorkflowInstanceResourceComponentServiceObjects(
+			_workflowInstanceResourceComponentServiceObjects);
 		Query.setWorkflowLogResourceComponentServiceObjects(
 			_workflowLogResourceComponentServiceObjects);
 		Query.setWorkflowTaskResourceComponentServiceObjects(
 			_workflowTaskResourceComponentServiceObjects);
+		Query.setWorkflowTaskAssignableUsersResourceComponentServiceObjects(
+			_workflowTaskAssignableUsersResourceComponentServiceObjects);
 	}
 
 	@Override
@@ -53,11 +72,7 @@ public class ServletDataImpl implements ServletData {
 		return new Mutation();
 	}
 
-	/**
-	 * @deprecated
-	 */
 	@Override
-	@Deprecated
 	public String getPath() {
 		return "/headless-admin-workflow-graphql/v1_0";
 	}
@@ -68,11 +83,31 @@ public class ServletDataImpl implements ServletData {
 	}
 
 	@Reference(scope = ReferenceScope.PROTOTYPE_REQUIRED)
+	private ComponentServiceObjects<WorkflowDefinitionResource>
+		_workflowDefinitionResourceComponentServiceObjects;
+
+	@Reference(scope = ReferenceScope.PROTOTYPE_REQUIRED)
+	private ComponentServiceObjects<WorkflowInstanceResource>
+		_workflowInstanceResourceComponentServiceObjects;
+
+	@Reference(scope = ReferenceScope.PROTOTYPE_REQUIRED)
 	private ComponentServiceObjects<WorkflowTaskResource>
 		_workflowTaskResourceComponentServiceObjects;
 
 	@Reference(scope = ReferenceScope.PROTOTYPE_REQUIRED)
+	private ComponentServiceObjects<AssigneeResource>
+		_assigneeResourceComponentServiceObjects;
+
+	@Reference(scope = ReferenceScope.PROTOTYPE_REQUIRED)
+	private ComponentServiceObjects<TransitionResource>
+		_transitionResourceComponentServiceObjects;
+
+	@Reference(scope = ReferenceScope.PROTOTYPE_REQUIRED)
 	private ComponentServiceObjects<WorkflowLogResource>
 		_workflowLogResourceComponentServiceObjects;
+
+	@Reference(scope = ReferenceScope.PROTOTYPE_REQUIRED)
+	private ComponentServiceObjects<WorkflowTaskAssignableUsersResource>
+		_workflowTaskAssignableUsersResourceComponentServiceObjects;
 
 }

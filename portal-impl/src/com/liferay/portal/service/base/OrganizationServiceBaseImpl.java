@@ -69,7 +69,7 @@ public abstract class OrganizationServiceBaseImpl
 	extends BaseServiceImpl
 	implements IdentifiableOSGiService, OrganizationService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>OrganizationService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.kernel.service.OrganizationServiceUtil</code>.
@@ -1361,8 +1361,8 @@ public abstract class OrganizationServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

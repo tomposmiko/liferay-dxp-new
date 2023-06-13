@@ -64,45 +64,35 @@ SegmentsDisplayContext segmentsDisplayContext = (SegmentsDisplayContext)request.
 			row.setData(rowData);
 			%>
 
-			<portlet:renderURL var="rowURL">
-				<portlet:param name="mvcRenderCommandName" value="editSegmentsEntry" />
-				<portlet:param name="redirect" value="<%= currentURL %>" />
-				<portlet:param name="segmentsEntryId" value="<%= String.valueOf(segmentsEntry.getSegmentsEntryId()) %>" />
-				<portlet:param name="showInEditMode" value="<%= Boolean.FALSE.toString() %>" />
-			</portlet:renderURL>
-
 			<liferay-ui:search-container-column-text
 				cssClass="table-cell-expand table-title"
-				href="<%= rowURL %>"
+				href="<%= segmentsDisplayContext.getSegmentsEntryURL(segmentsEntry) %>"
 				name="name"
+				target="<%= segmentsDisplayContext.getSegmentsEntryURLTarget(segmentsEntry) %>"
 				value="<%= HtmlUtil.escape(segmentsEntry.getName(locale)) %>"
 			/>
 
-			<liferay-ui:search-container-column-text
-				cssClass="table-cell-expand-smallest table-cell-minw-150"
-				name="active"
-				value='<%= LanguageUtil.get(request, segmentsEntry.isActive() ? "yes" : "no") %>'
-			/>
-
-			<liferay-ui:search-container-column-text
-				cssClass="table-cell-expand-smallest table-cell-minw-150"
-				name="source"
-			>
-				<c:choose>
-					<c:when test="<%= Objects.equals(segmentsEntry.getSource(), SegmentsEntryConstants.SOURCE_ASAH_FARO_BACKEND) %>">
-						<liferay-ui:icon
-							message="source.analytics-cloud"
-							src='<%= PortalUtil.getPathContext(request) + "/assets/ac-icon.svg" %>'
-						/>
-					</c:when>
-					<c:otherwise>
-						<liferay-ui:icon
-							message="source.dxp"
-							src='<%= PortalUtil.getPathContext(request) + "/assets/dxp-icon.svg" %>'
-						/>
-					</c:otherwise>
-				</c:choose>
-			</liferay-ui:search-container-column-text>
+			<c:if test="<%= segmentsDisplayContext.isAsahEnabled(themeDisplay.getCompanyId()) %>">
+				<liferay-ui:search-container-column-text
+					cssClass="table-cell-expand-smallest table-cell-minw-150"
+					name="source"
+				>
+					<c:choose>
+						<c:when test="<%= Objects.equals(segmentsEntry.getSource(), SegmentsEntryConstants.SOURCE_ASAH_FARO_BACKEND) %>">
+							<liferay-ui:icon
+								message="source.analytics-cloud"
+								src='<%= PortalUtil.getPathContext(request) + "/assets/ac-icon.svg" %>'
+							/>
+						</c:when>
+						<c:otherwise>
+							<liferay-ui:icon
+								message="source.dxp"
+								src='<%= PortalUtil.getPathContext(request) + "/assets/dxp-icon.svg" %>'
+							/>
+						</c:otherwise>
+					</c:choose>
+				</liferay-ui:search-container-column-text>
+			</c:if>
 
 			<liferay-ui:search-container-column-text
 				cssClass="table-cell-expand-smallest table-cell-minw-150"

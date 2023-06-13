@@ -55,7 +55,7 @@ public class AggregateResourceBundleLoader implements ResourceBundleLoader {
 					resourceBundles.add(resourceBundle);
 				}
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 			}
 		}
 
@@ -75,16 +75,6 @@ public class AggregateResourceBundleLoader implements ResourceBundleLoader {
 
 		return new AggregateResourceBundle(
 			resourceBundles.toArray(new ResourceBundle[0]));
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #loadResourceBundle(Locale)}
-	 */
-	@Deprecated
-	@Override
-	public ResourceBundle loadResourceBundle(String languageId) {
-		return ResourceBundleLoader.super.loadResourceBundle(languageId);
 	}
 
 	private final ResourceBundleLoader[] _resourceBundleLoaders;

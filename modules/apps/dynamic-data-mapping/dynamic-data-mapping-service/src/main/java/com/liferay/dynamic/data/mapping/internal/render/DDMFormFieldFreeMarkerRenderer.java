@@ -49,6 +49,7 @@ import com.liferay.portal.kernel.template.TemplateResourceLoaderUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
@@ -106,8 +107,8 @@ public class DDMFormFieldFreeMarkerRenderer implements DDMFormFieldRenderer {
 				null, portletNamespace, namespace, mode, readOnly,
 				showEmptyFieldLabel, ddmFormFieldRenderingContext.getLocale());
 		}
-		catch (Exception e) {
-			throw new PortalException(e);
+		catch (Exception exception) {
+			throw new PortalException(exception);
 		}
 	}
 
@@ -119,13 +120,17 @@ public class DDMFormFieldFreeMarkerRenderer implements DDMFormFieldRenderer {
 			String label, String value)
 		throws Exception {
 
-		Map<String, Object> fieldStructure = new HashMap<>();
-
-		fieldStructure.put("children", StringPool.BLANK);
-		fieldStructure.put("fieldNamespace", StringUtil.randomId());
-		fieldStructure.put("label", label);
-		fieldStructure.put("name", StringUtil.randomId());
-		fieldStructure.put("value", value);
+		Map<String, Object> fieldStructure = HashMapBuilder.<String, Object>put(
+			"children", StringPool.BLANK
+		).put(
+			"fieldNamespace", StringUtil.randomId()
+		).put(
+			"label", label
+		).put(
+			"name", StringUtil.randomId()
+		).put(
+			"value", value
+		).build();
 
 		freeMarkerContext.put("fieldStructure", fieldStructure);
 
@@ -220,6 +225,10 @@ public class DDMFormFieldFreeMarkerRenderer implements DDMFormFieldRenderer {
 			ddmFormField.getDDMFormFieldOptions();
 
 		for (String value : ddmFormFieldOptions.getOptionsValues()) {
+			if (value.equals(StringPool.BLANK)) {
+				continue;
+			}
+
 			LocalizedValue label = ddmFormFieldOptions.getOptionLabels(value);
 
 			addDDMFormFieldOptionHTML(
@@ -305,11 +314,11 @@ public class DDMFormFieldFreeMarkerRenderer implements DDMFormFieldRenderer {
 
 		String name = ddmFormField.getName();
 
-		String fieldDisplayValue = getFieldsDisplayValue(
+		String fieldsDisplayValue = getFieldsDisplayValue(
 			httpServletRequest, httpServletResponse, fields);
 
 		String[] fieldsDisplayValues = getFieldsDisplayValues(
-			fieldDisplayValue);
+			fieldsDisplayValue);
 
 		boolean fieldDisplayable = ArrayUtil.contains(
 			fieldsDisplayValues, name);
@@ -342,7 +351,7 @@ public class DDMFormFieldFreeMarkerRenderer implements DDMFormFieldRenderer {
 
 			if (fieldDisplayable) {
 				fieldNamespace = getFieldNamespace(
-					fieldDisplayValue, ddmFieldsCounter, offset);
+					fieldsDisplayValue, ddmFieldsCounter, offset);
 			}
 
 			fieldStructure.put("fieldNamespace", fieldNamespace);
@@ -500,8 +509,6 @@ public class DDMFormFieldFreeMarkerRenderer implements DDMFormFieldRenderer {
 		DDMFormField parentDDMFormField, boolean showEmptyFieldLabel,
 		Locale locale) {
 
-		Map<String, Object> freeMarkerContext = new HashMap<>();
-
 		Map<String, Object> fieldContext = getFieldContext(
 			httpServletRequest, httpServletResponse, portletNamespace,
 			namespace, ddmFormField, locale);
@@ -514,15 +521,21 @@ public class DDMFormFieldFreeMarkerRenderer implements DDMFormFieldRenderer {
 				namespace, parentDDMFormField, locale);
 		}
 
-		freeMarkerContext.put(
-			"ddmPortletId", DDMPortletKeys.DYNAMIC_DATA_MAPPING);
+		Map<String, Object> freeMarkerContext =
+			HashMapBuilder.<String, Object>put(
+				"ddmPortletId", DDMPortletKeys.DYNAMIC_DATA_MAPPING
+			).put(
+				"editorName",
+				() -> {
+					Editor editor =
+						DDMFormFieldFreeMarkerRendererHelper.getEditor(
+							httpServletRequest);
 
-		Editor editor = DDMFormFieldFreeMarkerRendererHelper.getEditor(
-			httpServletRequest);
-
-		freeMarkerContext.put("editorName", editor.getName());
-
-		freeMarkerContext.put("fieldStructure", fieldContext);
+					return editor.getName();
+				}
+			).put(
+				"fieldStructure", fieldContext
+			).build();
 
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)httpServletRequest.getAttribute(
@@ -537,8 +550,10 @@ public class DDMFormFieldFreeMarkerRenderer implements DDMFormFieldRenderer {
 			freeMarkerContext.put(
 				"itemSelectorAuthToken", itemSelectorAuthToken);
 		}
-		catch (PortalException pe) {
-			_log.error("Unable to generate item selector auth token ", pe);
+		catch (PortalException portalException) {
+			_log.error(
+				"Unable to generate item selector auth token ",
+				portalException);
 		}
 
 		freeMarkerContext.put("namespace", namespace);
@@ -593,8 +608,10 @@ public class DDMFormFieldFreeMarkerRenderer implements DDMFormFieldRenderer {
 					ClassLoaderPool.getContextName(clazz.getClassLoader()),
 					TemplateConstants.CLASS_LOADER_SEPARATOR, resource));
 		}
-		catch (TemplateException te) {
-			_log.error("Unable to find template resource " + resource, te);
+		catch (TemplateException templateException) {
+			_log.error(
+				"Unable to find template resource " + resource,
+				templateException);
 		}
 
 		return null;

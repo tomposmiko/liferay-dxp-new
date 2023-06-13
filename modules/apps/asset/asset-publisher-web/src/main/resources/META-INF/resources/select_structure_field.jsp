@@ -36,6 +36,7 @@ portletURL.setParameter("mvcPath", "/select_structure_field.jsp");
 portletURL.setParameter("portletResource", portletResource);
 portletURL.setParameter("className", className);
 portletURL.setParameter("classTypeId", String.valueOf(classTypeId));
+portletURL.setParameter("eventName", eventName);
 %>
 
 <div class="alert alert-danger hide" id="<portlet:namespace />message">
@@ -107,12 +108,15 @@ portletURL.setParameter("classTypeId", String.valueOf(classTypeId));
 			<liferay-ui:search-container-column-text>
 
 				<%
-				Map<String, Object> data = new HashMap<String, Object>();
-
-				data.put("fieldsnamespace", fieldsNamespace);
-				data.put("form", renderResponse.getNamespace() + name + "fieldForm");
-				data.put("label", label);
-				data.put("name", name);
+				Map<String, Object> data = HashMapBuilder.<String, Object>put(
+					"fieldsnamespace", fieldsNamespace
+				).put(
+					"form", renderResponse.getNamespace() + name + "fieldForm"
+				).put(
+					"label", label
+				).put(
+					"name", name
+				).build();
 				%>
 
 				<aui:button cssClass="selector-button" data="<%= data %>" disabled="<%= name.equals(ddmStructureFieldName) ? false : true %>" id='<%= "applyButton" + name %>' value="apply" />

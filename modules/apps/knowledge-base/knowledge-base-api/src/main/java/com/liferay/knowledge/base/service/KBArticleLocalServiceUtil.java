@@ -32,16 +32,10 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class KBArticleLocalServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.knowledge.base.service.impl.KBArticleLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
-	 */
-
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link KBArticleLocalServiceUtil} to access the kb article local service. Add custom service methods to <code>com.liferay.knowledge.base.service.impl.KBArticleLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	public static com.liferay.portal.kernel.repository.model.FileEntry
 			addAttachment(
@@ -97,20 +91,6 @@ public class KBArticleLocalServiceUtil {
 		getService().addKBArticleResources(kbArticle, modelPermissions);
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #addKBArticleResources(KBArticle, ModelPermissions)}
-	 */
-	@Deprecated
-	public static void addKBArticleResources(
-			com.liferay.knowledge.base.model.KBArticle kbArticle,
-			String[] groupPermissions, String[] guestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		getService().addKBArticleResources(
-			kbArticle, groupPermissions, guestPermissions);
-	}
-
 	public static void addKBArticleResources(
 			long kbArticleId, boolean addGroupPermissions,
 			boolean addGuestPermissions)
@@ -118,20 +98,6 @@ public class KBArticleLocalServiceUtil {
 
 		getService().addKBArticleResources(
 			kbArticleId, addGroupPermissions, addGuestPermissions);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #addKBArticleResources(KBArticle, ModelPermissions)}
-	 */
-	@Deprecated
-	public static void addKBArticleResources(
-			long kbArticleId, String[] groupPermissions,
-			String[] guestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		getService().addKBArticleResources(
-			kbArticleId, groupPermissions, guestPermissions);
 	}
 
 	public static int addKBArticlesMarkdown(
@@ -480,23 +446,6 @@ public class KBArticleLocalServiceUtil {
 			resourcePrimKey, status, orderByComparator);
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #getKBArticleAndAllDescendantKBArticles(long, int,
-	 OrderByComparator)}
-	 */
-	@Deprecated
-	public static java.util.List<com.liferay.knowledge.base.model.KBArticle>
-		getKBArticleAndAllDescendants(
-			long resourcePrimKey, int status,
-			com.liferay.portal.kernel.util.OrderByComparator
-				<com.liferay.knowledge.base.model.KBArticle>
-					orderByComparator) {
-
-		return getService().getKBArticleAndAllDescendants(
-			resourcePrimKey, status, orderByComparator);
-	}
-
 	public static com.liferay.knowledge.base.model.KBArticle
 			getKBArticleByUrlTitle(
 				long groupId, long kbFolderId, String urlTitle)
@@ -716,42 +665,19 @@ public class KBArticleLocalServiceUtil {
 			groupId, sections, status);
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link #getKBArticles(long,
-	 long, int, int, int, OrderByComparator)}
-	 */
-	@Deprecated
-	public static java.util.List<com.liferay.knowledge.base.model.KBArticle>
-		getSiblingKBArticles(
-			long groupId, long parentResourcePrimKey, int status, int start,
-			int end,
-			com.liferay.portal.kernel.util.OrderByComparator
-				<com.liferay.knowledge.base.model.KBArticle>
-					orderByComparator) {
-
-		return getService().getSiblingKBArticles(
-			groupId, parentResourcePrimKey, status, start, end,
-			orderByComparator);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #getKBArticlesCount(long, long, int)}
-	 */
-	@Deprecated
-	public static int getSiblingKBArticlesCount(
-		long groupId, long parentResourcePrimKey, int status) {
-
-		return getService().getSiblingKBArticlesCount(
-			groupId, parentResourcePrimKey, status);
-	}
-
 	public static String[] getTempAttachmentNames(
 			long groupId, long userId, String tempFolderName)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return getService().getTempAttachmentNames(
 			groupId, userId, tempFolderName);
+	}
+
+	public static void incrementViewCount(
+			long userId, long resourcePrimKey, int increment)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		getService().incrementViewCount(userId, resourcePrimKey, increment);
 	}
 
 	public static void moveKBArticle(
@@ -874,13 +800,6 @@ public class KBArticleLocalServiceUtil {
 
 		return getService().updateStatus(
 			userId, resourcePrimKey, status, serviceContext);
-	}
-
-	public static void updateViewCount(
-			long userId, long resourcePrimKey, int viewCount)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		getService().updateViewCount(userId, resourcePrimKey, viewCount);
 	}
 
 	public static KBArticleLocalService getService() {

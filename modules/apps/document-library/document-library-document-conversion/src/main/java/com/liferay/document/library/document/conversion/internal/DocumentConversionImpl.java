@@ -61,7 +61,7 @@ import org.osgi.service.component.annotations.Modified;
  */
 @Component(
 	configurationPid = "com.liferay.document.library.document.conversion.internal.configuration.OpenOfficeConfiguration",
-	immediate = true, service = DocumentConversion.class
+	service = DocumentConversion.class
 )
 public class DocumentConversionImpl implements DocumentConversion {
 
@@ -223,8 +223,8 @@ public class DocumentConversionImpl implements DocumentConversion {
 				return true;
 			}
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 
 		return false;

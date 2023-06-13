@@ -52,7 +52,7 @@ import org.osgi.annotation.versioning.ProviderType;
 )
 public interface SegmentsEntryService extends BaseService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link SegmentsEntryServiceUtil} to access the segments entry remote service. Add custom service methods to <code>com.liferay.segments.service.impl.SegmentsEntryServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -60,10 +60,25 @@ public interface SegmentsEntryService extends BaseService {
 	public SegmentsEntry addSegmentsEntry(
 			String segmentsEntryKey, Map<Locale, String> nameMap,
 			Map<Locale, String> descriptionMap, boolean active, String criteria,
+			String type, ServiceContext serviceContext)
+		throws PortalException;
+
+	public SegmentsEntry addSegmentsEntry(
+			String segmentsEntryKey, Map<Locale, String> nameMap,
+			Map<Locale, String> descriptionMap, boolean active, String criteria,
 			String source, String type, ServiceContext serviceContext)
 		throws PortalException;
 
+	public void addSegmentsEntryClassPKs(
+			long segmentsEntryId, long[] classPKs,
+			ServiceContext serviceContext)
+		throws PortalException;
+
 	public SegmentsEntry deleteSegmentsEntry(long segmentsEntryId)
+		throws PortalException;
+
+	public void deleteSegmentsEntryClassPKs(
+			long segmentsEntryId, long[] classPKs)
 		throws PortalException;
 
 	/**

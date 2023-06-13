@@ -42,7 +42,7 @@ public interface KBArticleModel
 	extends BaseModel<KBArticle>, MVCCModel, ResourcedModel, ShardedModel,
 			StagedGroupedModel, WorkflowedModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a kb article model instance should use the {@link KBArticle} interface instead.
@@ -399,20 +399,6 @@ public interface KBArticleModel
 	 * @param sections the sections of this kb article
 	 */
 	public void setSections(String sections);
-
-	/**
-	 * Returns the view count of this kb article.
-	 *
-	 * @return the view count of this kb article
-	 */
-	public int getViewCount();
-
-	/**
-	 * Sets the view count of this kb article.
-	 *
-	 * @param viewCount the view count of this kb article
-	 */
-	public void setViewCount(int viewCount);
 
 	/**
 	 * Returns the latest of this kb article.

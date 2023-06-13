@@ -32,7 +32,7 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class DLFileRankLocalServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.document.library.file.rank.service.impl.DLFileRankLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.

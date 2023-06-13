@@ -54,20 +54,9 @@ public class ExpandoBridgeIndexerImpl implements ExpandoBridgeIndexer {
 		try {
 			doAddAttributes(document, expandoBridge);
 		}
-		catch (SystemException se) {
-			_log.error(se, se);
+		catch (SystemException systemException) {
+			_log.error(systemException, systemException);
 		}
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #encodeFieldName(String, int)}
-	 */
-	@Deprecated
-	@Override
-	public String encodeFieldName(String columnName) {
-		return encodeFieldName(
-			columnName, ExpandoColumnConstants.INDEX_TYPE_TEXT);
 	}
 
 	@Override
@@ -299,8 +288,8 @@ public class ExpandoBridgeIndexerImpl implements ExpandoBridgeIndexer {
 			try {
 				addAttribute(document, expandoColumn, expandoValues);
 			}
-			catch (Exception e) {
-				_log.error("Indexing " + expandoColumn.getName(), e);
+			catch (Exception exception) {
+				_log.error("Indexing " + expandoColumn.getName(), exception);
 			}
 		}
 	}

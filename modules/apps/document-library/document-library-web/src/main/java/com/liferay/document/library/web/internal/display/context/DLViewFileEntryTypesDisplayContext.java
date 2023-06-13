@@ -39,12 +39,12 @@ import javax.servlet.http.HttpServletRequest;
 public class DLViewFileEntryTypesDisplayContext {
 
 	public DLViewFileEntryTypesDisplayContext(
-		RenderRequest renderRequest, RenderResponse renderResponse,
-		HttpServletRequest httpServletRequest) {
+		HttpServletRequest httpServletRequest, RenderRequest renderRequest,
+		RenderResponse renderResponse) {
 
-		this.renderRequest = renderRequest;
+		_httpServletRequest = httpServletRequest;
+		_renderRequest = renderRequest;
 		this.renderResponse = renderResponse;
-		request = httpServletRequest;
 	}
 
 	public String getClearResultsURL() {
@@ -52,8 +52,9 @@ public class DLViewFileEntryTypesDisplayContext {
 	}
 
 	public CreationMenu getCreationMenu() {
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		if (DLPermission.contains(
 				themeDisplay.getPermissionChecker(),
@@ -64,9 +65,10 @@ public class DLViewFileEntryTypesDisplayContext {
 			PortletURL creationURL = renderResponse.createRenderURL();
 
 			creationURL.setParameter(
-				"mvcPath", "/document_library/edit_file_entry_type.jsp");
+				"mvcRenderCommandName",
+				"/document_library/edit_file_entry_type");
 			creationURL.setParameter(
-				"redirect", PortalUtil.getCurrentURL(request));
+				"redirect", PortalUtil.getCurrentURL(_httpServletRequest));
 
 			creationMenu.addPrimaryDropdownItem(
 				dropdownItem -> dropdownItem.setHref(creationURL.toString()));
@@ -82,23 +84,25 @@ public class DLViewFileEntryTypesDisplayContext {
 	}
 
 	public SearchContainer getSearchContainer() throws PortalException {
-		if (searchContainer != null) {
-			return searchContainer;
+		if (_searchContainer != null) {
+			return _searchContainer;
 		}
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		SearchContainer searchContainer = new SearchContainer(
-			renderRequest, new DisplayTerms(request), new DisplayTerms(request),
+			_renderRequest, new DisplayTerms(_httpServletRequest),
+			new DisplayTerms(_httpServletRequest),
 			SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA,
 			getPortletURL(), null,
-			LanguageUtil.get(request, "there-are-no-results"));
+			LanguageUtil.get(_httpServletRequest, "there-are-no-results"));
 
 		DisplayTerms searchTerms = searchContainer.getSearchTerms();
 
 		boolean includeBasicFileEntryType = ParamUtil.getBoolean(
-			renderRequest, "includeBasicFileEntryType");
+			_renderRequest, "includeBasicFileEntryType");
 
 		int total = DLFileEntryTypeServiceUtil.searchCount(
 			themeDisplay.getCompanyId(),
@@ -117,9 +121,9 @@ public class DLViewFileEntryTypesDisplayContext {
 				searchContainer.getStart(), searchContainer.getEnd(),
 				searchContainer.getOrderByComparator()));
 
-		this.searchContainer = searchContainer;
+		_searchContainer = searchContainer;
 
-		return this.searchContainer;
+		return _searchContainer;
 	}
 
 	public int getTotalItems() throws PortalException {
@@ -136,9 +140,10 @@ public class DLViewFileEntryTypesDisplayContext {
 		return portletURL;
 	}
 
-	protected final RenderRequest renderRequest;
 	protected final RenderResponse renderResponse;
-	protected final HttpServletRequest request;
-	protected SearchContainer searchContainer;
+
+	private final HttpServletRequest _httpServletRequest;
+	private final RenderRequest _renderRequest;
+	private SearchContainer _searchContainer;
 
 }

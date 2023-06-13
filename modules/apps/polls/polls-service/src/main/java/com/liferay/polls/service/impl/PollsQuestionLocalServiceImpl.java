@@ -113,7 +113,7 @@ public class PollsQuestionLocalServiceImpl
 		question.setDescriptionMap(descriptionMap);
 		question.setExpirationDate(expirationDate);
 
-		pollsQuestionPersistence.update(question);
+		question = pollsQuestionPersistence.update(question);
 
 		// Resources
 
@@ -166,23 +166,6 @@ public class PollsQuestionLocalServiceImpl
 		addQuestionResources(question, modelPermissions);
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #addQuestionResources(long, ModelPermissions)}
-	 */
-	@Deprecated
-	@Override
-	public void addQuestionResources(
-			long questionId, String[] groupPermissions,
-			String[] guestPermissions)
-		throws PortalException {
-
-		PollsQuestion question = pollsQuestionPersistence.findByPrimaryKey(
-			questionId);
-
-		addQuestionResources(question, groupPermissions, guestPermissions);
-	}
-
 	@Override
 	public void addQuestionResources(
 			PollsQuestion question, boolean addGroupPermissions,
@@ -205,23 +188,6 @@ public class PollsQuestionLocalServiceImpl
 			question.getCompanyId(), question.getGroupId(),
 			question.getUserId(), PollsQuestion.class.getName(),
 			question.getQuestionId(), modelPermissions);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #addQuestionResources(PollsQuestion, ModelPermissions)}
-	 */
-	@Deprecated
-	@Override
-	public void addQuestionResources(
-			PollsQuestion question, String[] groupPermissions,
-			String[] guestPermissions)
-		throws PortalException {
-
-		resourceLocalService.addModelResources(
-			question.getCompanyId(), question.getGroupId(),
-			question.getUserId(), PollsQuestion.class.getName(),
-			question.getQuestionId(), groupPermissions, guestPermissions);
 	}
 
 	@Override
@@ -316,9 +282,9 @@ public class PollsQuestionLocalServiceImpl
 
 			return pollsQuestions;
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(pe, pe);
+				_log.debug(portalException, portalException);
 			}
 		}
 
@@ -346,9 +312,9 @@ public class PollsQuestionLocalServiceImpl
 			return (int)indexer.searchCount(
 				buildSearchContext(companyId, groupIds, keywords));
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(pe, pe);
+				_log.debug(portalException, portalException);
 			}
 		}
 

@@ -16,7 +16,6 @@ package com.liferay.bookmarks.service.base;
 
 import com.liferay.bookmarks.model.BookmarksEntry;
 import com.liferay.bookmarks.service.BookmarksEntryLocalService;
-import com.liferay.bookmarks.service.persistence.BookmarksEntryFinder;
 import com.liferay.bookmarks.service.persistence.BookmarksEntryPersistence;
 import com.liferay.bookmarks.service.persistence.BookmarksFolderFinder;
 import com.liferay.bookmarks.service.persistence.BookmarksFolderPersistence;
@@ -81,7 +80,7 @@ public abstract class BookmarksEntryLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements AopService, BookmarksEntryLocalService, IdentifiableOSGiService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>BookmarksEntryLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.bookmarks.service.BookmarksEntryLocalServiceUtil</code>.
@@ -583,8 +582,8 @@ public abstract class BookmarksEntryLocalServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 
@@ -592,9 +591,6 @@ public abstract class BookmarksEntryLocalServiceBaseImpl
 
 	@Reference
 	protected BookmarksEntryPersistence bookmarksEntryPersistence;
-
-	@Reference
-	protected BookmarksEntryFinder bookmarksEntryFinder;
 
 	@Reference
 	protected BookmarksFolderPersistence bookmarksFolderPersistence;

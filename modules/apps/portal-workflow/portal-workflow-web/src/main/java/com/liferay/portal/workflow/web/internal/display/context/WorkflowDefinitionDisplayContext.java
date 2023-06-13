@@ -42,10 +42,10 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.RequiredWorkflowDefinitionException;
 import com.liferay.portal.kernel.workflow.WorkflowDefinition;
 import com.liferay.portal.kernel.workflow.WorkflowDefinitionManagerUtil;
+import com.liferay.portal.workflow.constants.WorkflowPortletKeys;
 import com.liferay.portal.workflow.constants.WorkflowWebKeys;
 import com.liferay.portal.workflow.exception.IncompleteWorkflowInstancesException;
 import com.liferay.portal.workflow.web.internal.constants.WorkflowDefinitionConstants;
-import com.liferay.portal.workflow.web.internal.constants.WorkflowPortletKeys;
 import com.liferay.portal.workflow.web.internal.display.context.util.WorkflowDefinitionRequestHelper;
 import com.liferay.portal.workflow.web.internal.search.WorkflowDefinitionSearch;
 import com.liferay.portal.workflow.web.internal.search.WorkflowDefinitionSearchTerms;
@@ -137,7 +137,7 @@ public class WorkflowDefinitionDisplayContext {
 			return null;
 		}
 
-		LiferayPortletResponse response =
+		LiferayPortletResponse liferayPortletResponse =
 			_workflowDefinitionRequestHelper.getLiferayPortletResponse();
 
 		return new JSPCreationMenu(pageContext) {
@@ -145,7 +145,7 @@ public class WorkflowDefinitionDisplayContext {
 				addPrimaryDropdownItem(
 					dropdownItem -> {
 						dropdownItem.setHref(
-							response.createRenderURL(), "mvcPath",
+							liferayPortletResponse.createRenderURL(), "mvcPath",
 							"/definition/edit_workflow_definition.jsp");
 						dropdownItem.setLabel(
 							LanguageUtil.get(
@@ -434,10 +434,10 @@ public class WorkflowDefinitionDisplayContext {
 		String orderByType = ParamUtil.getString(
 			httpServletRequest, "orderByType", "asc");
 
-		LiferayPortletResponse response =
+		LiferayPortletResponse liferayPortletResponse =
 			_workflowDefinitionRequestHelper.getLiferayPortletResponse();
 
-		PortletURL portletURL = response.createRenderURL();
+		PortletURL portletURL = liferayPortletResponse.createRenderURL();
 
 		portletURL.setParameter(
 			"orderByType", Objects.equals(orderByType, "asc") ? "desc" : "asc");
@@ -494,14 +494,6 @@ public class WorkflowDefinitionDisplayContext {
 		return userName;
 	}
 
-	public int getWorkflowDefinitionCount(WorkflowDefinition workflowDefinition)
-		throws PortalException {
-
-		return WorkflowDefinitionManagerUtil.getWorkflowDefinitionCount(
-			_workflowDefinitionRequestHelper.getCompanyId(),
-			workflowDefinition.getName());
-	}
-
 	public List<WorkflowDefinition> getWorkflowDefinitions(String name)
 		throws PortalException {
 
@@ -510,20 +502,29 @@ public class WorkflowDefinitionDisplayContext {
 			QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 	}
 
+	public int getWorkflowDefinitionsCount(
+			WorkflowDefinition workflowDefinition)
+		throws PortalException {
+
+		return WorkflowDefinitionManagerUtil.getWorkflowDefinitionsCount(
+			_workflowDefinitionRequestHelper.getCompanyId(),
+			workflowDefinition.getName());
+	}
+
 	public List<WorkflowDefinition> getWorkflowDefinitionsOrderByDesc(
 			String name)
 		throws PortalException {
 
-		List<WorkflowDefinition> workFlowDefinitions = getWorkflowDefinitions(
+		List<WorkflowDefinition> workflowDefinitions = getWorkflowDefinitions(
 			name);
 
-		if (workFlowDefinitions.size() <= 1) {
-			return workFlowDefinitions;
+		if (workflowDefinitions.size() <= 1) {
+			return workflowDefinitions;
 		}
 
-		Collections.reverse(workFlowDefinitions);
+		Collections.reverse(workflowDefinitions);
 
-		return workFlowDefinitions;
+		return workflowDefinitions;
 	}
 
 	public boolean isDisabledManagementBar(
@@ -595,10 +596,10 @@ public class WorkflowDefinitionDisplayContext {
 	}
 
 	protected PortletURL getWorkflowDefinitionLinkPortletURL() {
-		LiferayPortletResponse response =
+		LiferayPortletResponse liferayPortletResponse =
 			_workflowDefinitionRequestHelper.getLiferayPortletResponse();
 
-		PortletURL portletURL = response.createLiferayPortletURL(
+		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(
 			WorkflowPortletKeys.CONTROL_PANEL_WORKFLOW,
 			PortletRequest.RENDER_PHASE);
 
@@ -627,10 +628,10 @@ public class WorkflowDefinitionDisplayContext {
 	}
 
 	protected PortletURL getWorkflowInstancesPortletURL() {
-		LiferayPortletResponse response =
+		LiferayPortletResponse liferayPortletResponse =
 			_workflowDefinitionRequestHelper.getLiferayPortletResponse();
 
-		PortletURL portletURL = response.createLiferayPortletURL(
+		PortletURL portletURL = liferayPortletResponse.createLiferayPortletURL(
 			WorkflowPortletKeys.CONTROL_PANEL_WORKFLOW_INSTANCE,
 			PortletRequest.RENDER_PHASE);
 

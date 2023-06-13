@@ -127,7 +127,7 @@ public class UploadImageMVCActionCommand extends BaseMVCActionCommand {
 				themeDisplay.getScopeGroupId(), themeDisplay.getUserId(),
 				UploadImageUtil.getTempImageFolderName(), fileName);
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 		}
 
 		return TempFileEntryUtil.addTempFileEntry(
@@ -194,9 +194,9 @@ public class UploadImageMVCActionCommand extends BaseMVCActionCommand {
 				sendRedirect(actionRequest, actionResponse);
 			}
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			handleUploadException(
-				actionRequest, actionResponse, cmd, maxFileSize, e);
+				actionRequest, actionResponse, cmd, maxFileSize, exception);
 		}
 	}
 
@@ -206,21 +206,21 @@ public class UploadImageMVCActionCommand extends BaseMVCActionCommand {
 
 	protected void handleUploadException(
 			ActionRequest actionRequest, ActionResponse actionResponse,
-			String cmd, long maxFileSize, Exception e)
+			String cmd, long maxFileSize, Exception exception)
 		throws Exception {
 
-		if (e instanceof PrincipalException) {
-			SessionErrors.add(actionRequest, e.getClass());
+		if (exception instanceof PrincipalException) {
+			SessionErrors.add(actionRequest, exception.getClass());
 
 			actionResponse.setRenderParameter("mvcPath", "/error.jsp");
 		}
-		else if (e instanceof AntivirusScannerException ||
-				 e instanceof FileExtensionException ||
-				 e instanceof FileSizeException ||
-				 e instanceof ImageTypeException ||
-				 e instanceof NoSuchFileException ||
-				 e instanceof UploadException ||
-				 e instanceof UploadRequestSizeException) {
+		else if (exception instanceof AntivirusScannerException ||
+				 exception instanceof FileExtensionException ||
+				 exception instanceof FileSizeException ||
+				 exception instanceof ImageTypeException ||
+				 exception instanceof NoSuchFileException ||
+				 exception instanceof UploadException ||
+				 exception instanceof UploadRequestSizeException) {
 
 			if (cmd.equals(Constants.ADD_TEMP)) {
 				hideDefaultErrorMessage(actionRequest);
@@ -231,18 +231,19 @@ public class UploadImageMVCActionCommand extends BaseMVCActionCommand {
 
 				String errorMessage = StringPool.BLANK;
 
-				if (e instanceof AntivirusScannerException) {
-					AntivirusScannerException ase =
-						(AntivirusScannerException)e;
+				if (exception instanceof AntivirusScannerException) {
+					AntivirusScannerException antivirusScannerException =
+						(AntivirusScannerException)exception;
 
-					errorMessage = themeDisplay.translate(ase.getMessageKey());
+					errorMessage = themeDisplay.translate(
+						antivirusScannerException.getMessageKey());
 				}
-				else if (e instanceof FileExtensionException) {
+				else if (exception instanceof FileExtensionException) {
 					errorMessage = themeDisplay.translate(
 						"please-enter-a-file-with-a-valid-extension-x",
 						StringUtil.merge(_dlConfiguration.fileExtensions()));
 				}
-				else if (e instanceof FileSizeException) {
+				else if (exception instanceof FileSizeException) {
 					if (maxFileSize == 0) {
 						maxFileSize =
 							_uploadServletRequestConfigurationHelper.
@@ -255,18 +256,18 @@ public class UploadImageMVCActionCommand extends BaseMVCActionCommand {
 						TextFormatter.formatStorageSize(
 							maxFileSize, themeDisplay.getLocale()));
 				}
-				else if (e instanceof ImageTypeException) {
+				else if (exception instanceof ImageTypeException) {
 					errorMessage = themeDisplay.translate(
 						"please-enter-a-file-with-a-valid-file-type");
 				}
-				else if (e instanceof NoSuchFileException ||
-						 e instanceof UploadException) {
+				else if (exception instanceof NoSuchFileException ||
+						 exception instanceof UploadException) {
 
 					errorMessage = themeDisplay.translate(
 						"an-unexpected-error-occurred-while-uploading-your-" +
 							"file");
 				}
-				else if (e instanceof UploadRequestSizeException) {
+				else if (exception instanceof UploadRequestSizeException) {
 					errorMessage = themeDisplay.translate(
 						"request-is-larger-than-x-and-could-not-be-processed",
 						TextFormatter.formatStorageSize(
@@ -282,11 +283,12 @@ public class UploadImageMVCActionCommand extends BaseMVCActionCommand {
 					actionRequest, actionResponse, jsonObject);
 			}
 			else {
-				SessionErrors.add(actionRequest, e.getClass(), e);
+				SessionErrors.add(
+					actionRequest, exception.getClass(), exception);
 			}
 		}
 		else {
-			throw e;
+			throw exception;
 		}
 	}
 
@@ -351,7 +353,7 @@ public class UploadImageMVCActionCommand extends BaseMVCActionCommand {
 						UploadImageUtil.getTempImageFolderName(),
 						getTempImageFileName(actionRequest));
 				}
-				catch (Exception e) {
+				catch (Exception exception) {
 				}
 
 				return TempFileEntryUtil.addTempFileEntry(
@@ -361,11 +363,11 @@ public class UploadImageMVCActionCommand extends BaseMVCActionCommand {
 					tempFileEntry.getMimeType());
 			}
 		}
-		catch (NoSuchFileEntryException nsfee) {
-			throw new UploadException(nsfee);
+		catch (NoSuchFileEntryException noSuchFileEntryException) {
+			throw new UploadException(noSuchFileEntryException);
 		}
-		catch (NoSuchRepositoryException nsre) {
-			throw new UploadException(nsre);
+		catch (NoSuchRepositoryException noSuchRepositoryException) {
+			throw new UploadException(noSuchRepositoryException);
 		}
 	}
 

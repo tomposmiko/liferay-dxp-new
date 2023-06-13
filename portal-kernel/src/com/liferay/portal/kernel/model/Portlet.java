@@ -30,7 +30,7 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface Portlet extends PersistedModel, PortletModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.portal.model.impl.PortletImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -373,15 +373,6 @@ public interface Portlet extends PersistedModel, PortletModel {
 	 * @return expiration cache of the portlet
 	 */
 	public Integer getExpCache();
-
-	/**
-	 * Returns the Facebook integration method of the portlet.
-	 *
-	 * @return the Facebook integration method of the portlet
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public String getFacebookIntegration();
 
 	/**
 	 * Returns a list of CSS files that will be referenced from the page's
@@ -1823,16 +1814,6 @@ public interface Portlet extends PersistedModel, PortletModel {
 	 * @param expCache expiration cache of the portlet
 	 */
 	public void setExpCache(Integer expCache);
-
-	/**
-	 * Sets the Facebook integration method of the portlet.
-	 *
-	 * @param facebookIntegration the Facebook integration method of the
-	 portlet
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public void setFacebookIntegration(String facebookIntegration);
 
 	/**
 	 * Sets a list of CSS files that will be referenced from the page's footer

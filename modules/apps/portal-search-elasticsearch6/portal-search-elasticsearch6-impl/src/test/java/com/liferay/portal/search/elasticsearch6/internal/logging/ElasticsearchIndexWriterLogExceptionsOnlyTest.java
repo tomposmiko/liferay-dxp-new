@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.IndexWriter;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchException;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.search.elasticsearch6.internal.LiferayElasticsearchIndexingFixtureFactory;
 import com.liferay.portal.search.elasticsearch6.internal.connection.ElasticsearchFixture;
 import com.liferay.portal.search.elasticsearch6.internal.search.engine.adapter.document.BulkDocumentRequestExecutorImpl;
@@ -29,7 +30,6 @@ import com.liferay.portal.search.test.util.indexing.IndexingFixture;
 import com.liferay.portal.search.test.util.logging.ExpectedLogTestRule;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -70,7 +70,7 @@ public class ElasticsearchIndexWriterLogExceptionsOnlyTest
 		try {
 			indexWriter.addDocuments(createSearchContext(), documents);
 		}
-		catch (SearchException se) {
+		catch (SearchException searchException) {
 		}
 	}
 
@@ -94,7 +94,7 @@ public class ElasticsearchIndexWriterLogExceptionsOnlyTest
 		try {
 			indexWriter.addDocuments(createSearchContext(), documents);
 		}
-		catch (SearchException se) {
+		catch (SearchException searchException) {
 		}
 	}
 
@@ -111,7 +111,7 @@ public class ElasticsearchIndexWriterLogExceptionsOnlyTest
 		try {
 			indexWriter.commit(searchContext);
 		}
-		catch (SearchException se) {
+		catch (SearchException searchException) {
 		}
 	}
 
@@ -128,7 +128,7 @@ public class ElasticsearchIndexWriterLogExceptionsOnlyTest
 		try {
 			indexWriter.deleteDocument(searchContext, "1");
 		}
-		catch (SearchException se) {
+		catch (SearchException searchException) {
 		}
 	}
 
@@ -149,7 +149,7 @@ public class ElasticsearchIndexWriterLogExceptionsOnlyTest
 		try {
 			indexWriter.deleteDocuments(searchContext, uids);
 		}
-		catch (SearchException se) {
+		catch (SearchException searchException) {
 		}
 	}
 
@@ -172,7 +172,7 @@ public class ElasticsearchIndexWriterLogExceptionsOnlyTest
 		try {
 			indexWriter.deleteDocuments(searchContext, uids);
 		}
-		catch (SearchException se) {
+		catch (SearchException searchException) {
 		}
 	}
 
@@ -189,7 +189,7 @@ public class ElasticsearchIndexWriterLogExceptionsOnlyTest
 		try {
 			indexWriter.deleteEntityDocuments(searchContext, "test");
 		}
-		catch (SearchException se) {
+		catch (SearchException searchException) {
 		}
 	}
 
@@ -207,7 +207,7 @@ public class ElasticsearchIndexWriterLogExceptionsOnlyTest
 			indexWriter.partiallyUpdateDocument(
 				createSearchContext(), document);
 		}
-		catch (SearchException se) {
+		catch (SearchException searchException) {
 		}
 	}
 
@@ -229,7 +229,7 @@ public class ElasticsearchIndexWriterLogExceptionsOnlyTest
 			indexWriter.partiallyUpdateDocuments(
 				createSearchContext(), documents);
 		}
-		catch (SearchException se) {
+		catch (SearchException searchException) {
 		}
 	}
 
@@ -253,7 +253,7 @@ public class ElasticsearchIndexWriterLogExceptionsOnlyTest
 			indexWriter.partiallyUpdateDocuments(
 				createSearchContext(), documents);
 		}
-		catch (SearchException se) {
+		catch (SearchException searchException) {
 		}
 	}
 
@@ -271,7 +271,7 @@ public class ElasticsearchIndexWriterLogExceptionsOnlyTest
 		try {
 			indexWriter.updateDocument(createSearchContext(), document);
 		}
-		catch (SearchException se) {
+		catch (SearchException searchException) {
 		}
 	}
 
@@ -292,7 +292,7 @@ public class ElasticsearchIndexWriterLogExceptionsOnlyTest
 		try {
 			indexWriter.updateDocument(createSearchContext(), document);
 		}
-		catch (SearchException se) {
+		catch (SearchException searchException) {
 		}
 	}
 
@@ -314,7 +314,7 @@ public class ElasticsearchIndexWriterLogExceptionsOnlyTest
 		try {
 			indexWriter.updateDocuments(createSearchContext(), documents);
 		}
-		catch (SearchException se) {
+		catch (SearchException searchException) {
 		}
 	}
 
@@ -339,7 +339,7 @@ public class ElasticsearchIndexWriterLogExceptionsOnlyTest
 		try {
 			indexWriter.updateDocuments(createSearchContext(), documents);
 		}
-		catch (SearchException se) {
+		catch (SearchException searchException) {
 		}
 	}
 
@@ -348,9 +348,9 @@ public class ElasticsearchIndexWriterLogExceptionsOnlyTest
 
 	protected ElasticsearchFixture createElasticsearchFixture() {
 		Map<String, Object> elasticsearchConfigurationProperties =
-			new HashMap<>();
-
-		elasticsearchConfigurationProperties.put("logExceptionsOnly", true);
+			HashMapBuilder.<String, Object>put(
+				"logExceptionsOnly", true
+			).build();
 
 		return new ElasticsearchFixture(
 			ElasticsearchIndexWriterLogExceptionsOnlyTest.class.getSimpleName(),

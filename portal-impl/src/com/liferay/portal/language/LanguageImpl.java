@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.util.CookieKeys;
 import com.liferay.portal.kernel.util.FastDateFormatConstants;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -301,9 +302,9 @@ public class LanguageImpl implements Language, Serializable {
 				value = pattern;
 			}
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(e, e);
+				_log.warn(exception, exception);
 			}
 		}
 
@@ -471,9 +472,9 @@ public class LanguageImpl implements Language, Serializable {
 				value = pattern;
 			}
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(e, e);
+				_log.warn(exception, exception);
 			}
 		}
 
@@ -650,9 +651,9 @@ public class LanguageImpl implements Language, Serializable {
 				value = pattern;
 			}
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(e, e);
+				_log.warn(exception, exception);
 			}
 		}
 
@@ -790,9 +791,9 @@ public class LanguageImpl implements Language, Serializable {
 				value = pattern;
 			}
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(e, e);
+				_log.warn(exception, exception);
 			}
 		}
 
@@ -995,7 +996,7 @@ public class LanguageImpl implements Language, Serializable {
 				return companyLocalesBag.getAvailableLocales();
 			}
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 		}
 
 		Map<String, Locale> groupLanguageIdLocalesMap =
@@ -1099,7 +1100,7 @@ public class LanguageImpl implements Language, Serializable {
 				return getLocale(languageCode);
 			}
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
 				_log.warn("Unable to check if group inherits locales");
 			}
@@ -1239,9 +1240,9 @@ public class LanguageImpl implements Language, Serializable {
 
 			value = format(httpServletRequest, "x-" + unit, parts[0]);
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(e, e);
+				_log.warn(exception, exception);
 			}
 		}
 
@@ -1382,9 +1383,9 @@ public class LanguageImpl implements Language, Serializable {
 
 			value = format(locale, "x-" + unit, parts[0]);
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(e, e);
+				_log.warn(exception, exception);
 			}
 		}
 
@@ -1503,7 +1504,7 @@ public class LanguageImpl implements Language, Serializable {
 				return isAvailableLocale(languageId);
 			}
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 		}
 
 		Map<String, Locale> groupLanguageIdLocalesMap =
@@ -1557,7 +1558,10 @@ public class LanguageImpl implements Language, Serializable {
 			group = group.getLiveGroup();
 		}
 
-		if (!group.isSite() || group.isCompany()) {
+		if ((!group.isSite() &&
+			 (group.getType() != GroupConstants.TYPE_DEPOT)) ||
+			group.isCompany()) {
+
 			return true;
 		}
 
@@ -1577,18 +1581,6 @@ public class LanguageImpl implements Language, Serializable {
 		String language2 = locale2.getLanguage();
 
 		return language1.equals(language2);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link #process(Supplier,
-	 *             Locale, String)}
-	 */
-	@Deprecated
-	@Override
-	public String process(
-		ResourceBundle resourceBundle, Locale locale, String content) {
-
-		return process(() -> resourceBundle, locale, content);
 	}
 
 	@Override
@@ -1714,15 +1706,16 @@ public class LanguageImpl implements Language, Serializable {
 				languageIds = StringUtil.split(groupLanguageIds);
 			}
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 		}
 
-		HashMap<String, Locale> groupLanguageCodeLocalesMap = new HashMap<>();
 		HashMap<String, Locale> groupLanguageIdLocalesMap =
 			new LinkedHashMap<>();
 
-		groupLanguageCodeLocalesMap.put(
-			defaultLocale.getLanguage(), defaultLocale);
+		HashMap<String, Locale> groupLanguageCodeLocalesMap =
+			HashMapBuilder.put(
+				defaultLocale.getLanguage(), defaultLocale
+			).build();
 
 		for (String languageId : languageIds) {
 			Locale locale = LocaleUtil.fromLanguageId(languageId, false);
@@ -2019,12 +2012,12 @@ public class LanguageImpl implements Language, Serializable {
 						companyId, PropsKeys.LOCALES, StringPool.COMMA,
 						PropsValues.LOCALES_ENABLED);
 				}
-				catch (SystemException se) {
+				catch (SystemException systemException) {
 
 					// LPS-52675
 
 					if (_log.isDebugEnabled()) {
-						_log.debug(se, se);
+						_log.debug(systemException, systemException);
 					}
 
 					languageIds = PropsValues.LOCALES_ENABLED;

@@ -65,7 +65,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface DDMFormInstanceRecordLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link DDMFormInstanceRecordLocalServiceUtil} to access the ddm form instance record local service. Add custom service methods to <code>com.liferay.dynamic.data.mapping.service.impl.DDMFormInstanceRecordLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -307,6 +307,16 @@ public interface DDMFormInstanceRecordLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getDDMFormInstanceRecordsCount();
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public DDMFormValues getDDMFormValues(
+			DDMForm ddmForm, long storageId, String storageType)
+		throws StorageException;
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #getDDMFormValues(DDMForm, long, String)}
+	 */
+	@Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DDMFormValues getDDMFormValues(long storageId, DDMForm ddmForm)
 		throws StorageException;

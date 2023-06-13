@@ -1442,20 +1442,6 @@ public class UserLocalServiceWrapper
 	}
 
 	/**
-	 * Returns all the users who do not have any contacts.
-	 *
-	 * @return the users who do not have any contacts
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public java.util.List<com.liferay.portal.kernel.model.User>
-		getNoContacts() {
-
-		return _userLocalService.getNoContacts();
-	}
-
-	/**
 	 * Returns all the users who do not belong to any groups, excluding the
 	 * default user.
 	 *
@@ -2242,25 +2228,6 @@ public class UserLocalServiceWrapper
 	}
 
 	/**
-	 * Returns <code>true</code> if the password policy is configured to warn
-	 * the user that his password is expiring and the remaining time until
-	 * expiration is equal or less than the configured warning time.
-	 *
-	 * @param user the user
-	 * @return <code>true</code> if the user's password is expiring soon;
-	 <code>false</code> otherwise
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	@Override
-	public boolean isPasswordExpiringSoon(
-			com.liferay.portal.kernel.model.User user)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _userLocalService.isPasswordExpiringSoon(user);
-	}
-
-	/**
 	 * Returns the default user for the company.
 	 *
 	 * @param companyId the primary key of the company
@@ -2335,15 +2302,12 @@ public class UserLocalServiceWrapper
 	 user's first name, middle name, last name, screen name, or email
 	 address
 	 * @param status the workflow status
-	 * @param params the indexer parameters (optionally <code>null</code>). For
-	 more information see {@link
-	 com.liferay.portlet.usersadmin.util.UserIndexer}.
+	 * @param params the indexer parameters (optionally <code>null</code>).
 	 * @param start the lower bound of the range of users
 	 * @param end the upper bound of the range of users (not inclusive)
 	 * @param sort the field and direction to sort by (optionally
 	 <code>null</code>)
 	 * @return the matching users
-	 * @see com.liferay.portlet.usersadmin.util.UserIndexer
 	 */
 	@Override
 	public com.liferay.portal.kernel.search.Hits search(
@@ -2441,9 +2405,7 @@ public class UserLocalServiceWrapper
 	 * @param screenName the screen name keywords
 	 * @param emailAddress the email address keywords
 	 * @param status the workflow status
-	 * @param params the indexer parameters (optionally <code>null</code>). For
-	 more information see {@link
-	 com.liferay.portlet.usersadmin.util.UserIndexer}.
+	 * @param params the indexer parameters (optionally <code>null</code>).
 	 * @param andSearch whether every field must match its keywords, or just
 	 one field. For example, &quot;users with the first name 'bob' and
 	 last name 'smith'&quot; vs &quot;users with the first name 'bob'
@@ -2453,7 +2415,6 @@ public class UserLocalServiceWrapper
 	 * @param sort the field and direction to sort by (optionally
 	 <code>null</code>)
 	 * @return the matching users
-	 * @see com.liferay.portlet.usersadmin.util.UserIndexer
 	 */
 	@Override
 	public com.liferay.portal.kernel.search.Hits search(

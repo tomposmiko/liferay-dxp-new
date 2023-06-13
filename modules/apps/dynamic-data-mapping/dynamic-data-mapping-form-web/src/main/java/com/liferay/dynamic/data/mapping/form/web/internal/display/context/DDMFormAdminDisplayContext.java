@@ -90,6 +90,7 @@ import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -328,8 +329,8 @@ public class DDMFormAdminDisplayContext {
 
 				jsonObject.put("settingsContext", settingsContext);
 			}
-			catch (PortalException pe) {
-				_log.error(pe, pe);
+			catch (PortalException portalException) {
+				_log.error(portalException, portalException);
 			}
 		}
 
@@ -864,13 +865,19 @@ public class DDMFormAdminDisplayContext {
 		String serializedFormBuilderContext = ParamUtil.getString(
 			renderRequest, "serializedFormBuilderContext");
 
+		ThemeDisplay themeDisplay = formAdminRequestHelper.getThemeDisplay();
+
 		if (Validator.isNotNull(serializedFormBuilderContext)) {
-			return serializedFormBuilderContext;
+			JSONObject jsonObject = jsonFactory.createJSONObject(
+				serializedFormBuilderContext);
+
+			_escape(themeDisplay.getLanguageId(), "description", jsonObject);
+			_escape(themeDisplay.getLanguageId(), "name", jsonObject);
+
+			return jsonObject.toString();
 		}
 
 		JSONSerializer jsonSerializer = jsonFactory.createJSONSerializer();
-
-		ThemeDisplay themeDisplay = formAdminRequestHelper.getThemeDisplay();
 
 		DDMFormBuilderContextRequest ddmFormBuilderContextRequest =
 			DDMFormBuilderContextRequest.with(
@@ -1113,9 +1120,9 @@ public class DDMFormAdminDisplayContext {
 		ThemeDisplay themeDisplay = formAdminRequestHelper.getThemeDisplay();
 
 		return Optional.ofNullable(
-			themeDisplay.getLocale()
-		).orElse(
 			themeDisplay.getSiteDefaultLocale()
+		).orElse(
+			themeDisplay.getLocale()
 		);
 	}
 
@@ -1177,8 +1184,8 @@ public class DDMFormAdminDisplayContext {
 
 			return availableLocales.toArray(new Locale[0]);
 		}
-		catch (PortalException pe) {
-			_log.error(pe, pe);
+		catch (PortalException portalException) {
+			_log.error(portalException, portalException);
 
 			return null;
 		}
@@ -1207,8 +1214,8 @@ public class DDMFormAdminDisplayContext {
 
 			return locales;
 		}
-		catch (JSONException jsone) {
-			_log.error("Unable to deserialize form context", jsone);
+		catch (JSONException jsonException) {
+			_log.error("Unable to deserialize form context", jsonException);
 
 			return null;
 		}
@@ -1228,8 +1235,8 @@ public class DDMFormAdminDisplayContext {
 
 			return jsonObject.getString("defaultLanguageId");
 		}
-		catch (JSONException jsone) {
-			_log.error("Unable to deserialize form context", jsone);
+		catch (JSONException jsonException) {
+			_log.error("Unable to deserialize form context", jsonException);
 
 			return null;
 		}
@@ -1247,8 +1254,8 @@ public class DDMFormAdminDisplayContext {
 
 			return LocaleUtil.toLanguageId(form.getDefaultLocale());
 		}
-		catch (PortalException pe) {
-			_log.error(pe, pe);
+		catch (PortalException portalException) {
+			_log.error(portalException, portalException);
 
 			return null;
 		}
@@ -1277,13 +1284,13 @@ public class DDMFormAdminDisplayContext {
 
 			return jsonObject.getString(getDefaultLanguageId());
 		}
-		catch (JSONException jsone) {
+		catch (JSONException jsonException) {
 			_log.error(
 				String.format(
 					"Unable to deserialize JSON localized property \"%s\" " +
 						"from request",
 					propertyName),
-				jsone);
+				jsonException);
 		}
 
 		return StringPool.BLANK;
@@ -1386,6 +1393,21 @@ public class DDMFormAdminDisplayContext {
 	protected final JSONFactory jsonFactory;
 	protected final RenderRequest renderRequest;
 	protected final RenderResponse renderResponse;
+
+	private void _escape(
+		String languageId, String propertyName,
+		JSONObject serializedFormBuilderContext) {
+
+		if (!serializedFormBuilderContext.has(propertyName)) {
+			return;
+		}
+
+		JSONObject jsonObject = serializedFormBuilderContext.getJSONObject(
+			propertyName);
+
+		jsonObject.put(
+			languageId, HtmlUtil.escape(jsonObject.getString(languageId)));
+	}
 
 	private void _populateDDMDataProviderNavigationItem(
 		NavigationItem navigationItem) {

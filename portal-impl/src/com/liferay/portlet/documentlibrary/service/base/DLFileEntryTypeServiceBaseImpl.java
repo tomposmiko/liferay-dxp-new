@@ -55,7 +55,7 @@ public abstract class DLFileEntryTypeServiceBaseImpl
 	extends BaseServiceImpl
 	implements DLFileEntryTypeService, IdentifiableOSGiService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>DLFileEntryTypeService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.document.library.kernel.service.DLFileEntryTypeServiceUtil</code>.
@@ -727,8 +727,8 @@ public abstract class DLFileEntryTypeServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

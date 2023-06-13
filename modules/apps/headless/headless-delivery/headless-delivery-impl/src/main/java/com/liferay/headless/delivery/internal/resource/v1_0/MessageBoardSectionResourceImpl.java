@@ -252,6 +252,7 @@ public class MessageBoardSectionResourceImpl
 					_portal,
 					_userLocalService.getUserById(mbCategory.getUserId()));
 				customFields = CustomFieldsUtil.toCustomFields(
+					contextAcceptLanguage.isAcceptAllLanguages(),
 					MBCategory.class.getName(), mbCategory.getCategoryId(),
 					mbCategory.getCompanyId(),
 					contextAcceptLanguage.getPreferredLocale());
@@ -268,6 +269,15 @@ public class MessageBoardSectionResourceImpl
 					mbCategory.getCompanyId(), contextUser.getUserId(),
 					MBCategory.class.getName(), mbCategory.getCategoryId());
 				title = mbCategory.getName();
+
+				setParentMessageBoardSectionId(
+					() -> {
+						if (mbCategory.getParentCategoryId() == 0L) {
+							return null;
+						}
+
+						return mbCategory.getParentCategoryId();
+					});
 			}
 		};
 	}

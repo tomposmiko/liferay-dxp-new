@@ -154,7 +154,11 @@ public class UpgradeLayoutPageTemplateStructure extends UpgradeProcess {
 			JSONObject structureJSONObject = JSONUtil.put(
 				"columns", JSONUtil.put(columnJSONObject)
 			).put(
+				"config", JSONFactoryUtil.createJSONObject()
+			).put(
 				"rowId", String.valueOf(i)
+			).put(
+				"type", "1"
 			);
 
 			structureJSONArray.put(structureJSONObject);
@@ -167,11 +171,6 @@ public class UpgradeLayoutPageTemplateStructure extends UpgradeProcess {
 		).put(
 			"nextRowId", fragmentEntryLinks.size()
 		);
-
-		if (!fragmentEntryLinks.isEmpty()) {
-			jsonObject.put(
-				"nextRowId", String.valueOf(fragmentEntryLinks.size() - 1));
-		}
 
 		jsonObject.put("structure", structureJSONArray);
 
@@ -223,9 +222,9 @@ public class UpgradeLayoutPageTemplateStructure extends UpgradeProcess {
 
 			ps.executeUpdate();
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(e, e);
+				_log.debug(exception, exception);
 			}
 		}
 		finally {

@@ -223,8 +223,8 @@ public class WikiPageFinderImpl
 				return pages.get(0);
 			}
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -258,20 +258,6 @@ public class WikiPageFinderImpl
 			groupId, nodeId, createDate, before, start, end, false);
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public List<WikiPage> findByModifiedDate(
-		long groupId, long nodeId, Date modifiedDate, boolean before, int start,
-		int end) {
-
-		return doFindByModifiedDate(
-			groupId, nodeId, new Timestamp(modifiedDate.getTime()), before,
-			start, end, false);
-	}
-
 	@Override
 	public List<WikiPage> findByModifiedDate(
 		long groupId, long nodeId, Timestamp modifiedDate, boolean before,
@@ -300,8 +286,8 @@ public class WikiPageFinderImpl
 
 			return q.list(true);
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -366,8 +352,8 @@ public class WikiPageFinderImpl
 
 			return 0;
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -424,8 +410,8 @@ public class WikiPageFinderImpl
 
 			return 0;
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -482,8 +468,8 @@ public class WikiPageFinderImpl
 
 			return 0;
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -530,8 +516,8 @@ public class WikiPageFinderImpl
 
 			return (List<WikiPage>)QueryUtil.list(q, getDialect(), start, end);
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -578,8 +564,8 @@ public class WikiPageFinderImpl
 
 			return (List<WikiPage>)QueryUtil.list(q, getDialect(), start, end);
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -631,8 +617,8 @@ public class WikiPageFinderImpl
 				q, getDialect(), queryDefinition.getStart(),
 				queryDefinition.getEnd());
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);

@@ -53,9 +53,9 @@ public class ContextODataMatcher implements ODataMatcher<Context> {
 
 			return predicate.test(pattern);
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			throw new PortalException(
-				"Unable to match filter: " + e.getMessage(), e);
+				"Unable to match filter: " + exception.getMessage(), exception);
 		}
 	}
 
@@ -109,12 +109,12 @@ public class ContextODataMatcher implements ODataMatcher<Context> {
 		Filter filter = new Filter(_filterParser.parse(filterString));
 
 		try {
-			return _expressionConvert.convert(
+			return (Predicate<Context>)_expressionConvert.convert(
 				filter.getExpression(), LocaleUtil.getDefault(), _entityModel);
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			throw new InvalidFilterException(
-				"Invalid filter: " + e.getMessage(), e);
+				"Invalid filter: " + exception.getMessage(), exception);
 		}
 	}
 
@@ -123,10 +123,8 @@ public class ContextODataMatcher implements ODataMatcher<Context> {
 
 	private volatile EntityModel _entityModel;
 
-	@Reference(
-		target = "(result.class.name=java.util.function.Predicate<Context>)"
-	)
-	private ExpressionConvert<Predicate<Context>> _expressionConvert;
+	@Reference(target = "(result.class.name=java.util.function.Predicate)")
+	private ExpressionConvert<Predicate> _expressionConvert;
 
 	private FilterParser _filterParser;
 

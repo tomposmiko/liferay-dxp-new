@@ -140,10 +140,16 @@ request.setAttribute("view_user.jsp-user", user2);
 				</aui:col>
 			</aui:row>
 
-			<div class="field-group lfr-detail-info" data-sectionId="details" data-title="<%= LanguageUtil.get(request, "details") %>">
+			<div class="field-group lfr-detail-info" data-title="<%= LanguageUtil.get(request, "details") %>">
+
+				<%
+				PortletURL editDetailsURL = PortletURLFactoryUtil.create(request, PortletKeys.MY_ACCOUNT, embeddedPersonalApplicationLayout, PortletRequest.RENDER_PHASE);
+				%>
+
 				<liferay-ui:icon
 					icon="pencil"
 					markupView="lexicon"
+					url="<%= editDetailsURL.toString() %>"
 				/>
 
 				<c:if test="<%= showIcon %>">
@@ -225,10 +231,8 @@ request.setAttribute("view_user.jsp-user", user2);
 
 									groupParams.put("site", Boolean.TRUE);
 
-									Group group = themeDisplay.getScopeGroup();
-
-									if (group.isUser()) {
-										groupParams.put("usersGroups", Long.valueOf(group.getClassPK()));
+									if (scopeGroup.isUser()) {
+										groupParams.put("usersGroups", Long.valueOf(scopeGroup.getClassPK()));
 									}
 									else {
 										groupParams.put("usersGroups", Long.valueOf(themeDisplay.getUserId()));
@@ -236,7 +240,7 @@ request.setAttribute("view_user.jsp-user", user2);
 
 									groupParams.put("active", Boolean.TRUE);
 
-									if (group.isUser() && (themeDisplay.getUserId() != group.getClassPK())) {
+									if (scopeGroup.isUser() && (themeDisplay.getUserId() != scopeGroup.getClassPK())) {
 										List<Integer> types = new ArrayList<Integer>();
 
 										types.add(GroupConstants.TYPE_SITE_OPEN);
@@ -269,7 +273,7 @@ request.setAttribute("view_user.jsp-user", user2);
 											</c:when>
 											<c:otherwise>
 												<div class="empty">
-													<liferay-ui:message arguments="<%= HtmlUtil.escape(PortalUtil.getUserName(user2.getUserId(), group.getDescriptiveName(locale))) %>" key="x-does-not-belong-to-any-sites" translateArguments="<%= false %>" />
+													<liferay-ui:message arguments="<%= HtmlUtil.escape(PortalUtil.getUserName(user2.getUserId(), scopeGroup.getDescriptiveName(locale))) %>" key="x-does-not-belong-to-any-sites" translateArguments="<%= false %>" />
 												</div>
 											</c:otherwise>
 										</c:choose>
@@ -287,10 +291,16 @@ request.setAttribute("view_user.jsp-user", user2);
 
 									<c:choose>
 										<c:when test="<%= !assetTags.isEmpty() %>">
-											<div class="field-group user-tags-wrapper" data-sectionId="categorization" data-title="<%= LanguageUtil.get(request, "tags") %>">
+											<div class="field-group user-tags-wrapper" data-title="<%= LanguageUtil.get(request, "tags") %>">
+
+												<%
+												PortletURL editCategorizationURL = PortletURLFactoryUtil.create(request, PortletKeys.MY_ACCOUNT, embeddedPersonalApplicationLayout, PortletRequest.RENDER_PHASE);
+												%>
+
 												<liferay-ui:icon
 													icon="pencil"
 													markupView="lexicon"
+													url="<%= editCategorizationURL.toString() %>"
 												/>
 
 												<ul class="user-tags">
@@ -321,12 +331,7 @@ request.setAttribute("view_user.jsp-user", user2);
 											</div>
 										</c:when>
 										<c:otherwise>
-
-											<%
-											Group group = themeDisplay.getScopeGroup();
-											%>
-
-											<liferay-ui:message arguments="<%= HtmlUtil.escape(PortalUtil.getUserName(user2.getUserId(), group.getDescriptiveName(locale))) %>" key="x-does-not-have-any-tags" translateArguments="<%= false %>" />
+											<liferay-ui:message arguments="<%= HtmlUtil.escape(PortalUtil.getUserName(user2.getUserId(), scopeGroup.getDescriptiveName(locale))) %>" key="x-does-not-have-any-tags" translateArguments="<%= false %>" />
 										</c:otherwise>
 									</c:choose>
 								</c:if>
@@ -348,67 +353,4 @@ request.setAttribute("view_user.jsp-user", user2);
 			</c:if>
 		</c:if>
 	</div>
-</c:if>
-
-<c:if test="<%= themeDisplay.getUserId() == user2.getUserId() %>">
-	<aui:script use="aui-base,liferay-util-window">
-			var contactsProfile = A.one('#<portlet:namespace />contactsProfile');
-
-			contactsProfile.delegate(
-				'click',
-				function(event) {
-					var node = event.target;
-
-					var tagName = node.get('tagName');
-
-					if (!tagName || tagName.toLowerCase() != 'a') {
-						<portlet:namespace />openDialog(event);
-					}
-				},
-				'.field-group, .action-field'
-			);
-
-			var <portlet:namespace />openDialog = function(event) {
-				var node = event.currentTarget;
-
-				var uri =
-					'<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="mvcPath" value="/user/edit_user_dialogs.jsp" /></portlet:renderURL>';
-
-				if (node.getAttribute('data-sectionId')) {
-					uri =
-						Liferay.Util.addParams(
-							'<portlet:namespace />curSectionId=' +
-								node.getAttribute('data-sectionId'),
-							uri
-						) || uri;
-				}
-
-				if (node.getAttribute('data-extension')) {
-					uri =
-						Liferay.Util.addParams(
-							'<portlet:namespace />extension=' +
-								node.getAttribute('data-extension'),
-							uri
-						) || uri;
-				}
-
-				var dialog = Liferay.Util.Window.getWindow({
-					dialog: {
-						align: {
-							node: null,
-							points: ['tc', 'tc']
-						},
-						constrain2view: true,
-						cssClass: 'profile-dialog',
-						destroyOnClose: true,
-						modal: true,
-						resizable: false,
-						width: 800
-					},
-					id: '<portlet:namespace />Dialog',
-					title: node.getAttribute('data-title'),
-					uri: uri
-				});
-			};
-	</aui:script>
 </c:if>

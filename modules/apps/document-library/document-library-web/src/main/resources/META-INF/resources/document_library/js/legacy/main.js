@@ -87,6 +87,14 @@ AUI.add(
 					} else {
 						instance._selectedFileEntries = [];
 					}
+
+					var bulkSelection =
+						instance._searchContainer.select &&
+						instance._searchContainer.select.get('bulkSelection');
+
+					var form = instance.get('form').node;
+
+					form.get(instance.NS + 'selectAll').val(bulkSelection);
 				},
 
 				_moveCurrentSelection(newFolderId) {
@@ -102,12 +110,6 @@ AUI.add(
 
 					form.get(instance.NS + 'cmd').val('move');
 					form.get(instance.NS + 'newFolderId').val(newFolderId);
-
-					var bulkSelection =
-						instance._searchContainer.select &&
-						instance._searchContainer.select.get('bulkSelection');
-
-					form.get(instance.NS + 'selectAll').val(bulkSelection);
 
 					submitForm(form, actionUrl, false);
 				},
@@ -196,11 +198,9 @@ AUI.add(
 				_openModalCategories() {
 					var instance = this;
 
-					var editCategoriesComponent = Liferay.component(
+					Liferay.componentReady(
 						instance.NS + 'EditCategoriesComponent'
-					);
-
-					if (editCategoriesComponent) {
+					).then(editCategoriesComponent => {
 						var bulkSelection =
 							instance._searchContainer.select &&
 							instance._searchContainer.select.get(
@@ -212,7 +212,7 @@ AUI.add(
 							bulkSelection,
 							instance.getFolderId()
 						);
-					}
+					});
 				},
 
 				_openModalMove() {
@@ -233,11 +233,9 @@ AUI.add(
 				_openModalTags() {
 					var instance = this;
 
-					var editTagsComponent = Liferay.component(
+					Liferay.componentReady(
 						instance.NS + 'EditTagsComponent'
-					);
-
-					if (editTagsComponent) {
+					).then(editTagsComponent => {
 						var bulkSelection =
 							instance._searchContainer.select &&
 							instance._searchContainer.select.get(
@@ -249,7 +247,7 @@ AUI.add(
 							bulkSelection,
 							instance.getFolderId()
 						);
-					}
+					});
 				},
 
 				_plugUpload(event, config) {
@@ -290,12 +288,6 @@ AUI.add(
 					}
 
 					form.get(namespace + 'redirect').val(redirectUrl);
-
-					var bulkSelection =
-						instance._searchContainer.select &&
-						instance._searchContainer.select.get('bulkSelection');
-
-					form.get(namespace + 'selectAll').val(bulkSelection);
 
 					submitForm(form, url, false);
 				},
@@ -402,12 +394,10 @@ AUI.add(
 							ItemSelectorDialog => {
 								var itemSelectorDialog = new ItemSelectorDialog.default(
 									{
-										buttonAddLabel: Liferay.Language.get(
-											'select'
-										),
 										eventName: instance.ns(
 											'selectFileEntryType'
 										),
+										singleSelect: true,
 										title: Liferay.Language.get(
 											'select-document-type'
 										),

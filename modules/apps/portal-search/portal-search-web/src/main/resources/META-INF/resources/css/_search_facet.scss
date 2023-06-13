@@ -1,0 +1,30 @@
+.search-facet {
+	.custom-control-label,
+	.term-name {
+		&.facet-term-unselected {
+			font-weight: 400;
+		}
+
+		&.facet-term-selected {
+			font-weight: 600;
+		}
+	}
+
+	.facet-clear-btn {
+		font-weight: 600;
+		font-size: 0.875rem; // Copied from .custom-control-label
+	}
+
+	&.search-facet-display-label {
+		.label-container {
+			margin-bottom: 16px;
+		}
+
+		.term-name {
+			&.facet-term-selected,
+			&.facet-term-unselected {
+				font-weight: 600;
+			}
+		}
+	}
+}

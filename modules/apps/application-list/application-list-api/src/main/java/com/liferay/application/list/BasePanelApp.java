@@ -82,7 +82,7 @@ public abstract class BasePanelApp implements PanelApp {
 		return _userNotificationEventLocalService.
 			getUserNotificationEventsCount(
 				user.getUserId(), _portlet.getPortletId(),
-				UserNotificationDeliveryConstants.TYPE_WEBSITE, false);
+				UserNotificationDeliveryConstants.TYPE_WEBSITE, true, false);
 	}
 
 	@Override
@@ -140,11 +140,11 @@ public abstract class BasePanelApp implements PanelApp {
 			return controlPanelEntry.hasAccessPermission(
 				permissionChecker, group, getPortlet());
 		}
-		catch (PortalException | RuntimeException e) {
-			throw e;
+		catch (PortalException | RuntimeException exception) {
+			throw exception;
 		}
-		catch (Exception e) {
-			throw new PortalException(e);
+		catch (Exception exception) {
+			throw new PortalException(exception);
 		}
 	}
 

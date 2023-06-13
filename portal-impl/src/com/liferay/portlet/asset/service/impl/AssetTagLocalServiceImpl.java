@@ -44,6 +44,7 @@ import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -56,7 +57,6 @@ import java.io.Serializable;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -113,9 +113,7 @@ public class AssetTagLocalServiceImpl extends AssetTagLocalServiceBaseImpl {
 
 		tag.setName(name);
 
-		assetTagPersistence.update(tag);
-
-		return tag;
+		return assetTagPersistence.update(tag);
 	}
 
 	/**
@@ -197,9 +195,7 @@ public class AssetTagLocalServiceImpl extends AssetTagLocalServiceBaseImpl {
 
 		tag.setAssetCount(Math.max(0, tag.getAssetCount() - 1));
 
-		assetTagPersistence.update(tag);
-
-		return tag;
+		return assetTagPersistence.update(tag);
 	}
 
 	/**
@@ -604,9 +600,7 @@ public class AssetTagLocalServiceImpl extends AssetTagLocalServiceBaseImpl {
 
 		tag.setAssetCount(tag.getAssetCount() + 1);
 
-		assetTagPersistence.update(tag);
-
-		return tag;
+		return assetTagPersistence.update(tag);
 	}
 
 	/**
@@ -714,7 +708,7 @@ public class AssetTagLocalServiceImpl extends AssetTagLocalServiceBaseImpl {
 
 		tag.setName(name);
 
-		assetTagPersistence.update(tag);
+		tag = assetTagPersistence.update(tag);
 
 		// Indexer
 
@@ -734,9 +728,10 @@ public class AssetTagLocalServiceImpl extends AssetTagLocalServiceBaseImpl {
 
 		SearchContext searchContext = new SearchContext();
 
-		Map<String, Serializable> attributes = new HashMap<>();
-
-		attributes.put(Field.NAME, name);
+		Map<String, Serializable> attributes =
+			HashMapBuilder.<String, Serializable>put(
+				Field.NAME, name
+			).build();
 
 		searchContext.setAttributes(attributes);
 

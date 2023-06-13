@@ -90,10 +90,10 @@ public class LayoutSetServiceSoap {
 				groupId, privateLayout, layoutSetPrototypeLinkEnabled,
 				layoutSetPrototypeUuid);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -105,10 +105,10 @@ public class LayoutSetServiceSoap {
 			LayoutSetServiceUtil.updateLogo(
 				groupId, privateLayout, hasLogo, bytes);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -126,10 +126,10 @@ public class LayoutSetServiceSoap {
 			return com.liferay.portal.kernel.model.LayoutSetSoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -145,30 +145,56 @@ public class LayoutSetServiceSoap {
 			return com.liferay.portal.kernel.model.LayoutSetSoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #updateVirtualHosts(long, boolean, TreeMap)}
+	 */
+	@Deprecated
 	public static com.liferay.portal.kernel.model.LayoutSetSoap
 			updateVirtualHost(
-				long groupId, boolean privateLayout, String virtualHost)
+				long groupId, boolean privateLayout, String virtualHostname)
 		throws RemoteException {
 
 		try {
 			com.liferay.portal.kernel.model.LayoutSet returnValue =
 				LayoutSetServiceUtil.updateVirtualHost(
-					groupId, privateLayout, virtualHost);
+					groupId, privateLayout, virtualHostname);
 
 			return com.liferay.portal.kernel.model.LayoutSetSoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static com.liferay.portal.kernel.model.LayoutSetSoap
+			updateVirtualHosts(
+				long groupId, boolean privateLayout,
+				java.util.TreeMap<String, String> virtualHostnames)
+		throws RemoteException {
+
+		try {
+			com.liferay.portal.kernel.model.LayoutSet returnValue =
+				LayoutSetServiceUtil.updateVirtualHosts(
+					groupId, privateLayout, virtualHostnames);
+
+			return com.liferay.portal.kernel.model.LayoutSetSoap.toSoapModel(
+				returnValue);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 

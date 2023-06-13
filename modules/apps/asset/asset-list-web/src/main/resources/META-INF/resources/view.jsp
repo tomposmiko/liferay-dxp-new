@@ -17,7 +17,7 @@
 <%@ include file="/init.jsp" %>
 
 <%
-AssetListManagementToolbarDisplayContext assetListManagementToolbarDisplayContext = new AssetListManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, assetListDisplayContext);
+AssetListManagementToolbarDisplayContext assetListManagementToolbarDisplayContext = new AssetListManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, assetListDisplayContext);
 %>
 
 <clay:management-toolbar
@@ -54,9 +54,9 @@ AssetListManagementToolbarDisplayContext assetListManagementToolbarDisplayContex
 						editURL = editAssetListEntryURL.toString();
 					}
 
-					Map<String, Object> rowData = new HashMap<>();
-
-					rowData.put("actions", assetListManagementToolbarDisplayContext.getAvailableActions(assetListEntry));
+					Map<String, Object> rowData = HashMapBuilder.<String, Object>put(
+						"actions", assetListManagementToolbarDisplayContext.getAvailableActions(assetListEntry)
+					).build();
 
 					row.setData(rowData);
 					%>

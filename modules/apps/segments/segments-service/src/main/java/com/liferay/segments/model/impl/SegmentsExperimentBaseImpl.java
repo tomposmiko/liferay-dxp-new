@@ -32,7 +32,7 @@ import com.liferay.segments.service.SegmentsExperimentLocalServiceUtil;
 public abstract class SegmentsExperimentBaseImpl
 	extends SegmentsExperimentModelImpl implements SegmentsExperiment {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a segments experiment model instance should use the <code>SegmentsExperiment</code> interface instead.

@@ -101,12 +101,14 @@ public class UserGroupRoleLocalServiceImpl
 			try {
 				userGroupRolePersistence.remove(userGroupRolePK);
 			}
-			catch (NoSuchUserGroupRoleException nsugre) {
+			catch (NoSuchUserGroupRoleException noSuchUserGroupRoleException) {
 
 				// LPS-52675
 
 				if (_log.isDebugEnabled()) {
-					_log.debug(nsugre, nsugre);
+					_log.debug(
+						noSuchUserGroupRoleException,
+						noSuchUserGroupRoleException);
 				}
 			}
 		}
@@ -141,12 +143,15 @@ public class UserGroupRoleLocalServiceImpl
 				try {
 					userGroupRolePersistence.remove(userGroupRolePK);
 				}
-				catch (NoSuchUserGroupRoleException nsugre) {
+				catch (NoSuchUserGroupRoleException
+							noSuchUserGroupRoleException) {
 
 					// LPS-52675
 
 					if (_log.isDebugEnabled()) {
-						_log.debug(nsugre, nsugre);
+						_log.debug(
+							noSuchUserGroupRoleException,
+							noSuchUserGroupRoleException);
 					}
 				}
 			}
@@ -163,12 +168,14 @@ public class UserGroupRoleLocalServiceImpl
 			try {
 				userGroupRolePersistence.remove(pk);
 			}
-			catch (NoSuchUserGroupRoleException nsugre) {
+			catch (NoSuchUserGroupRoleException noSuchUserGroupRoleException) {
 
 				// LPS-52675
 
 				if (_log.isDebugEnabled()) {
-					_log.debug(nsugre, nsugre);
+					_log.debug(
+						noSuchUserGroupRoleException,
+						noSuchUserGroupRoleException);
 				}
 			}
 		}
@@ -292,7 +299,7 @@ public class UserGroupRoleLocalServiceImpl
 		if (userGroupRole == null) {
 			userGroupRole = userGroupRolePersistence.create(userGroupRolePK);
 
-			userGroupRolePersistence.update(userGroupRole);
+			userGroupRole = userGroupRolePersistence.update(userGroupRole);
 		}
 
 		return userGroupRole;

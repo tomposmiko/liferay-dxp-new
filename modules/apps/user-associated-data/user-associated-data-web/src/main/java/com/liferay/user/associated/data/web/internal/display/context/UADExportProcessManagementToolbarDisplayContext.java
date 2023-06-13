@@ -41,13 +41,13 @@ public class UADExportProcessManagementToolbarDisplayContext
 	extends BaseManagementToolbarDisplayContext {
 
 	public UADExportProcessManagementToolbarDisplayContext(
+		HttpServletRequest httpServletRequest,
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
-		HttpServletRequest httpServletRequest,
 		SearchContainer searchContainer) {
 
 		super(
-			liferayPortletRequest, liferayPortletResponse, httpServletRequest);
+			httpServletRequest, liferayPortletRequest, liferayPortletResponse);
 
 		_liferayPortletResponse = liferayPortletResponse;
 		_searchContainer = searchContainer;
@@ -124,9 +124,9 @@ public class UADExportProcessManagementToolbarDisplayContext
 		try {
 			return PortletURLUtil.clone(_currentURL, _liferayPortletResponse);
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(e, e);
+				_log.warn(exception, exception);
 			}
 
 			return _liferayPortletResponse.createRenderURL();

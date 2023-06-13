@@ -35,11 +35,6 @@ public class PushNotificationsDeviceLocalServiceWrapper
 			pushNotificationsDeviceLocalService;
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link PushNotificationsDeviceLocalServiceUtil} to access the push notifications device local service. Add custom service methods to <code>com.liferay.push.notifications.service.impl.PushNotificationsDeviceLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
-	 */
 	@Override
 	public com.liferay.push.notifications.model.PushNotificationsDevice
 			addPushNotificationsDevice(

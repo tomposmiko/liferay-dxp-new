@@ -55,6 +55,7 @@ import com.liferay.portal.kernel.settings.SettingsFactoryUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.AggregateResourceBundle;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -669,17 +670,17 @@ public class PortletConfigurationPortlet extends MVCPortlet {
 
 			super.doDispatch(renderRequest, renderResponse);
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			if (_log.isInfoEnabled()) {
-				_log.info(pe.getMessage());
+				_log.info(portalException.getMessage());
 			}
 
-			_handleException(renderRequest, renderResponse, pe);
+			_handleException(renderRequest, renderResponse, portalException);
 		}
-		catch (Exception e) {
-			_log.error(e.getMessage());
+		catch (Exception exception) {
+			_log.error(exception.getMessage());
 
-			_handleException(renderRequest, renderResponse, e);
+			_handleException(renderRequest, renderResponse, exception);
 		}
 	}
 
@@ -772,11 +773,10 @@ public class PortletConfigurationPortlet extends MVCPortlet {
 				scopeLayoutUuid, layout.getGroupId(), layout.isPrivateLayout());
 
 			if (!scopeLayout.hasScopeGroup()) {
-				Map<Locale, String> nameMap = new HashMap<>();
-
-				String name = String.valueOf(scopeLayout.getPlid());
-
-				nameMap.put(LocaleUtil.getDefault(), name);
+				Map<Locale, String> nameMap = HashMapBuilder.put(
+					LocaleUtil.getDefault(),
+					String.valueOf(scopeLayout.getPlid())
+				).build();
 
 				_groupLocalService.addGroup(
 					themeDisplay.getUserId(),
@@ -1062,10 +1062,10 @@ public class PortletConfigurationPortlet extends MVCPortlet {
 
 	private void _handleException(
 			RenderRequest renderRequest, RenderResponse renderResponse,
-			Exception e)
+			Exception exception)
 		throws IOException, PortletException {
 
-		SessionErrors.add(renderRequest, e.getClass());
+		SessionErrors.add(renderRequest, exception.getClass());
 
 		include("/error.jsp", renderRequest, renderResponse);
 	}
@@ -1118,8 +1118,8 @@ public class PortletConfigurationPortlet extends MVCPortlet {
 					super.getResourceBundle(locale),
 					portletConfig.getResourceBundle(locale));
 			}
-			catch (Exception e) {
-				_log.error(e, e);
+			catch (Exception exception) {
+				_log.error(exception, exception);
 			}
 
 			return super.getResourceBundle(locale);

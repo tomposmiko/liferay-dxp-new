@@ -14,7 +14,6 @@
 
 package com.liferay.mail.reader.service.impl;
 
-import com.liferay.document.library.kernel.exception.DirectoryNameException;
 import com.liferay.document.library.kernel.store.DLStoreUtil;
 import com.liferay.mail.reader.model.Attachment;
 import com.liferay.mail.reader.model.Message;
@@ -71,7 +70,7 @@ public class AttachmentLocalServiceImpl extends AttachmentLocalServiceBaseImpl {
 		attachment.setFileName(fileName);
 		attachment.setSize(size);
 
-		attachmentPersistence.update(attachment);
+		attachment = attachmentPersistence.update(attachment);
 
 		// File
 
@@ -80,30 +79,15 @@ public class AttachmentLocalServiceImpl extends AttachmentLocalServiceBaseImpl {
 				throw new PortalException(new FileNotFoundException());
 			}
 
-			String directoryPath = getDirectoryPath(attachment.getMessageId());
-
-			try {
-				DLStoreUtil.addDirectory(
-					attachment.getCompanyId(), _REPOSITORY_ID, directoryPath);
-			}
-			catch (DirectoryNameException dne) {
-
-				// LPS-52675
-
-				if (_log.isDebugEnabled()) {
-					_log.debug(dne, dne);
-				}
-			}
-
 			String filePath = getFilePath(attachment.getMessageId(), fileName);
 
 			try {
 				DLStoreUtil.addFile(
 					attachment.getCompanyId(), _REPOSITORY_ID, filePath, file);
 			}
-			catch (PortalException pe) {
+			catch (PortalException portalException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(pe, pe);
+					_log.debug(portalException, portalException);
 				}
 			}
 		}
@@ -166,8 +150,8 @@ public class AttachmentLocalServiceImpl extends AttachmentLocalServiceBaseImpl {
 
 			return file;
 		}
-		catch (IOException ioe) {
-			throw new SystemException(ioe);
+		catch (IOException ioException) {
+			throw new SystemException(ioException);
 		}
 	}
 

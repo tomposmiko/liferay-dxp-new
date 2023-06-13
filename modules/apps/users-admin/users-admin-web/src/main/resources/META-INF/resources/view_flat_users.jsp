@@ -108,9 +108,9 @@ boolean showRestoreButton = viewUsersManagementToolbarDisplayContext.isShowResto
 			rowIdProperty="screenName"
 		>
 			<liferay-portlet:renderURL varImpl="rowURL">
-				<portlet:param name="mvcRenderCommandName" value="/users_admin/edit_user" />
-				<portlet:param name="redirect" value="<%= userSearchContainer.getIteratorURL().toString() %>" />
 				<portlet:param name="p_u_i_d" value="<%= String.valueOf(user2.getUserId()) %>" />
+				<portlet:param name="mvcRenderCommandName" value="/users_admin/edit_user" />
+				<portlet:param name="backURL" value="<%= currentURL %>" />
 			</liferay-portlet:renderURL>
 
 			<%

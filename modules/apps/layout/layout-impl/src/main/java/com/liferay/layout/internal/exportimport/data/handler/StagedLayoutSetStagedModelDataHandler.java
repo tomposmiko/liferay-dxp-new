@@ -142,8 +142,7 @@ public class StagedLayoutSetStagedModelDataHandler
 					layout.isPrivateLayout())) {
 
 				_layoutLocalService.deleteLayout(
-					layout, false,
-					ServiceContextThreadLocal.getServiceContext());
+					layout, ServiceContextThreadLocal.getServiceContext());
 			}
 		}
 	}
@@ -186,6 +185,12 @@ public class StagedLayoutSetStagedModelDataHandler
 			if (!sourceLayoutUuids.contains(layout.getUuid()) &&
 				!layoutPlids.containsValue(layout.getPlid())) {
 
+				layout = _layoutLocalService.fetchLayout(layout.getPlid());
+
+				if (layout == null) {
+					continue;
+				}
+
 				String layoutUUID = layout.getUuid();
 				long stagingGroupID = portletDataContext.getSourceGroupId();
 
@@ -202,10 +207,9 @@ public class StagedLayoutSetStagedModelDataHandler
 						continue;
 					}
 
-					_layoutLocalService.deleteLayout(
-						layout, false, serviceContext);
+					_layoutLocalService.deleteLayout(layout, serviceContext);
 				}
-				catch (Exception e) {
+				catch (Exception exception) {
 					if (_log.isWarnEnabled()) {
 						_log.warn(
 							"Unable to delete layout with UUID " + layoutUUID);
@@ -360,12 +364,6 @@ public class StagedLayoutSetStagedModelDataHandler
 		updateLayoutPriorities(
 			portletDataContext, layoutElements,
 			portletDataContext.isPrivateLayout());
-
-		// Page count
-
-		_layoutSetLocalService.updatePageCount(
-			portletDataContext.getGroupId(),
-			portletDataContext.isPrivateLayout());
 	}
 
 	protected void exportLayouts(
@@ -421,12 +419,14 @@ public class StagedLayoutSetStagedModelDataHandler
 					portletDataContext, stagedLayoutSet, layout,
 					PortletDataContext.REFERENCE_TYPE_CHILD);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (_log.isWarnEnabled()) {
-					_log.warn("Unable to export layout " + layout.getName(), e);
+					_log.warn(
+						"Unable to export layout " + layout.getName(),
+						exception);
 				}
 
-				throw e;
+				throw exception;
 			}
 		}
 	}
@@ -458,12 +458,12 @@ public class StagedLayoutSetStagedModelDataHandler
 				image = _imageLocalService.getImage(
 					layoutSetBranch.getLogoId());
 			}
-			catch (PortalException pe) {
+			catch (PortalException portalException) {
 				if (_log.isWarnEnabled()) {
 					_log.warn(
 						"Unable to get logo for layout set branch " +
 							layoutSetBranch.getLayoutSetBranchId(),
-						pe);
+						portalException);
 				}
 			}
 		}
@@ -472,12 +472,12 @@ public class StagedLayoutSetStagedModelDataHandler
 				image = _imageLocalService.getImage(
 					stagedLayoutSet.getLogoId());
 			}
-			catch (PortalException pe) {
+			catch (PortalException portalException) {
 				if (_log.isWarnEnabled()) {
 					_log.warn(
 						"Unable to get logo for layout set " +
 							stagedLayoutSet.getLayoutSetId(),
-						pe);
+						portalException);
 				}
 			}
 		}
@@ -527,12 +527,12 @@ public class StagedLayoutSetStagedModelDataHandler
 			try {
 				_themeExporter.exportTheme(portletDataContext, layoutSetBranch);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (_log.isWarnEnabled()) {
 					_log.warn(
 						"Unable to export theme reference for layout set " +
 							"branch " + layoutSetBranch.getLayoutSetBranchId(),
-						e);
+						exception);
 				}
 			}
 		}
@@ -540,12 +540,12 @@ public class StagedLayoutSetStagedModelDataHandler
 			try {
 				_themeExporter.exportTheme(portletDataContext, stagedLayoutSet);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (_log.isWarnEnabled()) {
 					_log.warn(
 						"Unable to export theme reference for layout set " +
 							stagedLayoutSet.getLayoutSetId(),
-						e);
+						exception);
 				}
 			}
 		}
@@ -608,9 +608,9 @@ public class StagedLayoutSetStagedModelDataHandler
 					portletDataContext.isPrivateLayout(), false, (File)null);
 			}
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn("Unable to import logo", pe);
+				_log.warn("Unable to import logo", portalException);
 			}
 		}
 	}
@@ -622,12 +622,12 @@ public class StagedLayoutSetStagedModelDataHandler
 		try {
 			_themeImporter.importTheme(portletDataContext, stagedLayoutSet);
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
 					"Unable to import theme reference " +
 						stagedLayoutSet.getThemeId(),
-					e);
+					exception);
 			}
 		}
 	}

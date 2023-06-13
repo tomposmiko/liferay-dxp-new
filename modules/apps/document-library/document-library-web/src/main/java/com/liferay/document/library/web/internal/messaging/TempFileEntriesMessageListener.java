@@ -50,7 +50,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.document.library.configuration.DLConfiguration",
-	immediate = true, service = TempFileEntriesMessageListener.class
+	service = TempFileEntriesMessageListener.class
 )
 public class TempFileEntriesMessageListener extends BaseMessageListener {
 
@@ -88,12 +88,14 @@ public class TempFileEntriesMessageListener extends BaseMessageListener {
 			localRepository = _repositoryProvider.getLocalRepository(
 				repository.getRepositoryId());
 		}
-		catch (PortalException | UndeployedExternalRepositoryException e) {
+		catch (PortalException | UndeployedExternalRepositoryException
+					exception) {
+
 			if (_log.isWarnEnabled()) {
 				_log.warn(
 					"Unable to get implementation for repository " +
 						repository.getRepositoryId(),
-					e);
+					exception);
 			}
 
 			return;
@@ -111,12 +113,12 @@ public class TempFileEntriesMessageListener extends BaseMessageListener {
 					deleteExpiredTemporaryFileEntries();
 			}
 		}
-		catch (Exception pe) {
+		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
 					"Unable to delete expired temporary file entries in " +
 						"repository " + repository.getRepositoryId(),
-					pe);
+					exception);
 			}
 		}
 	}
@@ -138,33 +140,18 @@ public class TempFileEntriesMessageListener extends BaseMessageListener {
 		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
-	@Reference(unbind = "-")
-	protected void setRepositoryLocalService(
-		RepositoryLocalService repositoryLocalService) {
-
-		_repositoryLocalService = repositoryLocalService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setRepositoryProvider(
-		RepositoryProvider repositoryProvider) {
-
-		_repositoryProvider = repositoryProvider;
-	}
-
-	@Reference(unbind = "-")
-	protected void setSchedulerEngineHelper(
-		SchedulerEngineHelper schedulerEngineHelper) {
-
-		_schedulerEngineHelper = schedulerEngineHelper;
-	}
-
 	private static final Log _log = LogFactoryUtil.getLog(
 		TempFileEntriesMessageListener.class);
 
 	private volatile DLConfiguration _dlConfiguration;
+
+	@Reference
 	private RepositoryLocalService _repositoryLocalService;
+
+	@Reference
 	private RepositoryProvider _repositoryProvider;
+
+	@Reference
 	private SchedulerEngineHelper _schedulerEngineHelper;
 
 	@Reference

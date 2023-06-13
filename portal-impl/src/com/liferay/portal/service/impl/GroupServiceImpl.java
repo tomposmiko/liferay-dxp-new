@@ -47,6 +47,8 @@ import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
 import com.liferay.portal.kernel.service.permission.RolePermissionUtil;
 import com.liferay.portal.kernel.service.permission.UserPermissionUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
@@ -63,7 +65,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -451,9 +452,10 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 		PermissionChecker permissionChecker = getPermissionChecker();
 
 		if (permissionChecker.isCompanyAdmin()) {
-			LinkedHashMap<String, Object> params = new LinkedHashMap<>();
-
-			params.put("site", Boolean.TRUE);
+			LinkedHashMap<String, Object> params =
+				LinkedHashMapBuilder.<String, Object>put(
+					"site", Boolean.TRUE
+				).build();
 
 			return ListUtil.unique(
 				groupLocalService.search(
@@ -787,12 +789,12 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 			UserPermissionUtil.check(
 				getPermissionChecker(), userId, ActionKeys.VIEW);
 		}
-		catch (PrincipalException pe) {
+		catch (PrincipalException principalException) {
 
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(pe, pe);
+				_log.debug(principalException, principalException);
 			}
 
 			GroupPermissionUtil.check(
@@ -878,6 +880,15 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 			companyId, name, description, paramsObj, true, start, end);
 
 		return filterGroups(groups);
+	}
+
+	@Override
+	public int searchCount(
+		long companyId, long[] classNameIds, String keywords,
+		LinkedHashMap<String, Object> params) {
+
+		return groupLocalService.searchCount(
+			companyId, classNameIds, keywords, params);
 	}
 
 	/**
@@ -1105,11 +1116,9 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 	}
 
 	protected Map<Locale, String> getLocalizationMap(String value) {
-		Map<Locale, String> map = new HashMap<>();
-
-		map.put(LocaleUtil.getDefault(), value);
-
-		return map;
+		return HashMapBuilder.put(
+			LocaleUtil.getDefault(), value
+		).build();
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

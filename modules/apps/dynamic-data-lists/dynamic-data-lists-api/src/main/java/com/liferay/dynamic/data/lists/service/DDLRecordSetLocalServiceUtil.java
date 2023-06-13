@@ -32,7 +32,7 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class DDLRecordSetLocalServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.dynamic.data.lists.service.impl.DDLRecordSetLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
@@ -121,26 +121,6 @@ public class DDLRecordSetLocalServiceUtil {
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		getService().addRecordSetResources(recordSet, modelPermissions);
-	}
-
-	/**
-	 * Adds the model resources with the permissions to the record set.
-	 *
-	 * @param recordSet the record set
-	 * @param groupPermissions whether to add group permissions
-	 * @param guestPermissions whether to add guest permissions
-	 * @throws PortalException if a portal exception occurred
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #addRecordSetResources(DDLRecordSet, ModelPermissions)}
-	 */
-	@Deprecated
-	public static void addRecordSetResources(
-			com.liferay.dynamic.data.lists.model.DDLRecordSet recordSet,
-			String[] groupPermissions, String[] guestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		getService().addRecordSetResources(
-			recordSet, groupPermissions, guestPermissions);
 	}
 
 	/**

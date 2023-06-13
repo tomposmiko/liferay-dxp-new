@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portlet.usersadmin.search.GroupSearch;
@@ -56,8 +57,9 @@ public class SitesThatIAdministerItemSelectorViewDisplayContext
 
 	@Override
 	public GroupSearch getGroupSearch() throws Exception {
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		GroupSearch groupSearch = new GroupSearch(
 			getPortletRequest(), getPortletURL());
@@ -104,8 +106,9 @@ public class SitesThatIAdministerItemSelectorViewDisplayContext
 			return _groupParams;
 		}
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		PermissionChecker permissionChecker =
 			themeDisplay.getPermissionChecker();
@@ -116,9 +119,9 @@ public class SitesThatIAdministerItemSelectorViewDisplayContext
 			filterManageableGroups = false;
 		}
 
-		_groupParams = new LinkedHashMap<>();
-
-		_groupParams.put("active", Boolean.TRUE);
+		_groupParams = LinkedHashMapBuilder.<String, Object>put(
+			"active", Boolean.TRUE
+		).build();
 
 		if (filterManageableGroups) {
 			User user = themeDisplay.getUser();

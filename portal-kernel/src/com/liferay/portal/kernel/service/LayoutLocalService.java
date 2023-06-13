@@ -15,6 +15,7 @@
 package com.liferay.portal.kernel.service;
 
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
+import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
@@ -25,16 +26,13 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutReference;
-import com.liferay.portal.kernel.model.LayoutSet;
-import com.liferay.portal.kernel.model.LayoutVersion;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
-import com.liferay.portal.kernel.service.version.VersionService;
-import com.liferay.portal.kernel.service.version.VersionServiceListener;
-import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
+import com.liferay.portal.kernel.service.change.tracking.CTService;
+import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
@@ -60,22 +58,15 @@ import org.osgi.annotation.versioning.ProviderType;
  * @see LayoutLocalServiceUtil
  * @generated
  */
-@OSGiBeanProperties(
-	property = {
-		"model.class.name=com.liferay.portal.kernel.model.Layout",
-		"version.model.class.name=com.liferay.portal.kernel.model.LayoutVersion"
-	}
-)
 @ProviderType
 @Transactional(
 	isolation = Isolation.PORTAL,
 	rollbackFor = {PortalException.class, SystemException.class}
 )
 public interface LayoutLocalService
-	extends BaseLocalService, PersistedModelLocalService,
-			VersionService<Layout, LayoutVersion> {
+	extends BaseLocalService, CTService<Layout>, PersistedModelLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link LayoutLocalServiceUtil} to access the layout local service. Add custom service methods to <code>com.liferay.portal.service.impl.LayoutLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -89,6 +80,73 @@ public interface LayoutLocalService
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	public Layout addLayout(Layout layout);
+
+	/**
+	 * Adds a layout with additional parameters.
+	 *
+	 * <p>
+	 * This method handles the creation of the layout including its resources,
+	 * metadata, and internal data structures. It is not necessary to make
+	 * subsequent calls to any methods to setup default groups, resources, ...
+	 * etc.
+	 * </p>
+	 *
+	 * @param userId the primary key of the user
+	 * @param groupId the primary key of the group
+	 * @param privateLayout whether the layout is private to the group
+	 * @param parentLayoutId the layout ID of the parent layout (optionally
+	 {@link LayoutConstants#DEFAULT_PARENT_LAYOUT_ID})
+	 * @param classNameId the class name ID of the entity
+	 * @param classPK the primary key of the entity
+	 * @param nameMap the layout's locales and localized names
+	 * @param titleMap the layout's locales and localized titles
+	 * @param descriptionMap the layout's locales and localized
+	 descriptions
+	 * @param keywordsMap the layout's locales and localized keywords
+	 * @param robotsMap the layout's locales and localized robots
+	 * @param type the layout's type (optionally {@link
+	 LayoutConstants#TYPE_PORTLET}). The possible types can be
+	 found in {@link LayoutConstants}.
+	 * @param typeSettings the settings to load the unicode properties
+	 object. See {@link UnicodeProperties #fastLoad(String)}.
+	 * @param hidden whether the layout is hidden
+	 * @param system whether the layout is of system type
+	 * @param masterLayoutPlid the primary key of the master layout
+	 * @param friendlyURLMap the layout's locales and localized friendly
+	 URLs. To see how the URL is normalized when accessed, see
+	 {@link
+	 com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil#normalize(
+	 String)}.
+	 * @param serviceContext the service context to be applied. Must set
+	 the UUID for the layout. Can set the creation date,
+	 modification date, and expando bridge attributes for the
+	 layout. For layouts that belong to a layout set prototype, an
+	 attribute named <code>layoutUpdateable</code> can be set to
+	 specify whether site administrators can modify this page
+	 within their site. For layouts that are created from a layout
+	 prototype, attributes named <code>layoutPrototypeUuid</code>
+	 and <code>layoutPrototypeLinkedEnabled</code> can be
+	 specified to provide the unique identifier of the source
+	 prototype and a boolean to determine whether a link to it
+	 should be enabled to activate propagation of changes made to
+	 the linked page in the prototype.
+	 * @return the layout
+	 * @throws PortalException if a portal exception occurred
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link #addLayout(long,
+	 long, boolean, long, long, long, Map, Map, Map, Map, Map,
+	 String, String, boolean, boolean, Map, long, ServiceContext)}
+	 */
+	@Deprecated
+	@Indexable(type = IndexableType.REINDEX)
+	public Layout addLayout(
+			long userId, long groupId, boolean privateLayout,
+			long parentLayoutId, long classNameId, long classPK,
+			Map<Locale, String> nameMap, Map<Locale, String> titleMap,
+			Map<Locale, String> descriptionMap, Map<Locale, String> keywordsMap,
+			Map<Locale, String> robotsMap, String type, String typeSettings,
+			boolean hidden, boolean system, long masterLayoutPlid,
+			Map<Locale, String> friendlyURLMap, ServiceContext serviceContext)
+		throws PortalException;
 
 	/**
 	 * Adds a layout with additional parameters.
@@ -123,6 +181,7 @@ public interface LayoutLocalService
 	 To see how the URL is normalized when accessed, see {@link
 	 com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil#normalize(
 	 String)}.
+	 * @param masterLayoutPlid the primary key of the master layout
 	 * @param serviceContext the service context to be applied. Must set the
 	 UUID for the layout. Can set the creation date, modification
 	 date, and expando bridge attributes for the layout. For layouts
@@ -139,6 +198,72 @@ public interface LayoutLocalService
 	 * @return the layout
 	 * @throws PortalException if a portal exception occurred
 	 */
+	@Indexable(type = IndexableType.REINDEX)
+	public Layout addLayout(
+			long userId, long groupId, boolean privateLayout,
+			long parentLayoutId, long classNameId, long classPK,
+			Map<Locale, String> nameMap, Map<Locale, String> titleMap,
+			Map<Locale, String> descriptionMap, Map<Locale, String> keywordsMap,
+			Map<Locale, String> robotsMap, String type, String typeSettings,
+			boolean hidden, boolean system, Map<Locale, String> friendlyURLMap,
+			long masterLayoutPlid, ServiceContext serviceContext)
+		throws PortalException;
+
+	/**
+	 * Adds a layout with additional parameters.
+	 *
+	 * <p>
+	 * This method handles the creation of the layout including its resources,
+	 * metadata, and internal data structures. It is not necessary to make
+	 * subsequent calls to any methods to setup default groups, resources, ...
+	 * etc.
+	 * </p>
+	 *
+	 * @param userId the primary key of the user
+	 * @param groupId the primary key of the group
+	 * @param privateLayout whether the layout is private to the group
+	 * @param parentLayoutId the layout ID of the parent layout (optionally
+	 {@link LayoutConstants#DEFAULT_PARENT_LAYOUT_ID})
+	 * @param classNameId the class name ID of the entity
+	 * @param classPK the primary key of the entity
+	 * @param nameMap the layout's locales and localized names
+	 * @param titleMap the layout's locales and localized titles
+	 * @param descriptionMap the layout's locales and localized
+	 descriptions
+	 * @param keywordsMap the layout's locales and localized keywords
+	 * @param robotsMap the layout's locales and localized robots
+	 * @param type the layout's type (optionally {@link
+	 LayoutConstants#TYPE_PORTLET}). The possible types can be
+	 found in {@link LayoutConstants}.
+	 * @param typeSettings the settings to load the unicode properties
+	 object. See {@link UnicodeProperties #fastLoad(String)}.
+	 * @param hidden whether the layout is hidden
+	 * @param system whether the layout is of system type
+	 * @param friendlyURLMap the layout's locales and localized friendly
+	 URLs. To see how the URL is normalized when accessed, see
+	 {@link
+	 com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil#normalize(
+	 String)}.
+	 * @param serviceContext the service context to be applied. Must set
+	 the UUID for the layout. Can set the creation date,
+	 modification date, and expando bridge attributes for the
+	 layout. For layouts that belong to a layout set prototype, an
+	 attribute named <code>layoutUpdateable</code> can be set to
+	 specify whether site administrators can modify this page
+	 within their site. For layouts that are created from a layout
+	 prototype, attributes named <code>layoutPrototypeUuid</code>
+	 and <code>layoutPrototypeLinkedEnabled</code> can be
+	 specified to provide the unique identifier of the source
+	 prototype and a boolean to determine whether a link to it
+	 should be enabled to activate propagation of changes made to
+	 the linked page in the prototype.
+	 * @return the layout
+	 * @throws PortalException if a portal exception occurred
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link #addLayout(long,
+	 long, boolean, long, long, long, Map, Map, Map, Map, Map,
+	 String, String, boolean, boolean, Map, long, ServiceContext)}
+	 */
+	@Deprecated
 	@Indexable(type = IndexableType.REINDEX)
 	public Layout addLayout(
 			long userId, long groupId, boolean privateLayout,
@@ -373,36 +498,13 @@ public interface LayoutLocalService
 		throws PortalException;
 
 	/**
-	 * Anonymize user information of the specific layout
+	 * Creates a new layout with the primary key. Does not add the layout to the database.
 	 *
-	 * @param layout the layout that need to anonymized
-	 * @param userId the primary key of the owner user
-	 * @param anonymousUser the anonymized user information
-	 */
-	public void anonymizeLayout(Layout layout, long userId, User anonymousUser)
-		throws PortalException;
-
-	@Indexable(type = IndexableType.REINDEX)
-	@Override
-	public Layout checkout(Layout publishedLayout, int version)
-		throws PortalException;
-
-	/**
-	 * Creates a new layout. Does not add the layout to the database.
-	 *
+	 * @param plid the primary key for the new layout
 	 * @return the new layout
 	 */
-	@Override
 	@Transactional(enabled = false)
-	public Layout create();
-
-	@Indexable(type = IndexableType.DELETE)
-	@Override
-	public Layout delete(Layout publishedLayout) throws PortalException;
-
-	@Indexable(type = IndexableType.DELETE)
-	@Override
-	public Layout deleteDraft(Layout draftLayout) throws PortalException;
+	public Layout createLayout(long plid);
 
 	/**
 	 * Deletes the layout from the database. Also notifies the appropriate model listeners.
@@ -415,14 +517,10 @@ public interface LayoutLocalService
 	public Layout deleteLayout(Layout layout) throws PortalException;
 
 	/**
-	 * Deletes the layout, its child layouts, and its associated resources.
-	 *
-	 * @param layout the layout
-	 * @param updateLayoutSet whether the layout set's page counter needs to be
-	 updated
-	 * @param serviceContext the service context to be applied
-	 * @throws PortalException if a portal exception occurred
+	 * @deprecated As of Mueller (7.2.x), As of (7.2.x), replaced by {@link
+	 #deleteLayout(Layout, ServiceContext)}
 	 */
+	@Deprecated
 	@SystemEvent(
 		action = SystemEventConstants.ACTION_SKIP,
 		type = SystemEventConstants.TYPE_DELETE
@@ -430,6 +528,20 @@ public interface LayoutLocalService
 	public void deleteLayout(
 			Layout layout, boolean updateLayoutSet,
 			ServiceContext serviceContext)
+		throws PortalException;
+
+	/**
+	 * Deletes the layout, its child layouts, and its associated resources.
+	 *
+	 * @param layout the layout
+	 * @param serviceContext the service context to be applied
+	 * @throws PortalException if a portal exception occurred
+	 */
+	@SystemEvent(
+		action = SystemEventConstants.ACTION_SKIP,
+		type = SystemEventConstants.TYPE_DELETE
+	)
+	public void deleteLayout(Layout layout, ServiceContext serviceContext)
 		throws PortalException;
 
 	/**
@@ -489,10 +601,6 @@ public interface LayoutLocalService
 	 */
 	@Override
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
-		throws PortalException;
-
-	@Override
-	public LayoutVersion deleteVersion(LayoutVersion layoutVersion)
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -564,14 +672,6 @@ public interface LayoutLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public Layout fetchDefaultLayout(long groupId, boolean privateLayout);
 
-	@Override
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public Layout fetchDraft(Layout layout);
-
-	@Override
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public Layout fetchDraft(long primaryKey);
-
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public Layout fetchFirstLayout(
 		long groupId, boolean privateLayout, long parentLayoutId);
@@ -580,10 +680,6 @@ public interface LayoutLocalService
 	public Layout fetchFirstLayout(
 		long groupId, boolean privateLayout, long parentLayoutId,
 		boolean hidden);
-
-	@Override
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public LayoutVersion fetchLatestVersion(Layout layout);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public Layout fetchLayout(long plid);
@@ -613,23 +709,11 @@ public interface LayoutLocalService
 	 * @param uuid the layout's UUID
 	 * @param groupId the primary key of the group
 	 * @param privateLayout whether the layout is private to the group
-	 * @return the matching layout, or <code>null</code> if a matching layout
-	 could not be found
+	 * @return the matching layout, or <code>null</code> if a matching layout could not be found
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public Layout fetchLayoutByUuidAndGroupId(
 		String uuid, long groupId, boolean privateLayout);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public LayoutVersion fetchLayoutVersion(long layoutVersionId);
-
-	@Override
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public Layout fetchPublished(Layout layout);
-
-	@Override
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public Layout fetchPublished(long primaryKey);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ActionableDynamicQuery getActionableDynamicQuery();
@@ -669,14 +753,6 @@ public interface LayoutLocalService
 	public long getDefaultPlid(
 			long groupId, boolean privateLayout, String portletId)
 		throws PortalException;
-
-	@Override
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public Layout getDraft(Layout layout) throws PortalException;
-
-	@Override
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public Layout getDraft(long primaryKey) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ExportActionableDynamicQuery getExportActionableDynamicQuery(
@@ -748,15 +824,6 @@ public interface LayoutLocalService
 	public Layout getLayoutByUuidAndGroupId(
 			String uuid, long groupId, boolean privateLayout)
 		throws PortalException;
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #getLayoutChildLayouts(List)}
-	 */
-	@Deprecated
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public Map<Long, List<Layout>> getLayoutChildLayouts(
-		LayoutSet layoutSet, List<Layout> parentLayouts);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public Map<Long, List<Layout>> getLayoutChildLayouts(
@@ -937,6 +1004,9 @@ public interface LayoutLocalService
 	public List<Layout> getLayouts(
 		long groupId, int start, int end, OrderByComparator<Layout> obc);
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<Layout> getLayouts(long groupId, long masterLayoutPlid);
+
 	/**
 	 * Returns the layout references for all the layouts that belong to the
 	 * company and belong to the portlet that matches the preferences.
@@ -995,10 +1065,8 @@ public interface LayoutLocalService
 	 * @param companyId the primary key of the company
 	 * @param start the lower bound of the range of layouts
 	 * @param end the upper bound of the range of layouts (not inclusive)
-	 * @param orderByComparator the comparator to order the results by
-	 (optionally <code>null</code>)
-	 * @return the range of matching layouts, or an empty list if no matches
-	 were found
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the range of matching layouts, or an empty list if no matches were found
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<Layout> getLayoutsByUuidAndCompanyId(
@@ -1039,6 +1107,9 @@ public interface LayoutLocalService
 	public int getLayoutsCount(long groupId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getLayoutsCount(long groupId, long masterLayoutPlid);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getLayoutsCount(long groupId, String keywords, String[] types)
 		throws PortalException;
 
@@ -1060,27 +1131,6 @@ public interface LayoutLocalService
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public long getNextLayoutId(long groupId, boolean privateLayout);
-
-	/**
-	 * Returns all the layouts without resource permissions
-	 *
-	 * @param roleId the primary key of the role
-	 * @return all the layouts without resource permissions
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<Layout> getNoPermissionLayouts(long roleId);
-
-	/**
-	 * Returns all the layouts whose friendly URLs are <code>null</code>
-	 *
-	 * @return all the layouts whose friendly URLs are <code>null</code>
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<Layout> getNullFriendlyURLLayouts();
 
 	/**
 	 * Returns the OSGi service identifier.
@@ -1113,15 +1163,6 @@ public interface LayoutLocalService
 	public List<Layout> getScopeGroupLayouts(
 			long parentGroupId, boolean privateLayout)
 		throws PortalException;
-
-	@Override
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public LayoutVersion getVersion(Layout layout, int version)
-		throws PortalException;
-
-	@Override
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<LayoutVersion> getVersions(Layout layout);
 
 	/**
 	 * Returns <code>true</code> if there is a matching layout with the UUID,
@@ -1183,14 +1224,6 @@ public interface LayoutLocalService
 			String layoutSetPrototypeUuid, long companyId, String layoutUuid)
 		throws PortalException;
 
-	@Indexable(type = IndexableType.REINDEX)
-	@Override
-	public Layout publishDraft(Layout draftLayout) throws PortalException;
-
-	@Override
-	public void registerListener(
-		VersionServiceListener<Layout, LayoutVersion> versionServiceListener);
-
 	/**
 	 * Sets the layouts for the group, replacing and prioritizing all layouts of
 	 * the parent layout.
@@ -1207,18 +1240,10 @@ public interface LayoutLocalService
 			long[] layoutIds, ServiceContext serviceContext)
 		throws PortalException;
 
-	@Override
-	public void unregisterListener(
-		VersionServiceListener<Layout, LayoutVersion> versionServiceListener);
-
 	public void updateAsset(
 			long userId, Layout layout, long[] assetCategoryIds,
 			String[] assetTagNames)
 		throws PortalException;
-
-	@Indexable(type = IndexableType.REINDEX)
-	@Override
-	public Layout updateDraft(Layout draftLayout) throws PortalException;
 
 	/**
 	 * Updates the friendly URL of the layout.
@@ -1242,10 +1267,9 @@ public interface LayoutLocalService
 	 *
 	 * @param layout the layout
 	 * @return the layout that was updated
-	 * @throws PortalException
 	 */
 	@Indexable(type = IndexableType.REINDEX)
-	public Layout updateLayout(Layout draftLayout) throws PortalException;
+	public Layout updateLayout(Layout layout);
 
 	/**
 	 * Updates the layout replacing its draft publish date.
@@ -1304,6 +1328,7 @@ public interface LayoutLocalService
 	 String)}.
 	 * @param hasIconImage whether the icon image will be updated
 	 * @param iconBytes the byte array of the layout's new icon image
+	 * @param masterLayoutPlid the primary key of the master layout
 	 * @param serviceContext the service context to be applied. Can set the
 	 modification date and expando bridge attributes for the layout.
 	 For layouts that are linked to a layout prototype, attributes
@@ -1316,6 +1341,61 @@ public interface LayoutLocalService
 	 * @return the updated layout
 	 * @throws PortalException if a portal exception occurred
 	 */
+	public Layout updateLayout(
+			long groupId, boolean privateLayout, long layoutId,
+			long parentLayoutId, Map<Locale, String> nameMap,
+			Map<Locale, String> titleMap, Map<Locale, String> descriptionMap,
+			Map<Locale, String> keywordsMap, Map<Locale, String> robotsMap,
+			String type, boolean hidden, Map<Locale, String> friendlyURLMap,
+			boolean hasIconImage, byte[] iconBytes, long masterLayoutPlid,
+			ServiceContext serviceContext)
+		throws PortalException;
+
+	/**
+	 * Updates the layout.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param privateLayout whether the layout is private to the group
+	 * @param layoutId the layout ID of the layout
+	 * @param parentLayoutId the layout ID of the layout's new parent
+	 layout
+	 * @param nameMap the locales and localized names to merge (optionally
+	 <code>null</code>)
+	 * @param titleMap the locales and localized titles to merge
+	 (optionally <code>null</code>)
+	 * @param descriptionMap the locales and localized descriptions to
+	 merge (optionally <code>null</code>)
+	 * @param keywordsMap the locales and localized keywords to merge
+	 (optionally <code>null</code>)
+	 * @param robotsMap the locales and localized robots to merge
+	 (optionally <code>null</code>)
+	 * @param type the layout's new type (optionally {@link
+	 LayoutConstants#TYPE_PORTLET})
+	 * @param hidden whether the layout is hidden
+	 * @param friendlyURLMap the layout's locales and localized friendly
+	 URLs. To see how the URL is normalized when accessed, see
+	 {@link
+	 com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil#normalize(
+	 String)}.
+	 * @param hasIconImage whether the icon image will be updated
+	 * @param iconBytes the byte array of the layout's new icon image
+	 * @param serviceContext the service context to be applied. Can set the
+	 modification date and expando bridge attributes for the
+	 layout. For layouts that are linked to a layout prototype,
+	 attributes named <code>layoutPrototypeUuid</code> and
+	 <code>layoutPrototypeLinkedEnabled</code> can be specified to
+	 provide the unique identifier of the source prototype and a
+	 boolean to determine whether a link to it should be enabled
+	 to activate propagation of changes made to the linked page in
+	 the prototype.
+	 * @return the updated layout
+	 * @throws PortalException if a portal exception occurred
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #updateLayout(long, boolean, long, long, Map, Map, Map, Map,
+	 Map, String, boolean, Map, boolean, byte[], long,
+	 ServiceContext)}
+	 */
+	@Deprecated
 	public Layout updateLayout(
 			long groupId, boolean privateLayout, long layoutId,
 			long parentLayoutId, Map<Locale, String> nameMap,
@@ -1357,6 +1437,21 @@ public interface LayoutLocalService
 	public Layout updateLookAndFeel(
 			long groupId, boolean privateLayout, long layoutId, String themeId,
 			String colorSchemeId, String css)
+		throws PortalException;
+
+	/**
+	 * Updates the layout replacing its master layout plid.
+	 *
+	 * @param groupId the primary key of the group
+	 * @param privateLayout whether the layout is private to the group
+	 * @param layoutId the layout ID of the layout
+	 * @param masterLayoutPlid the primary key of the master layout
+	 * @return the updated layout
+	 * @throws PortalException if a portal exception occurred
+	 */
+	public Layout updateMasterLayoutPlid(
+			long groupId, boolean privateLayout, long layoutId,
+			long masterLayoutPlid)
 		throws PortalException;
 
 	/**
@@ -1511,6 +1606,25 @@ public interface LayoutLocalService
 	public Layout updatePriority(long plid, int priority)
 		throws PortalException;
 
+	@Indexable(type = IndexableType.REINDEX)
+	public Layout updateStatus(
+			long userId, long plid, int status, ServiceContext serviceContext)
+		throws PortalException;
+
 	public Layout updateType(long plid, String type) throws PortalException;
+
+	@Override
+	@Transactional(enabled = false)
+	public CTPersistence<Layout> getCTPersistence();
+
+	@Override
+	@Transactional(enabled = false)
+	public Class<Layout> getModelClass();
+
+	@Override
+	@Transactional(rollbackFor = Throwable.class)
+	public <R, E extends Throwable> R updateWithUnsafeFunction(
+			UnsafeFunction<CTPersistence<Layout>, R, E> updateUnsafeFunction)
+		throws E;
 
 }

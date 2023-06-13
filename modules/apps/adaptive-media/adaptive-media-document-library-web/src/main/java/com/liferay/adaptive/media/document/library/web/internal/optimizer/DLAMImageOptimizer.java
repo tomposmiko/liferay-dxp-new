@@ -37,10 +37,8 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFileEntry;
-import com.liferay.trash.kernel.service.TrashEntryLocalService;
 
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -153,19 +151,19 @@ public class DLAMImageOptimizer implements AMImageOptimizer {
 
 					_sendStatusMessage(atomicCounter.incrementAndGet(), total);
 				}
-				catch (PortalException pe) {
+				catch (PortalException portalException) {
 					_log.error(
 						"Unable to process file entry " +
 							fileEntry.getFileEntryId(),
-						pe);
+						portalException);
 				}
 			});
 
 		try {
 			actionableDynamicQuery.performActions();
 		}
-		catch (PortalException pe) {
-			_log.error(pe, pe);
+		catch (PortalException portalException) {
+			_log.error(portalException, portalException);
 		}
 	}
 
@@ -211,15 +209,9 @@ public class DLAMImageOptimizer implements AMImageOptimizer {
 		_backgroundTaskStatusMessageSender;
 
 	@Reference
-	private ClassNameLocalService _classNameLocalService;
-
-	@Reference
 	private DLFileEntryLocalService _dlFileEntryLocalService;
 
 	@Reference
 	private DLFileVersionLocalService _dlFileVersionLocalService;
-
-	@Reference
-	private TrashEntryLocalService _trashEntryLocalService;
 
 }

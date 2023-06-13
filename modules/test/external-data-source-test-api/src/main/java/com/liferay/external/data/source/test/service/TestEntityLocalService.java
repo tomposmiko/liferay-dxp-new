@@ -14,8 +14,6 @@
 
 package com.liferay.external.data.source.test.service;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.external.data.source.test.model.TestEntity;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -37,6 +35,8 @@ import java.io.Serializable;
 
 import java.util.List;
 
+import org.osgi.annotation.versioning.ProviderType;
+
 /**
  * Provides the local service interface for TestEntity. Methods of this
  * service will not have security checks based on the propagated JAAS
@@ -55,7 +55,7 @@ import java.util.List;
 public interface TestEntityLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link TestEntityLocalServiceUtil} to access the test entity local service. Add custom service methods to <code>com.liferay.external.data.source.test.service.impl.TestEntityLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.

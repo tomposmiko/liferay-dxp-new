@@ -14,12 +14,17 @@
 
 package com.liferay.portal.search.elasticsearch7.internal.search.engine.adapter.document;
 
+import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchClientResolver;
 import com.liferay.portal.search.engine.adapter.document.BulkableDocumentRequestTranslator;
 import com.liferay.portal.search.engine.adapter.document.UpdateDocumentRequest;
 import com.liferay.portal.search.engine.adapter.document.UpdateDocumentResponse;
 
-import org.elasticsearch.action.update.UpdateRequestBuilder;
+import java.io.IOException;
+
+import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.rest.RestStatus;
 
 import org.osgi.service.component.annotations.Component;
@@ -36,14 +41,32 @@ public class UpdateDocumentRequestExecutorImpl
 	public UpdateDocumentResponse execute(
 		UpdateDocumentRequest updateDocumentRequest) {
 
-		UpdateRequestBuilder updateRequestBuilder =
+		UpdateRequest updateRequest =
 			_bulkableDocumentRequestTranslator.translate(updateDocumentRequest);
 
-		UpdateResponse updateResponse = updateRequestBuilder.get();
+		UpdateResponse updateResponse = getUpdateResponse(
+			updateRequest, updateDocumentRequest);
 
 		RestStatus restStatus = updateResponse.status();
 
 		return new UpdateDocumentResponse(restStatus.getStatus());
+	}
+
+	protected UpdateResponse getUpdateResponse(
+		UpdateRequest updateRequest,
+		UpdateDocumentRequest updateDocumentRequest) {
+
+		RestHighLevelClient restHighLevelClient =
+			_elasticsearchClientResolver.getRestHighLevelClient(
+				updateDocumentRequest.getConnectionId(), false);
+
+		try {
+			return restHighLevelClient.update(
+				updateRequest, RequestOptions.DEFAULT);
+		}
+		catch (IOException ioException) {
+			throw new RuntimeException(ioException);
+		}
 	}
 
 	@Reference(target = "(search.engine.impl=Elasticsearch)", unbind = "-")
@@ -53,7 +76,15 @@ public class UpdateDocumentRequestExecutorImpl
 		_bulkableDocumentRequestTranslator = bulkableDocumentRequestTranslator;
 	}
 
+	@Reference(unbind = "-")
+	protected void setElasticsearchClientResolver(
+		ElasticsearchClientResolver elasticsearchClientResolver) {
+
+		_elasticsearchClientResolver = elasticsearchClientResolver;
+	}
+
 	private BulkableDocumentRequestTranslator
 		_bulkableDocumentRequestTranslator;
+	private ElasticsearchClientResolver _elasticsearchClientResolver;
 
 }

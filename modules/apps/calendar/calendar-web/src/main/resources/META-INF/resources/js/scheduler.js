@@ -43,13 +43,18 @@ AUI.add(
 			'</div>';
 
 		var TPL_SCHEDULER_ICON_NEXT =
-			'<button aria-label="{ariaLabel}"" role="button" type="button" class="scheduler-base-icon-next btn btn-default">' +
+			'<button aria-label="{ariaLabel}"" role="button" type="button" class="btn btn-secondary scheduler-base-icon-next">' +
 			Liferay.Util.getLexiconIconTpl('angle-right') +
 			'</button>';
 
 		var TPL_SCHEDULER_ICON_PREV =
-			'<button aria-label="{ariaLabel}"" role="button" type="button" class="scheduler-base-icon-prev btn btn-default">' +
+			'<button aria-label="{ariaLabel}"" role="button" type="button" class="btn btn-secondary scheduler-base-icon-prev">' +
 			Liferay.Util.getLexiconIconTpl('angle-left') +
+			'</button>';
+
+		var TPL_SCHEDULER_TODAY =
+			'<button aria-label="{ariaLabel}"" role="button" type="button" class="btn btn-secondary scheduler-base-today">' +
+			Liferay.Language.get('today') +
 			'</button>';
 
 		var WEEKLY = 'WEEKLY';
@@ -154,6 +159,21 @@ AUI.add(
 				showAddEventBtn: {
 					validator: isBoolean,
 					value: true
+				},
+
+				todayNode: {
+					valueFn() {
+						var instance = this;
+
+						return A.Node.create(
+							A.Lang.sub(
+								this._processTemplate(TPL_SCHEDULER_TODAY),
+								{
+									ariaLabel: instance.getAriaLabel('today')
+								}
+							)
+						);
+					}
 				}
 			},
 
@@ -681,8 +701,21 @@ AUI.add(
 
 					Scheduler.superclass.renderUI.apply(this, arguments);
 
-					instance.navDateNode.replaceClass('hidden-xs', 'hidden');
-					instance.viewDateNode.removeClass('visible-xs');
+					instance.navDateNode.replaceClass(
+						'hidden-xs',
+						'd-none d-sm-block'
+					);
+					instance.viewDateNode.replaceClass(
+						'visible-xs',
+						'd-block d-sm-none'
+					);
+					instance.viewsNode
+						.all('button')
+						.replaceClass('hidden-xs', 'd-none d-sm-block');
+					instance.viewsSelectNode.replaceClass(
+						'visible-xs',
+						'd-block d-sm-none'
+					);
 
 					var showAddEventBtn = instance.get('showAddEventBtn');
 
@@ -751,6 +784,20 @@ AUI.add(
 
 		Liferay.SchedulerWeekView = A.Component.create({
 			ATTRS: {
+				headerDateFormatter: {
+					validator: isFunction,
+					value(date) {
+						var instance = this;
+
+						var scheduler = instance.get('scheduler');
+
+						return A.DataType.Date.format(date, {
+							format: Liferay.Language.get('a-d'),
+							locale: scheduler.get('locale')
+						});
+					}
+				},
+
 				navigationDateFormatter: {
 					validator: isFunction,
 					value(date) {
@@ -855,7 +902,7 @@ AUI.add(
 					var weeks = DateMath.getWeeksInMonth(date, firstDayOfWeek);
 
 					A.each(instance.tableRows, (item, index) => {
-						if (index > weeks) {
+						if (index >= weeks) {
 							item.remove();
 						} else if (index < weeks && !item.parentElement) {
 							instance.tableRowContainer.appendChild(item);

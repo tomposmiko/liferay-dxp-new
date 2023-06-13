@@ -18,6 +18,7 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.configuration.metatype.annotations.ExtendedAttributeDefinition;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.lang.reflect.Method;
@@ -118,26 +119,24 @@ public class AnnotationsExtendedAttributeDefinition
 				method.getAnnotation(ExtendedAttributeDefinition.class);
 
 			if (extendedAttributeDefinition != null) {
-				Map<String, String> map = new HashMap<>();
-
-				map.put(
+				Map<String, String> map = HashMapBuilder.put(
 					"description-arguments",
 					StringUtil.merge(
-						extendedAttributeDefinition.descriptionArguments()));
-				map.put(
+						extendedAttributeDefinition.descriptionArguments())
+				).put(
 					"name-arguments",
 					StringUtil.merge(
-						extendedAttributeDefinition.nameArguments()));
-				map.put(
+						extendedAttributeDefinition.nameArguments())
+				).put(
 					"required-input",
-					String.valueOf(
-						extendedAttributeDefinition.requiredInput()));
+					String.valueOf(extendedAttributeDefinition.requiredInput())
+				).build();
 
 				_extensionAttributes.put(
 					ExtendedAttributeDefinition.XML_NAMESPACE, map);
 			}
 		}
-		catch (NoSuchMethodException nsme) {
+		catch (NoSuchMethodException noSuchMethodException) {
 			if (_log.isDebugEnabled()) {
 				_log.debug(
 					StringBundler.concat(
@@ -145,7 +144,7 @@ public class AnnotationsExtendedAttributeDefinition
 						_configurationBeanClass.getName(),
 						" does not have a method for the attribute definition ",
 						_attributeDefinition.getID()),
-					nsme);
+					noSuchMethodException);
 			}
 		}
 	}

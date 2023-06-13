@@ -1,5 +1,5 @@
 dependencies {
-	compileOnly group: "com.liferay", name: "com.liferay.petra.concurrent", version: "3.0.0"
+	compileOnly project(":core:petra:petra-concurrent")
 }
 
 liferay {

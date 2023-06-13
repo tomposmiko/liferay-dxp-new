@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.bean.AutoEscape;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.ShardedModel;
+import com.liferay.portal.kernel.model.change.tracking.CTModel;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -34,9 +35,10 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface JournalArticleLocalizationModel
-	extends BaseModel<JournalArticleLocalization>, MVCCModel, ShardedModel {
+	extends BaseModel<JournalArticleLocalization>,
+			CTModel<JournalArticleLocalization>, MVCCModel, ShardedModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a journal article localization model instance should use the {@link JournalArticleLocalization} interface instead.
@@ -47,6 +49,7 @@ public interface JournalArticleLocalizationModel
 	 *
 	 * @return the primary key of this journal article localization
 	 */
+	@Override
 	public long getPrimaryKey();
 
 	/**
@@ -54,6 +57,7 @@ public interface JournalArticleLocalizationModel
 	 *
 	 * @param primaryKey the primary key of this journal article localization
 	 */
+	@Override
 	public void setPrimaryKey(long primaryKey);
 
 	/**
@@ -71,6 +75,22 @@ public interface JournalArticleLocalizationModel
 	 */
 	@Override
 	public void setMvccVersion(long mvccVersion);
+
+	/**
+	 * Returns the ct collection ID of this journal article localization.
+	 *
+	 * @return the ct collection ID of this journal article localization
+	 */
+	@Override
+	public long getCtCollectionId();
+
+	/**
+	 * Sets the ct collection ID of this journal article localization.
+	 *
+	 * @param ctCollectionId the ct collection ID of this journal article localization
+	 */
+	@Override
+	public void setCtCollectionId(long ctCollectionId);
 
 	/**
 	 * Returns the article localization ID of this journal article localization.

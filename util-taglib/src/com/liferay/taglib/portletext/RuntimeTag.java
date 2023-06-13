@@ -194,7 +194,7 @@ public class RuntimeTag extends TagSupport implements DirectTag {
 
 		String portletInstanceKey = portletName;
 
-		if (Validator.isNotNull(instanceId)) {
+		if (Validator.isNotNull(instanceId) && !instanceId.startsWith("0")) {
 			portletInstanceKey = PortletIdCodec.encode(
 				PortletIdCodec.decodePortletName(portletName),
 				PortletIdCodec.decodeUserId(portletName), instanceId);
@@ -385,10 +385,10 @@ public class RuntimeTag extends TagSupport implements DirectTag {
 
 			return EVAL_PAGE;
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new JspException(e);
+			throw new JspException(exception);
 		}
 	}
 

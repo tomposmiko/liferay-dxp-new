@@ -32,7 +32,7 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class DDMStructureLayoutLocalServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.dynamic.data.mapping.service.impl.DDMStructureLayoutLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
@@ -62,26 +62,6 @@ public class DDMStructureLayoutLocalServiceUtil {
 
 		return getService().addStructureLayout(
 			userId, groupId, structureVersionId, ddmFormLayout, serviceContext);
-	}
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 #addStructureLayout(long, long, long, long, Map, Map, String,
-	 String, ServiceContext)}
-	 */
-	@Deprecated
-	public static com.liferay.dynamic.data.mapping.model.DDMStructureLayout
-			addStructureLayout(
-				long userId, long groupId, long structureVersionId,
-				java.util.Map<java.util.Locale, String> name,
-				java.util.Map<java.util.Locale, String> description,
-				String definition,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return getService().addStructureLayout(
-			userId, groupId, structureVersionId, name, description, definition,
-			serviceContext);
 	}
 
 	public static com.liferay.dynamic.data.mapping.model.DDMStructureLayout
@@ -474,6 +454,15 @@ public class DDMStructureLayoutLocalServiceUtil {
 
 		return getService().getStructureLayouts(
 			groupId, classNameId, start, end, orderByComparator);
+	}
+
+	public static java.util.List
+		<com.liferay.dynamic.data.mapping.model.DDMStructureLayout>
+			getStructureLayouts(
+				long groupId, long classNameId, long structureVersionId) {
+
+		return getService().getStructureLayouts(
+			groupId, classNameId, structureVersionId);
 	}
 
 	public static java.util.List

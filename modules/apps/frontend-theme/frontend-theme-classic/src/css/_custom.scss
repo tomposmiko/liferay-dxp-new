@@ -63,7 +63,9 @@ body {
 		position: relative;
 
 		.panel-notifications-count {
+			display: block;
 			margin: 0;
+			max-width: none;
 			position: absolute;
 			right: calc(100% - 0.7rem);
 			top: -0.4rem;
@@ -80,6 +82,18 @@ body {
 					display: none;
 				}
 			}
+		}
+	}
+}
+
+#content.container-fluid {
+	padding: 0;
+
+	.row {
+		margin: 0;
+
+		.col-md-12 {
+			padding: 0;
 		}
 	}
 }

@@ -88,12 +88,12 @@ public class MemberRequestLocalServiceImpl
 
 			receiverUserId = receiverUser.getUserId();
 		}
-		catch (NoSuchUserException nsue) {
+		catch (NoSuchUserException noSuchUserException) {
 
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(nsue, nsue);
+				_log.debug(noSuchUserException, noSuchUserException);
 			}
 		}
 
@@ -116,15 +116,15 @@ public class MemberRequestLocalServiceImpl
 		memberRequest.setInvitedTeamId(invitedTeamId);
 		memberRequest.setStatus(InviteMembersConstants.STATUS_PENDING);
 
-		memberRequestPersistence.update(memberRequest);
+		memberRequest = memberRequestPersistence.update(memberRequest);
 
 		// Email
 
 		try {
 			sendEmail(receiverEmailAddress, memberRequest, serviceContext);
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 
 		// Notifications
@@ -235,7 +235,7 @@ public class MemberRequestLocalServiceImpl
 		memberRequest.setModifiedDate(new Date());
 		memberRequest.setStatus(status);
 
-		memberRequestPersistence.update(memberRequest);
+		memberRequest = memberRequestPersistence.update(memberRequest);
 
 		if (status == InviteMembersConstants.STATUS_ACCEPTED) {
 			userLocalService.addGroupUsers(
@@ -270,7 +270,7 @@ public class MemberRequestLocalServiceImpl
 		memberRequest.setModifiedDate(new Date());
 		memberRequest.setReceiverUserId(receiverUserId);
 
-		memberRequestPersistence.update(memberRequest);
+		memberRequest = memberRequestPersistence.update(memberRequest);
 
 		if (receiverUserId > 0) {
 			sendNotificationEvent(memberRequest);

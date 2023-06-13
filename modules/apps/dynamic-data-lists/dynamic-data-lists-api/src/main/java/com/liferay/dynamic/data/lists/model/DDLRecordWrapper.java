@@ -435,11 +435,6 @@ public class DDLRecordWrapper
 		return model.getVersionUserUuid();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a ddl record model instance should use the <code>DDLRecord</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

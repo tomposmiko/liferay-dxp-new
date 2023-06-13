@@ -12,12 +12,15 @@
  * details.
  */
 
+import {debounce} from 'frontend-js-web';
 import Component from 'metal-component';
 import dom from 'metal-dom';
 import Soy from 'metal-soy';
 import {Config} from 'metal-state';
 
 import './components/fragment_entry_link/FragmentEntryLinkList.es';
+
+import './components/master_layout/MasterFragmentEntryLinkList.es';
 
 import './components/sidebar/FragmentsEditorSidebar.es';
 
@@ -94,6 +97,49 @@ class FragmentsEditor extends Component {
 	}
 
 	/**
+	 * Adds edition listeners
+	 * @review
+	 */
+	_addEditionListeners() {
+		if (!this._activeEditionListeners) {
+			this._activeEditionListeners = true;
+
+			document.addEventListener('click', this._handleDocumentClick, true);
+			document.addEventListener('keydown', this._handleDocumentKeyDown);
+			document.addEventListener('keyup', this._handleDocumentKeyUp);
+			document.addEventListener(
+				'mouseover',
+				this._handleDocumentMouseOver
+			);
+		}
+	}
+
+	/**
+	 * Removes edition listeners
+	 * @review
+	 */
+	_removeEditionListeners() {
+		if (this._activeEditionListeners) {
+			this._activeEditionListeners = false;
+
+			document.removeEventListener(
+				'click',
+				this._handleDocumentClick,
+				true
+			);
+			document.removeEventListener(
+				'keydown',
+				this._handleDocumentKeyDown
+			);
+			document.removeEventListener('keyup', this._handleDocumentKeyUp);
+			document.removeEventListener(
+				'mouseover',
+				this._handleDocumentMouseOver
+			);
+		}
+	}
+
+	/**
 	 * @inheritdoc
 	 * @review
 	 */
@@ -101,14 +147,14 @@ class FragmentsEditor extends Component {
 		this._handleDocumentClick = this._handleDocumentClick.bind(this);
 		this._handleDocumentKeyDown = this._handleDocumentKeyDown.bind(this);
 		this._handleDocumentKeyUp = this._handleDocumentKeyUp.bind(this);
-		this._handleDocumentMouseOver = this._handleDocumentMouseOver.bind(
-			this
+		this._handleDocumentMouseOver = debounce(
+			this._handleDocumentMouseOver.bind(this),
+			100
 		);
 
-		document.addEventListener('click', this._handleDocumentClick, true);
-		document.addEventListener('keydown', this._handleDocumentKeyDown);
-		document.addEventListener('keyup', this._handleDocumentKeyUp);
-		document.addEventListener('mouseover', this._handleDocumentMouseOver);
+		if (!this.lockedSegmentsExperience) {
+			this._addEditionListeners();
+		}
 	}
 
 	/**
@@ -116,15 +162,28 @@ class FragmentsEditor extends Component {
 	 * @review
 	 */
 	disposed() {
-		document.removeEventListener('click', this._handleDocumentClick, true);
-		document.removeEventListener('keydown', this._handleDocumentKeyDown);
-		document.removeEventListener('keyup', this._handleDocumentKeyUp);
-		document.removeEventListener(
-			'mouseover',
-			this._handleDocumentMouseOver
-		);
+		this._removeEditionListeners();
 
 		stopListeningWidgetConfigurationChange();
+	}
+
+	/**
+	 * Listens for changes in the Experience lock status to hide edition features
+	 * @inheritdoc
+	 * @review
+	 */
+	syncLockedSegmentsExperience(value, previousValue) {
+		if (value && value !== previousValue) {
+			if (this.store) {
+				this.store.dispatch({
+					type: CLEAR_ACTIVE_ITEM
+				});
+			}
+
+			this._removeEditionListeners();
+		} else if (value !== previousValue) {
+			this._addEditionListeners();
+		}
 	}
 
 	/**

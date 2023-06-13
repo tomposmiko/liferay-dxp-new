@@ -32,12 +32,12 @@ import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.xml.Element;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -94,8 +94,8 @@ public class LinksToLayoutsExportImportContentProcessor
 
 			return configuration.validateLayoutReferences();
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 
 		return true;
@@ -144,18 +144,20 @@ public class LinksToLayoutsExportImportContentProcessor
 					stagedModel, entityElement, layout,
 					PortletDataContext.REFERENCE_TYPE_DEPENDENCY, true);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (_log.isDebugEnabled() || _log.isWarnEnabled()) {
 					String message = StringBundler.concat(
 						"Unable to get layout with ID ", layoutId, " in group ",
 						portletDataContext.getScopeGroupId());
 
 					if (_log.isDebugEnabled()) {
-						ExportImportContentProcessorException eicpe =
-							new ExportImportContentProcessorException(
-								message, e);
+						ExportImportContentProcessorException
+							exportImportContentProcessorException =
+								new ExportImportContentProcessorException(
+									message, exception);
 
-						_log.debug(message, eicpe);
+						_log.debug(
+							message, exportImportContentProcessorException);
 					}
 					else {
 						_log.warn(message);
@@ -311,26 +313,28 @@ public class LinksToLayoutsExportImportContentProcessor
 				groupId, privateLayout, layoutId);
 
 			if (layout == null) {
-				ExportImportContentValidationException eicve =
-					new ExportImportContentValidationException(
-						LinksToLayoutsExportImportContentProcessor.class.
-							getName());
+				ExportImportContentValidationException
+					exportImportContentValidationException =
+						new ExportImportContentValidationException(
+							LinksToLayoutsExportImportContentProcessor.class.
+								getName());
 
-				Map<String, String> layoutReferenceParameters = new HashMap<>();
+				Map<String, String> layoutReferenceParameters =
+					HashMapBuilder.put(
+						"groupId", String.valueOf(groupId)
+					).put(
+						"layoutId", String.valueOf(layoutId)
+					).put(
+						"privateLayout", String.valueOf(privateLayout)
+					).build();
 
-				layoutReferenceParameters.put(
-					"groupId", String.valueOf(groupId));
-				layoutReferenceParameters.put(
-					"layoutId", String.valueOf(layoutId));
-				layoutReferenceParameters.put(
-					"privateLayout", String.valueOf(privateLayout));
+				exportImportContentValidationException.
+					setLayoutReferenceParameters(layoutReferenceParameters);
 
-				eicve.setLayoutReferenceParameters(layoutReferenceParameters);
-
-				eicve.setType(
+				exportImportContentValidationException.setType(
 					ExportImportContentValidationException.LAYOUT_NOT_FOUND);
 
-				throw eicve;
+				throw exportImportContentValidationException;
 			}
 		}
 	}

@@ -181,11 +181,6 @@ public class MBStatsUserWrapper
 		return model.getUserUuid();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a message boards stats user model instance should use the <code>MBStatsUser</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

@@ -55,10 +55,10 @@ String redirect = ParamUtil.getString(request, "redirect");
 </liferay-frontend:edit-form>
 
 <aui:script require="metal-dom/src/all/dom as dom">
-	const articlePreview = document.getElementById(
+	var articlePreview = document.getElementById(
 		'<portlet:namespace />articlePreview'
 	);
-	const assetEntryIdInput = document.getElementById(
+	var assetEntryIdInput = document.getElementById(
 		'<portlet:namespace />assetEntryId'
 	);
 

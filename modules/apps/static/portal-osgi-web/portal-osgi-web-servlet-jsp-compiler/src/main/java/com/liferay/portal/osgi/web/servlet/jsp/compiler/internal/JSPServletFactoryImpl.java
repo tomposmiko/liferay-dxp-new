@@ -50,8 +50,13 @@ import org.osgi.util.tracker.BundleTrackerCustomizer;
 @Component(immediate = true, service = JSPServletFactory.class)
 public class JSPServletFactoryImpl implements JSPServletFactory {
 
+	@Override
+	public Servlet createJSPServlet() {
+		return new JspServlet();
+	}
+
 	@Activate
-	public void activate(BundleContext bundleContext) {
+	protected void activate(BundleContext bundleContext) {
 		_bundleTracker = new BundleTracker<>(
 			bundleContext, Bundle.RESOLVED,
 			new JspFragmentBundleTrackerCustomizer(bundleContext));
@@ -59,13 +64,8 @@ public class JSPServletFactoryImpl implements JSPServletFactory {
 		_bundleTracker.open();
 	}
 
-	@Override
-	public Servlet createJSPServlet() {
-		return new JspServlet();
-	}
-
 	@Deactivate
-	public void deactivate() {
+	protected void deactivate() {
 		_bundleTracker.close();
 	}
 
@@ -94,7 +94,7 @@ public class JSPServletFactoryImpl implements JSPServletFactory {
 			}
 
 			Enumeration<URL> enumeration = bundle.findEntries(
-				_DIR_NAME_RESOURCES, "*.jsp", true);
+				_DIR_NAME_RESOURCES, "*.jsp*", true);
 
 			if (enumeration == null) {
 				return null;

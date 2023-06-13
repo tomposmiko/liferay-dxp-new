@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.PortalRunMode;
 import com.liferay.portal.kernel.util.StringUtil;
 
+import java.io.File;
 import java.io.InputStream;
 
 import java.lang.reflect.Method;
@@ -34,7 +35,6 @@ import java.net.UnknownHostException;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 /**
@@ -69,7 +69,7 @@ public class JarUtil {
 								newURLString));
 					}
 				}
-				catch (UnknownHostException uhe) {
+				catch (UnknownHostException unknownHostException) {
 					if (_log.isDebugEnabled()) {
 						_log.debug("Unable to resolve \"mirrors\"");
 					}
@@ -77,7 +77,9 @@ public class JarUtil {
 			}
 		}
 
-		Path path = Paths.get(libPath, name);
+		File file = new File(libPath, name);
+
+		Path path = file.toPath();
 
 		if (_log.isInfoEnabled()) {
 			_log.info(StringBundler.concat("Downloading ", url, " to ", path));
@@ -126,8 +128,8 @@ public class JarUtil {
 			_addURLMethod = ReflectionUtil.getDeclaredMethod(
 				URLClassLoader.class, "addURL", URL.class);
 		}
-		catch (Exception e) {
-			throw new ExceptionInInitializerError(e);
+		catch (Exception exception) {
+			throw new ExceptionInInitializerError(exception);
 		}
 	}
 

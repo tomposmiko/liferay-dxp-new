@@ -1,0 +1,228 @@
+@component-name = "portal-collaboration"
+definition {
+
+	property portal.release = "true";
+	property portal.upstream = "true";
+	property testray.main.component.name = "Item Selector";
+
+	setUp {
+		TestCase.setUpPortalInstance();
+
+		User.firstLoginPG();
+	}
+
+	tearDown {
+		var testPortalInstance = PropsUtil.get("test.portal.instance");
+
+		if ("${testPortalInstance}" == "true") {
+			PortalInstances.tearDownCP();
+		}
+		else {
+			BlogsEntry.tearDownCP();
+
+			User.logoutPG();
+		}
+	}
+
+	@description = "This makes sure that an image can be uploaded via URL."
+	@priority = "5"
+	test AddBlogsImageViaURL {
+		property portal.acceptance = "true";
+
+		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
+
+		BlogsNavigator.gotoAddEntry();
+
+		BlogsEntry.addTitle(entryTitle = "Blogs Entry Title");
+
+		BlogsEntry.addContent(entryContent = "Blogs Entry Content");
+
+		ItemSelector.gotoItemSelectorViaAlloyEditor();
+
+		ItemSelector.addFromURL(
+			imageSourceURL = "https://raw.githubusercontent.com/liferay/liferay-portal/master/portal-web/test/functional/com/liferay/portalweb/dependencies/Document_1.png",
+			navTab = "URL");
+
+		Pause(locator1 = "1000");
+
+		PortletEntry.publish();
+
+		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
+
+		BlogsNavigator.gotoEntryCP(entryTitle = "Blogs Entry Title");
+
+		BlogsEntry.viewEntry(
+			entryContent = "Blogs Entry Content",
+			entryTitle = "Blogs Entry Title");
+
+		BlogsEntry.viewInlineImage(uploadFileName = "https://raw.githubusercontent.com/liferay/liferay-portal/master/portal-web/test/functional/com/liferay/portalweb/dependencies/Document_1.png");
+	}
+
+	@description = "This ensures that the SVG image can be added to a fragment background."
+	@priority = "5"
+	test AddSVGImageToFragmentBackground {
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Documents and Media Page");
+
+		JSONLayout.addWidgetToPublicLayout(
+			column = "1",
+			groupName = "Guest",
+			layoutName = "Documents and Media Page",
+			widgetName = "Documents and Media");
+
+		Navigator.gotoPage(pageName = "Documents and Media Page");
+
+		DMDocument.enableActionsMenuOnPortlet();
+
+		LexiconEntry.changeDisplayStyle(displayStyle = "list");
+
+		DMDocument.addPG(
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentFile = "Document_1.svg",
+			dmDocumentTitle = "Document_1.svg");
+
+		SitePages.openPagesAdmin(siteURLKey = "guest");
+
+		ContentPages.addPage(pageName = "Test Content Page Name");
+
+		PageEditor.addLayoutSection(columnCount = "2");
+
+		PageEditor.selectLayoutSectionImage(
+			entryTitle = "Document_1.svg",
+			navItem = "Documents and Media");
+
+		PageEditor.clickPublish();
+
+		Navigator.gotoPage(pageName = "Test Content Page Name");
+
+		AssertElementPresent(
+			key_imageName = "Document_1.svg",
+			locator1 = "Fragment#FRAGMENT_LAYOUT_BACKGROUND_IMAGE");
+	}
+
+	@description = "This test covers LPS-105188. It ensures that a user can change selected page for Navigation Menu item based on page after creation."
+	@priority = "4"
+	test ChangeSelectedPageNavigationMenu {
+		JSONGroup.addGroup(groupName = "Test Site Name");
+
+		for (var i : list "1,2") {
+			JSONLayout.addPublicLayout(
+				groupName = "Test Site Name",
+				layoutName = "Test Page Name ${i}");
+		}
+
+		NavigationMenusAdmin.openNavigationMenusAdmin(siteURLKey = "test-site-name");
+
+		NavigationMenusAdmin.addMenu(menuName = "Navigation Menu Name");
+
+		NavigationMenusAdmin.addItem(
+			item = "Page",
+			pageNames = "Test Page Name 1");
+
+		NavigationMenusAdmin.editItem(
+			item = "Page",
+			itemName = "Test Page Name 1",
+			pageNames = "Test Page Name 2");
+
+		NavigationMenusAdmin.viewItem(itemName = "Test Page Name 2");
+	}
+
+	@description = "This ensures that the background image of a fragment can be added."
+	@priority = "5"
+	test FragmentSmoke {
+		property portal.acceptance = "true";
+
+		JSONGroup.addGroup(groupName = "Test Site Name");
+
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "test-site-name");
+
+		DMDocument.addCP(
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentFile = "Document_1.jpeg",
+			dmDocumentTitle = "Document_1.jpeg");
+
+		SitePages.openPagesAdmin(siteURLKey = "test-site-name");
+
+		ContentPages.addPage(pageName = "Test Content Page Name");
+
+		PageEditor.addLayoutSection(columnCount = "2");
+
+		PageEditor.selectLayoutSectionImage(
+			entryTitle = "Document_1.jpeg",
+			navItem = "Documents and Media");
+
+		PageEditor.clickPublish();
+
+		Navigator.openWithAppendToBaseURL(urlAppend = "web/test-site-name/test-content-page-name");
+
+		AssertElementPresent(
+			key_imageName = "Document_1.jpeg",
+			locator1 = "Fragment#FRAGMENT_LAYOUT_BACKGROUND_IMAGE");
+	}
+
+	@description = "This makes sure that the files in item selector can display by pagination."
+	@priority = "4"
+	test PaginateFiles {
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+
+		DMDocument.addMultipleCP(dmDocumentFileList = "Document_1.jpg,Document_2.jpg,Document_3.jpg,Document_1.png,Document_2.png,Document_3.png");
+
+		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
+
+		BlogsNavigator.gotoAddEntry();
+
+		BlogsNavigator.gotoSelectFile();
+
+		SelectFrame(locator1 = "ItemSelector#ITEM_SELECTOR_IFRAME");
+
+		AssertClick(
+			key_navTab = "Documents and Media",
+			locator1 = "ItemSelector#NAVIGATION_SPECIFIC_TAB",
+			value1 = "Documents and Media");
+
+		for (var imageFileName : list "Document_1.jpg,Document_2.jpg,Document_3.jpg,Document_1.png,Document_2.png,Document_3.png") {
+			AssertElementPresent(
+				key_imageFileName = "${imageFileName}",
+				locator1 = "ItemSelector#SELECT_FILE_IMAGE_CARD");
+		}
+
+		Pagination.viewResults(results = "Showing 1 to 6 of 6 entries.");
+
+		Pagination.changePagination(itemsPerPage = "5");
+
+		for (var imageFileName : list "Document_1.jpg,Document_2.jpg,Document_3.jpg,Document_1.png,Document_2.png") {
+			AssertElementPresent(
+				key_imageFileName = "${imageFileName}",
+				locator1 = "ItemSelector#SELECT_FILE_IMAGE_CARD");
+		}
+
+		AssertElementNotPresent(
+			key_imageFileName = "Document_3.png",
+			locator1 = "ItemSelector#SELECT_FILE_IMAGE_CARD");
+
+		Pagination.viewResults(results = "Showing 1 to 5 of 6 entries.");
+	}
+
+	@description = "This ensures that users can preview the SVG image in item selector."
+	@priority = "5"
+	test PreviewSVG {
+		DMNavigator.openDocumentsAndMediaAdmin(siteURLKey = "guest");
+
+		DMDocument.addCP(
+			dmDocumentDescription = "DM Document Description",
+			dmDocumentFile = "Document_1.svg",
+			dmDocumentTitle = "Document_1.svg");
+
+		BlogsNavigator.openBlogsAdmin(siteURLKey = "guest");
+
+		BlogsNavigator.gotoAddEntry();
+
+		BlogsNavigator.gotoSelectFile();
+
+		ItemSelector.gotoPreviewViaSelectFile(navTab = "Documents and Media");
+
+		AssertVisible(locator1 = "ItemSelector#SELECT_IMAGE_PREVIEW");
+	}
+
+}

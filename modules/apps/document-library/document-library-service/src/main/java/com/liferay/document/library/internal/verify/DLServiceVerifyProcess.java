@@ -61,7 +61,6 @@ import org.osgi.service.component.annotations.Reference;
  * @deprecated As of Mueller (7.2.x), with no direct replacement
  */
 @Component(
-	immediate = true,
 	property = "verify.process.name=com.liferay.document.library.service",
 	service = VerifyProcess.class
 )
@@ -162,16 +161,16 @@ public class DLServiceVerifyProcess extends VerifyProcess {
 								dlFileEntry);
 						}
 					}
-					catch (PortalException pe) {
+					catch (PortalException portalException) {
 						if (_log.isWarnEnabled()) {
 							_log.warn(
 								"Unable to get file entry " +
 									dlFileVersion.getFileEntryId(),
-								pe);
+								portalException);
 						}
 					}
 				}
-				catch (Exception e) {
+				catch (Exception exception) {
 					if (_log.isWarnEnabled()) {
 						DLFileEntry dlFileEntry =
 							_dlFileEntryLocalService.fetchDLFileEntry(
@@ -182,7 +181,7 @@ public class DLServiceVerifyProcess extends VerifyProcess {
 								"Unable to find file entry associated with " +
 									"file version " +
 										dlFileVersion.getFileVersionId(),
-								e);
+								exception);
 						}
 						else {
 							StringBundler sb = new StringBundler(4);
@@ -192,7 +191,7 @@ public class DLServiceVerifyProcess extends VerifyProcess {
 							sb.append(" for file entry ");
 							sb.append(dlFileEntry.getName());
 
-							_log.warn(sb.toString(), e);
+							_log.warn(sb.toString(), exception);
 						}
 					}
 				}
@@ -278,7 +277,7 @@ public class DLServiceVerifyProcess extends VerifyProcess {
 	}
 
 	@Reference(
-		target = "(&(release.bundle.symbolic.name=com.liferay.document.library.service)(&(release.schema.version>=1.1.0)(!(release.schema.version>=2.0.0))))",
+		target = "(&(release.bundle.symbolic.name=com.liferay.document.library.service)(&(release.schema.version>=3.0.0)(!(release.schema.version>=4.0.0))))",
 		unbind = "-"
 	)
 	protected void setRelease(Release release) {
@@ -290,11 +289,11 @@ public class DLServiceVerifyProcess extends VerifyProcess {
 				"update DLFileEntry set classNameId = 0 where classNameId is " +
 					"null");
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
 					"Unable to fix file entries where class name ID is null",
-					e);
+					exception);
 			}
 		}
 	}
@@ -320,13 +319,13 @@ public class DLServiceVerifyProcess extends VerifyProcess {
 						dlFileEntry.getUserId(), fileEntry, fileVersion, null,
 						null, null);
 				}
-				catch (Exception e) {
+				catch (Exception exception) {
 					if (_log.isWarnEnabled()) {
 						_log.warn(
 							StringBundler.concat(
 								"Unable to update asset for file entry ",
 								dlFileEntry.getFileEntryId(), ": ",
-								e.getMessage()));
+								exception.getMessage()));
 					}
 				}
 			}
@@ -355,12 +354,13 @@ public class DLServiceVerifyProcess extends VerifyProcess {
 					_dlAppHelperLocalService.updateAsset(
 						dlFolder.getUserId(), folder, null, null, null);
 				}
-				catch (Exception e) {
+				catch (Exception exception) {
 					if (_log.isWarnEnabled()) {
 						_log.warn(
 							StringBundler.concat(
 								"Unable to update asset for folder ",
-								dlFolder.getFolderId(), ": ", e.getMessage()));
+								dlFolder.getFolderId(), ": ",
+								exception.getMessage()));
 					}
 				}
 			}

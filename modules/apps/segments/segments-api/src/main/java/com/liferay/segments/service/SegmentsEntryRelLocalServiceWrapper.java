@@ -33,11 +33,6 @@ public class SegmentsEntryRelLocalServiceWrapper
 		_segmentsEntryRelLocalService = segmentsEntryRelLocalService;
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link SegmentsEntryRelLocalServiceUtil} to access the segments entry rel local service. Add custom service methods to <code>com.liferay.segments.service.impl.SegmentsEntryRelLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
-	 */
 	@Override
 	public com.liferay.segments.model.SegmentsEntryRel addSegmentsEntryRel(
 			long segmentsEntryId, long classNameId, long classPK,
@@ -60,6 +55,16 @@ public class SegmentsEntryRelLocalServiceWrapper
 
 		return _segmentsEntryRelLocalService.addSegmentsEntryRel(
 			segmentsEntryRel);
+	}
+
+	@Override
+	public void addSegmentsEntryRels(
+			long segmentsEntryId, long classNameId, long[] classPKs,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		_segmentsEntryRelLocalService.addSegmentsEntryRels(
+			segmentsEntryId, classNameId, classPKs, serviceContext);
 	}
 
 	/**
@@ -136,6 +141,15 @@ public class SegmentsEntryRelLocalServiceWrapper
 	public void deleteSegmentsEntryRels(long classNameId, long classPK) {
 		_segmentsEntryRelLocalService.deleteSegmentsEntryRels(
 			classNameId, classPK);
+	}
+
+	@Override
+	public void deleteSegmentsEntryRels(
+			long segmentsEntryId, long classNameId, long[] classPKs)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		_segmentsEntryRelLocalService.deleteSegmentsEntryRels(
+			segmentsEntryId, classNameId, classPKs);
 	}
 
 	@Override

@@ -196,9 +196,9 @@ public class DDMFormEvaluatorHelper {
 		try {
 			evaluateExpression(action);
 		}
-		catch (DDMExpressionException ddmee) {
+		catch (DDMExpressionException ddmExpressionException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(ddmee, ddmee);
+				_log.debug(ddmExpressionException, ddmExpressionException);
 			}
 		}
 	}
@@ -207,9 +207,9 @@ public class DDMFormEvaluatorHelper {
 		try {
 			return evaluateExpression(condition);
 		}
-		catch (DDMExpressionException ddmee) {
+		catch (DDMExpressionException ddmExpressionException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(ddmee, ddmee);
+				_log.debug(ddmExpressionException, ddmExpressionException);
 			}
 
 			return false;
@@ -236,9 +236,9 @@ public class DDMFormEvaluatorHelper {
 			ddmFormEvaluatorExpressionObserver.updateFieldProperty(
 				builder.build());
 		}
-		catch (DDMExpressionException ddmee) {
+		catch (DDMExpressionException ddmExpressionException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(ddmee, ddmee);
+				_log.debug(ddmExpressionException, ddmExpressionException);
 			}
 		}
 	}
@@ -290,7 +290,7 @@ public class DDMFormEvaluatorHelper {
 
 		Set<Map.Entry<K, V>> set = map.entrySet();
 
-		Stream<Map.Entry<K, V>> stream = set.parallelStream();
+		Stream<Map.Entry<K, V>> stream = set.stream();
 
 		stream.forEach(entryConsumer);
 	}
@@ -392,6 +392,13 @@ public class DDMFormEvaluatorHelper {
 		return false;
 	}
 
+	protected boolean isFieldReadOnly(
+		DDMFormEvaluatorFieldContextKey ddmFormEvaluatorFieldContextKey) {
+
+		return getBooleanPropertyValue(
+			ddmFormEvaluatorFieldContextKey, "readOnly", false);
+	}
+
 	protected boolean isFieldVisible(
 		DDMFormEvaluatorFieldContextKey ddmFormFieldContextKey) {
 
@@ -407,10 +414,6 @@ public class DDMFormEvaluatorHelper {
 
 	protected void setRequiredErrorMessage(
 		DDMFormEvaluatorFieldContextKey fieldContextKey) {
-
-		Map<String, Object> properties = new HashMap<>();
-
-		properties.put("valid", false);
 
 		UpdateFieldPropertyRequest.Builder builder =
 			UpdateFieldPropertyRequest.Builder.newBuilder(
@@ -434,7 +437,15 @@ public class DDMFormEvaluatorHelper {
 		Locale locale = value.getDefaultLocale();
 
 		if (value.isLocalized()) {
-			locale = _ddmFormEvaluatorEvaluateRequest.getLocale();
+			DDMForm ddmForm = _ddmFormEvaluatorEvaluateRequest.getDDMForm();
+
+			Set<Locale> availableLocales = ddmForm.getAvailableLocales();
+
+			if (availableLocales.contains(
+					_ddmFormEvaluatorEvaluateRequest.getLocale())) {
+
+				locale = _ddmFormEvaluatorEvaluateRequest.getLocale();
+			}
 		}
 
 		value.addString(locale, String.valueOf(newValue));
@@ -448,6 +459,10 @@ public class DDMFormEvaluatorHelper {
 			entry.getKey();
 
 		if (isFieldEmpty(ddmFormEvaluatorFieldContextKey)) {
+			return;
+		}
+
+		if (isFieldReadOnly(ddmFormEvaluatorFieldContextKey)) {
 			return;
 		}
 
@@ -517,9 +532,9 @@ public class DDMFormEvaluatorHelper {
 
 			valid = ddmExpression.evaluate();
 		}
-		catch (DDMExpressionException ddmee) {
+		catch (DDMExpressionException ddmExpressionException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(ddmee, ddmee);
+				_log.debug(ddmExpressionException, ddmExpressionException);
 			}
 		}
 

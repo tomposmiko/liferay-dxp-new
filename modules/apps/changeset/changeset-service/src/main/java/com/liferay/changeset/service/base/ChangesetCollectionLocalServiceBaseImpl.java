@@ -65,7 +65,7 @@ public abstract class ChangesetCollectionLocalServiceBaseImpl
 	implements AopService, ChangesetCollectionLocalService,
 			   IdentifiableOSGiService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>ChangesetCollectionLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.changeset.service.ChangesetCollectionLocalServiceUtil</code>.
@@ -403,8 +403,8 @@ public abstract class ChangesetCollectionLocalServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

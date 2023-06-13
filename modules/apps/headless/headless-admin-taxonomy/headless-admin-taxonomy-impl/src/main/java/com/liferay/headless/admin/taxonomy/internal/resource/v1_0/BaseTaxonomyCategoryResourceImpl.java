@@ -17,13 +17,17 @@ package com.liferay.headless.admin.taxonomy.internal.resource.v1_0;
 import com.liferay.headless.admin.taxonomy.dto.v1_0.TaxonomyCategory;
 import com.liferay.headless.admin.taxonomy.resource.v1_0.TaxonomyCategoryResource;
 import com.liferay.petra.function.UnsafeFunction;
-import com.liferay.portal.kernel.model.Company;
-import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.GroupedModel;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
+import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.ResourceActionLocalService;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
+import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.portal.vulcan.util.ActionUtil;
 import com.liferay.portal.vulcan.util.TransformUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,6 +39,7 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Generated;
 
@@ -92,7 +97,7 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 	@Tags(value = {@Tag(name = "TaxonomyCategory")})
 	public Page<TaxonomyCategory> getTaxonomyCategoryTaxonomyCategoriesPage(
 			@NotNull @Parameter(hidden = true)
-			@PathParam("parentTaxonomyCategoryId") Long
+			@PathParam("parentTaxonomyCategoryId") String
 				parentTaxonomyCategoryId,
 			@Parameter(hidden = true) @QueryParam("search") String search,
 			@Context Filter filter, @Context Pagination pagination,
@@ -105,7 +110,7 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'POST' 'http://localhost:8080/o/headless-admin-taxonomy/v1.0/taxonomy-categories/{parentTaxonomyCategoryId}/taxonomy-categories' -d $'{"description": ___, "name": ___, "viewableBy": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'POST' 'http://localhost:8080/o/headless-admin-taxonomy/v1.0/taxonomy-categories/{parentTaxonomyCategoryId}/taxonomy-categories' -d $'{"description": ___, "description_i18n": ___, "externalReferenceCode": ___, "name": ___, "name_i18n": ___, "viewableBy": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@Override
 	@Consumes({"application/json", "application/xml"})
@@ -121,7 +126,7 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 	@Tags(value = {@Tag(name = "TaxonomyCategory")})
 	public TaxonomyCategory postTaxonomyCategoryTaxonomyCategory(
 			@NotNull @Parameter(hidden = true)
-			@PathParam("parentTaxonomyCategoryId") Long
+			@PathParam("parentTaxonomyCategoryId") String
 				parentTaxonomyCategoryId,
 			TaxonomyCategory taxonomyCategory)
 		throws Exception {
@@ -143,11 +148,11 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 		value = {@Parameter(in = ParameterIn.PATH, name = "taxonomyCategoryId")}
 	)
 	@Path("/taxonomy-categories/{taxonomyCategoryId}")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "TaxonomyCategory")})
 	public void deleteTaxonomyCategory(
 			@NotNull @Parameter(hidden = true) @PathParam("taxonomyCategoryId")
-				Long taxonomyCategoryId)
+				String taxonomyCategoryId)
 		throws Exception {
 	}
 
@@ -167,7 +172,7 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 	@Tags(value = {@Tag(name = "TaxonomyCategory")})
 	public TaxonomyCategory getTaxonomyCategory(
 			@NotNull @Parameter(hidden = true) @PathParam("taxonomyCategoryId")
-				Long taxonomyCategoryId)
+				String taxonomyCategoryId)
 		throws Exception {
 
 		return new TaxonomyCategory();
@@ -176,7 +181,7 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'PATCH' 'http://localhost:8080/o/headless-admin-taxonomy/v1.0/taxonomy-categories/{taxonomyCategoryId}' -d $'{"description": ___, "name": ___, "viewableBy": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'PATCH' 'http://localhost:8080/o/headless-admin-taxonomy/v1.0/taxonomy-categories/{taxonomyCategoryId}' -d $'{"description": ___, "description_i18n": ___, "externalReferenceCode": ___, "name": ___, "name_i18n": ___, "viewableBy": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@Override
 	@Consumes({"application/json", "application/xml"})
@@ -192,7 +197,7 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 	@Tags(value = {@Tag(name = "TaxonomyCategory")})
 	public TaxonomyCategory patchTaxonomyCategory(
 			@NotNull @Parameter(hidden = true) @PathParam("taxonomyCategoryId")
-				Long taxonomyCategoryId,
+				String taxonomyCategoryId,
 			TaxonomyCategory taxonomyCategory)
 		throws Exception {
 
@@ -219,8 +224,23 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 				taxonomyCategory.getDescription());
 		}
 
+		if (taxonomyCategory.getDescription_i18n() != null) {
+			existingTaxonomyCategory.setDescription_i18n(
+				taxonomyCategory.getDescription_i18n());
+		}
+
+		if (taxonomyCategory.getExternalReferenceCode() != null) {
+			existingTaxonomyCategory.setExternalReferenceCode(
+				taxonomyCategory.getExternalReferenceCode());
+		}
+
 		if (taxonomyCategory.getName() != null) {
 			existingTaxonomyCategory.setName(taxonomyCategory.getName());
+		}
+
+		if (taxonomyCategory.getName_i18n() != null) {
+			existingTaxonomyCategory.setName_i18n(
+				taxonomyCategory.getName_i18n());
 		}
 
 		if (taxonomyCategory.getNumberOfTaxonomyCategories() != null) {
@@ -242,7 +262,7 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'PUT' 'http://localhost:8080/o/headless-admin-taxonomy/v1.0/taxonomy-categories/{taxonomyCategoryId}' -d $'{"description": ___, "name": ___, "viewableBy": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'PUT' 'http://localhost:8080/o/headless-admin-taxonomy/v1.0/taxonomy-categories/{taxonomyCategoryId}' -d $'{"description": ___, "description_i18n": ___, "externalReferenceCode": ___, "name": ___, "name_i18n": ___, "viewableBy": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@Override
 	@Consumes({"application/json", "application/xml"})
@@ -258,7 +278,7 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 	@Tags(value = {@Tag(name = "TaxonomyCategory")})
 	public TaxonomyCategory putTaxonomyCategory(
 			@NotNull @Parameter(hidden = true) @PathParam("taxonomyCategoryId")
-				Long taxonomyCategoryId,
+				String taxonomyCategoryId,
 			TaxonomyCategory taxonomyCategory)
 		throws Exception {
 
@@ -302,7 +322,7 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'POST' 'http://localhost:8080/o/headless-admin-taxonomy/v1.0/taxonomy-vocabularies/{taxonomyVocabularyId}/taxonomy-categories' -d $'{"description": ___, "name": ___, "viewableBy": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'POST' 'http://localhost:8080/o/headless-admin-taxonomy/v1.0/taxonomy-vocabularies/{taxonomyVocabularyId}/taxonomy-categories' -d $'{"description": ___, "description_i18n": ___, "externalReferenceCode": ___, "name": ___, "name_i18n": ___, "viewableBy": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@Override
 	@Consumes({"application/json", "application/xml"})
@@ -331,7 +351,9 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 		this.contextAcceptLanguage = contextAcceptLanguage;
 	}
 
-	public void setContextCompany(Company contextCompany) {
+	public void setContextCompany(
+		com.liferay.portal.kernel.model.Company contextCompany) {
+
 		this.contextCompany = contextCompany;
 	}
 
@@ -351,8 +373,35 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 		this.contextUriInfo = contextUriInfo;
 	}
 
-	public void setContextUser(User contextUser) {
+	public void setContextUser(
+		com.liferay.portal.kernel.model.User contextUser) {
+
 		this.contextUser = contextUser;
+	}
+
+	protected Map<String, String> addAction(
+		String actionName, GroupedModel groupedModel, String methodName) {
+
+		return ActionUtil.addAction(
+			actionName, getClass(), groupedModel, methodName,
+			contextScopeChecker, contextUriInfo);
+	}
+
+	protected Map<String, String> addAction(
+		String actionName, Long id, String methodName, String permissionName,
+		Long siteId) {
+
+		return ActionUtil.addAction(
+			actionName, getClass(), id, methodName, permissionName,
+			contextScopeChecker, siteId, contextUriInfo);
+	}
+
+	protected Map<String, String> addAction(
+		String actionName, String methodName, String permissionName,
+		Long siteId) {
+
+		return addAction(
+			actionName, siteId, methodName, permissionName, siteId);
 	}
 
 	protected void preparePatch(
@@ -389,10 +438,15 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 	}
 
 	protected AcceptLanguage contextAcceptLanguage;
-	protected Company contextCompany;
+	protected com.liferay.portal.kernel.model.Company contextCompany;
+	protected com.liferay.portal.kernel.model.User contextUser;
+	protected GroupLocalService groupLocalService;
 	protected HttpServletRequest contextHttpServletRequest;
 	protected HttpServletResponse contextHttpServletResponse;
+	protected ResourceActionLocalService resourceActionLocalService;
+	protected ResourcePermissionLocalService resourcePermissionLocalService;
+	protected RoleLocalService roleLocalService;
+	protected Object contextScopeChecker;
 	protected UriInfo contextUriInfo;
-	protected User contextUser;
 
 }

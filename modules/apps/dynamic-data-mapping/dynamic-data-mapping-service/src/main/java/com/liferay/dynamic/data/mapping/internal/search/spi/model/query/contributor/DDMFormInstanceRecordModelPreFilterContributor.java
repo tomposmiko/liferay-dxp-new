@@ -60,12 +60,11 @@ public class DDMFormInstanceRecordModelPreFilterContributor
 			booleanFilter.addRequiredTerm(Field.STATUS, status);
 		}
 
-		long ddmFormInstanceId = GetterUtil.getLong(
-			searchContext.getAttribute("ddmFormInstanceId"));
+		long formInstanceId = GetterUtil.getLong(
+			searchContext.getAttribute("formInstanceId"));
 
-		if (ddmFormInstanceId > 0) {
-			booleanFilter.addRequiredTerm(
-				"ddmFormInstanceId", ddmFormInstanceId);
+		if (formInstanceId > 0) {
+			booleanFilter.addRequiredTerm("formInstanceId", formInstanceId);
 		}
 
 		addSearchClassTypeIds(booleanFilter, searchContext);
@@ -86,9 +85,9 @@ public class DDMFormInstanceRecordModelPreFilterContributor
 
 				booleanFilter.add(queryFilter, BooleanClauseOccur.MUST);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(e, e);
+					_log.debug(exception, exception);
 				}
 			}
 		}

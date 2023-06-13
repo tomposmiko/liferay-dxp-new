@@ -15,11 +15,11 @@
 package com.liferay.asset.list.web.internal.portlet.action;
 
 import com.liferay.asset.kernel.exception.DuplicateQueryRuleException;
-import com.liferay.asset.kernel.model.AssetQueryRule;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.asset.list.constants.AssetListPortletKeys;
 import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.service.AssetListEntryService;
+import com.liferay.asset.publisher.util.AssetQueryRule;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
@@ -38,6 +38,9 @@ import java.util.List;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
+
+import org.apache.commons.lang.text.StrMatcher;
+import org.apache.commons.lang.text.StrTokenizer;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -91,12 +94,15 @@ public class UpdateAssetListEntryDynamicMVCActionCommand
 			_assetListEntryService.updateAssetListEntryTypeSettings(
 				assetListEntryId, segmentsEntryId, properties.toString());
 		}
-		catch (DuplicateQueryRuleException dqre) {
+		catch (DuplicateQueryRuleException duplicateQueryRuleException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(dqre, dqre);
+				_log.debug(
+					duplicateQueryRuleException, duplicateQueryRuleException);
 			}
 
-			SessionErrors.add(actionRequest, dqre.getClass(), dqre);
+			SessionErrors.add(
+				actionRequest, duplicateQueryRuleException.getClass(),
+				duplicateQueryRuleException);
 		}
 	}
 
@@ -115,6 +121,16 @@ public class UpdateAssetListEntryDynamicMVCActionCommand
 		if (name.equals("assetTags")) {
 			values = ParamUtil.getStringValues(
 				actionRequest, "queryTagNames" + index);
+		}
+		else if (name.equals("keywords")) {
+			StrTokenizer strTokenizer = new StrTokenizer(
+				ParamUtil.getString(actionRequest, "keywords" + index));
+
+			strTokenizer.setQuoteMatcher(StrMatcher.quoteMatcher());
+
+			List<String> valuesList = (List<String>)strTokenizer.getTokenList();
+
+			values = valuesList.toArray(new String[0]);
 		}
 		else {
 			values = ParamUtil.getStringValues(

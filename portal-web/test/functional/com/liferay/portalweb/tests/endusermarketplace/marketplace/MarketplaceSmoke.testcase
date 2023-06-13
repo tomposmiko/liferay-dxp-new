@@ -9,25 +9,7 @@ definition {
 	}
 
 	tearDown {
-		Site.tearDownCP();
-
 		BlogsEntry.tearDownCP();
-
-		BookmarksFolder.tearDownCP();
-
-		WikiPage.tearDownCP();
-
-		Page.tearDownCP();
-
-		DMFolder.tearDownCP();
-
-		DMDocument.tearDownCP();
-
-		Navigator.gotoPage(pageName = "Calendar Test Page");
-
-		CalendarEvent.tearDown();
-
-		Calendar.tearDown();
 	}
 
 	@priority = "5"

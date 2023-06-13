@@ -34,8 +34,6 @@ import com.liferay.portal.kernel.settings.SettingsDescriptor;
 import com.liferay.portal.kernel.settings.SettingsException;
 import com.liferay.portal.kernel.settings.SettingsFactory;
 import com.liferay.portal.kernel.settings.SettingsLocator;
-import com.liferay.portal.kernel.settings.SettingsLocatorHelper;
-import com.liferay.portal.kernel.settings.SettingsLocatorHelperUtil;
 import com.liferay.portal.kernel.settings.definition.ConfigurationBeanDeclaration;
 import com.liferay.portal.kernel.settings.definition.ConfigurationPidMapping;
 
@@ -73,8 +71,8 @@ public class SettingsFactoryImpl implements SettingsFactory {
 
 			return new ArchivedSettingsImpl(portletItem);
 		}
-		catch (PortalException pe) {
-			throw new SettingsException(pe);
+		catch (PortalException portalException) {
+			throw new SettingsException(portalException);
 		}
 	}
 
@@ -95,19 +93,6 @@ public class SettingsFactoryImpl implements SettingsFactory {
 		}
 
 		return archivedSettingsList;
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             SettingsLocatorHelperImpl#getServerSettings(String)}
-	 */
-	@Deprecated
-	@Override
-	public Settings getServerSettings(String settingsId) {
-		SettingsLocatorHelper settingsLocatorHelper =
-			SettingsLocatorHelperUtil.getSettingsLocatorHelper();
-
-		return settingsLocatorHelper.getServerSettings(settingsId);
 	}
 
 	@Override
@@ -163,8 +148,8 @@ public class SettingsFactoryImpl implements SettingsFactory {
 
 			return group.getCompanyId();
 		}
-		catch (PortalException pe) {
-			throw new SettingsException(pe);
+		catch (PortalException portalException) {
+			throw new SettingsException(portalException);
 		}
 	}
 
@@ -178,12 +163,13 @@ public class SettingsFactoryImpl implements SettingsFactory {
 			portletItem = _portletItemLocalService.getPortletItem(
 				groupId, name, portletId, PortletPreferences.class.getName());
 		}
-		catch (NoSuchPortletItemException nspie) {
+		catch (NoSuchPortletItemException noSuchPortletItemException) {
 
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(nspie, nspie);
+				_log.debug(
+					noSuchPortletItemException, noSuchPortletItemException);
 			}
 
 			portletItem = _portletItemLocalService.updatePortletItem(

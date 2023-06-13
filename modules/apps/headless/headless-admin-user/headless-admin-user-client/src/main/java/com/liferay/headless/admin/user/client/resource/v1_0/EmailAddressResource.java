@@ -17,6 +17,7 @@ package com.liferay.headless.admin.user.client.resource.v1_0;
 import com.liferay.headless.admin.user.client.dto.v1_0.EmailAddress;
 import com.liferay.headless.admin.user.client.http.HttpInvoker;
 import com.liferay.headless.admin.user.client.pagination.Page;
+import com.liferay.headless.admin.user.client.problem.Problem;
 import com.liferay.headless.admin.user.client.serdes.v1_0.EmailAddressSerDes;
 
 import java.util.LinkedHashMap;
@@ -45,11 +46,11 @@ public interface EmailAddressResource {
 		throws Exception;
 
 	public Page<EmailAddress> getOrganizationEmailAddressesPage(
-			Long organizationId)
+			String organizationId)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
-			getOrganizationEmailAddressesPageHttpResponse(Long organizationId)
+			getOrganizationEmailAddressesPageHttpResponse(String organizationId)
 		throws Exception;
 
 	public Page<EmailAddress> getUserAccountEmailAddressesPage(
@@ -138,7 +139,7 @@ public interface EmailAddressResource {
 					Level.WARNING,
 					"Unable to process HTTP response: " + content, e);
 
-				throw e;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 		}
 
@@ -180,7 +181,7 @@ public interface EmailAddressResource {
 		}
 
 		public Page<EmailAddress> getOrganizationEmailAddressesPage(
-				Long organizationId)
+				String organizationId)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
@@ -194,12 +195,21 @@ public interface EmailAddressResource {
 			_logger.fine(
 				"HTTP response status code: " + httpResponse.getStatusCode());
 
-			return Page.of(content, EmailAddressSerDes::toDTO);
+			try {
+				return Page.of(content, EmailAddressSerDes::toDTO);
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
 		}
 
 		public HttpInvoker.HttpResponse
 				getOrganizationEmailAddressesPageHttpResponse(
-					Long organizationId)
+					String organizationId)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
@@ -250,7 +260,16 @@ public interface EmailAddressResource {
 			_logger.fine(
 				"HTTP response status code: " + httpResponse.getStatusCode());
 
-			return Page.of(content, EmailAddressSerDes::toDTO);
+			try {
+				return Page.of(content, EmailAddressSerDes::toDTO);
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
 		}
 
 		public HttpInvoker.HttpResponse

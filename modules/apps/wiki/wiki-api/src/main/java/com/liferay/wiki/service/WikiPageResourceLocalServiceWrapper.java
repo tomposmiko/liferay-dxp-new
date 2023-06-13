@@ -33,29 +33,12 @@ public class WikiPageResourceLocalServiceWrapper
 		_wikiPageResourceLocalService = wikiPageResourceLocalService;
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link WikiPageResourceLocalServiceUtil} to access the wiki page resource local service. Add custom service methods to <code>com.liferay.wiki.service.impl.WikiPageResourceLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
-	 */
 	@Override
 	public com.liferay.wiki.model.WikiPageResource addPageResource(
 		long groupId, long nodeId, String title) {
 
 		return _wikiPageResourceLocalService.addPageResource(
 			groupId, nodeId, title);
-	}
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 #addPageResource(long, long, String)}
-	 */
-	@Deprecated
-	@Override
-	public com.liferay.wiki.model.WikiPageResource addPageResource(
-		long nodeId, String title) {
-
-		return _wikiPageResourceLocalService.addPageResource(nodeId, title);
 	}
 
 	/**
@@ -311,17 +294,6 @@ public class WikiPageResourceLocalServiceWrapper
 
 		return _wikiPageResourceLocalService.getPageResourcePrimKey(
 			groupId, nodeId, title);
-	}
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 #getPageResourcePrimKey(long, long, String)}
-	 */
-	@Deprecated
-	@Override
-	public long getPageResourcePrimKey(long nodeId, String title) {
-		return _wikiPageResourceLocalService.getPageResourcePrimKey(
-			nodeId, title);
 	}
 
 	@Override

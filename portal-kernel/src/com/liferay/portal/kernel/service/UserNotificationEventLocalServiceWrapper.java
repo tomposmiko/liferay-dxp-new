@@ -31,11 +31,22 @@ public class UserNotificationEventLocalServiceWrapper
 		_userNotificationEventLocalService = userNotificationEventLocalService;
 	}
 
+	@Override
+	public com.liferay.portal.kernel.model.UserNotificationEvent
+			addUserNotificationEvent(
+				long userId, boolean delivered, boolean actionRequired,
+				com.liferay.portal.kernel.notifications.NotificationEvent
+					notificationEvent)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _userNotificationEventLocalService.addUserNotificationEvent(
+			userId, delivered, actionRequired, notificationEvent);
+	}
+
 	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link UserNotificationEventLocalServiceUtil} to access the user notification event local service. Add custom service methods to <code>com.liferay.portal.service.impl.UserNotificationEventLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 * @deprecated As of Mueller (7.2.x)
 	 */
+	@Deprecated
 	@Override
 	public com.liferay.portal.kernel.model.UserNotificationEvent
 			addUserNotificationEvent(
@@ -60,6 +71,24 @@ public class UserNotificationEventLocalServiceWrapper
 			userId, notificationEvent);
 	}
 
+	@Override
+	public com.liferay.portal.kernel.model.UserNotificationEvent
+			addUserNotificationEvent(
+				long userId, java.lang.String type, long timestamp,
+				int deliveryType, long deliverBy, boolean delivered,
+				java.lang.String payload, boolean actionRequired,
+				boolean archived, ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _userNotificationEventLocalService.addUserNotificationEvent(
+			userId, type, timestamp, deliveryType, deliverBy, delivered,
+			payload, actionRequired, archived, serviceContext);
+	}
+
+	/**
+	 * @deprecated As of Mueller (7.2.x)
+	 */
+	@Deprecated
 	@Override
 	public com.liferay.portal.kernel.model.UserNotificationEvent
 			addUserNotificationEvent(
@@ -387,6 +416,32 @@ public class UserNotificationEventLocalServiceWrapper
 	@Override
 	public java.util.List<com.liferay.portal.kernel.model.UserNotificationEvent>
 		getArchivedUserNotificationEvents(
+			long userId, int deliveryType, boolean delivered,
+			boolean actionRequired, boolean archived, int start, int end) {
+
+		return _userNotificationEventLocalService.
+			getArchivedUserNotificationEvents(
+				userId, deliveryType, delivered, actionRequired, archived,
+				start, end);
+	}
+
+	@Override
+	public java.util.List<com.liferay.portal.kernel.model.UserNotificationEvent>
+		getArchivedUserNotificationEvents(
+			long userId, int deliveryType, boolean delivered,
+			boolean actionRequired, boolean archived, int start, int end,
+			com.liferay.portal.kernel.util.OrderByComparator
+				<com.liferay.portal.kernel.model.UserNotificationEvent> obc) {
+
+		return _userNotificationEventLocalService.
+			getArchivedUserNotificationEvents(
+				userId, deliveryType, delivered, actionRequired, archived,
+				start, end, obc);
+	}
+
+	@Override
+	public java.util.List<com.liferay.portal.kernel.model.UserNotificationEvent>
+		getArchivedUserNotificationEvents(
 			long userId, int deliveryType, boolean actionRequired,
 			boolean archived, int start, int end) {
 
@@ -454,6 +509,25 @@ public class UserNotificationEventLocalServiceWrapper
 		return _userNotificationEventLocalService.
 			getArchivedUserNotificationEventsCount(
 				userId, deliveryType, actionRequired, archived);
+	}
+
+	@Override
+	public int getArchivedUserNotificationEventsCount(
+		long userId, int deliveryType, boolean delivered,
+		boolean actionRequired, boolean archived) {
+
+		return _userNotificationEventLocalService.
+			getArchivedUserNotificationEventsCount(
+				userId, deliveryType, delivered, actionRequired, archived);
+	}
+
+	@Override
+	public int getDeliveredArchivedUserNotificationEventsCount(
+		long userId, int deliveryType, boolean delivered, boolean archived) {
+
+		return _userNotificationEventLocalService.
+			getDeliveredArchivedUserNotificationEventsCount(
+				userId, deliveryType, delivered, archived);
 	}
 
 	@Override
@@ -732,12 +806,45 @@ public class UserNotificationEventLocalServiceWrapper
 
 	@Override
 	public int getUserNotificationEventsCount(
+		long userId, int deliveryType, boolean delivered, boolean archived) {
+
+		return _userNotificationEventLocalService.
+			getUserNotificationEventsCount(
+				userId, deliveryType, delivered, archived);
+	}
+
+	@Override
+	public int getUserNotificationEventsCount(
 		long userId, java.lang.String type, int deliveryType,
 		boolean archived) {
 
 		return _userNotificationEventLocalService.
 			getUserNotificationEventsCount(
 				userId, type, deliveryType, archived);
+	}
+
+	@Override
+	public int getUserNotificationEventsCount(
+		long userId, java.lang.String type, int deliveryType, boolean delivered,
+		boolean archived) {
+
+		return _userNotificationEventLocalService.
+			getUserNotificationEventsCount(
+				userId, type, deliveryType, delivered, archived);
+	}
+
+	@Override
+	public com.liferay.portal.kernel.model.UserNotificationEvent
+			sendUserNotificationEvents(
+				long userId, java.lang.String portletId, int deliveryType,
+				boolean delivered, boolean actionRequired,
+				com.liferay.portal.kernel.json.JSONObject
+					notificationEventJSONObject)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _userNotificationEventLocalService.sendUserNotificationEvents(
+			userId, portletId, deliveryType, delivered, actionRequired,
+			notificationEventJSONObject);
 	}
 
 	@Override

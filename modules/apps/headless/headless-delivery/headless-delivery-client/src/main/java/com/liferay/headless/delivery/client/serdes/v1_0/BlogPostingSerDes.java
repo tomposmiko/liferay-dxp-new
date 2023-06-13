@@ -65,6 +65,16 @@ public class BlogPostingSerDes {
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
+		if (blogPosting.getActions() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"actions\": ");
+
+			sb.append(_toJSON(blogPosting.getActions()));
+		}
+
 		if (blogPosting.getAggregateRating() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -399,6 +409,13 @@ public class BlogPostingSerDes {
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
+		if (blogPosting.getActions() == null) {
+			map.put("actions", null);
+		}
+		else {
+			map.put("actions", String.valueOf(blogPosting.getActions()));
+		}
+
 		if (blogPosting.getAggregateRating() == null) {
 			map.put("aggregateRating", null);
 		}
@@ -577,7 +594,14 @@ public class BlogPostingSerDes {
 			BlogPosting blogPosting, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
 
-			if (Objects.equals(jsonParserFieldName, "aggregateRating")) {
+			if (Objects.equals(jsonParserFieldName, "actions")) {
+				if (jsonParserFieldValue != null) {
+					blogPosting.setActions(
+						(Map)BlogPostingSerDes.toMap(
+							(String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "aggregateRating")) {
 				if (jsonParserFieldValue != null) {
 					blogPosting.setAggregateRating(
 						AggregateRatingSerDes.toDTO(
@@ -737,9 +761,11 @@ public class BlogPostingSerDes {
 	private static String _escape(Object object) {
 		String string = String.valueOf(object);
 
-		string = string.replace("\\", "\\\\");
+		for (String[] strings : BaseJSONParser.JSON_ESCAPE_STRINGS) {
+			string = string.replace(strings[0], strings[1]);
+		}
 
-		return string.replace("\"", "\\\"");
+		return string;
 	}
 
 	private static String _toJSON(Map<String, ?> map) {

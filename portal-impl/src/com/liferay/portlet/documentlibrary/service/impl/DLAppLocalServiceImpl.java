@@ -149,8 +149,9 @@ public class DLAppLocalServiceImpl extends DLAppLocalServiceBaseImpl {
 				userId, repositoryId, folderId, sourceFileName, mimeType, title,
 				description, changeLog, file, serviceContext);
 		}
-		catch (IOException ioe) {
-			throw new SystemException("Unable to write temporary file", ioe);
+		catch (IOException ioException) {
+			throw new SystemException(
+				"Unable to write temporary file", ioException);
 		}
 		finally {
 			FileUtil.delete(file);
@@ -277,9 +278,9 @@ public class DLAppLocalServiceImpl extends DLAppLocalServiceBaseImpl {
 						mimeType, title, description, changeLog, file,
 						serviceContext);
 				}
-				catch (IOException ioe) {
+				catch (IOException ioException) {
 					throw new SystemException(
-						"Unable to write temporary file", ioe);
+						"Unable to write temporary file", ioException);
 				}
 				finally {
 					FileUtil.delete(file);
@@ -400,40 +401,6 @@ public class DLAppLocalServiceImpl extends DLAppLocalServiceBaseImpl {
 	}
 
 	/**
-	 * Deletes the file ranks associated to a given file entry. This method is
-	 * only supported by the Liferay repository.
-	 *
-	 * @param      fileEntryId the primary key of the file entry
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             com.liferay.document.library.file.rank.service.DLFileRankLocalService#deleteFileRanksByFileEntryId}
-	 */
-	@Deprecated
-	@Override
-	public void deleteFileRanksByFileEntryId(long fileEntryId) {
-		throw new UnsupportedOperationException(
-			"This method is deprecated and replaced by " +
-				"com.liferay.document.library.file.rank.service." +
-					"DLFileRankLocalService#deleteFileRanksByFileEntryId");
-	}
-
-	/**
-	 * Deletes the file ranks associated to a given user. This method is only
-	 * supported by the Liferay repository.
-	 *
-	 * @param      userId the primary key of the user
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             com.liferay.document.library.file.rank.service.DLFileRankLocalService#deleteFileRanksByUserId}
-	 */
-	@Deprecated
-	@Override
-	public void deleteFileRanksByUserId(long userId) {
-		throw new UnsupportedOperationException(
-			"This method is deprecated and replaced by " +
-				"com.liferay.document.library.file.rank.service." +
-					"DLFileRankLocalService#deleteFileRanksByUserId");
-	}
-
-	/**
 	 * Deletes the file shortcut. This method is only supported by the Liferay
 	 * repository.
 	 *
@@ -551,9 +518,9 @@ public class DLAppLocalServiceImpl extends DLAppLocalServiceBaseImpl {
 
 			return localRepository.getFileEntry(folderId, title);
 		}
-		catch (NoSuchFileEntryException nsfee) {
+		catch (NoSuchFileEntryException noSuchFileEntryException) {
 			if (folderId == DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
-				throw nsfee;
+				throw noSuchFileEntryException;
 			}
 
 			LocalRepository localRepository =
@@ -580,9 +547,9 @@ public class DLAppLocalServiceImpl extends DLAppLocalServiceBaseImpl {
 
 			return localRepository.getFileEntryByUuid(uuid);
 		}
-		catch (NoSuchFileEntryException nsfee) {
+		catch (NoSuchFileEntryException noSuchFileEntryException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(nsfee, nsfee);
+				_log.debug(noSuchFileEntryException, noSuchFileEntryException);
 			}
 		}
 
@@ -596,9 +563,10 @@ public class DLAppLocalServiceImpl extends DLAppLocalServiceBaseImpl {
 
 				return localRepository.getFileEntryByUuid(uuid);
 			}
-			catch (NoSuchFileEntryException nsfee) {
+			catch (NoSuchFileEntryException noSuchFileEntryException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(nsfee, nsfee);
+					_log.debug(
+						noSuchFileEntryException, noSuchFileEntryException);
 				}
 			}
 		}
@@ -869,64 +837,6 @@ public class DLAppLocalServiceImpl extends DLAppLocalServiceBaseImpl {
 	}
 
 	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #updateFileEntry(long, long, String, String, String, String,
-	 *             String, DLVersionNumberIncrease, byte[], ServiceContext)}
-	 */
-	@Deprecated
-	@Override
-	public FileEntry updateFileEntry(
-			long userId, long fileEntryId, String sourceFileName,
-			String mimeType, String title, String description, String changeLog,
-			boolean majorVersion, byte[] bytes, ServiceContext serviceContext)
-		throws PortalException {
-
-		return updateFileEntry(
-			userId, fileEntryId, sourceFileName, mimeType, title, description,
-			changeLog, DLVersionNumberIncrease.fromMajorVersion(majorVersion),
-			bytes, serviceContext);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #updateFileEntry(long, long, String, String, String, String,
-	 *             String, DLVersionNumberIncrease, File, ServiceContext)}
-	 */
-	@Deprecated
-	@Override
-	public FileEntry updateFileEntry(
-			long userId, long fileEntryId, String sourceFileName,
-			String mimeType, String title, String description, String changeLog,
-			boolean majorVersion, File file, ServiceContext serviceContext)
-		throws PortalException {
-
-		return updateFileEntry(
-			userId, fileEntryId, sourceFileName, mimeType, title, description,
-			changeLog, DLVersionNumberIncrease.fromMajorVersion(majorVersion),
-			file, serviceContext);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #updateFileEntry(long, long, String, String, String, String,
-	 *             String, boolean, InputStream, long, ServiceContext)}
-	 */
-	@Deprecated
-	@Override
-	public FileEntry updateFileEntry(
-			long userId, long fileEntryId, String sourceFileName,
-			String mimeType, String title, String description, String changeLog,
-			boolean majorVersion, InputStream is, long size,
-			ServiceContext serviceContext)
-		throws PortalException {
-
-		return updateFileEntry(
-			userId, fileEntryId, sourceFileName, mimeType, title, description,
-			changeLog, DLVersionNumberIncrease.fromMajorVersion(majorVersion),
-			is, size, serviceContext);
-	}
-
-	/**
 	 * Updates a file entry and associated metadata based on a byte array
 	 * object. If the file data is <code>null</code>, then only the associated
 	 * metadata (i.e., <code>title</code>, <code>description</code>, and
@@ -982,8 +892,9 @@ public class DLAppLocalServiceImpl extends DLAppLocalServiceBaseImpl {
 				description, changeLog, dlVersionNumberIncrease, file,
 				serviceContext);
 		}
-		catch (IOException ioe) {
-			throw new SystemException("Unable to write temporary file", ioe);
+		catch (IOException ioException) {
+			throw new SystemException(
+				"Unable to write temporary file", ioException);
 		}
 		finally {
 			FileUtil.delete(file);
@@ -1122,9 +1033,9 @@ public class DLAppLocalServiceImpl extends DLAppLocalServiceBaseImpl {
 						description, changeLog, dlVersionNumberIncrease, file,
 						serviceContext);
 				}
-				catch (IOException ioe) {
+				catch (IOException ioException) {
 					throw new SystemException(
-						"Unable to write temporary file", ioe);
+						"Unable to write temporary file", ioException);
 				}
 				finally {
 					FileUtil.delete(file);
@@ -1191,19 +1102,6 @@ public class DLAppLocalServiceImpl extends DLAppLocalServiceBaseImpl {
 			repositoryProvider.getFileEntryLocalRepository(newToFileEntryId);
 
 		localRepository.updateFileShortcuts(oldToFileEntryId, newToFileEntryId);
-	}
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             #updateFileShortcuts(long, long)}
-	 */
-	@Deprecated
-	@Override
-	public void updateFileShortcuts(
-			long toRepositoryId, long oldToFileEntryId, long newToFileEntryId)
-		throws PortalException {
-
-		updateFileShortcuts(oldToFileEntryId, newToFileEntryId);
 	}
 
 	/**
@@ -1281,15 +1179,17 @@ public class DLAppLocalServiceImpl extends DLAppLocalServiceBaseImpl {
 					sourceFileName, destinationFileEntry.getMimeType(),
 					destinationFileEntry.getTitle(),
 					destinationFileEntry.getDescription(), StringPool.BLANK,
-					DLAppUtil.isMajorVersion(fileVersion, previousFileVersion),
+					DLVersionNumberIncrease.fromMajorVersion(
+						DLAppUtil.isMajorVersion(
+							fileVersion, previousFileVersion)),
 					fileVersion.getContentStream(false), fileVersion.getSize(),
 					serviceContext);
 			}
-			catch (PortalException pe) {
+			catch (PortalException portalException) {
 				toLocalRepository.deleteFileEntry(
 					destinationFileEntry.getFileEntryId());
 
-				throw pe;
+				throw portalException;
 			}
 		}
 
@@ -1320,12 +1220,12 @@ public class DLAppLocalServiceImpl extends DLAppLocalServiceBaseImpl {
 
 			return newFolder;
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			if (newFolder != null) {
 				toLocalRepository.deleteFolder(newFolder.getFolderId());
 			}
 
-			throw pe;
+			throw portalException;
 		}
 	}
 
@@ -1389,7 +1289,7 @@ public class DLAppLocalServiceImpl extends DLAppLocalServiceBaseImpl {
 
 			dlAppHelperLocalService.deleteFileEntry(fileEntry);
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			FileEntry fileEntry = toLocalRepository.getFileEntry(
 				newFileEntryId);
 
@@ -1397,7 +1297,7 @@ public class DLAppLocalServiceImpl extends DLAppLocalServiceBaseImpl {
 
 			dlAppHelperLocalService.deleteFileEntry(fileEntry);
 
-			throw pe;
+			throw portalException;
 		}
 	}
 
@@ -1434,14 +1334,15 @@ public class DLAppLocalServiceImpl extends DLAppLocalServiceBaseImpl {
 		try {
 			return repositoryProvider.getLocalRepository(repositoryId);
 		}
-		catch (InvalidRepositoryIdException irie) {
+		catch (InvalidRepositoryIdException invalidRepositoryIdException) {
 			StringBundler sb = new StringBundler(3);
 
 			sb.append("No Group exists with the key {repositoryId=");
 			sb.append(repositoryId);
 			sb.append("}");
 
-			throw new NoSuchGroupException(sb.toString(), irie);
+			throw new NoSuchGroupException(
+				sb.toString(), invalidRepositoryIdException);
 		}
 	}
 

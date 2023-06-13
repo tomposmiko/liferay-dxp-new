@@ -58,9 +58,7 @@ public class PasswordPolicyRelLocalServiceImpl
 		passwordPolicyRel.setClassNameId(classNameId);
 		passwordPolicyRel.setClassPK(classPK);
 
-		passwordPolicyRelPersistence.update(passwordPolicyRel);
-
-		return passwordPolicyRel;
+		return passwordPolicyRelPersistence.update(passwordPolicyRel);
 	}
 
 	@Override
@@ -96,12 +94,15 @@ public class PasswordPolicyRelLocalServiceImpl
 
 			deletePasswordPolicyRel(passwordPolicyRel);
 		}
-		catch (NoSuchPasswordPolicyRelException nsppre) {
+		catch (NoSuchPasswordPolicyRelException
+					noSuchPasswordPolicyRelException) {
 
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(nsppre, nsppre);
+				_log.debug(
+					noSuchPasswordPolicyRelException,
+					noSuchPasswordPolicyRelException);
 			}
 		}
 	}

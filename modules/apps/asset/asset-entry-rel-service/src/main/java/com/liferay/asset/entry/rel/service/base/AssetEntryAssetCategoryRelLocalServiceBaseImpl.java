@@ -64,7 +64,7 @@ public abstract class AssetEntryAssetCategoryRelLocalServiceBaseImpl
 	implements AopService, AssetEntryAssetCategoryRelLocalService,
 			   IdentifiableOSGiService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>AssetEntryAssetCategoryRelLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.asset.entry.rel.service.AssetEntryAssetCategoryRelLocalServiceUtil</code>.
@@ -409,8 +409,8 @@ public abstract class AssetEntryAssetCategoryRelLocalServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

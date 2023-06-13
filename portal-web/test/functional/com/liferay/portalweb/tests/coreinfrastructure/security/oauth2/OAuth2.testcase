@@ -153,7 +153,7 @@ definition {
 
 		var portalVersionOutput = JSONCurlUtil.post("${portalVersionCurl}");
 
-		if (!(contains("${portalVersionOutput}", "7.2"))) {
+		if (!(contains("${portalVersionOutput}", "7.3.10"))) {
 			fail("JSON-WS call failed to return Portal version");
 		}
 
@@ -193,7 +193,7 @@ definition {
 
 		var portalVersionOutput = JSONCurlUtil.post("${portalVersionCurl}");
 
-		if (!(contains("${portalVersionOutput}", "7.2"))) {
+		if (!(contains("${portalVersionOutput}", "7.3.10"))) {
 			fail("JSON-WS call failed to return Portal version");
 		}
 
@@ -229,7 +229,7 @@ definition {
 
 		var buildNumberOutput = JSONCurlUtil.post("${buildNumberCurl}");
 
-		if (!(contains("${buildNumberOutput}", "72"))) {
+		if (!(contains("${buildNumberOutput}", "7310"))) {
 			fail("JSON-WS call failed to return build number");
 		}
 	}
@@ -376,9 +376,9 @@ definition {
 
 		var accessToken = OAuth2.getAccessToken(tokenCurl = "${tokenCurl}");
 
-		var articleId = JSONWebcontentAPI._getArticleIdByURLTitle(
+		var articleId = JSONWebcontentSetter.setArticleId(
 			groupName = "Guest",
-			urlTitle = "wc-title");
+			title = "WC Title");
 
 		var liferaySiteId = JSONGroupAPI._getGroupIdByName(groupName = "Guest");
 
@@ -667,13 +667,30 @@ definition {
 			applicationName = "OAuth Application",
 			checkboxUncheckList = "Authorization Code");
 
+		Navigator.gotoBack();
+
+		OAuth2.editScopes(
+			applicationName = "OAuth Application",
+			resourceCheckList = "liferay-json-web-services.everything.read,liferay-json-web-services.everything.write,liferay-json-web-services.everything.read.documents.download,liferay-json-web-services.everything.read.userprofile",
+			resourcePanels = "Portal Services");
+
+		LexiconEntry.gotoEntryMenuItem(
+			menuItem = "Edit",
+			rowEntry = "OAuth Application");
+
+		AssertTextEquals(
+			locator1 = "Portlet#HEADER",
+			value1 = "OAuth Application");
+
 		var generatedClientId = selenium.getElementValue("OAuth2#ADMIN_INPUT_FORM_CLIENT_ID");
 		var generatedClientSecret = selenium.getElementValue("OAuth2#ADMIN_INPUT_FORM_CLIENT_SECRET");
 		var portalURL = PropsUtil.get("portal.url");
 
 		var curl = '''
 			${portalURL}/o/oauth2/token \
-				--data grant_type=client_credentials&client_id=${generatedClientId}&client_secret=${generatedClientSecret}
+				-d client_id=${generatedClientId} \
+				-d client_secret=${generatedClientSecret} \
+				-d grant_type=client_credentials
 		''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
@@ -687,6 +704,11 @@ definition {
 		OAuth2.revokeGrantedAuthViaAdmin(
 			applicationName = "OAuth Application",
 			userName = "Test Test");
+
+		OAuth2.viewScopes(
+			applicationName = "OAuth Application",
+			resourceCheckedList = "liferay-json-web-services.everything.read,liferay-json-web-services.everything.write,liferay-json-web-services.everything.read.documents.download,liferay-json-web-services.everything.read.userprofile",
+			resourcePanels = "Portal Services");
 
 		OAuth2.viewGrantedAuthViaAdmin(
 			applicationName = "OAuth Application",

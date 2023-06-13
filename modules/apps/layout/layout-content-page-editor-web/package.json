@@ -1,14 +1,19 @@
 {
 	"dependencies": {
-		"@clayui/alert": "3.0.0",
-		"@clayui/button": "3.0.0",
-		"@clayui/drop-down": "3.0.0",
-		"@clayui/form": "3.0.0",
-		"@clayui/icon": "3.0.0",
-		"@clayui/label": "3.0.0",
-		"@clayui/sticker": "3.0.0",
-		"clay-checkbox": "2.18.1",
-		"clay-dropdown": "2.18.1",
+		"@clayui/alert": "3.1.0",
+		"@clayui/button": "3.1.0",
+		"@clayui/drop-down": "3.1.3",
+		"@clayui/form": "3.3.0",
+		"@clayui/icon": "3.0.2",
+		"@clayui/label": "3.0.2",
+		"@clayui/loading-indicator": "3.0.0",
+		"@clayui/sticker": "3.0.4",
+		"@clayui/tooltip": "3.0.6",
+		"clay-alert": "2.20.0",
+		"clay-checkbox": "2.20.0",
+		"clay-dropdown": "2.20.0",
+		"clay-icon": "2.20.0",
+		"clay-label": "2.20.0",
 		"frontend-js-react-web": "*",
 		"frontend-js-web": "*",
 		"metal": "2.16.8",
@@ -21,8 +26,10 @@
 		"metal-state": "2.16.8",
 		"metal-throttle": "3.0.1",
 		"prop-types": "15.7.2",
-		"react": "16.9.0",
-		"react-dom": "16.9.0"
+		"react": "16.12.0",
+		"react-dnd": "7.7.0",
+		"react-dnd-html5-backend": "7.7.0",
+		"react-dom": "16.12.0"
 	},
 	"name": "layout-content-page-editor-web",
 	"optionalDependencies": {
@@ -34,5 +41,5 @@
 		"format": "liferay-npm-scripts fix",
 		"test": "liferay-npm-scripts test"
 	},
-	"version": "1.0.53"
+	"version": "2.0.8"
 }

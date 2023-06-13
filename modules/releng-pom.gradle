@@ -19,7 +19,7 @@ buildscript {
 	apply from: file("build-buildscript.gradle"), to: buildscript
 
 	dependencies {
-		classpath group: "com.liferay", name: "com.liferay.project.templates", version: "latest.release"
+		classpath group: "com.liferay", name: "com.liferay.project.templates", version: "4.5.6"
 		classpath group: "org.apache.maven", name: "maven-model", version: "3.6.1"
 	}
 
@@ -47,7 +47,7 @@ configurations {
 }
 
 dependencies {
-	pomProjectTemplates group: "com.liferay", name: "com.liferay.project.templates", version: "latest.release"
+	pomProjectTemplates group: "com.liferay", name: "com.liferay.project.templates", version: "4.5.6"
 }
 
 generatePom {
@@ -71,7 +71,12 @@ generatePomCompileOnly {
 				mainArgs += ["--host-bundle-symbolic-name", "com.liferay.login.web", "--host-bundle-version", "1.0.0"]
 			}
 			else if (it.equals("modules-ext")) {
-				mainArgs += ["--original-module-name", "com.liferay.login.web", "--original-module-version", "2.0.4"]
+				if (project.property("gradle.releng.pom.project.templates.version").startsWith("7.0")) {
+					return
+				}
+				else {
+					mainArgs += ["--original-module-name", "com.liferay.login.web", "--original-module-version", "2.0.4"]
+				}
 			}
 			else if (it.equals("service")) {
 				mainArgs += ["--class-name", "FooAction", "--service", "com.liferay.portal.kernel.events.LifecycleAction"]
@@ -82,7 +87,23 @@ generatePomCompileOnly {
 			else if (it.equals("service-wrapper")) {
 				mainArgs += ["--service", "com.liferay.portal.kernel.service.UserLocalServiceWrapper"]
 			}
+			else if (it.equals("social-bookmark") && project.property("gradle.releng.pom.project.templates.version").startsWith("7.0")) {
+				return
+			}
 			else if (it.equals("spring-mvc-portlet")) {
+				return
+			}
+			else if (project.property("gradle.releng.pom.project.templates.version").startsWith("7.2") &&
+					 (it.equals("content-targeting-report") ||
+					  it.equals("content-targeting-rule") ||
+					  it.equals("content-targeting-tracking-action") ||
+					  it.equals("form-field") ||
+					  it.equals("npm-angular-portlet") ||
+					  it.equals("npm-react-portlet") ||
+					  it.equals("npm-vuejs-portlet") ||
+					  it.equals("social-bookmark") ||
+					  it.equals("spring-mvc-portlet"))) {
+
 				return
 			}
 
@@ -287,7 +308,6 @@ testPomCompileOnly {
 	doLast {
 		_testPom(pomCompileOnlyArtifactId, version)
 	}
-
 }
 
 testPomRelease {
@@ -364,18 +384,8 @@ private Model _getModel(String artifactId) {
 	return model
 }
 
-private String _isDigitalExperiencePlatform() {
-	File releaseInfoFile = file("../portal-kernel/src/com/liferay/portal/kernel/util/ReleaseInfo.java")
-
-	Matcher matcher = (releaseInfoFile.text =~ /private static final String _NAME = "(.+)";/)
-
-	String releaseInfoName = matcher[0][1]
-
-	if (releaseInfoName.contains(" DXP ") || releaseInfoName.contains(" Digital Experience ")) {
-		return true
-	}
-
-	return false
+private Boolean _isDigitalExperiencePlatform() {
+	return project.properties["liferay.releng.product.display.name"] == "Liferay DXP"
 }
 
 private void _testPom(String artifactId, String version) {

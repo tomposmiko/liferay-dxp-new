@@ -45,6 +45,7 @@ page import="com.liferay.portal.kernel.model.*" %><%@
 page import="com.liferay.portal.kernel.model.impl.*" %><%@
 page import="com.liferay.portal.kernel.patcher.PatcherUtil" %><%@
 page import="com.liferay.portal.kernel.portlet.PortletURLUtil" %><%@
+page import="com.liferay.portal.kernel.scripting.ScriptingException" %><%@
 page import="com.liferay.portal.kernel.scripting.ScriptingUtil" %><%@
 page import="com.liferay.portal.kernel.service.*" %><%@
 page import="com.liferay.portal.kernel.servlet.SessionMessages" %><%@
@@ -71,7 +72,9 @@ page import="com.liferay.portal.util.PrefsPropsUtil" %><%@
 page import="com.liferay.portal.util.PropsUtil" %><%@
 page import="com.liferay.portal.util.PropsValues" %><%@
 page import="com.liferay.portal.util.ShutdownUtil" %><%@
-page import="com.liferay.server.admin.web.internal.display.context.ServerDisplayContext" %>
+page import="com.liferay.server.admin.web.internal.constants.ServerAdminNavigationEntryConstants" %><%@
+page import="com.liferay.server.admin.web.internal.display.context.ServerDisplayContext" %><%@
+page import="com.liferay.taglib.servlet.PipingServletResponse" %>
 
 <%@ page import="java.text.NumberFormat" %>
 

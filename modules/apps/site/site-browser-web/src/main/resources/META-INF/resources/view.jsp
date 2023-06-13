@@ -21,7 +21,7 @@
 />
 
 <clay:management-toolbar
-	displayContext="<%= new SiteBrowserManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, siteBrowserDisplayContext) %>"
+	displayContext="<%= new SiteBrowserManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, siteBrowserDisplayContext) %>"
 />
 
 <aui:form action="<%= siteBrowserDisplayContext.getPortletURL() %>" cssClass="container-fluid-1280" method="post" name="selectGroupFm">
@@ -119,9 +119,9 @@
 </aui:form>
 
 <aui:script>
-	const Util = Liferay.Util;
+	var Util = Liferay.Util;
 
-	const openingLiferay = Util.getOpener().Liferay;
+	var openingLiferay = Util.getOpener().Liferay;
 
 	openingLiferay.fire('<portlet:namespace />enableRemovedSites', {
 		selectors: document.querySelectorAll('.selector-button:disabled')

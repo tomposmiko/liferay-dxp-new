@@ -50,15 +50,15 @@ public class FragmentCollectionResourcesManagementToolbarDisplayContext
 	extends SearchContainerManagementToolbarDisplayContext {
 
 	public FragmentCollectionResourcesManagementToolbarDisplayContext(
+			HttpServletRequest httpServletRequest,
 			LiferayPortletRequest liferayPortletRequest,
 			LiferayPortletResponse liferayPortletResponse,
-			HttpServletRequest httpServletRequest,
 			FragmentCollectionResourcesDisplayContext
 				fragmentCollectionResourcesDisplayContext)
 		throws PortalException {
 
 		super(
-			liferayPortletRequest, liferayPortletResponse, httpServletRequest,
+			httpServletRequest, liferayPortletRequest, liferayPortletResponse,
 			fragmentCollectionResourcesDisplayContext.getSearchContainer());
 
 		_fragmentPortletConfiguration =

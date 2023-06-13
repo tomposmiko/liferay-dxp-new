@@ -611,11 +611,6 @@ public class DDLRecordSetWrapper
 		return model.getVersionUserUuid();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a ddl record set model instance should use the <code>DDLRecordSet</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

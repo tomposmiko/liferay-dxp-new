@@ -15,24 +15,25 @@
 package com.liferay.layout.content.page.editor.web.internal.sidebar.panel;
 
 import com.liferay.layout.content.page.editor.sidebar.panel.ContentPageEditorSidebarPanel;
-import com.liferay.layout.content.page.editor.web.internal.configuration.ContentsContentPageEditorSidebarPanelConfiguration;
-import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
+import com.liferay.layout.security.permission.resource.LayoutContentModelResourcePermission;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.service.permission.LayoutPermission;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.Locale;
-import java.util.Map;
 import java.util.ResourceBundle;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Eudaldo Alonso
  */
 @Component(
-	configurationPid = "com.liferay.layout.content.page.editor.web.internal.configuration.ContentsContentPageEditorSidebarPanelConfiguration",
 	immediate = true, property = "service.ranking:Integer=400",
 	service = ContentPageEditorSidebarPanel.class
 )
@@ -63,24 +64,38 @@ public class ContentsContentPageEditorSidebarPanel
 	}
 
 	@Override
-	public boolean isVisible(boolean pageIsDisplayPage) {
-		if (!_contentsContentPageEditorSidebarPanelConfiguration.enabled()) {
-			return false;
+	public boolean isVisible(
+		PermissionChecker permissionChecker, long plid,
+		boolean pageIsDisplayPage) {
+
+		try {
+			if (_layoutPermission.contains(
+					permissionChecker, plid, ActionKeys.UPDATE) ||
+				_layoutPermission.contains(
+					permissionChecker, plid,
+					ActionKeys.UPDATE_LAYOUT_CONTENT) ||
+				_modelResourcePermission.contains(
+					permissionChecker, plid, ActionKeys.UPDATE)) {
+
+				return true;
+			}
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
+			}
 		}
 
-		return !pageIsDisplayPage;
+		return false;
 	}
 
-	@Activate
-	@Modified
-	protected void activate(Map<String, Object> properties) {
-		_contentsContentPageEditorSidebarPanelConfiguration =
-			ConfigurableUtil.createConfigurable(
-				ContentsContentPageEditorSidebarPanelConfiguration.class,
-				properties);
-	}
+	private static final Log _log = LogFactoryUtil.getLog(
+		ContentsContentPageEditorSidebarPanel.class);
 
-	private volatile ContentsContentPageEditorSidebarPanelConfiguration
-		_contentsContentPageEditorSidebarPanelConfiguration;
+	@Reference
+	private LayoutPermission _layoutPermission;
+
+	@Reference
+	private LayoutContentModelResourcePermission _modelResourcePermission;
 
 }

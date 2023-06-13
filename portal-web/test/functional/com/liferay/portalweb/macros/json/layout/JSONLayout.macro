@@ -13,6 +13,12 @@ definition {
 			parentLayoutName = "${parentLayoutName}",
 			privateLayout = "true");
 
+		var serviceContext = JSONLayoutSetter.setServiceContext(
+			assetCategoryIds = "${assetCategoryIds}",
+			assetTagNames = "${assetTagNames}",
+			serviceContext = "${serviceContext}",
+			workflowAction = "${workflowAction}");
+
 		var type = JSONLayoutSetter.setType(type = "${type}");
 
 		JSONLayoutAPI._addLayout(
@@ -21,6 +27,7 @@ definition {
 			layoutName = "${layoutName}",
 			parentLayoutId = "${parentLayoutId}",
 			privateLayout = "true",
+			serviceContext = "${serviceContext}",
 			type = "${type}");
 	}
 
@@ -37,6 +44,12 @@ definition {
 			parentLayoutName = "${parentLayoutName}",
 			privateLayout = "true");
 
+		var serviceContext = JSONLayoutSetter.setServiceContext(
+			assetCategoryIds = "${assetCategoryIds}",
+			assetTagNames = "${assetTagNames}",
+			serviceContext = "${serviceContext}",
+			workflowAction = "${workflowAction}");
+
 		var type = JSONLayoutSetter.setType(type = "${type}");
 
 		JSONLayoutAPI._addLayout(
@@ -45,6 +58,7 @@ definition {
 			layoutName = "${layoutName}",
 			parentLayoutId = "${parentLayoutId}",
 			privateLayout = "true",
+			serviceContext = "${serviceContext}",
 			type = "${type}");
 	}
 
@@ -61,6 +75,12 @@ definition {
 			parentLayoutName = "${parentLayoutName}",
 			privateLayout = "false");
 
+		var serviceContext = JSONLayoutSetter.setServiceContext(
+			assetCategoryIds = "${assetCategoryIds}",
+			assetTagNames = "${assetTagNames}",
+			serviceContext = "${serviceContext}",
+			workflowAction = "${workflowAction}");
+
 		var type = JSONLayoutSetter.setType(type = "${type}");
 
 		JSONLayoutAPI._addLayout(
@@ -69,6 +89,7 @@ definition {
 			layoutName = "${layoutName}",
 			parentLayoutId = "${parentLayoutId}",
 			privateLayout = "false",
+			serviceContext = "${serviceContext}",
 			type = "${type}");
 	}
 
@@ -85,6 +106,12 @@ definition {
 			parentLayoutName = "${parentLayoutName}",
 			privateLayout = "false");
 
+		var serviceContext = JSONLayoutSetter.setServiceContext(
+			assetCategoryIds = "${assetCategoryIds}",
+			assetTagNames = "${assetTagNames}",
+			serviceContext = "${serviceContext}",
+			workflowAction = "${workflowAction}");
+
 		var type = JSONLayoutSetter.setType(type = "${type}");
 
 		JSONLayoutAPI._addLayout(
@@ -93,6 +120,7 @@ definition {
 			layoutName = "${layoutName}",
 			parentLayoutId = "${parentLayoutId}",
 			privateLayout = "false",
+			serviceContext = "${serviceContext}",
 			type = "${type}");
 	}
 
@@ -143,6 +171,41 @@ definition {
 			layoutId = "${layoutId}",
 			privateLayout = "false",
 			typeSettings = "${typeSettings}");
+	}
+
+	@summary = "Delete a public site page under an existing site via groupKey"
+	macro deletePublicLayout {
+		Variables.assertDefined(parameterList = "${groupName},${layoutName}");
+
+		var groupId = JSONLayoutSetter.setGroupId(groupName = "${groupName}");
+
+		var layoutId = JSONLayoutSetter.setLayoutId(
+			groupId = "${groupId}",
+			layoutName = "${layoutName}",
+			privateLayout = "false");
+
+		var serviceContext = JSONLayoutSetter.setServiceContext(
+			assetCategoryIds = "${assetCategoryIds}",
+			assetTagNames = "${assetTagNames}",
+			serviceContext = "${serviceContext}",
+			workflowAction = "${workflowAction}");
+
+		JSONLayoutAPI._deleteLayout(
+			groupId = "${groupId}",
+			layoutId = "${layoutId}",
+			privateLayout = "false",
+			serviceContext = "${serviceContext}");
+	}
+
+	@summary = "Get page scope id from an existing site via groupName"
+	macro getPageScopeIdByGroupName {
+		Variables.assertDefined(parameterList = "${groupName}");
+
+		var groupId = JSONLayoutSetter.setGroupId(groupName = "${groupName}");
+
+		JSONLayoutAPI._getDefaultPlidByGroupId(
+			groupId = "${groupId}",
+			privateLayout = "false");
 	}
 
 	macro updateLayoutTemplateOfPublicLayout {

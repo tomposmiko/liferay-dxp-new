@@ -198,11 +198,6 @@ public class AssetAutoTaggerEntryWrapper
 		return model.getPrimaryKey();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a asset auto tagger entry model instance should use the <code>AssetAutoTaggerEntry</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

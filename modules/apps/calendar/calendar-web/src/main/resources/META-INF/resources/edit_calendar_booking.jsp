@@ -23,10 +23,6 @@ TimeZone calendarBookingTimeZone = userTimeZone;
 
 boolean allDay = BeanParamUtil.getBoolean(calendarBooking, request, "allDay");
 
-if (allDay) {
-	calendarBookingTimeZone = utcTimeZone;
-}
-
 java.util.Calendar defaultStartTimeJCalendar = CalendarFactoryUtil.getCalendar(calendarBookingTimeZone);
 
 defaultStartTimeJCalendar.add(java.util.Calendar.HOUR, 1);

@@ -15,7 +15,36 @@
 AUI.add(
 	'liferay-search-facet-util',
 	A => {
-		var FacetUtil = {
+		const FACET_TERM_CLASS = 'facet-term';
+
+		const FACET_TERM_SELECTED_CLASS = 'facet-term-selected';
+
+		/**
+		 * Gets the ID by checking the `data-term-id` attribute and then `id` if
+		 * `data-term-id` is not defined.
+		 *
+		 * The default layout continues to use `data-term-id` in case the
+		 * original ID format `${namespace}_term_${index}` is expected, but
+		 * newer layouts (ADT) sometimes only use `id`.
+		 */
+		function _getTermId(term) {
+			return term.getAttribute('data-term-id') || term.id;
+		}
+
+		/**
+		 * Converts a NodeList to an array of nodes. This allows array
+		 * methods to be performed.
+		 * @param {NodeList} nodeList
+		 */
+		function _transformNodeListToArray(nodeList) {
+			const nodeArray = [];
+
+			nodeList.forEach(node => nodeArray.push(node));
+
+			return nodeArray;
+		}
+
+		const FacetUtil = {
 			addURLParameter(key, value, parameterArray) {
 				key = encodeURIComponent(key);
 				value = encodeURIComponent(value);
@@ -26,25 +55,39 @@ AUI.add(
 			},
 
 			changeSelection(event) {
-				var form = event.currentTarget.form;
+				event.preventDefault();
+
+				const form = event.currentTarget.form;
 
 				if (!form) {
 					return;
 				}
 
-				var selections = [];
+				const currentSelectedTermId = _getTermId(event.currentTarget);
 
-				var formCheckboxes = document.querySelectorAll(
-					'#' + form.id + ' input.facet-term'
+				const facetTerms = document.querySelectorAll(
+					`#${form.id} .${FACET_TERM_CLASS}`
 				);
 
-				Array.prototype.forEach.call(formCheckboxes, checkbox => {
-					if (checkbox.checked) {
-						selections.push(checkbox.getAttribute('data-term-id'));
-					}
-				});
+				const selectedTerms = _transformNodeListToArray(facetTerms)
+					.filter(term => {
+						if (term.type === 'checkbox') {
+							return term.checked;
+						}
 
-				FacetUtil.selectTerms(form, selections);
+						const isCurrentTarget =
+							_getTermId(term) === currentSelectedTermId;
+
+						const isSelected = Array.prototype.includes.call(
+							term.classList,
+							FACET_TERM_SELECTED_CLASS
+						);
+
+						return isCurrentTarget ? !isSelected : isSelected;
+					})
+					.map(term => _getTermId(term));
+
+				FacetUtil.selectTerms(form, selectedTerms);
 			},
 
 			clearSelections(event) {
@@ -57,6 +100,12 @@ AUI.add(
 				var selections = [];
 
 				FacetUtil.selectTerms(form._node, selections);
+			},
+
+			enableInputs(inputs) {
+				inputs.forEach(term => {
+					Liferay.Util.toggleDisabled(term, false);
+				});
 			},
 
 			removeURLParameters(key, parameterArray) {

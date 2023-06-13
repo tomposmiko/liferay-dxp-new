@@ -61,7 +61,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface LayoutSEOEntryLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link LayoutSEOEntryLocalServiceUtil} to access the layout seo entry local service. Add custom service methods to <code>com.liferay.layout.seo.service.impl.LayoutSEOEntryLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -308,7 +308,18 @@ public interface LayoutSEOEntryLocalService
 
 	public LayoutSEOEntry updateLayoutSEOEntry(
 			long userId, long groupId, boolean privateLayout, long layoutId,
-			boolean enabled, Map<Locale, String> canonicalURLMap,
+			boolean canonicalURLEnabled, Map<Locale, String> canonicalURLMap,
+			boolean openGraphDescriptionEnabled,
+			Map<Locale, String> openGraphDescriptionMap,
+			Map<Locale, String> openGraphImageAltMap,
+			long openGraphImageFileEntryId, boolean openGraphTitleEnabled,
+			Map<Locale, String> openGraphTitleMap,
+			ServiceContext serviceContext)
+		throws PortalException;
+
+	public LayoutSEOEntry updateLayoutSEOEntry(
+			long userId, long groupId, boolean privateLayout, long layoutId,
+			boolean canonicalURLEnabled, Map<Locale, String> canonicalURLMap,
 			ServiceContext serviceContext)
 		throws PortalException;
 

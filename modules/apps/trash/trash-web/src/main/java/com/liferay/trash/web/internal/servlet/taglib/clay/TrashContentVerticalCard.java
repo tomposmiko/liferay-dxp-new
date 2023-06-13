@@ -43,15 +43,16 @@ public class TrashContentVerticalCard implements VerticalCard {
 
 	public TrashContentVerticalCard(
 		TrashedModel trashedModel, TrashRenderer trashRenderer,
-		RenderRequest renderRequest,
-		LiferayPortletResponse liferayPortletResponse, String viewContentURL) {
+		LiferayPortletResponse liferayPortletResponse,
+		RenderRequest renderRequest, String viewContentURL) {
 
 		_trashedModel = trashedModel;
 		_trashRenderer = trashRenderer;
-		_liferayPortletRequest = PortalUtil.getLiferayPortletRequest(
-			renderRequest);
 		_liferayPortletResponse = liferayPortletResponse;
 		_viewContentURL = viewContentURL;
+
+		_liferayPortletRequest = PortalUtil.getLiferayPortletRequest(
+			renderRequest);
 	}
 
 	@Override
@@ -69,8 +70,8 @@ public class TrashContentVerticalCard implements VerticalCard {
 			return trashViewContentActionDropdownItemsProvider.
 				getActionDropdownItems();
 		}
-		catch (Exception e) {
-			_log.error("Unable to get trashed model actions", e);
+		catch (Exception exception) {
+			_log.error("Unable to get trashed model actions", exception);
 		}
 
 		return Collections.emptyList();
@@ -91,8 +92,9 @@ public class TrashContentVerticalCard implements VerticalCard {
 		try {
 			return _trashRenderer.getIconCssClass();
 		}
-		catch (PortalException pe) {
-			_log.error("Unable to get trash renderer icon css class", pe);
+		catch (PortalException portalException) {
+			_log.error(
+				"Unable to get trash renderer icon css class", portalException);
 		}
 
 		return "magic";

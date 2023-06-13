@@ -72,7 +72,9 @@ public class WorkflowTaskAssignToUser {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The ID of the user to assign the workflow task."
+	)
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	protected Long assigneeId;
 
@@ -102,7 +104,9 @@ public class WorkflowTaskAssignToUser {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "An optional comment to add when assigning the workflow task."
+	)
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	protected String comment;
 
@@ -132,9 +136,39 @@ public class WorkflowTaskAssignToUser {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The date on which the workflow task should be executed."
+	)
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	protected Date dueDate;
+
+	@Schema
+	public Long getWorkflowTaskId() {
+		return workflowTaskId;
+	}
+
+	public void setWorkflowTaskId(Long workflowTaskId) {
+		this.workflowTaskId = workflowTaskId;
+	}
+
+	@JsonIgnore
+	public void setWorkflowTaskId(
+		UnsafeSupplier<Long, Exception> workflowTaskIdUnsafeSupplier) {
+
+		try {
+			workflowTaskId = workflowTaskIdUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Long workflowTaskId;
 
 	@Override
 	public boolean equals(Object object) {
@@ -203,6 +237,16 @@ public class WorkflowTaskAssignToUser {
 			sb.append(liferayToJSONDateFormat.format(dueDate));
 
 			sb.append("\"");
+		}
+
+		if (workflowTaskId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"workflowTaskId\": ");
+
+			sb.append(workflowTaskId);
 		}
 
 		sb.append("}");

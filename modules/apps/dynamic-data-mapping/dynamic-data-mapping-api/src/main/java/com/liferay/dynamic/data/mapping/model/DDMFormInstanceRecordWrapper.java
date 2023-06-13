@@ -320,6 +320,13 @@ public class DDMFormInstanceRecordWrapper
 		return model.getStorageId();
 	}
 
+	@Override
+	public String getStorageType()
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return model.getStorageType();
+	}
+
 	/**
 	 * Returns the user ID of this ddm form instance record.
 	 *
@@ -400,11 +407,6 @@ public class DDMFormInstanceRecordWrapper
 		return model.getVersionUserUuid();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a ddm form instance record model instance should use the <code>DDMFormInstanceRecord</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

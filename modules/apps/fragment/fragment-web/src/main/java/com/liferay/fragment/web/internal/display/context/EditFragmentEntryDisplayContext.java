@@ -53,11 +53,10 @@ import javax.servlet.http.HttpServletRequest;
 public class EditFragmentEntryDisplayContext {
 
 	public EditFragmentEntryDisplayContext(
-		RenderResponse renderResponse, HttpServletRequest httpServletRequest) {
-
-		_renderResponse = renderResponse;
+		HttpServletRequest httpServletRequest, RenderResponse renderResponse) {
 
 		_httpServletRequest = httpServletRequest;
+		_renderResponse = renderResponse;
 
 		_fragmentCollectionContributorTracker =
 			(FragmentCollectionContributorTracker)
@@ -387,6 +386,14 @@ public class EditFragmentEntryDisplayContext {
 
 	private boolean _isReadOnlyFragmentEntry() {
 		if (_readOnly != null) {
+			return _readOnly;
+		}
+
+		FragmentEntry fragmentEntry = getFragmentEntry();
+
+		if (fragmentEntry.isReadOnly()) {
+			_readOnly = true;
+
 			return _readOnly;
 		}
 

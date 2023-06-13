@@ -153,6 +153,16 @@ String viewCalendarBookingURL = ParamUtil.getString(request, "viewCalendarBookin
 	window.<portlet:namespace />scheduler = new Liferay.Scheduler({
 		activeView:
 			window['<portlet:namespace /><%= HtmlUtil.escapeJS(activeView) %>View'],
+		ariaLabels: {
+			agenda: '<liferay-ui:message key="agenda-view" />',
+			day: '<liferay-ui:message key="day-view" />',
+			month: '<liferay-ui:message key="month-view" />',
+			next: '<liferay-ui:message key="next" />',
+			previous: '<liferay-ui:message key="previous" />',
+			today: '<liferay-ui:message key="today-view" />',
+			week: '<liferay-ui:message key="week-view" />',
+			year: '<liferay-ui:message key="year-view" />'
+		},
 		boundingBox: '#<portlet:namespace />scheduler',
 		calendarContainer: calendarContainer,
 

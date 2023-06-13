@@ -67,7 +67,7 @@ public abstract class ExpandoRowLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements ExpandoRowLocalService, IdentifiableOSGiService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>ExpandoRowLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.expando.kernel.service.ExpandoRowLocalServiceUtil</code>.
@@ -689,8 +689,8 @@ public abstract class ExpandoRowLocalServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

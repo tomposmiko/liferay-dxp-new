@@ -15,6 +15,7 @@
 package com.liferay.sync.model;
 
 import com.liferay.portal.kernel.model.BaseModel;
+import com.liferay.portal.kernel.model.ShardedModel;
 
 import java.util.Date;
 
@@ -33,9 +34,9 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface SyncDLFileVersionDiffModel
-	extends BaseModel<SyncDLFileVersionDiff> {
+	extends BaseModel<SyncDLFileVersionDiff>, ShardedModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a sync dl file version diff model instance should use the {@link SyncDLFileVersionDiff} interface instead.
@@ -68,6 +69,22 @@ public interface SyncDLFileVersionDiffModel
 	 * @param syncDLFileVersionDiffId the sync dl file version diff ID of this sync dl file version diff
 	 */
 	public void setSyncDLFileVersionDiffId(long syncDLFileVersionDiffId);
+
+	/**
+	 * Returns the company ID of this sync dl file version diff.
+	 *
+	 * @return the company ID of this sync dl file version diff
+	 */
+	@Override
+	public long getCompanyId();
+
+	/**
+	 * Sets the company ID of this sync dl file version diff.
+	 *
+	 * @param companyId the company ID of this sync dl file version diff
+	 */
+	@Override
+	public void setCompanyId(long companyId);
 
 	/**
 	 * Returns the file entry ID of this sync dl file version diff.

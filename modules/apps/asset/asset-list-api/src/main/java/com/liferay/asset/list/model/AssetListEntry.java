@@ -31,7 +31,7 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface AssetListEntry extends AssetListEntryModel, PersistedModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.asset.list.model.impl.AssetListEntryImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -129,5 +129,8 @@ public interface AssetListEntry extends AssetListEntryModel, PersistedModel {
 	public String getTypeLabel();
 
 	public String getTypeSettings(long segmentsEntryId);
+
+	public String getUnambiguousTitle(java.util.Locale locale)
+		throws com.liferay.portal.kernel.exception.PortalException;
 
 }

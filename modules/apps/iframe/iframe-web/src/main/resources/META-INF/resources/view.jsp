@@ -43,7 +43,7 @@
 
 				var hashObj = A.QueryString.parse(hash);
 
-				hash = hashObj['<portlet:namespace />'];
+				hash = String(hashObj['<portlet:namespace />']);
 
 				var iframe = A.one('#<portlet:namespace />iframe');
 
@@ -191,7 +191,7 @@
 
 <c:if test='<%= iFramePortletInstanceConfiguration.auth() && StringUtil.equals(iFramePortletInstanceConfiguration.authType(), "basic") %>'>
 	<aui:script>
-		const headers = new Headers();
+		var headers = new Headers();
 
 		headers.append(
 			'Authorization',

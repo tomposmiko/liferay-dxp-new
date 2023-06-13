@@ -42,6 +42,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -125,7 +126,9 @@ public class UploadGoogleDriveDocumentBackgroundTaskExecutor
 	}
 
 	@Override
-	public String handleException(BackgroundTask backgroundTask, Exception e) {
+	public String handleException(
+		BackgroundTask backgroundTask, Exception exception) {
+
 		Map<String, Serializable> taskContextMap =
 			backgroundTask.getTaskContextMap();
 
@@ -139,8 +142,8 @@ public class UploadGoogleDriveDocumentBackgroundTaskExecutor
 					DLOpenerGoogleDriveConstants.GOOGLE_DRIVE_REFERENCE_TYPE,
 					_dlAppLocalService.getFileEntry(fileEntryId));
 		}
-		catch (PortalException pe) {
-			_log.error(pe, pe);
+		catch (PortalException portalException) {
+			_log.error(portalException, portalException);
 		}
 
 		return StringPool.BLANK;
@@ -150,18 +153,18 @@ public class UploadGoogleDriveDocumentBackgroundTaskExecutor
 			long companyId, long fileEntryId, long userId, boolean add)
 		throws Exception {
 
-		FileEntry fileEntry = _dlAppLocalService.getFileEntry(fileEntryId);
-
 		com.google.api.services.drive.model.File file =
 			new com.google.api.services.drive.model.File();
 
-		String googleDocsMimeType =
+		FileEntry fileEntry = _dlAppLocalService.getFileEntry(fileEntryId);
+
+		FileVersion fileVersion = fileEntry.getLatestFileVersion();
+
+		file.setMimeType(
 			DLOpenerGoogleDriveMimeTypes.getGoogleDocsMimeType(
-				fileEntry.getMimeType());
+				fileVersion.getMimeType()));
 
-		file.setMimeType(googleDocsMimeType);
-
-		file.setName(fileEntry.getTitle());
+		file.setName(fileVersion.getTitle());
 
 		Drive drive = new Drive.Builder(
 			GoogleNetHttpTransport.newTrustedTransport(),
@@ -175,7 +178,7 @@ public class UploadGoogleDriveDocumentBackgroundTaskExecutor
 
 		if (add) {
 			FileContent fileContent = new FileContent(
-				fileEntry.getMimeType(), _getFileEntryFile(fileEntry));
+				fileVersion.getMimeType(), _getFileEntryFile(fileVersion));
 
 			driveFilesCreate = driveFiles.create(file, fileContent);
 
@@ -231,10 +234,10 @@ public class UploadGoogleDriveDocumentBackgroundTaskExecutor
 		return credential;
 	}
 
-	private File _getFileEntryFile(FileEntry fileEntry)
+	private File _getFileEntryFile(FileVersion fileVersion)
 		throws IOException, PortalException {
 
-		try (InputStream is = fileEntry.getContentStream()) {
+		try (InputStream is = fileVersion.getContentStream(false)) {
 			return FileUtil.createTempFile(is);
 		}
 	}

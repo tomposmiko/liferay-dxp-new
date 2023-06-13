@@ -24,9 +24,12 @@ import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.dao.orm.Type;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.model.Organization;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.persistence.OrganizationFinder;
 import com.liferay.portal.kernel.service.persistence.OrganizationUtil;
 import com.liferay.portal.kernel.service.persistence.UserUtil;
+import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -106,74 +109,6 @@ public class OrganizationFinderImpl
 	public static final String JOIN_O_BY_USERS_ORGS =
 		OrganizationFinder.class.getName() + ".joinO_ByUsersOrgs";
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #countO_ByKeywords(long, long, String, String, String, Long,
-	 *             Long, LinkedHashMap<String, Object>)}
-	 */
-	@Deprecated
-	@Override
-	public int countByKeywords(
-		long companyId, long parentOrganizationId,
-		String parentOrganizationIdComparator, String keywords, String type,
-		Long regionId, Long countryId, LinkedHashMap<String, Object> params) {
-
-		return countO_ByKeywords(
-			companyId, parentOrganizationId, parentOrganizationIdComparator,
-			keywords, type, regionId, countryId, params);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link #countO_ByO_U(long,
-	 *             long)}
-	 */
-	@Deprecated
-	@Override
-	public int countByO_U(long organizationId, long userId) {
-		return countO_ByO_U(organizationId, userId);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #countO_ByC_PO_N_T_S_C_Z_R_C(long, long, String, String,
-	 *             String, String, String, String, Long, Long,
-	 *             LinkedHashMap<String, Object>, boolean)}
-	 */
-	@Deprecated
-	@Override
-	public int countByC_PO_N_T_S_C_Z_R_C(
-		long companyId, long parentOrganizationId,
-		String parentOrganizationIdComparator, String name, String type,
-		String street, String city, String zip, Long regionId, Long countryId,
-		LinkedHashMap<String, Object> params, boolean andOperator) {
-
-		return countO_ByC_PO_N_T_S_C_Z_R_C(
-			companyId, parentOrganizationId, parentOrganizationIdComparator,
-			name, type, street, city, zip, regionId, countryId, params,
-			andOperator);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #countO_ByC_PO_N_T_S_C_Z_R_C(long, long, String, String[],
-	 *             String, String[], String[], String[], Long, Long,
-	 *             LinkedHashMap<String, Object>, boolean)}
-	 */
-	@Deprecated
-	@Override
-	public int countByC_PO_N_T_S_C_Z_R_C(
-		long companyId, long parentOrganizationId,
-		String parentOrganizationIdComparator, String[] names, String type,
-		String[] streets, String[] cities, String[] zips, Long regionId,
-		Long countryId, LinkedHashMap<String, Object> params,
-		boolean andOperator) {
-
-		return countO_ByC_PO_N_T_S_C_Z_R_C(
-			companyId, parentOrganizationId, parentOrganizationIdComparator,
-			names, type, streets, cities, zips, regionId, countryId, params,
-			andOperator);
-	}
-
 	@Override
 	public int countO_ByKeywords(
 		long companyId, long parentOrganizationId,
@@ -204,9 +139,10 @@ public class OrganizationFinderImpl
 
 	@Override
 	public int countO_ByO_U(long organizationId, long userId) {
-		LinkedHashMap<String, Object> params1 = new LinkedHashMap<>();
-
-		params1.put("usersOrgs", userId);
+		LinkedHashMap<String, Object> params1 =
+			LinkedHashMapBuilder.<String, Object>put(
+				"usersOrgs", userId
+			).build();
 
 		Session session = null;
 
@@ -215,8 +151,8 @@ public class OrganizationFinderImpl
 
 			return countO_ByOrganizationId(session, organizationId, params1);
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -380,8 +316,8 @@ public class OrganizationFinderImpl
 
 			return count;
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -438,99 +374,12 @@ public class OrganizationFinderImpl
 
 			return count;
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
 		}
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #findO_ByKeywords(long, long, String, String, String, Long,
-	 *             Long, LinkedHashMap<String, Object>, int, int,
-	 *             OrderByComparator<Organization>)}
-	 */
-	@Deprecated
-	@Override
-	public List<Organization> findByKeywords(
-		long companyId, long parentOrganizationId,
-		String parentOrganizationIdComparator, String keywords, String type,
-		Long regionId, Long countryId, LinkedHashMap<String, Object> params,
-		int start, int end, OrderByComparator<Organization> obc) {
-
-		return findO_ByKeywords(
-			companyId, parentOrganizationId, parentOrganizationIdComparator,
-			keywords, type, regionId, countryId, params, start, end, obc);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link #findO_ByNoAssets()}
-	 */
-	@Deprecated
-	@Override
-	public List<Organization> findByNoAssets() {
-		return findO_ByNoAssets();
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link #findO_ByC_P(long,
-	 *             long, long, int)}
-	 */
-	@Deprecated
-	@Override
-	public List<Long> findByC_P(
-		long companyId, long parentOrganizationId, long previousOrganizationId,
-		int size) {
-
-		return findO_ByC_P(
-			companyId, parentOrganizationId, previousOrganizationId, size);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #findO_ByC_PO_N_T_S_C_Z_R_C(long, long, String, String,
-	 *             String, String, String, String, Long, Long,
-	 *             LinkedHashMap<String, Object>, boolean, int, int,
-	 *             OrderByComparator<Organization>)}
-	 */
-	@Deprecated
-	@Override
-	public List<Organization> findByC_PO_N_T_S_C_Z_R_C(
-		long companyId, long parentOrganizationId,
-		String parentOrganizationIdComparator, String name, String type,
-		String street, String city, String zip, Long regionId, Long countryId,
-		LinkedHashMap<String, Object> params, boolean andOperator, int start,
-		int end, OrderByComparator<Organization> obc) {
-
-		return findO_ByC_PO_N_T_S_C_Z_R_C(
-			companyId, parentOrganizationId, parentOrganizationIdComparator,
-			name, type, street, city, zip, regionId, countryId, params,
-			andOperator, start, end, obc);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #findO_ByC_PO_N_T_S_C_Z_R_C(long, long, String, String[],
-	 *             String, String[], String[], String[], Long, Long,
-	 *             LinkedHashMap<String, Object>, boolean, int, int
-	 *             OrderByComparator<Organization>)}
-	 */
-	@Deprecated
-	@Override
-	public List<Organization> findByC_PO_N_T_S_C_Z_R_C(
-		long companyId, long parentOrganizationId,
-		String parentOrganizationIdComparator, String[] names, String type,
-		String[] streets, String[] cities, String[] zips, Long regionId,
-		Long countryId, LinkedHashMap<String, Object> params,
-		boolean andOperator, int start, int end,
-		OrderByComparator<Organization> obc) {
-
-		return findO_ByC_PO_N_T_S_C_Z_R_C(
-			companyId, parentOrganizationId, parentOrganizationIdComparator,
-			names, type, streets, cities, zips, regionId, countryId, params,
-			andOperator, start, end, obc);
 	}
 
 	@Override
@@ -581,8 +430,8 @@ public class OrganizationFinderImpl
 
 			return q.list(true);
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -621,8 +470,8 @@ public class OrganizationFinderImpl
 
 			return (List<Long>)QueryUtil.list(q, getDialect(), 0, size);
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -781,8 +630,8 @@ public class OrganizationFinderImpl
 
 			return organizations;
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -856,8 +705,8 @@ public class OrganizationFinderImpl
 
 			return models;
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -1126,14 +975,26 @@ public class OrganizationFinderImpl
 				List<Organization> organizationsTree =
 					(List<Organization>)value;
 
+				PermissionChecker permissionChecker =
+					PermissionThreadLocal.getPermissionChecker();
+
 				if (!organizationsTree.isEmpty()) {
 					for (Organization organization : organizationsTree) {
-						StringBundler sb = new StringBundler(4);
+						StringBundler sb = new StringBundler(5);
 
 						sb.append(StringPool.PERCENT);
 						sb.append(StringPool.SLASH);
 						sb.append(organization.getOrganizationId());
 						sb.append(StringPool.SLASH);
+
+						if ((permissionChecker != null) &&
+							(permissionChecker.isOrganizationAdmin(
+								organization.getOrganizationId()) ||
+							 permissionChecker.isOrganizationOwner(
+								 organization.getOrganizationId()))) {
+
+							sb.append(StringPool.PERCENT);
+						}
 
 						qPos.add(sb.toString());
 					}

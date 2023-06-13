@@ -56,10 +56,12 @@ class FragmentsEditorSidebar extends Component {
 	 * @review
 	 */
 	disposed() {
-		this._toggleHandle.removeListener(
-			'openStart.lexicon.sidenav',
-			this._handleHide
-		);
+		if (this._toggleHandle) {
+			this._toggleHandle.removeListener(
+				'openStart.lexicon.sidenav',
+				this._handleHide
+			);
+		}
 	}
 
 	/**
@@ -67,13 +69,25 @@ class FragmentsEditorSidebar extends Component {
 	 * @review
 	 */
 	rendered() {
-		const selectedSidebarPanel = this.sidebarPanels.find(
-			panel => panel.sidebarPanelId === this.selectedSidebarPanelId
-		);
-
-		if (selectedSidebarPanel) {
+		if (this._selectedSidebarPanel) {
 			Liferay.SideNavigation.hide(this._productMenuToggle);
 		}
+	}
+
+	/**
+	 * @inheritDoc
+	 * @review
+	 */
+	syncSelectedSidebarPanelId() {
+		this._updateSelectedSidebarPanel();
+	}
+
+	/**
+	 * @inheritDoc
+	 * @review
+	 */
+	syncSidebarPanels() {
+		this._updateSelectedSidebarPanel();
 	}
 
 	/**
@@ -85,6 +99,20 @@ class FragmentsEditorSidebar extends Component {
 			type: UPDATE_SELECTED_SIDEBAR_PANEL_ID,
 			value: ''
 		});
+	}
+
+	/**
+	 * @private
+	 * @review
+	 */
+	_updateSelectedSidebarPanel() {
+		const selectedSidebarPanel = this.sidebarPanels.find(
+			panel => panel.sidebarPanelId === this.selectedSidebarPanelId
+		);
+
+		if (selectedSidebarPanel !== this._selectedSidebarPanel) {
+			this._selectedSidebarPanel = selectedSidebarPanel;
+		}
 	}
 }
 
@@ -104,6 +132,15 @@ FragmentsEditorSidebar.STATE = {
 	 * @type {object}
 	 */
 	_productMenuToggle: Config.internal(),
+
+	/**
+	 * @default undefined
+	 * @instance
+	 * @memberOf FragmentsEditorSidebar
+	 * @review
+	 * @type {object}
+	 */
+	_selectedSidebarPanel: Config.object().internal(),
 
 	/**
 	 * Internal property for subscribing to sidenav events.

@@ -30,16 +30,10 @@ import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
  */
 public class DLFolderLocalServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.portlet.documentlibrary.service.impl.DLFolderLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
-	 */
-
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link DLFolderLocalServiceUtil} to access the document library folder local service. Add custom service methods to <code>com.liferay.portlet.documentlibrary.service.impl.DLFolderLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	public static void addDLFileEntryTypeDLFolder(
 		long fileEntryTypeId,
@@ -107,17 +101,6 @@ public class DLFolderLocalServiceUtil {
 		createDLFolder(long folderId) {
 
 		return getService().createDLFolder(folderId);
-	}
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 #deleteAllByGroup(long)}
-	 */
-	@Deprecated
-	public static void deleteAll(long groupId)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		getService().deleteAll(groupId);
 	}
 
 	public static void deleteAllByGroup(long groupId)
@@ -552,17 +535,6 @@ public class DLFolderLocalServiceUtil {
 		return getService().getFolderId(companyId, folderId);
 	}
 
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 #getGroupFolderIds(long, long)}
-	 */
-	@Deprecated
-	public static java.util.List<Long> getFolderIds(
-		long groupId, long parentFolderId) {
-
-		return getService().getFolderIds(groupId, parentFolderId);
-	}
-
 	public static java.util.List
 		<com.liferay.document.library.kernel.model.DLFolder> getFolders(
 			long groupId, long parentFolderId) {
@@ -581,6 +553,18 @@ public class DLFolderLocalServiceUtil {
 	public static java.util.List
 		<com.liferay.document.library.kernel.model.DLFolder> getFolders(
 			long groupId, long parentFolderId, boolean includeMountfolders,
+			int status, int start, int end,
+			com.liferay.portal.kernel.util.OrderByComparator
+				<com.liferay.document.library.kernel.model.DLFolder> obc) {
+
+		return getService().getFolders(
+			groupId, parentFolderId, includeMountfolders, status, start, end,
+			obc);
+	}
+
+	public static java.util.List
+		<com.liferay.document.library.kernel.model.DLFolder> getFolders(
+			long groupId, long parentFolderId, boolean includeMountfolders,
 			int start, int end,
 			com.liferay.portal.kernel.util.OrderByComparator
 				<com.liferay.document.library.kernel.model.DLFolder> obc) {
@@ -589,6 +573,12 @@ public class DLFolderLocalServiceUtil {
 			groupId, parentFolderId, includeMountfolders, start, end, obc);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #getFolders(long, long, boolean, int, int,
+	 OrderByComparator)}
+	 */
+	@Deprecated
 	public static java.util.List
 		<com.liferay.document.library.kernel.model.DLFolder> getFolders(
 			long groupId, long parentFolderId, int status,
@@ -642,6 +632,19 @@ public class DLFolderLocalServiceUtil {
 			groupId, parentFolderId, includeMountfolders);
 	}
 
+	public static int getFoldersCount(
+		long groupId, long parentFolderId, boolean includeMountfolders,
+		int status) {
+
+		return getService().getFoldersCount(
+			groupId, parentFolderId, includeMountfolders, status);
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #getFoldersCount(long, long, boolean, int)}
+	 */
+	@Deprecated
 	public static int getFoldersCount(
 		long groupId, long parentFolderId, int status,
 		boolean includeMountfolders) {
@@ -736,17 +739,6 @@ public class DLFolderLocalServiceUtil {
 
 		getService().getRepositorySubfolderIds(
 			folderIds, repositoryId, folderId);
-	}
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 #getGroupSubfolderIds(List, long, long)}
-	 */
-	@Deprecated
-	public static void getSubfolderIds(
-		java.util.List<Long> folderIds, long groupId, long folderId) {
-
-		getService().getSubfolderIds(folderIds, groupId, folderId);
 	}
 
 	public static String getUniqueFolderName(
@@ -848,26 +840,6 @@ public class DLFolderLocalServiceUtil {
 		return getService().updateDLFolder(dlFolder);
 	}
 
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 #updateFolder(long, long, String, String, long, List, int,
-	 ServiceContext)}
-	 */
-	@Deprecated
-	public static com.liferay.document.library.kernel.model.DLFolder
-			updateFolder(
-				long folderId, long parentFolderId, String name,
-				String description, long defaultFileEntryTypeId,
-				java.util.List<Long> fileEntryTypeIds,
-				boolean overrideFileEntryTypes,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return getService().updateFolder(
-			folderId, parentFolderId, name, description, defaultFileEntryTypeId,
-			fileEntryTypeIds, overrideFileEntryTypes, serviceContext);
-	}
-
 	public static com.liferay.document.library.kernel.model.DLFolder
 			updateFolder(
 				long folderId, long parentFolderId, String name,
@@ -881,26 +853,6 @@ public class DLFolderLocalServiceUtil {
 			fileEntryTypeIds, restrictionType, serviceContext);
 	}
 
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced {@link
-	 #updateFolder(long, long, String, String, long, List, int,
-	 ServiceContext)}
-	 */
-	@Deprecated
-	public static com.liferay.document.library.kernel.model.DLFolder
-			updateFolder(
-				long folderId, String name, String description,
-				long defaultFileEntryTypeId,
-				java.util.List<Long> fileEntryTypeIds,
-				boolean overrideFileEntryTypes,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return getService().updateFolder(
-			folderId, name, description, defaultFileEntryTypeId,
-			fileEntryTypeIds, overrideFileEntryTypes, serviceContext);
-	}
-
 	public static com.liferay.document.library.kernel.model.DLFolder
 			updateFolder(
 				long folderId, String name, String description,
@@ -912,27 +864,6 @@ public class DLFolderLocalServiceUtil {
 		return getService().updateFolder(
 			folderId, name, description, defaultFileEntryTypeId,
 			fileEntryTypeIds, restrictionType, serviceContext);
-	}
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link #
-	 updateFolderAndFileEntryTypes(long, long, long, String,
-	 String, long, List, int, ServiceContext)}
-	 */
-	@Deprecated
-	public static com.liferay.document.library.kernel.model.DLFolder
-			updateFolderAndFileEntryTypes(
-				long userId, long folderId, long parentFolderId, String name,
-				String description, long defaultFileEntryTypeId,
-				java.util.List<Long> fileEntryTypeIds,
-				boolean overrideFileEntryTypes,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return getService().updateFolderAndFileEntryTypes(
-			userId, folderId, parentFolderId, name, description,
-			defaultFileEntryTypeId, fileEntryTypeIds, overrideFileEntryTypes,
-			serviceContext);
 	}
 
 	public static com.liferay.document.library.kernel.model.DLFolder

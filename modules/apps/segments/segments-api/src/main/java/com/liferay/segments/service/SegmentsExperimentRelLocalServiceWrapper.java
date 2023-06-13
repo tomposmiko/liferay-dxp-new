@@ -33,11 +33,6 @@ public class SegmentsExperimentRelLocalServiceWrapper
 		_segmentsExperimentRelLocalService = segmentsExperimentRelLocalService;
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link SegmentsExperimentRelLocalServiceUtil} to access the segments experiment rel local service. Add custom service methods to <code>com.liferay.segments.service.impl.SegmentsExperimentRelLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
-	 */
 	@Override
 	public com.liferay.segments.model.SegmentsExperimentRel
 			addSegmentsExperimentRel(

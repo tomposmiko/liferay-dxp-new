@@ -56,7 +56,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface RatingsStatsLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link RatingsStatsLocalServiceUtil} to access the ratings stats local service. Add custom service methods to <code>com.liferay.portlet.ratings.service.impl.RatingsStatsLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -234,13 +234,6 @@ public interface RatingsStatsLocalService
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public RatingsStats getStats(long statsId) throws PortalException;
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<RatingsStats> getStats(String className, List<Long> classPKs);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public RatingsStats getStats(String className, long classPK)

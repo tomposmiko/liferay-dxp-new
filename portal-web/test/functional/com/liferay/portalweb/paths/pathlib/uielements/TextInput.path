@@ -29,6 +29,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>ASSET_PRIORITY</td>
+	<td>//input[contains(@id,'assetPriority')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>BLOGS_ENTRY_URL</td>
 	<td>//input[contains(@id,'_urlTitle')]</td>
 	<td></td>
@@ -44,8 +49,48 @@
 	<td></td>
 </tr>
 <tr>
+	<td>CUSTOM_CANONICAL_URL</td>
+	<td>//input[@type='text' and contains(@id,'canonicalURL')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>CUSTOM_FIELD</td>
 	<td>//input[@type='text' and contains(@name,'ExpandoAttribute')] | //textarea[contains(@name,'ExpandoAttribute')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CUSTOM_META_TAGS_CONTENT</td>
+	<td>//div[label[contains(.,'Content')]]/input[@type='text']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CUSTOM_META_TAGS_CONTENT_EDITOR</td>
+	<td>//div[label[contains(.,'Content')]]/input[@type='text' and @value='${key_customContent}']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CUSTOM_META_TAGS_LAST_CONTENT</td>
+	<td>xpath=(//div[label[contains(.,'Content')]]/input[@type='text'])[last()]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CUSTOM_META_TAGS_LAST_PROPERTY</td>
+	<td>xpath=(//div[label[contains(.,'Property')]]/input[@type='text'])[last()]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CUSTOM_META_TAGS_PROPERTY</td>
+	<td>//div[label[contains(.,'Property')]]/input[@type='text']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CUSTOM_META_TAGS_PROPERTY_DISABLED</td>
+	<td>//div[label[contains(.,'Property')]]/input[@type='text' and @disabled]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CUSTOM_META_TAGS_PROPERTY_EDITOR</td>
+	<td>//div[label[contains(.,'Property')]]/input[@type='text' and @value='${key_customProperty}']</td>
 	<td></td>
 </tr>
 <tr>
@@ -56,6 +101,11 @@
 <tr>
 	<td>DATA_DEFINITION</td>
 	<td>//div[label[contains(.,'Data Definition')]]/input[@type='text']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>DEPOT_UNNAMED_DEFAULT_TITLE</td>
+	<td>//input[contains(@value,'${key_unnamedTitle}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -304,6 +354,31 @@
 	<td></td>
 </tr>
 <tr>
+	<td>OPEN_GRAPH_CUSTOM_TITLE</td>
+	<td>//div[input[contains(@id,'openGraphTitle')]]//input[@type='text']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>OPEN_GRAPH_CUSTOM_IMAGE_INPUT</td>
+	<td>//div[label[contains(.,'Image')]]//input[contains(@value,'${key_dmDocumentURL}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>OPEN_GRAPH_CUSTOM_IMAGE_DEFAULT_VALUE</td>
+	<td>//div[label[contains(.,'Image')]]//input[@value='']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>OPEN_GRAPH_IMAGE_ALT_DESCRIPTION</td>
+	<td>//div[input[contains(@id,'openGraphImageAlt')]]//input[@type='text']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>OPEN_GRAPH_IMAGE_ALT_DESCRIPTION_DISABLED</td>
+	<td>//input[contains(@id,'${key_text}') and contains(@class,'disabled')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>PASSWORD</td>
 	<td>//div[label[contains(.,'Password')]]/input | //div[label[contains(.,'Contraseña')]]/input | //div[label[contains(.,'パスワード')]]/input | //div[label[contains(.,'密码')]]/input | //div[contains(.,'Kennwort')]//input[@type='password']</td>
 	<td></td>
@@ -366,6 +441,11 @@
 <tr>
 	<td>SAML_NAME_FIELD</td>
 	<td>//input[contains(@id,'SamlAdminPortlet_name')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>STRUCTURE_KEY_FIELD</td>
+	<td>//input[contains(@id,'structureKey')]</td>
 	<td></td>
 </tr>
 <tr>

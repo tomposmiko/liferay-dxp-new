@@ -67,6 +67,16 @@ public class LocationSerDes {
 			sb.append("\"");
 		}
 
+		if (location.getAddressCountry_i18n() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"addressCountry_i18n\": ");
+
+			sb.append(_toJSON(location.getAddressCountry_i18n()));
+		}
+
 		if (location.getAddressRegion() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -117,6 +127,15 @@ public class LocationSerDes {
 				"addressCountry", String.valueOf(location.getAddressCountry()));
 		}
 
+		if (location.getAddressCountry_i18n() == null) {
+			map.put("addressCountry_i18n", null);
+		}
+		else {
+			map.put(
+				"addressCountry_i18n",
+				String.valueOf(location.getAddressCountry_i18n()));
+		}
+
 		if (location.getAddressRegion() == null) {
 			map.put("addressRegion", null);
 		}
@@ -157,6 +176,15 @@ public class LocationSerDes {
 					location.setAddressCountry((String)jsonParserFieldValue);
 				}
 			}
+			else if (Objects.equals(
+						jsonParserFieldName, "addressCountry_i18n")) {
+
+				if (jsonParserFieldValue != null) {
+					location.setAddressCountry_i18n(
+						(Map)LocationSerDes.toMap(
+							(String)jsonParserFieldValue));
+				}
+			}
 			else if (Objects.equals(jsonParserFieldName, "addressRegion")) {
 				if (jsonParserFieldValue != null) {
 					location.setAddressRegion((String)jsonParserFieldValue);
@@ -178,9 +206,11 @@ public class LocationSerDes {
 	private static String _escape(Object object) {
 		String string = String.valueOf(object);
 
-		string = string.replace("\\", "\\\\");
+		for (String[] strings : BaseJSONParser.JSON_ESCAPE_STRINGS) {
+			string = string.replace(strings[0], strings[1]);
+		}
 
-		return string.replace("\"", "\\\"");
+		return string;
 	}
 
 	private static String _toJSON(Map<String, ?> map) {

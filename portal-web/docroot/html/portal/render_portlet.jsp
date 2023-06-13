@@ -148,7 +148,7 @@ LiferayRenderRequest liferayRenderRequest = RenderRequestFactory.create(request,
 
 BufferCacheServletResponse bufferCacheServletResponse = new BufferCacheServletResponse(response);
 
-LiferayRenderResponse liferayRenderResponse = RenderResponseFactory.create(liferayRenderRequest, bufferCacheServletResponse);
+LiferayRenderResponse liferayRenderResponse = RenderResponseFactory.create(bufferCacheServletResponse, liferayRenderRequest);
 
 if (stateMin) {
 	liferayRenderResponse.setUseDefaultTemplate(true);
@@ -834,7 +834,7 @@ Boolean portletVisibility = null;
 
 if (portlet.isActive() && portlet.isInclude() && portlet.isReady() && supportsMimeType && (invokerPortlet != null)) {
 	try {
-		if (!PortalUtil.isSkipPortletContentProcesssing(group, request, layoutTypePortlet, portletDisplay, portletDisplay.getPortletName())) {
+		if (!PortalUtil.isSkipPortletContentRendering(group, layoutTypePortlet, portletDisplay, portletDisplay.getPortletName())) {
 			invokerPortlet.render(liferayRenderRequest, liferayRenderResponse);
 		}
 

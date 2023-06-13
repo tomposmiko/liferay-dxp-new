@@ -21,6 +21,7 @@ import com.liferay.journal.model.impl.JournalArticleLocalizationModelImpl;
 import com.liferay.journal.service.persistence.JournalArticleLocalizationPersistence;
 import com.liferay.journal.service.persistence.impl.constants.JournalPersistenceConstants;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.kernel.change.tracking.CTColumnResolutionType;
 import com.liferay.portal.kernel.configuration.Configuration;
 import com.liferay.portal.kernel.dao.orm.EntityCache;
 import com.liferay.portal.kernel.dao.orm.FinderCache;
@@ -33,6 +34,7 @@ import com.liferay.portal.kernel.dao.orm.SessionFactory;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -42,9 +44,16 @@ import java.io.Serializable;
 
 import java.lang.reflect.InvocationHandler;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -68,7 +77,7 @@ public class JournalArticleLocalizationPersistenceImpl
 	extends BasePersistenceImpl<JournalArticleLocalization>
 	implements JournalArticleLocalizationPersistence {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Always use <code>JournalArticleLocalizationUtil</code> to access the journal article localization persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
@@ -161,18 +170,21 @@ public class JournalArticleLocalizationPersistenceImpl
 		OrderByComparator<JournalArticleLocalization> orderByComparator,
 		boolean useFinderCache) {
 
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			JournalArticleLocalization.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			if (useFinderCache) {
+			if (useFinderCache && productionMode) {
 				finderPath = _finderPathWithoutPaginationFindByArticlePK;
 				finderArgs = new Object[] {articlePK};
 			}
 		}
-		else if (useFinderCache) {
+		else if (useFinderCache && productionMode) {
 			finderPath = _finderPathWithPaginationFindByArticlePK;
 			finderArgs = new Object[] {
 				articlePK, start, end, orderByComparator
@@ -181,7 +193,7 @@ public class JournalArticleLocalizationPersistenceImpl
 
 		List<JournalArticleLocalization> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<JournalArticleLocalization>)finderCache.getResult(
 				finderPath, finderArgs, this);
 
@@ -241,16 +253,16 @@ public class JournalArticleLocalizationPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
-			catch (Exception e) {
-				if (useFinderCache) {
+			catch (Exception exception) {
+				if (useFinderCache && productionMode) {
 					finderCache.removeResult(finderPath, finderArgs);
 				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -414,8 +426,8 @@ public class JournalArticleLocalizationPersistenceImpl
 
 			return array;
 		}
-		catch (Exception e) {
-			throw processException(e);
+		catch (Exception exception) {
+			throw processException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -556,11 +568,21 @@ public class JournalArticleLocalizationPersistenceImpl
 	 */
 	@Override
 	public int countByArticlePK(long articlePK) {
-		FinderPath finderPath = _finderPathCountByArticlePK;
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			JournalArticleLocalization.class);
 
-		Object[] finderArgs = new Object[] {articlePK};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathCountByArticlePK;
+
+			finderArgs = new Object[] {articlePK};
+
+			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		}
 
 		if (count == null) {
 			StringBundler query = new StringBundler(2);
@@ -584,12 +606,16 @@ public class JournalArticleLocalizationPersistenceImpl
 
 				count = (Long)q.uniqueResult();
 
-				finderCache.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					finderCache.putResult(finderPath, finderArgs, count);
+				}
 			}
-			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+			catch (Exception exception) {
+				if (productionMode) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -672,15 +698,18 @@ public class JournalArticleLocalizationPersistenceImpl
 
 		languageId = Objects.toString(languageId, "");
 
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			JournalArticleLocalization.class);
+
 		Object[] finderArgs = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			finderArgs = new Object[] {articlePK, languageId};
 		}
 
 		Object result = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
 				_finderPathFetchByA_L, finderArgs, this);
 		}
@@ -735,7 +764,7 @@ public class JournalArticleLocalizationPersistenceImpl
 				List<JournalArticleLocalization> list = q.list();
 
 				if (list.isEmpty()) {
-					if (useFinderCache) {
+					if (useFinderCache && productionMode) {
 						finderCache.putResult(
 							_finderPathFetchByA_L, finderArgs, list);
 					}
@@ -749,12 +778,12 @@ public class JournalArticleLocalizationPersistenceImpl
 					cacheResult(journalArticleLocalization);
 				}
 			}
-			catch (Exception e) {
-				if (useFinderCache) {
+			catch (Exception exception) {
+				if (useFinderCache && productionMode) {
 					finderCache.removeResult(_finderPathFetchByA_L, finderArgs);
 				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -798,11 +827,21 @@ public class JournalArticleLocalizationPersistenceImpl
 	public int countByA_L(long articlePK, String languageId) {
 		languageId = Objects.toString(languageId, "");
 
-		FinderPath finderPath = _finderPathCountByA_L;
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			JournalArticleLocalization.class);
 
-		Object[] finderArgs = new Object[] {articlePK, languageId};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		Long count = null;
+
+		if (productionMode) {
+			finderPath = _finderPathCountByA_L;
+
+			finderArgs = new Object[] {articlePK, languageId};
+
+			count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+		}
 
 		if (count == null) {
 			StringBundler query = new StringBundler(3);
@@ -841,12 +880,16 @@ public class JournalArticleLocalizationPersistenceImpl
 
 				count = (Long)q.uniqueResult();
 
-				finderCache.putResult(finderPath, finderArgs, count);
+				if (productionMode) {
+					finderCache.putResult(finderPath, finderArgs, count);
+				}
 			}
-			catch (Exception e) {
-				finderCache.removeResult(finderPath, finderArgs);
+			catch (Exception exception) {
+				if (productionMode) {
+					finderCache.removeResult(finderPath, finderArgs);
+				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -881,6 +924,12 @@ public class JournalArticleLocalizationPersistenceImpl
 	public void cacheResult(
 		JournalArticleLocalization journalArticleLocalization) {
 
+		if (journalArticleLocalization.getCtCollectionId() != 0) {
+			journalArticleLocalization.resetOriginalValues();
+
+			return;
+		}
+
 		entityCache.putResult(
 			entityCacheEnabled, JournalArticleLocalizationImpl.class,
 			journalArticleLocalization.getPrimaryKey(),
@@ -908,6 +957,12 @@ public class JournalArticleLocalizationPersistenceImpl
 
 		for (JournalArticleLocalization journalArticleLocalization :
 				journalArticleLocalizations) {
+
+			if (journalArticleLocalization.getCtCollectionId() != 0) {
+				journalArticleLocalization.resetOriginalValues();
+
+				continue;
+			}
 
 			if (entityCache.getResult(
 					entityCacheEnabled, JournalArticleLocalizationImpl.class,
@@ -977,6 +1032,19 @@ public class JournalArticleLocalizationPersistenceImpl
 			clearUniqueFindersCache(
 				(JournalArticleLocalizationModelImpl)journalArticleLocalization,
 				true);
+		}
+	}
+
+	@Override
+	public void clearCache(Set<Serializable> primaryKeys) {
+		finderCache.clearCache(FINDER_CLASS_NAME_ENTITY);
+		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+
+		for (Serializable primaryKey : primaryKeys) {
+			entityCache.removeResult(
+				entityCacheEnabled, JournalArticleLocalizationImpl.class,
+				primaryKey);
 		}
 	}
 
@@ -1088,11 +1156,11 @@ public class JournalArticleLocalizationPersistenceImpl
 
 			return remove(journalArticleLocalization);
 		}
-		catch (NoSuchArticleLocalizationException nsee) {
-			throw nsee;
+		catch (NoSuchArticleLocalizationException noSuchEntityException) {
+			throw noSuchEntityException;
 		}
-		catch (Exception e) {
-			throw processException(e);
+		catch (Exception exception) {
+			throw processException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -1102,6 +1170,10 @@ public class JournalArticleLocalizationPersistenceImpl
 	@Override
 	protected JournalArticleLocalization removeImpl(
 		JournalArticleLocalization journalArticleLocalization) {
+
+		if (!ctPersistenceHelper.isRemove(journalArticleLocalization)) {
+			return journalArticleLocalization;
+		}
 
 		Session session = null;
 
@@ -1119,8 +1191,8 @@ public class JournalArticleLocalizationPersistenceImpl
 				session.delete(journalArticleLocalization);
 			}
 		}
-		catch (Exception e) {
-			throw processException(e);
+		catch (Exception exception) {
+			throw processException(exception);
 		}
 		finally {
 			closeSession(session);
@@ -1167,7 +1239,18 @@ public class JournalArticleLocalizationPersistenceImpl
 		try {
 			session = openSession();
 
-			if (journalArticleLocalization.isNew()) {
+			if (ctPersistenceHelper.isInsert(journalArticleLocalization)) {
+				if (!isNew) {
+					JournalArticleLocalization oldJournalArticleLocalization =
+						(JournalArticleLocalization)session.get(
+							JournalArticleLocalizationImpl.class,
+							journalArticleLocalization.getPrimaryKeyObj());
+
+					if (oldJournalArticleLocalization != null) {
+						session.evict(oldJournalArticleLocalization);
+					}
+				}
+
 				session.save(journalArticleLocalization);
 
 				journalArticleLocalization.setNew(false);
@@ -1178,11 +1261,17 @@ public class JournalArticleLocalizationPersistenceImpl
 						journalArticleLocalization);
 			}
 		}
-		catch (Exception e) {
-			throw processException(e);
+		catch (Exception exception) {
+			throw processException(exception);
 		}
 		finally {
 			closeSession(session);
+		}
+
+		if (journalArticleLocalization.getCtCollectionId() != 0) {
+			journalArticleLocalization.resetOriginalValues();
+
+			return journalArticleLocalization;
 		}
 
 		finderCache.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
@@ -1283,6 +1372,47 @@ public class JournalArticleLocalizationPersistenceImpl
 	/**
 	 * Returns the journal article localization with the primary key or returns <code>null</code> if it could not be found.
 	 *
+	 * @param primaryKey the primary key of the journal article localization
+	 * @return the journal article localization, or <code>null</code> if a journal article localization with the primary key could not be found
+	 */
+	@Override
+	public JournalArticleLocalization fetchByPrimaryKey(
+		Serializable primaryKey) {
+
+		if (ctPersistenceHelper.isProductionMode(
+				JournalArticleLocalization.class)) {
+
+			return super.fetchByPrimaryKey(primaryKey);
+		}
+
+		JournalArticleLocalization journalArticleLocalization = null;
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			journalArticleLocalization =
+				(JournalArticleLocalization)session.get(
+					JournalArticleLocalizationImpl.class, primaryKey);
+
+			if (journalArticleLocalization != null) {
+				cacheResult(journalArticleLocalization);
+			}
+		}
+		catch (Exception exception) {
+			throw processException(exception);
+		}
+		finally {
+			closeSession(session);
+		}
+
+		return journalArticleLocalization;
+	}
+
+	/**
+	 * Returns the journal article localization with the primary key or returns <code>null</code> if it could not be found.
+	 *
 	 * @param articleLocalizationId the primary key of the journal article localization
 	 * @return the journal article localization, or <code>null</code> if a journal article localization with the primary key could not be found
 	 */
@@ -1291,6 +1421,84 @@ public class JournalArticleLocalizationPersistenceImpl
 		long articleLocalizationId) {
 
 		return fetchByPrimaryKey((Serializable)articleLocalizationId);
+	}
+
+	@Override
+	public Map<Serializable, JournalArticleLocalization> fetchByPrimaryKeys(
+		Set<Serializable> primaryKeys) {
+
+		if (ctPersistenceHelper.isProductionMode(
+				JournalArticleLocalization.class)) {
+
+			return super.fetchByPrimaryKeys(primaryKeys);
+		}
+
+		if (primaryKeys.isEmpty()) {
+			return Collections.emptyMap();
+		}
+
+		Map<Serializable, JournalArticleLocalization> map =
+			new HashMap<Serializable, JournalArticleLocalization>();
+
+		if (primaryKeys.size() == 1) {
+			Iterator<Serializable> iterator = primaryKeys.iterator();
+
+			Serializable primaryKey = iterator.next();
+
+			JournalArticleLocalization journalArticleLocalization =
+				fetchByPrimaryKey(primaryKey);
+
+			if (journalArticleLocalization != null) {
+				map.put(primaryKey, journalArticleLocalization);
+			}
+
+			return map;
+		}
+
+		StringBundler query = new StringBundler(primaryKeys.size() * 2 + 1);
+
+		query.append(getSelectSQL());
+		query.append(" WHERE ");
+		query.append(getPKDBName());
+		query.append(" IN (");
+
+		for (Serializable primaryKey : primaryKeys) {
+			query.append((long)primaryKey);
+
+			query.append(",");
+		}
+
+		query.setIndex(query.index() - 1);
+
+		query.append(")");
+
+		String sql = query.toString();
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			Query q = session.createQuery(sql);
+
+			for (JournalArticleLocalization journalArticleLocalization :
+					(List<JournalArticleLocalization>)q.list()) {
+
+				map.put(
+					journalArticleLocalization.getPrimaryKeyObj(),
+					journalArticleLocalization);
+
+				cacheResult(journalArticleLocalization);
+			}
+		}
+		catch (Exception exception) {
+			throw processException(exception);
+		}
+		finally {
+			closeSession(session);
+		}
+
+		return map;
 	}
 
 	/**
@@ -1358,25 +1566,28 @@ public class JournalArticleLocalizationPersistenceImpl
 		OrderByComparator<JournalArticleLocalization> orderByComparator,
 		boolean useFinderCache) {
 
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			JournalArticleLocalization.class);
+
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
-			if (useFinderCache) {
+			if (useFinderCache && productionMode) {
 				finderPath = _finderPathWithoutPaginationFindAll;
 				finderArgs = FINDER_ARGS_EMPTY;
 			}
 		}
-		else if (useFinderCache) {
+		else if (useFinderCache && productionMode) {
 			finderPath = _finderPathWithPaginationFindAll;
 			finderArgs = new Object[] {start, end, orderByComparator};
 		}
 
 		List<JournalArticleLocalization> list = null;
 
-		if (useFinderCache) {
+		if (useFinderCache && productionMode) {
 			list = (List<JournalArticleLocalization>)finderCache.getResult(
 				finderPath, finderArgs, this);
 		}
@@ -1415,16 +1626,16 @@ public class JournalArticleLocalizationPersistenceImpl
 
 				cacheResult(list);
 
-				if (useFinderCache) {
+				if (useFinderCache && productionMode) {
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
-			catch (Exception e) {
-				if (useFinderCache) {
+			catch (Exception exception) {
+				if (useFinderCache && productionMode) {
 					finderCache.removeResult(finderPath, finderArgs);
 				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -1454,8 +1665,15 @@ public class JournalArticleLocalizationPersistenceImpl
 	 */
 	@Override
 	public int countAll() {
-		Long count = (Long)finderCache.getResult(
-			_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+		boolean productionMode = ctPersistenceHelper.isProductionMode(
+			JournalArticleLocalization.class);
+
+		Long count = null;
+
+		if (productionMode) {
+			count = (Long)finderCache.getResult(
+				_finderPathCountAll, FINDER_ARGS_EMPTY, this);
+		}
 
 		if (count == null) {
 			Session session = null;
@@ -1468,14 +1686,18 @@ public class JournalArticleLocalizationPersistenceImpl
 
 				count = (Long)q.uniqueResult();
 
-				finderCache.putResult(
-					_finderPathCountAll, FINDER_ARGS_EMPTY, count);
+				if (productionMode) {
+					finderCache.putResult(
+						_finderPathCountAll, FINDER_ARGS_EMPTY, count);
+				}
 			}
-			catch (Exception e) {
-				finderCache.removeResult(
-					_finderPathCountAll, FINDER_ARGS_EMPTY);
+			catch (Exception exception) {
+				if (productionMode) {
+					finderCache.removeResult(
+						_finderPathCountAll, FINDER_ARGS_EMPTY);
+				}
 
-				throw processException(e);
+				throw processException(exception);
 			}
 			finally {
 				closeSession(session);
@@ -1501,8 +1723,66 @@ public class JournalArticleLocalizationPersistenceImpl
 	}
 
 	@Override
-	protected Map<String, Integer> getTableColumnsMap() {
+	public Set<String> getCTColumnNames(
+		CTColumnResolutionType ctColumnResolutionType) {
+
+		return _ctColumnNamesMap.get(ctColumnResolutionType);
+	}
+
+	@Override
+	public List<String> getMappingTableNames() {
+		return _mappingTableNames;
+	}
+
+	@Override
+	public Map<String, Integer> getTableColumnsMap() {
 		return JournalArticleLocalizationModelImpl.TABLE_COLUMNS_MAP;
+	}
+
+	@Override
+	public String getTableName() {
+		return "JournalArticleLocalization";
+	}
+
+	@Override
+	public List<String[]> getUniqueIndexColumnNames() {
+		return _uniqueIndexColumnNames;
+	}
+
+	private static final Map<CTColumnResolutionType, Set<String>>
+		_ctColumnNamesMap = new EnumMap<CTColumnResolutionType, Set<String>>(
+			CTColumnResolutionType.class);
+	private static final List<String> _mappingTableNames =
+		new ArrayList<String>();
+	private static final List<String[]> _uniqueIndexColumnNames =
+		new ArrayList<String[]>();
+
+	static {
+		Set<String> ctControlColumnNames = new HashSet<String>();
+		Set<String> ctIgnoreColumnNames = new HashSet<String>();
+		Set<String> ctMergeColumnNames = new HashSet<String>();
+		Set<String> ctStrictColumnNames = new HashSet<String>();
+
+		ctControlColumnNames.add("mvccVersion");
+		ctControlColumnNames.add("ctCollectionId");
+		ctStrictColumnNames.add("companyId");
+		ctStrictColumnNames.add("articlePK");
+		ctStrictColumnNames.add("title");
+		ctStrictColumnNames.add("description");
+		ctStrictColumnNames.add("languageId");
+
+		_ctColumnNamesMap.put(
+			CTColumnResolutionType.CONTROL, ctControlColumnNames);
+		_ctColumnNamesMap.put(
+			CTColumnResolutionType.IGNORE, ctIgnoreColumnNames);
+		_ctColumnNamesMap.put(CTColumnResolutionType.MERGE, ctMergeColumnNames);
+		_ctColumnNamesMap.put(
+			CTColumnResolutionType.PK,
+			Collections.singleton("articleLocalizationId"));
+		_ctColumnNamesMap.put(
+			CTColumnResolutionType.STRICT, ctStrictColumnNames);
+
+		_uniqueIndexColumnNames.add(new String[] {"articlePK", "languageId"});
 	}
 
 	/**
@@ -1609,6 +1889,9 @@ public class JournalArticleLocalizationPersistenceImpl
 	private boolean _columnBitmaskEnabled;
 
 	@Reference
+	protected CTPersistenceHelper ctPersistenceHelper;
+
+	@Reference
 	protected EntityCache entityCache;
 
 	@Reference
@@ -1642,8 +1925,8 @@ public class JournalArticleLocalizationPersistenceImpl
 		try {
 			Class.forName(JournalPersistenceConstants.class.getName());
 		}
-		catch (ClassNotFoundException cnfe) {
-			throw new ExceptionInInitializerError(cnfe);
+		catch (ClassNotFoundException classNotFoundException) {
+			throw new ExceptionInInitializerError(classNotFoundException);
 		}
 	}
 

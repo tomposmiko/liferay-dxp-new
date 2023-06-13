@@ -14,6 +14,12 @@ definition {
 
 		PortletEntry.inputName(name = "${pageName}");
 
+		if (isSet(categoryName)) {
+			AssetCategorization.addCategory(
+				categoryName = "${categoryName}",
+				vocabularyName = "${vocabularyName}");
+		}
+
 		Button.clickAdd();
 
 		SelectFrame.selectFrameTop();
@@ -28,17 +34,26 @@ definition {
 			Page.togglePageTemplateInheritChanges(toggleValue = "${inheritChanges}");
 		}
 
+		VerifyElementPresent(locator1 = "Message#SUCCESS");
+
 		AssertVisible(locator1 = "TextInput#NAME");
 
-		Pause(locator1 = "1000");
-
-		Alert.closeMessage(messageType = "SUCCESS");
-
-		AssertElementNotPresent(locator1 = "Message#SUCCESS");
+		if (isSet(openGraph)) {
+			SitePages._configureOpenGraph(
+				customDescription = "${customDescription}",
+				customTitle = "${customTitle}");
+		}
 
 		Button.click(button = "Save");
 
 		WaitForSPARefresh();
+
+		//TODO find a better fix as we should not be navigating like this for every test. Workaround caused by LPS-104246
+
+		ProductMenu.gotoPortlet(
+			category = "Site Builder",
+			panel = "Site Administration",
+			portlet = "Pages");
 	}
 
 	@summary = "Add newly created pages to specified navigation menus or assert that the option to add the pages to navigation menus is missing."
@@ -61,6 +76,32 @@ definition {
 				}
 			}
 		}
+	}
+
+	@summary = "Configures openGraph for a site page. This should be moved outside of _addPage for stability."
+	macro _configureOpenGraph {
+		Navigator.gotoNavTab(navTab = "Open Graph");
+
+		var checkboxName = "Use Custom Title";
+
+		if (IsNotChecked(locator1 = "Checkbox#ANY_CHECKBOX")) {
+			Click(locator1 = "Checkbox#ANY_CHECKBOX");
+		}
+
+		Type(
+			locator1 = "TextInput#OPEN_GRAPH_CUSTOM_TITLE",
+			value1 = "${customTitle}");
+
+		var checkboxName = "Use Custom Description";
+
+		if (IsNotChecked(locator1 = "Checkbox#ANY_CHECKBOX")) {
+			Click(locator1 = "Checkbox#ANY_CHECKBOX");
+		}
+
+		Type(
+			key_text = "openGraphDescription",
+			locator1 = "TextArea#ANY",
+			value1 = "${customDescription}");
 	}
 
 	macro _configurePage {
@@ -186,16 +227,9 @@ definition {
 		if (IsElementPresent(locator1 = "Message#EMPTY_INFO_TAGLIB")) {
 			SitePages.gotoAddFirstPage(pageType = "Public Page");
 		}
-		else if (IsElementPresent(locator1 = "SitePages#LIST_GROUP_ITEM", key_itemName = "Public Pages")) {
-			Click(
-				key_itemName = "Public Pages",
-				locator1 = "SitePages#LIST_GROUP_ITEM");
-
-			LexiconEntry.gotoAdd();
-		}
 		else {
 			AssertClick(
-				locator1 = "Breadcrumb#BREADCRUMB_ENTRY",
+				locator1 = "Breadcrumb#BREADCRUMB_ENTRY_EXACT_MATCH",
 				value1 = "Pages");
 
 			LexiconEntry.gotoAddMenuItem(menuItem = "Public Page");
@@ -203,13 +237,18 @@ definition {
 
 		SitePages._addPage(
 			assertCheckboxMissing = "${assertCheckboxMissing}",
+			categoryName = "${categoryName}",
 			collectionName = "${collectionName}",
+			customDescription = "${customDescription}",
+			customTitle = "${customTitle}",
 			inheritChanges = "${inheritChanges}",
 			navigationMenus = "${navigationMenus}",
+			openGraph = "${openGraph}",
 			pageName = "${pageName}",
 			pageTemplateName = "${pageTemplateName}",
 			pageTypeURL = "${pageTypeURL}",
-			sitePageType = "${sitePageType}");
+			sitePageType = "${sitePageType}",
+			vocabularyName = "${vocabularyName}");
 	}
 
 	macro configureChildPage {
@@ -310,7 +349,7 @@ definition {
 
 		Refresh();
 
-		Click(locator1 = "Message#EMPTY_INFO_TAGLIB");
+		Click(locator1 = "Message#NO_PAGES");
 
 		Click(locator1 = "Dropdown#EMPTY_MESSAGE_DROPDOWN");
 
@@ -333,9 +372,16 @@ definition {
 			}
 		}
 
-		Click(
-			key_pageName = "${pageName}",
-			locator1 = "SitePages#LIST_GROUP_ITEM_ELLIPSIS_ICON");
+		if ("${browserType}" == "internetexplorer") {
+			Click(
+				key_pageName = "${pageName}",
+				locator1 = "SitePages#LIST_GROUP_ITEM_ELLIPSIS_ICON_IE");
+		}
+		else {
+			Click(
+				key_pageName = "${pageName}",
+				locator1 = "SitePages#LIST_GROUP_ITEM_ELLIPSIS_ICON");
+		}
 
 		MenuItem.click(menuItem = "${menuItem}");
 	}
@@ -356,9 +402,11 @@ definition {
 			MetalComponent.waitForLayout();
 		}
 
-		Click(
-			key_itemName = "${privacy}",
-			locator1 = "SitePages#LIST_GROUP_ITEM");
+		if (IsElementNotPresent(locator1 = "Breadcrumb#BREADCRUMB_ENTRY_EXACT_MATCH", key_breadcrumbName = "${privacy}")) {
+			Click(
+				key_itemName = "${privacy}",
+				locator1 = "SitePages#LIST_GROUP_ITEM");
+		}
 	}
 
 }

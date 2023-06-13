@@ -30,7 +30,6 @@ import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.segments.constants.SegmentsEntryConstants;
 import com.liferay.segments.constants.SegmentsPortletKeys;
 import com.liferay.segments.criteria.Criteria;
 import com.liferay.segments.criteria.CriteriaSerializer;
@@ -102,10 +101,15 @@ public class UpdateSegmentsEntryMVCActionCommand extends BaseMVCActionCommand {
 			validateCriteria(criteria, dynamic);
 
 			if (segmentsEntryId <= 0) {
+				long groupId = ParamUtil.getLong(actionRequest, "groupId");
+
+				if (groupId > 0) {
+					serviceContext.setScopeGroupId(groupId);
+				}
+
 				segmentsEntry = _segmentsEntryService.addSegmentsEntry(
 					segmentsEntryKey, nameMap, descriptionMap, active,
-					CriteriaSerializer.serialize(criteria),
-					SegmentsEntryConstants.SOURCE_DEFAULT, type,
+					CriteriaSerializer.serialize(criteria), type,
 					serviceContext);
 			}
 			else {
@@ -133,25 +137,26 @@ public class UpdateSegmentsEntryMVCActionCommand extends BaseMVCActionCommand {
 
 			sendRedirect(actionRequest, actionResponse, redirect);
 		}
-		catch (Exception e) {
-			if (e instanceof NoSuchEntryException ||
-				e instanceof PrincipalException) {
+		catch (Exception exception) {
+			if (exception instanceof NoSuchEntryException ||
+				exception instanceof PrincipalException) {
 
-				SessionErrors.add(actionRequest, e.getClass());
+				SessionErrors.add(actionRequest, exception.getClass());
 
 				actionResponse.setRenderParameter("mvcPath", "/error.jsp");
 			}
-			else if (e instanceof SegmentsEntryCriteriaException ||
-					 e instanceof SegmentsEntryKeyException ||
-					 e instanceof SegmentsEntryNameException) {
+			else if (exception instanceof SegmentsEntryCriteriaException ||
+					 exception instanceof SegmentsEntryKeyException ||
+					 exception instanceof SegmentsEntryNameException) {
 
-				SessionErrors.add(actionRequest, e.getClass(), e);
+				SessionErrors.add(
+					actionRequest, exception.getClass(), exception);
 
 				actionResponse.setRenderParameter(
 					"mvcRenderCommandName", "editSegmentsEntry");
 			}
 			else {
-				throw e;
+				throw exception;
 			}
 		}
 	}

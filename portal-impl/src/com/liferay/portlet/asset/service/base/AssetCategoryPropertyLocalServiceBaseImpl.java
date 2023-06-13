@@ -18,6 +18,7 @@ import com.liferay.asset.kernel.model.AssetCategoryProperty;
 import com.liferay.asset.kernel.service.AssetCategoryPropertyLocalService;
 import com.liferay.asset.kernel.service.persistence.AssetCategoryPropertyFinder;
 import com.liferay.asset.kernel.service.persistence.AssetCategoryPropertyPersistence;
+import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -37,6 +38,7 @@ import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.BaseLocalServiceImpl;
 import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
+import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -65,7 +67,7 @@ public abstract class AssetCategoryPropertyLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements AssetCategoryPropertyLocalService, IdentifiableOSGiService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>AssetCategoryPropertyLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.asset.kernel.service.AssetCategoryPropertyLocalServiceUtil</code>.
@@ -459,8 +461,23 @@ public abstract class AssetCategoryPropertyLocalServiceBaseImpl
 		return AssetCategoryPropertyLocalService.class.getName();
 	}
 
-	protected Class<?> getModelClass() {
+	@Override
+	public CTPersistence<AssetCategoryProperty> getCTPersistence() {
+		return assetCategoryPropertyPersistence;
+	}
+
+	@Override
+	public Class<AssetCategoryProperty> getModelClass() {
 		return AssetCategoryProperty.class;
+	}
+
+	@Override
+	public <R, E extends Throwable> R updateWithUnsafeFunction(
+			UnsafeFunction<CTPersistence<AssetCategoryProperty>, R, E>
+				updateUnsafeFunction)
+		throws E {
+
+		return updateUnsafeFunction.apply(assetCategoryPropertyPersistence);
 	}
 
 	protected String getModelClassName() {
@@ -487,8 +504,8 @@ public abstract class AssetCategoryPropertyLocalServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

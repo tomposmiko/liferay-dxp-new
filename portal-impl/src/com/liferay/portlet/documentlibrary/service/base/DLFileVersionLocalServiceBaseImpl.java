@@ -80,7 +80,7 @@ public abstract class DLFileVersionLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements DLFileVersionLocalService, IdentifiableOSGiService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>DLFileVersionLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.document.library.kernel.service.DLFileVersionLocalServiceUtil</code>.
@@ -766,8 +766,8 @@ public abstract class DLFileVersionLocalServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

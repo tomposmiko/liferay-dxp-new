@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
@@ -140,10 +141,10 @@ public class LicenseUtil {
 
 			return (Map<String, String>)clusterNodeResponse.getResult();
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw e;
+			throw exception;
 		}
 	}
 
@@ -179,21 +180,15 @@ public class LicenseUtil {
 	}
 
 	public static Map<String, String> getServerInfo() {
-		Map<String, String> serverInfo = new HashMap<>();
-
-		serverInfo.put("hostName", PortalUtil.getComputerName());
-		serverInfo.put("ipAddresses", StringUtil.merge(getIpAddresses()));
-		serverInfo.put("macAddresses", StringUtil.merge(getMacAddresses()));
-		serverInfo.put("processorCores", String.valueOf(getProcessorCores()));
-
-		return serverInfo;
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public static void init() {
+		return HashMapBuilder.put(
+			"hostName", PortalUtil.getComputerName()
+		).put(
+			"ipAddresses", StringUtil.merge(getIpAddresses())
+		).put(
+			"macAddresses", StringUtil.merge(getMacAddresses())
+		).put(
+			"processorCores", String.valueOf(getProcessorCores())
+		).build();
 	}
 
 	public static void registerOrder(HttpServletRequest httpServletRequest) {
@@ -230,8 +225,8 @@ public class LicenseUtil {
 						httpServletRequest, clusterNode, orderUuid,
 						productEntryName, maxServers);
 				}
-				catch (Exception e) {
-					_log.error(e, e);
+				catch (Exception exception) {
+					_log.error(exception, exception);
 
 					InetAddress inetAddress = clusterNode.getBindInetAddress();
 
@@ -292,8 +287,8 @@ public class LicenseUtil {
 					"Your license has been successfully registered.");
 			}
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
 			attributes.put(
 				"ERROR_MESSAGE",
@@ -595,8 +590,10 @@ public class LicenseUtil {
 				macAddresses.add(sb.toString());
 			}
 		}
-		catch (SocketException se) {
-			_log.error("Unable to read local server network interfaces", se);
+		catch (SocketException socketException) {
+			_log.error(
+				"Unable to read local server network interfaces",
+				socketException);
 		}
 
 		_ipAddresses = Collections.unmodifiableSet(ipAddresses);

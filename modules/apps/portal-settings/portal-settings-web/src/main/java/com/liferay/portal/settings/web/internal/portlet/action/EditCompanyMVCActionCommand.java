@@ -120,48 +120,51 @@ public class EditCompanyMVCActionCommand extends BaseFormMVCActionCommand {
 				sendRedirect(actionRequest, actionResponse, redirect);
 			}
 		}
-		catch (Exception e) {
-			if (e instanceof PrincipalException) {
-				SessionErrors.add(actionRequest, e.getClass());
+		catch (Exception exception) {
+			if (exception instanceof PrincipalException) {
+				SessionErrors.add(actionRequest, exception.getClass());
 
 				actionResponse.setRenderParameter("mvcPath", "/error.jsp");
 
 				return;
 			}
-			else if (e instanceof AccountNameException ||
-					 e instanceof AddressCityException ||
-					 e instanceof AddressStreetException ||
-					 e instanceof AddressZipException ||
-					 e instanceof CompanyMxException ||
-					 e instanceof CompanyVirtualHostException ||
-					 e instanceof CompanyWebIdException ||
-					 e instanceof EmailAddressException ||
-					 e instanceof LocaleException ||
-					 e instanceof NoSuchCountryException ||
-					 e instanceof NoSuchListTypeException ||
-					 e instanceof NoSuchRegionException ||
-					 e instanceof PhoneNumberException ||
-					 e instanceof PhoneNumberExtensionException ||
-					 e instanceof RequiredLocaleException ||
-					 e instanceof WebsiteURLException) {
+			else if (exception instanceof AccountNameException ||
+					 exception instanceof AddressCityException ||
+					 exception instanceof AddressStreetException ||
+					 exception instanceof AddressZipException ||
+					 exception instanceof CompanyMxException ||
+					 exception instanceof CompanyVirtualHostException ||
+					 exception instanceof CompanyWebIdException ||
+					 exception instanceof EmailAddressException ||
+					 exception instanceof LocaleException ||
+					 exception instanceof NoSuchCountryException ||
+					 exception instanceof NoSuchListTypeException ||
+					 exception instanceof NoSuchRegionException ||
+					 exception instanceof PhoneNumberException ||
+					 exception instanceof PhoneNumberExtensionException ||
+					 exception instanceof RequiredLocaleException ||
+					 exception instanceof WebsiteURLException) {
 
-				if (e instanceof NoSuchListTypeException) {
-					NoSuchListTypeException nslte = (NoSuchListTypeException)e;
+				if (exception instanceof NoSuchListTypeException) {
+					NoSuchListTypeException noSuchListTypeException =
+						(NoSuchListTypeException)exception;
 
-					Class<?> clazz = e.getClass();
+					Class<?> clazz = exception.getClass();
 
 					SessionErrors.add(
-						actionRequest, clazz.getName() + nslte.getType());
+						actionRequest,
+						clazz.getName() + noSuchListTypeException.getType());
 				}
 				else {
-					SessionErrors.add(actionRequest, e.getClass(), e);
+					SessionErrors.add(
+						actionRequest, exception.getClass(), exception);
 				}
 			}
 			else {
-				throw e;
+				throw exception;
 			}
 
-			SessionErrors.add(actionRequest, e.getClass(), e);
+			SessionErrors.add(actionRequest, exception.getClass(), exception);
 
 			String redirect = ParamUtil.getString(actionRequest, "redirect");
 
@@ -271,6 +274,13 @@ public class EditCompanyMVCActionCommand extends BaseFormMVCActionCommand {
 		UnicodeProperties properties = PropertiesParamUtil.getProperties(
 			actionRequest, "settings--");
 
+		if (properties.containsKey(PropsKeys.ADMIN_EMAIL_FROM_ADDRESS) &&
+			!Validator.isEmailAddress(
+				properties.getProperty(PropsKeys.ADMIN_EMAIL_FROM_ADDRESS))) {
+
+			throw new EmailAddressException();
+		}
+
 		String[] discardLegacyKeys = ParamUtil.getStringValues(
 			actionRequest, "discardLegacyKey");
 
@@ -293,8 +303,8 @@ public class EditCompanyMVCActionCommand extends BaseFormMVCActionCommand {
 
 			portletPreferences.store();
 		}
-		catch (ReadOnlyException roe) {
-			throw new SystemException(roe);
+		catch (ReadOnlyException readOnlyException) {
+			throw new SystemException(readOnlyException);
 		}
 
 		_companyService.updateCompany(

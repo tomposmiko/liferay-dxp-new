@@ -111,8 +111,8 @@ public abstract class BaseAuthFilter extends BasePortalFilter {
 			try {
 				userId = HttpAuthManagerUtil.getBasicUserId(httpServletRequest);
 			}
-			catch (Exception e) {
-				_log.error(e, e);
+			catch (Exception exception) {
+				_log.error(exception, exception);
 			}
 
 			if (userId > 0) {
@@ -161,8 +161,8 @@ public abstract class BaseAuthFilter extends BasePortalFilter {
 				userId = HttpAuthManagerUtil.getDigestUserId(
 					httpServletRequest);
 			}
-			catch (Exception e) {
-				_log.error(e, e);
+			catch (Exception exception) {
+				_log.error(exception, exception);
 			}
 
 			if (userId > 0) {
@@ -193,23 +193,6 @@ public abstract class BaseAuthFilter extends BasePortalFilter {
 		}
 
 		return httpServletRequest;
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	protected void initThreadLocals(HttpServletRequest httpServletRequest)
-		throws Exception {
-
-		HttpSession session = httpServletRequest.getSession();
-
-		User user = (User)session.getAttribute(WebKeys.USER);
-
-		initThreadLocals(user);
-
-		PrincipalThreadLocal.setPassword(
-			PortalUtil.getUserPassword(httpServletRequest));
 	}
 
 	protected void initThreadLocals(User user) throws Exception {
@@ -310,12 +293,12 @@ public abstract class BaseAuthFilter extends BasePortalFilter {
 			try {
 				user = PortalUtil.initUser(httpServletRequest);
 			}
-			catch (NoSuchUserException nsue) {
+			catch (NoSuchUserException noSuchUserException) {
 
 				// LPS-52675
 
 				if (_log.isDebugEnabled()) {
-					_log.debug(nsue, nsue);
+					_log.debug(noSuchUserException, noSuchUserException);
 				}
 
 				httpServletResponse.sendRedirect(
@@ -359,22 +342,6 @@ public abstract class BaseAuthFilter extends BasePortalFilter {
 					filterChain);
 			}
 		}
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #setCredentials(HttpServletRequest, HttpSession, User,
-	 *             String)}
-	 */
-	@Deprecated
-	protected HttpServletRequest setCredentials(
-			HttpServletRequest httpServletRequest, HttpSession session,
-			long userId, String authType)
-		throws Exception {
-
-		return setCredentials(
-			httpServletRequest, session, UserLocalServiceUtil.getUser(userId),
-			authType);
 	}
 
 	protected HttpServletRequest setCredentials(

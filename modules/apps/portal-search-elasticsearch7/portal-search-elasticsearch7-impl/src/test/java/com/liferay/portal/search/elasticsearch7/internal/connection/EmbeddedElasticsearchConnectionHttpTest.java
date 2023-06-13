@@ -14,31 +14,34 @@
 
 package com.liferay.portal.search.elasticsearch7.internal.connection;
 
+import com.liferay.portal.json.JSONFactoryImpl;
+import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.InputStream;
 
 import java.net.URL;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import org.elasticsearch.action.admin.cluster.node.info.NodeInfo;
-import org.elasticsearch.action.admin.cluster.node.info.NodesInfoRequestBuilder;
-import org.elasticsearch.action.admin.cluster.node.info.NodesInfoResponse;
-import org.elasticsearch.client.AdminClient;
-import org.elasticsearch.client.ClusterAdminClient;
-import org.elasticsearch.common.transport.BoundTransportAddress;
-import org.elasticsearch.common.transport.TransportAddress;
-import org.elasticsearch.http.HttpInfo;
+import org.apache.http.util.EntityUtils;
+
+import org.elasticsearch.client.Request;
+import org.elasticsearch.client.Response;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestHighLevelClient;
 
 import org.hamcrest.CoreMatchers;
 
-import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.mockito.MockitoAnnotations;
@@ -48,18 +51,17 @@ import org.mockito.MockitoAnnotations;
  */
 public class EmbeddedElasticsearchConnectionHttpTest {
 
-	@Before
-	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+		setUpJSONFactoryUtil();
 
 		_clusterName = RandomTestUtil.randomString();
 
-		Map<String, Object> properties = new HashMap<String, Object>() {
-			{
-				put("clusterName", _clusterName);
-				put("networkHost", "_site_");
-			}
-		};
+		Map<String, Object> properties = HashMapBuilder.<String, Object>put(
+			"clusterName", _clusterName
+		).put(
+			"networkHost", "_site_"
+		).build();
 
 		_elasticsearchFixture = new ElasticsearchFixture(
 			EmbeddedElasticsearchConnectionHttpTest.class.getSimpleName(),
@@ -68,9 +70,14 @@ public class EmbeddedElasticsearchConnectionHttpTest {
 		_elasticsearchFixture.setUp();
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@AfterClass
+	public static void tearDownClass() throws Exception {
 		_elasticsearchFixture.tearDown();
+	}
+
+	@Before
+	public void setUp() throws Exception {
+		MockitoAnnotations.initMocks(this);
 	}
 
 	@Test
@@ -85,28 +92,46 @@ public class EmbeddedElasticsearchConnectionHttpTest {
 				"\"cluster_name\" : \"" + _clusterName));
 	}
 
-	protected int getHttpPort() {
-		AdminClient adminClient = _elasticsearchFixture.getAdminClient();
+	protected static void setUpJSONFactoryUtil() {
+		JSONFactoryUtil jsonFactoryUtil = new JSONFactoryUtil();
 
-		ClusterAdminClient clusterAdminClient = adminClient.cluster();
+		jsonFactoryUtil.setJSONFactory(_jsonFactory);
+	}
 
-		NodesInfoRequestBuilder nodesInfoRequestBuilder =
-			clusterAdminClient.prepareNodesInfo();
+	protected int getHttpPort() throws Exception {
+		RestHighLevelClient restHighLevelClient =
+			_elasticsearchFixture.getRestHighLevelClient();
 
-		NodesInfoResponse nodesInfoResponse = nodesInfoRequestBuilder.get();
+		RestClient restClient = restHighLevelClient.getLowLevelClient();
 
-		List<NodeInfo> nodeInfos = nodesInfoResponse.getNodes();
+		String endpoint = "/_nodes";
 
-		NodeInfo nodeInfo = nodeInfos.get(0);
+		Request request = new Request("GET", endpoint);
 
-		HttpInfo httpInfo = nodeInfo.getHttp();
+		Response response = restClient.performRequest(request);
 
-		BoundTransportAddress boundTransportAddress = httpInfo.address();
+		String responseBody = EntityUtils.toString(response.getEntity());
 
-		TransportAddress transportAddress =
-			boundTransportAddress.publishAddress();
+		JSONObject responseJSONObject = JSONFactoryUtil.createJSONObject(
+			responseBody);
 
-		return transportAddress.getPort();
+		JSONObject nodesJSONObject = responseJSONObject.getJSONObject("nodes");
+
+		Set<String> nodes = nodesJSONObject.keySet();
+
+		for (String node : nodes) {
+			JSONObject nodeJSONObject = nodesJSONObject.getJSONObject(node);
+
+			JSONObject settingsJSONObject = nodeJSONObject.getJSONObject(
+				"settings");
+
+			JSONObject httpJSONObject = settingsJSONObject.getJSONObject(
+				"http");
+
+			return httpJSONObject.getInt("port");
+		}
+
+		return 0;
 	}
 
 	protected String toString(URL url) throws Exception {
@@ -115,7 +140,8 @@ public class EmbeddedElasticsearchConnectionHttpTest {
 		}
 	}
 
-	private String _clusterName;
-	private ElasticsearchFixture _elasticsearchFixture;
+	private static String _clusterName;
+	private static ElasticsearchFixture _elasticsearchFixture;
+	private static final JSONFactory _jsonFactory = new JSONFactoryImpl();
 
 }

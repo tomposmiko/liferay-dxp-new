@@ -61,117 +61,6 @@ import java.rmi.RemoteException;
  */
 public class FragmentEntryServiceSoap {
 
-	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 #addFragmentEntry(long, long, String, String, long, int, int,
-	 ServiceContext)}
-	 */
-	@Deprecated
-	public static com.liferay.fragment.model.FragmentEntrySoap addFragmentEntry(
-			long groupId, long fragmentCollectionId, String name, int type,
-			int status,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws RemoteException {
-
-		try {
-			com.liferay.fragment.model.FragmentEntry returnValue =
-				FragmentEntryServiceUtil.addFragmentEntry(
-					groupId, fragmentCollectionId, name, type, status,
-					serviceContext);
-
-			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModel(
-				returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 #addFragmentEntry(long, long, String, String, long, int, int,
-	 ServiceContext)}
-	 */
-	@Deprecated
-	public static com.liferay.fragment.model.FragmentEntrySoap addFragmentEntry(
-			long groupId, long fragmentCollectionId, String name, int status,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws RemoteException {
-
-		try {
-			com.liferay.fragment.model.FragmentEntry returnValue =
-				FragmentEntryServiceUtil.addFragmentEntry(
-					groupId, fragmentCollectionId, name, status,
-					serviceContext);
-
-			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModel(
-				returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 #addFragmentEntry(long, long, String, String, long, int, int,
-	 ServiceContext)}
-	 */
-	@Deprecated
-	public static com.liferay.fragment.model.FragmentEntrySoap addFragmentEntry(
-			long groupId, long fragmentCollectionId, String fragmentEntryKey,
-			String name, int type, int status,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws RemoteException {
-
-		try {
-			com.liferay.fragment.model.FragmentEntry returnValue =
-				FragmentEntryServiceUtil.addFragmentEntry(
-					groupId, fragmentCollectionId, fragmentEntryKey, name, type,
-					status, serviceContext);
-
-			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModel(
-				returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 #addFragmentEntry(long, long, String, String, long, int, int,
-	 ServiceContext)}
-	 */
-	@Deprecated
-	public static com.liferay.fragment.model.FragmentEntrySoap addFragmentEntry(
-			long groupId, long fragmentCollectionId, String fragmentEntryKey,
-			String name, int status,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws RemoteException {
-
-		try {
-			com.liferay.fragment.model.FragmentEntry returnValue =
-				FragmentEntryServiceUtil.addFragmentEntry(
-					groupId, fragmentCollectionId, fragmentEntryKey, name,
-					status, serviceContext);
-
-			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModel(
-				returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
 	public static com.liferay.fragment.model.FragmentEntrySoap addFragmentEntry(
 			long groupId, long fragmentCollectionId, String fragmentEntryKey,
 			String name, long previewFileEntryId, int type, int status,
@@ -187,123 +76,10 @@ public class FragmentEntryServiceSoap {
 			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 #addFragmentEntry(long, long, String, String, String, String,
-	 String, String, long, int, int, ServiceContext)}
-	 */
-	@Deprecated
-	public static com.liferay.fragment.model.FragmentEntrySoap addFragmentEntry(
-			long groupId, long fragmentCollectionId, String name, String css,
-			String html, String js, int type, int status,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws RemoteException {
-
-		try {
-			com.liferay.fragment.model.FragmentEntry returnValue =
-				FragmentEntryServiceUtil.addFragmentEntry(
-					groupId, fragmentCollectionId, name, css, html, js, type,
-					status, serviceContext);
-
-			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModel(
-				returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 #addFragmentEntry(long, long, String, String, String, String,
-	 String, String, long, int, int, ServiceContext)}
-	 */
-	@Deprecated
-	public static com.liferay.fragment.model.FragmentEntrySoap addFragmentEntry(
-			long groupId, long fragmentCollectionId, String name, String css,
-			String html, String js, int status,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws RemoteException {
-
-		try {
-			com.liferay.fragment.model.FragmentEntry returnValue =
-				FragmentEntryServiceUtil.addFragmentEntry(
-					groupId, fragmentCollectionId, name, css, html, js, status,
-					serviceContext);
-
-			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModel(
-				returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 #addFragmentEntry(long, long, String, String, String, String,
-	 String, String, long, int, int, ServiceContext)}
-	 */
-	@Deprecated
-	public static com.liferay.fragment.model.FragmentEntrySoap addFragmentEntry(
-			long groupId, long fragmentCollectionId, String fragmentEntryKey,
-			String name, String css, String html, String js, int type,
-			int status,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws RemoteException {
-
-		try {
-			com.liferay.fragment.model.FragmentEntry returnValue =
-				FragmentEntryServiceUtil.addFragmentEntry(
-					groupId, fragmentCollectionId, fragmentEntryKey, name, css,
-					html, js, type, status, serviceContext);
-
-			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModel(
-				returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 #addFragmentEntry(long, long, String, String, String, String,
-	 String, String, long, int, int, ServiceContext)}
-	 */
-	@Deprecated
-	public static com.liferay.fragment.model.FragmentEntrySoap addFragmentEntry(
-			long groupId, long fragmentCollectionId, String fragmentEntryKey,
-			String name, String css, String html, String js, int status,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws RemoteException {
-
-		try {
-			com.liferay.fragment.model.FragmentEntry returnValue =
-				FragmentEntryServiceUtil.addFragmentEntry(
-					groupId, fragmentCollectionId, fragmentEntryKey, name, css,
-					html, js, status, serviceContext);
-
-			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModel(
-				returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -324,10 +100,10 @@ public class FragmentEntryServiceSoap {
 			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -346,10 +122,10 @@ public class FragmentEntryServiceSoap {
 			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -359,10 +135,10 @@ public class FragmentEntryServiceSoap {
 		try {
 			FragmentEntryServiceUtil.deleteFragmentEntries(fragmentEntriesIds);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -377,10 +153,10 @@ public class FragmentEntryServiceSoap {
 			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -395,125 +171,10 @@ public class FragmentEntryServiceSoap {
 			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 #getFragmentEntriesCount(Long, Long)}
-	 */
-	@Deprecated
-	public static int getFragmentCollectionsCount(
-			long groupId, long fragmentCollectionId)
-		throws RemoteException {
-
-		try {
-			int returnValue =
-				FragmentEntryServiceUtil.getFragmentCollectionsCount(
-					groupId, fragmentCollectionId);
-
-			return returnValue;
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 #getFragmentEntriesCount(Long, Long, Integer)}
-	 */
-	@Deprecated
-	public static int getFragmentCollectionsCount(
-			long groupId, long fragmentCollectionId, int status)
-		throws RemoteException {
-
-		try {
-			int returnValue =
-				FragmentEntryServiceUtil.getFragmentCollectionsCount(
-					groupId, fragmentCollectionId, status);
-
-			return returnValue;
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 #getFragmentEntriesCount(Long, Long, String)}
-	 */
-	@Deprecated
-	public static int getFragmentCollectionsCount(
-			long groupId, long fragmentCollectionId, String name)
-		throws RemoteException {
-
-		try {
-			int returnValue =
-				FragmentEntryServiceUtil.getFragmentCollectionsCount(
-					groupId, fragmentCollectionId, name);
-
-			return returnValue;
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 #getFragmentEntriesCount(Long, Long, String, Integer)}
-	 */
-	@Deprecated
-	public static int getFragmentCollectionsCount(
-			long groupId, long fragmentCollectionId, String name, int status)
-		throws RemoteException {
-
-		try {
-			int returnValue =
-				FragmentEntryServiceUtil.getFragmentCollectionsCount(
-					groupId, fragmentCollectionId, name, status);
-
-			return returnValue;
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 #getFragmentEntriesCount(Long, Long, Integer)}
-	 */
-	@Deprecated
-	public static int getFragmentCollectionsCountByType(
-			long groupId, long fragmentCollectionId, int type)
-		throws RemoteException {
-
-		try {
-			int returnValue =
-				FragmentEntryServiceUtil.getFragmentCollectionsCountByType(
-					groupId, fragmentCollectionId, type);
-
-			return returnValue;
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -529,35 +190,10 @@ public class FragmentEntryServiceSoap {
 			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModels(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 #getFragmentEntriesByStatus(Long, Long, Integer)}
-	 */
-	@Deprecated
-	public static com.liferay.fragment.model.FragmentEntrySoap[]
-			getFragmentEntries(
-				long groupId, long fragmentCollectionId, int status)
-		throws RemoteException {
-
-		try {
-			java.util.List<com.liferay.fragment.model.FragmentEntry>
-				returnValue = FragmentEntryServiceUtil.getFragmentEntries(
-					groupId, fragmentCollectionId, status);
-
-			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModels(
-				returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -574,40 +210,10 @@ public class FragmentEntryServiceSoap {
 			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModels(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 #getFragmentEntriesByStatus(Long, Long, Integer, Integer, Integer, OrderByComparator)}
-	 */
-	@Deprecated
-	public static com.liferay.fragment.model.FragmentEntrySoap[]
-			getFragmentEntries(
-				long groupId, long fragmentCollectionId, int status, int start,
-				int end,
-				com.liferay.portal.kernel.util.OrderByComparator
-					<com.liferay.fragment.model.FragmentEntry>
-						orderByComparator)
-		throws RemoteException {
-
-		try {
-			java.util.List<com.liferay.fragment.model.FragmentEntry>
-				returnValue = FragmentEntryServiceUtil.getFragmentEntries(
-					groupId, fragmentCollectionId, status, start, end,
-					orderByComparator);
-
-			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModels(
-				returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -628,70 +234,10 @@ public class FragmentEntryServiceSoap {
 			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModels(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 #getFragmentEntriesByNameAndStatus(Long, Long, String, Integer, Integer, Integer, OrderByComparator)}
-	 */
-	@Deprecated
-	public static com.liferay.fragment.model.FragmentEntrySoap[]
-			getFragmentEntries(
-				long groupId, long fragmentCollectionId, String name,
-				int status, int start, int end,
-				com.liferay.portal.kernel.util.OrderByComparator
-					<com.liferay.fragment.model.FragmentEntry>
-						orderByComparator)
-		throws RemoteException {
-
-		try {
-			java.util.List<com.liferay.fragment.model.FragmentEntry>
-				returnValue = FragmentEntryServiceUtil.getFragmentEntries(
-					groupId, fragmentCollectionId, name, status, start, end,
-					orderByComparator);
-
-			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModels(
-				returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 #getFragmentEntriesByName(Long, Long, String, Integer, Integer, OrderByComparator)}
-	 */
-	@Deprecated
-	public static com.liferay.fragment.model.FragmentEntrySoap[]
-			getFragmentEntries(
-				long groupId, long fragmentCollectionId, String name, int start,
-				int end,
-				com.liferay.portal.kernel.util.OrderByComparator
-					<com.liferay.fragment.model.FragmentEntry>
-						orderByComparator)
-		throws RemoteException {
-
-		try {
-			java.util.List<com.liferay.fragment.model.FragmentEntry>
-				returnValue = FragmentEntryServiceUtil.getFragmentEntries(
-					groupId, fragmentCollectionId, name, start, end,
-					orderByComparator);
-
-			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModels(
-				returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -713,10 +259,10 @@ public class FragmentEntryServiceSoap {
 			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModels(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -739,10 +285,10 @@ public class FragmentEntryServiceSoap {
 			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModels(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -760,10 +306,10 @@ public class FragmentEntryServiceSoap {
 			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModels(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -786,35 +332,10 @@ public class FragmentEntryServiceSoap {
 			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModels(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 #getFragmentEntriesByTypeAndStatus(Long, Long, Integer, Integer)}
-	 */
-	@Deprecated
-	public static com.liferay.fragment.model.FragmentEntrySoap[]
-			getFragmentEntriesByType(
-				long groupId, long fragmentCollectionId, int type, int status)
-		throws RemoteException {
-
-		try {
-			java.util.List<com.liferay.fragment.model.FragmentEntry>
-				returnValue = FragmentEntryServiceUtil.getFragmentEntriesByType(
-					groupId, fragmentCollectionId, type, status);
-
-			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModels(
-				returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -836,10 +357,10 @@ public class FragmentEntryServiceSoap {
 			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModels(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -857,10 +378,10 @@ public class FragmentEntryServiceSoap {
 			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModels(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -883,10 +404,10 @@ public class FragmentEntryServiceSoap {
 			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModels(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -900,10 +421,10 @@ public class FragmentEntryServiceSoap {
 
 			return returnValue;
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -918,10 +439,10 @@ public class FragmentEntryServiceSoap {
 
 			return returnValue;
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -936,10 +457,10 @@ public class FragmentEntryServiceSoap {
 
 			return returnValue;
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -954,10 +475,10 @@ public class FragmentEntryServiceSoap {
 
 			return returnValue;
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -972,10 +493,10 @@ public class FragmentEntryServiceSoap {
 
 			return returnValue;
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -990,10 +511,10 @@ public class FragmentEntryServiceSoap {
 
 			return returnValue;
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -1006,10 +527,10 @@ public class FragmentEntryServiceSoap {
 
 			return returnValue;
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -1025,10 +546,10 @@ public class FragmentEntryServiceSoap {
 			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -1044,10 +565,10 @@ public class FragmentEntryServiceSoap {
 			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -1063,65 +584,10 @@ public class FragmentEntryServiceSoap {
 			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 #updateFragmentEntry(long, String, String, String,
-	 String, String, int)}
-	 */
-	@Deprecated
-	public static com.liferay.fragment.model.FragmentEntrySoap
-			updateFragmentEntry(
-				long fragmentEntryId, String name, String css, String html,
-				String js, int status)
-		throws RemoteException {
-
-		try {
-			com.liferay.fragment.model.FragmentEntry returnValue =
-				FragmentEntryServiceUtil.updateFragmentEntry(
-					fragmentEntryId, name, css, html, js, status);
-
-			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModel(
-				returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link
-	 #updateFragmentEntry(long, String, String, String,
-	 String, String, long, int)}
-	 */
-	@Deprecated
-	public static com.liferay.fragment.model.FragmentEntrySoap
-			updateFragmentEntry(
-				long fragmentEntryId, String name, String css, String html,
-				String js, long previewFileEntryId, int status)
-		throws RemoteException {
-
-		try {
-			com.liferay.fragment.model.FragmentEntry returnValue =
-				FragmentEntryServiceUtil.updateFragmentEntry(
-					fragmentEntryId, name, css, html, js, previewFileEntryId,
-					status);
-
-			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModel(
-				returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -1140,10 +606,10 @@ public class FragmentEntryServiceSoap {
 			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -1163,10 +629,10 @@ public class FragmentEntryServiceSoap {
 			return com.liferay.fragment.model.FragmentEntrySoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 

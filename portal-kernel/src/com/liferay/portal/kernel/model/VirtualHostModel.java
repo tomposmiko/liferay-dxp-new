@@ -33,7 +33,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface VirtualHostModel
 	extends BaseModel<VirtualHost>, MVCCModel, ShardedModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a virtual host model instance should use the {@link VirtualHost} interface instead.
@@ -127,5 +127,41 @@ public interface VirtualHostModel
 	 * @param hostname the hostname of this virtual host
 	 */
 	public void setHostname(String hostname);
+
+	/**
+	 * Returns the default virtual host of this virtual host.
+	 *
+	 * @return the default virtual host of this virtual host
+	 */
+	public boolean getDefaultVirtualHost();
+
+	/**
+	 * Returns <code>true</code> if this virtual host is default virtual host.
+	 *
+	 * @return <code>true</code> if this virtual host is default virtual host; <code>false</code> otherwise
+	 */
+	public boolean isDefaultVirtualHost();
+
+	/**
+	 * Sets whether this virtual host is default virtual host.
+	 *
+	 * @param defaultVirtualHost the default virtual host of this virtual host
+	 */
+	public void setDefaultVirtualHost(boolean defaultVirtualHost);
+
+	/**
+	 * Returns the language ID of this virtual host.
+	 *
+	 * @return the language ID of this virtual host
+	 */
+	@AutoEscape
+	public String getLanguageId();
+
+	/**
+	 * Sets the language ID of this virtual host.
+	 *
+	 * @param languageId the language ID of this virtual host
+	 */
+	public void setLanguageId(String languageId);
 
 }

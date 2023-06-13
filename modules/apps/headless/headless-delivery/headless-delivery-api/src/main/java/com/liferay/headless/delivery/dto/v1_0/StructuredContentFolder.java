@@ -88,6 +88,35 @@ public class StructuredContentFolder {
 
 	}
 
+	@Schema
+	@Valid
+	public Map<String, Map> getActions() {
+		return actions;
+	}
+
+	public void setActions(Map<String, Map> actions) {
+		this.actions = actions;
+	}
+
+	@JsonIgnore
+	public void setActions(
+		UnsafeSupplier<Map<String, Map>, Exception> actionsUnsafeSupplier) {
+
+		try {
+			actions = actionsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected Map<String, Map> actions;
+
 	@Schema(description = "The folder's creator.")
 	@Valid
 	public Creator getCreator() {
@@ -113,7 +142,7 @@ public class StructuredContentFolder {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The folder's creator.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator creator;
 
@@ -170,7 +199,7 @@ public class StructuredContentFolder {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The date the folder was created.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
@@ -198,7 +227,9 @@ public class StructuredContentFolder {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The last time any of the folder's fields changed."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateModified;
 
@@ -226,7 +257,7 @@ public class StructuredContentFolder {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The folder's description.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String description;
 
@@ -252,7 +283,7 @@ public class StructuredContentFolder {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The folder's ID.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
@@ -278,7 +309,7 @@ public class StructuredContentFolder {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The folder's name.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	@NotEmpty
 	protected String name;
@@ -314,7 +345,9 @@ public class StructuredContentFolder {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The number of structured content folders inside this folder."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer numberOfStructuredContentFolders;
 
@@ -348,9 +381,43 @@ public class StructuredContentFolder {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The number of structured content objects inside this folder."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer numberOfStructuredContents;
+
+	@Schema
+	public Long getParentStructuredContentFolderId() {
+		return parentStructuredContentFolderId;
+	}
+
+	public void setParentStructuredContentFolderId(
+		Long parentStructuredContentFolderId) {
+
+		this.parentStructuredContentFolderId = parentStructuredContentFolderId;
+	}
+
+	@JsonIgnore
+	public void setParentStructuredContentFolderId(
+		UnsafeSupplier<Long, Exception>
+			parentStructuredContentFolderIdUnsafeSupplier) {
+
+		try {
+			parentStructuredContentFolderId =
+				parentStructuredContentFolderIdUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Long parentStructuredContentFolderId;
 
 	@Schema(description = "The ID of the site to which this folder is scoped.")
 	public Long getSiteId() {
@@ -376,7 +443,9 @@ public class StructuredContentFolder {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The ID of the site to which this folder is scoped."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long siteId;
 
@@ -444,7 +513,9 @@ public class StructuredContentFolder {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A write-only property that specifies the folder's default permissions."
+	)
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	protected ViewableBy viewableBy;
 
@@ -478,6 +549,16 @@ public class StructuredContentFolder {
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+		if (actions != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"actions\": ");
+
+			sb.append(_toJSON(actions));
+		}
 
 		if (creator != null) {
 			if (sb.length() > 1) {
@@ -593,6 +674,16 @@ public class StructuredContentFolder {
 			sb.append("\"numberOfStructuredContents\": ");
 
 			sb.append(numberOfStructuredContents);
+		}
+
+		if (parentStructuredContentFolderId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"parentStructuredContentFolderId\": ");
+
+			sb.append(parentStructuredContentFolderId);
 		}
 
 		if (siteId != null) {

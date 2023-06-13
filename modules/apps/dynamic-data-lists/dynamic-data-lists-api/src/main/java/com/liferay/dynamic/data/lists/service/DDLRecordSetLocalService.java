@@ -65,7 +65,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface DDLRecordSetLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link DDLRecordSetLocalServiceUtil} to access the ddl record set local service. Add custom service methods to <code>com.liferay.dynamic.data.lists.service.impl.DDLRecordSetLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -133,22 +133,6 @@ public interface DDLRecordSetLocalService
 	 */
 	public void addRecordSetResources(
 			DDLRecordSet recordSet, ModelPermissions modelPermissions)
-		throws PortalException;
-
-	/**
-	 * Adds the model resources with the permissions to the record set.
-	 *
-	 * @param recordSet the record set
-	 * @param groupPermissions whether to add group permissions
-	 * @param guestPermissions whether to add guest permissions
-	 * @throws PortalException if a portal exception occurred
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #addRecordSetResources(DDLRecordSet, ModelPermissions)}
-	 */
-	@Deprecated
-	public void addRecordSetResources(
-			DDLRecordSet recordSet, String[] groupPermissions,
-			String[] guestPermissions)
 		throws PortalException;
 
 	/**

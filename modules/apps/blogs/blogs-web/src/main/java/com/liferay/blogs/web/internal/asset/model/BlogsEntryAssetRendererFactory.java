@@ -144,7 +144,7 @@ public class BlogsEntryAssetRendererFactory
 		try {
 			liferayPortletURL.setWindowState(windowState);
 		}
-		catch (WindowStateException wse) {
+		catch (WindowStateException windowStateException) {
 		}
 
 		return liferayPortletURL;
@@ -152,8 +152,7 @@ public class BlogsEntryAssetRendererFactory
 
 	@Override
 	public boolean hasAddPermission(
-			PermissionChecker permissionChecker, long groupId, long classTypeId)
-		throws Exception {
+		PermissionChecker permissionChecker, long groupId, long classTypeId) {
 
 		return _portletResourcePermission.contains(
 			permissionChecker, groupId, ActionKeys.ADD_ENTRY);

@@ -20,44 +20,27 @@
 PortletURL portletURL = renderResponse.createRenderURL();
 
 portletURL.setParameter("mvcRenderCommandName", "/wedeploy_auth_admin/view");
+
+SearchContainer weDeployAuthAppsSearchContainer = new SearchContainer(renderRequest, portletURL, null, "no-wedeploy-apps-were-found");
+
+int weDeployAuthAppsCount = WeDeployAuthAppLocalServiceUtil.getWeDeployAuthAppsCount();
+
+weDeployAuthAppsSearchContainer.setTotal(weDeployAuthAppsCount);
+
+List<WeDeployAuthApp> weDeployAuthApps = WeDeployAuthAppLocalServiceUtil.getWeDeployAuthApps(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
+weDeployAuthAppsSearchContainer.setResults(weDeployAuthApps);
 %>
 
-<clay:navigation-bar
-	inverted="<%= true %>"
-	navigationItems='<%=
-		new JSPNavigationItemList(pageContext) {
-			{
-				add(
-					navigationItem -> {
-						navigationItem.setActive(true);
-						navigationItem.setHref(portletURL);
-						navigationItem.setLabel(LanguageUtil.get(request, "wedeploy-app"));
-					});
-			}
-		}
-	%>'
+<clay:management-toolbar
+	displayContext="<%= new WeDeployAuthAppsManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, weDeployAuthAppsSearchContainer) %>"
 />
 
 <div class="container-fluid container-fluid-max-xl container-view">
 	<liferay-ui:search-container
-		emptyResultsMessage="no-wedeploy-apps-were-found"
 		id="weDeployAuthApps"
-		iteratorURL="<%= portletURL %>"
+		searchContainer="<%= weDeployAuthAppsSearchContainer %>"
 	>
-		<liferay-ui:search-container-results>
-
-			<%
-			total = WeDeployAuthAppLocalServiceUtil.getWeDeployAuthAppsCount();
-
-			searchContainer.setTotal(total);
-
-			results = WeDeployAuthAppLocalServiceUtil.getWeDeployAuthApps(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
-
-			searchContainer.setResults(results);
-			%>
-
-		</liferay-ui:search-container-results>
-
 		<liferay-ui:search-container-row
 			className="com.liferay.portal.security.wedeploy.auth.model.WeDeployAuthApp"
 			keyProperty="weDeployAuthAppId"
@@ -108,17 +91,4 @@ portletURL.setParameter("mvcRenderCommandName", "/wedeploy_auth_admin/view");
 			markupView="lexicon"
 		/>
 	</liferay-ui:search-container>
-
-	<c:if test="<%= WeDeployAuthPermission.contains(permissionChecker, WeDeployAuthActionKeys.ADD_APP) %>">
-		<portlet:renderURL var="editWeDeployAuthAppURL">
-			<portlet:param name="mvcRenderCommandName" value="/wedeploy_auth_admin/edit_wedeploy_auth_app" />
-		</portlet:renderURL>
-
-		<liferay-frontend:add-menu>
-			<liferay-frontend:add-menu-item
-				title='<%= LanguageUtil.get(request, "add-wedeploy-app") %>'
-				url="<%= editWeDeployAuthAppURL %>"
-			/>
-		</liferay-frontend:add-menu>
-	</c:if>
 </div>

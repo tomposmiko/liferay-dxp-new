@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.upgrade.UpgradeStep;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -67,7 +68,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -477,11 +477,10 @@ public class UpgradeContentTargetingTest {
 
 		long contentTargetingUserSegmentId = -1L;
 
-		Map<Locale, String> nameMap = new HashMap<>();
-
-		nameMap.put(
+		Map<Locale, String> nameMap = HashMapBuilder.put(
 			PortalUtil.getSiteDefaultLocale(_group),
-			RandomTestUtil.randomString());
+			RandomTestUtil.randomString()
+		).build();
 
 		Map<Locale, String> descriptionMap =
 			RandomTestUtil.randomLocaleStringMap();
@@ -741,21 +740,12 @@ public class UpgradeContentTargetingTest {
 		Registry registry = RegistryUtil.getRegistry();
 
 		UpgradeStepRegistrator upgradeStepRegistror = registry.getService(
-			"com.liferay.segments.content.targeting.upgrade.internal." +
-				"SegmentsContentTargetingUpgrade");
+			registry.getServiceReference(
+				"com.liferay.segments.content.targeting.upgrade.internal." +
+					"SegmentsContentTargetingUpgrade"));
 
 		upgradeStepRegistror.register(
 			new UpgradeStepRegistrator.Registry() {
-
-				@Override
-				public void register(
-					String bundleSymbolicName, String fromSchemaVersionString,
-					String toSchemaVersionString, UpgradeStep... upgradeSteps) {
-
-					register(
-						fromSchemaVersionString, toSchemaVersionString,
-						upgradeSteps);
-				}
 
 				@Override
 				public void register(

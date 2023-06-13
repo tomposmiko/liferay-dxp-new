@@ -79,38 +79,18 @@ public class SolrSearchEngineInformation implements SearchEngineInformation {
 
 			return sb.toString();
 		}
-		catch (Exception e) {
-			_log.error("Could not retrieve node information", e);
+		catch (Exception exception) {
+			_log.error("Could not retrieve node information", exception);
 
 			StringBundler sb = new StringBundler(4);
 
 			sb.append(StringPool.OPEN_PARENTHESIS);
 			sb.append("Error: ");
-			sb.append(e.toString());
+			sb.append(exception.toString());
 			sb.append(StringPool.CLOSE_PARENTHESIS);
 
 			return sb.toString();
 		}
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	@Override
-	public String getStatusString() {
-		StringBundler sb = new StringBundler(8);
-
-		sb.append("Vendor: ");
-		sb.append(getVendorString());
-		sb.append(StringPool.COMMA_AND_SPACE);
-		sb.append("Client Version: ");
-		sb.append(getClientVersionString());
-		sb.append(StringPool.COMMA_AND_SPACE);
-		sb.append("Nodes: ");
-		sb.append(getNodesString());
-
-		return sb.toString();
 	}
 
 	@Override

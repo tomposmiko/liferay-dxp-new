@@ -65,7 +65,7 @@ public abstract class MicroblogsEntryLocalServiceBaseImpl
 	implements AopService, IdentifiableOSGiService,
 			   MicroblogsEntryLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>MicroblogsEntryLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.microblogs.service.MicroblogsEntryLocalServiceUtil</code>.
@@ -384,8 +384,8 @@ public abstract class MicroblogsEntryLocalServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

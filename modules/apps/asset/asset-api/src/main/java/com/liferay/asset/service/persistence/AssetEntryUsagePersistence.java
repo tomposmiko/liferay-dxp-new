@@ -29,13 +29,16 @@ import org.osgi.annotation.versioning.ProviderType;
  *
  * @author Brian Wing Shun Chan
  * @see AssetEntryUsageUtil
+ * @deprecated As of Mueller (7.2.x), replaced by {@link
+ com.liferay.layout.model.impl.LayoutClassedModelUsageImpl}
  * @generated
  */
+@Deprecated
 @ProviderType
 public interface AssetEntryUsagePersistence
 	extends BasePersistence<AssetEntryUsage> {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link AssetEntryUsageUtil} to access the asset entry usage persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.
@@ -233,6 +236,161 @@ public interface AssetEntryUsagePersistence
 	 * @return the number of matching asset entry usages
 	 */
 	public int countByUUID_G(String uuid, long groupId);
+
+	/**
+	 * Returns all the asset entry usages where uuid = &#63; and companyId = &#63;.
+	 *
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @return the matching asset entry usages
+	 */
+	public java.util.List<AssetEntryUsage> findByUuid_C(
+		String uuid, long companyId);
+
+	/**
+	 * Returns a range of all the asset entry usages where uuid = &#63; and companyId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AssetEntryUsageModelImpl</code>.
+	 * </p>
+	 *
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @param start the lower bound of the range of asset entry usages
+	 * @param end the upper bound of the range of asset entry usages (not inclusive)
+	 * @return the range of matching asset entry usages
+	 */
+	public java.util.List<AssetEntryUsage> findByUuid_C(
+		String uuid, long companyId, int start, int end);
+
+	/**
+	 * Returns an ordered range of all the asset entry usages where uuid = &#63; and companyId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AssetEntryUsageModelImpl</code>.
+	 * </p>
+	 *
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @param start the lower bound of the range of asset entry usages
+	 * @param end the upper bound of the range of asset entry usages (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching asset entry usages
+	 */
+	public java.util.List<AssetEntryUsage> findByUuid_C(
+		String uuid, long companyId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<AssetEntryUsage>
+			orderByComparator);
+
+	/**
+	 * Returns an ordered range of all the asset entry usages where uuid = &#63; and companyId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>AssetEntryUsageModelImpl</code>.
+	 * </p>
+	 *
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @param start the lower bound of the range of asset entry usages
+	 * @param end the upper bound of the range of asset entry usages (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the ordered range of matching asset entry usages
+	 */
+	public java.util.List<AssetEntryUsage> findByUuid_C(
+		String uuid, long companyId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<AssetEntryUsage>
+			orderByComparator,
+		boolean useFinderCache);
+
+	/**
+	 * Returns the first asset entry usage in the ordered set where uuid = &#63; and companyId = &#63;.
+	 *
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching asset entry usage
+	 * @throws NoSuchEntryUsageException if a matching asset entry usage could not be found
+	 */
+	public AssetEntryUsage findByUuid_C_First(
+			String uuid, long companyId,
+			com.liferay.portal.kernel.util.OrderByComparator<AssetEntryUsage>
+				orderByComparator)
+		throws NoSuchEntryUsageException;
+
+	/**
+	 * Returns the first asset entry usage in the ordered set where uuid = &#63; and companyId = &#63;.
+	 *
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching asset entry usage, or <code>null</code> if a matching asset entry usage could not be found
+	 */
+	public AssetEntryUsage fetchByUuid_C_First(
+		String uuid, long companyId,
+		com.liferay.portal.kernel.util.OrderByComparator<AssetEntryUsage>
+			orderByComparator);
+
+	/**
+	 * Returns the last asset entry usage in the ordered set where uuid = &#63; and companyId = &#63;.
+	 *
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching asset entry usage
+	 * @throws NoSuchEntryUsageException if a matching asset entry usage could not be found
+	 */
+	public AssetEntryUsage findByUuid_C_Last(
+			String uuid, long companyId,
+			com.liferay.portal.kernel.util.OrderByComparator<AssetEntryUsage>
+				orderByComparator)
+		throws NoSuchEntryUsageException;
+
+	/**
+	 * Returns the last asset entry usage in the ordered set where uuid = &#63; and companyId = &#63;.
+	 *
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching asset entry usage, or <code>null</code> if a matching asset entry usage could not be found
+	 */
+	public AssetEntryUsage fetchByUuid_C_Last(
+		String uuid, long companyId,
+		com.liferay.portal.kernel.util.OrderByComparator<AssetEntryUsage>
+			orderByComparator);
+
+	/**
+	 * Returns the asset entry usages before and after the current asset entry usage in the ordered set where uuid = &#63; and companyId = &#63;.
+	 *
+	 * @param assetEntryUsageId the primary key of the current asset entry usage
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next asset entry usage
+	 * @throws NoSuchEntryUsageException if a asset entry usage with the primary key could not be found
+	 */
+	public AssetEntryUsage[] findByUuid_C_PrevAndNext(
+			long assetEntryUsageId, String uuid, long companyId,
+			com.liferay.portal.kernel.util.OrderByComparator<AssetEntryUsage>
+				orderByComparator)
+		throws NoSuchEntryUsageException;
+
+	/**
+	 * Removes all the asset entry usages where uuid = &#63; and companyId = &#63; from the database.
+	 *
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 */
+	public void removeByUuid_C(String uuid, long companyId);
+
+	/**
+	 * Returns the number of asset entry usages where uuid = &#63; and companyId = &#63;.
+	 *
+	 * @param uuid the uuid
+	 * @param companyId the company ID
+	 * @return the number of matching asset entry usages
+	 */
+	public int countByUuid_C(String uuid, long companyId);
 
 	/**
 	 * Returns all the asset entry usages where assetEntryId = &#63;.

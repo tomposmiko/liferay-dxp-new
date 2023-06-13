@@ -42,7 +42,7 @@ public interface LayoutPageTemplateEntryModel
 	extends BaseModel<LayoutPageTemplateEntry>, MVCCModel, ShardedModel,
 			StagedGroupedModel, TypedModel, WorkflowedModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a layout page template entry model instance should use the {@link LayoutPageTemplateEntry} interface instead.

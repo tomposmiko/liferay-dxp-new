@@ -17,10 +17,9 @@ package com.liferay.dynamic.data.mapping.form.field.type.internal.radio;
 import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.render.DDMFormFieldRenderingContext;
-import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -43,20 +42,17 @@ public class RadioDDMFormFieldContextHelper {
 		List<Object> options = new ArrayList<>();
 
 		for (String optionValue : _ddmFormFieldOptions.getOptionsValues()) {
-			Map<String, String> optionMap = new HashMap<>();
+			Map<String, String> optionMap = HashMapBuilder.put(
+				"label",
+				() -> {
+					LocalizedValue optionLabel =
+						_ddmFormFieldOptions.getOptionLabels(optionValue);
 
-			LocalizedValue optionLabel = _ddmFormFieldOptions.getOptionLabels(
-				optionValue);
-
-			String optionLabelString = optionLabel.getString(_locale);
-
-			if (ddmFormFieldRenderingContext.isViewMode()) {
-				optionLabelString = HtmlUtil.extractText(optionLabelString);
-			}
-
-			optionMap.put("label", optionLabelString);
-
-			optionMap.put("value", optionValue);
+					return optionLabel.getString(_locale);
+				}
+			).put(
+				"value", optionValue
+			).build();
 
 			options.add(optionMap);
 		}

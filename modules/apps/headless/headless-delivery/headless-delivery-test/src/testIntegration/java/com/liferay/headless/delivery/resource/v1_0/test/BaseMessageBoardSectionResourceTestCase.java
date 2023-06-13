@@ -1141,7 +1141,7 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 					{
 						put("page", 1);
 						put("pageSize", 2);
-						put("siteId", testGroup.getGroupId());
+						put("siteKey", "\"" + testGroup.getGroupId() + "\"");
 					}
 				},
 				graphQLFields.toArray(new GraphQLField[0])));
@@ -1314,6 +1314,27 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 				sb.append(", ");
 			}
 
+			if (Objects.equals(
+					"parentMessageBoardSectionId", additionalAssertFieldName)) {
+
+				sb.append(additionalAssertFieldName);
+				sb.append(": ");
+
+				Object value =
+					messageBoardSection.getParentMessageBoardSectionId();
+
+				if (value instanceof String) {
+					sb.append("\"");
+					sb.append(value);
+					sb.append("\"");
+				}
+				else {
+					sb.append(value);
+				}
+
+				sb.append(", ");
+			}
+
 			if (Objects.equals("siteId", additionalAssertFieldName)) {
 				sb.append(additionalAssertFieldName);
 				sb.append(": ");
@@ -1381,7 +1402,7 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 				"createSiteMessageBoardSection",
 				new HashMap<String, Object>() {
 					{
-						put("siteId", testGroup.getGroupId());
+						put("siteKey", "\"" + testGroup.getGroupId() + "\"");
 						put("messageBoardSection", sb.toString());
 					}
 				},
@@ -1507,6 +1528,14 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
 
+			if (Objects.equals("actions", additionalAssertFieldName)) {
+				if (messageBoardSection.getActions() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("creator", additionalAssertFieldName)) {
 				if (messageBoardSection.getCreator() == null) {
 					valid = false;
@@ -1548,6 +1577,18 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 					"numberOfMessageBoardThreads", additionalAssertFieldName)) {
 
 				if (messageBoardSection.getNumberOfMessageBoardThreads() ==
+						null) {
+
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"parentMessageBoardSectionId", additionalAssertFieldName)) {
+
+				if (messageBoardSection.getParentMessageBoardSectionId() ==
 						null) {
 
 					valid = false;
@@ -1644,6 +1685,17 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
 
+			if (Objects.equals("actions", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						messageBoardSection1.getActions(),
+						messageBoardSection2.getActions())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("creator", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						messageBoardSection1.getCreator(),
@@ -1732,6 +1784,20 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 						messageBoardSection1.getNumberOfMessageBoardThreads(),
 						messageBoardSection2.
 							getNumberOfMessageBoardThreads())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"parentMessageBoardSectionId", additionalAssertFieldName)) {
+
+				if (!Objects.deepEquals(
+						messageBoardSection1.getParentMessageBoardSectionId(),
+						messageBoardSection2.
+							getParentMessageBoardSectionId())) {
 
 					return false;
 				}
@@ -1828,6 +1894,17 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("parentMessageBoardSectionId", fieldName)) {
+				if (!Objects.deepEquals(
+						messageBoardSection.getParentMessageBoardSectionId(),
+						jsonObject.getLong("parentMessageBoardSectionId"))) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("subscribed", fieldName)) {
 				if (!Objects.deepEquals(
 						messageBoardSection.getSubscribed(),
@@ -1907,6 +1984,11 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 		sb.append(" ");
 		sb.append(operator);
 		sb.append(" ");
+
+		if (entityFieldName.equals("actions")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
 
 		if (entityFieldName.equals("creator")) {
 			throw new IllegalArgumentException(
@@ -2009,6 +2091,11 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("parentMessageBoardSectionId")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
 		if (entityFieldName.equals("siteId")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
@@ -2062,6 +2149,7 @@ public abstract class BaseMessageBoardSectionResourceTestCase {
 				id = RandomTestUtil.randomLong();
 				numberOfMessageBoardSections = RandomTestUtil.randomInt();
 				numberOfMessageBoardThreads = RandomTestUtil.randomInt();
+				parentMessageBoardSectionId = RandomTestUtil.randomLong();
 				siteId = testGroup.getGroupId();
 				subscribed = RandomTestUtil.randomBoolean();
 				title = RandomTestUtil.randomString();

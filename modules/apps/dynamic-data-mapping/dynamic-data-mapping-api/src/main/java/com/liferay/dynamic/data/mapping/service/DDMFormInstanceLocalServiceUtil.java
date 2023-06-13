@@ -32,7 +32,7 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class DDMFormInstanceLocalServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.dynamic.data.mapping.service.impl.DDMFormInstanceLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
@@ -118,21 +118,6 @@ public class DDMFormInstanceLocalServiceUtil {
 
 		getService().addFormInstanceResources(
 			ddmFormInstance, modelPermissions);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #addFormInstanceResources(DDMFormInstance, ModelPermissions)}
-	 */
-	@Deprecated
-	public static void addFormInstanceResources(
-			com.liferay.dynamic.data.mapping.model.DDMFormInstance
-				ddmFormInstance,
-			String[] groupPermissions, String[] guestPermissions)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		getService().addFormInstanceResources(
-			ddmFormInstance, groupPermissions, guestPermissions);
 	}
 
 	/**

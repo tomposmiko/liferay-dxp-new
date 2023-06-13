@@ -15,8 +15,6 @@
 package com.liferay.headless.delivery.resource.v1_0;
 
 import com.liferay.headless.delivery.dto.v1_0.WikiNode;
-import com.liferay.portal.kernel.model.Company;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
@@ -52,10 +50,6 @@ public interface WikiNodeResource {
 	public WikiNode postSiteWikiNode(Long siteId, WikiNode wikiNode)
 		throws Exception;
 
-	public void putWikiNodeSubscribe(Long wikiNodeId) throws Exception;
-
-	public void putWikiNodeUnsubscribe(Long wikiNodeId) throws Exception;
-
 	public void deleteWikiNode(Long wikiNodeId) throws Exception;
 
 	public WikiNode getWikiNode(Long wikiNodeId) throws Exception;
@@ -63,11 +57,16 @@ public interface WikiNodeResource {
 	public WikiNode putWikiNode(Long wikiNodeId, WikiNode wikiNode)
 		throws Exception;
 
+	public void putWikiNodeSubscribe(Long wikiNodeId) throws Exception;
+
+	public void putWikiNodeUnsubscribe(Long wikiNodeId) throws Exception;
+
 	public default void setContextAcceptLanguage(
 		AcceptLanguage contextAcceptLanguage) {
 	}
 
-	public void setContextCompany(Company contextCompany);
+	public void setContextCompany(
+		com.liferay.portal.kernel.model.Company contextCompany);
 
 	public default void setContextHttpServletRequest(
 		HttpServletRequest contextHttpServletRequest) {
@@ -80,6 +79,7 @@ public interface WikiNodeResource {
 	public default void setContextUriInfo(UriInfo contextUriInfo) {
 	}
 
-	public void setContextUser(User contextUser);
+	public void setContextUser(
+		com.liferay.portal.kernel.model.User contextUser);
 
 }

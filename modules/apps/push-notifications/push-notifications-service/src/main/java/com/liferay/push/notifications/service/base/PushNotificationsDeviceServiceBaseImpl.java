@@ -47,7 +47,7 @@ public abstract class PushNotificationsDeviceServiceBaseImpl
 	implements AopService, IdentifiableOSGiService,
 			   PushNotificationsDeviceService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>PushNotificationsDeviceService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.push.notifications.service.PushNotificationsDeviceServiceUtil</code>.
@@ -103,8 +103,8 @@ public abstract class PushNotificationsDeviceServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

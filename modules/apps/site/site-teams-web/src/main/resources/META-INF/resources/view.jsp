@@ -17,9 +17,9 @@
 <%@ include file="/init.jsp" %>
 
 <%
-SiteTeamsDisplayContext siteTeamsDisplayContext = new SiteTeamsDisplayContext(renderRequest, renderResponse, request);
+SiteTeamsDisplayContext siteTeamsDisplayContext = new SiteTeamsDisplayContext(request, renderRequest, renderResponse);
 
-SiteTeamsManagementToolbarDisplayContext siteTeamsManagementToolbarDisplayContext = new SiteTeamsManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, siteTeamsDisplayContext);
+SiteTeamsManagementToolbarDisplayContext siteTeamsManagementToolbarDisplayContext = new SiteTeamsManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, siteTeamsDisplayContext);
 %>
 
 <clay:management-toolbar

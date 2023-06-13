@@ -16,23 +16,28 @@ package com.liferay.layout.util.template;
 
 import com.liferay.portal.kernel.model.Layout;
 
+import java.util.Locale;
+
 /**
  * @author Eudaldo Alonso
  */
 public interface LayoutConverter {
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #convert(Layout, Locale)}
+	 */
+	@Deprecated
 	public LayoutData convert(Layout layout);
 
+	public default LayoutConversionResult convert(
+		Layout layout, Locale locale) {
+
+		return LayoutConversionResult.of(convert(layout), new String[0]);
+	}
+
 	public default boolean isConvertible(Layout layout) {
-		if (LayoutTypeSettingsInspectorUtil.hasNestedPortletsPortlet(
-				layout.getTypeSettingsProperties())) {
-
-			return false;
-		}
-
-		if (LayoutTypeSettingsInspectorUtil.isCustomizableLayout(
-				layout.getTypeSettingsProperties())) {
-
+		if (layout.isTypeContent()) {
 			return false;
 		}
 

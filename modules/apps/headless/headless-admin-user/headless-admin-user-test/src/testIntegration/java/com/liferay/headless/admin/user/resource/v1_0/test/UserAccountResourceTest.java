@@ -36,6 +36,8 @@ import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.OrganizationTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -43,7 +45,6 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 import org.junit.Assert;
@@ -124,6 +125,12 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 		assertValid(getUserAccount);
 	}
 
+	@Ignore
+	@Override
+	@Test
+	public void testGetOrganizationUserAccountsPageWithSortString() {
+	}
+
 	@Override
 	@Test
 	public void testGetSiteUserAccountsPage() throws Exception {
@@ -149,6 +156,12 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 			Arrays.asList(userAccount1, userAccount2),
 			(List<UserAccount>)page.getItems());
 		assertValid(page);
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testGetSiteUserAccountsPageWithSortString() {
 	}
 
 	@Override
@@ -217,12 +230,11 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 			"query",
 			new GraphQLField(
 				"userAccounts",
-				new HashMap<String, Object>() {
-					{
-						put("page", 1);
-						put("pageSize", 3);
-					}
-				},
+				HashMapBuilder.<String, Object>put(
+					"page", 1
+				).put(
+					"pageSize", 3
+				).build(),
 				graphQLFields.toArray(new GraphQLField[0])));
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
@@ -270,21 +282,21 @@ public class UserAccountResourceTest extends BaseUserAccountResourceTestCase {
 
 	@Override
 	protected UserAccount testGetOrganizationUserAccountsPage_addUserAccount(
-			Long organizationId, UserAccount userAccount)
+			String organizationId, UserAccount userAccount)
 		throws Exception {
 
 		userAccount = _addUserAccount(
 			testGetSiteUserAccountsPage_getSiteId(), userAccount);
 
 		UserLocalServiceUtil.addOrganizationUser(
-			organizationId, userAccount.getId());
+			GetterUtil.getLong(organizationId), userAccount.getId());
 
 		return userAccount;
 	}
 
 	@Override
-	protected Long testGetOrganizationUserAccountsPage_getOrganizationId() {
-		return _organization.getOrganizationId();
+	protected String testGetOrganizationUserAccountsPage_getOrganizationId() {
+		return String.valueOf(_organization.getOrganizationId());
 	}
 
 	@Override

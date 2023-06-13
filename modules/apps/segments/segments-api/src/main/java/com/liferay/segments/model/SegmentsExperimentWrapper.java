@@ -438,11 +438,6 @@ public class SegmentsExperimentWrapper
 		return model.getWinnerSegmentsExperienceKey();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a segments experiment model instance should use the <code>SegmentsExperiment</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

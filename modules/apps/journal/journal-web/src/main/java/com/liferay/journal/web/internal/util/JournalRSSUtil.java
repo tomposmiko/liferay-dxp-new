@@ -17,6 +17,7 @@ package com.liferay.journal.web.internal.util;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.kernel.util.ImageProcessorUtil;
+import com.liferay.document.library.util.DLURLHelper;
 import com.liferay.journal.exception.NoSuchFeedException;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalArticleConstants;
@@ -32,6 +33,8 @@ import com.liferay.journal.util.comparator.ArticleModifiedDateComparator;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -220,9 +223,9 @@ public class JournalRSSUtil {
 						groupId, folderId, title);
 				}
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(e, e);
+					_log.warn(exception, exception);
 				}
 			}
 		}
@@ -235,9 +238,9 @@ public class JournalRSSUtil {
 
 				fileEntry = _dlAppLocalService.getFileEntry(fileEntryId);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(e, e);
+					_log.warn(exception, exception);
 				}
 			}
 		}
@@ -251,9 +254,9 @@ public class JournalRSSUtil {
 				fileEntry = _dlAppLocalService.getFileEntryByUuidAndGroupId(
 					uuid, groupId);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(e, e);
+					_log.warn(exception, exception);
 				}
 			}
 		}
@@ -333,9 +336,9 @@ public class JournalRSSUtil {
 
 				image = _imageLocalService.getImage(imageId);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(e, e);
+					_log.warn(exception, exception);
 				}
 			}
 		}
@@ -358,7 +361,7 @@ public class JournalRSSUtil {
 			try {
 				feed = _journalFeedLocalService.getFeed(id);
 			}
-			catch (NoSuchFeedException nsfe) {
+			catch (NoSuchFeedException noSuchFeedException) {
 
 				// Backward compatibility with old URLs
 
@@ -433,9 +436,9 @@ public class JournalRSSUtil {
 					resourceRequest, resourceResponse, feed, article,
 					languageId, themeDisplay, syndEntry, syndContent);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(e, e);
+					_log.warn(exception, exception);
 				}
 			}
 
@@ -549,22 +552,6 @@ public class JournalRSSUtil {
 		return null;
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #processContent(ResourceRequest, ResourceResponse,
-	 *             JournalFeed, JournalArticle, String, ThemeDisplay, SyndEntry,
-	 *             SyndContent)}
-	 */
-	@Deprecated
-	protected String processContent(
-			JournalFeed feed, JournalArticle article, String languageId,
-			ThemeDisplay themeDisplay, SyndEntry syndEntry,
-			SyndContent syndContent)
-		throws Exception {
-
-		return StringPool.BLANK;
-	}
-
 	protected String processContent(
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse,
 			JournalFeed feed, JournalArticle article, String languageId,
@@ -624,7 +611,26 @@ public class JournalRSSUtil {
 			if (elType.equals("document_library")) {
 				String url = element.elementText("dynamic-content");
 
-				url = processURL(feed, url, themeDisplay, syndEntry);
+				JSONObject jsonObject = JSONFactoryUtil.createJSONObject(url);
+
+				String uuid = jsonObject.getString("uuid");
+				long groupId = jsonObject.getLong("groupId");
+
+				if (Validator.isNotNull(uuid) && (groupId > 0)) {
+					FileEntry fileEntry =
+						_dlAppLocalService.getFileEntryByUuidAndGroupId(
+							uuid, groupId);
+
+					url = _dlURLHelper.getPreviewURL(
+						fileEntry, fileEntry.getFileVersion(), null,
+						StringPool.BLANK, false, true);
+
+					url = processURL(feed, url, themeDisplay, syndEntry);
+
+					content = StringBundler.concat(
+						content, "<br /><br /><a href=\"",
+						themeDisplay.getURLPortal(), url, "\" />");
+				}
 			}
 			else if (elType.equals("image") || elType.equals("image_gallery")) {
 				String url = element.elementText("dynamic-content");
@@ -632,8 +638,8 @@ public class JournalRSSUtil {
 				url = processURL(feed, url, themeDisplay, syndEntry);
 
 				content = StringBundler.concat(
-					content, "<br /><br /><img alt='' src='",
-					themeDisplay.getURLPortal(), url, "' />");
+					content, "<br /><br /><img alt=\"\" src=\"\"",
+					themeDisplay.getURLPortal(), url, "\"\" />");
 			}
 			else if (elType.equals("text_box")) {
 				syndContent.setType("text");
@@ -676,65 +682,37 @@ public class JournalRSSUtil {
 		return url;
 	}
 
-	@Reference(unbind = "-")
-	protected void setDLAppLocalService(DLAppLocalService dlAppLocalService) {
-		_dlAppLocalService = dlAppLocalService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setImageLocalService(ImageLocalService imageLocalService) {
-		_imageLocalService = imageLocalService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setJournalArticleLocalService(
-		JournalArticleLocalService journalArticleLocalService) {
-
-		_journalArticleLocalService = journalArticleLocalService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setJournalContent(JournalContent journalContent) {
-		_journalContent = journalContent;
-	}
-
-	@Reference(unbind = "-")
-	protected void setJournalContentSearchLocalService(
-		JournalContentSearchLocalService journalContentSearchLocalService) {
-
-		_journalContentSearchLocalService = journalContentSearchLocalService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setJournalFeedLocalService(
-		JournalFeedLocalService journalFeedLocalService) {
-
-		_journalFeedLocalService = journalFeedLocalService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setLayoutLocalService(
-		LayoutLocalService layoutLocalService) {
-
-		_layoutLocalService = layoutLocalService;
-	}
-
 	private static final String _XML_REQUUEST =
 		"<request><parameters><parameter><name>rss</name><value>true</value>" +
 			"</parameter></parameters></request>";
 
 	private static final Log _log = LogFactoryUtil.getLog(JournalRSSUtil.class);
 
+	@Reference
 	private DLAppLocalService _dlAppLocalService;
+
+	@Reference
+	private DLURLHelper _dlURLHelper;
 
 	@Reference
 	private Http _http;
 
+	@Reference
 	private ImageLocalService _imageLocalService;
+
+	@Reference
 	private JournalArticleLocalService _journalArticleLocalService;
+
+	@Reference
 	private JournalContent _journalContent;
+
+	@Reference
 	private JournalContentSearchLocalService _journalContentSearchLocalService;
+
+	@Reference
 	private JournalFeedLocalService _journalFeedLocalService;
+
+	@Reference
 	private LayoutLocalService _layoutLocalService;
 
 	@Reference

@@ -19,6 +19,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.DisplayTerms;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.language.Language;
+import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.search.Document;
@@ -134,7 +135,7 @@ public class SearchResultsPortlet extends MVCPortlet {
 		throws PortletException {
 
 		SearchResultsPortletDisplayContext searchResultsPortletDisplayContext =
-			new SearchResultsPortletDisplayContext();
+			createSearchResultsPortletDisplayContext(renderRequest);
 
 		SearchResultsSummariesHolder searchResultsSummariesHolder =
 			buildSummaries(
@@ -175,7 +176,10 @@ public class SearchResultsPortlet extends MVCPortlet {
 
 		searchResultsPortletDisplayContext.setSearchResultsSummariesHolder(
 			searchResultsSummariesHolder);
-
+		searchResultsPortletDisplayContext.
+			setSearchResultSummaryDisplayContexts(
+				searchResultsPortletDisplayContext.
+					translateSearchResultSummaryDisplayContexts(documents));
 		searchResultsPortletDisplayContext.setTotalHits(
 			searchResponse.getTotalHits());
 
@@ -220,14 +224,26 @@ public class SearchResultsPortlet extends MVCPortlet {
 			return doBuildSummaries(
 				portletSharedSearchResponse, renderRequest, renderResponse);
 		}
-		catch (PortletException pe) {
-			throw pe;
+		catch (PortletException portletException) {
+			throw portletException;
 		}
-		catch (RuntimeException re) {
-			throw re;
+		catch (RuntimeException runtimeException) {
+			throw runtimeException;
 		}
-		catch (Exception e) {
-			throw new PortletException(e);
+		catch (Exception exception) {
+			throw new PortletException(exception);
+		}
+	}
+
+	protected SearchResultsPortletDisplayContext
+		createSearchResultsPortletDisplayContext(RenderRequest renderRequest) {
+
+		try {
+			return new SearchResultsPortletDisplayContext(
+				getHttpServletRequest(renderRequest));
+		}
+		catch (ConfigurationException configurationException) {
+			throw new RuntimeException(configurationException);
 		}
 	}
 

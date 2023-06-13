@@ -27,6 +27,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ContactConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.InetAddressUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -188,8 +189,8 @@ public class JabberImpl implements Jabber {
 
 			return jabberBuddies;
 		}
-		catch (Exception e) {
-			_log.error("Unable to get Jabber buddies", e);
+		catch (Exception exception) {
+			_log.error("Unable to get Jabber buddies", exception);
 
 			return buddies;
 		}
@@ -200,8 +201,8 @@ public class JabberImpl implements Jabber {
 		try {
 			connect(userId, password);
 		}
-		catch (XMPPException xmppe1) {
-			String message1 = xmppe1.getMessage();
+		catch (XMPPException xmppException1) {
+			String message1 = xmppException1.getMessage();
 
 			if (Validator.isNotNull(message1) &&
 				message1.contains("not-authorized")) {
@@ -226,8 +227,8 @@ public class JabberImpl implements Jabber {
 
 					connect(userId, password);
 				}
-				catch (XMPPException xmppe2) {
-					String message2 = xmppe2.getMessage();
+				catch (XMPPException xmppException2) {
+					String message2 = xmppException2.getMessage();
 
 					if (message2.contains("conflict(409)")) {
 						_log.error(
@@ -237,13 +238,13 @@ public class JabberImpl implements Jabber {
 								"synchronized with Jabber"));
 					}
 				}
-				catch (Exception e) {
-					_log.error(e, e);
+				catch (Exception exception) {
+					_log.error(exception, exception);
 				}
 			}
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 	}
 
@@ -302,17 +303,17 @@ public class JabberImpl implements Jabber {
 				try {
 					chat.sendMessage(content);
 				}
-				catch (XMPPException xmppe) {
+				catch (XMPPException xmppException) {
 					if (_log.isWarnEnabled()) {
 						_log.warn(
 							"User " + fromUserId + " could not send message",
-							xmppe);
+							xmppException);
 					}
 				}
 			}
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 	}
 
@@ -335,8 +336,9 @@ public class JabberImpl implements Jabber {
 
 			accountManager.changePassword(password);
 		}
-		catch (XMPPException xmppe) {
-			_log.error("Unable to update user " + userId + " password", xmppe);
+		catch (XMPPException xmppException) {
+			_log.error(
+				"Unable to update user " + userId + " password", xmppException);
 		}
 	}
 
@@ -465,12 +467,15 @@ public class JabberImpl implements Jabber {
 
 		User user = _userLocalService.getUserById(userId);
 
-		Map<String, String> attributes = new HashMap<>();
-
-		attributes.put("email", user.getEmailAddress());
-		attributes.put("first", user.getFirstName());
-		attributes.put("last", user.getLastName());
-		attributes.put("name", user.getFullName());
+		Map<String, String> attributes = HashMapBuilder.put(
+			"email", user.getEmailAddress()
+		).put(
+			"first", user.getFirstName()
+		).put(
+			"last", user.getLastName()
+		).put(
+			"name", user.getFullName()
+		).build();
 
 		accountManager.createAccount(
 			user.getScreenName(), password, attributes);
@@ -508,8 +513,8 @@ public class JabberImpl implements Jabber {
 				_onlineUserIds.remove(userId);
 			}
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 	}
 

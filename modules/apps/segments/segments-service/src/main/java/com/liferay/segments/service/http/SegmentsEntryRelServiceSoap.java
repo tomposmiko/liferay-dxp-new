@@ -61,6 +61,12 @@ import java.rmi.RemoteException;
  */
 public class SegmentsEntryRelServiceSoap {
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 com.liferay.segments.service.SegmentsEntryService#addSegmentsEntryClassPKs(
+	 long, long[], ServiceContext)}
+	 */
+	@Deprecated
 	public static com.liferay.segments.model.SegmentsEntryRelSoap
 			addSegmentsEntryRel(
 				long segmentsEntryId, long classNameId, long classPK,
@@ -75,13 +81,19 @@ public class SegmentsEntryRelServiceSoap {
 			return com.liferay.segments.model.SegmentsEntryRelSoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 com.liferay.segments.service.SegmentsEntryService#deleteSegmentsEntryClassPKs(
+	 long, long[])}
+	 */
+	@Deprecated
 	public static void deleteSegmentsEntryRel(long segmentsEntryRelId)
 		throws RemoteException {
 
@@ -89,13 +101,19 @@ public class SegmentsEntryRelServiceSoap {
 			SegmentsEntryRelServiceUtil.deleteSegmentsEntryRel(
 				segmentsEntryRelId);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 com.liferay.segments.service.SegmentsEntryService#deleteSegmentsEntryClassPKs(
+	 long, long[])}
+	 */
+	@Deprecated
 	public static void deleteSegmentsEntryRel(
 			long segmentsEntryId, long classNameId, long classPK)
 		throws RemoteException {
@@ -104,10 +122,10 @@ public class SegmentsEntryRelServiceSoap {
 			SegmentsEntryRelServiceUtil.deleteSegmentsEntryRel(
 				segmentsEntryId, classNameId, classPK);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -123,10 +141,10 @@ public class SegmentsEntryRelServiceSoap {
 			return com.liferay.segments.model.SegmentsEntryRelSoap.toSoapModels(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -146,10 +164,10 @@ public class SegmentsEntryRelServiceSoap {
 			return com.liferay.segments.model.SegmentsEntryRelSoap.toSoapModels(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -165,10 +183,10 @@ public class SegmentsEntryRelServiceSoap {
 			return com.liferay.segments.model.SegmentsEntryRelSoap.toSoapModels(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -182,10 +200,10 @@ public class SegmentsEntryRelServiceSoap {
 
 			return returnValue;
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -200,10 +218,10 @@ public class SegmentsEntryRelServiceSoap {
 
 			return returnValue;
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -218,10 +236,10 @@ public class SegmentsEntryRelServiceSoap {
 
 			return returnValue;
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 

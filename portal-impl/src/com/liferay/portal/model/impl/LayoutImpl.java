@@ -180,12 +180,13 @@ public class LayoutImpl extends LayoutBaseImpl {
 		String keyword = _getFriendlyURLKeyword(friendlyURL);
 
 		if (Validator.isNotNull(keyword)) {
-			LayoutFriendlyURLException lfurle = new LayoutFriendlyURLException(
-				LayoutFriendlyURLException.KEYWORD_CONFLICT);
+			LayoutFriendlyURLException layoutFriendlyURLException =
+				new LayoutFriendlyURLException(
+					LayoutFriendlyURLException.KEYWORD_CONFLICT);
 
-			lfurle.setKeywordConflict(keyword);
+			layoutFriendlyURLException.setKeywordConflict(keyword);
 
-			throw lfurle;
+			throw layoutFriendlyURLException;
 		}
 	}
 
@@ -390,7 +391,7 @@ public class LayoutImpl extends LayoutBaseImpl {
 
 				return theme.getSetting(key);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 			}
 		}
 
@@ -399,7 +400,7 @@ public class LayoutImpl extends LayoutBaseImpl {
 
 			return layoutSet.getThemeSetting(key, device);
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 		}
 
 		return StringPool.BLANK;
@@ -517,7 +518,7 @@ public class LayoutImpl extends LayoutBaseImpl {
 
 			friendlyURL = layoutFriendlyURL.getFriendlyURL();
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 		}
 
 		return friendlyURL;
@@ -580,8 +581,8 @@ public class LayoutImpl extends LayoutBaseImpl {
 		try {
 			return GroupLocalServiceUtil.getGroup(getGroupId());
 		}
-		catch (PortalException pe) {
-			return ReflectionUtil.throwException(pe);
+		catch (PortalException portalException) {
+			return ReflectionUtil.throwException(portalException);
 		}
 	}
 
@@ -649,8 +650,8 @@ public class LayoutImpl extends LayoutBaseImpl {
 				_layoutSet = LayoutSetLocalServiceUtil.getLayoutSet(
 					getGroupId(), isPrivateLayout());
 			}
-			catch (PortalException pe) {
-				ReflectionUtil.throwException(pe);
+			catch (PortalException portalException) {
+				ReflectionUtil.throwException(portalException);
 			}
 		}
 
@@ -725,12 +726,12 @@ public class LayoutImpl extends LayoutBaseImpl {
 			group = GroupLocalServiceUtil.getLayoutGroup(
 				getCompanyId(), getPlid());
 		}
-		catch (NoSuchGroupException nsge) {
+		catch (NoSuchGroupException noSuchGroupException) {
 
 			// LPS-52675
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(nsge, nsge);
+				_log.debug(noSuchGroupException, noSuchGroupException);
 			}
 		}
 
@@ -770,6 +771,12 @@ public class LayoutImpl extends LayoutBaseImpl {
 		String key, String device, boolean inheritLookAndFeel) {
 
 		UnicodeProperties typeSettingsProperties = getTypeSettingsProperties();
+
+		Layout masterLayout = _getMasterLayout();
+
+		if (masterLayout != null) {
+			typeSettingsProperties = masterLayout.getTypeSettingsProperties();
+		}
 
 		String value = typeSettingsProperties.getProperty(
 			ThemeSettingImpl.namespaceProperty(device, key));
@@ -1141,6 +1148,31 @@ public class LayoutImpl extends LayoutBaseImpl {
 	}
 
 	@Override
+	public boolean isTypeAssetDisplay() {
+		if (Objects.equals(getType(), LayoutConstants.TYPE_ASSET_DISPLAY) ||
+			Objects.equals(
+				_getLayoutTypeControllerType(),
+				LayoutConstants.TYPE_ASSET_DISPLAY)) {
+
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean isTypeContent() {
+		if (Objects.equals(getType(), LayoutConstants.TYPE_CONTENT) ||
+			Objects.equals(
+				_getLayoutTypeControllerType(), LayoutConstants.TYPE_CONTENT)) {
+
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
 	public boolean isTypeControlPanel() {
 		if (Objects.equals(getType(), LayoutConstants.TYPE_CONTROL_PANEL) ||
 			Objects.equals(
@@ -1197,19 +1229,6 @@ public class LayoutImpl extends LayoutBaseImpl {
 			Objects.equals(
 				_getLayoutTypeControllerType(), LayoutConstants.TYPE_PORTLET)) {
 
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public boolean isTypeSharedPortlet() {
-		if (Objects.equals(getType(), LayoutConstants.TYPE_SHARED_PORTLET)) {
 			return true;
 		}
 
@@ -1374,6 +1393,21 @@ public class LayoutImpl extends LayoutBaseImpl {
 		return layoutTypePortlet;
 	}
 
+	private Layout _getMasterLayout() {
+		if (_masterLayout != null) {
+			return _masterLayout;
+		}
+
+		if (getMasterLayoutPlid() <= 0) {
+			return null;
+		}
+
+		_masterLayout = LayoutLocalServiceUtil.fetchLayout(
+			getMasterLayoutPlid());
+
+		return _masterLayout;
+	}
+
 	private List<PortletPreferences> _getPortletPreferences(long groupId) {
 		List<PortletPreferences> portletPreferences =
 			PortletPreferencesLocalServiceUtil.getPortletPreferences(
@@ -1424,8 +1458,8 @@ public class LayoutImpl extends LayoutBaseImpl {
 					layoutTypePortlet = _getLayoutTypePortletClone(
 						httpServletRequest);
 				}
-				catch (IOException ioe) {
-					_log.error("Unable to clone layout settings", ioe);
+				catch (IOException ioException) {
+					_log.error("Unable to clone layout settings", ioException);
 
 					layoutTypePortlet = (LayoutTypePortlet)getLayoutType();
 				}
@@ -1443,8 +1477,8 @@ public class LayoutImpl extends LayoutBaseImpl {
 					portletURL.setWindowState(WindowState.NORMAL);
 					portletURL.setPortletMode(PortletMode.VIEW);
 				}
-				catch (PortletException pe) {
-					throw new SystemException(pe);
+				catch (PortletException portletException) {
+					throw new SystemException(portletException);
 				}
 
 				portletURL.setAnchor(false);
@@ -1501,6 +1535,7 @@ public class LayoutImpl extends LayoutBaseImpl {
 
 	private LayoutSet _layoutSet;
 	private transient LayoutType _layoutType;
+	private Layout _masterLayout;
 	private UnicodeProperties _typeSettingsProperties;
 
 }

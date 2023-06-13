@@ -18,6 +18,7 @@ import com.liferay.headless.delivery.client.dto.v1_0.MessageBoardMessage;
 import com.liferay.headless.delivery.client.http.HttpInvoker;
 import com.liferay.headless.delivery.client.pagination.Page;
 import com.liferay.headless.delivery.client.pagination.Pagination;
+import com.liferay.headless.delivery.client.problem.Problem;
 import com.liferay.headless.delivery.client.serdes.v1_0.MessageBoardMessageSerDes;
 
 import java.util.LinkedHashMap;
@@ -125,14 +126,16 @@ public interface MessageBoardMessageResource {
 
 	public Page<MessageBoardMessage>
 			getMessageBoardMessageMessageBoardMessagesPage(
-				Long parentMessageBoardMessageId, String search,
-				String filterString, Pagination pagination, String sortString)
+				Long parentMessageBoardMessageId, Boolean flatten,
+				String search, String filterString, Pagination pagination,
+				String sortString)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse
 			getMessageBoardMessageMessageBoardMessagesPageHttpResponse(
-				Long parentMessageBoardMessageId, String search,
-				String filterString, Pagination pagination, String sortString)
+				Long parentMessageBoardMessageId, Boolean flatten,
+				String search, String filterString, Pagination pagination,
+				String sortString)
 		throws Exception;
 
 	public MessageBoardMessage postMessageBoardMessageMessageBoardMessage(
@@ -166,6 +169,16 @@ public interface MessageBoardMessageResource {
 			postMessageBoardThreadMessageBoardMessageHttpResponse(
 				Long messageBoardThreadId,
 				MessageBoardMessage messageBoardMessage)
+		throws Exception;
+
+	public Page<MessageBoardMessage> getSiteMessageBoardMessagesPage(
+			Long siteId, Boolean flatten, String search, String filterString,
+			Pagination pagination, String sortString)
+		throws Exception;
+
+	public HttpInvoker.HttpResponse getSiteMessageBoardMessagesPageHttpResponse(
+			Long siteId, Boolean flatten, String search, String filterString,
+			Pagination pagination, String sortString)
 		throws Exception;
 
 	public static class Builder {
@@ -237,6 +250,17 @@ public interface MessageBoardMessageResource {
 			_logger.fine("HTTP response message: " + httpResponse.getMessage());
 			_logger.fine(
 				"HTTP response status code: " + httpResponse.getStatusCode());
+
+			try {
+				return;
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
 		}
 
 		public HttpInvoker.HttpResponse deleteMessageBoardMessageHttpResponse(
@@ -299,7 +323,7 @@ public interface MessageBoardMessageResource {
 					Level.WARNING,
 					"Unable to process HTTP response: " + content, e);
 
-				throw e;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 		}
 
@@ -365,7 +389,7 @@ public interface MessageBoardMessageResource {
 					Level.WARNING,
 					"Unable to process HTTP response: " + content, e);
 
-				throw e;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 		}
 
@@ -435,7 +459,7 @@ public interface MessageBoardMessageResource {
 					Level.WARNING,
 					"Unable to process HTTP response: " + content, e);
 
-				throw e;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 		}
 
@@ -495,6 +519,17 @@ public interface MessageBoardMessageResource {
 			_logger.fine("HTTP response message: " + httpResponse.getMessage());
 			_logger.fine(
 				"HTTP response status code: " + httpResponse.getStatusCode());
+
+			try {
+				return;
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
 		}
 
 		public HttpInvoker.HttpResponse
@@ -560,7 +595,7 @@ public interface MessageBoardMessageResource {
 					Level.WARNING,
 					"Unable to process HTTP response: " + content, e);
 
-				throw e;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 		}
 
@@ -629,7 +664,7 @@ public interface MessageBoardMessageResource {
 					Level.WARNING,
 					"Unable to process HTTP response: " + content, e);
 
-				throw e;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 		}
 
@@ -701,7 +736,7 @@ public interface MessageBoardMessageResource {
 					Level.WARNING,
 					"Unable to process HTTP response: " + content, e);
 
-				throw e;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 		}
 
@@ -760,6 +795,17 @@ public interface MessageBoardMessageResource {
 			_logger.fine("HTTP response message: " + httpResponse.getMessage());
 			_logger.fine(
 				"HTTP response status code: " + httpResponse.getStatusCode());
+
+			try {
+				return;
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
 		}
 
 		public HttpInvoker.HttpResponse
@@ -818,6 +864,17 @@ public interface MessageBoardMessageResource {
 			_logger.fine("HTTP response message: " + httpResponse.getMessage());
 			_logger.fine(
 				"HTTP response status code: " + httpResponse.getStatusCode());
+
+			try {
+				return;
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
 		}
 
 		public HttpInvoker.HttpResponse
@@ -863,14 +920,14 @@ public interface MessageBoardMessageResource {
 
 		public Page<MessageBoardMessage>
 				getMessageBoardMessageMessageBoardMessagesPage(
-					Long parentMessageBoardMessageId, String search,
-					String filterString, Pagination pagination,
+					Long parentMessageBoardMessageId, Boolean flatten,
+					String search, String filterString, Pagination pagination,
 					String sortString)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
 				getMessageBoardMessageMessageBoardMessagesPageHttpResponse(
-					parentMessageBoardMessageId, search, filterString,
+					parentMessageBoardMessageId, flatten, search, filterString,
 					pagination, sortString);
 
 			String content = httpResponse.getContent();
@@ -881,13 +938,22 @@ public interface MessageBoardMessageResource {
 			_logger.fine(
 				"HTTP response status code: " + httpResponse.getStatusCode());
 
-			return Page.of(content, MessageBoardMessageSerDes::toDTO);
+			try {
+				return Page.of(content, MessageBoardMessageSerDes::toDTO);
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
 		}
 
 		public HttpInvoker.HttpResponse
 				getMessageBoardMessageMessageBoardMessagesPageHttpResponse(
-					Long parentMessageBoardMessageId, String search,
-					String filterString, Pagination pagination,
+					Long parentMessageBoardMessageId, Boolean flatten,
+					String search, String filterString, Pagination pagination,
 					String sortString)
 			throws Exception {
 
@@ -911,6 +977,10 @@ public interface MessageBoardMessageResource {
 			}
 
 			httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
+
+			if (flatten != null) {
+				httpInvoker.parameter("flatten", String.valueOf(flatten));
+			}
 
 			if (search != null) {
 				httpInvoker.parameter("search", String.valueOf(search));
@@ -968,7 +1038,7 @@ public interface MessageBoardMessageResource {
 					Level.WARNING,
 					"Unable to process HTTP response: " + content, e);
 
-				throw e;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 		}
 
@@ -1034,7 +1104,16 @@ public interface MessageBoardMessageResource {
 			_logger.fine(
 				"HTTP response status code: " + httpResponse.getStatusCode());
 
-			return Page.of(content, MessageBoardMessageSerDes::toDTO);
+			try {
+				return Page.of(content, MessageBoardMessageSerDes::toDTO);
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
 		}
 
 		public HttpInvoker.HttpResponse
@@ -1121,7 +1200,7 @@ public interface MessageBoardMessageResource {
 					Level.WARNING,
 					"Unable to process HTTP response: " + content, e);
 
-				throw e;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 		}
 
@@ -1160,6 +1239,99 @@ public interface MessageBoardMessageResource {
 					_builder._port +
 						"/o/headless-delivery/v1.0/message-board-threads/{messageBoardThreadId}/message-board-messages",
 				messageBoardThreadId);
+
+			httpInvoker.userNameAndPassword(
+				_builder._login + ":" + _builder._password);
+
+			return httpInvoker.invoke();
+		}
+
+		public Page<MessageBoardMessage> getSiteMessageBoardMessagesPage(
+				Long siteId, Boolean flatten, String search,
+				String filterString, Pagination pagination, String sortString)
+			throws Exception {
+
+			HttpInvoker.HttpResponse httpResponse =
+				getSiteMessageBoardMessagesPageHttpResponse(
+					siteId, flatten, search, filterString, pagination,
+					sortString);
+
+			String content = httpResponse.getContent();
+
+			_logger.fine("HTTP response content: " + content);
+
+			_logger.fine("HTTP response message: " + httpResponse.getMessage());
+			_logger.fine(
+				"HTTP response status code: " + httpResponse.getStatusCode());
+
+			try {
+				return Page.of(content, MessageBoardMessageSerDes::toDTO);
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
+		}
+
+		public HttpInvoker.HttpResponse
+				getSiteMessageBoardMessagesPageHttpResponse(
+					Long siteId, Boolean flatten, String search,
+					String filterString, Pagination pagination,
+					String sortString)
+			throws Exception {
+
+			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
+
+			if (_builder._locale != null) {
+				httpInvoker.header(
+					"Accept-Language", _builder._locale.toLanguageTag());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._headers.entrySet()) {
+
+				httpInvoker.header(entry.getKey(), entry.getValue());
+			}
+
+			for (Map.Entry<String, String> entry :
+					_builder._parameters.entrySet()) {
+
+				httpInvoker.parameter(entry.getKey(), entry.getValue());
+			}
+
+			httpInvoker.httpMethod(HttpInvoker.HttpMethod.GET);
+
+			if (flatten != null) {
+				httpInvoker.parameter("flatten", String.valueOf(flatten));
+			}
+
+			if (search != null) {
+				httpInvoker.parameter("search", String.valueOf(search));
+			}
+
+			if (filterString != null) {
+				httpInvoker.parameter("filter", filterString);
+			}
+
+			if (pagination != null) {
+				httpInvoker.parameter(
+					"page", String.valueOf(pagination.getPage()));
+				httpInvoker.parameter(
+					"pageSize", String.valueOf(pagination.getPageSize()));
+			}
+
+			if (sortString != null) {
+				httpInvoker.parameter("sort", sortString);
+			}
+
+			httpInvoker.path(
+				_builder._scheme + "://" + _builder._host + ":" +
+					_builder._port +
+						"/o/headless-delivery/v1.0/sites/{siteId}/message-board-messages",
+				siteId);
 
 			httpInvoker.userNameAndPassword(
 				_builder._login + ":" + _builder._password);

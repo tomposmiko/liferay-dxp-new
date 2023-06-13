@@ -47,13 +47,13 @@ public class UserGroupsManagementToolbarDisplayContext
 	extends SearchContainerManagementToolbarDisplayContext {
 
 	public UserGroupsManagementToolbarDisplayContext(
+		HttpServletRequest httpServletRequest,
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
-		HttpServletRequest httpServletRequest,
 		UserGroupsDisplayContext userGroupsDisplayContext) {
 
 		super(
-			liferayPortletRequest, liferayPortletResponse, httpServletRequest,
+			httpServletRequest, liferayPortletRequest, liferayPortletResponse,
 			userGroupsDisplayContext.getUserGroupSearchContainer());
 
 		_userGroupsDisplayContext = userGroupsDisplayContext;
@@ -83,7 +83,7 @@ public class UserGroupsManagementToolbarDisplayContext
 							});
 					}
 				}
-				catch (Exception e) {
+				catch (Exception exception) {
 				}
 
 				try {
@@ -160,7 +160,7 @@ public class UserGroupsManagementToolbarDisplayContext
 						}
 					}
 				}
-				catch (Exception e) {
+				catch (Exception exception) {
 				}
 			}
 		};
@@ -206,7 +206,7 @@ public class UserGroupsManagementToolbarDisplayContext
 				}
 			};
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			return null;
 		}
 	}
@@ -272,7 +272,7 @@ public class UserGroupsManagementToolbarDisplayContext
 				return true;
 			}
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 		}
 
 		return false;

@@ -1141,7 +1141,7 @@ class RuleEditor extends Component {
 		this.setState({
 			actions: newActions,
 			conditions: rule.conditions,
-			logicalOperator: rule['logical-operator'],
+			logicalOperator: rule['logical-operator'].toLowerCase(),
 			rule: newRule
 		});
 	}

@@ -174,7 +174,7 @@ public class BlogsStatsUserLocalServiceImpl
 			statsUser.setCompanyId(group.getCompanyId());
 			statsUser.setUserId(userId);
 
-			blogsStatsUserPersistence.update(statsUser);
+			statsUser = blogsStatsUserPersistence.update(statsUser);
 		}
 
 		return statsUser;
@@ -200,9 +200,10 @@ public class BlogsStatsUserLocalServiceImpl
 			try {
 				blogsStatsUserPersistence.removeByG_U(groupId, userId);
 			}
-			catch (NoSuchStatsUserException nssue) {
+			catch (NoSuchStatsUserException noSuchStatsUserException) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(nssue, nssue);
+					_log.warn(
+						noSuchStatsUserException, noSuchStatsUserException);
 				}
 			}
 

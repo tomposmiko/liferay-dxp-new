@@ -22,13 +22,13 @@
 taglib uri="http://liferay.com/tld/clay" prefix="clay" %><%@
 taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
 taglib uri="http://liferay.com/tld/portlet" prefix="liferay-portlet" %><%@
+taglib uri="http://liferay.com/tld/react" prefix="react" %><%@
 taglib uri="http://liferay.com/tld/security" prefix="liferay-security" %><%@
 taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
 taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %><%@
 taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 
-<%@ page import="com.liferay.petra.string.StringBundler" %><%@
-page import="com.liferay.petra.string.StringPool" %><%@
+<%@ page import="com.liferay.petra.string.StringPool" %><%@
 page import="com.liferay.portal.kernel.dao.search.ResultRow" %><%@
 page import="com.liferay.portal.kernel.exception.NoSuchLayoutException" %><%@
 page import="com.liferay.portal.kernel.language.LanguageUtil" %><%@
@@ -78,5 +78,6 @@ page import="javax.portlet.PortletURL" %>
 
 <%
 SiteNavigationAdminDisplayContext siteNavigationAdminDisplayContext = (SiteNavigationAdminDisplayContext)renderRequest.getAttribute(SiteNavigationAdminWebKeys.SITE_NAVIGATION_MENU_ADMIN_DISPLAY_CONTEXT);
+
 SiteNavigationMenuItemTypeRegistry siteNavigationMenuItemTypeRegistry = siteNavigationAdminDisplayContext.getSiteNavigationMenuItemTypeRegistry();
 %>

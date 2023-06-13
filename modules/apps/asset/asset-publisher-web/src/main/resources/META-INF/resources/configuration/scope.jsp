@@ -123,9 +123,9 @@ List<Group> selectedGroups = GroupLocalServiceUtil.getGroups(assetPublisherDispl
 <%
 ItemSelector itemSelector = (ItemSelector)request.getAttribute(AssetPublisherWebKeys.ITEM_SELECTOR);
 
-ItemSelectorCriterion itemSelectorCriterion = new SiteItemSelectorCriterion();
+ItemSelectorCriterion itemSelectorCriterion = new GroupItemSelectorCriterion();
 
-itemSelectorCriterion.setDesiredItemSelectorReturnTypes(new SiteItemSelectorReturnType());
+itemSelectorCriterion.setDesiredItemSelectorReturnTypes(new GroupItemSelectorReturnType());
 
 PortletURL itemSelectorURL = itemSelector.getItemSelectorURL(RequestBackedPortletURLFactoryUtil.create(renderRequest), eventName, itemSelectorCriterion);
 

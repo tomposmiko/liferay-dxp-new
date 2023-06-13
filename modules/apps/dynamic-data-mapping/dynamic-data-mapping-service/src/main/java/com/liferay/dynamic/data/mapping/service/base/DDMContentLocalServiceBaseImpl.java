@@ -69,7 +69,7 @@ public abstract class DDMContentLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements AopService, DDMContentLocalService, IdentifiableOSGiService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>DDMContentLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.dynamic.data.mapping.service.DDMContentLocalServiceUtil</code>.
@@ -505,8 +505,8 @@ public abstract class DDMContentLocalServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

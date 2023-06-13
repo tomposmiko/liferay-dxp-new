@@ -68,7 +68,59 @@ public class LayoutSEOEntryServiceSoap {
 	public static com.liferay.layout.seo.model.LayoutSEOEntrySoap
 			updateLayoutSEOEntry(
 				long groupId, boolean privateLayout, long layoutId,
-				boolean enabled, String[] canonicalURLMapLanguageIds,
+				boolean canonicalURLEnabled,
+				String[] canonicalURLMapLanguageIds,
+				String[] canonicalURLMapValues,
+				boolean openGraphDescriptionEnabled,
+				String[] openGraphDescriptionMapLanguageIds,
+				String[] openGraphDescriptionMapValues,
+				String[] openGraphImageAltMapLanguageIds,
+				String[] openGraphImageAltMapValues,
+				long openGraphImageFileEntryId, boolean openGraphTitleEnabled,
+				String[] openGraphTitleMapLanguageIds,
+				String[] openGraphTitleMapValues,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws RemoteException {
+
+		try {
+			Map<Locale, String> canonicalURLMap =
+				LocalizationUtil.getLocalizationMap(
+					canonicalURLMapLanguageIds, canonicalURLMapValues);
+			Map<Locale, String> openGraphDescriptionMap =
+				LocalizationUtil.getLocalizationMap(
+					openGraphDescriptionMapLanguageIds,
+					openGraphDescriptionMapValues);
+			Map<Locale, String> openGraphImageAltMap =
+				LocalizationUtil.getLocalizationMap(
+					openGraphImageAltMapLanguageIds,
+					openGraphImageAltMapValues);
+			Map<Locale, String> openGraphTitleMap =
+				LocalizationUtil.getLocalizationMap(
+					openGraphTitleMapLanguageIds, openGraphTitleMapValues);
+
+			com.liferay.layout.seo.model.LayoutSEOEntry returnValue =
+				LayoutSEOEntryServiceUtil.updateLayoutSEOEntry(
+					groupId, privateLayout, layoutId, canonicalURLEnabled,
+					canonicalURLMap, openGraphDescriptionEnabled,
+					openGraphDescriptionMap, openGraphImageAltMap,
+					openGraphImageFileEntryId, openGraphTitleEnabled,
+					openGraphTitleMap, serviceContext);
+
+			return com.liferay.layout.seo.model.LayoutSEOEntrySoap.toSoapModel(
+				returnValue);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
+	public static com.liferay.layout.seo.model.LayoutSEOEntrySoap
+			updateLayoutSEOEntry(
+				long groupId, boolean privateLayout, long layoutId,
+				boolean enabledCanonicalURLMap,
+				String[] canonicalURLMapLanguageIds,
 				String[] canonicalURLMapValues,
 				com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws RemoteException {
@@ -80,16 +132,16 @@ public class LayoutSEOEntryServiceSoap {
 
 			com.liferay.layout.seo.model.LayoutSEOEntry returnValue =
 				LayoutSEOEntryServiceUtil.updateLayoutSEOEntry(
-					groupId, privateLayout, layoutId, enabled, canonicalURLMap,
-					serviceContext);
+					groupId, privateLayout, layoutId, enabledCanonicalURLMap,
+					canonicalURLMap, serviceContext);
 
 			return com.liferay.layout.seo.model.LayoutSEOEntrySoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 

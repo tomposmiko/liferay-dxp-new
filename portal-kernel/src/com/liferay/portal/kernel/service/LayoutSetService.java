@@ -25,6 +25,8 @@ import com.liferay.portal.kernel.transaction.Transactional;
 import java.io.File;
 import java.io.InputStream;
 
+import java.util.TreeMap;
+
 import org.osgi.annotation.versioning.ProviderType;
 
 /**
@@ -45,7 +47,7 @@ import org.osgi.annotation.versioning.ProviderType;
 )
 public interface LayoutSetService extends BaseService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link LayoutSetServiceUtil} to access the layout set remote service. Add custom service methods to <code>com.liferay.portal.service.impl.LayoutSetServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -109,8 +111,18 @@ public interface LayoutSetService extends BaseService {
 			long groupId, boolean privateLayout, String settings)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #updateVirtualHosts(long, boolean, TreeMap)}
+	 */
+	@Deprecated
 	public LayoutSet updateVirtualHost(
-			long groupId, boolean privateLayout, String virtualHost)
+			long groupId, boolean privateLayout, String virtualHostname)
+		throws PortalException;
+
+	public LayoutSet updateVirtualHosts(
+			long groupId, boolean privateLayout,
+			TreeMap<String, String> virtualHostnames)
 		throws PortalException;
 
 }

@@ -208,13 +208,6 @@ public class PropsUtil {
 		return configuration.getProperties(prefix, removePrefix);
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public static void reload() {
-	}
-
 	public static void removeProperties(
 		Company company, Properties properties) {
 
@@ -260,8 +253,8 @@ public class PropsUtil {
 
 					webId = company.getWebId();
 				}
-				catch (PortalException pe) {
-					_log.error(pe, pe);
+				catch (PortalException portalException) {
+					_log.error(portalException, portalException);
 				}
 
 				configuration = new ConfigurationImpl(

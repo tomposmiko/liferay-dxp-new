@@ -210,9 +210,9 @@ public class DDMTemplateLocalServiceImpl
 			try {
 				smallImageBytes = FileUtil.getBytes(smallImageFile);
 			}
-			catch (IOException ioe) {
+			catch (IOException ioException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(ioe, ioe);
+					_log.debug(ioException, ioException);
 				}
 			}
 
@@ -253,7 +253,7 @@ public class DDMTemplateLocalServiceImpl
 		template.setSmallImageId(counterLocalService.increment());
 		template.setSmallImageURL(smallImageURL);
 
-		ddmTemplatePersistence.update(template);
+		template = ddmTemplatePersistence.update(template);
 
 		// Resources
 
@@ -1433,9 +1433,9 @@ public class DDMTemplateLocalServiceImpl
 			try {
 				smallImageBytes = FileUtil.getBytes(smallImageFile);
 			}
-			catch (IOException ioe) {
+			catch (IOException ioException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(ioe, ioe);
+					_log.debug(ioException, ioException);
 				}
 			}
 
@@ -1500,7 +1500,7 @@ public class DDMTemplateLocalServiceImpl
 			user, template, version, serviceContext);
 
 		if (ddmTemplateVersion.isApproved()) {
-			ddmTemplatePersistence.update(template);
+			template = ddmTemplatePersistence.update(template);
 		}
 
 		return template;
@@ -1580,9 +1580,7 @@ public class DDMTemplateLocalServiceImpl
 		templateVersion.setStatusByUserName(user.getFullName());
 		templateVersion.setStatusDate(template.getModifiedDate());
 
-		ddmTemplateVersionPersistence.update(templateVersion);
-
-		return templateVersion;
+		return ddmTemplateVersionPersistence.update(templateVersion);
 	}
 
 	protected DDMTemplate copyTemplate(
@@ -1609,8 +1607,8 @@ public class DDMTemplateLocalServiceImpl
 			try {
 				script = _ddmXML.validateXML(script);
 			}
-			catch (PortalException pe) {
-				throw new TemplateScriptException(pe);
+			catch (PortalException portalException) {
+				throw new TemplateScriptException(portalException);
 			}
 
 			script = XMLUtil.formatXML(script);
@@ -1658,8 +1656,8 @@ public class DDMTemplateLocalServiceImpl
 				try {
 					FileUtil.write(smallImageFile, smallImage.getTextObj());
 				}
-				catch (IOException ioe) {
-					_log.error(ioe, ioe);
+				catch (IOException ioException) {
+					_log.error(ioException, ioException);
 				}
 			}
 		}
@@ -1678,8 +1676,8 @@ public class DDMTemplateLocalServiceImpl
 					imageLocalService.updateImage(
 						smallImageId, smallImageBytes);
 				}
-				catch (Exception e) {
-					throw new TemplateSmallImageContentException(e);
+				catch (Exception exception) {
+					throw new TemplateSmallImageContentException(exception);
 				}
 			}
 		}

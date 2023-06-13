@@ -23,8 +23,8 @@ import com.liferay.portlet.ratings.service.base.RatingsStatsLocalServiceBaseImpl
 import com.liferay.ratings.kernel.exception.NoSuchStatsException;
 import com.liferay.ratings.kernel.model.RatingsStats;
 
+import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -39,6 +39,11 @@ public class RatingsStatsLocalServiceImpl
 
 		RatingsStats stats = ratingsStatsPersistence.create(statsId);
 
+		Date now = new Date();
+
+		stats.setCreateDate(now);
+		stats.setModifiedDate(now);
+
 		stats.setClassNameId(classNameId);
 		stats.setClassPK(classPK);
 		stats.setTotalEntries(0);
@@ -46,9 +51,9 @@ public class RatingsStatsLocalServiceImpl
 		stats.setAverageScore(0.0);
 
 		try {
-			ratingsStatsPersistence.update(stats);
+			stats = ratingsStatsPersistence.update(stats);
 		}
-		catch (SystemException se) {
+		catch (SystemException systemException) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
 					StringBundler.concat(
@@ -60,7 +65,7 @@ public class RatingsStatsLocalServiceImpl
 				classNameId, classPK, false);
 
 			if (stats == null) {
-				throw se;
+				throw systemException;
 			}
 		}
 
@@ -74,9 +79,9 @@ public class RatingsStatsLocalServiceImpl
 		try {
 			ratingsStatsPersistence.removeByC_C(classNameId, classPK);
 		}
-		catch (NoSuchStatsException nsse) {
+		catch (NoSuchStatsException noSuchStatsException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(nsse, nsse);
+				_log.warn(noSuchStatsException, noSuchStatsException);
 			}
 		}
 
@@ -92,16 +97,6 @@ public class RatingsStatsLocalServiceImpl
 	@Override
 	public RatingsStats getStats(long statsId) throws PortalException {
 		return ratingsStatsPersistence.findByPrimaryKey(statsId);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public List<RatingsStats> getStats(String className, List<Long> classPKs) {
-		return ratingsStatsFinder.findByC_C(
-			classNameLocalService.getClassNameId(className), classPKs);
 	}
 
 	@Override

@@ -620,11 +620,6 @@ public class KaleoLogWrapper
 		return model.isTerminalKaleoNode();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a kaleo log model instance should use the <code>KaleoLog</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

@@ -61,7 +61,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface UserGroupLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link UserGroupLocalServiceUtil} to access the user group local service. Add custom service methods to <code>com.liferay.portal.service.impl.UserGroupLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -128,40 +128,6 @@ public interface UserGroupLocalService
 	public void clearTeamUserGroups(long teamId);
 
 	public void clearUserUserGroups(long userId);
-
-	/**
-	 * Copies the user group's layout to the user.
-	 *
-	 * @param userGroupId the primary key of the user group
-	 * @param userId the primary key of the user
-	 * @deprecated As of Paton (6.1.x)
-	 */
-	@Deprecated
-	public void copyUserGroupLayouts(long userGroupId, long userId)
-		throws PortalException;
-
-	/**
-	 * Copies the user group's layouts to the users who are not already members
-	 * of the user group.
-	 *
-	 * @param userGroupId the primary key of the user group
-	 * @param userIds the primary keys of the users
-	 * @deprecated As of Newton (6.2.x)
-	 */
-	@Deprecated
-	public void copyUserGroupLayouts(long userGroupId, long[] userIds)
-		throws PortalException;
-
-	/**
-	 * Copies the user groups' layouts to the user.
-	 *
-	 * @param userGroupIds the primary keys of the user groups
-	 * @param userId the primary key of the user
-	 * @deprecated As of Newton (6.2.x)
-	 */
-	@Deprecated
-	public void copyUserGroupLayouts(long[] userGroupIds, long userId)
-		throws PortalException;
 
 	/**
 	 * Creates a new user group with the primary key. Does not add the user group to the database.

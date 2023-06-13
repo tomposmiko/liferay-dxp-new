@@ -45,13 +45,13 @@ public class JournalHistoryManagementToolbarDisplayContext
 	extends SearchContainerManagementToolbarDisplayContext {
 
 	public JournalHistoryManagementToolbarDisplayContext(
-		JournalArticle article, LiferayPortletRequest liferayPortletRequest,
-		LiferayPortletResponse liferayPortletResponse,
 		HttpServletRequest httpServletRequest,
+		LiferayPortletRequest liferayPortletRequest,
+		LiferayPortletResponse liferayPortletResponse, JournalArticle article,
 		JournalHistoryDisplayContext journalHistoryDisplayContext) {
 
 		super(
-			liferayPortletRequest, liferayPortletResponse, httpServletRequest,
+			httpServletRequest, liferayPortletRequest, liferayPortletResponse,
 			journalHistoryDisplayContext.getArticleSearchContainer());
 
 		_article = article;
@@ -92,7 +92,7 @@ public class JournalHistoryManagementToolbarDisplayContext
 							});
 					}
 				}
-				catch (Exception e) {
+				catch (Exception exception) {
 				}
 
 				try {
@@ -123,7 +123,7 @@ public class JournalHistoryManagementToolbarDisplayContext
 							});
 					}
 				}
-				catch (Exception e) {
+				catch (Exception exception) {
 				}
 			}
 		};

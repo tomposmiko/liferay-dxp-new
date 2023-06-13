@@ -85,9 +85,7 @@ public class KaleoTaskFormInstanceLocalServiceImpl
 				serviceContext);
 		}
 
-		kaleoTaskFormInstancePersistence.update(kaleoTaskFormInstance);
-
-		return kaleoTaskFormInstance;
+		return kaleoTaskFormInstancePersistence.update(kaleoTaskFormInstance);
 	}
 
 	@Override
@@ -114,6 +112,14 @@ public class KaleoTaskFormInstanceLocalServiceImpl
 
 		kaleoTaskFormInstancePersistence.removeByKaleoInstanceId(
 			kaleoInstanceId);
+	}
+
+	@Override
+	public void deleteKaleoTaskInstanceTokenKaleoTaskFormInstances(
+		long kaleoTaskInstanceTokenId) {
+
+		kaleoTaskFormInstancePersistence.removeByKaleoTaskInstanceTokenId(
+			kaleoTaskInstanceTokenId);
 	}
 
 	@Override

@@ -14,14 +14,17 @@
 
 package com.liferay.portal.search.internal;
 
+import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
+import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
 import com.liferay.petra.executor.PortalExecutorManager;
+import com.liferay.petra.lang.SafeClosable;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.search.IndexWriterHelperUtil;
 import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchEngineHelperUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.util.PropsValues;
@@ -36,14 +39,18 @@ import java.util.concurrent.FutureTask;
 
 import org.apache.commons.lang.time.StopWatch;
 
+import org.osgi.framework.BundleContext;
+
 /**
  * @author Brian Wing Shun Chan
  */
 public class SearchEngineInitializer implements Runnable {
 
 	public SearchEngineInitializer(
-		long companyId, PortalExecutorManager portalExecutorManager) {
+		BundleContext bundleContext, long companyId,
+		PortalExecutorManager portalExecutorManager) {
 
+		_bundleContext = bundleContext;
 		_companyId = companyId;
 		_portalExecutorManager = portalExecutorManager;
 	}
@@ -90,7 +97,7 @@ public class SearchEngineInitializer implements Runnable {
 				Thread.sleep(Time.SECOND * delay);
 			}
 		}
-		catch (InterruptedException ie) {
+		catch (InterruptedException interruptedException) {
 		}
 
 		ExecutorService executorService =
@@ -111,7 +118,16 @@ public class SearchEngineInitializer implements Runnable {
 			List<FutureTask<Void>> futureTasks = new ArrayList<>();
 			Set<String> searchEngineIds = new HashSet<>();
 
-			for (Indexer<?> indexer : IndexerRegistryUtil.getIndexers()) {
+			if (_companyId == CompanyConstants.SYSTEM) {
+				_indexers = ServiceTrackerListFactory.open(
+					_bundleContext, Indexer.class, "(system.index=true)");
+			}
+			else {
+				_indexers = ServiceTrackerListFactory.open(
+					_bundleContext, Indexer.class, "(!(system.index=true))");
+			}
+
+			for (Indexer<?> indexer : _indexers) {
 				String searchEngineId = indexer.getSearchEngineId();
 
 				if (searchEngineIds.add(searchEngineId)) {
@@ -125,12 +141,15 @@ public class SearchEngineInitializer implements Runnable {
 
 						@Override
 						public Void call() throws Exception {
-							BackgroundTaskThreadLocal.setBackgroundTaskId(
-								backgroundTaskId);
+							try (SafeClosable safeClosable =
+									BackgroundTaskThreadLocal.
+										setBackgroundTaskIdWithSafeClosable(
+											backgroundTaskId)) {
 
-							reindex(indexer);
+								reindex(indexer);
 
-							return null;
+								return null;
+							}
 						}
 
 					});
@@ -139,6 +158,8 @@ public class SearchEngineInitializer implements Runnable {
 
 				futureTasks.add(futureTask);
 			}
+
+			_indexers.close();
 
 			for (FutureTask<Void> futureTask : futureTasks) {
 				futureTask.get();
@@ -150,8 +171,8 @@ public class SearchEngineInitializer implements Runnable {
 						(stopWatch.getTime() / Time.SECOND) + " seconds");
 			}
 		}
-		catch (Exception e) {
-			_log.error("Error encountered while reindexing", e);
+		catch (Exception exception) {
+			_log.error("Error encountered while reindexing", exception);
 
 			if (_log.isInfoEnabled()) {
 				_log.info("Reindexing Lucene failed");
@@ -185,8 +206,10 @@ public class SearchEngineInitializer implements Runnable {
 	private static final Log _log = LogFactoryUtil.getLog(
 		SearchEngineInitializer.class);
 
+	private final BundleContext _bundleContext;
 	private final long _companyId;
 	private boolean _finished;
+	private ServiceTrackerList<Indexer, Indexer> _indexers;
 	private final PortalExecutorManager _portalExecutorManager;
 	private final Set<String> _usedSearchEngineIds = new HashSet<>();
 

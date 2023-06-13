@@ -64,9 +64,9 @@ public class MBStatsUserLocalServiceImpl
 		statsUser.setUserId(userId);
 
 		try {
-			mbStatsUserPersistence.update(statsUser);
+			statsUser = mbStatsUserPersistence.update(statsUser);
 		}
-		catch (SystemException se) {
+		catch (SystemException systemException) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
 					StringBundler.concat(
@@ -78,7 +78,7 @@ public class MBStatsUserLocalServiceImpl
 				groupId, userId, false);
 
 			if (statsUser == null) {
-				throw se;
+				throw systemException;
 			}
 		}
 
@@ -267,9 +267,7 @@ public class MBStatsUserLocalServiceImpl
 			statsUser.setLastPostDate(lastPostDate);
 		}
 
-		mbStatsUserPersistence.update(statsUser);
-
-		return statsUser;
+		return mbStatsUserPersistence.update(statsUser);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

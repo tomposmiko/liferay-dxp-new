@@ -342,6 +342,10 @@ SideNavigation.prototype = {
 		const sidebar = element.querySelector('.sidebar-body');
 
 		if (!instance._fetchPromise && sidebar) {
+			while (sidebar.firstChild) {
+				sidebar.removeChild(sidebar.firstChild);
+			}
+
 			const loading = document.createElement('div');
 			addClass(loading, 'sidenav-loading');
 			loading.innerHTML = instance.options.loadingIndicatorTPL;
@@ -371,8 +375,7 @@ SideNavigation.prototype = {
 					instance.setHeight();
 				})
 				.catch(err => {
-					// eslint-disable-next-line no-console
-					console.log(err);
+					console.error(err);
 				});
 		}
 	},

@@ -63,8 +63,8 @@ boolean showPermanentLink = GetterUtil.getBoolean(request.getAttribute("edit-mes
 %>
 
 <div class="panel-heading">
-	<div class="card-row card-row-padded">
-		<div class="card-col-field">
+	<div class="autofit-padded autofit-row card-body">
+		<div class="autofit-col">
 			<div class="list-group-card-icon">
 				<liferay-ui:user-portrait
 					userId="<%= themeDisplay.getUserId() %>"
@@ -72,7 +72,7 @@ boolean showPermanentLink = GetterUtil.getBoolean(request.getAttribute("edit-mes
 			</div>
 		</div>
 
-		<div class="card-col-content card-col-gutters">
+		<div class="autofit-col autofit-col-expand">
 
 			<%
 			String userName = PortalUtil.getUserName(themeDisplay.getUserId(), StringPool.BLANK);
@@ -125,7 +125,7 @@ boolean showPermanentLink = GetterUtil.getBoolean(request.getAttribute("edit-mes
 <div class="divider"></div>
 
 <div class="panel-body">
-	<div class="card-row card-row-padded message-content" id="<%= liferayPortletResponse.getNamespace() + "addQuickReply" + parentMessageId %>">
+	<div class="card-body message-content" id="<%= liferayPortletResponse.getNamespace() + "addQuickReply" + parentMessageId %>">
 		<portlet:actionURL name="/message_boards/edit_message" var="editMessageURL" />
 
 		<aui:form action="<%= editMessageURL %>" method="post" name='<%= "addQuickReplyFm" + parentMessageId %>' onSubmit='<%= "event.preventDefault(); " %>'>

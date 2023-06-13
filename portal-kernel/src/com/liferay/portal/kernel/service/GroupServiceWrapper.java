@@ -28,11 +28,6 @@ public class GroupServiceWrapper
 		_groupService = groupService;
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link GroupServiceUtil} to access the group remote service. Add custom service methods to <code>com.liferay.portal.service.impl.GroupServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
-	 */
 	@Override
 	public com.liferay.portal.kernel.model.Group addGroup(
 			long parentGroupId, long liveGroupId,
@@ -598,6 +593,15 @@ public class GroupServiceWrapper
 
 		return _groupService.search(
 			companyId, name, description, params, start, end);
+	}
+
+	@Override
+	public int searchCount(
+		long companyId, long[] classNameIds, java.lang.String keywords,
+		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params) {
+
+		return _groupService.searchCount(
+			companyId, classNameIds, keywords, params);
 	}
 
 	/**

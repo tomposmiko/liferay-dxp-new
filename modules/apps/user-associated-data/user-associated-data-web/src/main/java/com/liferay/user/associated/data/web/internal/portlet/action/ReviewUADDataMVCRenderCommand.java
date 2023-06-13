@@ -118,8 +118,8 @@ public class ReviewUADDataMVCRenderCommand implements MVCRenderCommand {
 					applicationKey, renderRequest, renderResponse, scopeDisplay,
 					user, uadDisplay, uadHierarchyDisplay, uadRegistryKey));
 		}
-		catch (Exception e) {
-			throw new PortletException(e);
+		catch (Exception exception) {
+			throw new PortletException(exception);
 		}
 
 		return "/review_uad_data.jsp";
@@ -180,13 +180,13 @@ public class ReviewUADDataMVCRenderCommand implements MVCRenderCommand {
 		List<ScopeDisplay> scopeDisplays = new ArrayList<>();
 
 		for (String scope : UADConstants.SCOPES) {
-			long[] gropuIds = GroupUtil.getGroupIds(
+			long[] groupIds = GroupUtil.getGroupIds(
 				_groupLocalService, user, scope);
 
 			ScopeDisplay scopeDisplay = new ScopeDisplay(
-				scope, gropuIds,
+				scope, groupIds,
 				_uadApplicationSummaryHelper.getUADApplicationSummaryDisplays(
-					user.getUserId(), gropuIds));
+					user.getUserId(), groupIds));
 
 			scopeDisplays.add(scopeDisplay);
 		}
@@ -208,20 +208,20 @@ public class ReviewUADDataMVCRenderCommand implements MVCRenderCommand {
 
 		if (applicationKey.equals(UADConstants.ALL_APPLICATIONS)) {
 			return _uadSearchContainerBuilder.getSearchContainer(
-				renderRequest, liferayPortletResponse, currentURL,
+				liferayPortletResponse, renderRequest, currentURL,
 				scopeDisplay.getUADApplicationSummaryDisplays());
 		}
 
 		if (uadHierarchyDisplay != null) {
 			return _uadSearchContainerBuilder.getSearchContainer(
-				renderRequest, liferayPortletResponse, applicationKey,
+				liferayPortletResponse, renderRequest, applicationKey,
 				currentURL, scopeDisplay.getGroupIds(),
 				uadHierarchyDisplay.getFirstContainerTypeClass(), 0L, user,
 				uadHierarchyDisplay);
 		}
 
 		return _uadSearchContainerBuilder.getSearchContainer(
-			renderRequest, liferayPortletResponse, currentURL,
+			liferayPortletResponse, renderRequest, currentURL,
 			scopeDisplay.getGroupIds(), user, uadDisplay);
 	}
 

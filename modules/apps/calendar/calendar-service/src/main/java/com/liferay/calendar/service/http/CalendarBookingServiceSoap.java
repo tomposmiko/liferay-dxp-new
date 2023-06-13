@@ -101,10 +101,10 @@ public class CalendarBookingServiceSoap {
 			return com.liferay.calendar.model.CalendarBookingSoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -139,99 +139,10 @@ public class CalendarBookingServiceSoap {
 			return com.liferay.calendar.model.CalendarBookingSoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #addCalendarBooking(long, long[], long, long, Map, Map,
-	 String, long, long, boolean, String, long, String, long,
-	 String, ServiceContext)}
-	 */
-	@Deprecated
-	public static com.liferay.calendar.model.CalendarBookingSoap
-			addCalendarBooking(
-				long calendarId, long[] childCalendarIds,
-				long parentCalendarBookingId, String[] titleMapLanguageIds,
-				String[] titleMapValues, String[] descriptionMapLanguageIds,
-				String[] descriptionMapValues, String location,
-				int startTimeYear, int startTimeMonth, int startTimeDay,
-				int startTimeHour, int startTimeMinute, int endTimeYear,
-				int endTimeMonth, int endTimeDay, int endTimeHour,
-				int endTimeMinute, String timeZoneId, boolean allDay,
-				String recurrence, long firstReminder, String firstReminderType,
-				long secondReminder, String secondReminderType,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws RemoteException {
-
-		try {
-			Map<Locale, String> titleMap = LocalizationUtil.getLocalizationMap(
-				titleMapLanguageIds, titleMapValues);
-			Map<Locale, String> descriptionMap =
-				LocalizationUtil.getLocalizationMap(
-					descriptionMapLanguageIds, descriptionMapValues);
-
-			com.liferay.calendar.model.CalendarBooking returnValue =
-				CalendarBookingServiceUtil.addCalendarBooking(
-					calendarId, childCalendarIds, parentCalendarBookingId,
-					titleMap, descriptionMap, location, startTimeYear,
-					startTimeMonth, startTimeDay, startTimeHour,
-					startTimeMinute, endTimeYear, endTimeMonth, endTimeDay,
-					endTimeHour, endTimeMinute, timeZoneId, allDay, recurrence,
-					firstReminder, firstReminderType, secondReminder,
-					secondReminderType, serviceContext);
-
-			return com.liferay.calendar.model.CalendarBookingSoap.toSoapModel(
-				returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	public static com.liferay.calendar.model.CalendarBookingSoap
-			addCalendarBooking(
-				long calendarId, long[] childCalendarIds,
-				long parentCalendarBookingId, String[] titleMapLanguageIds,
-				String[] titleMapValues, String[] descriptionMapLanguageIds,
-				String[] descriptionMapValues, String location, long startTime,
-				long endTime, boolean allDay, String recurrence,
-				long firstReminder, String firstReminderType,
-				long secondReminder, String secondReminderType,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws RemoteException {
-
-		try {
-			Map<Locale, String> titleMap = LocalizationUtil.getLocalizationMap(
-				titleMapLanguageIds, titleMapValues);
-			Map<Locale, String> descriptionMap =
-				LocalizationUtil.getLocalizationMap(
-					descriptionMapLanguageIds, descriptionMapValues);
-
-			com.liferay.calendar.model.CalendarBooking returnValue =
-				CalendarBookingServiceUtil.addCalendarBooking(
-					calendarId, childCalendarIds, parentCalendarBookingId,
-					titleMap, descriptionMap, location, startTime, endTime,
-					allDay, recurrence, firstReminder, firstReminderType,
-					secondReminder, secondReminderType, serviceContext);
-
-			return com.liferay.calendar.model.CalendarBookingSoap.toSoapModel(
-				returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -247,10 +158,10 @@ public class CalendarBookingServiceSoap {
 			return com.liferay.calendar.model.CalendarBookingSoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -262,10 +173,10 @@ public class CalendarBookingServiceSoap {
 			CalendarBookingServiceUtil.deleteCalendarBookingInstance(
 				calendarBookingId, instanceIndex, allFollowing);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -279,10 +190,10 @@ public class CalendarBookingServiceSoap {
 				calendarBookingId, instanceIndex, allFollowing,
 				deleteRecurringCalendarBookings);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -294,10 +205,10 @@ public class CalendarBookingServiceSoap {
 			CalendarBookingServiceUtil.deleteCalendarBookingInstance(
 				calendarBookingId, startTime, allFollowing);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -312,10 +223,10 @@ public class CalendarBookingServiceSoap {
 
 			return returnValue;
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -331,10 +242,10 @@ public class CalendarBookingServiceSoap {
 			return com.liferay.calendar.model.CalendarBookingSoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -350,10 +261,10 @@ public class CalendarBookingServiceSoap {
 			return com.liferay.calendar.model.CalendarBookingSoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -369,10 +280,10 @@ public class CalendarBookingServiceSoap {
 			return com.liferay.calendar.model.CalendarBookingSoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -389,10 +300,10 @@ public class CalendarBookingServiceSoap {
 			return com.liferay.calendar.model.CalendarBookingSoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -408,10 +319,10 @@ public class CalendarBookingServiceSoap {
 			return com.liferay.calendar.model.CalendarBookingSoap.toSoapModels(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -427,10 +338,10 @@ public class CalendarBookingServiceSoap {
 			return com.liferay.calendar.model.CalendarBookingSoap.toSoapModels(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -447,10 +358,10 @@ public class CalendarBookingServiceSoap {
 			return com.liferay.calendar.model.CalendarBookingSoap.toSoapModels(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -467,10 +378,10 @@ public class CalendarBookingServiceSoap {
 			return com.liferay.calendar.model.CalendarBookingSoap.toSoapModels(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -490,10 +401,10 @@ public class CalendarBookingServiceSoap {
 			return com.liferay.calendar.model.CalendarBookingSoap.toSoapModels(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -510,10 +421,10 @@ public class CalendarBookingServiceSoap {
 			return com.liferay.calendar.model.CalendarBookingSoap.toSoapModels(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -529,10 +440,10 @@ public class CalendarBookingServiceSoap {
 			return com.liferay.calendar.model.CalendarBookingSoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -550,10 +461,10 @@ public class CalendarBookingServiceSoap {
 			return com.liferay.calendar.model.CalendarBookingSoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -567,10 +478,10 @@ public class CalendarBookingServiceSoap {
 
 			return returnValue;
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -590,32 +501,10 @@ public class CalendarBookingServiceSoap {
 			return com.liferay.calendar.model.CalendarBookingSoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #invokeTransition(long, int, long, boolean, boolean,
-	 ServiceContext)}
-	 */
-	@Deprecated
-	public static void invokeTransition(
-			long calendarBookingId, int status,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws RemoteException {
-
-		try {
-			CalendarBookingServiceUtil.invokeTransition(
-				calendarBookingId, status, serviceContext);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -635,10 +524,10 @@ public class CalendarBookingServiceSoap {
 			return com.liferay.calendar.model.CalendarBookingSoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -654,10 +543,10 @@ public class CalendarBookingServiceSoap {
 			return com.liferay.calendar.model.CalendarBookingSoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -673,10 +562,10 @@ public class CalendarBookingServiceSoap {
 			return com.liferay.calendar.model.CalendarBookingSoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -699,10 +588,10 @@ public class CalendarBookingServiceSoap {
 			return com.liferay.calendar.model.CalendarBookingSoap.toSoapModels(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -727,10 +616,10 @@ public class CalendarBookingServiceSoap {
 			return com.liferay.calendar.model.CalendarBookingSoap.toSoapModels(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -749,10 +638,10 @@ public class CalendarBookingServiceSoap {
 
 			return returnValue;
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -772,10 +661,10 @@ public class CalendarBookingServiceSoap {
 
 			return returnValue;
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -808,10 +697,10 @@ public class CalendarBookingServiceSoap {
 			return com.liferay.calendar.model.CalendarBookingSoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -844,10 +733,10 @@ public class CalendarBookingServiceSoap {
 			return com.liferay.calendar.model.CalendarBookingSoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -881,10 +770,10 @@ public class CalendarBookingServiceSoap {
 			return com.liferay.calendar.model.CalendarBookingSoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -919,10 +808,10 @@ public class CalendarBookingServiceSoap {
 			return com.liferay.calendar.model.CalendarBookingSoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -962,10 +851,10 @@ public class CalendarBookingServiceSoap {
 			return com.liferay.calendar.model.CalendarBookingSoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -999,10 +888,10 @@ public class CalendarBookingServiceSoap {
 			return com.liferay.calendar.model.CalendarBookingSoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -1015,10 +904,10 @@ public class CalendarBookingServiceSoap {
 				updateLastInstanceCalendarBookingRecurrence(
 					calendarBookingId, recurrence);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -1051,10 +940,10 @@ public class CalendarBookingServiceSoap {
 			return com.liferay.calendar.model.CalendarBookingSoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -1087,10 +976,10 @@ public class CalendarBookingServiceSoap {
 			return com.liferay.calendar.model.CalendarBookingSoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 
@@ -1123,53 +1012,10 @@ public class CalendarBookingServiceSoap {
 			return com.liferay.calendar.model.CalendarBookingSoap.toSoapModel(
 				returnValue);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new RemoteException(e.getMessage());
-		}
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #updateRecurringCalendarBooking(long, long, long[], Map, Map,
-	 String, long, long, boolean, long, String, long, String,
-	 ServiceContext)
-	 */
-	@Deprecated
-	public static com.liferay.calendar.model.CalendarBookingSoap
-			updateRecurringCalendarBooking(
-				long calendarBookingId, long calendarId,
-				long[] childCalendarIds, String[] titleMapLanguageIds,
-				String[] titleMapValues, String[] descriptionMapLanguageIds,
-				String[] descriptionMapValues, String location, long startTime,
-				long endTime, boolean allDay, String recurrence,
-				long firstReminder, String firstReminderType,
-				long secondReminder, String secondReminderType,
-				com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws RemoteException {
-
-		try {
-			Map<Locale, String> titleMap = LocalizationUtil.getLocalizationMap(
-				titleMapLanguageIds, titleMapValues);
-			Map<Locale, String> descriptionMap =
-				LocalizationUtil.getLocalizationMap(
-					descriptionMapLanguageIds, descriptionMapValues);
-
-			com.liferay.calendar.model.CalendarBooking returnValue =
-				CalendarBookingServiceUtil.updateRecurringCalendarBooking(
-					calendarBookingId, calendarId, childCalendarIds, titleMap,
-					descriptionMap, location, startTime, endTime, allDay,
-					recurrence, firstReminder, firstReminderType,
-					secondReminder, secondReminderType, serviceContext);
-
-			return com.liferay.calendar.model.CalendarBookingSoap.toSoapModel(
-				returnValue);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-
-			throw new RemoteException(e.getMessage());
+			throw new RemoteException(exception.getMessage());
 		}
 	}
 

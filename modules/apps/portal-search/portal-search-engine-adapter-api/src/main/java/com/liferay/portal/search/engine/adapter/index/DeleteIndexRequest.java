@@ -14,10 +14,13 @@
 
 package com.liferay.portal.search.engine.adapter.index;
 
+import com.liferay.portal.search.engine.adapter.ccr.CrossClusterRequest;
+
 /**
  * @author Michael C. Han
  */
-public class DeleteIndexRequest implements IndexRequest<DeleteIndexResponse> {
+public class DeleteIndexRequest
+	extends CrossClusterRequest implements IndexRequest<DeleteIndexResponse> {
 
 	public DeleteIndexRequest(String... indexNames) {
 		_indexNames = indexNames;
@@ -37,18 +40,6 @@ public class DeleteIndexRequest implements IndexRequest<DeleteIndexResponse> {
 
 	public IndicesOptions getIndicesOptions() {
 		return _indicesOptions;
-	}
-
-	/**
-	 * @return
-	 * @deprecated As of Judson (7.1.x), with no direct replacement. This method
-	 *             should not be in the parent interface.  Only certain
-	 *             IndexRequests work with mappings.
-	 */
-	@Deprecated
-	@Override
-	public String getMappingName() {
-		throw new UnsupportedOperationException();
 	}
 
 	public void setIndicesOptions(IndicesOptions indicesOptions) {

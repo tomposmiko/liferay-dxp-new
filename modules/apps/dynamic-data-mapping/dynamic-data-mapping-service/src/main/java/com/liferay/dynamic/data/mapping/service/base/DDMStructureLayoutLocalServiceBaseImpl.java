@@ -72,7 +72,7 @@ public abstract class DDMStructureLayoutLocalServiceBaseImpl
 	implements AopService, DDMStructureLayoutLocalService,
 			   IdentifiableOSGiService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>DDMStructureLayoutLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.dynamic.data.mapping.service.DDMStructureLayoutLocalServiceUtil</code>.
@@ -553,8 +553,8 @@ public abstract class DDMStructureLayoutLocalServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

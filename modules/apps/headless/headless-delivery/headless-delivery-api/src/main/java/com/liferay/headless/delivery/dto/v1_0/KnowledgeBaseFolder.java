@@ -88,6 +88,35 @@ public class KnowledgeBaseFolder {
 
 	}
 
+	@Schema
+	@Valid
+	public Map<String, Map> getActions() {
+		return actions;
+	}
+
+	public void setActions(Map<String, Map> actions) {
+		this.actions = actions;
+	}
+
+	@JsonIgnore
+	public void setActions(
+		UnsafeSupplier<Map<String, Map>, Exception> actionsUnsafeSupplier) {
+
+		try {
+			actions = actionsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected Map<String, Map> actions;
+
 	@Schema(description = "The folder's creator.")
 	@Valid
 	public Creator getCreator() {
@@ -113,7 +142,7 @@ public class KnowledgeBaseFolder {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The folder's creator.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator creator;
 
@@ -170,7 +199,7 @@ public class KnowledgeBaseFolder {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The date the folder was created.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
@@ -198,7 +227,7 @@ public class KnowledgeBaseFolder {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The last time the folder was modified.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateModified;
 
@@ -226,7 +255,7 @@ public class KnowledgeBaseFolder {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The folder's description.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String description;
 
@@ -252,7 +281,7 @@ public class KnowledgeBaseFolder {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The folder's ID.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
@@ -278,7 +307,7 @@ public class KnowledgeBaseFolder {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The folder's main title/name.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	@NotEmpty
 	protected String name;
@@ -313,7 +342,9 @@ public class KnowledgeBaseFolder {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The number of Knowledge Base articles in this folder."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer numberOfKnowledgeBaseArticles;
 
@@ -347,7 +378,9 @@ public class KnowledgeBaseFolder {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The number of Knowledge Base folders in this folder."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer numberOfKnowledgeBaseFolders;
 
@@ -382,7 +415,9 @@ public class KnowledgeBaseFolder {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The folder's parent Knowledge Base folder, if it exists."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected ParentKnowledgeBaseFolder parentKnowledgeBaseFolder;
 
@@ -416,7 +451,9 @@ public class KnowledgeBaseFolder {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The ID of the folder's parent Knowledge Base folder, if such a parent folder exists."
+	)
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	protected Long parentKnowledgeBaseFolderId;
 
@@ -444,7 +481,9 @@ public class KnowledgeBaseFolder {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The ID of the site to which this folder is scoped."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long siteId;
 
@@ -484,7 +523,9 @@ public class KnowledgeBaseFolder {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A write-only property that specifies the folder's default permissions."
+	)
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	protected ViewableBy viewableBy;
 
@@ -517,6 +558,16 @@ public class KnowledgeBaseFolder {
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+		if (actions != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"actions\": ");
+
+			sb.append(_toJSON(actions));
+		}
 
 		if (creator != null) {
 			if (sb.length() > 1) {

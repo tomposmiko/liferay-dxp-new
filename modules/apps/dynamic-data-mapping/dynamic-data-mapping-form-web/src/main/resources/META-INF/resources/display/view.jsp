@@ -196,7 +196,7 @@ long formInstanceId = ddmFormDisplayContext.getFormInstanceId();
 
 					function <portlet:namespace />fireFormView() {
 						Liferay.fire('ddmFormView', {
-							formId: <%= formInstanceId %>,
+							formId: '<%= formInstanceId %>',
 							title: '<%= HtmlUtil.escape(formInstance.getName(displayLocale)) %>'
 						});
 					}
@@ -212,7 +212,7 @@ long formInstanceId = ddmFormDisplayContext.getFormInstanceId();
 							</liferay-portlet:resourceURL>
 
 							function <portlet:namespace />autoSave() {
-								const data = new URLSearchParams({
+								var data = new URLSearchParams({
 									<portlet:namespace />formInstanceId: <%= formInstanceId %>,
 									<portlet:namespace />serializedDDMFormValues: JSON.stringify(
 										<portlet:namespace />form.toJSON()
@@ -232,7 +232,7 @@ long formInstanceId = ddmFormDisplayContext.getFormInstanceId();
 
 								<portlet:namespace />intervalId = setInterval(
 									<portlet:namespace />autoSave,
-									60000
+									<%= ddmFormDisplayContext.getAutosaveInterval() %>
 								);
 							}
 						</c:when>
@@ -259,7 +259,7 @@ long formInstanceId = ddmFormDisplayContext.getFormInstanceId();
 					</c:choose>
 
 					function <portlet:namespace />enableForm() {
-						const container = document.querySelector(
+						var container = document.querySelector(
 							'#<%= ddmFormDisplayContext.getContainerId() %>container'
 						);
 

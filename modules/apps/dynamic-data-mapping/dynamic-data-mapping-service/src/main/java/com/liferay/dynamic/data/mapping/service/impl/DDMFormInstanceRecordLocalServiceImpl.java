@@ -132,7 +132,8 @@ public class DDMFormInstanceRecordLocalServiceImpl
 			ddmFormInstance.getVersion());
 		ddmFormInstanceRecord.setVersion(_VERSION_DEFAULT);
 
-		ddmFormInstanceRecordPersistence.update(ddmFormInstanceRecord);
+		ddmFormInstanceRecord = ddmFormInstanceRecordPersistence.update(
+			ddmFormInstanceRecord);
 
 		int status = GetterUtil.getInteger(
 			serviceContext.getAttribute("status"),
@@ -185,6 +186,8 @@ public class DDMFormInstanceRecordLocalServiceImpl
 			ddmFormInstanceRecordVersionPersistence.findByFormInstanceRecordId(
 				ddmFormInstanceRecord.getFormInstanceRecordId());
 
+		String storageType = ddmFormInstanceRecord.getStorageType();
+
 		for (DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion :
 				ddmFormInstanceRecordVersions) {
 
@@ -193,7 +196,7 @@ public class DDMFormInstanceRecordLocalServiceImpl
 
 			long storageId = ddmFormInstanceRecordVersion.getStorageId();
 
-			deleteStorage(storageId);
+			deleteStorage(storageId, storageType);
 
 			_ddmStorageLinkLocalService.deleteClassStorageLink(storageId);
 
@@ -248,10 +251,11 @@ public class DDMFormInstanceRecordLocalServiceImpl
 	}
 
 	@Override
-	public DDMFormValues getDDMFormValues(long storageId, DDMForm ddmForm)
+	public DDMFormValues getDDMFormValues(
+			DDMForm ddmForm, long storageId, String storageType)
 		throws StorageException {
 
-		DDMStorageAdapter ddmStorageAdapter = getDDMStorageAdapter();
+		DDMStorageAdapter ddmStorageAdapter = getDDMStorageAdapter(storageType);
 
 		DDMStorageAdapterGetRequest.Builder builder =
 			DDMStorageAdapterGetRequest.Builder.newBuilder(storageId, ddmForm);
@@ -263,6 +267,19 @@ public class DDMFormInstanceRecordLocalServiceImpl
 			ddmStorageAdapter.get(ddmStorageAdapterGetRequest);
 
 		return ddmStorageAdapterGetResponse.getDDMFormValues();
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getDDMFormValues(DDMForm, long, String)}
+	 */
+	@Deprecated
+	@Override
+	public DDMFormValues getDDMFormValues(long storageId, DDMForm ddmForm)
+		throws StorageException {
+
+		return getDDMFormValues(
+			ddmForm, storageId, StorageType.JSON.toString());
 	}
 
 	@Override
@@ -334,9 +351,13 @@ public class DDMFormInstanceRecordLocalServiceImpl
 			return;
 		}
 
+		DDMFormInstance ddmFormInstance =
+			ddmFormInstanceRecordVersion.getFormInstance();
+
 		DDMFormValues ddmFormValues = getDDMFormValues(
+			ddmFormInstanceRecordVersion.getDDMForm(),
 			ddmFormInstanceRecordVersion.getStorageId(),
-			ddmFormInstanceRecordVersion.getDDMForm());
+			ddmFormInstance.getStorageType());
 
 		serviceContext.setCommand(Constants.REVERT);
 
@@ -358,8 +379,8 @@ public class DDMFormInstanceRecordLocalServiceImpl
 			return new BaseModelSearchResult<>(
 				getFormInstanceRecords(hits), hits.getLength());
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 
@@ -430,7 +451,9 @@ public class DDMFormInstanceRecordLocalServiceImpl
 			ddmFormInstanceRecordVersionPersistence.remove(
 				ddmFormInstanceRecordVersion);
 
-			deleteStorage(ddmFormInstanceRecordVersion.getStorageId());
+			deleteStorage(
+				ddmFormInstanceRecordVersion.getStorageId(),
+				ddmFormInstance.getStorageType());
 
 			return ddmFormInstanceRecord;
 		}
@@ -473,8 +496,9 @@ public class DDMFormInstanceRecordLocalServiceImpl
 		formInstanceRecordVersion.setStatusByUserName(user.getFullName());
 		formInstanceRecordVersion.setStatusDate(new Date());
 
-		ddmFormInstanceRecordVersionPersistence.update(
-			formInstanceRecordVersion);
+		formInstanceRecordVersion =
+			ddmFormInstanceRecordVersionPersistence.update(
+				formInstanceRecordVersion);
 
 		// Record
 
@@ -498,10 +522,9 @@ public class DDMFormInstanceRecordLocalServiceImpl
 					formInstanceRecordVersion.getStorageId());
 				formInstanceRecord.setVersion(
 					formInstanceRecordVersion.getVersion());
-				formInstanceRecord.setVersion(
-					formInstanceRecordVersion.getVersion());
 
-				ddmFormInstanceRecordPersistence.update(formInstanceRecord);
+				formInstanceRecord = ddmFormInstanceRecordPersistence.update(
+					formInstanceRecord);
 			}
 		}
 		else {
@@ -523,9 +546,14 @@ public class DDMFormInstanceRecordLocalServiceImpl
 					newVersion = firstApprovedVersion.getVersion();
 				}
 
+				formInstanceRecord =
+					ddmFormInstanceRecordPersistence.findByPrimaryKey(
+						formInstanceRecordVersion.getFormInstanceRecordId());
+
 				formInstanceRecord.setVersion(newVersion);
 
-				ddmFormInstanceRecordPersistence.update(formInstanceRecord);
+				formInstanceRecord = ddmFormInstanceRecordPersistence.update(
+					formInstanceRecord);
 			}
 		}
 
@@ -564,10 +592,8 @@ public class DDMFormInstanceRecordLocalServiceImpl
 		ddmFormInstanceRecordVersion.setStatusDate(
 			ddmFormInstanceRecord.getModifiedDate());
 
-		ddmFormInstanceRecordVersionPersistence.update(
+		return ddmFormInstanceRecordVersionPersistence.update(
 			ddmFormInstanceRecordVersion);
-
-		return ddmFormInstanceRecordVersion;
 	}
 
 	protected long createDDMContent(
@@ -589,15 +615,16 @@ public class DDMFormInstanceRecordLocalServiceImpl
 				DDMStorageLink.class.getName()
 			).build();
 
-		DDMStorageAdapter ddmStorageAdapter = getDDMStorageAdapter();
+		DDMFormInstance ddmFormInstance =
+			ddmFormInstancePersistence.findByPrimaryKey(ddmFormInstanceId);
+
+		DDMStorageAdapter ddmStorageAdapter = getDDMStorageAdapter(
+			ddmFormInstance.getStorageType());
 
 		DDMStorageAdapterSaveResponse ddmStorageAdapterSaveResponse =
 			ddmStorageAdapter.save(ddmStorageAdapterSaveRequest);
 
 		long primaryKey = ddmStorageAdapterSaveResponse.getPrimaryKey();
-
-		DDMFormInstance ddmFormInstance =
-			ddmFormInstancePersistence.findByPrimaryKey(ddmFormInstanceId);
 
 		DDMStructure ddmStructure = ddmFormInstance.getStructure();
 
@@ -611,8 +638,10 @@ public class DDMFormInstanceRecordLocalServiceImpl
 		return primaryKey;
 	}
 
-	protected void deleteStorage(long storageId) throws StorageException {
-		DDMStorageAdapter ddmStorageAdapter = getDDMStorageAdapter();
+	protected void deleteStorage(long storageId, String storageType)
+		throws StorageException {
+
+		DDMStorageAdapter ddmStorageAdapter = getDDMStorageAdapter(storageType);
 
 		DDMStorageAdapterDeleteRequest.Builder builder =
 			DDMStorageAdapterDeleteRequest.Builder.newBuilder(storageId);
@@ -636,9 +665,9 @@ public class DDMFormInstanceRecordLocalServiceImpl
 		return _indexerRegistry.nullSafeGetIndexer(DDMFormInstanceRecord.class);
 	}
 
-	protected DDMStorageAdapter getDDMStorageAdapter() {
+	protected DDMStorageAdapter getDDMStorageAdapter(String type) {
 		return _ddmStorageAdapterTracker.getDDMStorageAdapter(
-			StorageType.JSON.toString());
+			GetterUtil.getString(type, StorageType.JSON.toString()));
 	}
 
 	protected List<DDMFormInstanceRecord> getFormInstanceRecords(Hits hits)
@@ -653,12 +682,14 @@ public class DDMFormInstanceRecordLocalServiceImpl
 			try {
 				formInstanceRecords.add(getFormInstanceRecord(recordId));
 			}
-			catch (NoSuchFormInstanceRecordException nsfire) {
+			catch (NoSuchFormInstanceRecordException
+						noSuchFormInstanceRecordException) {
+
 				if (_log.isWarnEnabled()) {
 					_log.warn(
 						"DDM form instance record index is stale and" +
 							"contains record " + recordId,
-						nsfire);
+						noSuchFormInstanceRecordException);
 				}
 
 				long companyId = GetterUtil.getLong(
@@ -731,12 +762,21 @@ public class DDMFormInstanceRecordLocalServiceImpl
 			return false;
 		}
 
+		DDMFormInstance lastFormInstance =
+			lastDDMFormInstanceRecordVersion.getFormInstance();
+
 		DDMFormValues lastDDMFormValues = getDDMFormValues(
+			lastDDMFormInstanceRecordVersion.getDDMForm(),
 			lastDDMFormInstanceRecordVersion.getStorageId(),
-			lastDDMFormInstanceRecordVersion.getDDMForm());
+			lastFormInstance.getStorageType());
+
+		DDMFormInstance latestFormInstance =
+			latestDDMFormInstanceRecordVersion.getFormInstance();
+
 		DDMFormValues latestDDMFormValues = getDDMFormValues(
+			latestDDMFormInstanceRecordVersion.getDDMForm(),
 			latestDDMFormInstanceRecordVersion.getStorageId(),
-			latestDDMFormInstanceRecordVersion.getDDMForm());
+			latestFormInstance.getStorageType());
 
 		if (!lastDDMFormValues.equals(latestDDMFormValues)) {
 			return false;
@@ -834,7 +874,11 @@ public class DDMFormInstanceRecordLocalServiceImpl
 				ddmFormInstanceRecordVersion.getStorageId()
 			).build();
 
-		DDMStorageAdapter ddmStorageAdapter = getDDMStorageAdapter();
+		DDMFormInstance ddmFormInstance =
+			ddmFormInstanceRecordVersion.getFormInstance();
+
+		DDMStorageAdapter ddmStorageAdapter = getDDMStorageAdapter(
+			ddmFormInstance.getStorageType());
 
 		ddmStorageAdapter.save(ddmStorageAdapterSaveRequest);
 	}

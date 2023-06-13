@@ -27,12 +27,15 @@ import com.liferay.asset.service.AssetEntryUsageLocalServiceUtil;
  * @author Brian Wing Shun Chan
  * @see AssetEntryUsageImpl
  * @see AssetEntryUsage
+ * @deprecated As of Mueller (7.2.x), replaced by {@link
+ com.liferay.layout.model.impl.LayoutClassedModelUsageImpl}
  * @generated
  */
+@Deprecated
 public abstract class AssetEntryUsageBaseImpl
 	extends AssetEntryUsageModelImpl implements AssetEntryUsage {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a asset entry usage model instance should use the <code>AssetEntryUsage</code> interface instead.

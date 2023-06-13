@@ -1,0 +1,44 @@
+<html>
+<head>
+<title>TableViewBuilder</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">TableViewBuilder</td></tr>
+</thead>
+<tbody>
+
+<!--COLUMN_FIELDS-->
+
+<tr>
+	<td>COLUMN_LABEL</td>
+	<td>//div[@class='col' and contains(.,'${columnLabel}')] | //table//div[contains(@class,'col') and contains(.,'${columnLabel}')]</td>
+	<td></td>
+</tr>
+
+<tr>
+	<td>DELETE_COLUMN_BY_NAME</td>
+	<td>//header[contains(*, '${columnLabel}')]//button[(@data-title='Remove')]</td>
+	<td></td>
+</tr>
+
+<!--SIDEBAR-->
+
+<tr>
+	<td>CLOSE_COLUMN_SIDEBAR</td>
+	<td>//div[contains(@class,'sidebar-header')]//*[contains(@class,'lexicon-icon-angle-left')]</td>
+	<td></td>
+</tr>
+
+<tr>
+	<td>COLUMN_LABEL_AT_SIDEBAR</td>
+	<td>//div[contains(@class,'app-builder-sidebar')]//span[contains(text(),'${columnLabel}')]</td>
+	<td></td>
+</tr>
+
+
+</tbody>
+</table>
+</body>
+</html>

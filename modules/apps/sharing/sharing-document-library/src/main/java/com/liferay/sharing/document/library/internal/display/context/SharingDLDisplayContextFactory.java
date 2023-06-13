@@ -24,7 +24,6 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileShortcut;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.sharing.configuration.SharingConfiguration;
 import com.liferay.sharing.configuration.SharingConfigurationFactory;
@@ -100,17 +99,14 @@ public class SharingDLDisplayContextFactory implements DLDisplayContextFactory {
 			return new SharingDLViewFileVersionDisplayContext(
 				parentDLViewFileVersionDisplayContext, httpServletRequest,
 				httpServletResponse, fileEntry, fileVersion,
-				ResourceBundleUtil.getBundle(
-					themeDisplay.getLocale(),
-					SharingDLDisplayContextFactory.class),
 				_sharingMenuItemFactory, _sharingToolbarItemFactory,
 				_sharingPermission, sharingConfiguration);
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			throw new SystemException(
 				"Unable to create sharing document library view file version " +
 					"display context for file version " + fileVersion,
-				pe);
+				portalException);
 		}
 	}
 

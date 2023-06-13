@@ -17,6 +17,7 @@ package com.liferay.configuration.admin.web.internal.portlet.action;
 import com.liferay.configuration.admin.constants.ConfigurationAdminPortletKeys;
 import com.liferay.configuration.admin.display.ConfigurationFormRenderer;
 import com.liferay.configuration.admin.web.internal.display.context.ConfigurationScopeDisplayContext;
+import com.liferay.configuration.admin.web.internal.display.context.ConfigurationScopeDisplayContextFactory;
 import com.liferay.configuration.admin.web.internal.model.ConfigurationModel;
 import com.liferay.configuration.admin.web.internal.util.ConfigurationFormRendererRetriever;
 import com.liferay.configuration.admin.web.internal.util.ConfigurationModelRetriever;
@@ -78,6 +79,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + ConfigurationAdminPortletKeys.INSTANCE_SETTINGS,
+		"javax.portlet.name=" + ConfigurationAdminPortletKeys.SITE_SETTINGS,
 		"javax.portlet.name=" + ConfigurationAdminPortletKeys.SYSTEM_SETTINGS,
 		"mvc.command.name=bindConfiguration"
 	},
@@ -104,7 +106,7 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 		ConfigurationModel configurationModel = null;
 
 		ConfigurationScopeDisplayContext configurationScopeDisplayContext =
-			new ConfigurationScopeDisplayContext(actionRequest);
+			ConfigurationScopeDisplayContextFactory.create(actionRequest);
 
 		Map<String, ConfigurationModel> configurationModels =
 			_configurationModelRetriever.getConfigurationModels(
@@ -171,15 +173,18 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 				actionResponse.sendRedirect(redirect);
 			}
 		}
-		catch (ConfigurationModelListenerException cmle) {
+		catch (ConfigurationModelListenerException
+					configurationModelListenerException) {
+
 			SessionErrors.add(
-				actionRequest, ConfigurationModelListenerException.class, cmle);
+				actionRequest, ConfigurationModelListenerException.class,
+				configurationModelListenerException);
 
 			actionResponse.setRenderParameter(
 				"mvcRenderCommandName", "/edit_configuration");
 		}
-		catch (IOException ioe) {
-			throw new PortletException(ioe);
+		catch (IOException ioException) {
+			throw new PortletException(ioException);
 		}
 
 		return true;
@@ -307,12 +312,12 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 									oldFileName);
 						}
 					}
-					catch (Exception e) {
+					catch (Exception exception) {
 						if (_log.isWarnEnabled()) {
 							_log.warn(
 								"Unable to delete inconsistent factory " +
 									"configuration " + oldFileName,
-								e);
+								exception);
 						}
 					}
 				}
@@ -320,11 +325,13 @@ public class BindConfigurationMVCActionCommand implements MVCActionCommand {
 
 			configuration.update(configuredProperties);
 		}
-		catch (ConfigurationModelListenerException cmle) {
-			throw cmle;
+		catch (ConfigurationModelListenerException
+					configurationModelListenerException) {
+
+			throw configurationModelListenerException;
 		}
-		catch (IOException ioe) {
-			throw new PortletException(ioe);
+		catch (IOException ioException) {
+			throw new PortletException(ioException);
 		}
 	}
 

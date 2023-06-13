@@ -39,7 +39,6 @@ import org.osgi.service.component.annotations.Reference;
  * @author Michael C. Han
  */
 @Component(
-	immediate = true,
 	property = "related.entry.indexer.class.name=com.liferay.document.library.kernel.model.DLFileEntry",
 	service = RelatedEntryIndexer.class
 )
@@ -65,7 +64,7 @@ public class DLFileEntryRelatedEntryIndexer implements RelatedEntryIndexer {
 		try {
 			fileEntry = dlAppLocalService.getFileEntry(comment.getClassPK());
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			return;
 		}
 
@@ -98,9 +97,9 @@ public class DLFileEntryRelatedEntryIndexer implements RelatedEntryIndexer {
 				}
 			}
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isInfoEnabled()) {
-				_log.info("Unable to get file entry", e);
+				_log.info("Unable to get file entry", exception);
 			}
 
 			return false;

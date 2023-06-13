@@ -22,7 +22,7 @@ definition {
 				userLoginEmailAddress = "test@liferay.com",
 				userLoginFullName = "Test Test");
 
-			User.tearDownCP();
+			JSONUser.tearDownNonAdminUsers();
 
 			Role.tearDownCP();
 
@@ -691,7 +691,6 @@ definition {
 			portlet = "Users and Organizations");
 
 		User.impersonateCP(
-			notAdmin = "true",
 			siteName = "${siteName}",
 			userScreenName = "usersn2");
 
@@ -1469,6 +1468,33 @@ definition {
 			securityQuestions = "This is just a test");
 	}
 
+	@description = "This is a use case for LPS-104643."
+	@priority = "3"
+	test UpdateExistUserEmailAddressByScript {
+		property test.name.skip.portal.instance = "UsersandorganizationsUsecase#UpdateExistUserEmailAddressByScript";
+
+		JSONUser.addUser(
+			userEmailAddress = "userea@liferay.com",
+			userFirstName = "userfn",
+			userLastName = "userln",
+			userScreenName = "usersn");
+
+		ServerAdministration.openServerAdmin();
+
+		var script = TestCase.getFileContent(fileName = "updateUser.groovy");
+
+		ServerAdministration.executeScript(
+			language = "Groovy",
+			script = "${script}");
+
+		var companyId = JSONCompany.getCompanyId();
+		var userId = JSONUserSetter.setUserId(userEmailAddress = "test@liferay.com");
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "ServerAdministrationScript#OUTPUT_FIELD",
+			value1 = "exception.UserEmailAddressException$MustNotBeDuplicate: User ${userId} cannot be created or updated because a user with company ${companyId} and email address userea@liferay.com is already in use");
+	}
+
 	@priority = "4"
 	test ValidateRegExPasswordPolicyCP {
 		ProductMenu.gotoPortlet(
@@ -1717,7 +1743,6 @@ definition {
 		Organization.addCP(
 			orgCountry = "United States",
 			orgName = "United States",
-			orgParent = "North America",
 			orgType = "Location");
 
 		ProductMenu.gotoPortlet(
@@ -1728,7 +1753,6 @@ definition {
 		Organization.addCP(
 			orgCountry = "Canada",
 			orgName = "Canada",
-			orgParent = "North America",
 			orgType = "Location");
 
 		ProductMenu.gotoPortlet(
@@ -1878,7 +1902,12 @@ definition {
 			emailAddress = "test@liferay.com",
 			emailSenderName = "Joe Bloggs");
 
-		JSONUser.addUser(
+		ProductMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		User.addCP(
 			userEmailAddress = "userea@liferay.com",
 			userFirstName = "userfn",
 			userLastName = "userln",
@@ -1890,6 +1919,43 @@ definition {
 			recipient = "userfn userln",
 			sender = "Joe Bloggs",
 			subject = "${portalURL}: Your New Account");
+	}
+
+	@priority = "3"
+	test ViewPageRenderedProperlyAfterBeYourselfAgain {
+		var siteName = TestCase.getSiteName(siteName = "${siteName}");
+
+		ProductMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		User.addCP(
+			userEmailAddress = "userea@liferay.com",
+			userFirstName = "userfn",
+			userLastName = "userln",
+			userScreenName = "usersn");
+
+		ProductMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		User.impersonateCP(
+			siteName = "${siteName}",
+			userScreenName = "usersn");
+
+		UserBar.gotoDropdownItem(dropdownItem = "My Profile");
+
+		SearchPortlets.viewUserResultDetails(
+			pageName = "My Profile",
+			userName = "userfn userln");
+
+		UserBar.gotoDropdownItem(dropdownItem = "Be yourself again.");
+
+		SearchPortlets.viewUserResultDetails(
+			pageName = "My Profile",
+			userName = "Test Test");
 	}
 
 	@priority = "4"

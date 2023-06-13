@@ -59,6 +59,16 @@ public class CommentSerDes {
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
+		if (comment.getActions() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"actions\": ");
+
+			sb.append(_toJSON(comment.getActions()));
+		}
+
 		if (comment.getCreator() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -118,6 +128,16 @@ public class CommentSerDes {
 			sb.append(comment.getNumberOfComments());
 		}
 
+		if (comment.getParentCommentId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"parentCommentId\": ");
+
+			sb.append(comment.getParentCommentId());
+		}
+
 		if (comment.getText() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -153,6 +173,13 @@ public class CommentSerDes {
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
+		if (comment.getActions() == null) {
+			map.put("actions", null);
+		}
+		else {
+			map.put("actions", String.valueOf(comment.getActions()));
+		}
+
 		if (comment.getCreator() == null) {
 			map.put("creator", null);
 		}
@@ -184,6 +211,15 @@ public class CommentSerDes {
 				String.valueOf(comment.getNumberOfComments()));
 		}
 
+		if (comment.getParentCommentId() == null) {
+			map.put("parentCommentId", null);
+		}
+		else {
+			map.put(
+				"parentCommentId",
+				String.valueOf(comment.getParentCommentId()));
+		}
+
 		if (comment.getText() == null) {
 			map.put("text", null);
 		}
@@ -211,7 +247,13 @@ public class CommentSerDes {
 			Comment comment, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
 
-			if (Objects.equals(jsonParserFieldName, "creator")) {
+			if (Objects.equals(jsonParserFieldName, "actions")) {
+				if (jsonParserFieldValue != null) {
+					comment.setActions(
+						(Map)CommentSerDes.toMap((String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "creator")) {
 				if (jsonParserFieldValue != null) {
 					comment.setCreator(
 						CreatorSerDes.toDTO((String)jsonParserFieldValue));
@@ -240,6 +282,12 @@ public class CommentSerDes {
 						Integer.valueOf((String)jsonParserFieldValue));
 				}
 			}
+			else if (Objects.equals(jsonParserFieldName, "parentCommentId")) {
+				if (jsonParserFieldValue != null) {
+					comment.setParentCommentId(
+						Long.valueOf((String)jsonParserFieldValue));
+				}
+			}
 			else if (Objects.equals(jsonParserFieldName, "text")) {
 				if (jsonParserFieldValue != null) {
 					comment.setText((String)jsonParserFieldValue);
@@ -256,9 +304,11 @@ public class CommentSerDes {
 	private static String _escape(Object object) {
 		String string = String.valueOf(object);
 
-		string = string.replace("\\", "\\\\");
+		for (String[] strings : BaseJSONParser.JSON_ESCAPE_STRINGS) {
+			string = string.replace(strings[0], strings[1]);
+		}
 
-		return string.replace("\"", "\\\"");
+		return string;
 	}
 
 	private static String _toJSON(Map<String, ?> map) {

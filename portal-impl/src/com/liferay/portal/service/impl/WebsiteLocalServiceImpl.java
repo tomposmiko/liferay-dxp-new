@@ -59,9 +59,7 @@ public class WebsiteLocalServiceImpl extends WebsiteLocalServiceBaseImpl {
 		website.setTypeId(typeId);
 		website.setPrimary(primary);
 
-		websitePersistence.update(website);
-
-		return website;
+		return websitePersistence.update(website);
 	}
 
 	@Override
@@ -120,9 +118,7 @@ public class WebsiteLocalServiceImpl extends WebsiteLocalServiceBaseImpl {
 		website.setTypeId(typeId);
 		website.setPrimary(primary);
 
-		websitePersistence.update(website);
-
-		return website;
+		return websitePersistence.update(website);
 	}
 
 	protected void validate(
@@ -154,7 +150,7 @@ public class WebsiteLocalServiceImpl extends WebsiteLocalServiceBaseImpl {
 		UrlValidator urlValidator = new UrlValidator();
 
 		if (!urlValidator.isValid(url)) {
-			throw new WebsiteURLException();
+			throw new WebsiteURLException(url);
 		}
 
 		if (websiteId > 0) {

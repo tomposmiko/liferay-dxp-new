@@ -17,6 +17,7 @@ package com.liferay.headless.admin.user.client.resource.v1_0;
 import com.liferay.headless.admin.user.client.dto.v1_0.Phone;
 import com.liferay.headless.admin.user.client.http.HttpInvoker;
 import com.liferay.headless.admin.user.client.pagination.Page;
+import com.liferay.headless.admin.user.client.problem.Problem;
 import com.liferay.headless.admin.user.client.serdes.v1_0.PhoneSerDes;
 
 import java.util.LinkedHashMap;
@@ -38,11 +39,11 @@ public interface PhoneResource {
 		return new Builder();
 	}
 
-	public Page<Phone> getOrganizationPhonesPage(Long organizationId)
+	public Page<Phone> getOrganizationPhonesPage(String organizationId)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse getOrganizationPhonesPageHttpResponse(
-			Long organizationId)
+			String organizationId)
 		throws Exception;
 
 	public Phone getPhone(Long phoneId) throws Exception;
@@ -112,7 +113,7 @@ public interface PhoneResource {
 
 	public static class PhoneResourceImpl implements PhoneResource {
 
-		public Page<Phone> getOrganizationPhonesPage(Long organizationId)
+		public Page<Phone> getOrganizationPhonesPage(String organizationId)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
@@ -126,11 +127,20 @@ public interface PhoneResource {
 			_logger.fine(
 				"HTTP response status code: " + httpResponse.getStatusCode());
 
-			return Page.of(content, PhoneSerDes::toDTO);
+			try {
+				return Page.of(content, PhoneSerDes::toDTO);
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
 		}
 
 		public HttpInvoker.HttpResponse getOrganizationPhonesPageHttpResponse(
-				Long organizationId)
+				String organizationId)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
@@ -186,7 +196,7 @@ public interface PhoneResource {
 					Level.WARNING,
 					"Unable to process HTTP response: " + content, e);
 
-				throw e;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 		}
 
@@ -240,7 +250,16 @@ public interface PhoneResource {
 			_logger.fine(
 				"HTTP response status code: " + httpResponse.getStatusCode());
 
-			return Page.of(content, PhoneSerDes::toDTO);
+			try {
+				return Page.of(content, PhoneSerDes::toDTO);
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
 		}
 
 		public HttpInvoker.HttpResponse getUserAccountPhonesPageHttpResponse(

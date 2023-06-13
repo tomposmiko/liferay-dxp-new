@@ -41,7 +41,6 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
-import com.liferay.portlet.util.test.PortletKeys;
 
 import java.util.List;
 
@@ -87,12 +86,13 @@ public class EditServerMVCActionCommandTest {
 	public void testCleanUpProperPortletPreferences() throws Exception {
 		LayoutRevision layoutRevision = _getLayoutRevision();
 
-		String portletId = PortletIdCodec.encode(PortletKeys.TEST);
+		String portletId = PortletIdCodec.encode(
+			"com_liferay_test_portlet_TestPortlet");
 
-		UnicodeProperties typeSettingProperties =
+		UnicodeProperties typeSettingsProperties =
 			layoutRevision.getTypeSettingsProperties();
 
-		typeSettingProperties.setProperty("column-1", portletId);
+		typeSettingsProperties.setProperty("column-1", portletId);
 
 		layoutRevision = _layoutRevisionLocalService.updateLayoutRevision(
 			layoutRevision);

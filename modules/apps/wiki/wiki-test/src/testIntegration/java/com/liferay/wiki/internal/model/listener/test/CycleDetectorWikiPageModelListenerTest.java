@@ -22,7 +22,7 @@ import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
-import com.liferay.portal.service.test.ServiceTestUtil;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.wiki.model.WikiNode;
 import com.liferay.wiki.model.WikiPage;
@@ -50,7 +50,7 @@ public class CycleDetectorWikiPageModelListenerTest {
 
 	@Before
 	public void setUp() throws Exception {
-		ServiceTestUtil.setUser(TestPropsValues.getUser());
+		UserTestUtil.setUser(TestPropsValues.getUser());
 
 		_group = GroupTestUtil.addGroup();
 
@@ -78,7 +78,7 @@ public class CycleDetectorWikiPageModelListenerTest {
 
 			wikiPage2.setParentTitle("Title3");
 
-			wikiPage2 = WikiPageLocalServiceUtil.updateWikiPage(wikiPage2);
+			WikiPageLocalServiceUtil.updateWikiPage(wikiPage2);
 
 			wikiPage3.setParentTitle("Title1");
 
@@ -86,8 +86,8 @@ public class CycleDetectorWikiPageModelListenerTest {
 
 			Assert.fail();
 		}
-		catch (RuntimeException re) {
-			String message = re.getMessage();
+		catch (RuntimeException runtimeException) {
+			String message = runtimeException.getMessage();
 
 			Assert.assertEquals(
 				"Unable to update wiki page Title3 because a cycle was " +
@@ -98,16 +98,16 @@ public class CycleDetectorWikiPageModelListenerTest {
 		try {
 			wikiPage3.setParentTitle("Other");
 
-			wikiPage3 = WikiPageLocalServiceUtil.updateWikiPage(wikiPage3);
+			WikiPageLocalServiceUtil.updateWikiPage(wikiPage3);
 
 			wikiPage1.setTitle("Other");
 
-			wikiPage1 = WikiPageLocalServiceUtil.updateWikiPage(wikiPage1);
+			WikiPageLocalServiceUtil.updateWikiPage(wikiPage1);
 
 			Assert.fail();
 		}
-		catch (RuntimeException re) {
-			String message = re.getMessage();
+		catch (RuntimeException runtimeException) {
+			String message = runtimeException.getMessage();
 
 			Assert.assertEquals(
 				"Unable to update wiki page Other because a cycle was detected",
@@ -130,8 +130,8 @@ public class CycleDetectorWikiPageModelListenerTest {
 
 			Assert.fail();
 		}
-		catch (RuntimeException re) {
-			String message = re.getMessage();
+		catch (RuntimeException runtimeException) {
+			String message = runtimeException.getMessage();
 
 			Assert.assertEquals(
 				"Unable to create wiki page " + title +
@@ -153,8 +153,8 @@ public class CycleDetectorWikiPageModelListenerTest {
 
 			Assert.fail();
 		}
-		catch (RuntimeException re) {
-			String message = re.getMessage();
+		catch (RuntimeException runtimeException) {
+			String message = runtimeException.getMessage();
 
 			Assert.assertEquals(
 				"Unable to update wiki page Title because a cycle was detected",
@@ -168,12 +168,12 @@ public class CycleDetectorWikiPageModelListenerTest {
 
 			wikiPage1.setTitle("Other Title");
 
-			wikiPage1 = WikiPageLocalServiceUtil.updateWikiPage(wikiPage1);
+			WikiPageLocalServiceUtil.updateWikiPage(wikiPage1);
 
 			Assert.fail();
 		}
-		catch (RuntimeException re) {
-			String message = re.getMessage();
+		catch (RuntimeException runtimeException) {
+			String message = runtimeException.getMessage();
 
 			Assert.assertEquals(
 				"Unable to update wiki page Other Title because a cycle was " +

@@ -19,11 +19,14 @@ import com.liferay.portal.search.elasticsearch7.internal.connection.Elasticsearc
 import com.liferay.portal.search.engine.adapter.document.DeleteByQueryDocumentRequest;
 import com.liferay.portal.search.engine.adapter.document.DeleteByQueryDocumentResponse;
 
+import java.io.IOException;
+
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.reindex.BulkByScrollResponse;
-import org.elasticsearch.index.reindex.DeleteByQueryAction;
-import org.elasticsearch.index.reindex.DeleteByQueryRequestBuilder;
+import org.elasticsearch.index.reindex.DeleteByQueryRequest;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -41,11 +44,11 @@ public class DeleteByQueryDocumentRequestExecutorImpl
 	public DeleteByQueryDocumentResponse execute(
 		DeleteByQueryDocumentRequest deleteByQueryDocumentRequest) {
 
-		DeleteByQueryRequestBuilder deleteByQueryRequestBuilder =
-			createDeleteByQueryRequestBuilder(deleteByQueryDocumentRequest);
+		DeleteByQueryRequest deleteByQueryRequest = createDeleteByQueryRequest(
+			deleteByQueryDocumentRequest);
 
-		BulkByScrollResponse bulkByScrollResponse =
-			deleteByQueryRequestBuilder.get();
+		BulkByScrollResponse bulkByScrollResponse = getBulkByScrollResponse(
+			deleteByQueryRequest, deleteByQueryDocumentRequest);
 
 		TimeValue timeValue = bulkByScrollResponse.getTook();
 
@@ -53,25 +56,40 @@ public class DeleteByQueryDocumentRequestExecutorImpl
 			bulkByScrollResponse.getDeleted(), timeValue.getMillis());
 	}
 
-	protected DeleteByQueryRequestBuilder createDeleteByQueryRequestBuilder(
+	protected DeleteByQueryRequest createDeleteByQueryRequest(
 		DeleteByQueryDocumentRequest deleteByQueryDocumentRequest) {
 
-		DeleteByQueryRequestBuilder deleteByQueryRequestBuilder =
-			new DeleteByQueryRequestBuilder(
-				_elasticsearchClientResolver.getClient(),
-				DeleteByQueryAction.INSTANCE);
+		DeleteByQueryRequest deleteByQueryRequest = new DeleteByQueryRequest();
+
+		deleteByQueryRequest.indices(
+			deleteByQueryDocumentRequest.getIndexNames());
 
 		QueryBuilder queryBuilder = _queryTranslator.translate(
 			deleteByQueryDocumentRequest.getQuery(), null);
 
-		deleteByQueryRequestBuilder.filter(queryBuilder);
+		deleteByQueryRequest.setQuery(queryBuilder);
 
-		deleteByQueryRequestBuilder.refresh(
+		deleteByQueryRequest.setRefresh(
 			deleteByQueryDocumentRequest.isRefresh());
-		deleteByQueryRequestBuilder.source(
-			deleteByQueryDocumentRequest.getIndexNames());
 
-		return deleteByQueryRequestBuilder;
+		return deleteByQueryRequest;
+	}
+
+	protected BulkByScrollResponse getBulkByScrollResponse(
+		DeleteByQueryRequest deleteByQueryRequest,
+		DeleteByQueryDocumentRequest deleteByQueryDocumentRequest) {
+
+		RestHighLevelClient restHighLevelClient =
+			_elasticsearchClientResolver.getRestHighLevelClient(
+				deleteByQueryDocumentRequest.getConnectionId(), false);
+
+		try {
+			return restHighLevelClient.deleteByQuery(
+				deleteByQueryRequest, RequestOptions.DEFAULT);
+		}
+		catch (IOException ioException) {
+			throw new RuntimeException(ioException);
+		}
 	}
 
 	@Reference(unbind = "-")

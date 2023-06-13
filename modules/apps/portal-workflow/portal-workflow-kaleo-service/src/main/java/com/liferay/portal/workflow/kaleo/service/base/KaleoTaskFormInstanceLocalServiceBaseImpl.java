@@ -83,7 +83,7 @@ public abstract class KaleoTaskFormInstanceLocalServiceBaseImpl
 	implements AopService, IdentifiableOSGiService,
 			   KaleoTaskFormInstanceLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>KaleoTaskFormInstanceLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.workflow.kaleo.service.KaleoTaskFormInstanceLocalServiceUtil</code>.
@@ -421,8 +421,8 @@ public abstract class KaleoTaskFormInstanceLocalServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

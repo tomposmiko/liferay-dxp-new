@@ -58,6 +58,7 @@ const doEvaluate = debounce((fieldName, evaluatorContext, callback) => {
 			const mergedPages = mergePages(
 				defaultLanguageId,
 				editingLanguageId,
+				fieldName,
 				newPages,
 				pages
 			);
@@ -104,6 +105,7 @@ export const mergeFieldOptions = (field, newField) => {
 export const mergePages = (
 	defaultLanguageId,
 	editingLanguageId,
+	fieldName,
 	newPages,
 	sourcePages
 ) => {
@@ -115,10 +117,14 @@ export const mergePages = (
 				sourcePages[pageIndex].rows[rowIndex].columns[columnIndex]
 					.fields[fieldIndex];
 
+			const displayErrors =
+				sourceField.displayErrors || field.fieldName === fieldName;
+
 			let newField = {
 				...sourceField,
 				...field,
 				defaultLanguageId,
+				displayErrors,
 				editingLanguageId,
 				valid: field.valid !== false
 			};

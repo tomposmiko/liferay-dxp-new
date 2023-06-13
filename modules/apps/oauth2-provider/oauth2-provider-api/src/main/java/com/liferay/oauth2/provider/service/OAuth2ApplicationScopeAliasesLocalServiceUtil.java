@@ -32,17 +32,25 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class OAuth2ApplicationScopeAliasesLocalServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.oauth2.provider.service.impl.OAuth2ApplicationScopeAliasesLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
 	 */
+	public static
+		com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases
+				addOAuth2ApplicationScopeAliases(
+					long companyId, long userId, String userName,
+					long oAuth2ApplicationId,
+					java.util.function.Consumer
+						<com.liferay.oauth2.provider.util.builder.
+							OAuth2ScopeBuilder> builderConsumer)
+			throws com.liferay.portal.kernel.exception.PortalException {
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link OAuth2ApplicationScopeAliasesLocalServiceUtil} to access the o auth2 application scope aliases local service. Add custom service methods to <code>com.liferay.oauth2.provider.service.impl.OAuth2ApplicationScopeAliasesLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
-	 */
+		return getService().addOAuth2ApplicationScopeAliases(
+			companyId, userId, userName, oAuth2ApplicationId, builderConsumer);
+	}
+
 	public static
 		com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases
 				addOAuth2ApplicationScopeAliases(

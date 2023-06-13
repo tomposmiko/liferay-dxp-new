@@ -55,6 +55,7 @@ import com.liferay.journal.internal.upgrade.v2_0_0.util.JournalArticleTable;
 import com.liferay.journal.internal.upgrade.v2_0_0.util.JournalFeedTable;
 import com.liferay.journal.internal.upgrade.v2_0_0.util.JournalFolderTable;
 import com.liferay.journal.model.JournalArticle;
+import com.liferay.portal.change.tracking.store.CTStoreFactory;
 import com.liferay.portal.configuration.upgrade.PrefsPropsToConfigurationUpgradeHelper;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
@@ -76,6 +77,7 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.settings.SettingsFactory;
 import com.liferay.portal.kernel.upgrade.BaseUpgradeSQLServerDatetime;
 import com.liferay.portal.kernel.upgrade.DummyUpgradeStep;
+import com.liferay.portal.kernel.upgrade.UpgradeCTModel;
 import com.liferay.portal.kernel.upgrade.UpgradeMVCCVersion;
 import com.liferay.portal.kernel.upgrade.UpgradeStep;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
@@ -131,8 +133,8 @@ public class JournalServiceUpgrade implements UpgradeStepRegistrator {
 					try {
 						deleteTempImages();
 					}
-					catch (Exception e) {
-						e.printStackTrace(
+					catch (Exception exception) {
+						exception.printStackTrace(
 							new PrintWriter(
 								dbProcessContext.getOutputStream(), true));
 					}
@@ -234,6 +236,12 @@ public class JournalServiceUpgrade implements UpgradeStepRegistrator {
 				}
 
 			});
+
+		registry.register(
+			"3.1.0", "3.2.0",
+			new UpgradeCTModel(
+				"JournalArticleLocalization", "JournalArticleResource",
+				"JournalArticle", "JournalFolder"));
 	}
 
 	protected void deleteTempImages() throws Exception {
@@ -283,6 +291,9 @@ public class JournalServiceUpgrade implements UpgradeStepRegistrator {
 
 	@Reference
 	private ConfigurationAdmin _configurationAdmin;
+
+	@Reference
+	private CTStoreFactory _ctStoreFactory;
 
 	@Reference
 	private DDMStorageLinkLocalService _ddmStorageLinkLocalService;

@@ -42,6 +42,7 @@ import com.liferay.portal.kernel.security.xml.SecureXMLFactoryProviderUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeException;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
@@ -116,8 +117,9 @@ public class UpgradeDynamicDataMappingTest extends PowerMockito {
 		setUpJSONFactoryUtil();
 
 		_upgradeDynamicDataMapping = new UpgradeDynamicDataMapping(
-			null, null, null, null, null, null, _ddmFormValuesDeserializer,
-			_ddmFormValuesSerializer, null, null, null, null, null, null,
+			null, null, null, null, null, null, null,
+			_ddmFormValuesDeserializer, _ddmFormValuesSerializer, null, null,
+			null, null, null, null,
 			(ResourceActions)ProxyUtil.newProxyInstance(
 				UpgradeDynamicDataMappingTest.class.getClassLoader(),
 				new Class<?>[] {ResourceActions.class},
@@ -152,7 +154,7 @@ public class UpgradeDynamicDataMappingTest extends PowerMockito {
 					}
 
 				}),
-			null, null, null);
+			null, null, null, null);
 	}
 
 	@Test
@@ -605,16 +607,14 @@ public class UpgradeDynamicDataMappingTest extends PowerMockito {
 
 	@Test
 	public void testToXMLWithoutLocalizedData() throws Exception {
-		Map<String, String> expandoValuesMap = new HashMap<>();
-
-		expandoValuesMap.put(
-			"Text", createLocalizationXML(new String[] {"Joe Bloggs"}));
-
 		String fieldsDisplay = "Text_INSTANCE_hcxo";
 
-		expandoValuesMap.put(
+		Map<String, String> expandoValuesMap = HashMapBuilder.put(
 			"_fieldsDisplay",
-			createLocalizationXML(new String[] {fieldsDisplay}));
+			createLocalizationXML(new String[] {fieldsDisplay})
+		).put(
+			"Text", createLocalizationXML(new String[] {"Joe Bloggs"})
+		).build();
 
 		String xml = _upgradeDynamicDataMapping.toXML(expandoValuesMap);
 
@@ -637,19 +637,17 @@ public class UpgradeDynamicDataMappingTest extends PowerMockito {
 
 	@Test
 	public void testToXMLWithRepeatableAndLocalizedData() throws Exception {
-		Map<String, String> expandoValuesMap = new HashMap<>();
-
-		expandoValuesMap.put(
-			"Text",
-			createLocalizationXML(
-				new String[] {"A", "B", "C"}, new String[] {"D", "E", "F"}));
-
 		String fieldsDisplay =
 			"Text_INSTANCE_hcxo,Text_INSTANCE_vfqd,Text_INSTANCE_ycey";
 
-		expandoValuesMap.put(
+		Map<String, String> expandoValuesMap = HashMapBuilder.put(
 			"_fieldsDisplay",
-			createLocalizationXML(new String[] {fieldsDisplay}));
+			createLocalizationXML(new String[] {fieldsDisplay})
+		).put(
+			"Text",
+			createLocalizationXML(
+				new String[] {"A", "B", "C"}, new String[] {"D", "E", "F"})
+		).build();
 
 		String xml = _upgradeDynamicDataMapping.toXML(expandoValuesMap);
 

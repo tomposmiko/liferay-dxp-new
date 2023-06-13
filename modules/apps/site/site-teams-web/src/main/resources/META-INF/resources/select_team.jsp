@@ -17,11 +17,11 @@
 <%@ include file="/init.jsp" %>
 
 <%
-SelectTeamDisplayContext selectTeamDisplayContext = new SelectTeamDisplayContext(renderRequest, renderResponse, request);
+SelectTeamDisplayContext selectTeamDisplayContext = new SelectTeamDisplayContext(request, renderRequest, renderResponse);
 %>
 
 <clay:management-toolbar
-	displayContext="<%= new SelectTeamManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, selectTeamDisplayContext) %>"
+	displayContext="<%= new SelectTeamManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, selectTeamDisplayContext) %>"
 />
 
 <aui:form cssClass="container-fluid-1280" name="selectTeamFm">

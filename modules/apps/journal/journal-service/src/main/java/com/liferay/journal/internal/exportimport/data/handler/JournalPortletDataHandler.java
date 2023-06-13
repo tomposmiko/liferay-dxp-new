@@ -154,8 +154,8 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 
 			return journalServiceConfiguration.publishToLiveByDefaultEnabled();
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 
 		return true;
@@ -279,11 +279,11 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 			// Export DDM structure default values
 
 			ActionableDynamicQuery
-				ddmStructureDefaultValueActionableDynamicQuery =
+				ddmStructureDefaultValuesActionableDynamicQuery =
 					getDDMStructureDefaultValuesActionableDynamicQuery(
 						portletDataContext);
 
-			ddmStructureDefaultValueActionableDynamicQuery.performActions();
+			ddmStructureDefaultValuesActionableDynamicQuery.performActions();
 		}
 
 		if (portletDataContext.getBooleanParameter(NAMESPACE, "templates")) {
@@ -672,8 +672,8 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 
 			return journalServiceConfiguration.versionHistoryByDefaultEnabled();
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 
 		return true;

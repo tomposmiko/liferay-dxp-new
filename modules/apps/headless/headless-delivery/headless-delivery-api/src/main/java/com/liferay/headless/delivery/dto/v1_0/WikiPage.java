@@ -88,6 +88,35 @@ public class WikiPage {
 
 	}
 
+	@Schema
+	@Valid
+	public Map<String, Map> getActions() {
+		return actions;
+	}
+
+	public void setActions(Map<String, Map> actions) {
+		this.actions = actions;
+	}
+
+	@JsonIgnore
+	public void setActions(
+		UnsafeSupplier<Map<String, Map>, Exception> actionsUnsafeSupplier) {
+
+		try {
+			actions = actionsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected Map<String, Map> actions;
+
 	@Schema(description = "The blog post's average rating.")
 	@Valid
 	public AggregateRating getAggregateRating() {
@@ -114,7 +143,7 @@ public class WikiPage {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The blog post's average rating.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected AggregateRating aggregateRating;
 
@@ -142,7 +171,7 @@ public class WikiPage {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The wiki page's content.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String content;
 
@@ -171,7 +200,7 @@ public class WikiPage {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The wiki page's creator.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator creator;
 
@@ -228,7 +257,7 @@ public class WikiPage {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The date the wiki page was created.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
@@ -258,7 +287,9 @@ public class WikiPage {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The last time any of the wiki page's fields changed."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateModified;
 
@@ -286,7 +317,7 @@ public class WikiPage {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The wiki page's description.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String description;
 
@@ -316,7 +347,9 @@ public class WikiPage {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The wiki page's media format (e.g., HTML, BBCode, etc.)."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	@NotEmpty
 	protected String encodingFormat;
@@ -345,7 +378,7 @@ public class WikiPage {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The wiki page's main title.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	@NotEmpty
 	protected String headline;
@@ -372,7 +405,7 @@ public class WikiPage {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The wiki page's ID.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
@@ -400,7 +433,7 @@ public class WikiPage {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "A list of keywords describing the blog post.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String[] keywords;
 
@@ -428,7 +461,7 @@ public class WikiPage {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The wiki page's number attachments.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer numberOfAttachments;
 
@@ -456,9 +489,39 @@ public class WikiPage {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The number of child wiki page on this wiki page."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer numberOfWikiPages;
+
+	@Schema
+	public Long getParentWikiPageId() {
+		return parentWikiPageId;
+	}
+
+	public void setParentWikiPageId(Long parentWikiPageId) {
+		this.parentWikiPageId = parentWikiPageId;
+	}
+
+	@JsonIgnore
+	public void setParentWikiPageId(
+		UnsafeSupplier<Long, Exception> parentWikiPageIdUnsafeSupplier) {
+
+		try {
+			parentWikiPageId = parentWikiPageIdUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Long parentWikiPageId;
 
 	@Schema
 	@Valid
@@ -516,7 +579,9 @@ public class WikiPage {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The ID of the site to which this wiki page is scoped."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long siteId;
 
@@ -574,7 +639,9 @@ public class WikiPage {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The categories associated with this blog post."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected TaxonomyCategory[] taxonomyCategories;
 
@@ -604,7 +671,9 @@ public class WikiPage {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A write-only field that adds a `TaxonomyCategory` to this resource."
+	)
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	protected Long[] taxonomyCategoryIds;
 
@@ -644,7 +713,9 @@ public class WikiPage {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A write-only property that specifies the default permissions."
+	)
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	protected ViewableBy viewableBy;
 
@@ -677,6 +748,16 @@ public class WikiPage {
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+		if (actions != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"actions\": ");
+
+			sb.append(_toJSON(actions));
+		}
 
 		if (aggregateRating != null) {
 			if (sb.length() > 1) {
@@ -854,6 +935,16 @@ public class WikiPage {
 			sb.append("\"numberOfWikiPages\": ");
 
 			sb.append(numberOfWikiPages);
+		}
+
+		if (parentWikiPageId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"parentWikiPageId\": ");
+
+			sb.append(parentWikiPageId);
 		}
 
 		if (relatedContents != null) {

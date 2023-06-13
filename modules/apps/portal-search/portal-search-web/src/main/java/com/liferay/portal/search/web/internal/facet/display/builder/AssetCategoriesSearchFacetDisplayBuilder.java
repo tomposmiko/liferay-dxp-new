@@ -17,10 +17,12 @@ package com.liferay.portal.search.web.internal.facet.display.builder;
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.search.facet.collector.FacetCollector;
 import com.liferay.portal.kernel.search.facet.collector.TermCollector;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.search.web.internal.facet.display.context.AssetCategoriesSearchFacetDisplayContext;
 import com.liferay.portal.search.web.internal.facet.display.context.AssetCategoriesSearchFacetTermDisplayContext;
@@ -36,17 +38,25 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.portlet.RenderRequest;
+
 /**
  * @author Lino Alves
  */
 public class AssetCategoriesSearchFacetDisplayBuilder implements Serializable {
+
+	public AssetCategoriesSearchFacetDisplayBuilder(
+		RenderRequest renderRequest) {
+
+		_renderRequest = renderRequest;
+	}
 
 	public AssetCategoriesSearchFacetDisplayContext build() {
 		_buckets = collectBuckets(_facet.getFacetCollector());
 
 		AssetCategoriesSearchFacetDisplayContext
 			assetCategoriesSearchFacetDisplayContext =
-				new AssetCategoriesSearchFacetDisplayContext();
+				createAssetCategoriesSearchFacetDisplayContext();
 
 		assetCategoriesSearchFacetDisplayContext.setCloud(isCloud());
 		assetCategoriesSearchFacetDisplayContext.setNothingSelected(
@@ -127,6 +137,10 @@ public class AssetCategoriesSearchFacetDisplayBuilder implements Serializable {
 		).collect(
 			Collectors.toList()
 		);
+	}
+
+	public void setPortal(Portal portal) {
+		_portal = portal;
 	}
 
 	protected AssetCategoriesSearchFacetTermDisplayContext
@@ -248,6 +262,18 @@ public class AssetCategoriesSearchFacetDisplayBuilder implements Serializable {
 		}
 
 		return buckets;
+	}
+
+	protected AssetCategoriesSearchFacetDisplayContext
+		createAssetCategoriesSearchFacetDisplayContext() {
+
+		try {
+			return new AssetCategoriesSearchFacetDisplayContext(
+				_portal.getHttpServletRequest(_renderRequest));
+		}
+		catch (ConfigurationException configurationException) {
+			throw new RuntimeException(configurationException);
+		}
 	}
 
 	protected Optional<AssetCategoriesSearchFacetTermDisplayContext>
@@ -382,6 +408,8 @@ public class AssetCategoriesSearchFacetDisplayBuilder implements Serializable {
 	private Locale _locale;
 	private int _maxTerms;
 	private String _parameterName;
+	private Portal _portal;
+	private final RenderRequest _renderRequest;
 	private List<Long> _selectedCategoryIds = Collections.emptyList();
 
 }

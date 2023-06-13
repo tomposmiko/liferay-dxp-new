@@ -73,7 +73,7 @@ public abstract class EmailAddressLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements EmailAddressLocalService, IdentifiableOSGiService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>EmailAddressLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.kernel.service.EmailAddressLocalServiceUtil</code>.
@@ -714,8 +714,8 @@ public abstract class EmailAddressLocalServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

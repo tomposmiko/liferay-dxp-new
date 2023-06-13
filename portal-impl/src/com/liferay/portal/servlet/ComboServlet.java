@@ -87,11 +87,11 @@ public class ComboServlet extends HttpServlet {
 		try {
 			doService(httpServletRequest, httpServletResponse);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
 			PortalUtil.sendError(
-				HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e,
+				HttpServletResponse.SC_INTERNAL_SERVER_ERROR, exception,
 				httpServletRequest, httpServletResponse);
 		}
 	}
@@ -141,16 +141,16 @@ public class ComboServlet extends HttpServlet {
 
 			ServletContext servletContext = getServletContext();
 
-			String contextPath = servletContext.getContextPath();
-
-			if (name.startsWith(contextPath)) {
-				name = name.replaceFirst(contextPath, StringPool.BLANK);
-			}
-
 			String pathProxy = PortalUtil.getPathProxy();
 
 			if (name.startsWith(pathProxy)) {
 				name = name.replaceFirst(pathProxy, StringPool.BLANK);
+			}
+
+			String contextPath = servletContext.getContextPath();
+
+			if (name.startsWith(contextPath)) {
+				name = name.replaceFirst(contextPath, StringPool.BLANK);
 			}
 
 			modulePathsSet.add(name);
@@ -366,10 +366,10 @@ public class ComboServlet extends HttpServlet {
 							getServletContext(), httpServletRequest,
 							stringFileContent);
 					}
-					catch (Exception e) {
+					catch (Exception exception) {
 						_log.error(
 							"Unable to replace tokens in CSS " + resourcePath,
-							e);
+							exception);
 
 						if (_log.isDebugEnabled()) {
 							_log.debug(stringFileContent);

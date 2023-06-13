@@ -47,7 +47,7 @@ public abstract class DLAppLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements DLAppLocalService, IdentifiableOSGiService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>DLAppLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.document.library.kernel.service.DLAppLocalServiceUtil</code>.
@@ -301,8 +301,8 @@ public abstract class DLAppLocalServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

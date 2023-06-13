@@ -17,13 +17,17 @@ package com.liferay.headless.delivery.internal.resource.v1_0;
 import com.liferay.headless.delivery.dto.v1_0.WikiNode;
 import com.liferay.headless.delivery.resource.v1_0.WikiNodeResource;
 import com.liferay.petra.function.UnsafeFunction;
-import com.liferay.portal.kernel.model.Company;
-import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.GroupedModel;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
+import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.ResourceActionLocalService;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
+import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
+import com.liferay.portal.vulcan.util.ActionUtil;
 import com.liferay.portal.vulcan.util.TransformUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,6 +39,7 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Generated;
 
@@ -66,7 +71,7 @@ public abstract class BaseWikiNodeResourceImpl implements WikiNodeResource {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'GET' 'http://localhost:8080/o/headless-delivery/v1.0/sites/{siteId}/wiki-nodes/'  -u 'test@liferay.com:test'
+	 * curl -X 'GET' 'http://localhost:8080/o/headless-delivery/v1.0/sites/{siteId}/wiki-nodes'  -u 'test@liferay.com:test'
 	 */
 	@Override
 	@GET
@@ -83,7 +88,7 @@ public abstract class BaseWikiNodeResourceImpl implements WikiNodeResource {
 			@Parameter(in = ParameterIn.QUERY, name = "sort")
 		}
 	)
-	@Path("/sites/{siteId}/wiki-nodes/")
+	@Path("/sites/{siteId}/wiki-nodes")
 	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "WikiNode")})
 	public Page<WikiNode> getSiteWikiNodesPage(
@@ -99,14 +104,14 @@ public abstract class BaseWikiNodeResourceImpl implements WikiNodeResource {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -X 'POST' 'http://localhost:8080/o/headless-delivery/v1.0/sites/{siteId}/wiki-nodes/' -d $'{"description": ___, "name": ___, "viewableBy": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+	 * curl -X 'POST' 'http://localhost:8080/o/headless-delivery/v1.0/sites/{siteId}/wiki-nodes' -d $'{"description": ___, "name": ___, "viewableBy": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
 	 */
 	@Override
 	@Consumes({"application/json", "application/xml"})
 	@Operation(description = "Creates a new wiki node")
 	@POST
 	@Parameters(value = {@Parameter(in = ParameterIn.PATH, name = "siteId")})
-	@Path("/sites/{siteId}/wiki-nodes/")
+	@Path("/sites/{siteId}/wiki-nodes")
 	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "WikiNode")})
 	public WikiNode postSiteWikiNode(
@@ -115,44 +120,6 @@ public abstract class BaseWikiNodeResourceImpl implements WikiNodeResource {
 		throws Exception {
 
 		return new WikiNode();
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -X 'PUT' 'http://localhost:8080/o/headless-delivery/v1.0/wiki-node/{wikiNodeId}/subscribe'  -u 'test@liferay.com:test'
-	 */
-	@Override
-	@PUT
-	@Parameters(
-		value = {@Parameter(in = ParameterIn.PATH, name = "wikiNodeId")}
-	)
-	@Path("/wiki-node/{wikiNodeId}/subscribe")
-	@Produces("application/json")
-	@Tags(value = {@Tag(name = "WikiNode")})
-	public void putWikiNodeSubscribe(
-			@NotNull @Parameter(hidden = true) @PathParam("wikiNodeId") Long
-				wikiNodeId)
-		throws Exception {
-	}
-
-	/**
-	 * Invoke this method with the command line:
-	 *
-	 * curl -X 'PUT' 'http://localhost:8080/o/headless-delivery/v1.0/wiki-node/{wikiNodeId}/unsubscribe'  -u 'test@liferay.com:test'
-	 */
-	@Override
-	@PUT
-	@Parameters(
-		value = {@Parameter(in = ParameterIn.PATH, name = "wikiNodeId")}
-	)
-	@Path("/wiki-node/{wikiNodeId}/unsubscribe")
-	@Produces("application/json")
-	@Tags(value = {@Tag(name = "WikiNode")})
-	public void putWikiNodeUnsubscribe(
-			@NotNull @Parameter(hidden = true) @PathParam("wikiNodeId") Long
-				wikiNodeId)
-		throws Exception {
 	}
 
 	/**
@@ -169,7 +136,7 @@ public abstract class BaseWikiNodeResourceImpl implements WikiNodeResource {
 		value = {@Parameter(in = ParameterIn.PATH, name = "wikiNodeId")}
 	)
 	@Path("/wiki-nodes/{wikiNodeId}")
-	@Produces("application/json")
+	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "WikiNode")})
 	public void deleteWikiNode(
 			@NotNull @Parameter(hidden = true) @PathParam("wikiNodeId") Long
@@ -225,11 +192,51 @@ public abstract class BaseWikiNodeResourceImpl implements WikiNodeResource {
 		return new WikiNode();
 	}
 
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -X 'PUT' 'http://localhost:8080/o/headless-delivery/v1.0/wiki-nodes/{wikiNodeId}/subscribe'  -u 'test@liferay.com:test'
+	 */
+	@Override
+	@PUT
+	@Parameters(
+		value = {@Parameter(in = ParameterIn.PATH, name = "wikiNodeId")}
+	)
+	@Path("/wiki-nodes/{wikiNodeId}/subscribe")
+	@Produces({"application/json", "application/xml"})
+	@Tags(value = {@Tag(name = "WikiNode")})
+	public void putWikiNodeSubscribe(
+			@NotNull @Parameter(hidden = true) @PathParam("wikiNodeId") Long
+				wikiNodeId)
+		throws Exception {
+	}
+
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -X 'PUT' 'http://localhost:8080/o/headless-delivery/v1.0/wiki-nodes/{wikiNodeId}/unsubscribe'  -u 'test@liferay.com:test'
+	 */
+	@Override
+	@PUT
+	@Parameters(
+		value = {@Parameter(in = ParameterIn.PATH, name = "wikiNodeId")}
+	)
+	@Path("/wiki-nodes/{wikiNodeId}/unsubscribe")
+	@Produces({"application/json", "application/xml"})
+	@Tags(value = {@Tag(name = "WikiNode")})
+	public void putWikiNodeUnsubscribe(
+			@NotNull @Parameter(hidden = true) @PathParam("wikiNodeId") Long
+				wikiNodeId)
+		throws Exception {
+	}
+
 	public void setContextAcceptLanguage(AcceptLanguage contextAcceptLanguage) {
 		this.contextAcceptLanguage = contextAcceptLanguage;
 	}
 
-	public void setContextCompany(Company contextCompany) {
+	public void setContextCompany(
+		com.liferay.portal.kernel.model.Company contextCompany) {
+
 		this.contextCompany = contextCompany;
 	}
 
@@ -249,8 +256,35 @@ public abstract class BaseWikiNodeResourceImpl implements WikiNodeResource {
 		this.contextUriInfo = contextUriInfo;
 	}
 
-	public void setContextUser(User contextUser) {
+	public void setContextUser(
+		com.liferay.portal.kernel.model.User contextUser) {
+
 		this.contextUser = contextUser;
+	}
+
+	protected Map<String, String> addAction(
+		String actionName, GroupedModel groupedModel, String methodName) {
+
+		return ActionUtil.addAction(
+			actionName, getClass(), groupedModel, methodName,
+			contextScopeChecker, contextUriInfo);
+	}
+
+	protected Map<String, String> addAction(
+		String actionName, Long id, String methodName, String permissionName,
+		Long siteId) {
+
+		return ActionUtil.addAction(
+			actionName, getClass(), id, methodName, permissionName,
+			contextScopeChecker, siteId, contextUriInfo);
+	}
+
+	protected Map<String, String> addAction(
+		String actionName, String methodName, String permissionName,
+		Long siteId) {
+
+		return addAction(
+			actionName, siteId, methodName, permissionName, siteId);
 	}
 
 	protected void preparePatch(WikiNode wikiNode, WikiNode existingWikiNode) {
@@ -285,10 +319,15 @@ public abstract class BaseWikiNodeResourceImpl implements WikiNodeResource {
 	}
 
 	protected AcceptLanguage contextAcceptLanguage;
-	protected Company contextCompany;
+	protected com.liferay.portal.kernel.model.Company contextCompany;
+	protected com.liferay.portal.kernel.model.User contextUser;
+	protected GroupLocalService groupLocalService;
 	protected HttpServletRequest contextHttpServletRequest;
 	protected HttpServletResponse contextHttpServletResponse;
+	protected ResourceActionLocalService resourceActionLocalService;
+	protected ResourcePermissionLocalService resourcePermissionLocalService;
+	protected RoleLocalService roleLocalService;
+	protected Object contextScopeChecker;
 	protected UriInfo contextUriInfo;
-	protected User contextUser;
 
 }

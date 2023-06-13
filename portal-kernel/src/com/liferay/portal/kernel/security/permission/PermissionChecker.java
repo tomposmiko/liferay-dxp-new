@@ -18,7 +18,6 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.permission.contributor.RoleContributor;
 
-import java.util.List;
 import java.util.Map;
 
 import org.osgi.annotation.versioning.ProviderType;
@@ -43,13 +42,6 @@ public interface PermissionChecker extends Cloneable {
 	public long[] getGuestUserRoleIds();
 
 	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public List<Long> getOwnerResourceBlockIds(
-		long companyId, long groupId, String name, String actionId);
-
-	/**
 	 * Returns the primary key of the owner role. This role is automatically
 	 * given to the creator of a resource.
 	 *
@@ -58,14 +50,6 @@ public interface PermissionChecker extends Cloneable {
 	public long getOwnerRoleId();
 
 	public Map<Object, Object> getPermissionChecksMap();
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public List<Long> getResourceBlockIds(
-		long companyId, long groupId, long userId, String name,
-		String actionId);
 
 	/**
 	 * Returns the primary keys of the roles the user has within the group.

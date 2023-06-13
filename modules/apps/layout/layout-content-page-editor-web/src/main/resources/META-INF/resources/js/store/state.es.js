@@ -19,7 +19,8 @@ import {getEmptyLayoutData} from '../utils/LayoutDataList.es';
 import {
 	EDITABLE_FRAGMENT_ENTRY_PROCESSOR,
 	FRAGMENTS_EDITOR_ITEM_BORDERS,
-	FRAGMENTS_EDITOR_ROW_TYPES
+	FRAGMENTS_EDITOR_ROW_TYPES,
+	PAGE_TYPES
 } from '../utils/constants';
 
 const LayoutDataShape = Config.shapeOf({
@@ -98,35 +99,6 @@ const INITIAL_STATE = {
 	addStructuredContentURL: Config.string().value(''),
 
 	/**
-	 * List of asset browser links that can be used
-	 * for selecting an asset
-	 * @default []
-	 * @review
-	 * @type {object[]}
-	 */
-	assetBrowserLinks: Config.arrayOf(
-		Config.shapeOf({
-			href: Config.string(),
-			typeName: Config.string()
-		})
-	).value([]),
-
-	availableAssets: Config.arrayOf(
-		Config.shapeOf({
-			availableTemplates: Config.arrayOf(
-				Config.shapeOf({
-					key: Config.string(),
-					label: Config.string()
-				})
-			),
-			className: Config.string(),
-			classNameId: Config.string(),
-			href: Config.string(),
-			name: Config.string()
-		})
-	).value([]),
-
-	/**
 	 * Object of available languages.
 	 * @default {}
 	 * @review
@@ -161,10 +133,21 @@ const INITIAL_STATE = {
 	availableSegmentsExperiences: Config.objectOf(
 		Config.shapeOf({
 			active: Config.bool(),
+			hasLockedSegmentsExperiment: Config.bool(),
 			name: Config.string(),
 			priority: Config.number(),
 			segmentsEntryId: Config.string(),
-			segmentsExperienceId: Config.string()
+			segmentsExperienceId: Config.string(),
+			segmentsExperimentStatus: Config.oneOfType([
+				Config.objectOf(
+					Config.shapeOf({
+						label: Config.string(),
+						value: Config.number()
+					})
+				),
+				Config.object()
+			]),
+			segmentsExperimentURL: Config.string()
 		})
 	).value({}),
 
@@ -398,6 +381,14 @@ const INITIAL_STATE = {
 	getAssetMappingFieldsURL: Config.string().value(''),
 
 	/**
+	 * Get available templates url
+	 * @default undefined
+	 * @review
+	 * @type {string}
+	 */
+	getAvailableTemplatesURL: Config.string().value(''),
+
+	/**
 	 * URL for obtaining the content structure mapping fields
 	 * created.
 	 * @default '''
@@ -450,6 +441,20 @@ const INITIAL_STATE = {
 	getPageContentsURL: Config.string().value(''),
 
 	/**
+	 * @default true
+	 * @review
+	 * @type {bool}
+	 */
+	hasUpdateContentPermissions: Config.bool().value(true),
+
+	/**
+	 * @default true
+	 * @review
+	 * @type {bool}
+	 */
+	hasUpdatePermissions: Config.bool().value(true),
+
+	/**
 	 * Id of the last element that was hovered
 	 * @default ''
 	 * @review
@@ -474,6 +479,14 @@ const INITIAL_STATE = {
 	imageSelectorURL: Config.string().value(''),
 
 	/**
+	 * URL for selecting info items
+	 * @default []
+	 * @review
+	 * @type {object[]}
+	 */
+	infoItemSelectorURL: Config.string().value(''),
+
+	/**
 	 * Currently selected language id.
 	 * @default ''
 	 * @review
@@ -488,6 +501,14 @@ const INITIAL_STATE = {
 	 * @type {string}
 	 */
 	lastSaveDate: Config.string().value(''),
+
+	/**
+	 * Array of warning messages to display for layout conversion draft.
+	 * @default []
+	 * @review
+	 * @type {Array<string>}
+	 */
+	layoutConversionWarningMessages: Config.array().value([]),
 
 	/**
 	 * Data associated to the layout
@@ -511,6 +532,14 @@ const INITIAL_STATE = {
 	).value([]),
 
 	/**
+	 * Whether or not the selected Experience edition is locked
+	 * @default false
+	 * @review
+	 * @type {boolean}
+	 */
+	lockedSegmentsExperience: Config.bool().value(false),
+
+	/**
 	 * Current layout look&feel url
 	 * @default undefined
 	 * @review
@@ -523,7 +552,7 @@ const INITIAL_STATE = {
 	 * @review
 	 * @type {object[]}
 	 */
-	mappedAssetEntries: Config.array().value([]),
+	mappedInfoItems: Config.array().value([]),
 
 	/**
 	 * URL for getting the list of mapping fields
@@ -532,6 +561,21 @@ const INITIAL_STATE = {
 	 * @type {string}
 	 */
 	mappingFieldsURL: Config.string().value(''),
+
+	/**
+	 * Master layout data
+	 * @review
+	 * @type {{structure: Array}}
+	 */
+	masterLayoutData: LayoutDataShape,
+
+	/**
+	 * If current master is being used
+	 * @default false
+	 * @review
+	 * @type {boolean}
+	 */
+	masterUsed: Config.bool().value(false),
 
 	/**
 	 * @default []
@@ -549,6 +593,20 @@ const INITIAL_STATE = {
 			usagesCount: Config.number()
 		})
 	).value([]),
+
+	/**
+	 * @review
+	 * @type {number}
+	 */
+	pageType: Config.oneOf(Object.values(PAGE_TYPES)),
+
+	/**
+	 * When true, it indicates that page is in pending status.
+	 * @default false
+	 * @review
+	 * @type {boolean}
+	 */
+	pending: Config.bool().value(false),
 
 	/**
 	 * Portlet namespace needed for prefixing form inputs
@@ -628,6 +686,23 @@ const INITIAL_STATE = {
 	segmentsExperienceId: Config.string().value(),
 
 	/**
+	 * The selected Experience test status
+	 * This is meant to be swapped every time an Experience is selected
+	 * @default null
+	 * @review
+	 * @type {object}
+	 */
+	segmentsExperimentStatus: Config.oneOfType([
+		Config.objectOf(
+			Config.shapeOf({
+				label: Config.string(),
+				value: Config.number()
+			})
+		),
+		Config.object()
+	]).value(),
+
+	/**
 	 * Selected items
 	 * @default []
 	 * @review
@@ -673,7 +748,7 @@ const INITIAL_STATE = {
 	 * @review
 	 * @type {string}
 	 */
-	selectedSidebarPanelId: Config.string().value('sections'),
+	selectedSidebarPanelId: Config.string().value('elements'),
 
 	/**
 	 * Flag indicating if resolved comments should be shown
@@ -758,7 +833,15 @@ const INITIAL_STATE = {
 			),
 			title: Config.string().required()
 		})
-	).value([])
+	).value([]),
+
+	/**
+	 * When true, it indicates that workflow is enabled for the page.
+	 * @default false
+	 * @review
+	 * @type {boolean}
+	 */
+	workflowEnabled: Config.bool().value(false)
 };
 
 /**

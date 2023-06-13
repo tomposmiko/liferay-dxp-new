@@ -39,12 +39,13 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.util.DateTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.ContentTypes;
-import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -58,7 +59,6 @@ import com.liferay.portlet.dynamicdatamapping.util.test.DDMTemplateTestUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -88,10 +88,11 @@ public class AMJournalArticleStagedModelDataHandlerTest
 	public void setUp() throws Exception {
 		super.setUp();
 
-		Map<String, String> properties = new HashMap<>();
-
-		properties.put("max-height", "600");
-		properties.put("max-width", "800");
+		Map<String, String> properties = HashMapBuilder.put(
+			"max-height", "600"
+		).put(
+			"max-width", "800"
+		).build();
 
 		_amImageConfigurationHelper.addAMImageConfigurationEntry(
 			stagingGroup.getCompanyId(), StringUtil.randomString(),
@@ -227,12 +228,9 @@ public class AMJournalArticleStagedModelDataHandlerTest
 			StagedModel stagedModel, StagedModel importedStagedModel)
 		throws Exception {
 
-		Assert.assertTrue(
-			stagedModel.getCreateDate() + " " +
-				importedStagedModel.getCreateDate(),
-			DateUtil.equals(
-				stagedModel.getCreateDate(),
-				importedStagedModel.getCreateDate()));
+		DateTestUtil.assertEquals(
+			stagedModel.getCreateDate(), importedStagedModel.getCreateDate());
+
 		Assert.assertEquals(
 			stagedModel.getUuid(), importedStagedModel.getUuid());
 	}
@@ -274,9 +272,9 @@ public class AMJournalArticleStagedModelDataHandlerTest
 			RandomTestUtil.randomString(), "This is a test folder.",
 			serviceContext);
 
-		Map<Locale, String> titleMap = new HashMap<>();
-
-		titleMap.put(LocaleUtil.getSiteDefault(), "Test Article");
+		Map<Locale, String> titleMap = HashMapBuilder.put(
+			LocaleUtil.getSiteDefault(), "Test Article"
+		).build();
 
 		return _journalArticleLocalService.addArticle(
 			serviceContext.getUserId(), serviceContext.getScopeGroupId(),

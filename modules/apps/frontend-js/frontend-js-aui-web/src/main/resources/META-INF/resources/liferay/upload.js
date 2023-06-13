@@ -29,23 +29,31 @@ AUI.add(
 		var TPL_FILE_LIST = [
 			'<tpl for=".">',
 			'<tpl if="!values.error">',
-			'<li class="checkbox checkbox-card checkbox-middle-left upload-file {[ values.temp ? "upload-complete pending-file selectable" : "" ]} {[ values.selected ? "selected" : "" ]}" data-fileId="{id}" data-fileName="{[ LString.escapeHTML(values.name) ]}" data-title="{[ LString.escapeHTML(values.title ? values.title : values.name) ]}" id="{id}">',
+			'<li class="upload-file {[ values.temp ? "upload-complete pending-file selectable" : "" ]} {[ values.selected ? "selected" : "" ]}" data-fileId="{id}" data-fileName="{[ LString.escapeHTML(values.name) ]}" data-title="{[ LString.escapeHTML(values.title ? values.title : values.name) ]}" id="{id}">',
+			'<div class="form-check form-check-card form-check-middle-left">',
+			'<div class="custom-checkbox custom-control">',
 			'<label>',
-			'<input class="{[ !values.temp ? "hide" : "" ]} select-file" data-fileName="{[ LString.escapeHTML(values.name) ]}" data-title="{[ LString.escapeHTML(values.title ? values.title : values.name) ]}" id="{id}checkbox" name="{$ns}selectUploadedFile" type="{[ this.multipleFiles ? "checkbox" : "hidden" ]}" value="{[ LString.escapeHTML(values.name) ]}" />',
-			'<div class="card-horizontal">',
-			'<div class="card-row card-row-padded">',
-			'<div class="card-col-field">',
+			'<input class="custom-control-input entry-selector select-file" data-fileName="{[ LString.escapeHTML(values.name) ]}" data-title="{[ LString.escapeHTML(values.title ? values.title : values.name) ]}" {[ !values.temp ? "disabled" : "" ]} id="{id}checkbox" name="{$ns}selectUploadedFile" type="{[ this.multipleFiles ? "checkbox" : "hidden" ]}" value="{[ LString.escapeHTML(values.name) ]}" />',
+			'<span class="custom-control-label"></span>',
+			'<div class="card card-horizontal">',
+			'<div class="card-body">',
+			'<div class="card-row">',
+			'<div class="autofit-col">',
+			'<span class="sticker sticker-rounded">',
+			'<span class="sticker-overlay inline-item">',
 			Liferay.Util.getLexiconIconTpl('document'),
-			'</div>',
-			'<div class="card-col-content card-col-gutters clamp-horizontal">',
-			'<div class="clamp-container">',
-			'<span class="file-title truncate-text" title="{[ LString.escapeHTML(values.title ? values.title : values.name) ]}">{[ LString.escapeHTML(values.title ? values.title : values.name) ]}</span>',
-			'</div>',
-			'<span class="progress-bar">',
-			'<span class="progress" id="{id}progress"></span>',
+			'</span>',
 			'</span>',
 			'</div>',
-			'<div class="card-col-field delete-button-col">',
+			'<div class="autofit-col autofit-col-expand autofit-col-gutters clamp-horizontal">',
+			'<div class="clamp-container">',
+			'<span class="file-title text-truncate" title="{[ LString.escapeHTML(values.title ? values.title : values.name) ]}">{[ LString.escapeHTML(values.title ? values.title : values.name) ]}</span>',
+			'</div>',
+			'<span class="progress">',
+			'<span class="progress-bar progress-bar-animated" id="{id}progress"></span>',
+			'</span>',
+			'</div>',
+			'<div class="autofit-col delete-button-col">',
 			'<a class="delete-button lfr-button" href="javascript:;" id="{id}deleteButton" title="{[ this.strings.deleteFileText ]}">',
 			Liferay.Util.getLexiconIconTpl('times'),
 			'</a>',
@@ -57,7 +65,10 @@ AUI.add(
 			'</a>',
 			'</div>',
 			'</div>',
+			'</div>',
 			'</label>',
+			'</div>',
+			'</div>',
 			'</li>',
 			'</tpl>',
 
@@ -127,7 +138,7 @@ AUI.add(
 			'</tpl>',
 
 			'<span class="select-files-container" id="{$ns}selectFilesButton">',
-			'<button class="btn btn-default" type="button">{[ this.selectFilesText ]}</button>',
+			'<button class="btn btn-secondary" type="button">{[ this.selectFilesText ]}</button>',
 			'</span>',
 			'</div>',
 			'</div>',
@@ -821,9 +832,9 @@ AUI.add(
 
 					if (
 						data.status &&
-						(data.status >=
+						data.status >=
 							STATUS_CODE.SC_DUPLICATE_FILE_EXCEPTION &&
-							data.status < STATUS_CODE.INTERNAL_SERVER_ERROR)
+						data.status < STATUS_CODE.INTERNAL_SERVER_ERROR
 					) {
 						file.error =
 							data.message || strings.unexpectedErrorOnUploadText;
@@ -866,6 +877,7 @@ AUI.add(
 
 								if (input) {
 									input.attr('checked', true);
+									input.attr('disabled', false);
 
 									input.show();
 								}
@@ -913,6 +925,7 @@ AUI.add(
 						);
 
 						progress.setStyle('width', percentLoaded + '%');
+						progress.setAttribute('aria-valuenow', percentLoaded);
 					}
 				},
 

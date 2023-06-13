@@ -33,6 +33,22 @@
 	<td></td>
 	<td></td>
 </tr>
+<!--CREATE_NEW_CONTENT_FORM-->
+<tr>
+	<td>CONTENT_NAME_FIELD</td>
+	<td>//div[contains(@class,'form-group') and label[contains(.,'${key_fieldName}')]]//input</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CONTENT_VALUE_FIELD</td>
+	<td>//div[h3[contains(.,'Content Value')]]//input</td>
+	<td></td>
+</tr>
+<tr>
+	<td>STRUCTURE_FIELD_SELECT</td>
+	<td>//div[contains(.,'Structure Field')]//select</td>
+	<td></td>
+</tr>
 <!--FRAGMENT_SIDEBAR-->
 <tr>
 	<td>FRAGMENT_SIDEBAR</td>
@@ -95,6 +111,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>FRAGMENT_SIDEBAR_ENTRY_N</td>
+	<td>xpath=(//div[contains(@class,'fragments-editor-sidebar')]//li[contains(@data-fragments-editor-item-type,'fragments-editor-mapped-item')])[${key_rowNumber}]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>FRAGMENT_SIDEBAR_ELLIPSIS</td>
 	<td>//div[contains(@class,'sidebar')]//button[*[contains(@class,'lexicon-icon-ellipsis-v')]]</td>
 	<td></td>
@@ -136,22 +157,17 @@
 </tr>
 <tr>
 	<td>FRAGMENT_SIDEBAR_COLLECTION_PANEL</td>
-	<td>//div[contains(@class,'fragments-editor-sidebar-section')]//*[normalize-space()='${key_collectionName}']</td>
+	<td>//button[normalize-space()='${key_collectionName}']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>FRAGMENT_SIDEBAR_COLLECTION_PANEL_COLLAPSED</td>
-	<td>//div[contains(@class,'fragments-editor-sidebar-section')]//a[contains(@class,'collapsed')][normalize-space()='${key_collectionName}'] | //button[@aria-expanded='false'][normalize-space()='${key_collectionName}']</td>
+	<td>//button[@aria-expanded='false'][normalize-space()='${key_collectionName}']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>FRAGMENT_SIDEBAR_COLLECTION_PANEL_EXPANDED</td>
-	<td>//div[contains(@class,'fragments-editor-sidebar-section')]//*[@aria-expanded='true'][normalize-space()='${key_collectionName}']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>FRAGMENT_SIDEBAR_ADD_FRAGMENT_BUTTON</td>
-	<td>//button[@data-item-name='${key_fragmentName}']</td>
+	<td>//button[@aria-expanded='true'][normalize-space()='${key_collectionName}']</td>
 	<td></td>
 </tr>
 <tr>
@@ -181,7 +197,7 @@
 </tr>
 <tr>
 	<td>FRAGMENT_SIDEBAR_SHOW_RESOLVED_COMMENTS_CHECKBOX_UNCHECKED</td>
-	<td>//label[contains(.,'Show Resolved Comments')]/input[@value='false']</td>
+	<td>//label/input[@type='checkbox']</td>
 	<td></td>
 </tr>
 <tr>
@@ -192,6 +208,11 @@
 <tr>
 	<td>FRAGMENT_SIDEBAR_TAB_BUTTON_ACTIVE</td>
 	<td>//button[@data-title='${key_tabName}'][contains(@class,'active')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FRAGMENT_SIDEBAR_TITLE</td>
+	<td>//h1[contains(@class,'fragments-editor-sidebar-section__title') and contains(.,'${key_sidebarButton}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -216,6 +237,21 @@
 	<td></td>
 </tr>
 <tr>
+	<td>CONTENT_PAGE_IMAGE_CONTENT</td>
+	<td>//div[contains(@style,'${key_imageFileName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CONTENT_PAGE_TEXT_CONTENT</td>
+	<td>//div[contains(@class,'widget-content')]/p | //div[contains(@class,'asset-summary')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CONTENT_PAGE_WEB_CONTENT_CONTENT</td>
+	<td>//div[contains(@class,'journal-content-article ')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -233,7 +269,7 @@
 </tr>
 <tr>
 	<td>EXPERIENCE_SELECT_ITEM</td>
-	<td>//span[contains(@class,'truncate-text')]/strong[contains(.,'${key_experienceName}')]</td>
+	<td>//span[contains(@class,'text-truncate')]/strong[contains(.,'${key_experienceName}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -243,7 +279,7 @@
 </tr>
 <tr>
 	<td>EXPERIENCE_NAME</td>
-	<td>//input[@name='experienceName']</td>
+	<td>//input[contains(@id,'segmentsExperienceName')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -299,13 +335,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>EDITABLE_FIELD_TOOLBAR_MAP_DROPDOWN</td>
-	<td>//button[contains(@id,'asset-select-button')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>EDITABLE_FIELD_TOOLBAR_MAP_DROPDOWN_ASSET</td>
-	<td>//button[contains(@class,'dropdown-item') and @data-asset-browser-window-title='${key_assetField}']</td>
+	<td>EDITABLE_FIELD_TOOLBAR_MAP_ASSET_SELECT_POPUP_BUTTON</td>
+	<td>//div[contains(@class,'asset-select')]//button</td>
 	<td></td>
 </tr>
 <tr>
@@ -330,7 +361,7 @@
 </tr>
 <!--SECTION_BUILDER-->
 <tr>
-	<td>SECTION_BUILDER_BASIC_COMPONENTS_FRAGMENT</td>
+	<td>SECTION_BUILDER_FRAGMENTS</td>
 	<td>//div[contains(@data-item-name,'${fragmentName}')]</td>
 	<td></td>
 </tr>
@@ -367,12 +398,33 @@
 </tr>
 <tr>
 	<td>WIDGETS_ADD_PORTLET_DRAG_LINK</td>
-	<td>//div[contains(@data-drag-source-label,'${key_portletName}') and contains(@class,'drag-source')]</td>
+	<td>//button[contains(@data-drag-source-label,'${key_portletName}') and contains(@class,'drag-source')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>WIDGETS_OPTIONS_ICON</td>
 	<td>//span[contains(@class,'portlet-name') and contains(.,'${key_portletName}')]/../..//a[span//*[name()='path'][contains(@class,'lexicon-icon-body')]]</td>
+	<td></td>
+</tr>
+<!--BASED_ON_CUSTOM_MASTERS-->
+<tr>
+	<td>FRAGMENT_INHERITED_FROM_CUSTOM_MASTERS</td>
+	<td>//div[@data-onclick='null']//*[contains(@class,'component-${key_fragmentName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>OUTSIDE_OF_DROP_ZONE</td>
+	<td>//section[contains(@class,'container')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PORTLET_INHERITED_FROM_CUSTOM_MASTERS</td>
+	<td>//div[@data-onclick='null'and contains(.,'${key_portletName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SECTION_CONTAINER</td>
+	<td>//section[@tabindex='0'][${key_position}]/div[contains(@class,'container py-3')]</td>
 	<td></td>
 </tr>
 </tbody>

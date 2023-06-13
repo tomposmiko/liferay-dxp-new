@@ -66,6 +66,7 @@ import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.TransactionConfig;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -91,7 +92,6 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -265,7 +265,6 @@ public class CompanyLocalServiceTest {
 		CompanyLocalServiceUtil.deleteCompany(companyId);
 	}
 
-	@Ignore
 	@Test
 	public void testAddAndDeleteCompanyWithLayoutSetPrototype()
 		throws Throwable {
@@ -312,7 +311,6 @@ public class CompanyLocalServiceTest {
 		Assert.assertNull(layoutSetPrototype);
 	}
 
-	@Ignore
 	@Test
 	public void testAddAndDeleteCompanyWithLayoutSetPrototypeLinkedUserGroup()
 		throws Throwable {
@@ -706,8 +704,8 @@ public class CompanyLocalServiceTest {
 	}
 
 	@Test
-	public void testUpdateInvalidVirtualHostNames() throws Exception {
-		testUpdateVirtualHostNames(
+	public void testUpdateInvalidVirtualHostnames() throws Exception {
+		testUpdateVirtualHostnames(
 			new String[] {StringPool.BLANK, "localhost", ".abc"}, true);
 	}
 
@@ -730,8 +728,8 @@ public class CompanyLocalServiceTest {
 	}
 
 	@Test
-	public void testUpdateValidVirtualHostNames() throws Exception {
-		testUpdateVirtualHostNames(new String[] {"abc.com"}, false);
+	public void testUpdateValidVirtualHostnames() throws Exception {
+		testUpdateVirtualHostnames(new String[] {"abc.com"}, false);
 	}
 
 	protected Company addCompany() throws Exception {
@@ -749,9 +747,9 @@ public class CompanyLocalServiceTest {
 			long companyId, long userId, String name)
 		throws Exception {
 
-		Map<Locale, String> nameMap = new HashMap<>();
-
-		nameMap.put(LocaleUtil.getDefault(), name);
+		Map<Locale, String> nameMap = HashMapBuilder.put(
+			LocaleUtil.getDefault(), name
+		).build();
 
 		return LayoutSetPrototypeLocalServiceUtil.addLayoutSetPrototype(
 			userId, companyId, nameMap, new HashMap<Locale, String>(), true,
@@ -800,7 +798,7 @@ public class CompanyLocalServiceTest {
 
 				Assert.assertFalse(expectFailure);
 			}
-			catch (AccountNameException ane) {
+			catch (AccountNameException accountNameException) {
 				Assert.assertTrue(expectFailure);
 			}
 		}
@@ -842,7 +840,7 @@ public class CompanyLocalServiceTest {
 				Assert.assertEquals(originalMx, updatedMx);
 			}
 		}
-		catch (CompanyMxException cme) {
+		catch (CompanyMxException companyMxException) {
 			Assert.assertFalse(valid);
 			Assert.assertTrue(mailMxUpdate);
 		}
@@ -853,21 +851,21 @@ public class CompanyLocalServiceTest {
 		}
 	}
 
-	protected void testUpdateVirtualHostNames(
-			String[] virtualHostNames, boolean expectFailure)
+	protected void testUpdateVirtualHostnames(
+			String[] virtualHostnames, boolean expectFailure)
 		throws Exception {
 
 		Company company = addCompany();
 
-		for (String virtualHostName : virtualHostNames) {
+		for (String virtualHostname : virtualHostnames) {
 			try {
 				CompanyLocalServiceUtil.updateCompany(
-					company.getCompanyId(), virtualHostName, company.getMx(),
+					company.getCompanyId(), virtualHostname, company.getMx(),
 					company.getMaxUsers(), company.isActive());
 
 				Assert.assertFalse(expectFailure);
 			}
-			catch (CompanyVirtualHostException cvhe) {
+			catch (CompanyVirtualHostException companyVirtualHostException) {
 				Assert.assertTrue(expectFailure);
 			}
 		}

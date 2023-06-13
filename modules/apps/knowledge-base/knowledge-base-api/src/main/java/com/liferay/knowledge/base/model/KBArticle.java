@@ -31,7 +31,7 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface KBArticle extends KBArticleModel, PersistedModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.knowledge.base.model.impl.KBArticleImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -75,6 +75,8 @@ public interface KBArticle extends KBArticleModel, PersistedModel {
 
 	public String getParentTitle(java.util.Locale locale, int status)
 		throws com.liferay.portal.kernel.exception.PortalException;
+
+	public long getViewCount();
 
 	public boolean isFirstVersion();
 

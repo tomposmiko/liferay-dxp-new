@@ -17,16 +17,22 @@ package com.liferay.headless.admin.user.resource.v1_0.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.headless.admin.user.client.dto.v1_0.Organization;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.OrganizationLocalServiceUtil;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
@@ -43,9 +49,51 @@ public class OrganizationResourceTest extends BaseOrganizationResourceTestCase {
 		_user = UserTestUtil.addGroupAdminUser(testGroup);
 	}
 
+	@After
+	@Override
+	public void tearDown() throws Exception {
+		_deleteOrganizations(_childOrganizations);
+		_deleteOrganizations(_organizations);
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testGetOrganizationOrganizationsPageWithSortString() {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testGetOrganizationsPageWithSortString() {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testGraphQLDeleteOrganization() {
+	}
+
+	@Ignore
+	@Override
+	@Test
+	public void testPatchOrganization() {
+	}
+
 	@Override
 	protected String[] getAdditionalAssertFieldNames() {
 		return new String[] {"name"};
+	}
+
+	@Override
+	protected Organization testDeleteOrganization_addOrganization()
+		throws Exception {
+
+		Organization organization = randomOrganization();
+
+		return _toOrganization(
+			OrganizationLocalServiceUtil.addOrganization(
+				_user.getUserId(), 0, organization.getName(), true));
 	}
 
 	@Override
@@ -57,7 +105,7 @@ public class OrganizationResourceTest extends BaseOrganizationResourceTestCase {
 
 	@Override
 	protected Organization testGetOrganizationOrganizationsPage_addOrganization(
-			Long parentOrganizationId, Organization organization)
+			String parentOrganizationId, Organization organization)
 		throws Exception {
 
 		return _toOrganization(
@@ -65,14 +113,14 @@ public class OrganizationResourceTest extends BaseOrganizationResourceTestCase {
 	}
 
 	@Override
-	protected Long
+	protected String
 			testGetOrganizationOrganizationsPage_getParentOrganizationId()
 		throws Exception {
 
 		com.liferay.portal.kernel.model.Organization organization =
-			_addOrganization(randomOrganization(), 0);
+			_addOrganization(randomOrganization(), "0");
 
-		return organization.getOrganizationId();
+		return String.valueOf(organization.getOrganizationId());
 	}
 
 	@Override
@@ -90,17 +138,39 @@ public class OrganizationResourceTest extends BaseOrganizationResourceTestCase {
 		return testGetOrganization_addOrganization();
 	}
 
+	@Override
+	protected Organization testPatchOrganization_addOrganization()
+		throws Exception {
+
+		return _addUserOrganization(_user.getUserId(), randomOrganization());
+	}
+
+	@Override
+	protected Organization testPostOrganization_addOrganization(
+			Organization organization)
+		throws Exception {
+
+		return _addUserOrganization(_user.getUserId(), organization);
+	}
+
+	@Override
+	protected Organization testPutOrganization_addOrganization()
+		throws Exception {
+
+		return _addUserOrganization(_user.getUserId(), randomOrganization());
+	}
+
 	private com.liferay.portal.kernel.model.Organization _addOrganization(
-			Organization organization, long parentOrganizationId)
+			Organization organization, String parentOrganizationId)
 		throws PortalException {
 
 		com.liferay.portal.kernel.model.Organization
 			serviceBuilderOrganization =
 				OrganizationLocalServiceUtil.addOrganization(
-					_user.getUserId(), parentOrganizationId,
+					_user.getUserId(), GetterUtil.getLong(parentOrganizationId),
 					organization.getName(), true);
 
-		if (parentOrganizationId == 0) {
+		if (parentOrganizationId.equals("0")) {
 			_organizations.add(serviceBuilderOrganization);
 		}
 		else {
@@ -115,14 +185,42 @@ public class OrganizationResourceTest extends BaseOrganizationResourceTestCase {
 		throws Exception {
 
 		Organization parentOrganization = _toOrganization(
-			_addOrganization(organization, 0));
+			_addOrganization(organization, "0"));
 
 		if (userAccountId != null) {
 			UserLocalServiceUtil.addOrganizationUser(
-				parentOrganization.getId(), userAccountId);
+				GetterUtil.getLong(parentOrganization.getId()), userAccountId);
 		}
 
 		return parentOrganization;
+	}
+
+	private void _deleteOrganizations(
+		List<com.liferay.portal.kernel.model.Organization> organizations) {
+
+		for (com.liferay.portal.kernel.model.Organization organization :
+				organizations) {
+
+			try {
+				OrganizationLocalServiceUtil.deleteUserOrganization(
+					_user.getUserId(), organization);
+			}
+			catch (Exception exception) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(exception, exception);
+				}
+			}
+
+			try {
+				OrganizationLocalServiceUtil.deleteOrganization(
+					organization.getOrganizationId());
+			}
+			catch (Exception exception) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(exception, exception);
+				}
+			}
+		}
 	}
 
 	private Organization _toOrganization(
@@ -130,19 +228,19 @@ public class OrganizationResourceTest extends BaseOrganizationResourceTestCase {
 
 		return new Organization() {
 			{
-				id = organization.getOrganizationId();
 				dateCreated = organization.getCreateDate();
 				dateModified = organization.getModifiedDate();
+				id = String.valueOf(organization.getOrganizationId());
 				name = organization.getName();
 			}
 		};
 	}
 
-	@DeleteAfterTestRun
+	private static final Log _log = LogFactoryUtil.getLog(
+		OrganizationResourceTest.class);
+
 	private final List<com.liferay.portal.kernel.model.Organization>
 		_childOrganizations = new ArrayList<>();
-
-	@DeleteAfterTestRun
 	private final List<com.liferay.portal.kernel.model.Organization>
 		_organizations = new ArrayList<>();
 

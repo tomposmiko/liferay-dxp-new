@@ -15,6 +15,7 @@
 package com.liferay.portal.kernel.security.auth;
 
 import com.liferay.petra.lang.CentralizedThreadLocal;
+import com.liferay.portal.kernel.change.tracking.CTCollectionThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.CompanyConstants;
@@ -62,8 +63,8 @@ public class CompanyThreadLocal {
 				TimeZoneThreadLocal.setDefaultTimeZone(
 					defaultUser.getTimeZone());
 			}
-			catch (Exception e) {
-				_log.error(e, e);
+			catch (Exception exception) {
+				_log.error(exception, exception);
 			}
 		}
 		else {
@@ -72,6 +73,8 @@ public class CompanyThreadLocal {
 			LocaleThreadLocal.setDefaultLocale(null);
 			TimeZoneThreadLocal.setDefaultTimeZone(null);
 		}
+
+		CTCollectionThreadLocal.removeCTCollectionId();
 	}
 
 	public static void setDeleteInProcess(boolean deleteInProcess) {

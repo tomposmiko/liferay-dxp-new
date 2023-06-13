@@ -32,7 +32,7 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class AssetListEntrySegmentsEntryRelLocalServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.asset.list.service.impl.AssetListEntrySegmentsEntryRelLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
@@ -123,6 +123,13 @@ public class AssetListEntrySegmentsEntryRelLocalServiceUtil {
 
 		getService().deleteAssetListEntrySegmentsEntryRelByAssetListEntryId(
 			assetListEntryId);
+	}
+
+	public static void deleteAssetListEntrySegmentsEntryRelBySegmentsEntryId(
+		long segmentsEntryId) {
+
+		getService().deleteAssetListEntrySegmentsEntryRelBySegmentsEntryId(
+			segmentsEntryId);
 	}
 
 	/**

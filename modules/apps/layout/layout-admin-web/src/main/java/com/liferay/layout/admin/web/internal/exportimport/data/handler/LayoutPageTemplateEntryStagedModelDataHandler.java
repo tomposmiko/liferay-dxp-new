@@ -39,6 +39,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Element;
 
 import java.util.List;
@@ -108,23 +109,7 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 				PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
 		}
 
-		Layout layout = _layoutLocalService.fetchLayout(
-			layoutPageTemplateEntry.getPlid());
-
-		if (layout != null) {
-			Layout draftLayout = _layoutLocalService.fetchLayout(
-				_portal.getClassNameId(Layout.class), layout.getPlid());
-
-			if (draftLayout != null) {
-				StagedModelDataHandlerUtil.exportReferenceStagedModel(
-					portletDataContext, layoutPageTemplateEntry, draftLayout,
-					PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
-			}
-
-			StagedModelDataHandlerUtil.exportReferenceStagedModel(
-				portletDataContext, layoutPageTemplateEntry, layout,
-				PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
-		}
+		_exportReferenceLayout(layoutPageTemplateEntry, portletDataContext);
 
 		Element entryElement = portletDataContext.getExportDataElement(
 			layoutPageTemplateEntry);
@@ -135,6 +120,9 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 		if (defaultUserId == layoutPageTemplateEntry.getUserId()) {
 			entryElement.addAttribute("preloaded", "true");
 		}
+
+		entryElement.addAttribute(
+			"type", String.valueOf(layoutPageTemplateEntry.getType()));
 
 		portletDataContext.addClassedModel(
 			entryElement,
@@ -164,6 +152,8 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 			referenceElement.attributeValue("class-pk"));
 		String name = GetterUtil.getString(
 			referenceElement.attributeValue("name"));
+		int type = GetterUtil.getInteger(
+			referenceElement.attributeValue("type"));
 		boolean preloaded = GetterUtil.getBoolean(
 			referenceElement.attributeValue("preloaded"));
 
@@ -175,7 +165,7 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 		}
 		else {
 			existingLayoutPageTemplateEntry = fetchExistingTemplate(
-				uuid, groupId, name, 0L, preloaded);
+				uuid, groupId, name, type, 0L, preloaded);
 		}
 
 		if (existingLayoutPageTemplateEntry == null) {
@@ -309,7 +299,8 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 				fetchExistingTemplate(
 					layoutPageTemplateEntry.getUuid(),
 					portletDataContext.getScopeGroupId(),
-					layoutPageTemplateEntry.getName(), plid, preloaded);
+					layoutPageTemplateEntry.getName(),
+					layoutPageTemplateEntry.getType(), plid, preloaded);
 
 			if (existingLayoutPageTemplateEntry == null) {
 				importedLayoutPageTemplateEntry = _addStagedModel(
@@ -341,7 +332,8 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 	}
 
 	protected LayoutPageTemplateEntry fetchExistingTemplate(
-		String uuid, long groupId, String name, long plid, boolean preloaded) {
+		String uuid, long groupId, String name, int type, long plid,
+		boolean preloaded) {
 
 		LayoutPageTemplateEntry existingTemplate = null;
 
@@ -359,7 +351,7 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 		if ((existingTemplate == null) && preloaded) {
 			existingTemplate =
 				_layoutPageTemplateEntryLocalService.
-					fetchLayoutPageTemplateEntry(groupId, name);
+					fetchLayoutPageTemplateEntry(groupId, name, type);
 		}
 
 		return existingTemplate;
@@ -397,6 +389,42 @@ public class LayoutPageTemplateEntryStagedModelDataHandler
 
 		return _stagedModelRepository.addStagedModel(
 			portletDataContext, layoutPageTemplateEntry);
+	}
+
+	private void _exportReferenceLayout(
+			LayoutPageTemplateEntry layoutPageTemplateEntry,
+			PortletDataContext portletDataContext)
+		throws PortletDataException {
+
+		Layout layout = _layoutLocalService.fetchLayout(
+			layoutPageTemplateEntry.getPlid());
+
+		if (layout == null) {
+			return;
+		}
+
+		Element layoutElement = portletDataContext.getReferenceElement(
+			Layout.class.getName(), Long.valueOf(layout.getPlid()));
+
+		if ((layoutElement != null) &&
+			Validator.isNotNull(
+				layoutElement.attributeValue("master-layout-uuid"))) {
+
+			return;
+		}
+
+		Layout draftLayout = _layoutLocalService.fetchLayout(
+			_portal.getClassNameId(Layout.class), layout.getPlid());
+
+		if (draftLayout != null) {
+			StagedModelDataHandlerUtil.exportReferenceStagedModel(
+				portletDataContext, layoutPageTemplateEntry, draftLayout,
+				PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
+		}
+
+		StagedModelDataHandlerUtil.exportReferenceStagedModel(
+			portletDataContext, layoutPageTemplateEntry, layout,
+			PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
 	}
 
 	private void _validateLayoutPrototype(

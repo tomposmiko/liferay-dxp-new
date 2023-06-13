@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -161,8 +162,8 @@ public class WebDAVUtil {
 				return group.getGroupId();
 			}
 		}
-		catch (Exception e) {
-			throw new WebDAVException(e);
+		catch (Exception exception) {
+			throw new WebDAVException(exception);
 		}
 
 		return 0;
@@ -191,9 +192,10 @@ public class WebDAVUtil {
 
 		Set<Group> groups = new HashSet<>();
 
-		LinkedHashMap<String, Object> params = new LinkedHashMap<>();
-
-		params.put("usersGroups", user.getUserId());
+		LinkedHashMap<String, Object> params =
+			LinkedHashMapBuilder.<String, Object>put(
+				"usersGroups", user.getUserId()
+			).build();
 
 		OrderByComparator<Group> orderByComparator =
 			new GroupFriendlyURLComparator(true);

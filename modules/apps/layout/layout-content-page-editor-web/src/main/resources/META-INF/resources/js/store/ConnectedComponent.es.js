@@ -24,9 +24,21 @@ import {connect, disconnect, Store} from './store.es';
  * to a Store parameter.
  * @param {Component} Component
  * @param {string[]} [properties=[]] List of properties to be fetched from store
+ * @param {function} [mapStateToProps] Function to map store state to
+ *  component props
  * @return {Component}
  */
-const getConnectedComponent = (Component, properties) => {
+const getConnectedComponent = (Component, properties, mapStateToProps) => {
+	const defaultMapStateToProps = (state, props) => {
+		const mappedProps = {...props};
+
+		properties.forEach(property => {
+			mappedProps[property] = state[property];
+		});
+
+		return mappedProps;
+	};
+
 	/**
 	 * ConnectedComponent
 	 */
@@ -37,7 +49,19 @@ const getConnectedComponent = (Component, properties) => {
 		 * @param  {...any} ...args
 		 */
 		constructor(props, ...args) {
-			super(props, ...args);
+			let syncedProps = props;
+
+			if (syncedProps.store instanceof Store) {
+				syncedProps = {
+					...syncedProps,
+					...(mapStateToProps || defaultMapStateToProps)(
+						syncedProps.store.getState(),
+						syncedProps
+					)
+				};
+			}
+
+			super(syncedProps, ...args);
 
 			this.on('storeChanged', change => {
 				const newStore = change.newVal;
@@ -49,7 +73,8 @@ const getConnectedComponent = (Component, properties) => {
 					if (newStore instanceof Store) {
 						connect(
 							this,
-							newStore
+							newStore,
+							mapStateToProps || defaultMapStateToProps
 						);
 					}
 				}
@@ -59,10 +84,11 @@ const getConnectedComponent = (Component, properties) => {
 				disconnect(this);
 			});
 
-			if (props.store instanceof Store) {
+			if (syncedProps.store instanceof Store) {
 				connect(
 					this,
-					props.store
+					syncedProps.store,
+					mapStateToProps || defaultMapStateToProps
 				);
 			}
 		}

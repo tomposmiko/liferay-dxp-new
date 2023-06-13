@@ -50,6 +50,7 @@ import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.MapUtil;
@@ -64,7 +65,6 @@ import java.io.IOException;
 
 import java.net.URL;
 
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -106,8 +106,8 @@ public class AddStructuredContentMVCActionCommand extends BaseMVCActionCommand {
 			);
 		}
 		catch (Throwable t) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(t, t);
+			if (_log.isDebugEnabled()) {
+				_log.debug(t, t);
 			}
 
 			_handleException(themeDisplay, t, jsonObject);
@@ -215,14 +215,11 @@ public class AddStructuredContentMVCActionCommand extends BaseMVCActionCommand {
 
 		String content = _journalConverter.getContent(ddmStructure, fields);
 
-		Map<Locale, String> titleMap = new HashMap<Locale, String>() {
-			{
-				put(
-					LocaleUtil.fromLanguageId(
-						LocalizationUtil.getDefaultLanguageId(content)),
-					title);
-			}
-		};
+		Map<Locale, String> titleMap = HashMapBuilder.put(
+			LocaleUtil.fromLanguageId(
+				LocalizationUtil.getDefaultLanguageId(content)),
+			title
+		).build();
 
 		return _journalArticleService.addArticle(
 			themeDisplay.getScopeGroupId(),
@@ -273,9 +270,9 @@ public class AddStructuredContentMVCActionCommand extends BaseMVCActionCommand {
 				DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, imageName,
 				image.getType(), bytes, serviceContext);
 		}
-		catch (Exception e) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(e, e);
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception, exception);
 			}
 
 			throw new StorageFieldValueException(
@@ -297,9 +294,9 @@ public class AddStructuredContentMVCActionCommand extends BaseMVCActionCommand {
 
 			return false;
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(pe, pe);
+				_log.debug(portalException, portalException);
 			}
 
 			return false;

@@ -32,7 +32,7 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class DDMFormInstanceRecordLocalServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.dynamic.data.mapping.service.impl.DDMFormInstanceRecordLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
@@ -349,6 +349,20 @@ public class DDMFormInstanceRecordLocalServiceUtil {
 		return getService().getDDMFormInstanceRecordsCount();
 	}
 
+	public static com.liferay.dynamic.data.mapping.storage.DDMFormValues
+			getDDMFormValues(
+				com.liferay.dynamic.data.mapping.model.DDMForm ddmForm,
+				long storageId, String storageType)
+		throws com.liferay.dynamic.data.mapping.exception.StorageException {
+
+		return getService().getDDMFormValues(ddmForm, storageId, storageType);
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #getDDMFormValues(DDMForm, long, String)}
+	 */
+	@Deprecated
 	public static com.liferay.dynamic.data.mapping.storage.DDMFormValues
 			getDDMFormValues(
 				long storageId,

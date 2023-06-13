@@ -111,6 +111,11 @@ AUI.add(
 
 				instance._eventHandles.push(
 					instance.after(
+						'childrenChange',
+						instance._afterRenderTree,
+						instance
+					),
+					instance.after(
 						'render',
 						instance._afterRenderTree,
 						instance
@@ -317,7 +322,7 @@ AUI.add(
 						label: name,
 						plid: node.plid,
 						title,
-						url: node.friendlyURL,
+						url: node.regularURL,
 						uuid: node.uuid
 					},
 					node
@@ -419,7 +424,12 @@ AUI.add(
 						}
 					},
 					formatter: A.bind(instance._formatJSONResults, instance),
-					url: themeDisplay.getPathMain() + '/portal/get_layouts'
+					url:
+						themeDisplay.getDoAsUserIdEncoded() === ''
+							? themeDisplay.getPathMain() + '/portal/get_layouts'
+							: themeDisplay.getPathMain() +
+							  '/portal/get_layouts?doAsUserId=' +
+							  themeDisplay.getDoAsUserIdEncoded()
 				};
 
 				return ioCfg;

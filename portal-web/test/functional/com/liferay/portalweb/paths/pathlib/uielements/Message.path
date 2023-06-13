@@ -44,6 +44,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>EMPTY_INFO_DEPOT</td>
+	<td>//p[contains(@class,'text-muted')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>EMPTY_INFO_TAGLIB</td>
 	<td>//div[contains(@class,'taglib-empty-result-message')]</td>
 	<td></td>
@@ -145,7 +150,7 @@
 </tr>
 <tr>
 	<td>ERROR_FORM_FIELD_REQUIRED</td>
-	<td>//div[contains(@class,'has-error')]//div[contains(@class,'help-block')] | //div[contains(@class,'has-error')]//div[contains(@class,'form-feedback-indicator')]</td>
+	<td>//div[contains(@class,'has-error')]//div[contains(@class,'form-feedback-item')] | //div[contains(@class,'has-error')]//div[contains(@class,'form-feedback-indicator')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -170,7 +175,7 @@
 </tr>
 <tr>
 	<td>ERROR_MODAL_CONTENT</td>
-	<td>//div[contains(@class,'modal-content')]//form[contains(@class,'form-feedback')]</td>
+	<td>//div[contains(@class,'modal-content')]//div[contains(@class,'form-feedback')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -259,6 +264,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>NO_PAGES</td>
+	<td>//h1[contains(.,'No Pages yet')]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>PORTAL_LOCALIZATION</td>
 	<td>//div[contains(@class,'portal-message') and contains(@class,'alert-info')]</td>
 	<td></td>
@@ -315,7 +325,7 @@
 </tr>
 <tr>
 	<td>TOOLTIP</td>
-	<td>//div[contains(@class,'tooltip-content')]</td>
+	<td>//div[contains(@class,'tooltip') and contains(@class,'show')]</td>
 	<td></td>
 </tr>
 <tr>

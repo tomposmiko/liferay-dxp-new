@@ -97,7 +97,7 @@ const PageContent = props => {
 		>
 			<div className="d-flex pl-3 pr-2 py-3">
 				<div className="autofit-col autofit-col-expand">
-					<strong className="list-group-title truncate-text">
+					<strong className="list-group-title text-truncate">
 						{props.title}
 					</strong>
 
@@ -124,54 +124,56 @@ const PageContent = props => {
 					</div>
 				</div>
 
-				<ClayDropDown
-					active={active}
-					onActiveChange={setActive}
-					trigger={
-						<ClayButton
-							className="btn-monospaced btn-sm text-secondary"
-							displayType="unstyled"
-						>
-							<ClayIcon symbol="ellipsis-v" />
-						</ClayButton>
-					}
-				>
-					<ClayDropDown.ItemList>
-						{editURL && (
-							<ClayDropDown.Item href={editURL} key="editURL">
-								{Liferay.Language.get('edit')}
-							</ClayDropDown.Item>
-						)}
-
-						{permissionsURL && (
-							<ClayDropDown.Item
-								key="permissionsURL"
-								onClick={() =>
-									openWindow(
-										permissionsURL,
-										Liferay.Language.get('permissions')
-									)
-								}
+				{(editURL || permissionsURL || viewUsagesURL) && (
+					<ClayDropDown
+						active={active}
+						onActiveChange={setActive}
+						trigger={
+							<ClayButton
+								className="btn-monospaced btn-sm text-secondary"
+								displayType="unstyled"
 							>
-								{Liferay.Language.get('permissions')}
-							</ClayDropDown.Item>
-						)}
+								<ClayIcon symbol="ellipsis-v" />
+							</ClayButton>
+						}
+					>
+						<ClayDropDown.ItemList>
+							{editURL && (
+								<ClayDropDown.Item href={editURL} key="editURL">
+									{Liferay.Language.get('edit')}
+								</ClayDropDown.Item>
+							)}
 
-						{viewUsagesURL && (
-							<ClayDropDown.Item
-								key="viewUsagesURL"
-								onClick={() =>
-									openWindow(
-										viewUsagesURL,
-										Liferay.Language.get('view-usages')
-									)
-								}
-							>
-								{Liferay.Language.get('view-usages')}
-							</ClayDropDown.Item>
-						)}
-					</ClayDropDown.ItemList>
-				</ClayDropDown>
+							{permissionsURL && (
+								<ClayDropDown.Item
+									key="permissionsURL"
+									onClick={() =>
+										openWindow(
+											permissionsURL,
+											Liferay.Language.get('permissions')
+										)
+									}
+								>
+									{Liferay.Language.get('permissions')}
+								</ClayDropDown.Item>
+							)}
+
+							{viewUsagesURL && (
+								<ClayDropDown.Item
+									key="viewUsagesURL"
+									onClick={() =>
+										openWindow(
+											viewUsagesURL,
+											Liferay.Language.get('view-usages')
+										)
+									}
+								>
+									{Liferay.Language.get('view-usages')}
+								</ClayDropDown.Item>
+							)}
+						</ClayDropDown.ItemList>
+					</ClayDropDown>
+				)}
 			</div>
 		</li>
 	);

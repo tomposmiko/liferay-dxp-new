@@ -77,40 +77,49 @@ public class BasicFragmentEntryActionDropdownItemsProvider {
 						FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES)) {
 
 					add(_getEditFragmentEntryActionUnsafeConsumer());
-					add(_getRenameFragmentEntryActionUnsafeConsumer());
-					add(_getMoveFragmentEntryActionUnsafeConsumer());
+
+					if (!_fragmentEntry.isReadOnly()) {
+						add(_getRenameFragmentEntryActionUnsafeConsumer());
+						add(_getMoveFragmentEntryActionUnsafeConsumer());
+					}
+
 					add(_getCopyFragmentEntryActionUnsafeConsumer());
-					add(_getUpdateFragmentEntryPreviewActionUnsafeConsumer());
 
-					if ((_fragmentEntry.getGroupId() ==
-							_themeDisplay.getCompanyGroupId()) &&
-						(_fragmentEntry.getGlobalUsageCount() > 0)) {
-
+					if (!_fragmentEntry.isReadOnly()) {
 						add(
-							_getViewGroupFragmentEntryUsagesActionUnsafeConsumer());
+							_getUpdateFragmentEntryPreviewActionUnsafeConsumer());
+
+						if ((_fragmentEntry.getGroupId() ==
+								_themeDisplay.getCompanyGroupId()) &&
+							(_fragmentEntry.getGlobalUsageCount() > 0)) {
+
+							add(
+								_getViewGroupFragmentEntryUsagesActionUnsafeConsumer());
+						}
+
+						if (_fragmentEntry.getPreviewFileEntryId() > 0) {
+							add(
+								_getDeleteFragmentEntryPreviewActionUnsafeConsumer());
+						}
+
+						add(_getExportFragmentEntryActionUnsafeConsumer());
+
+						if ((_fragmentEntry.getGroupId() !=
+								_themeDisplay.getCompanyGroupId()) &&
+							(_fragmentEntry.getUsageCount() > 0)) {
+
+							add(
+								_getViewFragmentEntryUsagesActionUnsafeConsumer());
+						}
+
+						if (FragmentPermission.contains(
+								_themeDisplay.getPermissionChecker(),
+								_themeDisplay.getScopeGroupId(),
+								FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES)) {
+
+							add(_getDeleteFragmentEntryActionUnsafeConsumer());
+						}
 					}
-
-					if (_fragmentEntry.getPreviewFileEntryId() > 0) {
-						add(
-							_getDeleteFragmentEntryPreviewActionUnsafeConsumer());
-					}
-				}
-
-				add(_getExportFragmentEntryActionUnsafeConsumer());
-
-				if ((_fragmentEntry.getGroupId() !=
-						_themeDisplay.getCompanyGroupId()) &&
-					(_fragmentEntry.getUsageCount() > 0)) {
-
-					add(_getViewFragmentEntryUsagesActionUnsafeConsumer());
-				}
-
-				if (FragmentPermission.contains(
-						_themeDisplay.getPermissionChecker(),
-						_themeDisplay.getScopeGroupId(),
-						FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES)) {
-
-					add(_getDeleteFragmentEntryActionUnsafeConsumer());
 				}
 			}
 		};

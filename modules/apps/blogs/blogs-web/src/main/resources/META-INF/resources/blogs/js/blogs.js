@@ -327,17 +327,15 @@ AUI.add(
 
 						instance.updateFriendlyURL(title);
 
-						urlTitleInput.setAttribute('disabled', true);
-
-						urlTitleInputLabel.addClass('disabled');
+						Liferay.Util.toggleDisabled(urlTitleInput, true);
+						Liferay.Util.toggleDisabled(urlTitleInputLabel, true);
 					} else {
 						urlTitleInput.val(
 							instance._lastCustomURL || urlTitleInput.val()
 						);
 
-						urlTitleInput.removeAttribute('disabled');
-
-						urlTitleInputLabel.removeClass('disabled');
+						Liferay.Util.toggleDisabled(urlTitleInput, false);
+						Liferay.Util.toggleDisabled(urlTitleInputLabel, false);
 					}
 				},
 
@@ -407,14 +405,16 @@ AUI.add(
 								'#allowTrackbacks'
 							);
 
+							var assetTagNames = instance.one('#assetTagNames');
+
 							var data = instance.ns({
 								allowPingbacks:
 									allowPingbacks && allowPingbacks.val(),
 								allowTrackbacks:
 									allowTrackbacks && allowTrackbacks.val(),
-								assetTagNames: instance
-									.one('#assetTagNames')
-									.val(),
+								assetTagNames: assetTagNames
+									? assetTagNames.val()
+									: '',
 								cmd: constants.ADD,
 								content,
 								coverImageCaption,
@@ -703,6 +703,12 @@ AUI.add(
 					);
 				},
 
+				setCustomDescription(text) {
+					var instance = this;
+
+					instance._customDescription = text;
+				},
+
 				setDescription(text) {
 					var instance = this;
 
@@ -728,11 +734,16 @@ AUI.add(
 					var form = Liferay.Form.get(instance.ns('fm'));
 
 					if (!instance._shortenDescription) {
-						descriptionLabelNode.removeClass('disabled');
+						Liferay.Util.toggleDisabled(descriptionNode, false);
+						Liferay.Util.toggleDisabled(
+							descriptionLabelNode,
+							false
+						);
 
 						form.addRule(instance.ns('description'), 'required');
 					} else {
-						descriptionLabelNode.addClass('disabled');
+						Liferay.Util.toggleDisabled(descriptionNode, true);
+						Liferay.Util.toggleDisabled(descriptionLabelNode, true);
 
 						form.removeRule(instance.ns('description'), 'required');
 					}

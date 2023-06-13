@@ -28,6 +28,7 @@ import com.liferay.document.library.kernel.service.DLAppServiceUtil;
 import com.liferay.document.library.sync.constants.DLSyncConstants;
 import com.liferay.document.library.test.util.BaseDLAppTestCase;
 import com.liferay.document.library.workflow.WorkflowHandlerInvocationCounter;
+import com.liferay.petra.lang.SafeClosable;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.test.util.ConfigurationTemporarySwapper;
@@ -42,11 +43,11 @@ import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.ServiceTestConstants;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.security.permission.DoAsUserThread;
-import com.liferay.portal.service.test.ServiceTestUtil;
 import com.liferay.portal.test.rule.ExpectedLog;
 import com.liferay.portal.test.rule.ExpectedLogs;
 import com.liferay.portal.test.rule.ExpectedType;
@@ -312,9 +313,9 @@ public class DLAppServiceWhenAddingAFileEntryTest extends BaseDLAppTestCase {
 	@Ignore
 	@Test
 	public void testShouldSucceedWithConcurrentAccess() throws Exception {
-		_users = new User[ServiceTestUtil.THREAD_COUNT];
+		_users = new User[ServiceTestConstants.THREAD_COUNT];
 
-		for (int i = 0; i < ServiceTestUtil.THREAD_COUNT; i++) {
+		for (int i = 0; i < ServiceTestConstants.THREAD_COUNT; i++) {
 			User user = UserTestUtil.addUser(
 				"DLAppServiceTest" + (i + 1), group.getGroupId());
 
@@ -417,9 +418,9 @@ public class DLAppServiceWhenAddingAFileEntryTest extends BaseDLAppTestCase {
 
 		@Override
 		protected void doRun() throws Exception {
-			ProxyModeThreadLocal.setForceSync(true);
+			try (SafeClosable safeClosable =
+					ProxyModeThreadLocal.setWithSafeClosable(true)) {
 
-			try {
 				FileEntry fileEntry = DLAppServiceTestUtil.addFileEntry(
 					group.getGroupId(), parentFolder.getFolderId(),
 					"Test-" + _index + ".txt");
@@ -432,8 +433,8 @@ public class DLAppServiceWhenAddingAFileEntryTest extends BaseDLAppTestCase {
 
 				_success = true;
 			}
-			catch (Exception e) {
-				_log.error("Unable to add file " + _index, e);
+			catch (Exception exception) {
+				_log.error("Unable to add file " + _index, exception);
 			}
 		}
 
@@ -473,8 +474,8 @@ public class DLAppServiceWhenAddingAFileEntryTest extends BaseDLAppTestCase {
 					_success = true;
 				}
 			}
-			catch (Exception e) {
-				_log.error("Unable to get file " + _index, e);
+			catch (Exception exception) {
+				_log.error("Unable to get file " + _index, exception);
 			}
 		}
 

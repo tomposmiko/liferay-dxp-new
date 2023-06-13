@@ -47,6 +47,7 @@ public class AssetEntryAssetCategoryRelWrapper
 		attributes.put("mvccVersion", getMvccVersion());
 		attributes.put(
 			"assetEntryAssetCategoryRelId", getAssetEntryAssetCategoryRelId());
+		attributes.put("companyId", getCompanyId());
 		attributes.put("assetEntryId", getAssetEntryId());
 		attributes.put("assetCategoryId", getAssetCategoryId());
 		attributes.put("priority", getPriority());
@@ -67,6 +68,12 @@ public class AssetEntryAssetCategoryRelWrapper
 
 		if (assetEntryAssetCategoryRelId != null) {
 			setAssetEntryAssetCategoryRelId(assetEntryAssetCategoryRelId);
+		}
+
+		Long companyId = (Long)attributes.get("companyId");
+
+		if (companyId != null) {
+			setCompanyId(companyId);
 		}
 
 		Long assetEntryId = (Long)attributes.get("assetEntryId");
@@ -119,6 +126,16 @@ public class AssetEntryAssetCategoryRelWrapper
 	}
 
 	/**
+	 * Returns the company ID of this asset entry asset category rel.
+	 *
+	 * @return the company ID of this asset entry asset category rel
+	 */
+	@Override
+	public long getCompanyId() {
+		return model.getCompanyId();
+	}
+
+	/**
 	 * Returns the mvcc version of this asset entry asset category rel.
 	 *
 	 * @return the mvcc version of this asset entry asset category rel
@@ -148,11 +165,6 @@ public class AssetEntryAssetCategoryRelWrapper
 		return model.getPriority();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a asset entry asset category rel model instance should use the <code>AssetEntryAssetCategoryRel</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();
@@ -188,6 +200,16 @@ public class AssetEntryAssetCategoryRelWrapper
 	@Override
 	public void setAssetEntryId(long assetEntryId) {
 		model.setAssetEntryId(assetEntryId);
+	}
+
+	/**
+	 * Sets the company ID of this asset entry asset category rel.
+	 *
+	 * @param companyId the company ID of this asset entry asset category rel
+	 */
+	@Override
+	public void setCompanyId(long companyId) {
+		model.setCompanyId(companyId);
 	}
 
 	/**

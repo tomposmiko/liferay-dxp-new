@@ -91,8 +91,8 @@ public class SoyTemplateRecord extends SoyAbstractValue implements SoyRecord {
 		try {
 			render(appendable);
 		}
-		catch (IOException ioe) {
-			throw new AssertionError(ioe);
+		catch (IOException ioException) {
+			throw new AssertionError(ioException);
 		}
 
 		return appendable.toString();
@@ -207,6 +207,9 @@ public class SoyTemplateRecord extends SoyAbstractValue implements SoyRecord {
 
 	private SoyValue _toSoyValue(Object object) {
 		if (object == null) {
+			return NullData.INSTANCE;
+		}
+		else if (object == org.json.JSONObject.NULL) {
 			return NullData.INSTANCE;
 		}
 		else if (object instanceof BigDecimal) {
@@ -337,11 +340,11 @@ public class SoyTemplateRecord extends SoyAbstractValue implements SoyRecord {
 				}
 			}
 		}
-		catch (RuntimeException re) {
-			throw re;
+		catch (RuntimeException runtimeException) {
+			throw runtimeException;
 		}
-		catch (Exception e) {
-			throw new SoyDataException(e.getMessage(), e);
+		catch (Exception exception) {
+			throw new SoyDataException(exception.getMessage(), exception);
 		}
 
 		return soyMapData;

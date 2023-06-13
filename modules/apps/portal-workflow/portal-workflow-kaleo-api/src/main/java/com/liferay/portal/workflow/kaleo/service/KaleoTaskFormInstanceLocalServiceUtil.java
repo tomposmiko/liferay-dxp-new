@@ -32,7 +32,7 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class KaleoTaskFormInstanceLocalServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.portal.workflow.kaleo.service.impl.KaleoTaskFormInstanceLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
@@ -129,6 +129,13 @@ public class KaleoTaskFormInstanceLocalServiceUtil {
 
 		return getService().deleteKaleoTaskFormInstance(
 			kaleoTaskFormInstanceId);
+	}
+
+	public static void deleteKaleoTaskInstanceTokenKaleoTaskFormInstances(
+		long kaleoTaskInstanceTokenId) {
+
+		getService().deleteKaleoTaskInstanceTokenKaleoTaskFormInstances(
+			kaleoTaskInstanceTokenId);
 	}
 
 	/**

@@ -19,6 +19,7 @@ import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalServiceUtil;
 import com.liferay.journal.configuration.JournalServiceConfiguration;
+import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.internal.transformer.JournalTransformer;
 import com.liferay.journal.internal.transformer.JournalTransformerListenerRegistryUtil;
 import com.liferay.journal.model.JournalArticle;
@@ -37,6 +38,7 @@ import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.ModelHintsUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
+import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.portlet.PortletRequestModel;
@@ -73,6 +75,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
@@ -206,6 +209,42 @@ public class JournalUtil {
 	}
 
 	public static String getJournalControlPanelLink(
+		long folderId, long groupId,
+		LiferayPortletResponse liferayPortletResponse) {
+
+		if (liferayPortletResponse != null) {
+			PortletURL portletURL = liferayPortletResponse.createRenderURL();
+
+			portletURL.setParameter("groupId", String.valueOf(groupId));
+			portletURL.setParameter("folderId", String.valueOf(folderId));
+
+			return portletURL.toString();
+		}
+
+		try {
+			String portletId = PortletProviderUtil.getPortletId(
+				JournalArticle.class.getName(), PortletProvider.Action.EDIT);
+
+			String articleURL = PortalUtil.getControlPanelFullURL(
+				groupId, portletId, null);
+
+			String namespace = PortalUtil.getPortletNamespace(
+				JournalPortletKeys.JOURNAL);
+
+			articleURL = HttpUtil.addParameter(
+				articleURL, namespace + "groupId", groupId);
+
+			return HttpUtil.addParameter(
+				articleURL, namespace + "folderId", folderId);
+		}
+		catch (PortalException portalException) {
+			_log.error(portalException, portalException);
+		}
+
+		return StringPool.BLANK;
+	}
+
+	public static String getJournalControlPanelLink(
 			PortletRequest portletRequest, long folderId)
 		throws PortalException {
 
@@ -236,9 +275,9 @@ public class JournalUtil {
 				try {
 					_populateTokens(tokens, articleGroupId, themeDisplayModel);
 				}
-				catch (Exception e) {
+				catch (Exception exception) {
 					if (_log.isWarnEnabled()) {
-						_log.warn(e, e);
+						_log.warn(exception, exception);
 					}
 				}
 			}
@@ -350,8 +389,8 @@ public class JournalUtil {
 
 			content = XMLUtil.formatXML(document);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 
 		return content;
@@ -705,8 +744,8 @@ public class JournalUtil {
 				ConfigurationProviderUtil.getCompanyConfiguration(
 					JournalServiceConfiguration.class, companyId);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 
 		if (journalServiceConfiguration == null) {
@@ -762,10 +801,11 @@ public class JournalUtil {
 
 		String layoutSetFriendlyUrl = themeDisplay.getI18nPath();
 
-		String virtualHostname = layoutSet.getVirtualHostname();
+		TreeMap<String, String> virtualHostnames =
+			layoutSet.getVirtualHostnames();
 
-		if (Validator.isNull(virtualHostname) ||
-			!virtualHostname.equals(themeDisplay.getServerName())) {
+		if (virtualHostnames.isEmpty() ||
+			!virtualHostnames.containsKey(themeDisplay.getServerName())) {
 
 			layoutSetFriendlyUrl = friendlyUrlCurrent + group.getFriendlyURL();
 		}
@@ -838,10 +878,11 @@ public class JournalUtil {
 
 		String layoutSetFriendlyUrl = themeDisplayModel.getI18nPath();
 
-		String virtualHostname = layoutSet.getVirtualHostname();
+		TreeMap<String, String> virtualHostnames =
+			layoutSet.getVirtualHostnames();
 
-		if (Validator.isNull(virtualHostname) ||
-			!virtualHostname.equals(themeDisplayModel.getServerName())) {
+		if (virtualHostnames.isEmpty() ||
+			!virtualHostnames.containsKey(themeDisplayModel.getServerName())) {
 
 			layoutSetFriendlyUrl = friendlyUrlCurrent + group.getFriendlyURL();
 		}

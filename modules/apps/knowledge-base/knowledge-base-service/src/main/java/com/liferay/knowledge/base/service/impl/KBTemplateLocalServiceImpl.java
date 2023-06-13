@@ -90,7 +90,7 @@ public class KBTemplateLocalServiceImpl extends KBTemplateLocalServiceBaseImpl {
 		kbTemplate.setTitle(title);
 		kbTemplate.setContent(content);
 
-		kbTemplatePersistence.update(kbTemplate);
+		kbTemplate = kbTemplatePersistence.update(kbTemplate);
 
 		// Resources
 
@@ -170,7 +170,7 @@ public class KBTemplateLocalServiceImpl extends KBTemplateLocalServiceBaseImpl {
 				kbTemplate = kbTemplatePersistence.findByPrimaryKey(
 					kbTemplateId);
 			}
-			catch (NoSuchTemplateException nste) {
+			catch (NoSuchTemplateException noSuchTemplateException) {
 				continue;
 			}
 
@@ -221,7 +221,7 @@ public class KBTemplateLocalServiceImpl extends KBTemplateLocalServiceBaseImpl {
 		kbTemplate.setTitle(title);
 		kbTemplate.setContent(content);
 
-		kbTemplatePersistence.update(kbTemplate);
+		kbTemplate = kbTemplatePersistence.update(kbTemplate);
 
 		// Social
 

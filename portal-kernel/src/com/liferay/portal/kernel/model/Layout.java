@@ -30,7 +30,7 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface Layout extends LayoutModel, PersistedModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.portal.model.impl.LayoutImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -412,6 +412,10 @@ public interface Layout extends LayoutModel, PersistedModel {
 	 */
 	public boolean isSupportsEmbeddedPortlets();
 
+	public boolean isTypeAssetDisplay();
+
+	public boolean isTypeContent();
+
 	public boolean isTypeControlPanel();
 
 	public boolean isTypeEmbedded();
@@ -421,12 +425,6 @@ public interface Layout extends LayoutModel, PersistedModel {
 	public boolean isTypePanel();
 
 	public boolean isTypePortlet();
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public boolean isTypeSharedPortlet();
 
 	public boolean isTypeURL();
 

@@ -16,6 +16,7 @@ package com.liferay.dynamic.data.mapping.internal.search.spi.model.index.contrib
 
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.model.DDMTemplateVersion;
+import com.liferay.dynamic.data.mapping.security.permission.DDMPermissionSupport;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateVersionLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
@@ -43,6 +44,8 @@ public class DDMTemplateModelDocumentContributor
 	public void contribute(Document document, DDMTemplate ddmTemplate) {
 		document.addKeyword(Field.CLASS_NAME_ID, ddmTemplate.getClassNameId());
 		document.addKeyword(Field.CLASS_PK, ddmTemplate.getClassPK());
+		document.addKeyword("language", ddmTemplate.getLanguage());
+		document.addKeyword("mode", ddmTemplate.getMode());
 		document.addKeyword(
 			"resourceClassNameId", ddmTemplate.getResourceClassNameId());
 
@@ -54,14 +57,24 @@ public class DDMTemplateModelDocumentContributor
 			document.addKeyword(Field.STATUS, templateVersion.getStatus());
 			document.addKeyword(Field.VERSION, templateVersion.getVersion());
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(pe, pe);
+				_log.debug(portalException, portalException);
 			}
 		}
 
-		document.addKeyword("language", ddmTemplate.getLanguage());
-		document.addKeyword("mode", ddmTemplate.getMode());
+		try {
+			document.addKeyword(
+				"resourcePermissionName",
+				_ddmPermissionSupport.getTemplateModelResourceName(
+					ddmTemplate.getResourceClassNameId()));
+		}
+		catch (PortalException portalException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(portalException, portalException);
+			}
+		}
+
 		document.addKeyword("type", ddmTemplate.getType());
 		document.addLocalizedText(
 			Field.DESCRIPTION,
@@ -93,5 +106,8 @@ public class DDMTemplateModelDocumentContributor
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		DDMTemplateModelDocumentContributor.class);
+
+	@Reference
+	private DDMPermissionSupport _ddmPermissionSupport;
 
 }

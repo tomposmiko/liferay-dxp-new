@@ -63,6 +63,16 @@ public class WikiPageSerDes {
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
+		if (wikiPage.getActions() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"actions\": ");
+
+			sb.append(_toJSON(wikiPage.getActions()));
+		}
+
 		if (wikiPage.getAggregateRating() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -243,6 +253,16 @@ public class WikiPageSerDes {
 			sb.append(wikiPage.getNumberOfWikiPages());
 		}
 
+		if (wikiPage.getParentWikiPageId() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"parentWikiPageId\": ");
+
+			sb.append(wikiPage.getParentWikiPageId());
+		}
+
 		if (wikiPage.getRelatedContents() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -358,6 +378,13 @@ public class WikiPageSerDes {
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
+		if (wikiPage.getActions() == null) {
+			map.put("actions", null);
+		}
+		else {
+			map.put("actions", String.valueOf(wikiPage.getActions()));
+		}
+
 		if (wikiPage.getAggregateRating() == null) {
 			map.put("aggregateRating", null);
 		}
@@ -450,6 +477,15 @@ public class WikiPageSerDes {
 				String.valueOf(wikiPage.getNumberOfWikiPages()));
 		}
 
+		if (wikiPage.getParentWikiPageId() == null) {
+			map.put("parentWikiPageId", null);
+		}
+		else {
+			map.put(
+				"parentWikiPageId",
+				String.valueOf(wikiPage.getParentWikiPageId()));
+		}
+
 		if (wikiPage.getRelatedContents() == null) {
 			map.put("relatedContents", null);
 		}
@@ -518,7 +554,14 @@ public class WikiPageSerDes {
 			WikiPage wikiPage, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
 
-			if (Objects.equals(jsonParserFieldName, "aggregateRating")) {
+			if (Objects.equals(jsonParserFieldName, "actions")) {
+				if (jsonParserFieldValue != null) {
+					wikiPage.setActions(
+						(Map)WikiPageSerDes.toMap(
+							(String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(jsonParserFieldName, "aggregateRating")) {
 				if (jsonParserFieldValue != null) {
 					wikiPage.setAggregateRating(
 						AggregateRatingSerDes.toDTO(
@@ -600,6 +643,12 @@ public class WikiPageSerDes {
 						Integer.valueOf((String)jsonParserFieldValue));
 				}
 			}
+			else if (Objects.equals(jsonParserFieldName, "parentWikiPageId")) {
+				if (jsonParserFieldValue != null) {
+					wikiPage.setParentWikiPageId(
+						Long.valueOf((String)jsonParserFieldValue));
+				}
+			}
 			else if (Objects.equals(jsonParserFieldName, "relatedContents")) {
 				if (jsonParserFieldValue != null) {
 					wikiPage.setRelatedContents(
@@ -664,9 +713,11 @@ public class WikiPageSerDes {
 	private static String _escape(Object object) {
 		String string = String.valueOf(object);
 
-		string = string.replace("\\", "\\\\");
+		for (String[] strings : BaseJSONParser.JSON_ESCAPE_STRINGS) {
+			string = string.replace(strings[0], strings[1]);
+		}
 
-		return string.replace("\"", "\\\"");
+		return string;
 	}
 
 	private static String _toJSON(Map<String, ?> map) {

@@ -31,7 +31,6 @@ import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.repository.liferayrepository.model.LiferayFileVersion;
 
 import java.awt.image.RenderedImage;
 
@@ -79,6 +78,8 @@ public class AMGIFImageScaler implements AMImageScaler {
 
 			Map.Entry<byte[], byte[]> objectValuePair = collectorFuture.get();
 
+			file.delete();
+
 			byte[] bytes = objectValuePair.getKey();
 
 			Tuple<Integer, Integer> dimension = getDimension(bytes);
@@ -87,9 +88,9 @@ public class AMGIFImageScaler implements AMImageScaler {
 				bytes, dimension.second, dimension.first);
 		}
 		catch (ExecutionException | InterruptedException | IOException |
-			   PortalException | ProcessException e) {
+			   PortalException | ProcessException exception) {
 
-			throw new AMRuntimeException.IOException(e);
+			throw new AMRuntimeException.IOException(exception);
 		}
 	}
 
@@ -143,13 +144,6 @@ public class AMGIFImageScaler implements AMImageScaler {
 
 	private File _getFile(FileVersion fileVersion)
 		throws IOException, PortalException {
-
-		if (fileVersion instanceof LiferayFileVersion) {
-			LiferayFileVersion liferayFileVersion =
-				(LiferayFileVersion)fileVersion;
-
-			return liferayFileVersion.getFile(false);
-		}
 
 		try (InputStream inputStream = fileVersion.getContentStream(false)) {
 			return FileUtil.createTempFile(inputStream);

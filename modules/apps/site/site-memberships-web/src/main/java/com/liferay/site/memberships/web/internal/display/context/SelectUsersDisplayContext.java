@@ -17,6 +17,7 @@ package com.liferay.site.memberships.web.internal.display.context;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -175,6 +176,8 @@ public class SelectUsersDisplayContext {
 			(UserSearchTerms)userSearch.getSearchTerms();
 
 		LinkedHashMap<String, Object> userParams = new LinkedHashMap<>();
+
+		userParams.put(Field.GROUP_ID, Long.valueOf(getGroupId()));
 
 		if (group.isLimitedToParentSiteMembers()) {
 			userParams.put("inherit", Boolean.TRUE);

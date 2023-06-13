@@ -102,6 +102,7 @@ Group ddmTemplateGroup = GroupLocalServiceUtil.getGroup(ddmTemplateGroupId);
 					dialog: {
 						width: 1024
 					},
+					eventName: '<portlet:namespace />saveTemplate',
 					groupId: <%= ddmTemplateGroupId %>,
 					mvcPath: '/view_template.jsp',
 					navigationStartsOn: '<%= DDMNavigationHelper.VIEW_TEMPLATES %>',

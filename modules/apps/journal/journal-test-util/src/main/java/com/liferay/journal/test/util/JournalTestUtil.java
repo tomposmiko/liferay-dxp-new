@@ -49,6 +49,7 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -517,9 +518,9 @@ public class JournalTestUtil {
 			Map<String, byte[]> images, ServiceContext serviceContext)
 		throws Exception {
 
-		Map<Locale, String> titleMap = new HashMap<>();
-
-		titleMap.put(defaultLocale, "Test Article");
+		Map<Locale, String> titleMap = HashMapBuilder.put(
+			defaultLocale, "Test Article"
+		).build();
 
 		return JournalArticleLocalServiceUtil.addArticle(
 			serviceContext.getUserId(), serviceContext.getScopeGroupId(),
@@ -659,56 +660,81 @@ public class JournalTestUtil {
 			feedFormat, feedVersion, serviceContext);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             JournalFolderFixture#addFolder(long, long, long, String)}
+	 */
+	@Deprecated
 	public static JournalFolder addFolder(
 			long userId, long groupId, long parentFolderId, String name)
 		throws Exception {
 
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(groupId, userId);
+		JournalFolderFixture journalFolderFixture = new JournalFolderFixture(
+			JournalFolderLocalServiceUtil.getService());
 
-		return addFolder(parentFolderId, name, serviceContext);
+		return journalFolderFixture.addFolder(
+			userId, groupId, parentFolderId, name);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             JournalFolderFixture#addFolder(long, long, String)}
+	 */
+	@Deprecated
 	public static JournalFolder addFolder(
 			long groupId, long parentFolderId, String name)
 		throws Exception {
 
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext(
-				groupId, TestPropsValues.getUserId());
+		JournalFolderFixture journalFolderFixture = new JournalFolderFixture(
+			JournalFolderLocalServiceUtil.getService());
 
-		return addFolder(parentFolderId, name, serviceContext);
+		return journalFolderFixture.addFolder(groupId, parentFolderId, name);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             JournalFolderFixture#addFolder(long, String)}
+	 */
+	@Deprecated
 	public static JournalFolder addFolder(long groupId, String name)
 		throws Exception {
 
-		return addFolder(
-			groupId, JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, name);
+		JournalFolderFixture journalFolderFixture = new JournalFolderFixture(
+			JournalFolderLocalServiceUtil.getService());
+
+		return journalFolderFixture.addFolder(groupId, name);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             JournalFolderFixture#addFolder(long, String, ServiceContext)}
+	 */
+	@Deprecated
 	public static JournalFolder addFolder(
 			long parentFolderId, String name, ServiceContext serviceContext)
 		throws Exception {
 
-		return addFolder(
-			parentFolderId, name, "This is a test folder.", serviceContext);
+		JournalFolderFixture journalFolderFixture = new JournalFolderFixture(
+			JournalFolderLocalServiceUtil.getService());
+
+		return journalFolderFixture.addFolder(
+			parentFolderId, name, serviceContext);
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             JournalFolderFixture#addFolder(long, String, String, ServiceContext)}
+	 */
+	@Deprecated
 	public static JournalFolder addFolder(
 			long parentFolderId, String name, String description,
 			ServiceContext serviceContext)
 		throws Exception {
 
-		JournalFolder folder = JournalFolderLocalServiceUtil.fetchFolder(
-			serviceContext.getScopeGroupId(), parentFolderId, name);
+		JournalFolderFixture journalFolderFixture = new JournalFolderFixture(
+			JournalFolderLocalServiceUtil.getService());
 
-		if (folder != null) {
-			return folder;
-		}
-
-		return JournalFolderLocalServiceUtil.addFolder(
-			serviceContext.getUserId(), serviceContext.getScopeGroupId(),
+		return journalFolderFixture.addFolder(
 			parentFolderId, name, description, serviceContext);
 	}
 
@@ -1067,8 +1093,8 @@ public class JournalTestUtil {
 			_JOURNAL_UTIL_CLASS = classLoader.loadClass(
 				"com.liferay.journal.internal.util.JournalUtil");
 		}
-		catch (ClassNotFoundException cnfe) {
-			throw new ExceptionInInitializerError(cnfe);
+		catch (ClassNotFoundException classNotFoundException) {
+			throw new ExceptionInInitializerError(classNotFoundException);
 		}
 	}
 

@@ -9,11 +9,13 @@
 		actionURLs: map<string, string>,
 		active: bool,
 		checked: bool,
+		conversionPreview: bool,
 		description: string,
 		draft: bool,
 		dropdownItems: list<?>,
 		hasChild: bool,
 		parentable: bool,
+		pending: bool,
 		plid: string,
 		title: string,
 		url: string
@@ -86,12 +88,14 @@
 		actionURLs: map<string, string>,
 		active: bool,
 		checked: bool,
+		conversionPreview: bool,
 		description: string,
 		draft: bool,
 		dropdownItems: list<?>,
 		hasChild: bool,
 		parentable: bool,
 		plid: string,
+		pending: bool,
 		title: string,
 		url: string
 	]}
@@ -167,7 +171,7 @@
 					{/if}
 				{/let}
 
-				<div class="autofit-col flex-col">
+				<div class="autofit-col">
 					<div
 						class="custom-checkbox custom-control"
 						data-onclick="{$handleLayoutColumnItemCheckboxClick}"
@@ -181,7 +185,7 @@
 				</div>
 			{/if}
 
-			<div class="autofit-col flex-col flex-col-expand layout-column-item-title">
+			<div class="autofit-col autofit-col-expand layout-column-item-title">
 				<h4 class="list-group-title">
 					<span class="text-truncate">
 						{$layoutColumnItem.title}
@@ -192,10 +196,20 @@
 					<h6 class="layout-column-item-subtitle list-group-subtitle small text-truncate">
 						{$layoutColumnItem.description}
 
-						{if $layoutColumnItem.draft}
+						{if $layoutColumnItem.pending}
+							&nbsp;
+							<span class="label label-info">
+								<span class="label-item label-item-expand">{msg desc=""}pending{/msg}</span>
+							</span>
+						{elseif $layoutColumnItem.draft}
 							&nbsp;
 							<span class="label label-secondary">
 								<span class="label-item label-item-expand">{msg desc=""}draft{/msg}</span>
+							</span>
+						{elseif $layoutColumnItem.conversionPreview}
+							&nbsp;
+							<span class="label label-info">
+								<span class="label-item label-item-expand">{msg desc=""}conversion-draft{/msg}</span>
 							</span>
 						{/if}
 					</h6>
@@ -205,7 +219,7 @@
 			{if $layoutColumnItem.actionURLs}
 				{if $layoutColumnItem.plid == '0'}
 					{if $layoutColumnItem.actionURLs['addURL']}
-						<div class="flex-col">
+						<div class="autofit-col">
 							<div class="quick-action-menu">
 								<a
 									class="component-action"
@@ -222,7 +236,7 @@
 					{/if}
 
 					{if $layoutColumnItem.actionURLs['configureURL']}
-						<div class="flex-col">
+						<div class="autofit-col">
 							<div class="quick-action-menu">
 								<a
 									class="component-action"
@@ -239,7 +253,7 @@
 					{/if}
 				{else}
 					{if $layoutColumnItem.actionURLs['addURL']}
-						<div class="flex-col">
+						<div class="autofit-col">
 							<div class="quick-action-menu">
 								<a
 									class="component-action"
@@ -255,7 +269,7 @@
 						</div>
 					{/if}
 
-					<div class="flex-col">
+					<div class="autofit-col">
 						{let $dropdownTriggerTitle kind="text"}
 							{msg desc=""}show-actions{/msg}
 						{/let}

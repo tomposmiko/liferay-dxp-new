@@ -30,11 +30,6 @@ public class StagingLocalServiceWrapper
 		_stagingLocalService = stagingLocalService;
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link StagingLocalServiceUtil} to access the staging local service. Add custom service methods to <code>com.liferay.portlet.exportimport.service.impl.StagingLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
-	 */
 	@Override
 	public void checkDefaultLayoutSetBranches(
 			long userId, com.liferay.portal.kernel.model.Group liveGroup,
@@ -119,21 +114,6 @@ public class StagingLocalServiceWrapper
 		return _stagingLocalService.getOSGiServiceIdentifier();
 	}
 
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public com.liferay.exportimport.kernel.lar.MissingReferences
-			publishStagingRequest(
-				long userId, long stagingRequestId, boolean privateLayout,
-				java.util.Map<String, String[]> parameterMap)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _stagingLocalService.publishStagingRequest(
-			userId, stagingRequestId, privateLayout, parameterMap);
-	}
-
 	@Override
 	public com.liferay.exportimport.kernel.lar.MissingReferences
 			publishStagingRequest(
@@ -153,21 +133,6 @@ public class StagingLocalServiceWrapper
 
 		_stagingLocalService.updateStagingRequest(
 			userId, stagingRequestId, fileName, bytes);
-	}
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 #publishStagingRequest(long, long, boolean, Map)}
-	 */
-	@Deprecated
-	@Override
-	public com.liferay.exportimport.kernel.lar.MissingReferences
-		validateStagingRequest(
-			long userId, long stagingRequestId, boolean privateLayout,
-			java.util.Map<String, String[]> parameterMap) {
-
-		return _stagingLocalService.validateStagingRequest(
-			userId, stagingRequestId, privateLayout, parameterMap);
 	}
 
 	@Override

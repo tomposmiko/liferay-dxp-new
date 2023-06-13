@@ -78,7 +78,7 @@ public class ExpandoColumnLocalServiceImpl
 		column.setType(type);
 		column.setDefaultData(value.getData());
 
-		expandoColumnPersistence.update(column);
+		column = expandoColumnPersistence.update(column);
 
 		// Resources
 
@@ -378,9 +378,7 @@ public class ExpandoColumnLocalServiceImpl
 		column.setType(type);
 		column.setDefaultData(value.getData());
 
-		expandoColumnPersistence.update(column);
-
-		return column;
+		return expandoColumnPersistence.update(column);
 	}
 
 	@Override
@@ -392,9 +390,7 @@ public class ExpandoColumnLocalServiceImpl
 
 		column.setTypeSettings(typeSettings);
 
-		expandoColumnPersistence.update(column);
-
-		return column;
+		return expandoColumnPersistence.update(column);
 	}
 
 	protected void addDeletionSystemEvent(ExpandoColumn expandoColumn) {
@@ -418,8 +414,8 @@ public class ExpandoColumnLocalServiceImpl
 				SystemEventConstants.TYPE_DELETE,
 				extraDataJSONObject.toString());
 		}
-		catch (PortalException pe) {
-			throw new RuntimeException(pe);
+		catch (PortalException portalException) {
+			throw new RuntimeException(portalException);
 		}
 	}
 

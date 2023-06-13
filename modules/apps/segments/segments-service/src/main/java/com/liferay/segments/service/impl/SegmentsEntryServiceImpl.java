@@ -53,6 +53,22 @@ public class SegmentsEntryServiceImpl extends SegmentsEntryServiceBaseImpl {
 	public SegmentsEntry addSegmentsEntry(
 			String segmentsEntryKey, Map<Locale, String> nameMap,
 			Map<Locale, String> descriptionMap, boolean active, String criteria,
+			String type, ServiceContext serviceContext)
+		throws PortalException {
+
+		_portletResourcePermission.check(
+			getPermissionChecker(), serviceContext.getScopeGroupId(),
+			SegmentsActionKeys.MANAGE_SEGMENTS_ENTRIES);
+
+		return segmentsEntryLocalService.addSegmentsEntry(
+			segmentsEntryKey, nameMap, descriptionMap, active, criteria, type,
+			serviceContext);
+	}
+
+	@Override
+	public SegmentsEntry addSegmentsEntry(
+			String segmentsEntryKey, Map<Locale, String> nameMap,
+			Map<Locale, String> descriptionMap, boolean active, String criteria,
 			String source, String type, ServiceContext serviceContext)
 		throws PortalException {
 
@@ -66,6 +82,19 @@ public class SegmentsEntryServiceImpl extends SegmentsEntryServiceBaseImpl {
 	}
 
 	@Override
+	public void addSegmentsEntryClassPKs(
+			long segmentsEntryId, long[] classPKs,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		_segmentsEntryResourcePermission.check(
+			getPermissionChecker(), segmentsEntryId, ActionKeys.UPDATE);
+
+		segmentsEntryLocalService.addSegmentsEntryClassPKs(
+			segmentsEntryId, classPKs, serviceContext);
+	}
+
+	@Override
 	public SegmentsEntry deleteSegmentsEntry(long segmentsEntryId)
 		throws PortalException {
 
@@ -73,6 +102,18 @@ public class SegmentsEntryServiceImpl extends SegmentsEntryServiceBaseImpl {
 			getPermissionChecker(), segmentsEntryId, ActionKeys.DELETE);
 
 		return segmentsEntryLocalService.deleteSegmentsEntry(segmentsEntryId);
+	}
+
+	@Override
+	public void deleteSegmentsEntryClassPKs(
+			long segmentsEntryId, long[] classPKs)
+		throws PortalException {
+
+		_segmentsEntryResourcePermission.check(
+			getPermissionChecker(), segmentsEntryId, ActionKeys.UPDATE);
+
+		segmentsEntryLocalService.deleteSegmentsEntryClassPKs(
+			segmentsEntryId, classPKs);
 	}
 
 	@Override

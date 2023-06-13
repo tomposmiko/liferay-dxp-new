@@ -284,11 +284,6 @@ public class MBDiscussionWrapper
 		return model.getUuid();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a message boards discussion model instance should use the <code>MBDiscussion</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

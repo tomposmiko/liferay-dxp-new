@@ -19,7 +19,7 @@ import com.liferay.fragment.exception.FragmentEntryContentException;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.processor.FragmentEntryProcessor;
 import com.liferay.fragment.processor.FragmentEntryProcessorContext;
-import com.liferay.fragment.util.FragmentEntryConfigUtil;
+import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringWriter;
@@ -38,11 +38,11 @@ import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.template.TemplateException;
 import com.liferay.portal.kernel.template.TemplateManager;
 import com.liferay.portal.kernel.template.TemplateManagerUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -117,21 +117,20 @@ public class FreeMarkerFragmentEntryProcessor
 			TemplateManagerUtil.getTemplateManager(
 				TemplateConstants.LANG_TYPE_FTL);
 
-		Map<String, Object> contextObjects = new HashMap<>();
-
 		JSONObject configurationValuesJSONObject =
-			FragmentEntryConfigUtil.getConfigurationJSONObject(
+			_fragmentEntryConfigurationParser.getConfigurationJSONObject(
 				fragmentEntryLink.getConfiguration(),
 				fragmentEntryLink.getEditableValues(),
 				fragmentEntryProcessorContext.getSegmentsExperienceIds());
 
-		contextObjects.put("configuration", configurationValuesJSONObject);
-
-		contextObjects.put(
-			"fragmentEntryLinkNamespace", fragmentEntryLink.getNamespace());
+		Map<String, Object> contextObjects = HashMapBuilder.<String, Object>put(
+			"configuration", configurationValuesJSONObject
+		).put(
+			"fragmentEntryLinkNamespace", fragmentEntryLink.getNamespace()
+		).build();
 
 		contextObjects.putAll(
-			FragmentEntryConfigUtil.getContextObjects(
+			_fragmentEntryConfigurationParser.getContextObjects(
 				configurationValuesJSONObject,
 				fragmentEntryLink.getConfiguration()));
 
@@ -146,8 +145,9 @@ public class FreeMarkerFragmentEntryProcessor
 		try {
 			template.processTemplate(unsyncStringWriter);
 		}
-		catch (TemplateException te) {
-			throw new FragmentEntryContentException(_getMessage(te), te);
+		catch (TemplateException templateException) {
+			throw new FragmentEntryContentException(
+				_getMessage(templateException), templateException);
 		}
 
 		return unsyncStringWriter.toString();
@@ -191,20 +191,19 @@ public class FreeMarkerFragmentEntryProcessor
 					TemplateManagerUtil.getTemplateManager(
 						TemplateConstants.LANG_TYPE_FTL);
 
-				Map<String, Object> contextObjects = new HashMap<>();
-
 				JSONObject configurationDefaultValuesJSONObject =
-					FragmentEntryConfigUtil.
+					_fragmentEntryConfigurationParser.
 						getConfigurationDefaultValuesJSONObject(configuration);
 
-				contextObjects.put(
-					"configuration", configurationDefaultValuesJSONObject);
-
-				contextObjects.put(
-					"fragmentEntryLinkNamespace", StringPool.BLANK);
+				Map<String, Object> contextObjects =
+					HashMapBuilder.<String, Object>put(
+						"configuration", configurationDefaultValuesJSONObject
+					).put(
+						"fragmentEntryLinkNamespace", StringPool.BLANK
+					).build();
 
 				contextObjects.putAll(
-					FragmentEntryConfigUtil.getContextObjects(
+					_fragmentEntryConfigurationParser.getContextObjects(
 						configurationDefaultValuesJSONObject, configuration));
 
 				templateManager.addContextObjects(template, contextObjects);
@@ -217,19 +216,20 @@ public class FreeMarkerFragmentEntryProcessor
 				template.processTemplate(new UnsyncStringWriter());
 			}
 		}
-		catch (TemplateException te) {
-			throw new FragmentEntryContentException(_getMessage(te), te);
+		catch (TemplateException templateException) {
+			throw new FragmentEntryContentException(
+				_getMessage(templateException), templateException);
 		}
 	}
 
-	private String _getMessage(TemplateException te) {
+	private String _getMessage(TemplateException templateException) {
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", getClass());
 
 		String message = LanguageUtil.get(
 			resourceBundle, "freemarker-syntax-is-invalid");
 
-		Throwable causeThrowable = te.getCause();
+		Throwable causeThrowable = templateException.getCause();
 
 		String causeThrowableMessage = causeThrowable.getLocalizedMessage();
 
@@ -245,5 +245,8 @@ public class FreeMarkerFragmentEntryProcessor
 
 	@Reference
 	private ConfigurationProvider _configurationProvider;
+
+	@Reference
+	private FragmentEntryConfigurationParser _fragmentEntryConfigurationParser;
 
 }

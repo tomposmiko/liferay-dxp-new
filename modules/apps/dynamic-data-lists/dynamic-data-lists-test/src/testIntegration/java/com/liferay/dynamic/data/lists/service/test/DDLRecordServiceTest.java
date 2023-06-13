@@ -56,9 +56,6 @@ import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.ServiceRegistration;
 
-import java.io.Serializable;
-
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -426,13 +423,15 @@ public class DDLRecordServiceTest {
 
 		DDLRecord record = recordTestHelper.addRecord();
 
-		Map<String, Serializable> fieldsMap = new HashMap<>();
+		DDMFormValues ddmFormValues = createDDMFormValues(ddmForm);
 
-		fieldsMap.put("Name", "Joe Bloggs");
-		fieldsMap.put("Phone", "123456");
+		ddmFormValues.addDDMFormFieldValue(
+			createLocalizedDDMFormFieldValue("Name", "Joe Bloggs"));
+		ddmFormValues.addDDMFormFieldValue(
+			createLocalizedDDMFormFieldValue("Phone", "123456"));
 
 		updateRecord(
-			record.getRecordId(), fieldsMap, true,
+			record.getRecordId(), ddmFormValues,
 			WorkflowConstants.ACTION_PUBLISH);
 
 		record = DDLRecordLocalServiceUtil.getRecord(record.getRecordId());
@@ -574,20 +573,6 @@ public class DDLRecordServiceTest {
 		return DDLRecordLocalServiceUtil.updateRecord(
 			TestPropsValues.getUserId(), recordId, false,
 			DDLRecordConstants.DISPLAY_INDEX_DEFAULT, ddmFormValues,
-			serviceContext);
-	}
-
-	protected DDLRecord updateRecord(
-			long recordId, Map<String, Serializable> fieldsMap,
-			boolean mergeFields, int workflowAction)
-		throws Exception {
-
-		ServiceContext serviceContext = DDLRecordTestUtil.getServiceContext(
-			workflowAction);
-
-		return DDLRecordLocalServiceUtil.updateRecord(
-			TestPropsValues.getUserId(), recordId,
-			DDLRecordConstants.DISPLAY_INDEX_DEFAULT, fieldsMap, mergeFields,
 			serviceContext);
 	}
 

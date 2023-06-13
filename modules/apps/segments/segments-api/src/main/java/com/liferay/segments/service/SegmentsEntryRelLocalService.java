@@ -56,7 +56,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface SegmentsEntryRelLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link SegmentsEntryRelLocalServiceUtil} to access the segments entry rel local service. Add custom service methods to <code>com.liferay.segments.service.impl.SegmentsEntryRelLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -75,6 +75,11 @@ public interface SegmentsEntryRelLocalService
 	@Indexable(type = IndexableType.REINDEX)
 	public SegmentsEntryRel addSegmentsEntryRel(
 		SegmentsEntryRel segmentsEntryRel);
+
+	public void addSegmentsEntryRels(
+			long segmentsEntryId, long classNameId, long[] classPKs,
+			ServiceContext serviceContext)
+		throws PortalException;
 
 	/**
 	 * Creates a new segments entry rel with the primary key. Does not add the segments entry rel to the database.
@@ -120,6 +125,10 @@ public interface SegmentsEntryRelLocalService
 	public void deleteSegmentsEntryRels(long segmentsEntryId);
 
 	public void deleteSegmentsEntryRels(long classNameId, long classPK);
+
+	public void deleteSegmentsEntryRels(
+			long segmentsEntryId, long classNameId, long[] classPKs)
+		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DynamicQuery dynamicQuery();

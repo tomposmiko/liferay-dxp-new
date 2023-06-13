@@ -46,13 +46,14 @@ import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowThreadLocal;
-import com.liferay.portal.service.test.ServiceTestUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portlet.expando.util.test.ExpandoTestUtil;
 import com.liferay.wiki.exception.DuplicatePageException;
@@ -68,7 +69,6 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -93,7 +93,7 @@ public class WikiPageLocalServiceTest {
 
 	@Before
 	public void setUp() throws Exception {
-		ServiceTestUtil.setUser(TestPropsValues.getUser());
+		UserTestUtil.setUser(TestPropsValues.getUser());
 
 		_group = GroupTestUtil.addGroup();
 
@@ -141,7 +141,7 @@ public class WikiPageLocalServiceTest {
 					"Created a page with invalid character " +
 						invalidCharacter);
 			}
-			catch (PageTitleException pte) {
+			catch (PageTitleException pageTitleException) {
 			}
 		}
 	}
@@ -176,7 +176,7 @@ public class WikiPageLocalServiceTest {
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 				true, serviceContext);
 		}
-		catch (AssetCategoryException ace) {
+		catch (AssetCategoryException assetCategoryException) {
 			throw new AssetCategoryTestException();
 		}
 	}
@@ -297,10 +297,11 @@ public class WikiPageLocalServiceTest {
 
 			Assert.assertEquals("ParentPage1", childPage.getParentTitle());
 
-			Map<String, Serializable> workflowContext = new HashMap<>();
-
-			workflowContext.put(
-				WorkflowConstants.CONTEXT_COMMAND, serviceContext.getCommand());
+			Map<String, Serializable> workflowContext =
+				HashMapBuilder.<String, Serializable>put(
+					WorkflowConstants.CONTEXT_COMMAND,
+					serviceContext.getCommand()
+				).build();
 
 			WikiPageLocalServiceUtil.updateStatus(
 				TestPropsValues.getUserId(), pendingChildPage,
@@ -412,7 +413,7 @@ public class WikiPageLocalServiceTest {
 
 			Assert.fail();
 		}
-		catch (NoSuchPageResourceException nspre) {
+		catch (NoSuchPageResourceException noSuchPageResourceException) {
 			redirectPage = WikiPageLocalServiceUtil.getPage(
 				redirectPage.getResourcePrimKey());
 
@@ -437,7 +438,7 @@ public class WikiPageLocalServiceTest {
 
 			Assert.fail();
 		}
-		catch (NoSuchPageResourceException nspre) {
+		catch (NoSuchPageResourceException noSuchPageResourceException) {
 			WikiPageLocalServiceUtil.getPage(redirectPage.getResourcePrimKey());
 		}
 	}
@@ -461,7 +462,7 @@ public class WikiPageLocalServiceTest {
 
 			Assert.fail();
 		}
-		catch (NoSuchPageResourceException nspre) {
+		catch (NoSuchPageResourceException noSuchPageResourceException) {
 			childPage = WikiPageLocalServiceUtil.getPage(
 				childPage.getResourcePrimKey());
 
@@ -492,7 +493,7 @@ public class WikiPageLocalServiceTest {
 
 			Assert.fail();
 		}
-		catch (NoSuchPageResourceException nspre) {
+		catch (NoSuchPageResourceException noSuchPageResourceException) {
 			redirectPage = WikiPageLocalServiceUtil.getPageByPageId(
 				redirectPage.getPageId());
 
@@ -519,7 +520,7 @@ public class WikiPageLocalServiceTest {
 
 			Assert.fail();
 		}
-		catch (NoSuchPageResourceException nspre) {
+		catch (NoSuchPageResourceException noSuchPageResourceException) {
 			childPage = WikiPageLocalServiceUtil.getPageByPageId(
 				childPage.getPageId());
 
@@ -544,7 +545,7 @@ public class WikiPageLocalServiceTest {
 
 			Assert.fail();
 		}
-		catch (NoSuchPageResourceException nspre) {
+		catch (NoSuchPageResourceException noSuchPageResourceException) {
 			WikiPageLocalServiceUtil.getPage(childPage.getResourcePrimKey());
 		}
 	}

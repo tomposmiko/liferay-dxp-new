@@ -16,7 +16,6 @@ package com.liferay.headless.admin.user.internal.resource.v1_0;
 
 import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
-import com.liferay.headless.admin.user.dto.v1_0.ContactInformation;
 import com.liferay.headless.admin.user.dto.v1_0.EmailAddress;
 import com.liferay.headless.admin.user.dto.v1_0.OrganizationBrief;
 import com.liferay.headless.admin.user.dto.v1_0.Phone;
@@ -24,7 +23,9 @@ import com.liferay.headless.admin.user.dto.v1_0.PostalAddress;
 import com.liferay.headless.admin.user.dto.v1_0.RoleBrief;
 import com.liferay.headless.admin.user.dto.v1_0.SiteBrief;
 import com.liferay.headless.admin.user.dto.v1_0.UserAccount;
+import com.liferay.headless.admin.user.dto.v1_0.UserAccountContactInformation;
 import com.liferay.headless.admin.user.dto.v1_0.WebUrl;
+import com.liferay.headless.admin.user.internal.dto.v1_0.helper.OrganizationResourceDTOConverter;
 import com.liferay.headless.admin.user.internal.dto.v1_0.util.CustomFieldsUtil;
 import com.liferay.headless.admin.user.internal.dto.v1_0.util.EmailAddressUtil;
 import com.liferay.headless.admin.user.internal.dto.v1_0.util.PhoneUtil;
@@ -64,6 +65,7 @@ import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
+import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 import com.liferay.portal.vulcan.util.SearchUtil;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -98,9 +100,12 @@ public class UserAccountResourceImpl
 
 	@Override
 	public Page<UserAccount> getOrganizationUserAccountsPage(
-			Long organizationId, String search, Filter filter,
+			String organizationId, String search, Filter filter,
 			Pagination pagination, Sort[] sorts)
 		throws Exception {
+
+		Organization organization = _organizationResourceDTOConverter.getObject(
+			organizationId);
 
 		return _getUserAccountsPage(
 			booleanQuery -> {
@@ -109,7 +114,8 @@ public class UserAccountResourceImpl
 
 				booleanFilter.add(
 					new TermFilter(
-						"organizationIds", String.valueOf(organizationId)),
+						"organizationIds",
+						String.valueOf(organization.getOrganizationId())),
 					BooleanClauseOccur.MUST);
 			},
 			search, filter, pagination, sorts);
@@ -214,6 +220,9 @@ public class UserAccountResourceImpl
 				id = role.getRoleId();
 				name = role.getTitle(
 					contextAcceptLanguage.getPreferredLocale());
+				name_i18n = LocalizedMapUtil.getLocalizedMap(
+					contextAcceptLanguage.isAcceptAllLanguages(),
+					role.getTitleMap());
 			}
 		};
 	}
@@ -224,6 +233,9 @@ public class UserAccountResourceImpl
 				id = group.getGroupId();
 				name = group.getName(
 					contextAcceptLanguage.getPreferredLocale());
+				name_i18n = LocalizedMapUtil.getLocalizedMap(
+					contextAcceptLanguage.isAcceptAllLanguages(),
+					group.getNameMap());
 			}
 		};
 	}
@@ -236,30 +248,8 @@ public class UserAccountResourceImpl
 				additionalName = user.getMiddleName();
 				alternateName = user.getScreenName();
 				birthDate = user.getBirthday();
-				contactInformation = new ContactInformation() {
-					{
-						emailAddresses = transformToArray(
-							user.getEmailAddresses(), EmailAddressUtil::toEmail,
-							EmailAddress.class);
-						facebook = contact.getFacebookSn();
-						jabber = contact.getJabberSn();
-						postalAddresses = transformToArray(
-							user.getAddresses(),
-							address -> PostalAddressUtil.toPostalAddress(
-								address,
-								contextAcceptLanguage.getPreferredLocale()),
-							PostalAddress.class);
-						skype = contact.getSkypeSn();
-						sms = contact.getSmsSn();
-						telephones = transformToArray(
-							user.getPhones(), PhoneUtil::toPhone, Phone.class);
-						twitter = contact.getTwitterSn();
-						webUrls = transformToArray(
-							user.getWebsites(), WebUrlUtil::toWebUrl,
-							WebUrl.class);
-					}
-				};
 				customFields = CustomFieldsUtil.toCustomFields(
+					contextAcceptLanguage.isAcceptAllLanguages(),
 					User.class.getName(), user.getUserId(), user.getCompanyId(),
 					contextAcceptLanguage.getPreferredLocale());
 				dateCreated = user.getCreateDate();
@@ -288,6 +278,34 @@ public class UserAccountResourceImpl
 						contextCompany.getCompanyId(),
 						GroupConstants.DEFAULT_PARENT_GROUP_ID, true),
 					group -> _toSiteBrief(group), SiteBrief.class);
+				userAccountContactInformation =
+					new UserAccountContactInformation() {
+						{
+							emailAddresses = transformToArray(
+								user.getEmailAddresses(),
+								EmailAddressUtil::toEmailAddress,
+								EmailAddress.class);
+							facebook = contact.getFacebookSn();
+							jabber = contact.getJabberSn();
+							postalAddresses = transformToArray(
+								user.getAddresses(),
+								address -> PostalAddressUtil.toPostalAddress(
+									contextAcceptLanguage.
+										isAcceptAllLanguages(),
+									address, user.getCompanyId(),
+									contextAcceptLanguage.getPreferredLocale()),
+								PostalAddress.class);
+							skype = contact.getSkypeSn();
+							sms = contact.getSmsSn();
+							telephones = transformToArray(
+								user.getPhones(), PhoneUtil::toPhone,
+								Phone.class);
+							twitter = contact.getTwitterSn();
+							webUrls = transformToArray(
+								user.getWebsites(), WebUrlUtil::toWebUrl,
+								WebUrl.class);
+						}
+					};
 
 				setDashboardURL(
 					() -> {
@@ -331,6 +349,9 @@ public class UserAccountResourceImpl
 
 	@Reference
 	private ListTypeService _listTypeService;
+
+	@Reference
+	private OrganizationResourceDTOConverter _organizationResourceDTOConverter;
 
 	@Reference
 	private Portal _portal;

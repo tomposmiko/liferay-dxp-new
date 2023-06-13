@@ -417,11 +417,6 @@ public class BackgroundTaskWrapper
 		return model.isInProgress();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a background task model instance should use the <code>BackgroundTask</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

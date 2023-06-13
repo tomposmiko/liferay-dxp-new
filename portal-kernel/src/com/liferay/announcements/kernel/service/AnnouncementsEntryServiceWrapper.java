@@ -33,31 +33,6 @@ public class AnnouncementsEntryServiceWrapper
 		_announcementsEntryService = announcementsEntryService;
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link #addEntry(long,
-	 long, String, String, String, String, Date, Date, int,
-	 boolean)}
-	 */
-	@Deprecated
-	@Override
-	public com.liferay.announcements.kernel.model.AnnouncementsEntry addEntry(
-			long plid, long classNameId, long classPK, String title,
-			String content, String url, String type, int displayDateMonth,
-			int displayDateDay, int displayDateYear, int displayDateHour,
-			int displayDateMinute, boolean displayImmediately,
-			int expirationDateMonth, int expirationDateDay,
-			int expirationDateYear, int expirationDateHour,
-			int expirationDateMinute, int priority, boolean alert)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _announcementsEntryService.addEntry(
-			plid, classNameId, classPK, title, content, url, type,
-			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
-			displayDateMinute, displayImmediately, expirationDateMonth,
-			expirationDateDay, expirationDateYear, expirationDateHour,
-			expirationDateMinute, priority, alert);
-	}
-
 	@Override
 	public com.liferay.announcements.kernel.model.AnnouncementsEntry addEntry(
 			long classNameId, long classPK, String title, String content,
@@ -105,30 +80,6 @@ public class AnnouncementsEntryServiceWrapper
 
 		return _announcementsEntryService.updateEntry(
 			entryId, title, content, url, type, displayDate, expirationDate,
-			priority);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link #updateEntry(long,
-	 String, String, String, String, Date, Date, int)}
-	 */
-	@Deprecated
-	@Override
-	public com.liferay.announcements.kernel.model.AnnouncementsEntry
-			updateEntry(
-				long entryId, String title, String content, String url,
-				String type, int displayDateMonth, int displayDateDay,
-				int displayDateYear, int displayDateHour, int displayDateMinute,
-				boolean displayImmediately, int expirationDateMonth,
-				int expirationDateDay, int expirationDateYear,
-				int expirationDateHour, int expirationDateMinute, int priority)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return _announcementsEntryService.updateEntry(
-			entryId, title, content, url, type, displayDateMonth,
-			displayDateDay, displayDateYear, displayDateHour, displayDateMinute,
-			displayImmediately, expirationDateMonth, expirationDateDay,
-			expirationDateYear, expirationDateHour, expirationDateMinute,
 			priority);
 	}
 

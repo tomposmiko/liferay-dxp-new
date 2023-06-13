@@ -32,16 +32,10 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class SegmentsEntryRelLocalServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.segments.service.impl.SegmentsEntryRelLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
-	 */
-
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link SegmentsEntryRelLocalServiceUtil} to access the segments entry rel local service. Add custom service methods to <code>com.liferay.segments.service.impl.SegmentsEntryRelLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	public static com.liferay.segments.model.SegmentsEntryRel
 			addSegmentsEntryRel(
@@ -64,6 +58,15 @@ public class SegmentsEntryRelLocalServiceUtil {
 			com.liferay.segments.model.SegmentsEntryRel segmentsEntryRel) {
 
 		return getService().addSegmentsEntryRel(segmentsEntryRel);
+	}
+
+	public static void addSegmentsEntryRels(
+			long segmentsEntryId, long classNameId, long[] classPKs,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		getService().addSegmentsEntryRels(
+			segmentsEntryId, classNameId, classPKs, serviceContext);
 	}
 
 	/**
@@ -130,6 +133,14 @@ public class SegmentsEntryRelLocalServiceUtil {
 
 	public static void deleteSegmentsEntryRels(long classNameId, long classPK) {
 		getService().deleteSegmentsEntryRels(classNameId, classPK);
+	}
+
+	public static void deleteSegmentsEntryRels(
+			long segmentsEntryId, long classNameId, long[] classPKs)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		getService().deleteSegmentsEntryRels(
+			segmentsEntryId, classNameId, classPKs);
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.DynamicQuery

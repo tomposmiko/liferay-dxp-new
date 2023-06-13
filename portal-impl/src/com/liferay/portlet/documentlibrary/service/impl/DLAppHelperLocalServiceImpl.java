@@ -264,8 +264,8 @@ public class DLAppHelperLocalServiceImpl
 		// File read count
 
 		assetEntryLocalService.incrementViewCounter(
-			userId, DLFileEntryConstants.getClassName(),
-			fileEntry.getFileEntryId(), 1);
+			fileEntry.getCompanyId(), userId,
+			DLFileEntryConstants.getClassName(), fileEntry.getFileEntryId(), 1);
 
 		List<DLFileShortcut> fileShortcuts =
 			dlFileShortcutPersistence.findByToFileEntryId(
@@ -273,7 +273,8 @@ public class DLAppHelperLocalServiceImpl
 
 		for (DLFileShortcut fileShortcut : fileShortcuts) {
 			assetEntryLocalService.incrementViewCounter(
-				userId, DLFileShortcutConstants.getClassName(),
+				fileEntry.getCompanyId(), userId,
+				DLFileShortcutConstants.getClassName(),
 				fileShortcut.getFileShortcutId(), 1);
 		}
 	}
@@ -304,43 +305,6 @@ public class DLAppHelperLocalServiceImpl
 		throws PortalException {
 
 		trashOrRestoreFolder(dlFolder, true);
-	}
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             #moveDependentsToTrash(DLFolder)}
-	 */
-	@Deprecated
-	@Override
-	public void moveDependentsToTrash(
-			List<Object> dlFileEntriesAndDLFolders, long trashEntryId)
-		throws PortalException {
-
-		if (dlFileEntriesAndDLFolders.isEmpty()) {
-			return;
-		}
-
-		Object object = dlFileEntriesAndDLFolders.get(0);
-
-		long folderId = 0;
-
-		if (object instanceof DLFileEntry) {
-			DLFileEntry dlFileEntry = (DLFileEntry)object;
-
-			folderId = dlFileEntry.getFolderId();
-		}
-		else if (object instanceof DLFileShortcut) {
-			DLFileShortcut dlFileShortcut = (DLFileShortcut)object;
-
-			folderId = dlFileShortcut.getFolderId();
-		}
-		else if (object instanceof DLFolder) {
-			DLFolder dlFolder = (DLFolder)object;
-
-			folderId = dlFolder.getFolderId();
-		}
-
-		moveDependentsToTrash(dlFolderLocalService.getDLFolder(folderId));
 	}
 
 	@Override
@@ -455,8 +419,8 @@ public class DLAppHelperLocalServiceImpl
 				extraDataJSONObject.toString(), 0);
 		}
 
-		return dlAppService.updateFileShortcut(
-			fileShortcut.getFileShortcutId(), newFolderId,
+		return dlAppLocalService.updateFileShortcut(
+			userId, fileShortcut.getFileShortcutId(), newFolderId,
 			fileShortcut.getToFileEntryId(), serviceContext);
 	}
 
@@ -616,56 +580,6 @@ public class DLAppHelperLocalServiceImpl
 		throws PortalException {
 
 		trashOrRestoreFolder(dlFolder, false);
-	}
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             #restoreDependentsFromTrash(DLFolder)}
-	 */
-	@Deprecated
-	@Override
-	public void restoreDependentsFromTrash(
-			List<Object> dlFileEntriesAndDLFolders)
-		throws PortalException {
-
-		if (dlFileEntriesAndDLFolders.isEmpty()) {
-			return;
-		}
-
-		Object object = dlFileEntriesAndDLFolders.get(0);
-
-		long folderId = 0;
-
-		if (object instanceof DLFileEntry) {
-			DLFileEntry dlFileEntry = (DLFileEntry)object;
-
-			folderId = dlFileEntry.getFolderId();
-		}
-		else if (object instanceof DLFileShortcut) {
-			DLFileShortcut dlFileShortcut = (DLFileShortcut)object;
-
-			folderId = dlFileShortcut.getFolderId();
-		}
-		else if (object instanceof DLFolder) {
-			DLFolder dlFolder = (DLFolder)object;
-
-			folderId = dlFolder.getFolderId();
-		}
-
-		restoreDependentsFromTrash(dlFolderLocalService.getDLFolder(folderId));
-	}
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             #restoreDependentsFromTrash(List)}
-	 */
-	@Deprecated
-	@Override
-	public void restoreDependentsFromTrash(
-			List<Object> dlFileEntriesAndDLFolders, long trashEntryId)
-		throws PortalException {
-
-		restoreDependentsFromTrash(dlFileEntriesAndDLFolders);
 	}
 
 	@Override
@@ -833,7 +747,7 @@ public class DLAppHelperLocalServiceImpl
 				folder.getUuid(), folder.getGroupId(),
 				folder.getParentFolderId(), originalName, 2));
 
-		dlFolderPersistence.update(dlFolder);
+		dlFolder = dlFolderPersistence.update(dlFolder);
 
 		TrashEntry trashEntry = trashEntryLocalService.getEntry(
 			DLFolder.class.getName(), dlFolder.getFolderId());
@@ -1299,7 +1213,7 @@ public class DLAppHelperLocalServiceImpl
 			oldStatus = trashVersion.getStatus();
 		}
 
-		dlFileEntry = dlFileEntryLocalService.updateStatus(
+		dlFileEntryLocalService.updateStatus(
 			userId, dlFileEntry, dlFileVersions.get(0), oldStatus,
 			serviceContext, new HashMap<>());
 
@@ -1340,8 +1254,8 @@ public class DLAppHelperLocalServiceImpl
 
 		// App helper
 
-		fileEntry = dlAppService.moveFileEntry(
-			fileEntry.getFileEntryId(), newFolderId, serviceContext);
+		fileEntry = dlAppLocalService.moveFileEntry(
+			userId, fileEntry.getFileEntryId(), newFolderId, serviceContext);
 
 		// Sync
 
@@ -1450,7 +1364,7 @@ public class DLAppHelperLocalServiceImpl
 		dlFileEntry.setFileName(trashTitle);
 		dlFileEntry.setTitle(trashTitle);
 
-		dlFileEntryPersistence.update(dlFileEntry);
+		dlFileEntry = dlFileEntryPersistence.update(dlFileEntry);
 
 		// Indexer
 
@@ -1573,7 +1487,7 @@ public class DLAppHelperLocalServiceImpl
 
 		dlFolder.setName(TrashUtil.getTrashTitle(trashEntry.getEntryId()));
 
-		dlFolderPersistence.update(dlFolder);
+		dlFolder = dlFolderPersistence.update(dlFolder);
 
 		// Folders, file entries, and file shortcuts
 
@@ -1788,7 +1702,8 @@ public class DLAppHelperLocalServiceImpl
 
 					dlFileVersion.setStatus(WorkflowConstants.STATUS_IN_TRASH);
 
-					dlFileVersionPersistence.update(dlFileVersion);
+					dlFileVersion = dlFileVersionPersistence.update(
+						dlFileVersion);
 
 					// Trash
 
@@ -1863,7 +1778,8 @@ public class DLAppHelperLocalServiceImpl
 
 				dlFileShortcut.setStatus(WorkflowConstants.STATUS_IN_TRASH);
 
-				dlFileShortcutPersistence.update(dlFileShortcut);
+				dlFileShortcut = dlFileShortcutPersistence.update(
+					dlFileShortcut);
 
 				// Trash
 
@@ -1913,7 +1829,7 @@ public class DLAppHelperLocalServiceImpl
 
 			childDLFolder.setStatus(WorkflowConstants.STATUS_IN_TRASH);
 
-			dlFolderPersistence.update(childDLFolder);
+			childDLFolder = dlFolderPersistence.update(childDLFolder);
 
 			// Trash
 
@@ -1939,7 +1855,7 @@ public class DLAppHelperLocalServiceImpl
 
 			childDLFolder.setStatus(oldStatus);
 
-			dlFolderPersistence.update(childDLFolder);
+			childDLFolder = dlFolderPersistence.update(childDLFolder);
 
 			// Trash
 

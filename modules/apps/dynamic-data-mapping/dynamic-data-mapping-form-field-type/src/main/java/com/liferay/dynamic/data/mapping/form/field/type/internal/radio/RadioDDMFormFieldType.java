@@ -28,11 +28,12 @@ import org.osgi.service.component.annotations.Component;
 	property = {
 		"ddm.form.field.type.data.domain=list",
 		"ddm.form.field.type.description=radio-field-type-description",
-		"ddm.form.field.type.display.order:Integer=4",
+		"ddm.form.field.type.display.order:Integer=3",
 		"ddm.form.field.type.group=basic",
 		"ddm.form.field.type.icon=radio-button",
 		"ddm.form.field.type.label=radio-field-type-label",
-		"ddm.form.field.type.name=radio"
+		"ddm.form.field.type.name=radio",
+		"ddm.form.field.type.scope=app-builder,forms"
 	},
 	service = DDMFormFieldType.class
 )

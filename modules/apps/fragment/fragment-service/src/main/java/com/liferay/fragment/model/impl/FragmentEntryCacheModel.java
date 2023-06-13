@@ -77,7 +77,7 @@ public class FragmentEntryCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(47);
+		StringBundler sb = new StringBundler(49);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
@@ -113,6 +113,8 @@ public class FragmentEntryCacheModel
 		sb.append(configuration);
 		sb.append(", previewFileEntryId=");
 		sb.append(previewFileEntryId);
+		sb.append(", readOnly=");
+		sb.append(readOnly);
 		sb.append(", type=");
 		sb.append(type);
 		sb.append(", lastPublishDate=");
@@ -214,6 +216,7 @@ public class FragmentEntryCacheModel
 		}
 
 		fragmentEntryImpl.setPreviewFileEntryId(previewFileEntryId);
+		fragmentEntryImpl.setReadOnly(readOnly);
 		fragmentEntryImpl.setType(type);
 
 		if (lastPublishDate == Long.MIN_VALUE) {
@@ -270,6 +273,8 @@ public class FragmentEntryCacheModel
 		configuration = objectInput.readUTF();
 
 		previewFileEntryId = objectInput.readLong();
+
+		readOnly = objectInput.readBoolean();
 
 		type = objectInput.readInt();
 		lastPublishDate = objectInput.readLong();
@@ -356,6 +361,8 @@ public class FragmentEntryCacheModel
 
 		objectOutput.writeLong(previewFileEntryId);
 
+		objectOutput.writeBoolean(readOnly);
+
 		objectOutput.writeInt(type);
 		objectOutput.writeLong(lastPublishDate);
 
@@ -390,6 +397,7 @@ public class FragmentEntryCacheModel
 	public String js;
 	public String configuration;
 	public long previewFileEntryId;
+	public boolean readOnly;
 	public int type;
 	public long lastPublishDate;
 	public int status;

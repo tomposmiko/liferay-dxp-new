@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.kernel.util.Validator;
@@ -75,7 +76,7 @@ public class BaseWebDAVTestCase {
 			mockHttpServletRequest.setRemoteUser(
 				String.valueOf(TestPropsValues.getUserId()));
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			Assert.fail("User ID cannot be initialized");
 		}
 
@@ -88,8 +89,8 @@ public class BaseWebDAVTestCase {
 		try {
 			throw new Exception();
 		}
-		catch (Exception e) {
-			StackTraceElement[] stackTraceElements = e.getStackTrace();
+		catch (Exception exception) {
+			StackTraceElement[] stackTraceElements = exception.getStackTrace();
 
 			for (StackTraceElement stackTraceElement : stackTraceElements) {
 				String methodName = stackTraceElement.getMethodName();
@@ -152,8 +153,8 @@ public class BaseWebDAVTestCase {
 
 			return new Tuple(statusCode, responseBody, responseHeaders);
 		}
-		catch (Exception e) {
-			e.printStackTrace();
+		catch (Exception exception) {
+			exception.printStackTrace();
 		}
 
 		return null;
@@ -192,9 +193,9 @@ public class BaseWebDAVTestCase {
 		Map<String, String> headers = null;
 
 		if (Validator.isNotNull(lock)) {
-			headers = new HashMap<>();
-
-			headers.put("If", "<opaquelocktoken:" + lock + ">");
+			headers = HashMapBuilder.put(
+				"If", "<opaquelocktoken:" + lock + ">"
+			).build();
 		}
 
 		return serviceCopyOrMove(method, path, headers, destination, 0, false);
@@ -233,9 +234,9 @@ public class BaseWebDAVTestCase {
 		Map<String, String> headers = null;
 
 		if (Validator.isNotNull(lock)) {
-			headers = new HashMap<>();
-
-			headers.put("If", "<opaquelocktoken:" + lock + ">");
+			headers = HashMapBuilder.put(
+				"If", "<opaquelocktoken:" + lock + ">"
+			).build();
 		}
 
 		return service(Method.PUT, name, headers, data);
@@ -245,9 +246,9 @@ public class BaseWebDAVTestCase {
 		Map<String, String> headers = null;
 
 		if (Validator.isNotNull(lock)) {
-			headers = new HashMap<>();
-
-			headers.put("Lock-Token", "<opaquelocktoken:" + lock + ">");
+			headers = HashMapBuilder.put(
+				"Lock-Token", "<opaquelocktoken:" + lock + ">"
+			).build();
 		}
 
 		return service(Method.UNLOCK, path, headers, null);

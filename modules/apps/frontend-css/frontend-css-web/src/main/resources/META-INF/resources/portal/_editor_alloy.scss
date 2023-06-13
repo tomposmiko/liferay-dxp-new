@@ -48,6 +48,10 @@
 			cursor: auto;
 		}
 
+		blockquote {
+			margin: 1em 40px;
+		}
+
 		p:only-child {
 			margin-bottom: 0;
 		}
@@ -57,6 +61,7 @@
 
 			~ .alloy-editor-icon {
 				display: block;
+				max-width: 24px;
 			}
 		}
 
@@ -161,7 +166,7 @@
 	}
 }
 
-.has-error .alloy-editor-container .help-block {
+.has-error .alloy-editor-container .form-feedback-item {
 	font-size: 16px;
 	font-weight: normal;
 	line-height: 1.4em;

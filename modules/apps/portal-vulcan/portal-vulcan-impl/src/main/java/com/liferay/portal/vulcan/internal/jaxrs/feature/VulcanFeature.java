@@ -20,6 +20,9 @@ import com.fasterxml.jackson.jaxrs.xml.JacksonXMLProvider;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.ResourceActionLocalService;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
+import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.odata.filter.ExpressionConvert;
 import com.liferay.portal.odata.filter.FilterParserProvider;
@@ -40,6 +43,7 @@ import com.liferay.portal.vulcan.internal.jaxrs.context.resolver.ObjectMapperCon
 import com.liferay.portal.vulcan.internal.jaxrs.context.resolver.XmlMapperContextResolver;
 import com.liferay.portal.vulcan.internal.jaxrs.dynamic.feature.StatusDynamicFeature;
 import com.liferay.portal.vulcan.internal.jaxrs.exception.mapper.ExceptionMapper;
+import com.liferay.portal.vulcan.internal.jaxrs.exception.mapper.InvalidFilterExceptionMapper;
 import com.liferay.portal.vulcan.internal.jaxrs.exception.mapper.InvalidFormatExceptionMapper;
 import com.liferay.portal.vulcan.internal.jaxrs.exception.mapper.JsonMappingExceptionMapper;
 import com.liferay.portal.vulcan.internal.jaxrs.exception.mapper.JsonParseExceptionMapper;
@@ -63,6 +67,7 @@ import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -99,6 +104,7 @@ public class VulcanFeature implements Feature {
 		featureContext.register(JSONMessageBodyReader.class);
 		featureContext.register(JSONMessageBodyWriter.class);
 		featureContext.register(JsonParseExceptionMapper.class);
+		featureContext.register(InvalidFilterExceptionMapper.class);
 		featureContext.register(InvalidFormatExceptionMapper.class);
 		featureContext.register(LogContainerRequestFilter.class);
 		featureContext.register(MultipartBodyMessageBodyReader.class);
@@ -122,7 +128,10 @@ public class VulcanFeature implements Feature {
 			new AcceptLanguageContextProvider(_language, _portal));
 		featureContext.register(new CompanyContextProvider(_portal));
 		featureContext.register(
-			new ContextContainerRequestFilter(_language, _portal));
+			new ContextContainerRequestFilter(
+				_groupLocalService, _language, _portal,
+				_resourceActionLocalService, _resourcePermissionLocalService,
+				_roleLocalService, _getScopeChecker()));
 		featureContext.register(
 			new FilterContextProvider(
 				_expressionConvert, _filterParserProvider, _language, _portal));
@@ -154,6 +163,18 @@ public class VulcanFeature implements Feature {
 		}
 	}
 
+	private Object _getScopeChecker() {
+		ServiceReference<?> serviceReference =
+			_bundleContext.getServiceReference(
+				"com.liferay.oauth2.provider.scope.ScopeChecker");
+
+		if (serviceReference != null) {
+			return _bundleContext.getService(serviceReference);
+		}
+
+		return null;
+	}
+
 	private BundleContext _bundleContext;
 
 	@Reference(
@@ -174,6 +195,15 @@ public class VulcanFeature implements Feature {
 
 	@Reference
 	private Portal _portal;
+
+	@Reference
+	private ResourceActionLocalService _resourceActionLocalService;
+
+	@Reference
+	private ResourcePermissionLocalService _resourcePermissionLocalService;
+
+	@Reference
+	private RoleLocalService _roleLocalService;
 
 	@Reference
 	private SortParserProvider _sortParserProvider;

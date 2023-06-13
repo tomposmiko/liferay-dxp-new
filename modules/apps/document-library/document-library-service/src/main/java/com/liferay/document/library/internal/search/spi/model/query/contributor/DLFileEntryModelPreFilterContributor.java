@@ -50,7 +50,6 @@ import org.osgi.service.component.annotations.Reference;
  * @author Bryan Engler
  */
 @Component(
-	immediate = true,
 	property = "indexer.class.name=com.liferay.document.library.kernel.model.DLFileEntry",
 	service = ModelPreFilterContributor.class
 )
@@ -83,8 +82,8 @@ public class DLFileEntryModelPreFilterContributor
 			relatedEntryIndexer.addRelatedClassNames(
 				booleanFilter, searchContext);
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 
@@ -136,25 +135,40 @@ public class DLFileEntryModelPreFilterContributor
 							ddmStructureFieldValue,
 							ddmStructure.getFieldType(fieldName));
 				}
-				catch (Exception e) {
+				catch (Exception exception) {
 					if (_log.isDebugEnabled()) {
-						_log.debug(e, e);
+						_log.debug(exception, exception);
 					}
 				}
 
 				BooleanQuery booleanQuery = new BooleanQueryImpl();
 
-				booleanQuery.addRequiredTerm(
-					ddmStructureFieldName,
-					StringPool.QUOTE + ddmStructureFieldValue +
-						StringPool.QUOTE);
+				if (ddmStructureFieldValue instanceof String[]) {
+					String[] ddmStructureFieldValueArray =
+						(String[])ddmStructureFieldValue;
+
+					for (String ddmStructureFieldValueString :
+							ddmStructureFieldValueArray) {
+
+						booleanQuery.addRequiredTerm(
+							ddmStructureFieldName,
+							StringPool.QUOTE + ddmStructureFieldValueString +
+								StringPool.QUOTE);
+					}
+				}
+				else {
+					booleanQuery.addRequiredTerm(
+						ddmStructureFieldName,
+						StringPool.QUOTE + ddmStructureFieldValue +
+							StringPool.QUOTE);
+				}
 
 				booleanFilter.add(
 					new QueryFilter(booleanQuery), BooleanClauseOccur.MUST);
 			}
 		}
-		catch (PortalException pe) {
-			throw new SystemException(pe);
+		catch (PortalException portalException) {
+			throw new SystemException(portalException);
 		}
 	}
 

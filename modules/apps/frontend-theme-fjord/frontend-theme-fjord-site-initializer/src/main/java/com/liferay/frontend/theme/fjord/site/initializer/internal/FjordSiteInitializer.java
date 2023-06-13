@@ -49,6 +49,7 @@ import com.liferay.portal.kernel.service.ThemeLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
@@ -63,7 +64,6 @@ import java.io.InputStream;
 import java.net.URL;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -181,10 +181,10 @@ public class FjordSiteInitializer implements SiteInitializer {
 				"Download", downloadFragmentEntries,
 				_PATH + "/fragments/download", serviceContext);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 
-			throw new InitializationException(e);
+			throw new InitializationException(exception);
 		}
 	}
 
@@ -302,9 +302,9 @@ public class FjordSiteInitializer implements SiteInitializer {
 			layoutPageTemplateEntry.getLayoutPageTemplateEntryId(), name,
 			fragmentEntryIds, StringPool.BLANK, serviceContext);
 
-		Map<Locale, String> nameMap = new HashMap<>();
-
-		nameMap.put(LocaleUtil.getSiteDefault(), name);
+		Map<Locale, String> nameMap = HashMapBuilder.put(
+			LocaleUtil.getSiteDefault(), name
+		).build();
 
 		Layout layout = _layoutLocalService.addLayout(
 			serviceContext.getUserId(), serviceContext.getScopeGroupId(), false,
@@ -317,6 +317,10 @@ public class FjordSiteInitializer implements SiteInitializer {
 		TransactionCommitCallbackUtil.registerCallback(
 			() -> {
 				_copyLayout(layout);
+
+				_layoutLocalService.updateStatus(
+					serviceContext.getUserId(), layout.getPlid(),
+					WorkflowConstants.STATUS_APPROVED, serviceContext);
 
 				return null;
 			});
@@ -363,10 +367,6 @@ public class FjordSiteInitializer implements SiteInitializer {
 		if (draftLayout != null) {
 			_layoutCopyHelper.copyLayout(draftLayout, layout);
 		}
-
-		_layoutLocalService.updateLayout(
-			layout.getGroupId(), layout.isPrivateLayout(), layout.getLayoutId(),
-			new Date());
 	}
 
 	private ServiceContext _createServiceContext(long groupId)

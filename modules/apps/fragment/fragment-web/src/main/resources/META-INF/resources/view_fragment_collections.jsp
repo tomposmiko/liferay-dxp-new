@@ -17,11 +17,11 @@
 <%@ include file="/init.jsp" %>
 
 <%
-FragmentCollectionsDisplayContext fragmentCollectionsDisplayContext = new FragmentCollectionsDisplayContext(renderRequest, renderResponse, request);
+FragmentCollectionsDisplayContext fragmentCollectionsDisplayContext = new FragmentCollectionsDisplayContext(request, renderRequest, renderResponse);
 %>
 
 <clay:management-toolbar
-	displayContext="<%= new FragmentCollectionsManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, fragmentCollectionsDisplayContext) %>"
+	displayContext="<%= new FragmentCollectionsManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, fragmentCollectionsDisplayContext) %>"
 />
 
 <aui:form cssClass="container-fluid-1280" name="fm">

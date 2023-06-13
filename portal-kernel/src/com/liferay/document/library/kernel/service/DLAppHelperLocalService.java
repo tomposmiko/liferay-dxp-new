@@ -54,7 +54,7 @@ import org.osgi.annotation.versioning.ProviderType;
 )
 public interface DLAppHelperLocalService extends BaseLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link DLAppHelperLocalServiceUtil} to access the dl app helper local service. Add custom service methods to <code>com.liferay.portlet.documentlibrary.service.impl.DLAppHelperLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -110,15 +110,6 @@ public interface DLAppHelperLocalService extends BaseLocalService {
 
 	public void moveDependentsToTrash(DLFolder dlFolder) throws PortalException;
 
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 #moveDependentsToTrash(DLFolder)}
-	 */
-	@Deprecated
-	public void moveDependentsToTrash(
-			List<Object> dlFileEntriesAndDLFolders, long trashEntryId)
-		throws PortalException;
-
 	public FileEntry moveFileEntryFromTrash(
 			long userId, FileEntry fileEntry, long newFolderId,
 			ServiceContext serviceContext)
@@ -171,24 +162,6 @@ public interface DLAppHelperLocalService extends BaseLocalService {
 		throws PortalException;
 
 	public void restoreDependentsFromTrash(DLFolder dlFolder)
-		throws PortalException;
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 #restoreDependentsFromTrash(DLFolder)}
-	 */
-	@Deprecated
-	public void restoreDependentsFromTrash(
-			List<Object> dlFileEntriesAndDLFolders)
-		throws PortalException;
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 #restoreDependentsFromTrash(List)}
-	 */
-	@Deprecated
-	public void restoreDependentsFromTrash(
-			List<Object> dlFileEntriesAndDLFolders, long trashEntryId)
 		throws PortalException;
 
 	public void restoreFileEntryFromTrash(long userId, FileEntry fileEntry)

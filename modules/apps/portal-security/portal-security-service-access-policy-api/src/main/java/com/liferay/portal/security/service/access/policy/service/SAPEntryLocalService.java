@@ -60,7 +60,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface SAPEntryLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link SAPEntryLocalServiceUtil} to access the sap entry local service. Add custom service methods to <code>com.liferay.portal.security.service.access.policy.service.impl.SAPEntryLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -188,8 +188,7 @@ public interface SAPEntryLocalService
 	public SAPEntry fetchSAPEntry(long sapEntryId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public SAPEntry fetchSAPEntry(long companyId, String name)
-		throws PortalException;
+	public SAPEntry fetchSAPEntry(long companyId, String name);
 
 	/**
 	 * Returns the sap entry with the matching UUID and company.

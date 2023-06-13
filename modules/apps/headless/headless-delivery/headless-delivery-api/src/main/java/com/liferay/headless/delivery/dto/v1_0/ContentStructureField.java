@@ -72,7 +72,9 @@ public class ContentStructureField {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The form field's type (e.g., date, geolocation, text, etc.)."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String dataType;
 
@@ -102,7 +104,9 @@ public class ContentStructureField {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The form field's input control type (e.g., text, textarea, select field, etc.)."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String inputControl;
 
@@ -130,9 +134,39 @@ public class ContentStructureField {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The form field's label.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String label;
+
+	@Schema
+	@Valid
+	public Map<String, String> getLabel_i18n() {
+		return label_i18n;
+	}
+
+	public void setLabel_i18n(Map<String, String> label_i18n) {
+		this.label_i18n = label_i18n;
+	}
+
+	@JsonIgnore
+	public void setLabel_i18n(
+		UnsafeSupplier<Map<String, String>, Exception>
+			label_i18nUnsafeSupplier) {
+
+		try {
+			label_i18n = label_i18nUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected Map<String, String> label_i18n;
 
 	@Schema(
 		description = "A flag that indicates whether the content is accessible in different languages."
@@ -160,7 +194,9 @@ public class ContentStructureField {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A flag that indicates whether the content is accessible in different languages."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Boolean localizable;
 
@@ -190,7 +226,9 @@ public class ContentStructureField {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A flag that indicates whether the form field can have several values."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Boolean multiple;
 
@@ -216,7 +254,7 @@ public class ContentStructureField {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The form field's name.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String name;
 
@@ -251,7 +289,9 @@ public class ContentStructureField {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The child content structure fields that depend on this form field."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected ContentStructureField[] nestedContentStructureFields;
 
@@ -280,7 +320,7 @@ public class ContentStructureField {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The list of different possible values.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Option[] options;
 
@@ -308,9 +348,41 @@ public class ContentStructureField {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The form field's default value.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String predefinedValue;
+
+	@Schema
+	@Valid
+	public Map<String, String> getPredefinedValue_i18n() {
+		return predefinedValue_i18n;
+	}
+
+	public void setPredefinedValue_i18n(
+		Map<String, String> predefinedValue_i18n) {
+
+		this.predefinedValue_i18n = predefinedValue_i18n;
+	}
+
+	@JsonIgnore
+	public void setPredefinedValue_i18n(
+		UnsafeSupplier<Map<String, String>, Exception>
+			predefinedValue_i18nUnsafeSupplier) {
+
+		try {
+			predefinedValue_i18n = predefinedValue_i18nUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected Map<String, String> predefinedValue_i18n;
 
 	@Schema(
 		description = "A flag that indicates whether this content can be rendered (and answered) several times."
@@ -338,7 +410,9 @@ public class ContentStructureField {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A flag that indicates whether this content can be rendered (and answered) several times."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Boolean repeatable;
 
@@ -368,7 +442,9 @@ public class ContentStructureField {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A flag that indicates whether this form field is required."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Boolean required;
 
@@ -398,7 +474,9 @@ public class ContentStructureField {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A flag that indicates whether the structure's end target should render the field label."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Boolean showLabel;
 
@@ -470,6 +548,16 @@ public class ContentStructureField {
 			sb.append(_escape(label));
 
 			sb.append("\"");
+		}
+
+		if (label_i18n != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"label_i18n\": ");
+
+			sb.append(_toJSON(label_i18n));
 		}
 
 		if (localizable != null) {
@@ -558,6 +646,16 @@ public class ContentStructureField {
 			sb.append(_escape(predefinedValue));
 
 			sb.append("\"");
+		}
+
+		if (predefinedValue_i18n != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"predefinedValue_i18n\": ");
+
+			sb.append(_toJSON(predefinedValue_i18n));
 		}
 
 		if (repeatable != null) {

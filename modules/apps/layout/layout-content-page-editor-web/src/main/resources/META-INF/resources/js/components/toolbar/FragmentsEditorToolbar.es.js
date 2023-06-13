@@ -16,12 +16,17 @@ import Component from 'metal-component';
 import Soy from 'metal-soy';
 import {Config} from 'metal-state';
 
+import 'clay-label';
+
 import './TranslationStatus.es';
 
 import './SegmentsExperienceSelector.es';
+
+import './ExperimentsLabel.es';
 import {TOGGLE_SIDEBAR} from '../../actions/actions.es';
 import getConnectedComponent from '../../store/ConnectedComponent.es';
 import {setIn} from '../../utils/FragmentsEditorUpdateUtils.es';
+import {PAGE_TYPES} from '../../utils/constants';
 import templates from './FragmentsEditorToolbar.soy';
 
 /**
@@ -47,7 +52,33 @@ class FragmentsEditorToolbar extends Component {
 			);
 		}
 
+		nextState = setIn(
+			nextState,
+			['_isMasterLayout'],
+			this.pageType === PAGE_TYPES.master
+		);
+
+		if (state.pageType && state.pageType === PAGE_TYPES.conversion) {
+			nextState = setIn(nextState, ['_conversionDraft'], true);
+		}
+
 		return nextState;
+	}
+
+	/**
+	 * @inheritdoc
+	 * @review
+	 */
+	syncLayoutData() {
+		this._checkPublishButtonState();
+	}
+
+	/**
+	 * @inheritdoc
+	 * @review
+	 */
+	syncLastSaveDate() {
+		this._checkPublishButtonState();
 	}
 
 	/**
@@ -71,6 +102,12 @@ class FragmentsEditorToolbar extends Component {
 		window.removeEventListener('online', this._updateOnlineStatus);
 	}
 
+	_checkPublishButtonState() {
+		requestAnimationFrame(() => {
+			this._publishButtonEnabled = this._online && !this.pending;
+		});
+	}
+
 	/**
 	 * Handles discard draft form submit action.
 	 * @private
@@ -81,6 +118,24 @@ class FragmentsEditorToolbar extends Component {
 			!confirm(
 				Liferay.Language.get(
 					'are-you-sure-you-want-to-discard-current-draft-and-apply-latest-published-changes'
+				)
+			)
+		) {
+			event.preventDefault();
+		}
+	}
+
+	/**
+	 * Handles publish form submit action.
+	 * @private
+	 * @review
+	 */
+	_handlePublish(event) {
+		if (
+			this.masterUsed &&
+			!confirm(
+				Liferay.Language.get(
+					'changes-made-on-this-master-are-going-to-be-propagated-to-all-page-templates,-display-page-templates,-and-pages-using-it.are-you-sure-you-want-to-proceed'
 				)
 			)
 		) {
@@ -138,6 +193,19 @@ class FragmentsEditorToolbar extends Component {
 
 FragmentsEditorToolbar.STATE = {
 	/**
+	 * If the page is conversion draft
+	 * @default false
+	 * @instance
+	 * @memberof FragmentsEditorToolbar
+	 * @private
+	 * @review
+	 * @type {boolean}
+	 */
+	_conversionDraft: Config.bool()
+		.internal()
+		.value(false),
+
+	/**
 	 * If fragments editor is online
 	 * @default true
 	 * @instance
@@ -148,7 +216,29 @@ FragmentsEditorToolbar.STATE = {
 	 */
 	_online: Config.bool()
 		.internal()
-		.value(true)
+		.value(true),
+
+	/**
+	 * If the publish button should be enabled
+	 * @default true
+	 * @instance
+	 * @memberof FragmentsEditorToolbar
+	 * @private
+	 * @review
+	 * @type {boolean}
+	 */
+	_publishButtonEnabled: Config.bool()
+		.internal()
+		.value(true),
+
+	/**
+	 * If the page is in Draft status
+	 * @instance
+	 * @memberof FragmentsEditorToolbar
+	 * @review
+	 * @type {boolean}
+	 */
+	draft: Config.bool()
 };
 
 const ConnectedFragmentsEditorToolbar = getConnectedComponent(
@@ -157,13 +247,20 @@ const ConnectedFragmentsEditorToolbar = getConnectedComponent(
 		'classPK',
 		'discardDraftRedirectURL',
 		'discardDraftURL',
+		'hasUpdateContentPermissions',
+		'hasUpdatePermissions',
 		'lastSaveDate',
+		'layoutData',
+		'masterUsed',
 		'portletNamespace',
+		'pageType',
+		'pending',
 		'publishURL',
 		'redirectURL',
 		'savingChanges',
 		'selectedSidebarPanelId',
-		'spritemap'
+		'spritemap',
+		'workflowEnabled'
 	]
 );
 

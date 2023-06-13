@@ -49,7 +49,7 @@ public abstract class UserGroupGroupRoleServiceBaseImpl
 	extends BaseServiceImpl
 	implements IdentifiableOSGiService, UserGroupGroupRoleService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>UserGroupGroupRoleService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.kernel.service.UserGroupGroupRoleServiceUtil</code>.
@@ -366,8 +366,8 @@ public abstract class UserGroupGroupRoleServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

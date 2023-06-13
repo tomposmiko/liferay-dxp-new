@@ -74,7 +74,7 @@ public abstract class DDMFormInstanceRecordLocalServiceBaseImpl
 	implements AopService, DDMFormInstanceRecordLocalService,
 			   IdentifiableOSGiService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>DDMFormInstanceRecordLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordLocalServiceUtil</code>.
@@ -549,8 +549,8 @@ public abstract class DDMFormInstanceRecordLocalServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

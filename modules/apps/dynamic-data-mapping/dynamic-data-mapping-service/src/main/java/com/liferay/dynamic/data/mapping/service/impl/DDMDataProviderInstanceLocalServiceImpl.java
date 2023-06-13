@@ -95,7 +95,8 @@ public class DDMDataProviderInstanceLocalServiceImpl
 		dataProviderInstance.setDefinition(serialize(ddmFormValues));
 		dataProviderInstance.setType(type);
 
-		ddmDataProviderInstancePersistence.update(dataProviderInstance);
+		dataProviderInstance = ddmDataProviderInstancePersistence.update(
+			dataProviderInstance);
 
 		// Resources
 
@@ -306,9 +307,7 @@ public class DDMDataProviderInstanceLocalServiceImpl
 		dataProviderInstance.setDescriptionMap(descriptionMap);
 		dataProviderInstance.setDefinition(serialize(ddmFormValues));
 
-		ddmDataProviderInstancePersistence.update(dataProviderInstance);
-
-		return dataProviderInstance;
+		return ddmDataProviderInstancePersistence.update(dataProviderInstance);
 	}
 
 	protected void addDataProviderInstanceResources(
@@ -379,9 +378,9 @@ public class DDMDataProviderInstanceLocalServiceImpl
 			return InetAddressUtil.isLocalInetAddress(
 				InetAddressUtil.getInetAddressByName(url.getHost()));
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(e, e);
+				_log.debug(exception, exception);
 			}
 		}
 

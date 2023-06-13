@@ -25,14 +25,14 @@ import {getAssetFieldValue} from '../../utils/FragmentsEditorFetchUtils.es';
 import {
 	editableShouldBeHighlighted,
 	editableIsMapped,
-	editableIsMappedToAssetEntry
+	editableIsMappedToInfoItem
 } from '../../utils/FragmentsEditorGetUtils.es';
+import {computeEditableValue} from '../../utils/computeValues.es';
 import {
 	BACKGROUND_IMAGE_FRAGMENT_ENTRY_PROCESSOR,
 	FLOATING_TOOLBAR_BUTTONS,
 	FRAGMENTS_EDITOR_ITEM_TYPES
 } from '../../utils/constants';
-import {prefixSegmentsExperienceId} from '../../utils/prefixSegmentsExperienceId.es';
 import FloatingToolbar from '../floating_toolbar/FloatingToolbar.es';
 import EditableBackgroundImageProcessor from '../fragment_processors/EditableBackgroundImageProcessor.es';
 import FragmentProcessors from '../fragment_processors/FragmentProcessors.es';
@@ -59,7 +59,7 @@ class FragmentEditableBackgroundImage extends Component {
 		);
 
 		this.element.addEventListener(
-			'click',
+			'dblclick',
 			this._handleEditableBackgroundImageClick
 		);
 
@@ -75,7 +75,7 @@ class FragmentEditableBackgroundImage extends Component {
 
 		if (this.element) {
 			this.element.removeEventListener(
-				'click',
+				'dblclick',
 				this._handleEditableBackgroundImageClick
 			);
 		}
@@ -86,7 +86,10 @@ class FragmentEditableBackgroundImage extends Component {
 	 * @review
 	 */
 	syncActiveItemId() {
+		this._setEditableAttributes();
+
 		if (
+			this.hasUpdatePermissions &&
 			this.activeItemId === this._getItemId() &&
 			this.activeItemType ===
 				FRAGMENTS_EDITOR_ITEM_TYPES.backgroundImageEditable
@@ -169,6 +172,14 @@ class FragmentEditableBackgroundImage extends Component {
 	}
 
 	/**
+	 * @inheritDoc
+	 * @review
+	 */
+	syncLanguageId() {
+		this._renderBackgroundImage();
+	}
+
+	/**
 	 * Creates tooltip instance
 	 * @private
 	 * @review
@@ -219,23 +230,13 @@ class FragmentEditableBackgroundImage extends Component {
 	 * @review
 	 */
 	_getBackgroundImageValue() {
-		const defaultSegmentsExperienceId = prefixSegmentsExperienceId(
-			this.defaultSegmentsExperienceId
-		);
-		const segmentsExperienceId = prefixSegmentsExperienceId(
-			this.segmentsExperienceId
-		);
+		const segmentedValue = computeEditableValue(this.editableValues, {
+			defaultLanguageId: this.defaultLanguageId,
+			selectedExperienceId: this.segmentsExperienceId,
+			selectedLanguageId: this.languageId
+		});
 
-		const segmentedValue =
-			this.editableValues[segmentsExperienceId] ||
-			this.editableValues[defaultSegmentsExperienceId] ||
-			this.editableValues;
-
-		const translatedValue =
-			segmentedValue[this.languageId] ||
-			segmentedValue[this.defaultLanguageId];
-
-		return translatedValue;
+		return segmentedValue;
 	}
 
 	/**
@@ -256,12 +257,14 @@ class FragmentEditableBackgroundImage extends Component {
 	_handleEditableBackgroundImageClick(event) {
 		const item = event.target.closest('[data-fragments-editor-item-id]');
 
-		if (item === this.element && this._active) {
-			openImageSelector({
-				callback: image => this._updateFragmentBackgroundImage(image),
-				imageSelectorURL: this.imageSelectorURL,
-				portletNamespace: this.portletNamespace
-			});
+		if (
+			this.hasUpdatePermissions &&
+			item === this.element &&
+			this._active
+		) {
+			openImageSelector(image =>
+				this._updateFragmentBackgroundImage(image)
+			);
 		}
 	}
 
@@ -278,11 +281,9 @@ class FragmentEditableBackgroundImage extends Component {
 			!this._getBackgroundImageValue() &&
 			panelId === FLOATING_TOOLBAR_BUTTONS.fragmentBackgroundImage.panelId
 		) {
-			openImageSelector({
-				callback: image => this._updateFragmentBackgroundImage(image),
-				imageSelectorURL: this.imageSelectorURL,
-				portletNamespace: this.portletNamespace
-			});
+			openImageSelector(image =>
+				this._updateFragmentBackgroundImage(image)
+			);
 		}
 	}
 
@@ -306,20 +307,26 @@ class FragmentEditableBackgroundImage extends Component {
 	 * @review
 	 */
 	_setEditableAttributes() {
-		this.element.setAttribute(
-			'data-fragments-editor-item-id',
-			this._getItemId()
-		);
+		if (this.activeItemId === this.fragmentEntryLinkId) {
+			this.element.setAttribute(
+				'data-fragments-editor-item-id',
+				this._getItemId()
+			);
 
-		this.element.setAttribute(
-			'data-fragments-editor-item-type',
-			FRAGMENTS_EDITOR_ITEM_TYPES.backgroundImageEditable
-		);
+			this.element.setAttribute(
+				'data-fragments-editor-item-type',
+				FRAGMENTS_EDITOR_ITEM_TYPES.backgroundImageEditable
+			);
 
-		this.element.setAttribute(
-			'data-fragment-entry-link-id',
-			this.fragmentEntryLinkId
-		);
+			this.element.setAttribute(
+				'data-fragment-entry-link-id',
+				this.fragmentEntryLinkId
+			);
+		} else if (this.activeItemId !== this._getItemId()) {
+			this.element.removeAttribute('data-fragment-entry-link-id');
+			this.element.removeAttribute('data-fragments-editor-item-id');
+			this.element.removeAttribute('data-fragments-editor-item-type');
+		}
 	}
 
 	/**
@@ -369,7 +376,7 @@ class FragmentEditableBackgroundImage extends Component {
 	_updateMappedFieldValue() {
 		if (
 			this.getAssetFieldValueURL &&
-			editableIsMappedToAssetEntry(this.editableValues)
+			editableIsMappedToInfoItem(this.editableValues)
 		) {
 			getAssetFieldValue(
 				this.editableValues.classNameId,
@@ -456,15 +463,6 @@ FragmentEditableBackgroundImage.STATE = {
 	processor: Config.string().required(),
 
 	/**
-	 * If <code>true</code>, the mapping is activated.
-	 * @default undefined
-	 * @instance
-	 * @memberOf FragmentEditableBackgroundImage
-	 * @type {!boolean}
-	 */
-	showMapping: Config.bool().required(),
-
-	/**
 	 * Store instance.
 	 * @default undefined
 	 * @instance
@@ -479,16 +477,15 @@ const ConnectedFragmentEditableBackgroundImage = getConnectedComponent(
 	[
 		'activeItemId',
 		'activeItemType',
+		'hasUpdatePermissions',
 		'hoveredItemId',
 		'hoveredItemType',
 		'defaultLanguageId',
 		'defaultSegmentsExperienceId',
 		'getAssetFieldValueURL',
-		'imageSelectorURL',
 		'languageId',
 		'layoutData',
 		'mappingFieldsURL',
-		'portletNamespace',
 		'segmentsExperienceId',
 		'selectedMappingTypes'
 	]

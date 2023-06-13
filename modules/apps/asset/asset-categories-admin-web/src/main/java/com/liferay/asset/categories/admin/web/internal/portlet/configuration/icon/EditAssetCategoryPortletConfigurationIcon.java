@@ -14,7 +14,7 @@
 
 package com.liferay.asset.categories.admin.web.internal.portlet.configuration.icon;
 
-import com.liferay.asset.categories.admin.web.internal.constants.AssetCategoriesAdminPortletKeys;
+import com.liferay.asset.categories.admin.web.constants.AssetCategoriesAdminPortletKeys;
 import com.liferay.asset.categories.admin.web.internal.display.context.AssetCategoriesDisplayContext;
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.petra.string.StringPool;
@@ -83,7 +83,7 @@ public class EditAssetCategoryPortletConfigurationIcon
 
 			return editCategoryURL.toString();
 		}
-		catch (WindowStateException wse) {
+		catch (WindowStateException windowStateException) {
 		}
 
 		return StringPool.BLANK;
@@ -98,7 +98,7 @@ public class EditAssetCategoryPortletConfigurationIcon
 	public boolean isShow(PortletRequest portletRequest) {
 		AssetCategoriesDisplayContext assetCategoriesDisplayContext =
 			new AssetCategoriesDisplayContext(
-				null, null, _portal.getHttpServletRequest(portletRequest));
+				_portal.getHttpServletRequest(portletRequest), null, null);
 
 		AssetCategory category = assetCategoriesDisplayContext.getCategory();
 
@@ -110,9 +110,9 @@ public class EditAssetCategoryPortletConfigurationIcon
 			return assetCategoriesDisplayContext.hasPermission(
 				category, ActionKeys.UPDATE);
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(pe, pe);
+				_log.debug(portalException, portalException);
 			}
 		}
 

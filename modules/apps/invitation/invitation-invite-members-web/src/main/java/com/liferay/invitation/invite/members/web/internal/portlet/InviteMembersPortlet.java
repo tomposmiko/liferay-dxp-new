@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -144,9 +145,9 @@ public class InviteMembersPortlet extends MVCPortlet {
 		try {
 			doSendInvite(actionRequest);
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(e, e);
+				_log.warn(exception, exception);
 			}
 		}
 	}
@@ -166,8 +167,8 @@ public class InviteMembersPortlet extends MVCPortlet {
 				super.serveResource(resourceRequest, resourceResponse);
 			}
 		}
-		catch (Exception e) {
-			throw new PortletException(e);
+		catch (Exception exception) {
+			throw new PortletException(exception);
 		}
 	}
 
@@ -190,7 +191,7 @@ public class InviteMembersPortlet extends MVCPortlet {
 
 			jsonObject.put("success", Boolean.TRUE);
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			jsonObject.put("success", Boolean.FALSE);
 		}
 
@@ -273,16 +274,16 @@ public class InviteMembersPortlet extends MVCPortlet {
 			long companyId, long groupId, String keywords, int start, int end)
 		throws Exception {
 
-		LinkedHashMap usersParams = new LinkedHashMap();
-
-		usersParams.put(
-			"usersInvited",
-			new CustomSQLParam(
-				_customSQL.get(
-					getClass(),
-					"com.liferay.portal.service.persistence.UserFinder." +
-						"filterByUsersGroupsGroupId"),
-				groupId));
+		LinkedHashMap<String, Object> usersParams =
+			LinkedHashMapBuilder.<String, Object>put(
+				"usersInvited",
+				new CustomSQLParam(
+					_customSQL.get(
+						getClass(),
+						"com.liferay.portal.service.persistence.UserFinder." +
+							"filterByUsersGroupsGroupId"),
+					groupId)
+			).build();
 
 		return _userLocalService.search(
 			companyId, keywords, WorkflowConstants.STATUS_APPROVED, usersParams,
@@ -293,16 +294,16 @@ public class InviteMembersPortlet extends MVCPortlet {
 			long companyId, long groupId, String keywords)
 		throws Exception {
 
-		LinkedHashMap usersParams = new LinkedHashMap();
-
-		usersParams.put(
-			"usersInvited",
-			new CustomSQLParam(
-				_customSQL.get(
-					getClass(),
-					"com.liferay.portal.service.persistence.UserFinder." +
-						"filterByUsersGroupsGroupId"),
-				groupId));
+		LinkedHashMap<String, Object> usersParams =
+			LinkedHashMapBuilder.<String, Object>put(
+				"usersInvited",
+				new CustomSQLParam(
+					_customSQL.get(
+						getClass(),
+						"com.liferay.portal.service.persistence.UserFinder." +
+							"filterByUsersGroupsGroupId"),
+					groupId)
+			).build();
 
 		return _userLocalService.searchCount(
 			companyId, keywords, WorkflowConstants.STATUS_APPROVED,

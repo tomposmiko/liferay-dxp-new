@@ -32,16 +32,10 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class FragmentCollectionServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.fragment.service.impl.FragmentCollectionServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
-	 */
-
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link FragmentCollectionServiceUtil} to access the fragment collection remote service. Add custom service methods to <code>com.liferay.fragment.service.impl.FragmentCollectionServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	public static com.liferay.fragment.model.FragmentCollection
 			addFragmentCollection(
@@ -91,6 +85,23 @@ public class FragmentCollectionServiceUtil {
 	}
 
 	public static java.util.List<com.liferay.fragment.model.FragmentCollection>
+		getFragmentCollections(long groupId, boolean includeSystem) {
+
+		return getService().getFragmentCollections(groupId, includeSystem);
+	}
+
+	public static java.util.List<com.liferay.fragment.model.FragmentCollection>
+		getFragmentCollections(
+			long groupId, boolean includeSystem, int start, int end,
+			com.liferay.portal.kernel.util.OrderByComparator
+				<com.liferay.fragment.model.FragmentCollection>
+					orderByComparator) {
+
+		return getService().getFragmentCollections(
+			groupId, includeSystem, start, end, orderByComparator);
+	}
+
+	public static java.util.List<com.liferay.fragment.model.FragmentCollection>
 		getFragmentCollections(long groupId, int start, int end) {
 
 		return getService().getFragmentCollections(groupId, start, end);
@@ -105,6 +116,18 @@ public class FragmentCollectionServiceUtil {
 
 		return getService().getFragmentCollections(
 			groupId, start, end, orderByComparator);
+	}
+
+	public static java.util.List<com.liferay.fragment.model.FragmentCollection>
+		getFragmentCollections(
+			long groupId, String name, boolean includeSystem, int start,
+			int end,
+			com.liferay.portal.kernel.util.OrderByComparator
+				<com.liferay.fragment.model.FragmentCollection>
+					orderByComparator) {
+
+		return getService().getFragmentCollections(
+			groupId, name, includeSystem, start, end, orderByComparator);
 	}
 
 	public static java.util.List<com.liferay.fragment.model.FragmentCollection>
@@ -150,8 +173,21 @@ public class FragmentCollectionServiceUtil {
 		return getService().getFragmentCollectionsCount(groupId);
 	}
 
+	public static int getFragmentCollectionsCount(
+		long groupId, boolean includeSystem) {
+
+		return getService().getFragmentCollectionsCount(groupId, includeSystem);
+	}
+
 	public static int getFragmentCollectionsCount(long groupId, String name) {
 		return getService().getFragmentCollectionsCount(groupId, name);
+	}
+
+	public static int getFragmentCollectionsCount(
+		long groupId, String name, boolean includeSystem) {
+
+		return getService().getFragmentCollectionsCount(
+			groupId, name, includeSystem);
 	}
 
 	public static int getFragmentCollectionsCount(long[] groupIds) {

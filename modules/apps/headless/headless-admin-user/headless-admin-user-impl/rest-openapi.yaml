@@ -10,6 +10,12 @@ components:
                         The user's additional name, which can be used as a middle name.
                     readOnly: true
                     type: string
+                contentType:
+                    # @review
+                    description:
+                        The type of the content.
+                    readOnly: true
+                    type: string
                 familyName:
                     description:
                         The user's surname (last name).
@@ -56,6 +62,10 @@ components:
                             description:
                                 The field's content for simple types.
                             type: object
+                        data_i18n:
+                            additionalProperties:
+                                type: string
+                            type: object
                         geo:
                             description:
                                 A point determined by latitude and longitude.
@@ -88,23 +98,20 @@ components:
                 emailAddress:
                     description:
                         The email address.
-                    readOnly: true
                     type: string
                 id:
                     description:
                         The email address's ID.
                     format: int64
-                    readOnly: true
                     type: integer
+                # @review
                 primary:
                     description:
                         A flag that indicates whether this is the main email address of the user/organization.
-                    readOnly: true
                     type: boolean
                 type:
                     description:
                         The email address's type.
-                    readOnly: true
                     type: string
             type: object
         Organization:
@@ -115,43 +122,7 @@ components:
                 comment:
                     description:
                         The text of a comment associated with the organization.
-                    readOnly: true
                     type: string
-                contactInformation:
-                    description:
-                        The organization's contact information, which includes email addresses, postal addresses, phone
-                        numbers, and web URLs. This is modeled internally as a `Contact`.
-                    properties:
-                        emailAddresses:
-                            description:
-                                The organization's email addresses, with one optionally marked as primary.
-                            items:
-                                $ref: "#/components/schemas/EmailAddress"
-                            readOnly: true
-                            type: array
-                        postalAddresses:
-                            description:
-                                The organization's postal addresses, with one optionally marked as primary.
-                            items:
-                                $ref: "#/components/schemas/PostalAddress"
-                            readOnly: true
-                            type: array
-                        telephones:
-                            description:
-                                The organization's phones numbers, with one optionally marked as primary.
-                            items:
-                                $ref: "#/components/schemas/Phone"
-                            readOnly: true
-                            type: array
-                        webUrls:
-                            description:
-                                The organization's web URLs, with one optionally marked as primary.
-                            items:
-                                $ref: "#/components/schemas/WebUrl"
-                            readOnly: true
-                            type: array
-                    readOnly: true
-                    type: object
                 customFields:
                     items:
                         $ref: "#/components/schemas/CustomField"
@@ -171,9 +142,7 @@ components:
                 id:
                     description:
                         The organization's ID.
-                    format: int64
-                    readOnly: true
-                    type: integer
+                    type: string
                 image:
                     description:
                         A relative URL to the organization's image.
@@ -195,13 +164,15 @@ components:
                             description:
                                 The organization's country. This follows the
                                 [`addressCountry`](https://schema.org/addressCountry) specification.
-                            readOnly: true
                             type: string
+                        addressCountry_i18n:
+                            additionalProperties:
+                                type: string
+                            type: object
                         addressRegion:
                             description:
                                 The organization's region. This follows the
                                 [`addressRegion`](https://schema.org/addressRegion) specification.
-                            readOnly: true
                             type: string
                         id:
                             description:
@@ -209,24 +180,51 @@ components:
                             format: int64
                             readOnly: true
                             type: integer
-                    readOnly: true
                     type: object
                 name:
                     description:
                         The organization's name.
-                    readOnly: true
                     type: string
                 numberOfOrganizations:
                     description:
                         The number of this organization's child organizations.
                     readOnly: true
                     type: integer
+                organizationContactInformation:
+                    description:
+                        The organization's contact information, which includes email addresses, postal addresses, phone
+                        numbers, and web URLs. This is modeled internally as a `Contact`.
+                    properties:
+                        emailAddresses:
+                            description:
+                                The organization's email addresses, with one optionally marked as primary.
+                            items:
+                                $ref: "#/components/schemas/EmailAddress"
+                            type: array
+                        postalAddresses:
+                            description:
+                                The organization's postal addresses, with one optionally marked as primary.
+                            items:
+                                $ref: "#/components/schemas/PostalAddress"
+                            type: array
+                        telephones:
+                            description:
+                                The organization's phones numbers, with one optionally marked as primary.
+                            items:
+                                $ref: "#/components/schemas/Phone"
+                            type: array
+                        webUrls:
+                            description:
+                                The organization's web URLs, with one optionally marked as primary.
+                            items:
+                                $ref: "#/components/schemas/WebUrl"
+                            type: array
+                    type: object
                 parentOrganization:
                     allOf:
                         - $ref: "#/components/schemas/Organization"
                     description:
                         The organization's parent organization.
-                    readOnly: true
                 services:
                     description:
                         A list of services the organization provides. This follows the
@@ -243,28 +241,22 @@ components:
                                         closes:
                                             description:
                                                 The organization's closing time (in `HH:MM` format).
-                                            readOnly: true
                                             type: string
                                         dayOfWeek:
                                             description:
                                                 The day of the week.
-                                            readOnly: true
                                             type: string
                                         opens:
                                             description:
                                                 The organization's opening time (in `HH:MM` format).
-                                            readOnly: true
                                             type: string
                                     type: object
-                                readOnly: true
                                 type: array
                             serviceType:
                                 description:
                                     The type of service the organization provides.
-                                readOnly: true
                                 type: string
                         type: object
-                    readOnly: true
                     type: array
             type: object
         OrganizationBrief:
@@ -291,28 +283,23 @@ components:
                 extension:
                     description:
                         The phone number's extension.
-                    readOnly: true
                     type: string
                 id:
                     description:
                         The phone number's ID.
                     format: int64
-                    readOnly: true
                     type: integer
                 phoneNumber:
                     description:
                         The phone number without its extension.
-                    readOnly: true
                     type: string
                 phoneType:
                     description:
                         The phone number's type.
-                    readOnly: true
                     type: string
                 primary:
                     description:
                         A flag that identifies whether this is the main phone number of the user/organization.
-                    readOnly: true
                     type: boolean
             type: object
         PostalAddress:
@@ -323,53 +310,47 @@ components:
                 addressCountry:
                     description:
                         The address's country (e.g., USA).
-                    readOnly: true
                     type: string
+                addressCountry_i18n:
+                    additionalProperties:
+                        type: string
+                    type: object
                 addressLocality:
                     description:
                         The address's locality (e.g., city).
-                    readOnly: true
                     type: string
                 addressRegion:
                     description:
                         The address's region (e.g., state).
-                    readOnly: true
                     type: string
                 addressType:
                     description:
                         The address's type.
-                    readOnly: true
                     type: string
                 id:
                     description:
                         The address's ID.
                     format: int64
-                    readOnly: true
                     type: integer
                 postalCode:
                     description:
                         The address's postal code (e.g., zip code).
-                    readOnly: true
                     type: string
                 primary:
                     description:
                         A flag that identifies whether this is the main address of the user/organization.
-                    readOnly: true
                     type: boolean
                 streetAddressLine1:
                     description:
                         The street address's first line (e.g., 1600 Amphitheatre Pkwy.).
-                    readOnly: true
                     type: string
                 streetAddressLine2:
                     description:
                         The street address's second line.
-                    readOnly: true
                     type: string
                 streetAddressLine3:
                     description:
                         The street address's third line.
-                    readOnly: true
                     type: string
             type: object
         Role:
@@ -407,6 +388,11 @@ components:
                         The role's description.
                     readOnly: true
                     type: string
+                description_i18n:
+                    additionalProperties:
+                        type: string
+                    readOnly: true
+                    type: object
                 id:
                     description:
                         The role's ID.
@@ -418,6 +404,11 @@ components:
                         The role's name.
                     readOnly: true
                     type: string
+                name_i18n:
+                    additionalProperties:
+                        type: string
+                    readOnly: true
+                    type: object
                 roleType:
                     description:
                         The role's type.
@@ -440,6 +431,11 @@ components:
                         The role's name.
                     readOnly: true
                     type: string
+                name_i18n:
+                    additionalProperties:
+                        type: string
+                    readOnly: true
+                    type: object
             type: object
         Segment:
             description:
@@ -516,7 +512,7 @@ components:
                     type: string
             type: object
         Site:
-            #@review
+            # @review
             description:
                 Represents the site where the content is created. Properties follow the
                 [WebSite](https://schema.org/WebSite) specification.
@@ -529,6 +525,10 @@ components:
                     $ref: "#/components/schemas/Creator"
                 description:
                     type: string
+                description_i18n:
+                    additionalProperties:
+                        type: string
+                    type: object
                 friendlyUrlPath:
                     type: string
                 id:
@@ -540,6 +540,13 @@ components:
                     type: string
                 name:
                     type: string
+                name_i18n:
+                    additionalProperties:
+                        type: string
+                    type: object
+                parentSiteId:
+                    format: int64
+                    type: integer
                 sites:
                     items:
                         $ref: "#/components/schemas/Site"
@@ -560,6 +567,11 @@ components:
                         The site's name.
                     readOnly: true
                     type: string
+                name_i18n:
+                    additionalProperties:
+                        type: string
+                    readOnly: true
+                    type: object
             type: object
         Subscription:
             properties:
@@ -604,70 +616,6 @@ components:
                     format: date-time
                     readOnly: true
                     type: string
-                contactInformation:
-                    description:
-                        The user's contact information.
-                    properties:
-                        emailAddresses:
-                            description:
-                                A list of the user's email addresses, with one optionally marked as primary.
-                            items:
-                                $ref: "#/components/schemas/EmailAddress"
-                            readOnly: true
-                            type: array
-                        facebook:
-                            description:
-                                The user's Facebook account.
-                            readOnly: true
-                            type: string
-                        id:
-                            description:
-                                The ID of the `contactInformation`.
-                            format: int64
-                            readOnly: true
-                            type: integer
-                        jabber:
-                            description:
-                                The user's Jabber handle.
-                            readOnly: true
-                            type: string
-                        postalAddresses:
-                            description:
-                                A list of user's postal addresses, with one optionally marked as primary.
-                            items:
-                                $ref: "#/components/schemas/PostalAddress"
-                            readOnly: true
-                            type: array
-                        skype:
-                            description:
-                                The user's Skype handle.
-                            readOnly: true
-                            type: string
-                        sms:
-                            description:
-                                The user's SMS number.
-                            readOnly: true
-                            type: string
-                        telephones:
-                            description:
-                                A list of the user's phone numbers, with one optionally marked as primary.
-                            items:
-                                $ref: "#/components/schemas/Phone"
-                            readOnly: true
-                            type: array
-                        twitter:
-                            description:
-                                The user's Twitter handle.
-                            readOnly: true
-                            type: string
-                        webUrls:
-                            description:
-                                A list of the user's web URLs, with one optionally marked as primary.
-                            items:
-                                $ref: "#/components/schemas/WebUrl"
-                            readOnly: true
-                            type: array
-                    type: object
                 customFields:
                     items:
                         $ref: "#/components/schemas/CustomField"
@@ -769,6 +717,70 @@ components:
                         $ref: "#/components/schemas/SiteBrief"
                     readOnly: true
                     type: array
+                userAccountContactInformation:
+                    description:
+                        The user's contact information.
+                    properties:
+                        emailAddresses:
+                            description:
+                                A list of the user's email addresses, with one optionally marked as primary.
+                            items:
+                                $ref: "#/components/schemas/EmailAddress"
+                            readOnly: true
+                            type: array
+                        facebook:
+                            description:
+                                The user's Facebook account.
+                            readOnly: true
+                            type: string
+                        id:
+                            description:
+                                The ID of the `contactInformation`.
+                            format: int64
+                            readOnly: true
+                            type: integer
+                        jabber:
+                            description:
+                                The user's Jabber handle.
+                            readOnly: true
+                            type: string
+                        postalAddresses:
+                            description:
+                                A list of user's postal addresses, with one optionally marked as primary.
+                            items:
+                                $ref: "#/components/schemas/PostalAddress"
+                            readOnly: true
+                            type: array
+                        skype:
+                            description:
+                                The user's Skype handle.
+                            readOnly: true
+                            type: string
+                        sms:
+                            description:
+                                The user's SMS number.
+                            readOnly: true
+                            type: string
+                        telephones:
+                            description:
+                                A list of the user's phone numbers, with one optionally marked as primary.
+                            items:
+                                $ref: "#/components/schemas/Phone"
+                            readOnly: true
+                            type: array
+                        twitter:
+                            description:
+                                The user's Twitter handle.
+                            readOnly: true
+                            type: string
+                        webUrls:
+                            description:
+                                A list of the user's web URLs, with one optionally marked as primary.
+                            items:
+                                $ref: "#/components/schemas/WebUrl"
+                            readOnly: true
+                            type: array
+                    type: object
             type: object
         WebUrl:
             description:
@@ -778,17 +790,18 @@ components:
                     description:
                         The URL's ID.
                     format: int64
-                    readOnly: true
                     type: integer
+                primary:
+                    description:
+                        A flag that identifies whether this is the main web address of the user/organization.
+                    type: boolean
                 url:
                     description:
                         The absolute URL.
-                    readOnly: true
                     type: string
                 urlType:
                     description:
                         The URL's type.
-                    readOnly: true
                     type: string
             type: object
 info:
@@ -915,6 +928,7 @@ paths:
                 204:
                     content:
                         application/json: {}
+                        application/xml: {}
                     description:
                         ""
             tags: ["Subscription"]
@@ -985,7 +999,50 @@ paths:
                     description:
                         ""
             tags: ["Organization"]
+        post:
+            description:
+                Creates a new organization
+            operationId: postOrganization
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/Organization"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/Organization"
+            responses:
+                201:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Organization"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/Organization"
+                    description:
+                        "Organizations successfully created"
+            tags: ["Organization"]
     "/organizations/{organizationId}":
+        delete:
+            # @review
+            description:
+                Deletes an organization.
+            operationId: deleteOrganization
+            parameters:
+                - in: path
+                  name: organizationId
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                204:
+                    content:
+                        application/json: {}
+                        application/xml: {}
+                    description:
+                        ""
+            tags: ["Organization"]
         get:
             description:
                 Retrieves the organization.
@@ -995,8 +1052,7 @@ paths:
                   name: organizationId
                   required: true
                   schema:
-                      format: int64
-                      type: integer
+                      type: string
             responses:
                 200:
                     content:
@@ -1009,6 +1065,70 @@ paths:
                     description:
                         ""
             tags: ["Organization"]
+        patch:
+            # @review
+            description:
+                Updates the organization with the information sent in the request body. Fields not present in the
+                request body are left unchanged.
+            operationId: patchOrganization
+            parameters:
+                - in: path
+                  name: organizationId
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/Organization"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/Organization"
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Organization"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/Organization"
+                    description:
+                        "Organization successfully updated"
+            tags: ["Organization"]
+        put:
+            # @review
+            description:
+                Replaces the organization with information sent in the request body. Any missing fields are deleted
+                unless they are required.
+            operationId: putOrganization
+            parameters:
+                - in: path
+                  name: organizationId
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/Organization"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/Organization"
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Organization"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/Organization"
+                    description:
+                        "Organization successfully replaced"
+            tags: ["Organization"]
     "/organizations/{organizationId}/email-addresses":
         get:
             description:
@@ -1019,8 +1139,7 @@ paths:
                   name: organizationId
                   required: true
                   schema:
-                      format: int64
-                      type: integer
+                      type: string
             responses:
                 200:
                     content:
@@ -1047,8 +1166,7 @@ paths:
                   name: organizationId
                   required: true
                   schema:
-                      format: int64
-                      type: integer
+                      type: string
             responses:
                 200:
                     content:
@@ -1075,8 +1193,7 @@ paths:
                   name: organizationId
                   required: true
                   schema:
-                      format: int64
-                      type: integer
+                      type: string
             responses:
                 200:
                     content:
@@ -1103,8 +1220,7 @@ paths:
                   name: organizationId
                   required: true
                   schema:
-                      format: int64
-                      type: integer
+                      type: string
                 - in: query
                   name: filter
                   schema:
@@ -1151,8 +1267,7 @@ paths:
                   name: organizationId
                   required: true
                   schema:
-                      format: int64
-                      type: integer
+                      type: string
             responses:
                 200:
                     content:
@@ -1180,8 +1295,7 @@ paths:
                   name: parentOrganizationId
                   required: true
                   schema:
-                      format: int64
-                      type: integer
+                      type: string
                 - in: query
                   name: flatten
                   schema:
@@ -1440,7 +1554,7 @@ paths:
     "/sites/{siteId}/user-accounts":
         get:
             description:
-                Retrieves the Site members' user accounts. Results can be paginated, filtered, searched, and sorted.
+                Retrieves the site members' user accounts. Results can be paginated, filtered, searched, and sorted.
             operationId: getSiteUserAccountsPage
             parameters:
                 - in: path
@@ -1487,7 +1601,7 @@ paths:
             tags: ["UserAccount"]
     "/sites/{siteId}/user-accounts/{userAccountId}/segments":
         get:
-            #review
+            # @review
             description:
                 "Gets a user's segments. The set of available headers are: Accept-Language (string), Host (string),
                 User-Agent (string), X-Browser (string), X-Cookies (collection string), X-Device-Brand (string),

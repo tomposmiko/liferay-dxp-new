@@ -21,6 +21,8 @@ public class GroupConstants {
 
 	public static final int ANY_PARENT_GROUP_ID = -1;
 
+	public static final String APP = "App";
+
 	public static final String CONTROL_PANEL = "Control Panel";
 
 	public static final String CONTROL_PANEL_FRIENDLY_URL = "/control_panel";
@@ -48,6 +50,8 @@ public class GroupConstants {
 	public static final String[] SYSTEM_GROUPS = {
 		CONTROL_PANEL, FORMS, GUEST, GroupConstants.USER_PERSONAL_SITE
 	};
+
+	public static final int TYPE_DEPOT = 5;
 
 	public static final String TYPE_SETTINGS_KEY_INHERIT_LOCALES =
 		"inheritLocales";

@@ -1,0 +1,15 @@
+.page-editor__page-structure {
+	.lfr-treeview {
+		&-node-list {
+			border-left-style: solid;
+
+			&-item {
+				margin-bottom: 0;
+
+				&__children {
+					padding-left: 24px;
+				}
+			}
+		}
+	}
+}

@@ -20,6 +20,7 @@ import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldValueRendere
 import com.liferay.dynamic.data.mapping.form.web.internal.search.FormInstanceRecordSearch;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
+import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecord;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecordVersion;
@@ -32,6 +33,7 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemList;
+import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -56,8 +58,11 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.portlet.PortletException;
 import javax.portlet.PortletURL;
@@ -73,16 +78,16 @@ public class DDMFormViewFormInstanceRecordsDisplayContext {
 
 	public DDMFormViewFormInstanceRecordsDisplayContext(
 			RenderRequest renderRequest, RenderResponse renderResponse,
-			DDMFormInstance formInstance,
-			DDMFormInstanceRecordLocalService formInstanceRecordLocalService,
-			DDMFormFieldTypeServicesTracker formFieldTypeServicesTracker)
+			DDMFormInstance ddmFormInstance,
+			DDMFormInstanceRecordLocalService ddmFormInstanceRecordLocalService,
+			DDMFormFieldTypeServicesTracker ddmFormFieldTypeServicesTracker)
 		throws PortalException {
 
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
-		_ddmFormInstance = formInstance;
-		_ddmFormInstanceRecordLocalService = formInstanceRecordLocalService;
-		_ddmFormFieldTypeServicesTracker = formFieldTypeServicesTracker;
+		_ddmFormInstance = ddmFormInstance;
+		_ddmFormInstanceRecordLocalService = ddmFormInstanceRecordLocalService;
+		_ddmFormFieldTypeServicesTracker = ddmFormFieldTypeServicesTracker;
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)_renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -136,24 +141,35 @@ public class DDMFormViewFormInstanceRecordsDisplayContext {
 			return StringPool.BLANK;
 		}
 
+		String formFieldType = formField.getType();
+
 		final DDMFormFieldValueRenderer fieldValueRenderer =
 			_ddmFormFieldTypeServicesTracker.getDDMFormFieldValueRenderer(
-				formField.getType());
+				formFieldType);
 
-		List<String> renderedFormFielValues = ListUtil.toList(
+		List<String> renderedFormFieldValues = ListUtil.toList(
 			formFieldValues,
 			new Function<DDMFormFieldValue, String>() {
 
 				@Override
 				public String apply(DDMFormFieldValue formFieldValue) {
-					return fieldValueRenderer.render(
-						formFieldValue, _renderRequest.getLocale());
+					return HtmlUtil.escape(
+						fieldValueRenderer.render(
+							formFieldValue, _renderRequest.getLocale()));
 				}
 
 			});
 
+		if (formFieldType.equals("select")) {
+			DDMFormFieldOptions formFieldOptions =
+				formField.getDDMFormFieldOptions();
+
+			renderedFormFieldValues = _getOptionsRenderedFormFieldValues(
+				formFieldOptions, renderedFormFieldValues);
+		}
+
 		return StringUtil.merge(
-			renderedFormFielValues, StringPool.COMMA_AND_SPACE);
+			renderedFormFieldValues, StringPool.COMMA_AND_SPACE);
 	}
 
 	public List<DDMFormField> getDDMFormFields() {
@@ -573,6 +589,40 @@ public class DDMFormViewFormInstanceRecordsDisplayContext {
 		}
 
 		ddmFormInstanceRecordSearch.setTotal(total);
+	}
+
+	private List<String> _getOptionsRenderedFormFieldValues(
+		DDMFormFieldOptions formFieldOptions,
+		List<String> renderedFormFieldValues) {
+
+		Stream<String> stream = renderedFormFieldValues.stream();
+
+		List<String> convertedFormFieldValues = stream.flatMap(
+			renderedFormFieldValue -> Arrays.stream(
+				StringUtil.split(renderedFormFieldValue, CharPool.COMMA))
+		).map(
+			String::trim
+		).collect(
+			Collectors.toList()
+		);
+
+		return ListUtil.toList(
+			convertedFormFieldValues,
+			new Function<String, String>() {
+
+				@Override
+				public String apply(String formFieldValue) {
+					LocalizedValue optionLabel =
+						formFieldOptions.getOptionLabels(formFieldValue);
+
+					if (optionLabel == null) {
+						return formFieldValue;
+					}
+
+					return optionLabel.getString(_renderRequest.getLocale());
+				}
+
+			});
 	}
 
 	private static final int _MAX_COLUMNS = 5;

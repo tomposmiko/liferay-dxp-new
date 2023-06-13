@@ -428,8 +428,6 @@ public class BeanPortletImpl implements BeanPortlet {
 
 		allPortletModes.addAll(beanApp.getCustomPortletModes());
 
-		StringBundler portletModesSB = new StringBundler();
-
 		List<String> supportedPortletModes = new ArrayList<>();
 
 		Map<String, Set<String>> supportedPortletModesMap =
@@ -438,24 +436,22 @@ public class BeanPortletImpl implements BeanPortlet {
 		for (Map.Entry<String, Set<String>> entry :
 				supportedPortletModesMap.entrySet()) {
 
+			StringBundler portletModesSB = new StringBundler();
+
 			portletModesSB.append(entry.getKey());
 			portletModesSB.append(";");
 
 			Set<String> portletModes = entry.getValue();
 
-			boolean first = true;
-
 			for (String portletMode : portletModes) {
 				if (allPortletModes.contains(portletMode)) {
-					if (first) {
-						first = false;
-					}
-					else {
-						portletModesSB.append(",");
-					}
-
 					portletModesSB.append(portletMode);
+					portletModesSB.append(",");
 				}
+			}
+
+			if (portletModesSB.index() > 2) {
+				portletModesSB.setIndex(portletModesSB.index() - 1);
 			}
 
 			supportedPortletModes.add(portletModesSB.toString());
@@ -523,14 +519,13 @@ public class BeanPortletImpl implements BeanPortlet {
 		Map<String, String> securityRoleRefs = getSecurityRoleRefs();
 
 		for (Map.Entry<String, String> entry : securityRoleRefs.entrySet()) {
-			if (roleNamesSB.length() > 0) {
-				roleNamesSB.append(",");
-			}
-
 			roleNamesSB.append(entry.getKey());
+			roleNamesSB.append(",");
 		}
 
-		if (roleNamesSB.length() > 0) {
+		if (roleNamesSB.index() > 0) {
+			roleNamesSB.setIndex(roleNamesSB.index() - 1);
+
 			dictionary.put(
 				"javax.portlet.security-role-ref", roleNamesSB.toString());
 		}
@@ -560,30 +555,26 @@ public class BeanPortletImpl implements BeanPortlet {
 
 		List<String> supportedWindowStates = new ArrayList<>();
 
-		StringBundler windowStatesSB = new StringBundler();
-
 		Map<String, Set<String>> supportedWindowStatesMap =
 			getSupportedWindowStates();
 
 		for (Map.Entry<String, Set<String>> entry :
 				supportedWindowStatesMap.entrySet()) {
 
+			StringBundler windowStatesSB = new StringBundler();
+
 			windowStatesSB.append(entry.getKey());
 			windowStatesSB.append(";");
 
 			Set<String> windowStates = entry.getValue();
 
-			boolean first = true;
-
 			for (String windowState : windowStates) {
-				if (first) {
-					first = false;
-				}
-				else {
-					windowStatesSB.append(",");
-				}
-
 				windowStatesSB.append(windowState);
+				windowStatesSB.append(",");
+			}
+
+			if (windowStatesSB.index() > 2) {
+				windowStatesSB.setIndex(windowStatesSB.index() - 1);
 			}
 
 			supportedWindowStates.add(windowStatesSB.toString());
@@ -679,8 +670,9 @@ public class BeanPortletImpl implements BeanPortlet {
 						}
 					}
 				}
-				catch (IllegalAccessException iae) {
-					throw new ExceptionInInitializerError(iae);
+				catch (IllegalAccessException illegalAccessException) {
+					throw new ExceptionInInitializerError(
+						illegalAccessException);
 				}
 			}
 		};

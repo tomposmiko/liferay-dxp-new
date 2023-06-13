@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.model.AttachedModel;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.ShardedModel;
+import com.liferay.portal.kernel.model.change.tracking.CTModel;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -34,10 +35,10 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface DDMStructureLinkModel
-	extends AttachedModel, BaseModel<DDMStructureLink>, MVCCModel,
-			ShardedModel {
+	extends AttachedModel, BaseModel<DDMStructureLink>,
+			CTModel<DDMStructureLink>, MVCCModel, ShardedModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a ddm structure link model instance should use the {@link DDMStructureLink} interface instead.
@@ -48,6 +49,7 @@ public interface DDMStructureLinkModel
 	 *
 	 * @return the primary key of this ddm structure link
 	 */
+	@Override
 	public long getPrimaryKey();
 
 	/**
@@ -55,6 +57,7 @@ public interface DDMStructureLinkModel
 	 *
 	 * @param primaryKey the primary key of this ddm structure link
 	 */
+	@Override
 	public void setPrimaryKey(long primaryKey);
 
 	/**
@@ -72,6 +75,22 @@ public interface DDMStructureLinkModel
 	 */
 	@Override
 	public void setMvccVersion(long mvccVersion);
+
+	/**
+	 * Returns the ct collection ID of this ddm structure link.
+	 *
+	 * @return the ct collection ID of this ddm structure link
+	 */
+	@Override
+	public long getCtCollectionId();
+
+	/**
+	 * Sets the ct collection ID of this ddm structure link.
+	 *
+	 * @param ctCollectionId the ct collection ID of this ddm structure link
+	 */
+	@Override
+	public void setCtCollectionId(long ctCollectionId);
 
 	/**
 	 * Returns the structure link ID of this ddm structure link.

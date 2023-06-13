@@ -35,11 +35,11 @@ import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.service.test.ServiceTestUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.trash.kernel.exception.RestoreEntryException;
 
@@ -67,7 +67,7 @@ public class JournalFolderServiceTest {
 	public void setUp() throws Exception {
 		_group = GroupTestUtil.addGroup();
 
-		ServiceTestUtil.setUser(TestPropsValues.getUser());
+		UserTestUtil.setUser(TestPropsValues.getUser());
 	}
 
 	@Test
@@ -133,7 +133,7 @@ public class JournalFolderServiceTest {
 
 			Assert.fail();
 		}
-		catch (InvalidDDMStructureException iddmse) {
+		catch (InvalidDDMStructureException invalidDDMStructureException) {
 		}
 
 		JournalFolder subfolder = JournalTestUtil.addFolder(
@@ -147,7 +147,7 @@ public class JournalFolderServiceTest {
 
 			Assert.fail();
 		}
-		catch (InvalidDDMStructureException iddmse) {
+		catch (InvalidDDMStructureException invalidDDMStructureException) {
 		}
 
 		JournalFolderLocalServiceUtil.deleteFolder(folder.getFolderId());
@@ -272,7 +272,7 @@ public class JournalFolderServiceTest {
 
 			Assert.fail();
 		}
-		catch (RestoreEntryException ree) {
+		catch (RestoreEntryException restoreEntryException) {
 		}
 
 		JournalFolder subfolder = JournalTestUtil.addFolder(
@@ -284,7 +284,7 @@ public class JournalFolderServiceTest {
 
 			Assert.fail();
 		}
-		catch (RestoreEntryException ree) {
+		catch (RestoreEntryException restoreEntryException) {
 		}
 	}
 
@@ -333,7 +333,7 @@ public class JournalFolderServiceTest {
 
 			Assert.fail();
 		}
-		catch (InvalidDDMStructureException iddmse) {
+		catch (InvalidDDMStructureException invalidDDMStructureException) {
 		}
 
 		JournalFolder subfolder = JournalTestUtil.addFolder(
@@ -346,7 +346,7 @@ public class JournalFolderServiceTest {
 
 			Assert.fail();
 		}
-		catch (InvalidDDMStructureException iddmse) {
+		catch (InvalidDDMStructureException invalidDDMStructureException) {
 		}
 	}
 
@@ -406,7 +406,7 @@ public class JournalFolderServiceTest {
 
 			Assert.fail();
 		}
-		catch (RestoreEntryException ree) {
+		catch (RestoreEntryException restoreEntryException) {
 		}
 
 		JournalFolder subfolder = JournalTestUtil.addFolder(
@@ -418,7 +418,7 @@ public class JournalFolderServiceTest {
 
 			Assert.fail();
 		}
-		catch (RestoreEntryException ree) {
+		catch (RestoreEntryException restoreEntryException) {
 		}
 	}
 
@@ -469,7 +469,7 @@ public class JournalFolderServiceTest {
 
 			Assert.fail();
 		}
-		catch (InvalidDDMStructureException iddmse) {
+		catch (InvalidDDMStructureException invalidDDMStructureException) {
 		}
 
 		JournalFolder subfolder = JournalTestUtil.addFolder(
@@ -481,7 +481,7 @@ public class JournalFolderServiceTest {
 
 			Assert.fail();
 		}
-		catch (InvalidDDMStructureException iddmse) {
+		catch (InvalidDDMStructureException invalidDDMStructureException) {
 		}
 	}
 
@@ -547,7 +547,7 @@ public class JournalFolderServiceTest {
 
 			Assert.fail();
 		}
-		catch (InvalidDDMStructureException iddmse) {
+		catch (InvalidDDMStructureException invalidDDMStructureException) {
 		}
 
 		JournalFolder subfolder = JournalTestUtil.addFolder(
@@ -569,7 +569,7 @@ public class JournalFolderServiceTest {
 
 			Assert.fail();
 		}
-		catch (InvalidDDMStructureException iddmse) {
+		catch (InvalidDDMStructureException invalidDDMStructureException) {
 		}
 	}
 

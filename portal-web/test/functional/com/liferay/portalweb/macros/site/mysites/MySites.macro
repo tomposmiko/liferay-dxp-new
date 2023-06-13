@@ -13,11 +13,13 @@ definition {
 	}
 
 	macro viewMembershipRequested {
-		LexiconList.clickEllipsis(listEntry = "${siteName}");
+		LexiconList.clickEllipsis(
+			listEntry = "${siteName}",
+			userRole = "${userRole}");
 
 		MenuItem.viewPresent(menuItem = "Membership Requested");
 
-		MenuItem.viewPresent(menuItem = "Membership Requested");
+		MenuItem.viewVisible(menuItem = "Membership Requested");
 	}
 
 	macro viewNoOptions {

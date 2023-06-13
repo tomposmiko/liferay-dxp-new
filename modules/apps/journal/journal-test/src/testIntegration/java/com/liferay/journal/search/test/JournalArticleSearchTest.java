@@ -59,18 +59,18 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.SearchContextTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.search.test.util.BaseSearchTestCase;
-import com.liferay.portal.service.test.ServiceTestUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -98,7 +98,7 @@ public class JournalArticleSearchTest extends BaseSearchTestCase {
 	@Before
 	@Override
 	public void setUp() throws Exception {
-		ServiceTestUtil.setUser(TestPropsValues.getUser());
+		UserTestUtil.setUser(TestPropsValues.getUser());
 
 		super.setUp();
 
@@ -144,13 +144,15 @@ public class JournalArticleSearchTest extends BaseSearchTestCase {
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(group.getGroupId());
 
-		Map<Locale, String> keywordsMap = new HashMap<>();
-
 		String keywords = "keywords";
 
-		keywordsMap.put(LocaleUtil.getDefault(), keywords);
-		keywordsMap.put(LocaleUtil.GERMANY, keywords);
-		keywordsMap.put(LocaleUtil.SPAIN, keywords);
+		Map<Locale, String> keywordsMap = HashMapBuilder.put(
+			LocaleUtil.getDefault(), keywords
+		).put(
+			LocaleUtil.GERMANY, keywords
+		).put(
+			LocaleUtil.SPAIN, keywords
+		).build();
 
 		String articleId = "Article.Id";
 
@@ -558,7 +560,8 @@ public class JournalArticleSearchTest extends BaseSearchTestCase {
 	protected void setUpDDMIndexer() {
 		Registry registry = RegistryUtil.getRegistry();
 
-		_ddmIndexer = registry.getService(DDMIndexer.class);
+		_ddmIndexer = registry.getService(
+			registry.getServiceReference(DDMIndexer.class));
 	}
 
 	@Override
@@ -625,9 +628,9 @@ public class JournalArticleSearchTest extends BaseSearchTestCase {
 				fieldValues.length);
 
 			for (String fieldValue : fieldValues) {
-				Map<Locale, String> map = new HashMap<>();
-
-				map.put(LocaleUtil.US, fieldValue);
+				Map<Locale, String> map = HashMapBuilder.put(
+					LocaleUtil.US, fieldValue
+				).build();
 
 				contents.add(map);
 			}

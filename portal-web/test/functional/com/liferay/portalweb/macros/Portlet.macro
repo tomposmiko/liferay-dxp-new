@@ -143,13 +143,23 @@ definition {
 	}
 
 	macro clickPortletPlusIconPG {
-		MouseOver.mouseOverNotVisible(
-			key_portletName = "${portletName}",
-			locator1 = "Portlet#ICON_PLUS_SIGN");
+		var browserType = PropsUtil.get("browser.type");
+		var key_portletName = "${portletName}";
 
-		Click(
-			key_portletName = "${portletName}",
-			locator1 = "Portlet#ICON_PLUS_SIGN");
+		if ("${browserType}" == "internetexplorer") {
+			Click.javaScriptClick(locator1 = "Portlet#ICON_PLUS_SIGN");
+
+			AssertVisible(locator1 = "Portlet#ICON_PLUS_SIGN");
+		}
+		else {
+			MouseOver.mouseOverNotVisible(
+				key_portletName = "${portletName}",
+				locator1 = "Portlet#ICON_PLUS_SIGN");
+
+			Click(
+				key_portletName = "${portletName}",
+				locator1 = "Portlet#ICON_PLUS_SIGN");
+		}
 	}
 
 	macro configureApplicationDecoratorViaLookandfeelPG {
@@ -249,15 +259,28 @@ definition {
 	macro gotoPortletOptions {
 		if (isSet(portletName)) {
 			var key_portletName = "${portletName}";
+			var browserType = PropsUtil.get("browser.type");
 
-			MouseOver.mouseOverNotVisible(locator1 = "Portlet#SPECIFIC_BORDERLESS_ELLIPSIS_ICON");
+			if ("${browserType}" == "internetexplorer") {
+				Click.javaScriptClick(locator1 = "Portlet#SPECIFIC_BORDERLESS_ELLIPSIS_ICON");
 
-			Click(locator1 = "Portlet#SPECIFIC_BORDERLESS_ELLIPSIS_ICON");
+				AssertVisible(locator1 = "Portlet#SPECIFIC_BORDERLESS_ELLIPSIS_ICON");
+			}
+			else if ("${siteTemplate}" == "true") {
+				MouseOver.mouseOverNotVisible(locator1 = "Portlet#SPECIFIC_BORDERLESS_ELLIPSIS_ICON");
+
+				Click(locator1 = "Portlet#SPECIFIC_BORDERLESS_ELLIPSIS_ICON");
+			}
+			else {
+				MouseOver.mouseOverNotVisible(locator1 = "Portlet#SPECIFIC_BORDERLESS_ELLIPSIS_ICON");
+
+				Click.waitForMenuToggleJSClick(locator1 = "Portlet#SPECIFIC_BORDERLESS_ELLIPSIS_ICON");
+			}
 		}
 		else {
 			MouseOver.mouseOverNotVisible(locator1 = "Portlet#OPTIONS_ICON");
 
-			Click(locator1 = "Portlet#OPTIONS_ICON");
+			Click.waitForMenuToggleJSClick(locator1 = "Portlet#OPTIONS_ICON");
 		}
 
 		if (isSet(portletOption)) {
@@ -337,9 +360,17 @@ definition {
 	}
 
 	macro viewApplicationDecorator {
-		AssertElementPresent(
-			key_decorator = StringUtil.lowerCase("${decorator}"),
-			locator1 = "Portlet#PORTLET_BORDER_DECORATOR");
+		if (isSet(portletName)) {
+			key_decorator = StringUtil.lowerCase("${decorator}");
+			var key_portletTitleName = "${portletName}";
+
+			AssertElementPresent(locator1 = "Portlet#SPECIFIC_PORTLET_BORDER_DECORATOR");
+		}
+		else {
+			AssertElementPresent(
+				key_decorator = StringUtil.lowerCase("${decorator}"),
+				locator1 = "Portlet#PORTLET_BORDER_DECORATOR");
+		}
 	}
 
 	@summary = "Assert that the ${portletName} portlet body has the text '${portletBody}'"
@@ -411,6 +442,17 @@ definition {
 		AssertTextEquals(
 			locator1 = "Message#ERROR",
 			value1 = "You do not have the roles required to access this portlet.");
+	}
+
+	macro viewNoPortletsPresentCP {
+		ProductMenuHelper.expandPanel(panel = "${panel}");
+
+		ProductMenuHelper.expandCategory(category = "${category}");
+
+		AssertElementNotPresent(
+			key_portlet = "${portlet}",
+			locator1 = "ProductMenu#PORTLET",
+			value1 = "${portlet}");
 	}
 
 	macro viewNoPortletsPresentPG {

@@ -32,7 +32,7 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class ChangesetEntryLocalServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.changeset.service.impl.ChangesetEntryLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.

@@ -40,7 +40,7 @@ Layout curLayout = (Layout)row.getObject();
 
 	<c:if test="<%= Validator.isNotNull(editLayoutURL) %>">
 		<liferay-ui:icon
-			message="edit"
+			message='<%= layoutsAdminDisplayContext.isConversionDraft(layout) ? "edit-conversion-draft" : "edit" %>'
 			url="<%= editLayoutURL %>"
 		/>
 	</c:if>
@@ -85,7 +85,7 @@ Layout curLayout = (Layout)row.getObject();
 
 	<c:if test="<%= layoutsAdminDisplayContext.isShowConvertLayoutAction(curLayout) %>">
 		<liferay-ui:icon
-			message="convert-to-content-page"
+			message="convert-to-content-page-and-preview"
 			url="<%= layoutsAdminDisplayContext.getConvertLayoutURL(curLayout) %>"
 		/>
 	</c:if>
@@ -97,7 +97,7 @@ Layout curLayout = (Layout)row.getObject();
 	</c:if>
 </liferay-ui:icon-menu>
 
-<aui:script require="metal-dom/src/all/dom as dom,frontend-js-web/liferay/modal/commands/OpenSimpleInputModal.es as modalCommands">
+<aui:script require="metal-dom/src/all/dom as dom">
 	var addLayoutPrototypeActionOptionQueryClickHandler = dom.delegate(
 		document.body,
 		'click',

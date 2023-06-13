@@ -93,6 +93,7 @@ page import="com.liferay.portal.kernel.portlet.PortletURLFactoryUtil" %><%@
 page import="com.liferay.portal.kernel.security.permission.ActionKeys" %><%@
 page import="com.liferay.portal.kernel.security.permission.ResourceActionsUtil" %><%@
 page import="com.liferay.portal.kernel.service.ClassNameLocalServiceUtil" %><%@
+page import="com.liferay.portal.kernel.service.GroupLocalServiceUtil" %><%@
 page import="com.liferay.portal.kernel.service.GroupServiceUtil" %><%@
 page import="com.liferay.portal.kernel.service.UserLocalServiceUtil" %><%@
 page import="com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalServiceUtil" %><%@
@@ -224,16 +225,7 @@ if (calendarDisplayContext != null) {
 	defaultCalendar = calendarDisplayContext.getDefaultCalendar(groupCalendars, userCalendars);
 }
 
-TimeZone userTimeZone = null;
-
-if ((calendarBooking != null) && calendarBooking.isAllDay()) {
-	userTimeZone = TimeZone.getTimeZone(StringPool.UTC);
-}
-else {
-	userTimeZone = TimeZone.getTimeZone(timeZoneId);
-}
-
-TimeZone utcTimeZone = TimeZone.getTimeZone(StringPool.UTC);
+TimeZone userTimeZone = TimeZone.getTimeZone(timeZoneId);
 
 Format dateFormatLongDate = FastDateFormatFactoryUtil.getDate(FastDateFormatConstants.LONG, locale, userTimeZone);
 

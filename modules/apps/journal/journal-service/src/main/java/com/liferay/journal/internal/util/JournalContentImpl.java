@@ -14,6 +14,8 @@
 
 package com.liferay.journal.internal.util;
 
+import com.liferay.change.tracking.constants.CTConstants;
+import com.liferay.change.tracking.listener.CTEventListener;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalArticleDisplay;
@@ -27,6 +29,7 @@ import com.liferay.portal.kernel.cache.MultiVMPool;
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.cache.index.IndexEncoder;
 import com.liferay.portal.kernel.cache.index.PortalCacheIndexer;
+import com.liferay.portal.kernel.change.tracking.CTCollectionThreadLocal;
 import com.liferay.portal.kernel.cluster.ClusterInvokeAcceptor;
 import com.liferay.portal.kernel.cluster.ClusterInvokeThreadLocal;
 import com.liferay.portal.kernel.cluster.ClusterableInvokerUtil;
@@ -67,21 +70,14 @@ import org.osgi.service.component.annotations.Reference;
  * @author Raymond Augé
  * @author Michael Young
  */
-@Component(service = {IdentifiableOSGiService.class, JournalContent.class})
-public class JournalContentImpl
-	implements IdentifiableOSGiService, JournalContent {
-
-	@Activate
-	public void activate() {
-		_portalCache =
-			(PortalCache<JournalContentKey, JournalArticleDisplay>)
-				_multiVMPool.getPortalCache(CACHE_NAME);
-
-		_journalArticlePortalCacheIndexer = new PortalCacheIndexer<>(
-			new JournalContentArticleKeyIndexEncoder(), _portalCache);
-		_journalTemplatePortalCacheIndexer = new PortalCacheIndexer<>(
-			new JournalContentTemplateKeyIndexEncoder(), _portalCache);
+@Component(
+	service = {
+		CTEventListener.class, IdentifiableOSGiService.class,
+		JournalContent.class
 	}
+)
+public class JournalContentImpl
+	implements CTEventListener, IdentifiableOSGiService, JournalContent {
 
 	@Override
 	public void clearCache() {
@@ -126,11 +122,6 @@ public class JournalContentImpl
 				ReflectionUtil.throwException(t);
 			}
 		}
-	}
-
-	@Deactivate
-	public void deactivate() {
-		_multiVMPool.removePortalCache(CACHE_NAME);
 	}
 
 	@Override
@@ -234,7 +225,7 @@ public class JournalContentImpl
 					return null;
 				}
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 			}
 
 			LayoutSet layoutSet = themeDisplay.getLayoutSet();
@@ -256,8 +247,13 @@ public class JournalContentImpl
 			groupId, articleId, version, ddmTemplateKey, layoutSetId, viewMode,
 			languageId, page, secure);
 
-		JournalArticleDisplay articleDisplay = _portalCache.get(
-			journalContentKey);
+		JournalArticleDisplay articleDisplay = null;
+
+		long ctCollectionId = CTCollectionThreadLocal.getCTCollectionId();
+
+		if (ctCollectionId == CTConstants.CT_COLLECTION_ID_PRODUCTION) {
+			articleDisplay = _portalCache.get(journalContentKey);
+		}
 
 		if ((articleDisplay == null) || !lifecycleRender) {
 			articleDisplay = getArticleDisplay(
@@ -268,11 +264,17 @@ public class JournalContentImpl
 				lifecycleRender) {
 
 				try {
-					_portalCache.put(journalContentKey, articleDisplay);
+					if (ctCollectionId ==
+							CTConstants.CT_COLLECTION_ID_PRODUCTION) {
+
+						_portalCache.put(journalContentKey, articleDisplay);
+					}
 				}
-				catch (ClassCastException cce) {
+				catch (ClassCastException classCastException) {
 					if (_log.isWarnEnabled()) {
-						_log.warn("Unable to cache article display", cce);
+						_log.warn(
+							"Unable to cache article display",
+							classCastException);
 					}
 				}
 			}
@@ -303,13 +305,13 @@ public class JournalContentImpl
 				article, ddmTemplateKey, viewMode, languageId, page,
 				portletRequestModel, themeDisplay);
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
 					StringBundler.concat(
 						"Unable to get display for ", groupId, StringPool.BLANK,
 						articleId, StringPool.BLANK, languageId),
-					pe);
+					portalException);
 			}
 
 			return null;
@@ -384,6 +386,28 @@ public class JournalContentImpl
 		return JournalContent.class.getName();
 	}
 
+	@Override
+	public void onAfterPublish(long ctCollectionId) {
+		_portalCache.removeAll();
+	}
+
+	@Activate
+	protected void activate() {
+		_portalCache =
+			(PortalCache<JournalContentKey, JournalArticleDisplay>)
+				_multiVMPool.getPortalCache(CACHE_NAME);
+
+		_journalArticlePortalCacheIndexer = new PortalCacheIndexer<>(
+			new JournalContentArticleKeyIndexEncoder(), _portalCache);
+		_journalTemplatePortalCacheIndexer = new PortalCacheIndexer<>(
+			new JournalContentTemplateKeyIndexEncoder(), _portalCache);
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		_multiVMPool.removePortalCache(CACHE_NAME);
+	}
+
 	protected JournalArticleDisplay getArticleDisplay(
 		JournalArticle article, String ddmTemplateKey, String viewMode,
 		String languageId, int page, PortletRequestModel portletRequestModel,
@@ -409,13 +433,13 @@ public class JournalContentImpl
 				article, ddmTemplateKey, viewMode, languageId, page,
 				portletRequestModel, themeDisplay);
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
 					StringBundler.concat(
 						"Unable to get display for ", article.toString(),
 						StringPool.SPACE, languageId),
-					e);
+					exception);
 			}
 
 			return null;
@@ -439,7 +463,7 @@ public class JournalContentImpl
 				groupId, articleId, ddmTemplateKey, viewMode, languageId, page,
 				portletRequestModel, themeDisplay);
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
 					StringBundler.concat(
@@ -486,8 +510,8 @@ public class JournalContentImpl
 			_clearTemplateCacheMethod = JournalContent.class.getMethod(
 				"clearCache", String.class);
 		}
-		catch (NoSuchMethodException nsme) {
-			throw new ExceptionInInitializerError(nsme);
+		catch (NoSuchMethodException noSuchMethodException) {
+			throw new ExceptionInInitializerError(noSuchMethodException);
 		}
 	}
 

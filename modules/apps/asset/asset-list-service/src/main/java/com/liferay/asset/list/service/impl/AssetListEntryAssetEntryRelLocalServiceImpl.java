@@ -214,27 +214,46 @@ public class AssetListEntryAssetEntryRelLocalServiceImpl
 
 		assetListEntryAssetEntryRel.setPosition(-1);
 
-		assetListEntryAssetEntryRelPersistence.update(
-			assetListEntryAssetEntryRel);
+		assetListEntryAssetEntryRel =
+			assetListEntryAssetEntryRelPersistence.update(
+				assetListEntryAssetEntryRel);
+
+		long assetListEntryAssetEntryRelId =
+			assetListEntryAssetEntryRel.getAssetListEntryAssetEntryRelId();
 
 		swapAssetListEntryAssetEntryRel.setPosition(-2);
 
-		assetListEntryAssetEntryRelPersistence.update(
-			swapAssetListEntryAssetEntryRel);
+		swapAssetListEntryAssetEntryRel =
+			assetListEntryAssetEntryRelPersistence.update(
+				swapAssetListEntryAssetEntryRel);
+
+		long swapAssetListEntryAssetEntryRelId =
+			swapAssetListEntryAssetEntryRel.getAssetListEntryAssetEntryRelId();
 
 		TransactionCommitCallbackUtil.registerCallback(
 			() -> {
-				assetListEntryAssetEntryRel.setPosition(newPosition);
+				AssetListEntryAssetEntryRel
+					callbackAssetListEntryAssetEntryRel =
+						assetListEntryAssetEntryRelLocalService.
+							fetchAssetListEntryAssetEntryRel(
+								assetListEntryAssetEntryRelId);
+
+				callbackAssetListEntryAssetEntryRel.setPosition(newPosition);
 
 				assetListEntryAssetEntryRelLocalService.
 					updateAssetListEntryAssetEntryRel(
-						assetListEntryAssetEntryRel);
+						callbackAssetListEntryAssetEntryRel);
 
-				swapAssetListEntryAssetEntryRel.setPosition(position);
+				callbackAssetListEntryAssetEntryRel =
+					assetListEntryAssetEntryRelLocalService.
+						fetchAssetListEntryAssetEntryRel(
+							swapAssetListEntryAssetEntryRelId);
+
+				callbackAssetListEntryAssetEntryRel.setPosition(position);
 
 				assetListEntryAssetEntryRelLocalService.
 					updateAssetListEntryAssetEntryRel(
-						swapAssetListEntryAssetEntryRel);
+						callbackAssetListEntryAssetEntryRel);
 
 				return null;
 			});
@@ -257,10 +276,8 @@ public class AssetListEntryAssetEntryRelLocalServiceImpl
 		assetListEntryAssetEntryRel.setSegmentsEntryId(segmentsEntryId);
 		assetListEntryAssetEntryRel.setPosition(position);
 
-		assetListEntryAssetEntryRelPersistence.update(
+		return assetListEntryAssetEntryRelPersistence.update(
 			assetListEntryAssetEntryRel);
-
-		return assetListEntryAssetEntryRel;
 	}
 
 	private List<AssetListEntryAssetEntryRel> _getAssetListEntryAssetEntryRels(

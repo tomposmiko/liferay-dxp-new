@@ -140,8 +140,8 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 
 				return (DataSource)JNDIUtil.lookup(context, jndiName);
 			}
-			catch (Exception e) {
-				_log.error("Unable to lookup " + jndiName, e);
+			catch (Exception exception) {
+				_log.error("Unable to lookup " + jndiName, exception);
 			}
 		}
 
@@ -223,16 +223,6 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 		return initDataSource(properties);
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public interface PACL {
-
-		public DataSource getDataSource(DataSource dataSource);
-
-	}
-
 	protected DataSource initDataSourceC3PO(Properties properties)
 		throws Exception {
 
@@ -304,7 +294,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 			try {
 				BeanUtil.setProperty(comboPooledDataSource, key, value);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (_log.isWarnEnabled()) {
 					_log.warn(
 						"Property " + key + " is an invalid C3PO property");
@@ -386,7 +376,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 				BeanUtil.setProperty(
 					hikariDataSource, key, (String)entry.getValue());
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (_log.isWarnEnabled()) {
 					_log.warn(
 						"Property " + key + " is an invalid HikariCP property");
@@ -432,7 +422,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 				BeanUtil.setProperty(
 					poolProperties, key, (String)entry.getValue());
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (_log.isWarnEnabled()) {
 					_log.warn(
 						StringBundler.concat(
@@ -555,9 +545,9 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 		try {
 			Class.forName(driverClassName);
 		}
-		catch (ClassNotFoundException cnfe) {
+		catch (ClassNotFoundException classNotFoundException) {
 			if (!ServerDetector.isTomcat()) {
-				throw cnfe;
+				throw classNotFoundException;
 			}
 
 			String url = PropsUtil.get(
@@ -566,7 +556,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 				PropsKeys.SETUP_DATABASE_JAR_NAME, new Filter(driverClassName));
 
 			if (Validator.isNull(url) || Validator.isNull(name)) {
-				throw cnfe;
+				throw classNotFoundException;
 			}
 
 			ClassLoader classLoader = SystemException.class.getClassLoader();
@@ -579,9 +569,20 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 				return;
 			}
 
-			JarUtil.downloadAndInstallJar(
-				new URL(url), PropsValues.LIFERAY_LIB_GLOBAL_DIR, name,
-				(URLClassLoader)classLoader);
+			try {
+				JarUtil.downloadAndInstallJar(
+					new URL(url), PropsValues.LIFERAY_LIB_GLOBAL_DIR, name,
+					(URLClassLoader)classLoader);
+			}
+			catch (Exception exception) {
+				_log.error(
+					StringBundler.concat(
+						"Unable to download and install ", name, " to ",
+						PropsValues.LIFERAY_LIB_GLOBAL_DIR, " from ", url),
+					exception);
+
+				throw classNotFoundException;
+			}
 		}
 	}
 
@@ -616,9 +617,10 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 					return;
 				}
 			}
-			catch (SQLException sqle) {
+			catch (SQLException sqlException) {
 				if (_log.isDebugEnabled()) {
-					_log.error("Unable to acquire JDBC connection", sqle);
+					_log.error(
+						"Unable to acquire JDBC connection", sqlException);
 				}
 			}
 
@@ -633,9 +635,11 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 			try {
 				Thread.sleep(delay * Time.SECOND);
 			}
-			catch (InterruptedException ie) {
+			catch (InterruptedException interruptedException) {
 				if (_log.isWarnEnabled()) {
-					_log.warn("Interruptted acquiring a JDBC connection", ie);
+					_log.warn(
+						"Interruptted acquiring a JDBC connection",
+						interruptedException);
 				}
 
 				break;
@@ -688,8 +692,8 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 
 				mBeanServer.registerMBean(jmxConnectionPool, _objectName);
 			}
-			catch (Exception e) {
-				_log.error(e, e);
+			catch (Exception exception) {
+				_log.error(exception, exception);
 			}
 
 			return mBeanServer;
@@ -713,8 +717,8 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
 			try {
 				mBeanServer.unregisterMBean(_objectName);
 			}
-			catch (Exception e) {
-				_log.error(e, e);
+			catch (Exception exception) {
+				_log.error(exception, exception);
 			}
 		}
 

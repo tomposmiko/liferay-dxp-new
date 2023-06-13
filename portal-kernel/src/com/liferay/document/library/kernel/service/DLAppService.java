@@ -61,7 +61,7 @@ import org.osgi.annotation.versioning.ProviderType;
 )
 public interface DLAppService extends BaseService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link DLAppServiceUtil} to access the dl app remote service. Add custom service methods to <code>com.liferay.portlet.documentlibrary.service.impl.DLAppServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -288,17 +288,6 @@ public interface DLAppService extends BaseService {
 	 * @see #checkOutFileEntry(long, ServiceContext)
 	 */
 	public void cancelCheckOut(long fileEntryId) throws PortalException;
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #checkInFileEntry(long, DLVersionNumberIncrease, String,
-	 ServiceContext)}
-	 */
-	@Deprecated
-	public void checkInFileEntry(
-			long fileEntryId, boolean majorVersion, String changeLog,
-			ServiceContext serviceContext)
-		throws PortalException;
 
 	/**
 	 * Checks in the file entry. If a user has not checked out the specified
@@ -1668,44 +1657,6 @@ public interface DLAppService extends BaseService {
 		throws PortalException;
 
 	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #updateFileEntry(long, String, String, String, String,
-	 String, DLVersionNumberIncrease, byte[], ServiceContext)}
-	 */
-	@Deprecated
-	public FileEntry updateFileEntry(
-			long fileEntryId, String sourceFileName, String mimeType,
-			String title, String description, String changeLog,
-			boolean majorVersion, byte[] bytes, ServiceContext serviceContext)
-		throws PortalException;
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #updateFileEntry(long, String, String, String, String,
-	 String, DLVersionNumberIncrease, File, ServiceContext)}
-	 */
-	@Deprecated
-	public FileEntry updateFileEntry(
-			long fileEntryId, String sourceFileName, String mimeType,
-			String title, String description, String changeLog,
-			boolean majorVersion, File file, ServiceContext serviceContext)
-		throws PortalException;
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #updateFileEntry(long, String, String, String, String,
-	 String, DLVersionNumberIncrease, InputStream, long,
-	 ServiceContext)}
-	 */
-	@Deprecated
-	public FileEntry updateFileEntry(
-			long fileEntryId, String sourceFileName, String mimeType,
-			String title, String description, String changeLog,
-			boolean majorVersion, InputStream is, long size,
-			ServiceContext serviceContext)
-		throws PortalException;
-
-	/**
 	 * Updates a file entry and associated metadata based on a byte array
 	 * object. If the file data is <code>null</code>, then only the associated
 	 * metadata (i.e., <code>title</code>, <code>description</code>, and
@@ -1830,33 +1781,6 @@ public interface DLAppService extends BaseService {
 			String title, String description, String changeLog,
 			DLVersionNumberIncrease dlVersionNumberIncrease, InputStream is,
 			long size, ServiceContext serviceContext)
-		throws PortalException;
-
-	/**
-	 * @deprecated As of Judson (7.1.x),  As of Judson (7.1.x), replaced by
-	 {@link #updateFileEntryAndCheckIn(long, String, String,
-	 String, String, String, DLVersionNumberIncrease, File,
-	 ServiceContext)}
-	 */
-	@Deprecated
-	public FileEntry updateFileEntryAndCheckIn(
-			long fileEntryId, String sourceFileName, String mimeType,
-			String title, String description, String changeLog,
-			boolean majorVersion, File file, ServiceContext serviceContext)
-		throws PortalException;
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #updateFileEntryAndCheckIn(long, String, String, String,
-	 String, String, DLVersionNumberIncrease, InputStream, long,
-	 ServiceContext)}
-	 */
-	@Deprecated
-	public FileEntry updateFileEntryAndCheckIn(
-			long fileEntryId, String sourceFileName, String mimeType,
-			String title, String description, String changeLog,
-			boolean majorVersion, InputStream is, long size,
-			ServiceContext serviceContext)
 		throws PortalException;
 
 	public FileEntry updateFileEntryAndCheckIn(

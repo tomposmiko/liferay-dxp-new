@@ -21,6 +21,9 @@ import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
+import com.liferay.info.display.contributor.InfoDisplayContributor;
+import com.liferay.info.display.contributor.InfoDisplayContributorTracker;
+import com.liferay.info.display.contributor.InfoDisplayObjectProvider;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
 import com.liferay.portal.aop.AopService;
@@ -87,11 +90,12 @@ public class AssetDisplayPageEntryLocalServiceImpl
 
 		assetDisplayPageEntry.setPlid(plid);
 
-		assetDisplayPageEntryPersistence.update(assetDisplayPageEntry);
+		assetDisplayPageEntry = assetDisplayPageEntryPersistence.update(
+			assetDisplayPageEntry);
 
 		LayoutPageTemplateEntry layoutPageTemplateEntry =
 			_layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
-				assetDisplayPageEntryId);
+				layoutPageTemplateEntryId);
 
 		if (layoutPageTemplateEntry != null) {
 			layoutPageTemplateEntry.setModifiedDate(new Date());
@@ -171,11 +175,12 @@ public class AssetDisplayPageEntryLocalServiceImpl
 
 		assetDisplayPageEntry.setPlid(plid);
 
-		assetDisplayPageEntryPersistence.update(assetDisplayPageEntry);
+		assetDisplayPageEntry = assetDisplayPageEntryPersistence.update(
+			assetDisplayPageEntry);
 
 		LayoutPageTemplateEntry layoutPageTemplateEntry =
 			_layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
-				assetDisplayPageEntryId);
+				layoutPageTemplateEntryId);
 
 		if (layoutPageTemplateEntry != null) {
 			layoutPageTemplateEntry.setModifiedDate(new Date());
@@ -191,33 +196,31 @@ public class AssetDisplayPageEntryLocalServiceImpl
 		long groupId, long classNameId, long classPK,
 		long layoutPageTemplateEntryId) {
 
-		AssetRendererFactory assetRendererFactory =
-			AssetRendererFactoryRegistryUtil.
-				getAssetRendererFactoryByClassNameId(classNameId);
+		InfoDisplayContributor infoDisplayContributor =
+			_infoDisplayContributorTracker.getInfoDisplayContributor(
+				_portal.getClassName(classNameId));
 
-		AssetEntry assetEntry = null;
-
-		if (assetRendererFactory != null) {
-			try {
-				assetEntry = assetRendererFactory.getAssetEntry(
-					_portal.getClassName(classNameId), classPK);
-			}
-			catch (PortalException pe) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(pe, pe);
-				}
-			}
-		}
-		else {
-			assetEntry = _assetEntryLocalService.fetchEntry(
-				classNameId, classPK);
-		}
-
-		if (assetEntry == null) {
+		if (infoDisplayContributor == null) {
 			return LayoutConstants.DEFAULT_PLID;
 		}
 
-		long classTypeId = assetEntry.getClassTypeId();
+		InfoDisplayObjectProvider infoDisplayObjectProvider = null;
+
+		try {
+			infoDisplayObjectProvider =
+				infoDisplayContributor.getInfoDisplayObjectProvider(classPK);
+		}
+		catch (PortalException portalException) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(portalException, portalException);
+			}
+		}
+
+		if (infoDisplayObjectProvider == null) {
+			return LayoutConstants.DEFAULT_PLID;
+		}
+
+		long classTypeId = infoDisplayObjectProvider.getClassTypeId();
 
 		LayoutPageTemplateEntry layoutPageTemplateEntry = Optional.ofNullable(
 			_layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
@@ -231,6 +234,32 @@ public class AssetDisplayPageEntryLocalServiceImpl
 
 		if (layoutPageTemplateEntry != null) {
 			return layoutPageTemplateEntry.getPlid();
+		}
+
+		AssetRendererFactory assetRendererFactory =
+			AssetRendererFactoryRegistryUtil.
+				getAssetRendererFactoryByClassNameId(classNameId);
+
+		AssetEntry assetEntry = null;
+
+		if (assetRendererFactory != null) {
+			try {
+				assetEntry = assetRendererFactory.getAssetEntry(
+					_portal.getClassName(classNameId), classPK);
+			}
+			catch (PortalException portalException) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(portalException, portalException);
+				}
+			}
+		}
+		else {
+			assetEntry = _assetEntryLocalService.fetchEntry(
+				classNameId, classPK);
+		}
+
+		if (assetEntry == null) {
+			return LayoutConstants.DEFAULT_PLID;
 		}
 
 		Layout layout = _layoutLocalService.fetchLayoutByUuidAndGroupId(
@@ -255,6 +284,9 @@ public class AssetDisplayPageEntryLocalServiceImpl
 
 	@Reference
 	private AssetEntryLocalService _assetEntryLocalService;
+
+	@Reference
+	private InfoDisplayContributorTracker _infoDisplayContributorTracker;
 
 	@Reference
 	private LayoutLocalService _layoutLocalService;

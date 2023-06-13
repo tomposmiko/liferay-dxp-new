@@ -53,7 +53,7 @@ public abstract class MembershipRequestServiceBaseImpl
 	extends BaseServiceImpl
 	implements IdentifiableOSGiService, MembershipRequestService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>MembershipRequestService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.kernel.service.MembershipRequestServiceUtil</code>.
@@ -595,8 +595,8 @@ public abstract class MembershipRequestServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

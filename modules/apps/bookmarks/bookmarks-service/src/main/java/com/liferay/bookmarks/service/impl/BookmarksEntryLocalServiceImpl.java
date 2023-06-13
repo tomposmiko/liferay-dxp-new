@@ -22,7 +22,6 @@ import com.liferay.bookmarks.constants.BookmarksPortletKeys;
 import com.liferay.bookmarks.exception.EntryURLException;
 import com.liferay.bookmarks.model.BookmarksEntry;
 import com.liferay.bookmarks.model.BookmarksFolder;
-import com.liferay.bookmarks.model.BookmarksFolderConstants;
 import com.liferay.bookmarks.service.base.BookmarksEntryLocalServiceBaseImpl;
 import com.liferay.bookmarks.social.BookmarksActivityKeys;
 import com.liferay.bookmarks.util.comparator.EntryModifiedDateComparator;
@@ -57,6 +56,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.settings.GroupServiceSettingsLocator;
 import com.liferay.portal.kernel.settings.LocalizedValuesMap;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
+import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GroupSubscriptionCheckSubscriptionSender;
@@ -65,7 +65,9 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.SubscriptionSender;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.view.count.ViewCountManager;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.util.LayoutURLUtil;
 import com.liferay.social.kernel.model.SocialActivityConstants;
 import com.liferay.subscription.service.SubscriptionLocalService;
 import com.liferay.trash.exception.RestoreEntryException;
@@ -77,6 +79,11 @@ import com.liferay.trash.service.TrashVersionLocalService;
 
 import java.util.Date;
 import java.util.List;
+
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletURL;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -108,7 +115,7 @@ public class BookmarksEntryLocalServiceImpl
 			name = url;
 		}
 
-		validate(url);
+		_validate(url);
 
 		long entryId = counterLocalService.increment();
 
@@ -150,7 +157,7 @@ public class BookmarksEntryLocalServiceImpl
 
 		// Subscriptions
 
-		notifySubscribers(userId, entry, serviceContext);
+		_notifySubscribers(userId, entry, serviceContext);
 
 		return entry;
 	}
@@ -222,6 +229,13 @@ public class BookmarksEntryLocalServiceImpl
 			_trashVersionLocalService.deleteTrashVersion(
 				BookmarksEntry.class.getName(), entry.getEntryId());
 		}
+
+		// View count
+
+		_viewCountManager.deleteViewCount(
+			entry.getCompanyId(),
+			classNameLocalService.getClassNameId(BookmarksEntry.class),
+			entry.getEntryId());
 
 		return entry;
 	}
@@ -336,15 +350,6 @@ public class BookmarksEntryLocalServiceImpl
 			groupId, userId, WorkflowConstants.STATUS_APPROVED);
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public List<BookmarksEntry> getNoAssetEntries() {
-		return bookmarksEntryFinder.findByNoAssets();
-	}
-
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public BookmarksEntry moveEntry(long entryId, long parentFolderId)
@@ -386,7 +391,7 @@ public class BookmarksEntryLocalServiceImpl
 				status = trashVersion.getStatus();
 			}
 
-			entry = updateStatus(userId, entry, status);
+			updateStatus(userId, entry, status);
 
 			// Trash
 
@@ -427,13 +432,12 @@ public class BookmarksEntryLocalServiceImpl
 	}
 
 	@Override
+	@Transactional(enabled = false)
 	public BookmarksEntry openEntry(long userId, BookmarksEntry entry) {
-		entry.setVisits(entry.getVisits() + 1);
-
-		entry = bookmarksEntryPersistence.update(entry);
-
-		assetEntryLocalService.incrementViewCounter(
-			userId, BookmarksEntry.class.getName(), entry.getEntryId(), 1);
+		_viewCountManager.incrementViewCount(
+			entry.getCompanyId(),
+			classNameLocalService.getClassNameId(BookmarksEntry.class),
+			entry.getEntryId(), 1);
 
 		return entry;
 	}
@@ -613,7 +617,7 @@ public class BookmarksEntryLocalServiceImpl
 			name = url;
 		}
 
-		validate(url);
+		_validate(url);
 
 		entry.setFolderId(folderId);
 		entry.setTreePath(entry.buildTreePath());
@@ -643,7 +647,7 @@ public class BookmarksEntryLocalServiceImpl
 
 		// Subscriptions
 
-		notifySubscribers(userId, entry, serviceContext);
+		_notifySubscribers(userId, entry, serviceContext);
 
 		return entry;
 	}
@@ -699,30 +703,48 @@ public class BookmarksEntryLocalServiceImpl
 		return entry;
 	}
 
-	protected long getFolder(BookmarksEntry entry, long folderId) {
-		if ((entry.getFolderId() == folderId) ||
-			(folderId == BookmarksFolderConstants.DEFAULT_PARENT_FOLDER_ID)) {
+	private String _getBookmarksEntryURL(
+			BookmarksEntry entry, ServiceContext serviceContext)
+		throws PortalException {
 
-			return folderId;
+		String layoutURL = LayoutURLUtil.getLayoutURL(
+			entry.getGroupId(), BookmarksPortletKeys.BOOKMARKS, serviceContext);
+
+		if (Validator.isNotNull(layoutURL)) {
+			return StringBundler.concat(
+				layoutURL, Portal.FRIENDLY_URL_SEPARATOR, "bookmarks/folder/",
+				entry.getFolderId());
 		}
 
-		BookmarksFolder folder = bookmarksFolderPersistence.fetchByPrimaryKey(
-			folderId);
+		HttpServletRequest httpServletRequest = serviceContext.getRequest();
 
-		if ((folder != null) && (entry.getGroupId() == folder.getGroupId())) {
-			return folderId;
+		if (httpServletRequest == null) {
+			return StringBundler.concat(
+				serviceContext.getLayoutFullURL(),
+				Portal.FRIENDLY_URL_SEPARATOR, "bookmarks/folder/",
+				entry.getFolderId());
 		}
 
-		return entry.getFolderId();
+		Group group = groupLocalService.fetchGroup(entry.getGroupId());
+
+		PortletURL portletURL = _portal.getControlPanelPortletURL(
+			httpServletRequest, group, BookmarksPortletKeys.BOOKMARKS_ADMIN, 0,
+			0, PortletRequest.RENDER_PHASE);
+
+		portletURL.setParameter("mvcRenderCommandName", "/bookmarks/view");
+		portletURL.setParameter(
+			"folderId", String.valueOf(entry.getFolderId()));
+
+		return portletURL.toString();
 	}
 
-	protected void notifySubscribers(
+	private void _notifySubscribers(
 			long userId, BookmarksEntry entry, ServiceContext serviceContext)
 		throws PortalException {
 
-		String layoutFullURL = serviceContext.getLayoutFullURL();
+		if (!entry.isApproved() ||
+			Validator.isNull(serviceContext.getLayoutFullURL())) {
 
-		if (!entry.isApproved() || Validator.isNull(layoutFullURL)) {
 			return;
 		}
 
@@ -751,23 +773,13 @@ public class BookmarksEntryLocalServiceImpl
 
 			statusByUserName = user.getFullName();
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 
 		String entryTitle = entry.getName();
 
-		StringBundler sb = new StringBundler(7);
-
-		sb.append(layoutFullURL);
-		sb.append(Portal.FRIENDLY_URL_SEPARATOR);
-		sb.append("bookmarks");
-		sb.append(StringPool.SLASH);
-		sb.append("folder");
-		sb.append(StringPool.SLASH);
-		sb.append(entry.getFolderId());
-
-		String entryURL = sb.toString();
+		String entryURL = _getBookmarksEntryURL(entry, serviceContext);
 
 		String fromName =
 			bookmarksGroupServiceOverriddenConfiguration.emailFromName();
@@ -860,7 +872,7 @@ public class BookmarksEntryLocalServiceImpl
 		subscriptionSender.flushNotificationsAsync();
 	}
 
-	protected void validate(String url) throws PortalException {
+	private void _validate(String url) throws PortalException {
 		if (!Validator.isUrl(url)) {
 			throw new EntryURLException();
 		}
@@ -873,6 +885,9 @@ public class BookmarksEntryLocalServiceImpl
 	private ConfigurationProvider _configurationProvider;
 
 	@Reference
+	private Portal _portal;
+
+	@Reference
 	private SubscriptionLocalService _subscriptionLocalService;
 
 	@Reference
@@ -880,5 +895,8 @@ public class BookmarksEntryLocalServiceImpl
 
 	@Reference
 	private TrashVersionLocalService _trashVersionLocalService;
+
+	@Reference
+	private ViewCountManager _viewCountManager;
 
 }

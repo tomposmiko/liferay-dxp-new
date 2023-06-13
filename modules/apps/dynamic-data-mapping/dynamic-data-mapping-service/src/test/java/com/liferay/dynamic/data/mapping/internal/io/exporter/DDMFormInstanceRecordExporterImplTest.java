@@ -41,8 +41,10 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Html;
 import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.LinkedHashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -55,8 +57,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -289,26 +289,36 @@ public class DDMFormInstanceRecordExporterImplTest extends PowerMockito {
 			"Autor"
 		);
 
-		DDMFormField ddmFormField1 = new DDMFormField("field1", "text");
-
 		LocalizedValue localizedValue1 = new LocalizedValue();
 
 		localizedValue1.addString(locale, "Campo 1");
-
-		ddmFormField1.setLabel(localizedValue1);
-
-		DDMFormField ddmFormField2 = new DDMFormField("field2", "text");
 
 		LocalizedValue localizedValue2 = new LocalizedValue();
 
 		localizedValue2.addString(locale, "Campo 2");
 
-		ddmFormField2.setLabel(localizedValue2);
+		Map<String, DDMFormField> ddmFormFieldMap =
+			HashMapBuilder.<String, DDMFormField>put(
+				"field1",
+				() -> {
+					DDMFormField ddmFormField1 = new DDMFormField(
+						"field1", "text");
 
-		Map<String, DDMFormField> ddmFormFieldMap = new HashMap<>();
+					ddmFormField1.setLabel(localizedValue1);
 
-		ddmFormFieldMap.put("field1", ddmFormField1);
-		ddmFormFieldMap.put("field2", ddmFormField2);
+					return ddmFormField1;
+				}
+			).put(
+				"field2",
+				() -> {
+					DDMFormField ddmFormField2 = new DDMFormField(
+						"field2", "text");
+
+					ddmFormField2.setLabel(localizedValue2);
+
+					return ddmFormField2;
+				}
+			).build();
 
 		Map<String, String> ddmFormFieldsLabel =
 			ddmFormInstanceRecordExporterImpl.getDDMFormFieldsLabel(
@@ -335,9 +345,6 @@ public class DDMFormInstanceRecordExporterImplTest extends PowerMockito {
 
 		DDMFormField ddmFormField = new DDMFormField("field1", "text");
 
-		Map<String, List<DDMFormFieldValue>> ddmFormFieldValueMap =
-			new HashMap<>();
-
 		List<DDMFormFieldValue> ddmFormFieldValues = new ArrayList<>();
 
 		DDMFormFieldValue ddmFormFieldValue =
@@ -346,7 +353,10 @@ public class DDMFormInstanceRecordExporterImplTest extends PowerMockito {
 
 		ddmFormFieldValues.add(ddmFormFieldValue);
 
-		ddmFormFieldValueMap.put("field1", ddmFormFieldValues);
+		Map<String, List<DDMFormFieldValue>> ddmFormFieldValueMap =
+			HashMapBuilder.<String, List<DDMFormFieldValue>>put(
+				"field1", ddmFormFieldValues
+			).build();
 
 		Locale locale = new Locale("pt", "BR");
 
@@ -408,8 +418,6 @@ public class DDMFormInstanceRecordExporterImplTest extends PowerMockito {
 
 		ddmFormInstanceRecords.add(ddmFormInstanceRecord);
 
-		Map<String, DDMFormField> ddmFormFields = new HashMap<>();
-
 		DDMForm ddmForm = DDMFormTestUtil.createDDMForm();
 
 		DDMFormField ddmFormField1 = new DDMFormField("field1", "text");
@@ -420,8 +428,12 @@ public class DDMFormInstanceRecordExporterImplTest extends PowerMockito {
 
 		ddmForm.addDDMFormField(ddmFormField2);
 
-		ddmFormFields.put("field1", ddmFormField1);
-		ddmFormFields.put("field2", ddmFormField2);
+		Map<String, DDMFormField> ddmFormFields =
+			HashMapBuilder.<String, DDMFormField>put(
+				"field1", ddmFormField1
+			).put(
+				"field2", ddmFormField2
+			).build();
 
 		DDMFormValues ddmFormValues1 =
 			DDMFormValuesTestUtil.createDDMFormValues(ddmForm);
@@ -572,14 +584,15 @@ public class DDMFormInstanceRecordExporterImplTest extends PowerMockito {
 			ListUtil.fromArray(ddmStructureVersion)
 		);
 
-		Map<String, DDMFormField> ddmFormFields = new LinkedHashMap<>();
-
 		DDMFormField ddmFormField1 = new DDMFormField("field1", "text");
-
 		DDMFormField ddmFormField2 = new DDMFormField("field2", "text");
 
-		ddmFormFields.put("field1", ddmFormField1);
-		ddmFormFields.put("field2", ddmFormField2);
+		Map<String, DDMFormField> ddmFormFields =
+			LinkedHashMapBuilder.<String, DDMFormField>put(
+				"field1", ddmFormField1
+			).put(
+				"field2", ddmFormField2
+			).build();
 
 		when(
 			ddmFormInstanceRecordExporterImpl.getNontransientDDMFormFieldsMap(

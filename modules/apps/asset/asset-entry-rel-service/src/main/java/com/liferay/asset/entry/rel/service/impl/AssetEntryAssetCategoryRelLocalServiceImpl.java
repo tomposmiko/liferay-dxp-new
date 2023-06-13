@@ -63,10 +63,8 @@ public class AssetEntryAssetCategoryRelLocalServiceImpl
 		assetEntryAssetCategoryRel.setAssetCategoryId(assetCategoryId);
 		assetEntryAssetCategoryRel.setPriority(priority);
 
-		assetEntryAssetCategoryRelPersistence.update(
+		return assetEntryAssetCategoryRelPersistence.update(
 			assetEntryAssetCategoryRel);
-
-		return assetEntryAssetCategoryRel;
 	}
 
 	@Override
@@ -100,9 +98,6 @@ public class AssetEntryAssetCategoryRelLocalServiceImpl
 
 				_reindex(assetEntryAssetCategoryRel.getAssetEntryId());
 			});
-
-		assetEntryAssetCategoryRelPersistence.removeByAssetCategoryId(
-			assetCategoryId);
 	}
 
 	@Override
@@ -200,7 +195,7 @@ public class AssetEntryAssetCategoryRelLocalServiceImpl
 
 		return ListUtil.toLongArray(
 			assetEntryAssetCategoryRels,
-			AssetEntryAssetCategoryRel::getAssetCategoryId);
+			AssetEntryAssetCategoryRel::getAssetEntryId);
 	}
 
 	private void _reindex(long assetEntryId) {
@@ -236,8 +231,8 @@ public class AssetEntryAssetCategoryRelLocalServiceImpl
 
 			indexer.reindex(assetObject);
 		}
-		catch (SearchException se) {
-			_log.error("Unable to reindex asset entry", se);
+		catch (SearchException searchException) {
+			_log.error("Unable to reindex asset entry", searchException);
 		}
 	}
 

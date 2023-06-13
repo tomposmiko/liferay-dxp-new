@@ -51,9 +51,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Brian Wing Shun Chan
  */
-@Component(
-	immediate = true, service = {DLFolderUADDisplay.class, UADDisplay.class}
-)
+@Component(service = {DLFolderUADDisplay.class, UADDisplay.class})
 public class DLFolderUADDisplay extends BaseDLFolderUADDisplay {
 
 	@Override
@@ -158,8 +156,8 @@ public class DLFolderUADDisplay extends BaseDLFolderUADDisplay {
 						ancestorFolderIds.indexOf(parentFolderId) - 1));
 			}
 		}
-		catch (PortalException pe) {
-			_log.error(pe, pe);
+		catch (PortalException portalException) {
+			_log.error(portalException, portalException);
 		}
 
 		return null;

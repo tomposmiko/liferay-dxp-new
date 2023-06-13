@@ -100,6 +100,8 @@ public class CKEditorConfigContributor extends BaseCKEditorConfigContributor {
 		).put(
 			"stylesSet", getStyleFormatsJSONArray(themeDisplay.getLocale())
 		).put(
+			"title", false
+		).put(
 			"toolbar_editInPlace",
 			getToolbarEditInPlaceJSONArray(inputEditorTaglibAttributes)
 		).put(
@@ -149,7 +151,7 @@ public class CKEditorConfigContributor extends BaseCKEditorConfigContributor {
 		try {
 			resourceBundle = _resourceBundleLoader.loadResourceBundle(locale);
 		}
-		catch (MissingResourceException mre) {
+		catch (MissingResourceException missingResourceException) {
 			resourceBundle = ResourceBundleUtil.EMPTY_RESOURCE_BUNDLE;
 		}
 

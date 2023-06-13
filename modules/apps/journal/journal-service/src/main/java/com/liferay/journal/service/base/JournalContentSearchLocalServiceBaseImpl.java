@@ -64,7 +64,7 @@ public abstract class JournalContentSearchLocalServiceBaseImpl
 	implements AopService, IdentifiableOSGiService,
 			   JournalContentSearchLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>JournalContentSearchLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.journal.service.JournalContentSearchLocalServiceUtil</code>.
@@ -398,8 +398,8 @@ public abstract class JournalContentSearchLocalServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

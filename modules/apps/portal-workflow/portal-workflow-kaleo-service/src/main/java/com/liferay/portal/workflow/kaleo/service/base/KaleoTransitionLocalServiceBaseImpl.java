@@ -83,7 +83,7 @@ public abstract class KaleoTransitionLocalServiceBaseImpl
 	implements AopService, IdentifiableOSGiService,
 			   KaleoTransitionLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>KaleoTransitionLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.workflow.kaleo.service.KaleoTransitionLocalServiceUtil</code>.
@@ -400,8 +400,8 @@ public abstract class KaleoTransitionLocalServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

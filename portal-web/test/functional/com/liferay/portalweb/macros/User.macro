@@ -8,11 +8,11 @@ definition {
 			locator1 = "UserBar#USER_SIGN_IN",
 			value1 = "Sign In");
 
-		Type(
+		Type.typePause(
 			locator1 = "TextInput#EMAIL_ADDRESS",
 			value1 = "${userEmailAddress}");
 
-		Type(
+		Type.typePause(
 			locator1 = "TextInput#PASSWORD",
 			value1 = "${password}");
 
@@ -728,7 +728,7 @@ definition {
 		var key_roleTitle = "${roleTitle}";
 
 		AssertTextEquals(
-			locator1 = "Permissions#CONTENT_PERMISSIONS_ROLE_NAME",
+			locator1 = "UsersAndOrganizationsEditUser#ROLES_SELECT_ROLE_NAME",
 			value1 = "${roleTitle}");
 
 		AssertClick(
@@ -738,7 +738,7 @@ definition {
 		SelectFrame(value1 = "relative=top");
 
 		AssertTextEquals(
-			locator1 = "Permissions#CONTENT_PERMISSIONS_ROLE_NAME",
+			locator1 = "UsersAndOrganizationsEditUser#ROLES_SELECT_ROLE_NAME",
 			value1 = "${roleTitle}");
 
 		PortletEntry.save();
@@ -760,17 +760,17 @@ definition {
 		var key_roleTitle = "${roleTitle}";
 
 		AssertTextEquals(
-			locator1 = "Permissions#CONTENT_PERMISSIONS_ROLE_NAME",
+			locator1 = "UsersAndOrganizationsEditUser#ROLES_SELECT_ROLE_NAME",
 			value1 = "${roleTitle}");
 
 		AssertClick(
-			locator1 = "UsersAndOrganizationsEditUser#ROLES_ORGANIZATION_SELECT_CHOOSE_BUTTON",
+			locator1 = "UsersAndOrganizationsEditUser#ROLES_REGULAR_SELECT_CHOOSE_BUTTON",
 			value1 = "Choose");
 
 		SelectFrame(value1 = "relative=top");
 
 		AssertTextEquals(
-			locator1 = "Permissions#CONTENT_PERMISSIONS_ROLE_NAME",
+			locator1 = "UsersAndOrganizationsEditUser#ROLES_SELECT_ROLE_NAME",
 			value1 = "${roleTitle}");
 
 		PortletEntry.save();
@@ -795,7 +795,7 @@ definition {
 			value1 = "${siteRoleName}");
 
 		AssertClick(
-			locator1 = "UsersAndOrganizationsEditUser#ROLES_ORGANIZATION_SELECT_CHOOSE_BUTTON",
+			locator1 = "UsersAndOrganizationsEditUser#ROLES_REGULAR_SELECT_CHOOSE_BUTTON",
 			value1 = "Choose");
 
 		SelectFrame(value1 = "relative=top");
@@ -1086,7 +1086,7 @@ definition {
 		else {
 			PortletEntry.selectAll();
 
-			ClickNoError(locator1 = "Icon#DELETE");
+			ClickNoError(locator1 = "Icon#DEACTIVATE");
 
 			AssertConfirm(value1 = "Are you sure you want to deactivate the selected users?");
 
@@ -1203,6 +1203,40 @@ definition {
 		}
 
 		PortletEntry.save();
+	}
+
+	macro editDetailsViaProfile {
+		Click(locator1 = "Profile#JOB_TITLE_FIELD");
+
+		SelectFrame(locator1 = "IFrame#PROFILE_DETAILS");
+
+		AssertElementPresent.assertElementPresent(locator1 = "TextInput#FIRST_NAME");
+
+		if (isSet(userFirstNameEdit)) {
+			Type(
+				locator1 = "TextInput#FIRST_NAME",
+				value1 = "${userFirstNameEdit}");
+		}
+
+		if (isSet(userLastNameEdit)) {
+			Type(
+				locator1 = "TextInput#LAST_NAME",
+				value1 = "${userLastNameEdit}");
+		}
+
+		if (isSet(userMiddleNameEdit)) {
+			Type(
+				locator1 = "TextInput#MIDDLE_NAME",
+				value1 = "${userMiddleNameEdit}");
+		}
+
+		if (isSet(userScreenNameEdit)) {
+			Type(
+				locator1 = "TextInput#SCREEN_NAME",
+				value1 = "${userScreenNameEdit}");
+		}
+
+		Button.clickSave();
 	}
 
 	macro editDisplaySettingsCP {
@@ -1553,9 +1587,13 @@ definition {
 		}
 
 		if (IsElementNotPresent(locator1 = "UserBar#USER_SIGN_IN")) {
-			User.logoutPG();
+			User.logoutPG(
+				nodePort = "${nodePort}",
+				specificURL = "${virtualHostsURL}");
 
-			User.loginPG(userEmailAddress = "${userEmailAddress}");
+			User.loginPG(
+				specificURL = "${virtualHostsURL}",
+				userEmailAddress = "${userEmailAddress}");
 		}
 		else {
 			User.loginPG(
@@ -1601,6 +1639,10 @@ definition {
 	macro impersonateCP {
 		Pause(locator1 = "1000");
 
+		if (isSet(userName)) {
+			var userScreenName = "${userName}";
+		}
+
 		Search.searchCP(searchTerm = "${userScreenName}");
 
 		var key_rowEntry = "${userScreenName}";
@@ -1611,11 +1653,7 @@ definition {
 
 		SelectWindow(locator1 = "title=Home - ${siteName}");
 
-		AssertElementPresent(locator1 = "UserBar#USER_AVATAR_IMAGE");
-
-		Click(locator1 = "UserBar#USER_AVATAR_IMAGE");
-
-		AssertElementPresent(locator1 = "UserBar#USER_AVATAR_DROPDOWN_PORTAL_OPEN");
+		UserBar.gotoDropdown();
 	}
 
 	macro loginLocalizationPG {
@@ -1661,12 +1699,12 @@ definition {
 				value1 = "${userScreenName}");
 		}
 		else {
-			Type(
+			Type.typePause(
 				locator1 = "TextInput#EMAIL_ADDRESS",
 				value1 = "${userEmailAddress}");
 		}
 
-		Type(
+		Type.typePause(
 			locator1 = "TextInput#PASSWORD",
 			value1 = "${password}");
 
@@ -1692,12 +1730,12 @@ definition {
 					value1 = "${userScreenName}");
 			}
 			else {
-				Type(
+				Type.typePause(
 					locator1 = "TextInput#EMAIL_ADDRESS",
 					value1 = "${userEmailAddress}");
 			}
 
-			Type(
+			Type.typePause(
 				locator1 = "TextInput#PASSWORD",
 				value1 = "${password}");
 
@@ -1788,7 +1826,7 @@ definition {
 
 		Type(
 			locator1 = "CAS#PASSWORD_FIELD",
-			value1 = "${userScreenName}");
+			value1 = "${userPassword}");
 
 		AssertClick(
 			locator1 = "CAS#LOGIN_BUTTON",
@@ -2607,7 +2645,7 @@ definition {
 		}
 		else {
 			AssertTextEquals(
-				locator1 = "Permissions#CONTENT_PERMISSIONS_ROLE_NAME",
+				locator1 = "UsersAndOrganizationsEditUser#ROLES_SELECT_ROLE_NAME",
 				value1 = "${roleTitle}");
 		}
 	}

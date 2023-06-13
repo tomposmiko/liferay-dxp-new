@@ -33,7 +33,7 @@ public abstract class LayoutPageTemplateStructureRelBaseImpl
 	extends LayoutPageTemplateStructureRelModelImpl
 	implements LayoutPageTemplateStructureRel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a layout page template structure rel model instance should use the <code>LayoutPageTemplateStructureRel</code> interface instead.

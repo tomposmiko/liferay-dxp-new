@@ -83,7 +83,7 @@ public abstract class KaleoTaskAssignmentLocalServiceBaseImpl
 	implements AopService, IdentifiableOSGiService,
 			   KaleoTaskAssignmentLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>KaleoTaskAssignmentLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.workflow.kaleo.service.KaleoTaskAssignmentLocalServiceUtil</code>.
@@ -421,8 +421,8 @@ public abstract class KaleoTaskAssignmentLocalServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

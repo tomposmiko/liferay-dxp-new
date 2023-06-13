@@ -52,6 +52,8 @@ import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -59,7 +61,6 @@ import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.service.test.ServiceTestUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
@@ -69,7 +70,6 @@ import java.lang.reflect.InvocationHandler;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -119,7 +119,7 @@ public class JournalArticleServiceTest {
 			JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID, "Version 1",
 			"This is a test article.");
 
-		ServiceTestUtil.setUser(TestPropsValues.getUser());
+		UserTestUtil.setUser(TestPropsValues.getUser());
 
 		PortalPreferences portalPreferenceces =
 			PortletPreferencesFactoryUtil.getPortalPreferences(
@@ -161,9 +161,9 @@ public class JournalArticleServiceTest {
 
 	@Test(expected = StorageFieldRequiredException.class)
 	public void testAddArticleWithEmptyRequiredHTMLField() throws Exception {
-		Map<String, String> requiredFields = new HashMap<>();
-
-		requiredFields.put("HTML2030", "");
+		Map<String, String> requiredFields = HashMapBuilder.put(
+			"HTML2030", ""
+		).build();
 
 		testAddArticleRequiredFields(
 			"test-ddm-structure-html-required-field.xml",
@@ -173,9 +173,9 @@ public class JournalArticleServiceTest {
 
 	@Test
 	public void testAddArticleWithNotEmptyRequiredHTMLField() throws Exception {
-		Map<String, String> requiredFields = new HashMap<>();
-
-		requiredFields.put("HTML2030", "<p>Hello.</p>");
+		Map<String, String> requiredFields = HashMapBuilder.put(
+			"HTML2030", "<p>Hello.</p>"
+		).build();
 
 		testAddArticleRequiredFields(
 			"test-ddm-structure-html-required-field.xml",
@@ -247,7 +247,7 @@ public class JournalArticleServiceTest {
 
 			Assert.fail();
 		}
-		catch (RequiredTemplateException rte) {
+		catch (RequiredTemplateException requiredTemplateException) {
 		}
 	}
 

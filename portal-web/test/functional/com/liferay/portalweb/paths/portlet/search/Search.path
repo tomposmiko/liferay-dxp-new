@@ -10,7 +10,7 @@
 <tbody>
 <tr>
 	<td>CLASSIC_SEARCH_BAR</td>
-	<td>//input[contains(@id,'templateSearch') and @type='text']</td>
+	<td>//input[contains(@id,'SearchPortlet') and @type='text']</td>
 	<td></td>
 </tr>
 <tr>
@@ -81,6 +81,21 @@
 <tr>
 	<td>SEARCH_TYPE_FACET_TERM_COUNT</td>
 	<td>//li[@class='facet-value']//small[@class='term-count']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SIMILAR_RESULTS_CARD_TITLE</td>
+	<td>//h3[@class='card-title']/a[contains(.,'${key_cardResultTitle}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SIMILAR_RESULTS_LINK_TITLE</td>
+	<td>//li/a[contains(.,'${key_linkResultTitle}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SIMILAR_RESULTS_LIST_TITLE</td>
+	<td>//div[@class='list-group-title']/a[contains(.,'${key_listResultTitle}')]</td>
 	<td></td>
 </tr>
 <tr>

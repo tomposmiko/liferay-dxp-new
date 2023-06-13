@@ -30,17 +30,16 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
 public interface ElasticsearchConfiguration {
 
 	@Meta.AD(
-		deflt = "LiferayElasticsearchCluster",
-		description = "cluster-name-help", name = "cluster-name",
-		required = false
-	)
-	public String clusterName();
-
-	@Meta.AD(
 		deflt = "EMBEDDED", description = "operation-mode-help",
 		name = "operation-mode", required = false
 	)
 	public OperationMode operationMode();
+
+	@Meta.AD(
+		description = "remote-cluster-connection-id-help",
+		name = "remote-cluster-connection-id", required = false
+	)
+	public String remoteClusterConnectionId();
 
 	@Meta.AD(
 		deflt = "liferay-", description = "index-name-prefix-help",
@@ -61,10 +60,22 @@ public interface ElasticsearchConfiguration {
 	public String indexNumberOfShards();
 
 	@Meta.AD(
-		deflt = "false", description = "bootstrap-mlockall-help",
-		name = "bootstrap-mlockall", required = false
+		description = "additional-index-configurations-help",
+		name = "additional-index-configurations", required = false
 	)
-	public boolean bootstrapMlockAll();
+	public String additionalIndexConfigurations();
+
+	@Meta.AD(
+		description = "additional-type-mappings-help",
+		name = "additional-type-mappings", required = false
+	)
+	public String additionalTypeMappings();
+
+	@Meta.AD(
+		description = "override-type-mappings-help",
+		name = "override-type-mappings", required = false
+	)
+	public String overrideTypeMappings();
 
 	@Meta.AD(
 		deflt = "true", description = "log-exceptions-only-help",
@@ -73,10 +84,29 @@ public interface ElasticsearchConfiguration {
 	public boolean logExceptionsOnly();
 
 	@Meta.AD(
-		deflt = "5", description = "retry-on-conflict-help",
-		name = "retry-on-conflict", required = false
+		deflt = "ERROR", description = "rest-client-logger-level-help",
+		name = "rest-client-logger-level", required = false
 	)
-	public int retryOnConflict();
+	public RESTClientLoggerLevel restClientLoggerLevel();
+
+	@Meta.AD(
+		deflt = "LiferayElasticsearchCluster",
+		description = "cluster-name-help", name = "cluster-name",
+		required = false
+	)
+	public String clusterName();
+
+	@Meta.AD(
+		deflt = "false", description = "bootstrap-mlockall-help",
+		name = "bootstrap-mlockall", required = false
+	)
+	public boolean bootstrapMlockAll();
+
+	@Meta.AD(
+		deflt = "9201", description = "embedded-http-port-help",
+		name = "embedded-http-port", required = false
+	)
+	public int embeddedHttpPort();
 
 	@Meta.AD(
 		deflt = "9300-9400",
@@ -110,46 +140,10 @@ public interface ElasticsearchConfiguration {
 	public String transportTcpPort();
 
 	@Meta.AD(
-		deflt = "localhost:9300", description = "transport-addresses-help",
-		name = "transport-addresses", required = false
+		description = "additional-configurations-help",
+		name = "additional-configurations", required = false
 	)
-	public String[] transportAddresses();
-
-	@Meta.AD(
-		deflt = "true", description = "client-transport-sniff-help",
-		name = "client-transport-sniff", required = false
-	)
-	public boolean clientTransportSniff();
-
-	@Meta.AD(
-		deflt = "false",
-		description = "client-transport-ignore-cluster-name-help",
-		name = "client-transport-ignore-cluster-name", required = false
-	)
-	public boolean clientTransportIgnoreClusterName();
-
-	@Meta.AD(
-		deflt = "", description = "client-transport-ping-timeout-help",
-		name = "client-transport-ping-timeout", required = false
-	)
-	public String clientTransportPingTimeout();
-
-	@Meta.AD(
-		deflt = "",
-		description = "client-transport-nodes-sampler-interval-help",
-		name = "client-transport-nodes-sampler-interval", required = false
-	)
-	public String clientTransportNodesSamplerInterval();
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Meta.AD(
-		deflt = "true", description = "http-enabled-help",
-		name = "http-enabled", required = false
-	)
-	public boolean httpEnabled();
+	public String additionalConfigurations();
 
 	@Meta.AD(
 		deflt = "true", description = "http-cors-enabled-help",
@@ -169,29 +163,5 @@ public interface ElasticsearchConfiguration {
 		name = "http-cors-configurations", required = false
 	)
 	public String httpCORSConfigurations();
-
-	@Meta.AD(
-		description = "additional-configurations-help",
-		name = "additional-configurations", required = false
-	)
-	public String additionalConfigurations();
-
-	@Meta.AD(
-		description = "additional-index-configurations-help",
-		name = "additional-index-configurations", required = false
-	)
-	public String additionalIndexConfigurations();
-
-	@Meta.AD(
-		description = "additional-type-mappings-help",
-		name = "additional-type-mappings", required = false
-	)
-	public String additionalTypeMappings();
-
-	@Meta.AD(
-		description = "override-type-mappings-help",
-		name = "override-type-mappings", required = false
-	)
-	public String overrideTypeMappings();
 
 }

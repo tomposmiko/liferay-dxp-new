@@ -332,7 +332,10 @@ definition {
 		Pause(locator1 = "1000");
 
 		if (isSet(siteName)) {
-			Click(locator1 = "ItemSelector#SITES_NAVIGATION");
+			AssertClick(
+				key_breadcrumbName = "sites",
+				locator1 = "Breadcrumb#BREADCRUMB_ENTRY",
+				value1 = "sites");
 
 			AssertClick(
 				key_siteName = "${siteName}",
@@ -341,12 +344,6 @@ definition {
 		}
 
 		LexiconCard.clickCard(card = "${dmDocumentTitle}");
-
-		SelectFrameTop(value1 = "relative=top");
-
-		AssertClick(
-			locator1 = "ItemSelector#ADD_BUTTON",
-			value1 = "Add");
 
 		PortletEntry.publish();
 	}
@@ -423,6 +420,20 @@ definition {
 		PortletEntry.publish();
 	}
 
+	macro addWithPriorityCP {
+		WebContent.addCP(
+			webContentContent = "${webContentContent}",
+			webContentTitle = "${webContentTitle}");
+
+		Panel.expandPanel(panel = "Metadata");
+
+		Type(
+			locator1 = "TextInput#ASSET_PRIORITY",
+			value1 = "${assetPriority}");
+
+		PortletEntry.publish();
+	}
+
 	macro addWithStructureAndWorkflowCP {
 		WebContent.addCP(webContentTitle = "${webContentTitle}");
 
@@ -442,8 +453,6 @@ definition {
 
 	macro addWithStructureCP {
 		AssertVisible(locator1 = "WCEditWebContent#SIDEBAR");
-
-		Click(locator1 = "TextInput#TITLE");
 
 		PortletEntry.inputTitle(title = "${webContentTitle}");
 
@@ -480,16 +489,24 @@ definition {
 				locator1 = "Button#SELECT_CONTENT",
 				value1 = "Select");
 
-			SelectFrame(locator1 = "IFrame#DIALOG");
+			if (isSet(depotName)) {
+				ItemSelector.selectRepositoryImage(
+					available = "${available}",
+					contentName = "${webContentSelectWCFile}",
+					depotName = "${depotName}",
+					folderName = "${folderName}",
+					imageFileName = "${webContentDocumentsAndMedia}");
+			}
 
-			AssertClick(
-				key_dmDocumentTitle = "${webContentDocumentsAndMedia}",
-				locator1 = "WC#ICON_DOCUMENT_TITLE",
-				value1 = "${webContentDocumentsAndMedia}");
+			else {
+				SelectFrame(locator1 = "IFrame#DIALOG");
 
-			SelectFrameTop(value1 = "relative=top");
+				AssertClick(
+					key_dmDocumentTitle = "${webContentDocumentsAndMedia}",
+					locator1 = "WC#ICON_DOCUMENT_TITLE",
+					value1 = "${webContentDocumentsAndMedia}");
+			}
 
-			Click(locator1 = "Button#ADD");
 		}
 
 		if (isSet(webContentHTML)) {
@@ -502,9 +519,24 @@ definition {
 		if (isSet(webContentImage)) {
 			Click(locator1 = "WCEditWebContent#IMAGE_FIELD_SELECT");
 
-			ItemSelector.uploadFile(
-				navTab = "Web Content Images",
-				uploadFileName = "${webContentImage}");
+			if (isSet(depotName)) {
+				ItemSelector.selectRepositoryImage(
+					depotName = "${depotName}",
+					imageFileName = "${webContentImage}",
+					navTab = "Documents and Media");
+			}
+
+			else {
+				ItemSelector.uploadFile(
+					navTab = "Web Content Images",
+					uploadFileName = "${webContentImage}");
+			}
+		}
+
+		if (isSet(webContentImageDescription)) {
+			FormFields.editTextAlt(
+				fieldName = "Image",
+				fieldValue = "${webContentImageDescription}");
 		}
 
 		if (isSet(webContentImageUnderDocumentsAndMedia)) {
@@ -564,14 +596,25 @@ definition {
 				locator1 = "Button#SELECT_CONTENT",
 				value1 = "Select");
 
-			SelectFrame(locator1 = "IFrame#DIALOG");
+			if (isSet(depotName)) {
+				WebContent.selectRepositoryWC(
+					available = "${available}",
+					contentName = "${webContentSelectWCFile}",
+					depotName = "${depotName}",
+					folderName = "${folderName}");
+			}
 
-			AssertClick(
-				key_webContentTitle = "${webContentSelectWCFile}",
-				locator1 = "Link#WEB_CONTENT_ARTICLE",
-				value1 = "${webContentSelectWCFile}");
+			else {
+				SelectFrame(locator1 = "IFrame#DIALOG");
 
-			SelectFrame(value1 = "relative=top");
+				AssertClick.assertPartialTextClickAt(
+					key_listEntry = "${webContentSelectWCFile}",
+					locator1 = "LexiconList#LIST_ENTRY",
+					value1 = "${webContentSelectWCFile}");
+
+				SelectFrame(value1 = "relative=top");
+			}
+
 		}
 
 		if (isSet(webContentText)) {
@@ -780,9 +823,9 @@ definition {
 
 			SelectFrame(locator1 = "IFrame#DIALOG");
 
-			AssertClick(
-				key_webContentTitle = "${webContentSelectWCFile}",
-				locator1 = "Link#WEB_CONTENT_ARTICLE",
+			AssertClick.assertPartialTextClickAt(
+				key_listEntry = "${webContentSelectWCFile}",
+				locator1 = "LexiconList#LIST_ENTRY",
 				value1 = "${webContentSelectWCFile}");
 
 			SelectFrame(value1 = "relative=top");
@@ -843,19 +886,16 @@ definition {
 
 			Portlet.expandTree();
 
-			Portlet.selectTreeNode(nodeName = "${pageName}");
+			AssertClick.assertPartialTextClickAt(
+				key_nodeName = "${pageName}",
+				locator1 = "Treeview#NODE_UNSELECTED",
+				value1 = "${pageName}");
 		}
 		else {
 			Navigator.gotoNavItem(navItem = "${pageType}");
 
 			LexiconCard.clickCard(card = "${pageName}");
 		}
-
-		SelectFrameTop();
-
-		Button.clickDone();
-
-		SelectFrame(value1 = "relative=top");
 
 		if ("${pageType}" == "Public Pages") {
 			AssertTextEquals(
@@ -970,6 +1010,53 @@ definition {
 		}
 	}
 
+	macro editViaContentPanel {
+		PageEditor.gotoTab(tabName = "Contents");
+
+		LexiconEntry.gotoFragmentEllipsisMenuItem(
+			menuItem = "Edit",
+			webContentTitle = "${webContentTitleEdit}");
+
+		WebContent.addCP(webContentTitle = "${webContentTitleEdit}");
+
+		if (isSet(webContentContentEdit)) {
+			AlloyEditor.addContent(content = "${webContentContentEdit}");
+		}
+
+		if (isSet(webContentSelectWCFile)) {
+			AssertClick(
+				key_fieldName = "${fieldName}",
+				locator1 = "Button#SELECT_CONTENT",
+				value1 = "Select");
+
+			SelectFrame(locator1 = "IFrame#DIALOG");
+
+			AssertClick.assertPartialTextClickAt(
+				key_listEntry = "${webContentSelectWCFile}",
+				locator1 = "LexiconList#LIST_ENTRY",
+				value1 = "${webContentSelectWCFile}");
+
+			SelectFrame(value1 = "relative=top");
+		}
+
+		if ("${saveAsDraft}" == "true") {
+			PortletEntry.saveAsDraft();
+
+			AssertTextEquals.assertPartialText(
+				key_status = "Draft",
+				locator1 = "WCEditWebContent#WORKFLOW_STATUS",
+				value1 = "Draft");
+		}
+		else {
+			if ("${changeListEnabled}" == "true") {
+				Button.clickPublishToChangeList();
+			}
+			else {
+				PortletEntry.publish();
+			}
+		}
+	}
+
 	macro expireCP {
 		for (var webContentTitle : list "${webContentTitleList}") {
 			Check(
@@ -1036,13 +1123,9 @@ definition {
 
 		SelectFrame(locator1 = "IFrame#DIALOG");
 
-		Portlet.expandTree();
-
-		Portlet.selectTreeNode(nodeName = "${folderName}");
+		WebContentFolder.selectFolderTreeNode(nodeName = "${folderName}");
 
 		SelectFrameTop();
-
-		Button.clickDone();
 
 		AssertClick(
 			locator1 = "Button#MOVE",
@@ -1068,15 +1151,9 @@ definition {
 
 		SelectFrame(locator1 = "IFrame#DIALOG");
 
-		Portlet.expandTree();
-
-		Portlet.selectTreeNode(nodeName = "${folderName}");
+		WebContentFolder.selectFolderTreeNode(nodeName = "${folderName}");
 
 		SelectFrame(value1 = "relative=top");
-
-		Pause(locator1 = "5000");
-
-		Button.clickDone();
 
 		AssertClick(
 			locator1 = "Button#MOVE",
@@ -1101,15 +1178,9 @@ definition {
 
 		SelectFrame(locator1 = "IFrame#DIALOG");
 
-		Portlet.expandTree();
-
-		Portlet.selectTreeNode(nodeName = "${folderName}");
+		WebContentFolder.selectFolderTreeNode(nodeName = "${folderName}");
 
 		SelectFrame(value1 = "relative=top");
-
-		Pause(locator1 = "5000");
-
-		Button.clickDone();
 
 		AssertClick(
 			locator1 = "Button#MOVE",
@@ -1254,6 +1325,26 @@ definition {
 		AssetCategorization.addCategory(
 			categoryName = "${categoryName}",
 			vocabularyName = "${vocabularyName}");
+	}
+
+	macro selectRepositoryWC {
+		var key_contentName = "${contentName}";
+
+		ItemSelector.changeWorkspaces(workspacesType = "Repository");
+
+		LexiconCard.clickCard(card = "${depotName}");
+
+		if (isSet(folderName)) {
+			LexiconList.clickListEntryTitle(listEntry = "${folderName}");
+		}
+
+		if ("${available}" == "false") {
+			AssertElementNotPresent(locator1 = "ItemSelector#SELECT_FILE_WEB_CONTENT");
+		}
+
+		else {
+			Click(locator1 = "ItemSelector#SELECT_FILE_WEB_CONTENT");
+		}
 	}
 
 	macro selectTemplateCP {

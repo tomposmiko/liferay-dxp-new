@@ -40,7 +40,7 @@ renderResponse.setTitle(journalEditDDMTemplateDisplayContext.getTitle());
 	<aui:input name="ddmTemplateId" type="hidden" value="<%= journalEditDDMTemplateDisplayContext.getDDMTemplateId() %>" />
 	<aui:input name="groupId" type="hidden" value="<%= journalEditDDMTemplateDisplayContext.getGroupId() %>" />
 	<aui:input name="classPK" type="hidden" value="<%= journalEditDDMTemplateDisplayContext.getClassPK() %>" />
-	<aui:input name="language" type="hidden" value="<%= journalEditDDMTemplateDisplayContext.getLanguage() %>" />
+	<aui:input name="saveAndContinue" type="hidden" value="<%= false %>" />
 
 	<aui:model-context bean="<%= ddmTemplate %>" model="<%= DDMTemplate.class %>" />
 
@@ -55,10 +55,16 @@ renderResponse.setTitle(journalEditDDMTemplateDisplayContext.getTitle());
 						<aui:button cssClass="btn-secondary btn-sm mr-3" href="<%= journalEditDDMTemplateDisplayContext.getRedirect() %>" type="cancel" />
 
 						<%
-						String taglibOnClick = "Liferay.fire('" + liferayPortletResponse.getNamespace() + "saveTemplate');";
+						String taglibOnClickSaveAndContinue = "Liferay.fire('" + liferayPortletResponse.getNamespace() + "saveAndContinue');";
 						%>
 
-						<aui:button cssClass="btn-sm mr-3" onClick="<%= taglibOnClick %>" type="submit" value="<%= journalEditDDMTemplateDisplayContext.getSaveButtonLabel() %>" />
+						<aui:button cssClass="btn-secondary btn-sm mr-3" onClick="<%= taglibOnClickSaveAndContinue %>" type="submit" value="save-and-continue" />
+
+						<%
+						String taglibOnClickSaveTemplate = "Liferay.fire('" + liferayPortletResponse.getNamespace() + "saveTemplate');";
+						%>
+
+						<aui:button cssClass="btn-sm mr-3" onClick="<%= taglibOnClickSaveTemplate %>" type="submit" value="save" />
 
 						<clay:button
 							icon="cog"
@@ -109,6 +115,12 @@ renderResponse.setTitle(journalEditDDMTemplateDisplayContext.getTitle());
 </aui:form>
 
 <aui:script>
+	Liferay.after('<portlet:namespace />saveAndContinue', function() {
+		document.<portlet:namespace />fm.<portlet:namespace />saveAndContinue.value = true;
+
+		Liferay.fire('<portlet:namespace />saveTemplate');
+	});
+
 	Liferay.after('<portlet:namespace />saveTemplate', function() {
 		submitForm(document.<portlet:namespace />fm);
 	});

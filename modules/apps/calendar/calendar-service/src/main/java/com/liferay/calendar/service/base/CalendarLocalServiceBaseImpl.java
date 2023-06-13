@@ -75,7 +75,7 @@ public abstract class CalendarLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements AopService, CalendarLocalService, IdentifiableOSGiService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>CalendarLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.calendar.service.CalendarLocalServiceUtil</code>.
@@ -512,8 +512,8 @@ public abstract class CalendarLocalServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

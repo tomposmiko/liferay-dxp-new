@@ -41,6 +41,7 @@ import com.liferay.segments.model.SegmentsEntry;
 
 import java.io.Serializable;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -65,7 +66,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface SegmentsEntryLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link SegmentsEntryLocalServiceUtil} to access the segments entry local service. Add custom service methods to <code>com.liferay.segments.service.impl.SegmentsEntryLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -80,11 +81,22 @@ public interface SegmentsEntryLocalService
 	@Indexable(type = IndexableType.REINDEX)
 	public SegmentsEntry addSegmentsEntry(SegmentsEntry segmentsEntry);
 
+	public SegmentsEntry addSegmentsEntry(
+			String segmentsEntryKey, Map<Locale, String> nameMap,
+			Map<Locale, String> descriptionMap, boolean active, String criteria,
+			String type, ServiceContext serviceContext)
+		throws PortalException;
+
 	@Indexable(type = IndexableType.REINDEX)
 	public SegmentsEntry addSegmentsEntry(
 			String segmentsEntryKey, Map<Locale, String> nameMap,
 			Map<Locale, String> descriptionMap, boolean active, String criteria,
 			String source, String type, ServiceContext serviceContext)
+		throws PortalException;
+
+	public void addSegmentsEntryClassPKs(
+			long segmentsEntryId, long[] classPKs,
+			ServiceContext serviceContext)
 		throws PortalException;
 
 	/**
@@ -128,6 +140,10 @@ public interface SegmentsEntryLocalService
 	@Indexable(type = IndexableType.DELETE)
 	@SystemEvent(type = SystemEventConstants.TYPE_DELETE)
 	public SegmentsEntry deleteSegmentsEntry(SegmentsEntry segmentsEntry)
+		throws PortalException;
+
+	public void deleteSegmentsEntryClassPKs(
+			long segmentsEntryId, long[] classPKs)
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -333,11 +349,24 @@ public interface SegmentsEntryLocalService
 			String uuid, long groupId)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 #searchSegmentsEntries(long, long, String, boolean,
+	 LinkedHashMap, int, int, Sort)}
+	 */
+	@Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public BaseModelSearchResult<SegmentsEntry> searchSegmentsEntries(
 			long companyId, long groupId, String keywords,
 			boolean includeAncestorSegmentsEntries, int start, int end,
 			Sort sort)
+		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public BaseModelSearchResult<SegmentsEntry> searchSegmentsEntries(
+			long companyId, long groupId, String keywords,
+			boolean includeAncestorSegmentsEntries,
+			LinkedHashMap<String, Object> params, int start, int end, Sort sort)
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)

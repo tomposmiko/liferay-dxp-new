@@ -74,7 +74,9 @@ public class UserAccount {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The user's additional name (e.g., middle name)."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String additionalName;
 
@@ -102,7 +104,7 @@ public class UserAccount {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The user's alias or screen name.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String alternateName;
 
@@ -130,39 +132,9 @@ public class UserAccount {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The user's date of birth, in ISO 8601 format.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date birthDate;
-
-	@Schema(description = "The user's contact information.")
-	@Valid
-	public ContactInformation getContactInformation() {
-		return contactInformation;
-	}
-
-	public void setContactInformation(ContactInformation contactInformation) {
-		this.contactInformation = contactInformation;
-	}
-
-	@JsonIgnore
-	public void setContactInformation(
-		UnsafeSupplier<ContactInformation, Exception>
-			contactInformationUnsafeSupplier) {
-
-		try {
-			contactInformation = contactInformationUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected ContactInformation contactInformation;
 
 	@Schema
 	@Valid
@@ -217,7 +189,7 @@ public class UserAccount {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "A relative URL to the user's dashboard.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String dashboardURL;
 
@@ -245,7 +217,7 @@ public class UserAccount {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The creation date of the user's account.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
@@ -275,7 +247,9 @@ public class UserAccount {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The last time any field of the user's account was changed."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateModified;
 
@@ -303,7 +277,7 @@ public class UserAccount {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The user's main email address.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String emailAddress;
 
@@ -331,7 +305,7 @@ public class UserAccount {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The user's surname (last name).")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String familyName;
 
@@ -359,7 +333,7 @@ public class UserAccount {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The user's first name.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String givenName;
 
@@ -387,7 +361,9 @@ public class UserAccount {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The user's title (e.g., Dr., Mr., Mrs, Ms., etc.)."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String honorificPrefix;
 
@@ -415,7 +391,7 @@ public class UserAccount {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The user's suffix (e.g., II, Jr., PhD, etc.).")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String honorificSuffix;
 
@@ -441,7 +417,7 @@ public class UserAccount {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The user's ID.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
@@ -469,7 +445,7 @@ public class UserAccount {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "A relative URL to the user's profile image.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String image;
 
@@ -497,7 +473,7 @@ public class UserAccount {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The user's job title.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String jobTitle;
 
@@ -525,7 +501,7 @@ public class UserAccount {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "A list of keywords describing the user.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String[] keywords;
 
@@ -551,7 +527,7 @@ public class UserAccount {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The user's full name.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String name;
 
@@ -581,7 +557,7 @@ public class UserAccount {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "A list of the user's organizations.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected OrganizationBrief[] organizationBriefs;
 
@@ -609,7 +585,7 @@ public class UserAccount {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "A relative URL to the user's profile.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String profileURL;
 
@@ -638,7 +614,7 @@ public class UserAccount {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "A list of the user's roles.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected RoleBrief[] roleBriefs;
 
@@ -667,9 +643,42 @@ public class UserAccount {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "A list of the user's sites.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected SiteBrief[] siteBriefs;
+
+	@Schema(description = "The user's contact information.")
+	@Valid
+	public UserAccountContactInformation getUserAccountContactInformation() {
+		return userAccountContactInformation;
+	}
+
+	public void setUserAccountContactInformation(
+		UserAccountContactInformation userAccountContactInformation) {
+
+		this.userAccountContactInformation = userAccountContactInformation;
+	}
+
+	@JsonIgnore
+	public void setUserAccountContactInformation(
+		UnsafeSupplier<UserAccountContactInformation, Exception>
+			userAccountContactInformationUnsafeSupplier) {
+
+		try {
+			userAccountContactInformation =
+				userAccountContactInformationUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField(description = "The user's contact information.")
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected UserAccountContactInformation userAccountContactInformation;
 
 	@Override
 	public boolean equals(Object object) {
@@ -741,16 +750,6 @@ public class UserAccount {
 			sb.append(liferayToJSONDateFormat.format(birthDate));
 
 			sb.append("\"");
-		}
-
-		if (contactInformation != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"contactInformation\": ");
-
-			sb.append(String.valueOf(contactInformation));
 		}
 
 		if (customFields != null) {
@@ -1033,6 +1032,16 @@ public class UserAccount {
 			}
 
 			sb.append("]");
+		}
+
+		if (userAccountContactInformation != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"userAccountContactInformation\": ");
+
+			sb.append(String.valueOf(userAccountContactInformation));
 		}
 
 		sb.append("}");

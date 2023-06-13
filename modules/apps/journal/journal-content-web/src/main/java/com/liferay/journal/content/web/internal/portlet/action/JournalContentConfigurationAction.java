@@ -21,6 +21,7 @@ import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
+import com.liferay.item.selector.ItemSelector;
 import com.liferay.journal.constants.JournalContentPortletKeys;
 import com.liferay.journal.constants.JournalWebKeys;
 import com.liferay.journal.content.web.internal.display.context.JournalContentDisplayContext;
@@ -84,6 +85,8 @@ public class JournalContentConfigurationAction
 				JavaConstants.JAVAX_PORTLET_RESPONSE);
 
 		httpServletRequest.setAttribute(
+			JournalWebKeys.ITEM_SELECTOR, _itemSelector);
+		httpServletRequest.setAttribute(
 			JournalWebKeys.JOURNAL_CONTENT, _journalContent);
 
 		try {
@@ -91,9 +94,9 @@ public class JournalContentConfigurationAction
 				portletRequest, portletResponse, _CLASS_NAME_ID,
 				_ddmTemplateModelResourcePermission);
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(pe, pe);
+				_log.debug(portalException, portalException);
 			}
 		}
 
@@ -178,6 +181,9 @@ public class JournalContentConfigurationAction
 	)
 	private ModelResourcePermission<DDMTemplate>
 		_ddmTemplateModelResourcePermission;
+
+	@Reference
+	private ItemSelector _itemSelector;
 
 	@Reference
 	private JournalContent _journalContent;

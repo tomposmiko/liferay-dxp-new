@@ -19,10 +19,10 @@ import com.liferay.oauth2.provider.exception.NoSuchOAuth2ApplicationException;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.model.OAuth2ApplicationScopeAliases;
 import com.liferay.oauth2.provider.model.OAuth2ScopeGrant;
-import com.liferay.oauth2.provider.scope.liferay.ApplicationDescriptorLocator;
 import com.liferay.oauth2.provider.scope.liferay.LiferayOAuth2Scope;
-import com.liferay.oauth2.provider.scope.liferay.ScopeDescriptorLocator;
 import com.liferay.oauth2.provider.scope.liferay.ScopeLocator;
+import com.liferay.oauth2.provider.scope.liferay.spi.ApplicationDescriptorLocator;
+import com.liferay.oauth2.provider.scope.liferay.spi.ScopeDescriptorLocator;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalService;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationService;
 import com.liferay.oauth2.provider.service.OAuth2ScopeGrantLocalService;
@@ -151,26 +151,30 @@ public class ViewAuthorizationRequestMVCRenderCommand
 				OAuth2ProviderWebKeys.OAUTH2_AUTHORIZE_PORTLET_DISPLAY_CONTEXT,
 				oAuth2AuthorizePortletDisplayContext);
 		}
-		catch (NoSuchOAuth2ApplicationException nsoaae) {
+		catch (NoSuchOAuth2ApplicationException
+					noSuchOAuth2ApplicationException) {
+
 			if (_log.isDebugEnabled()) {
-				_log.debug(nsoaae, nsoaae);
+				_log.debug(
+					noSuchOAuth2ApplicationException,
+					noSuchOAuth2ApplicationException);
 			}
 
 			SessionErrors.add(renderRequest, "clientIdInvalid");
 
 			return "/authorize/error.jsp";
 		}
-		catch (PrincipalException pe) {
+		catch (PrincipalException principalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(pe, pe);
+				_log.debug(principalException, principalException);
 			}
 
-			SessionErrors.add(renderRequest, pe.getClass());
+			SessionErrors.add(renderRequest, principalException.getClass());
 
 			return "/authorize/error.jsp";
 		}
-		catch (PortalException pe) {
-			throw new PortletException(pe);
+		catch (PortalException portalException) {
+			throw new PortletException(portalException);
 		}
 
 		return "/authorize/authorize.jsp";

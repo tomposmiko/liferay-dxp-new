@@ -53,7 +53,7 @@ import org.osgi.annotation.versioning.ProviderType;
 )
 public interface GroupService extends BaseService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link GroupServiceUtil} to access the group remote service. Add custom service methods to <code>com.liferay.portal.service.impl.GroupServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -476,6 +476,11 @@ public interface GroupService extends BaseService {
 			long companyId, String name, String description, String[] params,
 			int start, int end)
 		throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int searchCount(
+		long companyId, long[] classNameIds, String keywords,
+		LinkedHashMap<String, Object> params);
 
 	/**
 	 * Returns the number of groups and organization groups that match the name

@@ -20,7 +20,6 @@ import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.kernel.model.BaseJSPAssetRenderer;
 import com.liferay.asset.kernel.model.DDMFormValuesReader;
-import com.liferay.asset.model.AssetEntryUsage;
 import com.liferay.dynamic.data.mapping.util.FieldsToDDMFormValuesConverter;
 import com.liferay.journal.configuration.JournalServiceConfiguration;
 import com.liferay.journal.constants.JournalPortletKeys;
@@ -45,8 +44,6 @@ import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
-import com.liferay.portal.kernel.portlet.PortletProvider;
-import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.portlet.PortletRequestModel;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
@@ -159,8 +156,8 @@ public class JournalArticleAssetRenderer
 						JournalServiceConfiguration.class,
 						_article.getCompanyId());
 			}
-			catch (Exception e) {
-				_log.error(e, e);
+			catch (Exception exception) {
+				_log.error(exception, exception);
 
 				return null;
 			}
@@ -171,15 +168,6 @@ public class JournalArticleAssetRenderer
 		}
 
 		return null;
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public Date getDisplayDate() {
-		return _article.getDisplayDate();
 	}
 
 	@Override
@@ -249,7 +237,7 @@ public class JournalArticleAssetRenderer
 			summary = HtmlUtil.render(
 				HtmlUtil.stripHtml(articleDisplay.getContent()));
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 		}
 
 		return summary;
@@ -353,8 +341,8 @@ public class JournalArticleAssetRenderer
 		try {
 			return _article.getUrlTitle(locale);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 
 		return getUrlTitle();
@@ -450,40 +438,13 @@ public class JournalArticleAssetRenderer
 		sb.append(groupFriendlyURL);
 		sb.append(JournalArticleConstants.CANONICAL_URL_SEPARATOR);
 		sb.append(_article.getUrlTitle(themeDisplay.getLocale()));
-		sb.append(StringPool.SLASH);
-		sb.append(_article.getVersion());
 
-		return PortalUtil.addPreservedParameters(themeDisplay, sb.toString());
-	}
-
-	@Override
-	public String getURLViewUsages(HttpServletRequest httpServletRequest)
-		throws Exception {
-
-		AssetRendererFactory assetRendererFactory = getAssetRendererFactory();
-
-		AssetEntry assetEntry = assetRendererFactory.getAssetEntry(
-			JournalArticle.class.getName(), _article.getResourcePrimKey());
-
-		if (assetEntry == null) {
-			return StringPool.BLANK;
+		if (!_article.isApproved()) {
+			sb.append(StringPool.SLASH);
+			sb.append(_article.getVersion());
 		}
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		PortletURL viewUsagesURL = PortletProviderUtil.getPortletURL(
-			httpServletRequest, AssetEntryUsage.class.getName(),
-			PortletProvider.Action.VIEW);
-
-		viewUsagesURL.setParameter("redirect", themeDisplay.getURLCurrent());
-		viewUsagesURL.setParameter(
-			"className", String.valueOf(assetEntry.getClassName()));
-		viewUsagesURL.setParameter(
-			"classPK", String.valueOf(assetEntry.getClassPK()));
-
-		return viewUsagesURL.toString();
+		return PortalUtil.addPreservedParameters(themeDisplay, sb.toString());
 	}
 
 	@Override
@@ -672,13 +633,6 @@ public class JournalArticleAssetRenderer
 		}
 
 		return new PortletRequestModel(portletRequest, portletResponse);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	protected void setJournalServiceConfiguration() {
 	}
 
 	private boolean _isShowDisplayPage(long groupId, JournalArticle article)

@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface DEDataListViewPersistence
 	extends BasePersistence<DEDataListView> {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link DEDataListViewUtil} to access the de data list view persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.
@@ -390,6 +390,150 @@ public interface DEDataListViewPersistence
 	public int countByUuid_C(String uuid, long companyId);
 
 	/**
+	 * Returns all the de data list views where ddmStructureId = &#63;.
+	 *
+	 * @param ddmStructureId the ddm structure ID
+	 * @return the matching de data list views
+	 */
+	public java.util.List<DEDataListView> findByDDMStructureId(
+		long ddmStructureId);
+
+	/**
+	 * Returns a range of all the de data list views where ddmStructureId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>DEDataListViewModelImpl</code>.
+	 * </p>
+	 *
+	 * @param ddmStructureId the ddm structure ID
+	 * @param start the lower bound of the range of de data list views
+	 * @param end the upper bound of the range of de data list views (not inclusive)
+	 * @return the range of matching de data list views
+	 */
+	public java.util.List<DEDataListView> findByDDMStructureId(
+		long ddmStructureId, int start, int end);
+
+	/**
+	 * Returns an ordered range of all the de data list views where ddmStructureId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>DEDataListViewModelImpl</code>.
+	 * </p>
+	 *
+	 * @param ddmStructureId the ddm structure ID
+	 * @param start the lower bound of the range of de data list views
+	 * @param end the upper bound of the range of de data list views (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the ordered range of matching de data list views
+	 */
+	public java.util.List<DEDataListView> findByDDMStructureId(
+		long ddmStructureId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<DEDataListView>
+			orderByComparator);
+
+	/**
+	 * Returns an ordered range of all the de data list views where ddmStructureId = &#63;.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to <code>QueryUtil#ALL_POS</code> will return the full result set. If <code>orderByComparator</code> is specified, then the query will include the given ORDER BY logic. If <code>orderByComparator</code> is absent, then the query will include the default ORDER BY logic from <code>DEDataListViewModelImpl</code>.
+	 * </p>
+	 *
+	 * @param ddmStructureId the ddm structure ID
+	 * @param start the lower bound of the range of de data list views
+	 * @param end the upper bound of the range of de data list views (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the ordered range of matching de data list views
+	 */
+	public java.util.List<DEDataListView> findByDDMStructureId(
+		long ddmStructureId, int start, int end,
+		com.liferay.portal.kernel.util.OrderByComparator<DEDataListView>
+			orderByComparator,
+		boolean useFinderCache);
+
+	/**
+	 * Returns the first de data list view in the ordered set where ddmStructureId = &#63;.
+	 *
+	 * @param ddmStructureId the ddm structure ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching de data list view
+	 * @throws NoSuchDataListViewException if a matching de data list view could not be found
+	 */
+	public DEDataListView findByDDMStructureId_First(
+			long ddmStructureId,
+			com.liferay.portal.kernel.util.OrderByComparator<DEDataListView>
+				orderByComparator)
+		throws NoSuchDataListViewException;
+
+	/**
+	 * Returns the first de data list view in the ordered set where ddmStructureId = &#63;.
+	 *
+	 * @param ddmStructureId the ddm structure ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching de data list view, or <code>null</code> if a matching de data list view could not be found
+	 */
+	public DEDataListView fetchByDDMStructureId_First(
+		long ddmStructureId,
+		com.liferay.portal.kernel.util.OrderByComparator<DEDataListView>
+			orderByComparator);
+
+	/**
+	 * Returns the last de data list view in the ordered set where ddmStructureId = &#63;.
+	 *
+	 * @param ddmStructureId the ddm structure ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching de data list view
+	 * @throws NoSuchDataListViewException if a matching de data list view could not be found
+	 */
+	public DEDataListView findByDDMStructureId_Last(
+			long ddmStructureId,
+			com.liferay.portal.kernel.util.OrderByComparator<DEDataListView>
+				orderByComparator)
+		throws NoSuchDataListViewException;
+
+	/**
+	 * Returns the last de data list view in the ordered set where ddmStructureId = &#63;.
+	 *
+	 * @param ddmStructureId the ddm structure ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching de data list view, or <code>null</code> if a matching de data list view could not be found
+	 */
+	public DEDataListView fetchByDDMStructureId_Last(
+		long ddmStructureId,
+		com.liferay.portal.kernel.util.OrderByComparator<DEDataListView>
+			orderByComparator);
+
+	/**
+	 * Returns the de data list views before and after the current de data list view in the ordered set where ddmStructureId = &#63;.
+	 *
+	 * @param deDataListViewId the primary key of the current de data list view
+	 * @param ddmStructureId the ddm structure ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the previous, current, and next de data list view
+	 * @throws NoSuchDataListViewException if a de data list view with the primary key could not be found
+	 */
+	public DEDataListView[] findByDDMStructureId_PrevAndNext(
+			long deDataListViewId, long ddmStructureId,
+			com.liferay.portal.kernel.util.OrderByComparator<DEDataListView>
+				orderByComparator)
+		throws NoSuchDataListViewException;
+
+	/**
+	 * Removes all the de data list views where ddmStructureId = &#63; from the database.
+	 *
+	 * @param ddmStructureId the ddm structure ID
+	 */
+	public void removeByDDMStructureId(long ddmStructureId);
+
+	/**
+	 * Returns the number of de data list views where ddmStructureId = &#63;.
+	 *
+	 * @param ddmStructureId the ddm structure ID
+	 * @return the number of matching de data list views
+	 */
+	public int countByDDMStructureId(long ddmStructureId);
+
+	/**
 	 * Returns all the de data list views where groupId = &#63; and companyId = &#63; and ddmStructureId = &#63;.
 	 *
 	 * @param groupId the group ID
@@ -397,7 +541,7 @@ public interface DEDataListViewPersistence
 	 * @param ddmStructureId the ddm structure ID
 	 * @return the matching de data list views
 	 */
-	public java.util.List<DEDataListView> findByG_C_D(
+	public java.util.List<DEDataListView> findByG_C_DDMSI(
 		long groupId, long companyId, long ddmStructureId);
 
 	/**
@@ -414,7 +558,7 @@ public interface DEDataListViewPersistence
 	 * @param end the upper bound of the range of de data list views (not inclusive)
 	 * @return the range of matching de data list views
 	 */
-	public java.util.List<DEDataListView> findByG_C_D(
+	public java.util.List<DEDataListView> findByG_C_DDMSI(
 		long groupId, long companyId, long ddmStructureId, int start, int end);
 
 	/**
@@ -432,7 +576,7 @@ public interface DEDataListViewPersistence
 	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching de data list views
 	 */
-	public java.util.List<DEDataListView> findByG_C_D(
+	public java.util.List<DEDataListView> findByG_C_DDMSI(
 		long groupId, long companyId, long ddmStructureId, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<DEDataListView>
 			orderByComparator);
@@ -453,7 +597,7 @@ public interface DEDataListViewPersistence
 	 * @param useFinderCache whether to use the finder cache
 	 * @return the ordered range of matching de data list views
 	 */
-	public java.util.List<DEDataListView> findByG_C_D(
+	public java.util.List<DEDataListView> findByG_C_DDMSI(
 		long groupId, long companyId, long ddmStructureId, int start, int end,
 		com.liferay.portal.kernel.util.OrderByComparator<DEDataListView>
 			orderByComparator,
@@ -469,7 +613,7 @@ public interface DEDataListViewPersistence
 	 * @return the first matching de data list view
 	 * @throws NoSuchDataListViewException if a matching de data list view could not be found
 	 */
-	public DEDataListView findByG_C_D_First(
+	public DEDataListView findByG_C_DDMSI_First(
 			long groupId, long companyId, long ddmStructureId,
 			com.liferay.portal.kernel.util.OrderByComparator<DEDataListView>
 				orderByComparator)
@@ -484,7 +628,7 @@ public interface DEDataListViewPersistence
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching de data list view, or <code>null</code> if a matching de data list view could not be found
 	 */
-	public DEDataListView fetchByG_C_D_First(
+	public DEDataListView fetchByG_C_DDMSI_First(
 		long groupId, long companyId, long ddmStructureId,
 		com.liferay.portal.kernel.util.OrderByComparator<DEDataListView>
 			orderByComparator);
@@ -499,7 +643,7 @@ public interface DEDataListViewPersistence
 	 * @return the last matching de data list view
 	 * @throws NoSuchDataListViewException if a matching de data list view could not be found
 	 */
-	public DEDataListView findByG_C_D_Last(
+	public DEDataListView findByG_C_DDMSI_Last(
 			long groupId, long companyId, long ddmStructureId,
 			com.liferay.portal.kernel.util.OrderByComparator<DEDataListView>
 				orderByComparator)
@@ -514,7 +658,7 @@ public interface DEDataListViewPersistence
 	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching de data list view, or <code>null</code> if a matching de data list view could not be found
 	 */
-	public DEDataListView fetchByG_C_D_Last(
+	public DEDataListView fetchByG_C_DDMSI_Last(
 		long groupId, long companyId, long ddmStructureId,
 		com.liferay.portal.kernel.util.OrderByComparator<DEDataListView>
 			orderByComparator);
@@ -530,7 +674,7 @@ public interface DEDataListViewPersistence
 	 * @return the previous, current, and next de data list view
 	 * @throws NoSuchDataListViewException if a de data list view with the primary key could not be found
 	 */
-	public DEDataListView[] findByG_C_D_PrevAndNext(
+	public DEDataListView[] findByG_C_DDMSI_PrevAndNext(
 			long deDataListViewId, long groupId, long companyId,
 			long ddmStructureId,
 			com.liferay.portal.kernel.util.OrderByComparator<DEDataListView>
@@ -544,7 +688,7 @@ public interface DEDataListViewPersistence
 	 * @param companyId the company ID
 	 * @param ddmStructureId the ddm structure ID
 	 */
-	public void removeByG_C_D(
+	public void removeByG_C_DDMSI(
 		long groupId, long companyId, long ddmStructureId);
 
 	/**
@@ -555,7 +699,8 @@ public interface DEDataListViewPersistence
 	 * @param ddmStructureId the ddm structure ID
 	 * @return the number of matching de data list views
 	 */
-	public int countByG_C_D(long groupId, long companyId, long ddmStructureId);
+	public int countByG_C_DDMSI(
+		long groupId, long companyId, long ddmStructureId);
 
 	/**
 	 * Caches the de data list view in the entity cache if it is enabled.

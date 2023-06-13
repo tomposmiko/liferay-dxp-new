@@ -69,9 +69,10 @@ public class JournalArticleTag extends IncludeTag {
 				_article.getVersion(), _ddmTemplateKey, Constants.VIEW,
 				getLanguageId(), 1, portletRequestModel, themeDisplay);
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug("Unable to get journal article display", pe);
+				_log.debug(
+					"Unable to get journal article display", portalException);
 			}
 
 			return SKIP_BODY;
@@ -132,6 +133,7 @@ public class JournalArticleTag extends IncludeTag {
 		super.cleanUp();
 
 		_article = null;
+		_articleDisplay = null;
 		_articleId = null;
 		_ddmTemplateKey = null;
 		_groupId = 0;

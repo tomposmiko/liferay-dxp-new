@@ -30,16 +30,10 @@ import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
  */
 public class GroupServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.portal.service.impl.GroupServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
-	 */
-
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link GroupServiceUtil} to access the group remote service. Add custom service methods to <code>com.liferay.portal.service.impl.GroupServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	public static com.liferay.portal.kernel.model.Group addGroup(
 			long parentGroupId, long liveGroupId,
@@ -574,6 +568,14 @@ public class GroupServiceUtil {
 
 		return getService().search(
 			companyId, name, description, params, start, end);
+	}
+
+	public static int searchCount(
+		long companyId, long[] classNameIds, String keywords,
+		java.util.LinkedHashMap<String, Object> params) {
+
+		return getService().searchCount(
+			companyId, classNameIds, keywords, params);
 	}
 
 	/**

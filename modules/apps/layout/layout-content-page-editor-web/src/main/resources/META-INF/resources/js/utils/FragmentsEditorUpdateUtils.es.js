@@ -90,7 +90,9 @@ function addRow(
 		layoutData.structure,
 		{
 			columns,
-			config: defaultConfig,
+			config: {
+				...defaultConfig
+			},
 			rowId: `${nextRowId}`,
 			type
 		},
@@ -338,7 +340,7 @@ function updateWidgets(state, fragmentEntryLinkIds = []) {
 	fragmentEntryLinkIds.forEach(fragmentEntryLinkId => {
 		const fragmentEntryLink = state.fragmentEntryLinks[fragmentEntryLinkId];
 
-		if (fragmentEntryLink.portletId) {
+		if (fragmentEntryLink && fragmentEntryLink.portletId) {
 			const widget = getWidget(
 				state.widgets,
 				fragmentEntryLink.portletId

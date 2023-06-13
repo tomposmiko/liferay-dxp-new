@@ -456,6 +456,13 @@ public class DDMFormInstanceWrapper
 	}
 
 	@Override
+	public String getStorageType()
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return model.getStorageType();
+	}
+
+	@Override
 	public DDMStructure getStructure()
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -552,11 +559,6 @@ public class DDMFormInstanceWrapper
 		return model.getVersionUserUuid();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a ddm form instance model instance should use the <code>DDMFormInstance</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

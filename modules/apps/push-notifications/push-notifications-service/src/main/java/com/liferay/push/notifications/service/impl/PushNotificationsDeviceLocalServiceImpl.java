@@ -51,12 +51,6 @@ import org.osgi.service.component.annotations.Reference;
 public class PushNotificationsDeviceLocalServiceImpl
 	extends PushNotificationsDeviceLocalServiceBaseImpl {
 
-	@Activate
-	public void activate(BundleContext bundleContext) {
-		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext, PushNotificationsSender.class, "platform");
-	}
-
 	@Override
 	public PushNotificationsDevice addPushNotificationsDevice(
 			long userId, String platform, String token)
@@ -76,14 +70,8 @@ public class PushNotificationsDeviceLocalServiceImpl
 		pushNotificationsDevice.setPlatform(platform);
 		pushNotificationsDevice.setToken(token);
 
-		pushNotificationsDevicePersistence.update(pushNotificationsDevice);
-
-		return pushNotificationsDevice;
-	}
-
-	@Deactivate
-	public void deactivate() {
-		_serviceTrackerMap.close();
+		return pushNotificationsDevicePersistence.update(
+			pushNotificationsDevice);
 	}
 
 	@Override
@@ -145,26 +133,26 @@ public class PushNotificationsDeviceLocalServiceImpl
 			return;
 		}
 
-		Exception exception = null;
+		Exception exception1 = null;
 
 		try {
 			pushNotificationsSender.send(tokens, payloadJSONObject);
 		}
-		catch (PortalException pe) {
-			exception = pe;
+		catch (PortalException portalException) {
+			exception1 = portalException;
 
-			throw pe;
+			throw portalException;
 		}
-		catch (Exception e) {
-			exception = e;
+		catch (Exception exception2) {
+			exception1 = exception2;
 
-			throw new PortalException(e);
+			throw new PortalException(exception2);
 		}
 		finally {
-			if (exception != null) {
+			if (exception1 != null) {
 				Message message = new Message();
 
-				message.setPayload(new BaseResponse(platform, exception));
+				message.setPayload(new BaseResponse(platform, exception1));
 
 				_messageBus.sendMessage(
 					PushNotificationsDestinationNames.
@@ -189,6 +177,17 @@ public class PushNotificationsDeviceLocalServiceImpl
 				oldPushNotificationsDevice.getUserId(),
 				oldPushNotificationsDevice.getPlatform(), newToken);
 		}
+	}
+
+	@Activate
+	protected void activate(BundleContext bundleContext) {
+		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
+			bundleContext, PushNotificationsSender.class, "platform");
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		_serviceTrackerMap.close();
 	}
 
 	@Reference

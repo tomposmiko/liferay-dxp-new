@@ -476,8 +476,8 @@ public class CustomSQL {
 				}
 			}
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 		finally {
 			DataAccess.cleanUp(con);
@@ -498,8 +498,8 @@ public class CustomSQL {
 
 			_sqlPool = sqlPool;
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 	}
 
@@ -830,14 +830,6 @@ public class CustomSQL {
 		}
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link #_read(ClassLoader,
-	 *             String, Map)}
-	 */
-	@Deprecated
-	protected void read(ClassLoader classLoader, String source) {
-	}
-
 	protected String transform(String sql) {
 		sql = PortalUtil.transformCustomSQL(sql);
 
@@ -862,7 +854,7 @@ public class CustomSQL {
 				}
 			}
 		}
-		catch (IOException ioe) {
+		catch (IOException ioException) {
 			return sql;
 		}
 

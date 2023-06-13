@@ -20,11 +20,14 @@ export default (pages, properties) => {
 
 	return Promise.resolve(
 		pageVisitor.mapFields(field => {
-			const matches = field.name === fieldInstance.name;
+			const matches =
+				field.name === fieldInstance.name &&
+				field.required &&
+				fieldInstance.value == '';
 
 			return {
 				...field,
-				displayErrors: field.displayErrors || matches,
+				displayErrors: !!field.displayErrors || matches,
 				focused: matches ? false : field.focused
 			};
 		})

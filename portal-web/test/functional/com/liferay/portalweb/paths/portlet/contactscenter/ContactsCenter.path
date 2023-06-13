@@ -9,11 +9,6 @@
 </thead>
 <tbody>
 <tr>
-	<td>CONTACT_EMAIL_ADDRESS</td>
-	<td>//div[label[contains(.,'Email Address')]]//input[@type='email']</td>
-	<td></td>
-</tr>
-<tr>
 	<td>SUCCESS_MESSAGE</td>
 	<td>//span[contains(@class,'alert') and contains(@class,'alert-success')]</td>
 	<td></td>
@@ -21,6 +16,36 @@
 <tr>
 	<td>CONTACT_CONTAINER_TEXT</td>
 	<td>//div[contains(@class,'contacts-container')]//*[contains(text(),'${key_contactText}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CONTACT_LIST</td>
+	<td>//div[contains(@class,'contacts-list')]//*[contains(text(),'${key_contact}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CONTACT_CONNECTIONS_COUNT</td>
+	<td>//div[contains(@class,'contacts-count') and contains(@class,'connections')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CONTACT_FOLLOWING_COUNT</td>
+	<td>//div[contains(@class,'contacts-count') and contains(@class,'followings')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CONTACT_FOLLOWER_COUNT</td>
+	<td>//div[contains(@class,'contacts-count') and contains(@class,'followers')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>MY_CONTACTS_COUNT</td>
+	<td>//div[contains(@class,'contacts-count') and contains(@class,'contacts')]/*[contains(text(),'View my')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>All_USERS_COUNT</td>
+	<td>//div[contains(@class,'contacts-count') and contains(@class,'all')]</td>
 	<td></td>
 </tr>
 <tr>

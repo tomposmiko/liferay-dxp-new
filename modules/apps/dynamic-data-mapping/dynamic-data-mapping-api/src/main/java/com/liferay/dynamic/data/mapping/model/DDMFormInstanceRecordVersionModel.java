@@ -40,7 +40,7 @@ public interface DDMFormInstanceRecordVersionModel
 	extends BaseModel<DDMFormInstanceRecordVersion>, MVCCModel, ShardedModel,
 			WorkflowedModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a ddm form instance record version model instance should use the {@link DDMFormInstanceRecordVersion} interface instead.

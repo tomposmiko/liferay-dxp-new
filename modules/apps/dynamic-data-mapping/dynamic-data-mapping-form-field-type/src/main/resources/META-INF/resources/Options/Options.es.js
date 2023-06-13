@@ -86,17 +86,16 @@ class Options extends Component {
 		});
 	}
 
-	getCurrentLocaleValue() {
+	getCurrentLocaleValue(localizedValue = this.value) {
 		const {defaultLanguageId, editingLanguageId} = this;
-		let value = [];
 
-		if (this.value && this.value[editingLanguageId]) {
-			value = this.value[editingLanguageId];
-		} else if (this.value && this.value[defaultLanguageId]) {
-			value = this.value[defaultLanguageId];
+		if (localizedValue && localizedValue[editingLanguageId]) {
+			return localizedValue[editingLanguageId];
+		} else if (localizedValue && localizedValue[defaultLanguageId]) {
+			return localizedValue[defaultLanguageId];
 		}
 
-		return value;
+		return [];
 	}
 
 	getFieldIndex(element) {
@@ -107,22 +106,24 @@ class Options extends Component {
 	}
 
 	getItems(options = []) {
+		const items = [...options];
+		const newItems = items.map(option => {
+			return {
+				...option,
+				generateKeyword: this.shouldGenerateOptionValue(items, option)
+			};
+		});
+
 		const {defaultLanguageId, editingLanguageId} = this;
-		const items = options.filter(({value}) => !!value);
 
 		if (defaultLanguageId === editingLanguageId) {
-			items.push({
+			newItems.push({
 				label: '',
 				value: ''
 			});
 		}
 
-		return items.map(option => {
-			return {
-				...option,
-				generateKeyword: this.shouldGenerateOptionValue(option)
-			};
-		});
+		return newItems;
 	}
 
 	moveOption(sourceIndex, targetIndex) {
@@ -150,28 +151,32 @@ class Options extends Component {
 		this._handleFieldEdited({}, value);
 	}
 
-	normalizeOption(options, option, force) {
+	normalizeOption(options, option, editedIndex, editedProperty) {
 		const {label, value} = option;
-		const desiredValue =
-			value || label || (force ? Liferay.Language.get('option') : '');
-		let normalizedValue = desiredValue;
+		let desiredValue =
+			editedProperty === 'label' ? label : value ? value : label;
+		const optionIndex = options.indexOf(option);
 
-		if (this.shouldGenerateOptionValue(option)) {
-			let counter = 0;
-			const optionIndex = options.indexOf(option);
-
-			do {
-				if (counter > 0) {
-					normalizedValue = desiredValue + counter;
-				}
-
-				counter++;
-			} while (
-				this.findOptionByValue(options, normalizedValue, optionIndex)
-			);
-
-			normalizedValue = normalizeFieldName(normalizedValue);
+		if (!this.shouldGenerateOptionValue(options, option)) {
+			return option;
 		}
+
+		if (!desiredValue) {
+			desiredValue = Liferay.Language.get('option');
+		}
+
+		let normalizedValue = desiredValue;
+		let counter = 0;
+
+		do {
+			if (counter > 0) {
+				normalizedValue = desiredValue + counter;
+			}
+
+			counter++;
+		} while (this.findOptionByValue(options, normalizedValue, optionIndex));
+
+		normalizedValue = normalizeFieldName(normalizedValue);
 
 		return {
 			...option,
@@ -179,22 +184,23 @@ class Options extends Component {
 		};
 	}
 
-	normalizeOptions(options, force) {
-		return options.map(option =>
-			this.normalizeOption(options, option, force)
-		);
-	}
+	normalizeOptions(options, editedIndex, editedProperty) {
+		const normalizedOptions = [...options];
 
-	normalizeValue(value, force = false) {
-		const newValue = {};
+		normalizedOptions.forEach((option, index) => {
+			if (editedIndex !== index) {
+				return;
+			}
 
-		Object.keys(value).forEach(locale => {
-			const options = value[locale] || [];
-
-			newValue[locale] = this.normalizeOptions(options, force);
+			normalizedOptions[index] = this.normalizeOption(
+				normalizedOptions,
+				normalizedOptions[index],
+				editedIndex,
+				editedProperty
+			);
 		});
 
-		return newValue;
+		return normalizedOptions;
 	}
 
 	prepareStateForRender(state) {
@@ -207,16 +213,47 @@ class Options extends Component {
 		};
 	}
 
-	shouldGenerateOptionValue(option) {
+	shouldGenerateOptionValue(options, option) {
 		const {defaultLanguageId, editingLanguageId} = this;
 
-		return (
-			defaultLanguageId === editingLanguageId &&
-			(option.value === '' ||
-				new RegExp(`^${normalizeFieldName(option.label)}\\d*$`).test(
-					option.value
-				))
-		);
+		if (defaultLanguageId !== editingLanguageId) {
+			return false;
+		}
+
+		if (option.value === '') {
+			return true;
+		}
+
+		const optionIndex = options.indexOf(option);
+		const duplicated = options.some(({value}, index) => {
+			return value === option.value && index !== optionIndex;
+		});
+
+		if (duplicated) {
+			return true;
+		}
+
+		if (option.edited) {
+			return false;
+		}
+
+		if (
+			new RegExp(`^${Liferay.Language.get('option')}\\d*$`).test(
+				option.value
+			)
+		) {
+			return true;
+		}
+
+		if (
+			new RegExp(`^${option.value.replace(/\d+$/, '')}\\d*`).test(
+				normalizeFieldName(option.label)
+			)
+		) {
+			return true;
+		}
+
+		return true;
 	}
 
 	syncEditingLanguageId(editingLanguageId) {
@@ -237,42 +274,9 @@ class Options extends Component {
 		}
 	}
 
-	shouldUpdate(changes) {
-		let changed = false;
-
-		if (changes.items) {
-			const {newVal, prevVal} = changes.items;
-
-			if (!prevVal) {
-				changed = true;
-			} else if (newVal.length !== prevVal.length) {
-				changed = true;
-			} else {
-				for (let i = 0; i < newVal.length; i++) {
-					const {label, value} = newVal[i];
-
-					if (
-						label !== prevVal[i].label ||
-						value !== prevVal[i].value
-					) {
-						changed = true;
-
-						break;
-					}
-				}
-			}
-		}
-
-		if (changes.visible) {
-			changed = true;
-		}
-
-		return changed;
-	}
-
-	syncValue() {
+	syncValue(value) {
 		this.setState({
-			items: this.getItems(this.getCurrentLocaleValue())
+			items: this.getCurrentLocaleValue(value)
 		});
 	}
 
@@ -297,7 +301,7 @@ class Options extends Component {
 	}
 
 	_getOptionIndex({name}) {
-		return parseInt(name.replace('option', ''), 10);
+		return parseInt(name.replace(/[^\d]/gi, ''), 10);
 	}
 
 	_handleDragDropEvent({source, target}) {
@@ -338,17 +342,18 @@ class Options extends Component {
 		const {defaultLanguageId, editingLanguageId} = this;
 		const {fieldInstance, value} = event;
 		let options = this.getCurrentLocaleValue();
+		const optionIndex = this._getOptionIndex(fieldInstance);
 
-		const optionExists = options.some((option, index) => {
-			return index === this._getOptionIndex(fieldInstance);
-		});
-
-		if (optionExists) {
+		if (optionIndex < options.length) {
 			options = options.map((option, index) => {
-				return index === this._getOptionIndex(fieldInstance)
+				return index === optionIndex
 					? {
 							...option,
-							edited: property === 'label',
+							edited:
+								option.edited ||
+								(value &&
+									value !== option.value &&
+									property === 'value'),
 							[property]: value
 					  }
 					: option;
@@ -363,9 +368,7 @@ class Options extends Component {
 			];
 		}
 
-		if (property === 'label') {
-			options = this.normalizeOptions(options);
-		}
+		options = this.normalizeOptions(options, optionIndex, property);
 
 		let newValue = {
 			...this.value,
@@ -373,16 +376,16 @@ class Options extends Component {
 		};
 
 		if (defaultLanguageId === editingLanguageId) {
-			const generateLabels = (languageId, options) => {
+			const copyLanguageLabels = (languageId, options) => {
 				return options.map(({label, value}, index) => {
 					const option = newValue[languageId][index];
 
-					if (option && option.edited) {
+					if (property === 'label') {
 						label = option.label;
 					}
 
 					return {
-						edited: option && option.edited,
+						...option,
 						label,
 						value
 					};
@@ -396,7 +399,7 @@ class Options extends Component {
 
 				newValue = {
 					...newValue,
-					[languageId]: generateLabels(languageId, options)
+					[languageId]: copyLanguageLabels(languageId, options)
 				};
 			});
 		}
@@ -423,8 +426,11 @@ class Options extends Component {
 		this._handleOptionEdited(event, 'label');
 	}
 
-	_handleOptionValueEdited(event) {
-		this._handleOptionEdited(event, 'value');
+	_handleOptionValueBlurred({fieldInstance}) {
+		this._handleOptionEdited(
+			{fieldInstance, value: fieldInstance.keyword},
+			'value'
+		);
 	}
 
 	_setValue(value = {}) {

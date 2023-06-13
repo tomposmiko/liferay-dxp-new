@@ -32,16 +32,10 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class MBMessageLocalServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.message.boards.service.impl.MBMessageLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
-	 */
-
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link MBMessageLocalServiceUtil} to access the message-boards message local service. Add custom service methods to <code>com.liferay.message.boards.service.impl.MBMessageLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
 	public static com.liferay.message.boards.model.MBMessage
 			addDiscussionMessage(
@@ -738,16 +732,6 @@ public class MBMessageLocalServiceUtil {
 	}
 
 	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public static java.util.List<com.liferay.message.boards.model.MBMessage>
-		getNoAssetMessages() {
-
-		return getService().getNoAssetMessages();
-	}
-
-	/**
 	 * Returns the OSGi service identifier.
 	 *
 	 * @return the OSGi service identifier
@@ -792,43 +776,6 @@ public class MBMessageLocalServiceUtil {
 
 		return getService().getRootDiscussionMessagesCount(
 			className, classPK, status);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #getRootDiscussionMessages(String, long, int)}
-	 */
-	@Deprecated
-	public static java.util.List<com.liferay.message.boards.model.MBMessage>
-			getRootMessages(String className, long classPK, int status)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return getService().getRootMessages(className, classPK, status);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #getRootDiscussionMessages(String, long, int, int, int)}
-	 */
-	@Deprecated
-	public static java.util.List<com.liferay.message.boards.model.MBMessage>
-			getRootMessages(
-				String className, long classPK, int status, int start, int end)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return getService().getRootMessages(
-			className, classPK, status, start, end);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #getRootDiscussionMessagesCount(String, long, int)}
-	 */
-	@Deprecated
-	public static int getRootMessagesCount(
-		String className, long classPK, int status) {
-
-		return getService().getRootMessagesCount(className, classPK, status);
 	}
 
 	public static String[] getTempAttachmentNames(
@@ -1043,26 +990,6 @@ public class MBMessageLocalServiceUtil {
 		return getService().updateMessage(
 			userId, messageId, subject, body, inputStreamOVPs, priority,
 			allowPingbacks, serviceContext);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link #updateMessage(long,
-	 long, String, String, List, double, boolean, ServiceContext)}
-	 */
-	@Deprecated
-	public static com.liferay.message.boards.model.MBMessage updateMessage(
-			long userId, long messageId, String subject, String body,
-			java.util.List
-				<com.liferay.portal.kernel.util.ObjectValuePair
-					<String, java.io.InputStream>> inputStreamOVPs,
-			java.util.List<String> existingFiles, double priority,
-			boolean allowPingbacks,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
-		return getService().updateMessage(
-			userId, messageId, subject, body, inputStreamOVPs, existingFiles,
-			priority, allowPingbacks, serviceContext);
 	}
 
 	public static com.liferay.message.boards.model.MBMessage updateStatus(

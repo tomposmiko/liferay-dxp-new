@@ -2,7 +2,7 @@ definition {
 
 	@summary = "Directly calls the JSON WS API to add a layout"
 	macro _addLayout {
-		Variables.assertDefined(parameterList = "${friendlyURL},${groupId},${privateLayout},${parentLayoutId},${layoutName}");
+		Variables.assertDefined(parameterList = "${friendlyURL},${groupId},${privateLayout},${parentLayoutId},${layoutName},${serviceContext}");
 
 		var portalURL = JSONCompany.getPortalURL();
 
@@ -17,10 +17,52 @@ definition {
 				-d description= \
 				-d type=${type} \
 				-d hidden=false \
-				-d friendlyURL=${friendlyURL}
+				-d friendlyURL=${friendlyURL} \
+				-d serviceContext=${serviceContext}
 		''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@summary = "Directly calls the JSON WS API to delete a layout"
+	macro _deleteLayout {
+		Variables.assertDefined(parameterList = "${groupId},${layoutId},${privateLayout},${serviceContext}");
+
+		var portalURL = JSONCompany.getPortalURL();
+
+		var curl = '''
+			${portalURL}/api/jsonws/layout/delete-layout \
+				-u test@liferay.com:test \
+				-d groupId=${groupId} \
+				-d privateLayout=${privateLayout} \
+				-d layoutId=${layoutId} \
+				-d serviceContext=${serviceContext}
+		''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@summary = "Get the default plid from a site by using groupId"
+	macro _getDefaultPlidByGroupId {
+		Variables.assertDefined(parameterList = "${groupId},${privateLayout}");
+
+		var portalURL = JSONCompany.getPortalURL();
+
+		var curl = '''
+			${portalURL}/api/jsonws/layout/get-default-plid \
+				-u test@liferay.com:test \
+				-d groupId=${groupId} \
+				-d privateLayout=${privateLayout}
+		''';
+
+		var defaultPlid = JSONCurlUtil.post("${curl}");
+		var defaultPlid = StringUtil.extractDigits("${defaultPlid}");
+
+		if ("${defaultPlid}" == "[]") {
+			fail("FAIL. Cannot find defaultPlid.");
+		}
+
+		return "${defaultPlid}";
 	}
 
 	@summary = "Get the layoutId from a layout by using groupId and layoutName"

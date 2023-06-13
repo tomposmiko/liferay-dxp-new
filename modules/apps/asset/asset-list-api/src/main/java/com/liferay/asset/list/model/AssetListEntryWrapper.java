@@ -361,6 +361,13 @@ public class AssetListEntryWrapper
 		return model.getTypeSettings(segmentsEntryId);
 	}
 
+	@Override
+	public String getUnambiguousTitle(java.util.Locale locale)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return model.getUnambiguousTitle(locale);
+	}
+
 	/**
 	 * Returns the user ID of this asset list entry.
 	 *
@@ -401,11 +408,6 @@ public class AssetListEntryWrapper
 		return model.getUuid();
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this class directly. All methods that expect a asset list entry model instance should use the <code>AssetListEntry</code> interface instead.
-	 */
 	@Override
 	public void persist() {
 		model.persist();

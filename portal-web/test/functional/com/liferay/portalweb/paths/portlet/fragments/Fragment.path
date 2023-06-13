@@ -14,6 +14,21 @@
 	<td></td>
 </tr>
 <tr>
+	<td>FRAGMENT_BASIC_COMPONENT</td>
+	<td>//div[contains(@class,'layout-content')]//*[contains(@class,'component-${key_fragmentName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FRAGMENT_ELLIPSIS_ICON</td>
+	<td>//div[contains(*,'${key_fragmentName}')]//*[*[name()='svg'][contains(@class,'lexicon-icon-ellipsis-v')]]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FRAGMENT_FLOATING_MENU_ITEM</td>
+	<td>//div[contains(@class,'lfr-icon-menu-open')]//*[normalize-space(text())='${key_menuItem}']</td>
+	<td></td>
+</tr>
+<tr>
 	<td>FRAGMENT_IMAGE</td>
 	<td>//div[contains(@class,'layout-content')]//section[${key_position}]//*[contains(@class,'fragment-${key_fragmentClass}')]//img[contains(@src,'${key_image}')]</td>
 	<td></td>
@@ -26,6 +41,11 @@
 <tr>
 	<td>FRAGMENT_LAYOUT_BACKGROUND_IMAGE</td>
 	<td>//div[contains(@class,'layout-content')]//section[contains(@style,'${key_imageName}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FRAGMENT_CONTENT_BACKGROUND_IMAGE</td>
+	<td>//div[contains(@class,'fragment-entry-link')]//div[contains(@style,'${key_imageName}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -131,8 +151,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>FRAGMENT_CONFIGURATION_HEADER_H2</td>
-	<td>//h2[contains(@class,'component-${key_fragmentName}')]</td>
+	<td>FRAGMENT_CONFIGURATION_HEADER</td>
+	<td>//${key_headingLevel}[contains(@class,'component-${key_fragmentName}')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -183,7 +203,7 @@
 </tr>
 <tr>
 	<td>FRAGMENT_HEADER_DELETE_BUTTON</td>
-	<td>//div[contains(@class,'fragment-entry-link-wrapper')]//ul[contains(.,'${key_fragmentName}')]//button[*[name()='svg'][*[contains(@class,'times-circle-x')]]]</td>
+	<td>//div[contains(@data-drag-source-label,'${key_fragmentName}')]//button[*[name()='svg'][*[contains(@class,'times-circle-x')]]]</td>
 	<td></td>
 </tr>
 </tbody>

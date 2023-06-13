@@ -76,41 +76,11 @@ public class Organization {
 		}
 	}
 
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected String comment;
-
-	@Schema(
-		description = "The organization's contact information, which includes email addresses, postal addresses, phone numbers, and web URLs. This is modeled internally as a `Contact`."
+	@GraphQLField(
+		description = "The text of a comment associated with the organization."
 	)
-	@Valid
-	public ContactInformation getContactInformation() {
-		return contactInformation;
-	}
-
-	public void setContactInformation(ContactInformation contactInformation) {
-		this.contactInformation = contactInformation;
-	}
-
-	@JsonIgnore
-	public void setContactInformation(
-		UnsafeSupplier<ContactInformation, Exception>
-			contactInformationUnsafeSupplier) {
-
-		try {
-			contactInformation = contactInformationUnsafeSupplier.get();
-		}
-		catch (RuntimeException re) {
-			throw re;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected ContactInformation contactInformation;
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String comment;
 
 	@Schema
 	@Valid
@@ -165,7 +135,7 @@ public class Organization {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The organization's creation date.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
@@ -195,21 +165,23 @@ public class Organization {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The most recent time any of the organization's fields changed."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateModified;
 
 	@Schema(description = "The organization's ID.")
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
 	@JsonIgnore
-	public void setId(UnsafeSupplier<Long, Exception> idUnsafeSupplier) {
+	public void setId(UnsafeSupplier<String, Exception> idUnsafeSupplier) {
 		try {
 			id = idUnsafeSupplier.get();
 		}
@@ -221,9 +193,9 @@ public class Organization {
 		}
 	}
 
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	protected Long id;
+	@GraphQLField(description = "The organization's ID.")
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String id;
 
 	@Schema(description = "A relative URL to the organization's image.")
 	public String getImage() {
@@ -249,7 +221,7 @@ public class Organization {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "A relative URL to the organization's image.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String image;
 
@@ -277,7 +249,9 @@ public class Organization {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A list of keywords describing the organization."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected String[] keywords;
 
@@ -308,8 +282,10 @@ public class Organization {
 		}
 	}
 
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@GraphQLField(
+		description = "The organization's postal information (country and region)."
+	)
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Location location;
 
 	@Schema(description = "The organization's name.")
@@ -334,8 +310,8 @@ public class Organization {
 		}
 	}
 
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@GraphQLField(description = "The organization's name.")
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String name;
 
 	@Schema(
@@ -365,9 +341,48 @@ public class Organization {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The number of this organization's child organizations."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer numberOfOrganizations;
+
+	@Schema(
+		description = "The organization's contact information, which includes email addresses, postal addresses, phone numbers, and web URLs. This is modeled internally as a `Contact`."
+	)
+	@Valid
+	public OrganizationContactInformation getOrganizationContactInformation() {
+		return organizationContactInformation;
+	}
+
+	public void setOrganizationContactInformation(
+		OrganizationContactInformation organizationContactInformation) {
+
+		this.organizationContactInformation = organizationContactInformation;
+	}
+
+	@JsonIgnore
+	public void setOrganizationContactInformation(
+		UnsafeSupplier<OrganizationContactInformation, Exception>
+			organizationContactInformationUnsafeSupplier) {
+
+		try {
+			organizationContactInformation =
+				organizationContactInformationUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField(
+		description = "The organization's contact information, which includes email addresses, postal addresses, phone numbers, and web URLs. This is modeled internally as a `Contact`."
+	)
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected OrganizationContactInformation organizationContactInformation;
 
 	@Schema(description = "The organization's parent organization.")
 	@Valid
@@ -395,8 +410,8 @@ public class Organization {
 		}
 	}
 
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@GraphQLField(description = "The organization's parent organization.")
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Organization parentOrganization;
 
 	@Schema(
@@ -426,8 +441,10 @@ public class Organization {
 		}
 	}
 
-	@GraphQLField
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@GraphQLField(
+		description = "A list of services the organization provides. This follows the [`Service`](https://www.schema.org/Service) specification."
+	)
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected Service[] services;
 
 	@Override
@@ -472,16 +489,6 @@ public class Organization {
 			sb.append(_escape(comment));
 
 			sb.append("\"");
-		}
-
-		if (contactInformation != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"contactInformation\": ");
-
-			sb.append(String.valueOf(contactInformation));
 		}
 
 		if (customFields != null) {
@@ -539,7 +546,11 @@ public class Organization {
 
 			sb.append("\"id\": ");
 
-			sb.append(id);
+			sb.append("\"");
+
+			sb.append(_escape(id));
+
+			sb.append("\"");
 		}
 
 		if (image != null) {
@@ -612,6 +623,16 @@ public class Organization {
 			sb.append("\"numberOfOrganizations\": ");
 
 			sb.append(numberOfOrganizations);
+		}
+
+		if (organizationContactInformation != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"organizationContactInformation\": ");
+
+			sb.append(String.valueOf(organizationContactInformation));
 		}
 
 		if (parentOrganization != null) {

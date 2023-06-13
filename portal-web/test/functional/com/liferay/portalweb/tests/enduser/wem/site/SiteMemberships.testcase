@@ -24,7 +24,7 @@ definition {
 
 			UserGroup.tearDownCP();
 
-			User.tearDownCP();
+			JSONUser.tearDownNonAdminUsers();
 		}
 	}
 
@@ -998,7 +998,8 @@ definition {
 
 		Site.joinViaMySitesPG(
 			membershipType = "Restricted",
-			siteName = "Site Name 1");
+			siteName = "Site Name 1",
+			userRole = "Guest");
 
 		User.logoutAndLoginPG(userLoginFullName = "Test Test");
 

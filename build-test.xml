@@ -26,16 +26,7 @@
 	<property file="${project.dir}/test.properties" />
 
 	<propertycopy from="app.server.${app.server.type}.start.executable" name="app.server.start.executable" />
-
-	<if>
-		<os family="windows" />
-		<then>
-			<propertycopy from="app.server.${app.server.type}.start.executable.arg.line.windows" name="app.server.start.executable.arg.line" />
-		</then>
-		<else>
-			<propertycopy from="app.server.${app.server.type}.start.executable.arg.line" name="app.server.start.executable.arg.line" />
-		</else>
-	</if>
+	<propertycopy from="app.server.${app.server.type}.start.executable.arg.line" name="app.server.start.executable.arg.line" />
 
 	<propertycopy from="app.server.${app.server.type}.stop.executable" name="app.server.stop.executable" />
 	<propertycopy from="app.server.${app.server.type}.stop.executable.arg.line" name="app.server.stop.executable.arg.line" />
@@ -199,11 +190,23 @@ module.framework.properties.osgi.console=11312</echo>
 			<if>
 				<matches pattern=".*\.7z$" string="${archive.basename}" />
 				<then>
-					<execute>
-						<![CDATA[
-							7z x @{src} -o@{dest} -aoa
-						]]>
-					</execute>
+					<if>
+						<os family="mac" />
+						<then>
+							<execute>
+								<![CDATA[
+									unar @{src} -o @{dest} -f
+								]]>
+							</execute>
+						</then>
+						<else>
+							<execute>
+								<![CDATA[
+									7z x @{src} -o @{dest} -aoa
+								]]>
+							</execute>
+						</else>
+					</if>
 				</then>
 				<elseif>
 					<matches pattern=".*\.tar\.gz$" string="${archive.basename}" />
@@ -670,10 +673,6 @@ jdbc.counter.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 		<sequential>
 			<var name="module.base.dir" unset="true" />
 
-			<antelope:stringutil property="subrepository.name" string="@{subrepository.name}">
-				<antelope:replace regex="(.+)-private" replacement="$1" />
-			</antelope:stringutil>
-
 			<for param="gitrepo.file">
 				<fileset
 					dir="${project.dir}/modules"
@@ -683,18 +682,11 @@ jdbc.counter.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 					<include name="**/.gitrepo" />
 				</fileset>
 				<sequential>
-					<local name="gitrepo.file.content" />
-
-					<loadfile
-						property="gitrepo.file.content"
-						srcfile="@{gitrepo.file}"
-					/>
-
 					<if>
-						<or>
-							<contains string="${gitrepo.file.content}" substring="git@github.com:liferay/${subrepository.name}.git" />
-							<contains string="${gitrepo.file.content}" substring="git@github.com:liferay/${subrepository.name}-private.git" />
-						</or>
+						<resourcecontains
+							resource="@{gitrepo.file}"
+							substring="git@github.com:liferay/@{subrepository.name}.git"
+						/>
 						<then>
 							<antelope:stringutil property="module.base.dir" string="@{gitrepo.file}">
 								<antelope:replace regex="\\" replacement="/" />
@@ -1185,6 +1177,32 @@ jdbc.counter.connectionProperties=oracle.jdbc.ReadTimeout=0;oracle.net.CONNECT_T
 		</sequential>
 	</macrodef>
 
+	<macrodef name="install-lpkg-patch">
+		<attribute name="patch.file.zip.url" />
+
+		<sequential>
+			<local name="patch.file.name" />
+
+			<propertyregex
+				input="@{patch.file.zip.url}"
+				property="patch.file.name"
+				regexp="http:\/\/.*\/(Liferay[^\/]*\.lpkg)"
+				select="\1"
+			/>
+
+			<beanshell>
+				import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
+
+				project.setProperty("patch.file.name", JenkinsResultsParserUtil.decode(project.getProperty("patch.file.name")));
+			</beanshell>
+
+			<mirrors-get
+				dest="${liferay.home}/deploy/${patch.file.name}"
+				src="@{patch.file.zip.url}"
+			/>
+		</sequential>
+	</macrodef>
+
 	<macrodef name="install-patch">
 		<attribute name="patch.file.zip.url" />
 		<attribute default="${app.server.parent.dir}/patching-tool" name="patching.tool.dir" />
@@ -1495,9 +1513,9 @@ war.path=${app.server.portal.dir}/</echo>
 
 	<macrodef name="prepare-blacklist-configuration">
 		<sequential>
-			<var name="blacklistBundleSymbolicNames" value="com.liferay.portal.mobile.device.detection.fiftyonedegrees.api,com.liferay.portal.mobile.device.detection.fiftyonedegrees.enterprise,com.liferay.portal.mobile.device.detection.fiftyonedegrees.enterprise.test.data,com.liferay.portal.mobile.device.detection.fiftyonedegrees" />
+			<var name="blacklistBundleSymbolicNames" value="[&quot;com.liferay.portal.mobile.device.detection.fiftyonedegrees.api&quot;,&quot;com.liferay.portal.mobile.device.detection.fiftyonedegrees.enterprise&quot;,&quot;com.liferay.portal.mobile.device.detection.fiftyonedegrees.enterprise.test.data&quot;,&quot;com.liferay.portal.mobile.device.detection.fiftyonedegrees&quot;]" />
 
-			<echo file="${liferay.home}/osgi/configs/com.liferay.portal.bundle.blacklist.internal.BundleBlacklistConfiguration.config">blacklistBundleSymbolicNames=&quot;${blacklistBundleSymbolicNames}&quot;</echo>
+			<echo file="${liferay.home}/osgi/configs/com.liferay.portal.bundle.blacklist.internal.BundleBlacklistConfiguration.config">blacklistBundleSymbolicNames=${blacklistBundleSymbolicNames}</echo>
 		</sequential>
 	</macrodef>
 
@@ -1561,6 +1579,8 @@ sendPasswordCaptchaEnabled=&quot;false&quot;</echo>
 
 	<macrodef name="prepare-custom-properties">
 		<attribute name="custom.properties" />
+		<attribute default="portal-impl/src/portal-ext.properties" name="properties.file" />
+
 		<sequential>
 			<for delimiter="${line.separator}" list="@{custom.properties}" param="property">
 				<sequential>
@@ -1592,13 +1612,13 @@ sendPasswordCaptchaEnabled=&quot;false&quot;</echo>
 					/>
 
 					<replaceregexp
-						file="portal-impl/src/portal-ext.properties"
+						file="@{properties.file}"
 						flags="g"
 						match="${propertyName}=.*"
 						replace=""
 					/>
 
-					<echo append="true" file="portal-impl/src/portal-ext.properties">
+					<echo append="true" file="@{properties.file}">
 
 @{property}</echo>
 				</sequential>
@@ -1793,6 +1813,12 @@ jdbc.default.password=${database.password}</echo>
 		<sequential>
 			<echo file="${liferay.home}/osgi/configs/com.liferay.portal.search.elasticsearch6.configuration.ElasticsearchConfiguration.config">logExceptionsOnly="false"</echo>
 			<echo file="${liferay.home}/osgi/configs/com.liferay.portal.search.elasticsearch7.configuration.ElasticsearchConfiguration.config">logExceptionsOnly="false"</echo>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="prepare-elasticsearch-connection-config">
+		<sequential>
+			<delete file="${liferay.home}/osgi/configs/com.liferay.portal.search.elasticsearch7.configuration.ElasticsearchConnectionConfiguration-default.config" />
 		</sequential>
 	</macrodef>
 
@@ -2401,8 +2427,6 @@ tell application "Safari" to quit
 
 							<ant dir="portal-test" inheritAll="false" target="deploy" />
 
-							<ant dir="portal-test-integration" inheritAll="false" target="deploy" />
-
 							<ant dir="util-java" inheritAll="false" target="deploy" />
 
 							<ant dir="portal-impl" inheritAll="false" target="deploy" />
@@ -2410,7 +2434,6 @@ tell application "Safari" to quit
 							<ant dir="portal-impl" inheritAll="false" target="install-portal-snapshot" />
 							<ant dir="portal-kernel" inheritAll="false" target="install-portal-snapshot" />
 							<ant dir="portal-test" inheritAll="false" target="install-portal-snapshot" />
-							<ant dir="portal-test-integration" inheritAll="false" target="install-portal-snapshot" />
 							<ant dir="util-java" inheritAll="false" target="install-portal-snapshot" />
 
 							<gradle-execute dir="${project.dir}/modules/core" task="deploy">
@@ -2765,7 +2788,15 @@ ${tomcat-gc-log}
 
 					Job job = JobFactory.newJob(project.getProperty("top.level.job.name"), project.getProperty("env.CI_TEST_SUITE"), project.getProperty("portal.branch.name"), project.getProperty("env.REPOSITORY_NAME"));
 
-					BatchTestClassGroup batchTestClassGroup = TestClassGroupFactory.newBatchTestClassGroup(project.getProperty("test.batch.name"), job);
+					BatchTestClassGroup.BuildProfile buildProfile = BatchTestClassGroup.BuildProfile.PORTAL;
+
+					String testPortalBuildProfile = project.getProperty("build.profile");
+
+					if ((testPortalBuildProfile != null) && testPortalBuildProfile.equals("dxp")) {
+						buildProfile = BatchTestClassGroup.BuildProfile.DXP;
+					}
+
+					BatchTestClassGroup batchTestClassGroup = TestClassGroupFactory.newBatchTestClassGroup(project.getProperty("test.batch.name"), buildProfile, job);
 
 					int axisCount = batchTestClassGroup.getAxisCount();
 
@@ -2841,7 +2872,15 @@ ${tomcat-gc-log}
 					try {
 						Job job = JobFactory.newJob(project.getProperty("top.level.job.name"));
 
-						BatchTestClassGroup batchTestClassGroup = TestClassGroupFactory.newBatchTestClassGroup(project.getProperty("test.batch.name"), job);
+						BatchTestClassGroup.BuildProfile buildProfile = BatchTestClassGroup.BuildProfile.PORTAL;
+
+						String testPortalBuildProfile = project.getProperty("build.profile");
+
+						if ((testPortalBuildProfile != null) && testPortalBuildProfile.equals("dxp")) {
+							buildProfile = BatchTestClassGroup.BuildProfile.DXP;
+						}
+
+						BatchTestClassGroup batchTestClassGroup = TestClassGroupFactory.newBatchTestClassGroup(project.getProperty("test.batch.name"), buildProfile, job);
 
 						if (batchTestClassGroup instanceof JUnitBatchTestClassGroup ||
 							batchTestClassGroup instanceof NPMTestBatchTestClassGroup) {
@@ -3446,7 +3485,16 @@ go</echo>
 					</then>
 				</elseif>
 				<elseif>
-					<equals arg1="@{liferay.portal.bundle}" arg2="7.1.1" />
+					<equals arg1="@{liferay.portal.bundle}" arg2="7.1.10.3" />
+					<then>
+						<var name="app.server.tomcat.version" value="9.0.17" />
+					</then>
+				</elseif>
+				<elseif>
+					<or>
+						<equals arg1="@{liferay.portal.bundle}" arg2="7.1.1" />
+						<equals arg1="@{liferay.portal.bundle}" arg2="7.1.2" />
+					</or>
 					<then>
 						<var name="app.server.tomcat.version" value="9.0.10" />
 					</then>
@@ -3806,32 +3854,36 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 					<if>
 						<equals arg1="${test.ant.launched.by.selenium}" arg2="true" />
 						<then>
-							<if>
-								<istrue value="${test.docker.environment}" />
-								<then>
-									<echo>docker run -d -p ${test.app.server.leading.port.number}080:${test.app.server.leading.port.number}080 -v ${app.server.parent.dir}:${app.server.parent.dir} --cidfile=docker.process.pid --network=@{docker.network.name} openjdk:8-alpine ${app.server.bin.dir}/${app.server.start.executable} ${app.server.start.executable.arg.line}</echo>
+							<parallel>
+								<if>
+									<istrue value="${test.docker.environment}" />
+									<then>
+										<echo>docker run -d -p ${test.app.server.leading.port.number}080:${test.app.server.leading.port.number}080 -v ${app.server.parent.dir}:${app.server.parent.dir} --cidfile=docker.process.pid --network=@{docker.network.name} openjdk:8-alpine ${app.server.bin.dir}/${app.server.start.executable} ${app.server.start.executable.arg.line}</echo>
 
-									<exec executable="docker">
-										<arg line="run -d" />
-										<arg line="-p ${test.app.server.leading.port.number}080:${test.app.server.leading.port.number}080" />
-										<arg value="-v" />
-										<arg value="${app.server.parent.dir}:${app.server.parent.dir}" />
-										<arg value="--cidfile=docker.process.pid" />
-										<arg value="--network=@{docker.network.name}" />
-										<arg value="openjdk:8u191-jdk-alpine3.8" />
-										<arg value="${app.server.bin.dir}/${app.server.start.executable}" />
-										<arg value="${app.server.start.executable.arg.line}" />
-									</exec>
-								</then>
-								<else>
-									<exec dir="${test.app.server.bin.dir}" executable="${app.server.start.executable}" resolveexecutable="true">
-										<arg line="${app.server.start.executable.arg.line}" />
-										<env key="JAVA_HOME" path="${java.jdk.home}" />
-									</exec>
-								</else>
-							</if>
+										<parallel>
+											<exec executable="docker">
+												<arg line="run -d" />
+												<arg line="-p ${test.app.server.leading.port.number}080:${test.app.server.leading.port.number}080" />
+												<arg value="-v" />
+												<arg value="${app.server.parent.dir}:${app.server.parent.dir}" />
+												<arg value="--cidfile=docker.process.pid" />
+												<arg value="--network=@{docker.network.name}" />
+												<arg value="openjdk:8u191-jdk-alpine3.8" />
+												<arg value="${app.server.bin.dir}/${app.server.start.executable}" />
+												<arg value="${app.server.start.executable.arg.line}" />
+											</exec>
+										</parallel>
+									</then>
+									<else>
+										<exec dir="${test.app.server.bin.dir}" executable="${app.server.start.executable}" resolveexecutable="true">
+											<arg line="${app.server.start.executable.arg.line}" />
+											<env key="JAVA_HOME" path="${java.jdk.home}" />
+										</exec>
+									</else>
+								</if>
 
-							<wait-for-app-server app.server.bin.dir="@{app.server.bin.dir}" app.server.bundle.index="@{app.server.bundle.index}" />
+								<wait-for-app-server app.server.bin.dir="@{app.server.bin.dir}" app.server.bundle.index="@{app.server.bundle.index}" />
+							</parallel>
 						</then>
 						<else>
 							<get-testcase-property property.name="ext.plugins.includes" />
@@ -3921,6 +3973,219 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 								</exec>
 							</daemons>
 						</parallel>
+					</then>
+				</elseif>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="start-docker-database">
+		<sequential>
+			<get-database-property property.name="database.host" />
+			<get-database-property property.name="database.docker.database.options" />
+			<get-database-property property.name="database.docker.image" />
+			<get-database-property property.name="database.docker.run.options" />
+
+			<property name="database.docker.database.options" value="" />
+			<property name="database.docker.run.options" value="" />
+
+			<local name="database.docker.network.run.option" />
+
+			<condition else="" property="database.docker.network.run.option" value="--network=${env.DOCKER_NETWORK_NAME}">
+				<isset property="env.DOCKER_NETWORK_NAME" />
+			</condition>
+
+			<local name="docker.start.script" />
+
+			<property name="docker.start.script" value="docker_start.sh" />
+
+			<echo file="${docker.start.script}">
+				<![CDATA[
+					docker run \
+						--detach \
+						--hostname=${database.host} \
+						--interactive \
+						--name=${database.host} \
+						--tty \
+						\
+						${database.docker.network.run.option} \
+						${database.docker.run.options} \
+						\
+						${database.docker.image} \
+						\
+						${database.docker.database.options}
+				]]>
+			</echo>
+
+			<chmod
+				perm="a+x"
+			>
+				<fileset
+					dir="."
+					includes="${docker.start.script}"
+				/>
+			</chmod>
+
+			<exec executable="/bin/bash" os="${os.apple},${os.unix}">
+				<arg value="${docker.start.script}" />
+			</exec>
+
+			<exec executable="cmd.exe" os="${os.windows}">
+				<arg value="${docker.start.script}" />
+			</exec>
+
+			<delete file="${docker.start.script}" />
+
+			<if>
+				<or>
+					<equals arg1="${database.type}" arg2="mariadb" />
+					<equals arg1="${database.type}" arg2="mysql" />
+				</or>
+				<then>
+					<property location="${project.dir}/setup.sh" name="setup.sh.file" />
+
+					<local name="database.name" />
+
+					<condition else="MariaDB" property="database.name" value="MySQL">
+						<equals arg1="${database.type}" arg2="mysql" />
+					</condition>
+
+					<get-database-property property.name="database.host" />
+					<get-database-property property.name="database.version" />
+
+					<echo file="${setup.sh.file}">
+						<![CDATA[
+							#!/bin/bash
+
+							while ! mysqladmin ping --host=${database.host} --silent
+							do
+								echo "Waiting for ${database.name} ${database.version} to be ready"
+
+								sleep 10
+							done
+						]]>
+					</echo>
+
+					<get-database-property property.name="database.host" />
+
+					<execute>
+						<![CDATA[
+							docker cp ${setup.sh.file} ${database.host}:/tmp/setup.sh
+
+							docker exec ${database.host} /bin/bash /tmp/setup.sh
+						]]>
+					</execute>
+				</then>
+				<elseif>
+					<equals arg1="${database.type}" arg2="oracle" />
+					<then>
+						<property location="${project.dir}/setup.sh" name="setup.sh.file" />
+
+						<get-database-property property.name="database.version" />
+
+						<echo file="${setup.sh.file}">
+							<![CDATA[
+								#!/bin/bash
+
+								sqlplus ${oracle.admin.user}/${oracle.admin.password} @/tmp/setup.sql
+
+								while [[ "$(${ORACLE_HOME}/bin/lsnrctl status | grep READY)" == "" ]]
+								do
+									echo "Waiting for Oracle ${database.version} to be ready"
+
+									sleep 10
+								done
+
+								${ORACLE_HOME}/bin/lsnrctl status
+							]]>
+						</echo>
+
+						<property location="${project.dir}/setup.sql" name="setup.sql.file" />
+
+						<echo file="${setup.sql.file}">
+							<![CDATA[
+								alter system set result_cache_max_size=24M scope=spfile;
+								alter system set sga_target=4928M scope=spfile;
+								alter system set shared_pool_reserved_size=40M scope=spfile;
+
+								quit;
+							]]>
+						</echo>
+
+						<get-database-property property.name="database.host" />
+
+						<execute>
+							<![CDATA[
+								docker cp ${setup.sh.file} ${database.host}:/tmp/setup.sh
+								docker cp ${setup.sql.file} ${database.host}:/tmp/setup.sql
+
+								docker exec ${database.host} /bin/bash /tmp/setup.sh
+							]]>
+						</execute>
+					</then>
+				</elseif>
+				<elseif>
+					<equals arg1="${database.type}" arg2="postgresql" />
+					<then>
+						<property location="setup.sh" name="setup.sh.file" />
+
+						<get-database-property property.name="database.version" />
+
+						<echo file="${setup.sh.file}">
+							<![CDATA[
+								#!/bin/bash
+
+								while [[ "$(pg_isready | grep 'accepting connections')" == "" ]]
+								do
+									echo "Waiting for PostgreSQL ${database.version} to be ready"
+
+									sleep 10
+								done
+
+								pg_isready
+							]]>
+						</echo>
+
+						<get-database-property property.name="database.host" />
+
+						<execute>
+							<![CDATA[
+								docker cp ${setup.sh.file} ${database.host}:/tmp/setup.sh
+
+								docker exec ${database.host} /bin/bash /tmp/setup.sh
+							]]>
+						</execute>
+					</then>
+				</elseif>
+				<elseif>
+					<equals arg1="${database.type}" arg2="sybase" />
+					<then>
+						<property location="setup.sh" name="setup.sh.file" />
+
+						<get-database-property property.name="database.version" />
+
+						<echo file="${setup.sh.file}">
+							<![CDATA[
+								#!/bin/bash
+
+								while ! nc -z ${database.host} 5000
+								do
+									echo "Waiting for Sybase ${database.version} to be ready"
+
+									sleep 10
+								done
+							]]>
+						</echo>
+
+						<get-database-property property.name="database.host" />
+
+						<execute>
+							<![CDATA[
+								docker cp ${setup.sh.file} ${database.host}:/tmp/setup.sh
+
+								docker exec ${database.host} /bin/bash /tmp/setup.sh
+							]]>
+						</execute>
 					</then>
 				</elseif>
 			</if>
@@ -4028,21 +4293,10 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 
 			<parallel>
 				<daemons>
-					<if>
-						<equals arg1="${test.ant.launched.by.selenium}" arg2="true" />
-						<then>
-							<exec dir="${test.app.server.bin.dir}" executable="${app.server.stop.executable}" resolveexecutable="true">
-								<arg line="${app.server.stop.executable.arg.line}" />
-								<env key="JAVA_HOME" path="${java.jdk.home}" />
-							</exec>
-						</then>
-						<else>
-							<exec dir="${test.app.server.bin.dir}" executable="${app.server.stop.executable}" resolveexecutable="true">
-								<arg line="${app.server.stop.executable.arg.line}" />
-								<env key="JAVA_HOME" path="${java.jdk.home}" />
-							</exec>
-						</else>
-					</if>
+					<exec dir="${test.app.server.bin.dir}" executable="${app.server.stop.executable}" resolveexecutable="true">
+						<arg line="${app.server.stop.executable.arg.line}" />
+						<env key="JAVA_HOME" path="${java.jdk.home}" />
+					</exec>
 				</daemons>
 				<sequential>
 					<if>
@@ -4214,6 +4468,48 @@ org.apache.catalina.startup.ClassLoaderFactory.level=INFO]]>
 					</execute>
 				</else>
 			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="stop-docker-database">
+		<sequential>
+			<get-database-property property.name="database.host" />
+
+			<local name="docker.stop.script" />
+
+			<property name="docker.stop.script" value="docker_stop.sh" />
+
+			<echo file="${docker.stop.script}">
+				<![CDATA[
+					docker_rm_list=$(docker ps -a -q --filter="name=${env.HOSTNAME}_")
+
+					if [[ "${docker_rm_list}" != "" ]]
+					then
+						docker kill ${docker_rm_list}
+
+						docker rm ${docker_rm_list}
+					fi
+				]]>
+			</echo>
+
+			<chmod
+				perm="a+x"
+			>
+				<fileset
+					dir="."
+					includes="${docker.stop.script}"
+				/>
+			</chmod>
+
+			<exec executable="/bin/bash" failonerror="false" os="${os.apple},${os.unix}">
+				<arg value="${docker.stop.script}" />
+			</exec>
+
+			<exec executable="cmd.exe" failonerror="false" os="${os.windows}">
+				<arg value="${docker.stop.script}" />
+			</exec>
+
+			<delete file="${docker.stop.script}" />
 		</sequential>
 	</macrodef>
 
@@ -4821,17 +5117,6 @@ create database lportal${databases.size} encoding = 'UNICODE';</echo>
 						<get-database-property property.name="database.password" />
 						<get-database-property property.name="database.username" />
 
-						<if>
-							<equals arg1="${env.DOCKER_ENABLED}" arg2="true" />
-							<then>
-								<replace
-									file="create.sql"
-									token="drop database lportal;"
-									value="attach to liferay user ${database.username} using ${database.password};${line.separator}drop database lportal;"
-								/>
-							</then>
-						</if>
-
 						<replace
 							file="create.sql"
 						>
@@ -4852,17 +5137,6 @@ connect to lportal;</replacevalue>
 							<replacetoken>create database lportal pagesize 8192;</replacetoken>
 							<replacevalue>create database lportal pagesize 32768 temporary tablespace managed by automatic storage;</replacevalue>
 						</replace>
-
-						<if>
-							<equals arg1="${env.DOCKER_ENABLED}" arg2="true" />
-							<then>
-								<replace
-									file="create.sql"
-									token="connect to lportal;"
-									value="connect to lportal user ${database.username} using ${database.password};"
-								/>
-							</then>
-						</if>
 
 						<if>
 							<isset property="databases.size" />
@@ -5846,14 +6120,18 @@ go</echo>
 							<antelope:trim />
 						</antelope:stringutil>
 
+						<local name="app.dir.includes" />
+
+						<condition else="apps/${osgi.app.name}" property="app.dir.includes" value="apps/${osgi.app.name},dxp/apps/${osgi.app.name}">
+							<equals arg1="${build.profile}" arg2="dxp" />
+						</condition>
+
 						<for param="app.dir">
 							<path>
 								<dirset
 									dir="modules"
-								>
-									<include name="apps/${osgi.app.name}" />
-									<include name="dxp/apps/${osgi.app.name}" />
-								</dirset>
+									includes="${app.dir.includes}"
+								/>
 							</path>
 							<sequential>
 								<local name="Liferay-Releng-App-Title" />
@@ -5933,15 +6211,8 @@ go</echo>
 											</sequential>
 										</for>
 
-										<local name="deploy.build.profile" />
-
-										<condition else="portal" property="deploy.build.profile" value="${build.profile}">
-											<equals arg1="${build.profile}" arg2="dxp" />
-										</condition>
-
 										<gradle-execute dir="@{app.dir}" task="deploy">
 											<arg value="clean" />
-											<arg value="-Dbuild.profile=${deploy.build.profile}" />
 										</gradle-execute>
 
 										<for param="module.dir.path">
@@ -6543,6 +6814,177 @@ go</echo>
 		/>
 	</target>
 
+	<target name="hot-deploy-osgi-apps">
+		<get-testcase-property property.name="hot.deploy.osgi.app.includes" />
+
+		<if>
+			<isset property="hot.deploy.osgi.app.includes" />
+			<then>
+				<for list="${hot.deploy.osgi.app.includes}" param="osgi.app.name">
+					<sequential>
+						<antelope:stringutil property="osgi.app.name" string="@{osgi.app.name}">
+							<antelope:trim />
+						</antelope:stringutil>
+
+						<local name="app.dir.includes" />
+
+						<condition else="apps/${osgi.app.name}" property="app.dir.includes" value="apps/${osgi.app.name},dxp/apps/${osgi.app.name}">
+							<equals arg1="${build.profile}" arg2="dxp" />
+						</condition>
+
+						<for param="app.dir">
+							<path>
+								<dirset
+									dir="modules"
+									includes="${app.dir.includes}"
+								/>
+							</path>
+							<sequential>
+								<local name="Liferay-Releng-App-Title" />
+
+								<property file="@{app.dir}/app.bnd" />
+
+								<if>
+									<available file="${liferay.home}/osgi/marketplace/${Liferay-Releng-App-Title}.lpkg" />
+									<then>
+										<delete file="${liferay.home}/osgi/marketplace/${Liferay-Releng-App-Title}.lpkg" />
+									</then>
+								</if>
+
+								<gradle-execute dir="@{app.dir}" task="clean" />
+
+								<if>
+									<available file="${project.dir}/plugins/dist/${Liferay-Releng-App-Title}.lpkg" />
+									<then>
+										<echo>Copying ${project.dir}/plugins/dist/${Liferay-Releng-App-Title}.lpkg to ${liferay.home}/deploy/${Liferay-Releng-App-Title}.lpkg.</echo>
+
+										<copy
+											file="${project.dir}/plugins/dist/${Liferay-Releng-App-Title}.lpkg"
+											tofile="${liferay.home}/deploy/${Liferay-Releng-App-Title}.lpkg"
+										/>
+									</then>
+									<elseif>
+										<available file="${project.dir}/plugins/marketplace/${Liferay-Releng-App-Title}.lpkg" />
+										<then>
+											<echo>Copying ${project.dir}/plugins/marketplace/${Liferay-Releng-App-Title}.lpkg to ${liferay.home}/deploy/${Liferay-Releng-App-Title}.lpkg.</echo>
+
+											<copy
+												file="${project.dir}/plugins/marketplace/${Liferay-Releng-App-Title}.lpkg"
+												tofile="${liferay.home}/deploy/${Liferay-Releng-App-Title}.lpkg"
+											/>
+										</then>
+									</elseif>
+									<else>
+										<echo>Generating and hot deploying all relevant modules that make up ${Liferay-Releng-App-Title}.lpkg.</echo>
+
+										<for param="module.dir.path">
+											<path>
+												<dirset
+													dir="@{app.dir}"
+												>
+													<exclude name="**/*-test*" />
+													<present targetdir="@{app.dir}">
+														<mapper
+															from="*"
+															to="*/bnd.bnd"
+															type="glob"
+														/>
+													</present>
+												</dirset>
+											</path>
+											<sequential>
+												<if>
+													<contains string="${test.modules.force.deploy}" substring="@{osgi.app.name}" />
+													<then>
+														<echo file="@{module.dir.path}/.lfrbuild-portal" />
+													</then>
+												</if>
+											</sequential>
+										</for>
+
+										<gradle-execute dir="@{app.dir}" task="deploy">
+											<arg value="clean" />
+											<arg value="-Pliferay.home=${liferay.home}/osgi-temp" />
+										</gradle-execute>
+
+										<move
+											todir="${liferay.home}/deploy-temp"
+										>
+											<fileset
+												dir="${liferay.home}/deploy/"
+												includes="**/*"
+											/>
+										</move>
+
+										<ant antfile="build.xml" dir="modules" target="build-app-lpkg">
+											<property name="app.name" value="${osgi.app.name}" />
+											<property name="output.dir" value="${liferay.home}/deploy" />
+											<property name="osgi.dir" value="${liferay.home}/osgi-temp/osgi" />
+										</ant>
+
+										<delete dir="${liferay.home}/osgi-temp" failonerror="false" />
+
+										<if>
+											<available file="${liferay.home}/deploy-temp" />
+											<then>
+												<move
+													todir="${liferay.home}/deploy"
+												>
+													<fileset
+														dir="${liferay.home}/deploy-temp/"
+														includes="**/*"
+													/>
+												</move>
+
+												<delete dir="${liferay.home}/deploy-temp" failonerror="false" />
+											</then>
+										</if>
+									</else>
+								</if>
+
+								<sleep seconds="5" />
+
+								<for param="lpkg.file.path">
+									<path>
+										<fileset
+											dir="${liferay.home}/deploy"
+										>
+											<include name="*${Liferay-Releng-App-Title}*.lpkg" />
+										</fileset>
+									</path>
+									<sequential>
+										<echo>Disabling restart requirement for @{lpkg.file.path}</echo>
+
+										<unzip
+											dest="${liferay.home}/lpkg-unzip-temp"
+											src="@{lpkg.file.path}"
+										/>
+
+										<echo append="true" file="${liferay.home}/lpkg-unzip-temp/liferay-marketplace.properties" message="${line.separator}" />
+
+										<echo append="true" file="${liferay.home}/lpkg-unzip-temp/liferay-marketplace.properties">restart-required=false</echo>
+
+										<zip
+											destfile="@{lpkg.file.path}"
+											update="true"
+										>
+											<zipfileset
+												dir="${liferay.home}/lpkg-unzip-temp"
+												includes="liferay-marketplace.properties"
+											/>
+										</zip>
+
+										<delete dir="${liferay.home}/lpkg-unzip-temp" failonerror="false" />
+									</sequential>
+								</for>
+							</sequential>
+						</for>
+					</sequential>
+				</for>
+			</then>
+		</if>
+	</target>
+
 	<target name="install-patch">
 		<fail message="Please set the property ${patch.file.zip.url}." unless="patch.file.zip.url" />
 
@@ -6557,9 +6999,17 @@ go</echo>
 			</or>
 		</condition>
 
-		<install-patch patching.tool.dir="${patching.tool.dir}" patch.file.zip.url="${patch.file.zip.url}" />
+		<if>
+			<matches pattern="http:\/\/.*\/(Liferay[^\/]*\.lpkg)" string="${patch.file.zip.url}" />
+			<then>
+				<install-lpkg-patch patch.file.zip.url="${patch.file.zip.url}" />
+			</then>
+			<else>
+				<install-patch patching.tool.dir="${patching.tool.dir}" patch.file.zip.url="${patch.file.zip.url}" />
 
-		<validate-installed-patch patching.tool.dir="${patching.tool.dir}" patch.file.zip.url="${patch.file.zip.url}" />
+				<validate-installed-patch patching.tool.dir="${patching.tool.dir}" patch.file.zip.url="${patch.file.zip.url}" />
+			</else>
+		</if>
 	</target>
 
 	<target name="install-patches">
@@ -6577,18 +7027,26 @@ go</echo>
 		</condition>
 
 		<if>
-			<or>
-				<contains string="${patch.file.zip.url}" substring="hotfix" />
-				<contains string="${patch.file.zip.url}" substring="security" />
-			</or>
+			<matches pattern="http:\/\/.*\/(Liferay[^\/]*\.lpkg)" string="${patch.file.zip.url}" />
 			<then>
-				<install-patch-dependencies patch.file.zip.url="${patch.file.zip.url}" />
+				<install-lpkg-patch patch.file.zip.url="${patch.file.zip.url}" />
 			</then>
+			<else>
+				<if>
+					<or>
+						<contains string="${patch.file.zip.url}" substring="hotfix" />
+						<contains string="${patch.file.zip.url}" substring="security" />
+					</or>
+					<then>
+						<install-patch-dependencies patch.file.zip.url="${patch.file.zip.url}" />
+					</then>
+				</if>
+
+				<install-patch patching.tool.dir="${patching.tool.dir}" patch.file.zip.url="${patch.file.zip.url}" />
+
+				<validate-installed-patches patching.tool.dir="${patching.tool.dir}" />
+			</else>
 		</if>
-
-		<install-patch patching.tool.dir="${patching.tool.dir}" patch.file.zip.url="${patch.file.zip.url}" />
-
-		<validate-installed-patches patching.tool.dir="${patching.tool.dir}" />
 	</target>
 
 	<target name="kill-spi">
@@ -6758,18 +7216,8 @@ go</echo>
 		<if>
 			<equals arg1="${add.new.properties}" arg2="true" />
 			<then>
-				<if>
-					<equals arg1="${add.cluster.link.properties}" arg2="true" />
-					<then>
-						<echo append="true" file="${test.app.server.classes.portal.dir}/portal-ext.properties">
-cluster.link.bind.addr["cluster-link-control"]=${cluster.node.ip.address}
-cluster.link.bind.addr["cluster-link-udp"]=${cluster.node.ip.address}</echo>
-					</then>
-					<else>
-						<echo append="true" file="${test.app.server.classes.portal.dir}/portal-ext.properties">
+				<echo append="true" file="${test.app.server.classes.portal.dir}/portal-ext.properties">
 ${update.properties}</echo>
-					</else>
-				</if>
 			</then>
 			<else>
 				<replace
@@ -6781,6 +7229,22 @@ ${update.properties}</echo>
 		</if>
 
 		<apply-portal-ext-properties />
+	</target>
+
+	<target name="prepare-ip-address-update">
+		<get-testcase-property property.name="testcase.url" />
+
+		<if>
+			<contains string="${testcase.url}" substring=":1]" />
+			<then>
+				<replace
+					file="${app.server.bin.dir}/setenv${file.suffix.bat}"
+				>
+					<replacetoken><![CDATA[-Djava.net.preferIPv4Stack=true]]></replacetoken>
+					<replacevalue><![CDATA[-Djava.net.preferIPv4Stack=false]]></replacevalue>
+				</replace>
+			</then>
+		</if>
 	</target>
 
 	<target name="prepare-lcs-gateway-bundle">
@@ -7041,10 +7505,6 @@ osb.lcs.portlet.oauth.consumer.secret=${osb.lcs.portlet.oauth.consumer.secret}</
 		<priority value="${dialect.detector.log.level}" />
 	</category>
 
-	<category name="com.liferay.portal.test.randomizerbumpers.TikaSafeRandomizerBumper">
-		<priority value="INFO" />
-	</category>
-
 	<root>
 		<priority value="INFO" />
 		<appender-ref ref="CONSOLE" />
@@ -7192,8 +7652,6 @@ jdbc.counter.minIdle=0
 
 browser.launcher.url=
 
-index.on.startup=true
-
 setup.wizard.enabled=false
 
 mail.send.blacklist=
@@ -7249,6 +7707,17 @@ web.server.display.node=true</echo>
 				<echo append="true" file="portal-impl/src/portal-ext.properties">
 
 cluster.link.channel.properties.control=${project.dir}/portal-web/test/functional/com/liferay/portalweb/dependencies/clustering_jdbc_ping.xml</echo>
+			</then>
+		</if>
+
+		<get-testcase-property property.name="cluster.node.ip" />
+
+		<if>
+			<equals arg1="${cluster.node.ip}" arg2="true" />
+			<then>
+				<echo append="true" file="portal-impl/src/portal-ext.properties">
+cluster.link.bind.addr["cluster-link-control"]=${ip.address}
+cluster.link.bind.addr["cluster-link-udp"]=${ip.address}</echo>
 			</then>
 		</if>
 
@@ -7361,7 +7830,11 @@ portal.security.manager.strategy=liferay</echo>
 		</if>
 
 		<if>
-			<equals arg1="${javascript.fast.load}" arg2="false" />
+			<or>
+				<equals arg1="${app.server.type}" arg2="weblogic" />
+				<equals arg1="${app.server.type}" arg2="websphere" />
+				<equals arg1="${javascript.fast.load}" arg2="false" />
+			</or>
 			<then>
 				<echo append="true" file="portal-impl/src/portal-ext.properties">
 
@@ -7405,6 +7878,16 @@ javascript.fast.load=false</echo>
 		<echo append="true" file="portal-impl/src/portal-ext.properties">
 
 module.framework.properties.blacklist.portal.profile.names=${blacklist.portal.profile.names}</echo>
+
+		<if>
+			<equals arg1="${app.server.type}" arg2="tcserver" />
+			<then>
+				<echo append="true" file="portal-impl/src/portal-ext.properties">
+
+session.cookie.use.full.hostname=true
+				</echo>
+			</then>
+		</if>
 
 		<get-testcase-property property.name="portal.version" />
 
@@ -9022,6 +9505,17 @@ auto.deploy.dest.dir=C:/WINDOWS/system32/config/systemprofile/liferay/websphere-
 liferay.mode=test
 log.sanitizer.enabled=false</echo>
 
+		<get-testcase-property property.name="custom.system.properties" />
+
+		<if>
+			<isset property="custom.system.properties" />
+			<then>
+				<prepare-custom-properties
+					custom.properties="${custom.system.properties}"
+					properties.file="${app.server.classes.portal.dir}/system-ext.properties"
+				/>
+			</then>
+		</if>
 	</target>
 
 	<target name="prepare-test-build">
@@ -9383,13 +9877,35 @@ ANT_OPTS=${env.ANT_OPTS}</echo>
 					<elseif>
 						<matches pattern="https?://" string="${test.build.portal.osgi.zip.url}" />
 						<then>
+							<local name="bundle.base.url" />
+
 							<propertyregex
 								input="${test.build.portal.osgi.zip.url}"
 								override="true"
-								property="bundle.zip.url"
-								regexp="osgi"
-								replace="tomcat"
+								property="bundle.base.url"
+								regexp="(.+/)[^/]+"
+								replace="\1"
 							/>
+
+							<local name="bundle.content" />
+
+							<exec executable="curl" outputproperty="bundle.content">
+								<arg value="${bundle.base.url}" />
+							</exec>
+
+							<local name="bundle.zip.name" />
+
+							<propertyregex
+								input="${bundle.content}"
+								override="true"
+								property="bundle.zip.name"
+								regexp="[\S\s]*href=\&quot;(liferay-[^\&quot;]+tomcat[^\&quot;]+\.(7z|zip))\&quot;[\S\s]*"
+								replace="\1"
+							/>
+
+							<antelope:stringutil property="bundle.zip.url" string="${bundle.base.url}${bundle.zip.name}">
+								<antelope:replace regex="-slim" replacement="" />
+							</antelope:stringutil>
 						</then>
 					</elseif>
 				</if>
@@ -9635,85 +10151,135 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 				<antcall target="delete-liferay-home" />
 
 				<if>
-					<equals arg1="${database.type}" arg2="db2" />
+					<and>
+						<equals arg1="${env.DOCKER_ENABLED}" arg2="true" />
+						<not>
+							<equals arg1="${database.type}" arg2="hypersonic" />
+						</not>
+					</and>
 					<then>
-						<get-testcase-property property.name="databases.size" />
+						<get-database-property property.name="database.host" />
+						<get-database-property property.name="database.password" />
+						<get-database-property property.name="database.schema" />
+						<get-database-property property.name="database.username" />
+
+						<property location="create.sh" name="create.sh.file.path" />
+						<property location="create.sql" name="create.sql.file.path" />
 
 						<if>
-							<os family="windows" />
+							<equals arg1="${database.type}" arg2="db2" />
 							<then>
-								<exec executable="${db2.executable}">
-									<arg line="/c /w db2 disconnect lportal" />
-								</exec>
+								<get-testcase-property property.name="databases.size" />
 
-								<exec executable="${db2.executable}">
-									<arg line="/c /w db2 drop db lportal" />
-								</exec>
+								<echo file="${create.sh.file.path}">
+									<![CDATA[
+										#!/bin/bash
+
+										db2 disconnect lportal
+
+										db2 drop db lportal
+
+										db2 drop db lportal${databases.size}
+
+										db2 -f/tmp/create.sql -st
+									]]>
+								</echo>
+							</then>
+							<elseif>
+								<or>
+									<equals arg1="${database.type}" arg2="mariadb" />
+									<equals arg1="${database.type}" arg2="mysql" />
+								</or>
+								<then>
+									<echo file="${create.sh.file.path}">
+										<![CDATA[
+											#!/bin/bash
+
+											mysql --host=${database.host} --password=${database.password} --user=${database.username} < /tmp/create.sql
+										]]>
+									</echo>
+								</then>
+							</elseif>
+							<elseif>
+								<equals arg1="${database.type}" arg2="oracle" />
+								<then>
+									<echo file="${create.sh.file.path}">
+										<![CDATA[
+											#!/bin/bash
+
+											sqlplus ${oracle.admin.user}/${oracle.admin.password} @/tmp/create.sql ${database.username} ${database.password}
+										]]>
+									</echo>
+								</then>
+							</elseif>
+							<elseif>
+								<equals arg1="${database.type}" arg2="postgresql" />
+								<then>
+									<echo file="${create.sh.file.path}">
+										<![CDATA[
+											#!/bin/bash
+
+											export PGPASSWORD=${database.password}
+
+											psql --file=/tmp/create.sql --username=${database.username}
+										]]>
+									</echo>
+								</then>
+							</elseif>
+							<elseif>
+								<equals arg1="${database.type}" arg2="sybase" />
+								<then>
+									<echo file="${create.sh.file.path}">
+										<![CDATA[
+											#!/bin/bash
+
+											isql -i /tmp/create.sql -P ${database.password} -S ${database.schema} -U ${database.username}
+										]]>
+									</echo>
+								</then>
+							</elseif>
+						</if>
+
+						<execute>
+							<![CDATA[
+								docker cp ${create.sh.file.path} ${database.host}:/tmp/create.sh
+								docker cp ${create.sql.file.path} ${database.host}:/tmp/create.sql
+
+								docker exec ${database.host} /bin/bash /tmp/create.sh
+							]]>
+						</execute>
+
+						<delete file="${create.sh.file.path}" />
+					</then>
+					<else>
+						<if>
+							<equals arg1="${database.type}" arg2="db2" />
+							<then>
+								<get-testcase-property property.name="databases.size" />
 
 								<if>
-									<isset property="databases.size" />
+									<os family="windows" />
 									<then>
 										<exec executable="${db2.executable}">
-											<arg line="/c /w db2 drop db lportal${databases.size}" />
+											<arg line="/c /w db2 disconnect lportal" />
 										</exec>
-									</then>
-								</if>
 
-								<exec executable="${db2.executable}">
-									<arg line="/c /w db2 -fcreate.sql -td;" />
-								</exec>
-							</then>
-							<else>
-								<if>
-									<equals arg1="${env.DOCKER_ENABLED}" arg2="true" />
-									<then>
-										<property name="databases.size" value="" />
+										<exec executable="${db2.executable}">
+											<arg line="/c /w db2 drop db lportal" />
+										</exec>
 
-										<get-database-property property.name="database.password" />
-										<get-database-property property.name="database.username" />
+										<if>
+											<isset property="databases.size" />
+											<then>
+												<exec executable="${db2.executable}">
+													<arg line="/c /w db2 drop db lportal${databases.size}" />
+												</exec>
+											</then>
+										</if>
 
-										<property location="create.sh" name="create.sh.file.path" />
-
-										<echo file="${create.sh.file.path}">
-											<![CDATA[
-												#!/bin/bash
-
-												db2 uncatalog db lportal
-
-												if [[ "${databases.size}" != "" ]]
-												then
-													db2 uncatalog db lportal${databases.size}
-												fi
-
-												db2 terminate
-
-												db2 attach to liferay user ${database.username} using ${database.password}
-
-												db2 disconnect lportal
-
-												db2 drop db lportal
-
-												if [[ "${databases.size}" != "" ]]
-												then
-													db2 drop db lportal${databases.size}
-												fi
-
-												db2 -f/tmp/create.sql -t
-											]]>
-										</echo>
-
-										<property location="create.sql" name="create.sql.file.path" />
-
-										<get-database-property property.name="database.host" />
-
-										<execute failonerror="false">
-											<![CDATA[
-												docker cp ${create.sh.file.path} ${database.host}:/tmp/create.sh
-												docker cp ${create.sql.file.path} ${database.host}:/tmp/create.sql
-
-												docker exec ${database.host} /bin/bash /tmp/create.sh
-											]]>
-										</execute>
+										<exec executable="${db2.executable}">
+											<arg line="/c /w db2 -fcreate.sql -td;" />
+										</exec>
 									</then>
 									<else>
 										<exec executable="${db2.executable}">
@@ -9734,92 +10300,59 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 										</exec>
 									</else>
 								</if>
-							</else>
-						</if>
-					</then>
-					<elseif>
-						<and>
-							<available file="sql/${database.name}.properties" />
-							<available file="sql/${database.name}.script" />
-							<equals arg1="${database.type}" arg2="hypersonic" />
-						</and>
-						<then>
-							<delete dir="${liferay.home}/data" includeemptydirs="true" />
-
-							<copy
-								file="sql/${database.name}.properties"
-								tofile="${liferay.home}/data/hypersonic/${database.name}.properties"
-							/>
-							<copy
-								file="sql/${database.name}.script"
-								tofile="${liferay.home}/data/hypersonic/${database.name}.script"
-							/>
-						</then>
-					</elseif>
-					<elseif>
-						<or>
-							<equals arg1="${database.type}" arg2="mariadb" />
-							<equals arg1="${database.type}" arg2="mysql" />
-						</or>
-						<then>
-							<var name="arg.line" value="" />
-
-							<get-database-property property.name="database.host" />
-
-							<local name="mysql.host" />
-
-							<if>
+							</then>
+							<elseif>
 								<and>
-									<equals arg1="${database.host}" arg2="localhost" />
-									<istrue value="${test.docker.environment}" />
+									<available file="sql/${database.name}.properties" />
+									<available file="sql/${database.name}.script" />
+									<equals arg1="${database.type}" arg2="hypersonic" />
 								</and>
 								<then>
-									<property name="mysql.host" value="127.0.0.1" />
+									<delete dir="${liferay.home}/data" includeemptydirs="true" />
+
+									<copy
+										file="sql/${database.name}.properties"
+										tofile="${liferay.home}/data/hypersonic/${database.name}.properties"
+									/>
+									<copy
+										file="sql/${database.name}.script"
+										tofile="${liferay.home}/data/hypersonic/${database.name}.script"
+									/>
 								</then>
-								<elseif>
-									<equals arg1="${env.DOCKER_ENABLED}" arg2="true" />
-									<then>
-										<property name="mysql.host" value="${database.host}" />
-									</then>
-								</elseif>
-								<else>
-									<property name="mysql.host" value="" />
-								</else>
-							</if>
-
-							<var name="arg.line" unless:blank="${mysql.host}" value="${arg.line} --host=${mysql.host}" />
-
-							<get-database-property property.name="database.password" />
-							<get-database-property property.name="database.username" />
-
-							<var name="arg.line" unless:blank="${database.password}" value="${arg.line} --password=${database.password}" />
-							<var name="arg.line" unless:blank="${database.username}" value="${arg.line} --user=${database.username}" />
-
-							<if>
-								<equals arg1="${env.DOCKER_ENABLED}" arg2="true" />
+							</elseif>
+							<elseif>
+								<or>
+									<equals arg1="${database.type}" arg2="mariadb" />
+									<equals arg1="${database.type}" arg2="mysql" />
+								</or>
 								<then>
-									<property location="create.sh" name="create.sh.file.path" />
+									<var name="arg.line" value="" />
 
-									<echo file="create.sh">
-										<![CDATA[
-											#!/bin/bash
+									<get-database-property property.name="database.host" />
 
-											mysql ${arg.line} < /tmp/create.sql
-										]]>
-									</echo>
+									<local name="mysql.host" />
 
-									<property location="create.sql" name="create.sql.file.path" />
+									<if>
+										<and>
+											<equals arg1="${database.host}" arg2="localhost" />
+											<istrue value="${test.docker.environment}" />
+										</and>
+										<then>
+											<property name="mysql.host" value="127.0.0.1" />
+										</then>
+										<else>
+											<property name="mysql.host" value="" />
+										</else>
+									</if>
 
-									<execute failonerror="false">
-										<![CDATA[
-											docker cp ${create.sh.file.path} ${database.host}:/tmp/create.sh
-											docker cp ${create.sql.file.path} ${database.host}:/tmp/create.sql
+									<var name="arg.line" unless:blank="${mysql.host}" value="${arg.line} --host=${mysql.host}" />
 
-											docker exec ${database.host} /bin/bash /tmp/create.sh
-										]]>
-									</execute>
-								</then>
-								<else>
+									<get-database-property property.name="database.password" />
+									<get-database-property property.name="database.username" />
+
+									<var name="arg.line" unless:blank="${database.password}" value="${arg.line} --password=${database.password}" />
+									<var name="arg.line" unless:blank="${database.username}" value="${arg.line} --user=${database.username}" />
+
 									<propertycopy from="${database.type}.executable" name="database.executable" override="true" />
 
 									<retry retrycount="3" retrydelay="60000">
@@ -9827,90 +10360,42 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 											<arg line="${arg.line}" />
 										</exec>
 									</retry>
-								</else>
-							</if>
-						</then>
-					</elseif>
-					<elseif>
-						<equals arg1="${database.type}" arg2="oracle" />
-						<then>
-							<get-database-property property.name="database.password" />
-							<get-database-property property.name="database.username" />
-
-							<if>
-								<equals arg1="${env.DOCKER_ENABLED}" arg2="true" />
-								<then>
-									<get-database-property property.name="database.host" />
-
-									<property location="create.sql" name="create.sql.file.path" />
-
-									<execute failonerror="false">
-										<![CDATA[
-											docker cp ${create.sql.file.path} ${database.host}:/tmp/create.sql
-
-											docker exec ${database.host} sqlplus ${oracle.admin.user}/${oracle.admin.password} @/tmp/create.sql ${database.username} ${database.password}
-										]]>
-									</execute>
 								</then>
-								<elseif>
-									<os family="windows" />
-									<then>
-										<exec executable="${oracle.sqlplus.executable}" failonerror="true">
-											<arg value="${oracle.admin.user}/${oracle.admin.password} as sysdba" />
-											<arg value="@create.sql" />
-											<arg value="${database.username}" />
-											<arg value="${database.password}" />
-										</exec>
-									</then>
-								</elseif>
-								<else>
-									<retry retrycount="10" retrydelay="60000">
-										<exec executable="${oracle.sqlplus.executable}" failonerror="true">
-											<arg value="${oracle.admin.user}/${oracle.admin.password}" />
-											<arg value="@create.sql" />
-											<arg value="${database.username}" />
-											<arg value="${database.password}" />
-										</exec>
-									</retry>
-								</else>
-							</if>
-						</then>
-					</elseif>
-					<elseif>
-						<equals arg1="${database.type}" arg2="postgresql" />
-						<then>
-							<get-database-property property.name="database.username" />
-
-							<if>
-								<equals arg1="${env.DOCKER_ENABLED}" arg2="true" />
+							</elseif>
+							<elseif>
+								<equals arg1="${database.type}" arg2="oracle" />
 								<then>
 									<get-database-property property.name="database.password" />
-									<get-database-property property.name="database.host" />
+									<get-database-property property.name="database.username" />
 
-									<property location="create.sh" name="create.sh.file.path" />
-
-									<echo file="${create.sh.file.path}">
-										<![CDATA[
-											#!/bin/bash
-
-											export PGPASSWORD=${database.password}
-
-											psql --file=/tmp/create.sql --username=${database.username}
-										]]>
-									</echo>
-
-									<property location="create.sql" name="create.sql.file.path" />
-
-									<execute>
-										<![CDATA[
-											docker cp ${create.sh.file.path} ${database.host}:/tmp/create.sh
-											docker cp ${create.sql.file.path} ${database.host}:/tmp/create.sql
-
-											docker exec ${database.host} /bin/bash /tmp/create.sh
-										]]>
-									</execute>
+									<if>
+										<os family="windows" />
+										<then>
+											<exec executable="${oracle.sqlplus.executable}" failonerror="true">
+												<arg value="${oracle.admin.user}/${oracle.admin.password} as sysdba" />
+												<arg value="@create.sql" />
+												<arg value="${database.username}" />
+												<arg value="${database.password}" />
+											</exec>
+										</then>
+										<else>
+											<retry retrycount="10" retrydelay="60000">
+												<exec executable="${oracle.sqlplus.executable}" failonerror="true">
+													<arg value="${oracle.admin.user}/${oracle.admin.password}" />
+													<arg value="@create.sql" />
+													<arg value="${database.username}" />
+													<arg value="${database.password}" />
+												</exec>
+											</retry>
+										</else>
+									</if>
 								</then>
-								<else>
+							</elseif>
+							<elseif>
+								<equals arg1="${database.type}" arg2="postgresql" />
+								<then>
+									<get-database-property property.name="database.username" />
+
 									<retry retrycount="3" retrydelay="60000">
 										<exec executable="${postgresql.executable}" failonerror="true">
 											<arg value="-f" />
@@ -9919,49 +10404,31 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 											<arg value="${database.username}" />
 										</exec>
 									</retry>
-								</else>
-							</if>
-						</then>
-					</elseif>
-					<elseif>
-						<equals arg1="${database.type}" arg2="sqlserver" />
-						<then>
-							<get-database-property property.name="database.password" />
-							<get-database-property property.name="database.username" />
-
-							<exec executable="${sqlserver.executable}" failonerror="true">
-								<arg value="-U" />
-								<arg value="${database.username}" />
-								<arg value="-P" />
-								<arg value="${database.password}" />
-								<arg value="-i" />
-								<arg value="create.sql" />
-							</exec>
-						</then>
-					</elseif>
-					<elseif>
-						<equals arg1="${database.type}" arg2="sybase" />
-						<then>
-							<get-database-property property.name="database.password" />
-							<get-database-property property.name="database.schema" />
-							<get-database-property property.name="database.username" />
-
-							<if>
-								<equals arg1="${env.DOCKER_ENABLED}" arg2="true" />
-								<then>
-									<get-database-property property.name="database.host" />
-
-									<property location="create.sql" name="create.sql.file.path" />
-
-									<execute failonerror="false">
-										<![CDATA[
-											docker cp ${create.sql.file.path} ${database.host}:/tmp/create.sql
-
-											docker exec ${database.host} isql -i /tmp/create.sql -P ${database.password} -S ${database.schema} -U ${database.username}
-										]]>
-									</execute>
 								</then>
-								<else>
+							</elseif>
+							<elseif>
+								<equals arg1="${database.type}" arg2="sqlserver" />
+								<then>
+									<get-database-property property.name="database.password" />
+									<get-database-property property.name="database.username" />
+
+									<exec executable="${sqlserver.executable}" failonerror="true">
+										<arg value="-U" />
+										<arg value="${database.username}" />
+										<arg value="-P" />
+										<arg value="${database.password}" />
+										<arg value="-i" />
+										<arg value="create.sql" />
+									</exec>
+								</then>
+							</elseif>
+							<elseif>
+								<equals arg1="${database.type}" arg2="sybase" />
+								<then>
+									<get-database-property property.name="database.password" />
+									<get-database-property property.name="database.schema" />
+									<get-database-property property.name="database.username" />
+
 									<retry retrycount="3" retrydelay="60000">
 										<exec executable="${sybase.executable}" failonerror="true">
 											<arg value="-i" />
@@ -9974,10 +10441,10 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 											<arg value="${database.username}" />
 										</exec>
 									</retry>
-								</else>
-							</if>
-						</then>
-					</elseif>
+								</then>
+							</elseif>
+						</if>
+					</else>
 				</if>
 			</then>
 		</if>
@@ -10002,87 +10469,54 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 		/>
 
 		<if>
-			<equals arg1="${database.type}" arg2="db2" />
+			<equals arg1="${env.DOCKER_ENABLED}" arg2="true" />
 			<then>
-				<echo>chmod -v 777 ${liferay.home}</echo>
+				<get-database-property property.name="database.host" />
+				<get-database-property property.name="database.password" />
+				<get-database-property property.name="database.schema" />
+				<get-database-property property.name="database.username" />
 
-				<chmod
-					file="${liferay.home}"
-					perm="777"
-					type="dir"
-					verbose="true"
-				/>
+				<property location="import-database.sh" name="import.database.sh.file.path" />
 
 				<if>
-					<equals arg1="${env.DOCKER_ENABLED}" arg2="true" />
+					<equals arg1="${database.type}" arg2="db2" />
 					<then>
-						<property name="databases.size" value="" />
-
-						<get-database-property property.name="database.password" />
-						<get-database-property property.name="database.username" />
-
-						<property location="db2.sh" name="db2.sh.file.path" />
-
-						<echo file="${db2.sh.file.path}">
+						<echo file="${import.database.sh.file.path}">
 							<![CDATA[
 								#!/bin/bash
 
-								db2 uncatalog db lportal
+								echo "db2 restore database lportal user ${database.username} using ${database.password} from /opt/ibm/db2 replace existing"
 
-								if [[ "${databases.size}" != "" ]]
+								output=$(db2 restore database lportal user ${database.username} using ${database.password} from /opt/ibm/db2 replace existing)
+
+								exit_code=$?
+
+								if [[ (${exit_code} != "0") && ($output == *"SQL2555I"*) ]]
 								then
-									db2 uncatalog db lportal${databases.size}
+									echo "$output"
+
+									exit 0
+								else
+									echo "$output"
+
+									exit ${exit_code}
 								fi
-
-								db2 terminate
-
-								echo "${db2.executable} restore database lportal user ${database.username} using ${database.password} from /opt/ibm/db2 replace existing"
-
-								db2 restore database lportal user ${database.username} using ${database.password} from /opt/ibm/db2 replace existing
 							]]>
 						</echo>
 
-						<get-database-property property.name="database.host" />
-
-						<execute failonerror="false">
-							<![CDATA[
-								docker cp ${db2.sh.file.path} ${database.host}:/tmp/db2.sh
-								docker cp ${liferay.home}/. ${database.host}:/opt/ibm/db2
-
-								docker exec ${database.host} /bin/bash /tmp/db2.sh
-							]]>
-						</execute>
+						<property name="docker.database.dest.path" value="/opt/ibm/db2" />
+						<property name="import.database.src.path" value="${liferay.home}/." />
 					</then>
-					<else>
-						<echo>${db2.executable} restore database lportal from ${liferay.home} replace existing</echo>
-
-						<exec executable="${db2.executable}" outputproperty="db2.executable.output">
-							<arg line="restore database lportal from ${liferay.home} replace existing" />
-						</exec>
-
-						<echo>${db2.executable.output}</echo>
-					</else>
-				</if>
-			</then>
-			<elseif>
-				<equals arg1="${database.type}" arg2="mariadb" />
-				<then>
-					<antcall target="rebuild-database">
-						<param name="database.type" value="${database.type}" />
-						<param name="sql.dir" value="sql/create-bare/" />
-						<param name="sql.file" value="create-bare-mysql.sql" />
-					</antcall>
-
-					<get-database-property property.name="database.password" />
-					<get-database-property property.name="database.schema" />
-					<get-database-property property.name="database.username" />
-
-					<if>
-						<equals arg1="${env.DOCKER_ENABLED}" arg2="true" />
+					<elseif>
+						<equals arg1="${database.type}" arg2="mariadb" />
 						<then>
-							<property location="${database.type}.sh" name="sh.file.path" />
+							<antcall target="rebuild-database">
+								<param name="database.type" value="${database.type}" />
+								<param name="sql.dir" value="sql/create-bare/" />
+								<param name="sql.file" value="create-bare-mysql.sql" />
+							</antcall>
 
-							<echo file="${database.type}.sh">
+							<echo file="${import.database.sh.file.path}">
 								<![CDATA[
 									#!/bin/bash
 
@@ -10090,116 +10524,76 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 								]]>
 							</echo>
 
-							<get-database-property property.name="database.host" />
-
-							<property location="${liferay.home}/${database.type}.sql" name="sql.file.path" />
-
-							<execute>
-								<![CDATA[
-									docker cp ${sh.file.path} ${database.host}:/tmp/${database.type}.sh
-									docker cp ${sql.file.path} ${database.host}:/tmp/${database.type}.sql
-
-									docker exec ${database.host} /bin/bash /tmp/${database.type}.sh
-								]]>
-							</execute>
+							<property name="docker.database.dest.path" value="/tmp/${database.type}.sql" />
+							<property name="import.database.src.path" value="${liferay.home}/${database.type}.sql" />
 						</then>
-						<else>
-							<exec executable="${mariadb.executable}" input="${liferay.home}/${database.type}.sql">
-								<arg value="--database=${database.schema}" />
-								<arg value="--password=${database.password}" />
-								<arg value="--user=${database.username}" />
-							</exec>
-						</else>
-					</if>
-				</then>
-			</elseif>
-			<elseif>
-				<equals arg1="${database.type}" arg2="mysql" />
-				<then>
-					<antcall target="rebuild-database">
-						<param name="database.type" value="${database.type}" />
-						<param name="sql.dir" value="sql/create-bare/" />
-						<param name="sql.file" value="create-bare-mysql.sql" />
-					</antcall>
-
-					<var name="arg.line" value="" />
-
-					<get-database-property property.name="database.host" />
-
-					<local name="mysql.host" />
-
-					<if>
-						<and>
-							<equals arg1="${database.host}" arg2="localhost" />
-							<istrue value="${test.docker.environment}" />
-						</and>
+					</elseif>
+					<elseif>
+						<equals arg1="${database.type}" arg2="mysql" />
 						<then>
-							<property name="mysql.host" value="127.0.0.1" />
-						</then>
-						<elseif>
-							<equals arg1="${env.DOCKER_ENABLED}" arg2="true" />
-							<then>
-								<property name="mysql.host" value="${database.host}" />
-							</then>
-						</elseif>
-						<else>
-							<property name="mysql.host" value="" />
-						</else>
-					</if>
+							<antcall target="rebuild-database">
+								<param name="database.type" value="${database.type}" />
+								<param name="sql.dir" value="sql/create-bare/" />
+								<param name="sql.file" value="create-bare-mysql.sql" />
+							</antcall>
 
-					<var name="arg.line" unless:blank="${mysql.host}" value="${arg.line} --host=${mysql.host}" />
-
-					<get-database-property property.name="database.password" />
-					<get-database-property property.name="database.schema" />
-					<get-database-property property.name="database.username" />
-
-					<var name="arg.line" unless:blank="${database.password}" value="${arg.line} --password=${database.password}" />
-					<var name="arg.line" unless:blank="${database.schema}" value="${arg.line} --database=${database.schema}" />
-					<var name="arg.line" unless:blank="${database.username}" value="${arg.line} --user=${database.username}" />
-
-					<if>
-						<equals arg1="${env.DOCKER_ENABLED}" arg2="true" />
-						<then>
-							<property location="${database.type}.sh" name="sh.file.path" />
-
-							<echo file="${database.type}.sh">
+							<echo file="${import.database.sh.file.path}">
 								<![CDATA[
 									#!/bin/bash
 
-									mysql ${arg.line} < /tmp/${database.type}.sql
+									mysql --database=${database.schema} --password=${database.password} --user=${database.username} < /tmp/${database.type}.sql
 
-									mysql_upgrade --password=${database.password} --user=${database.username}
+									mysql_upgrade --force --password=${database.password} --user=${database.username}
 								]]>
 							</echo>
 
-							<property location="${liferay.home}/${database.type}.sql" name="sql.file.path" />
+							<property name="docker.database.dest.path" value="/tmp/${database.type}.sql" />
+							<property name="import.database.src.path" value="${liferay.home}/${database.type}.sql" />
+						</then>
+					</elseif>
+					<elseif>
+						<equals arg1="${database.type}" arg2="oracle" />
+						<then>
+							<property location="${project.dir}/import-database.sql" name="oracle.setup.file.path" />
+
+							<echo file="${oracle.setup.file.path}">
+								<![CDATA[
+									drop user lportal cascade;
+
+									create or replace directory DATA_PUMP_DIR as '/tmp/data_pump_dir';
+
+									select directory_name, directory_path from dba_directories where directory_name='DATA_PUMP_DIR';
+
+									quit;
+								]]>
+							</echo>
+
+							<echo file="${import.database.sh.file.path}">
+								<![CDATA[
+									#!/bin/bash
+
+									impdp ${oracle.admin.user}/${oracle.admin.password} dumpfile=oracle.dmp table_exists_action=replace
+								]]>
+							</echo>
 
 							<execute>
 								<![CDATA[
-									docker cp ${sh.file.path} ${database.host}:/tmp/${database.type}.sh
-									docker cp ${sql.file.path} ${database.host}:/tmp/${database.type}.sql
+									docker exec ${database.host} mkdir -p /tmp/data_pump_dir
 
-									docker exec ${database.host} /bin/bash /tmp/${database.type}.sh
+									docker exec ${database.host} chown -R oracle:oracle /tmp/data_pump_dir
+
+									docker cp ${oracle.setup.file.path} ${database.host}:/tmp/import-database.sql
+
+									docker exec ${database.host} sqlplus ${oracle.admin.user}/${oracle.admin.password} @/tmp/import-database.sql
 								]]>
 							</execute>
-						</then>
-						<else>
-							<retry retrycount="3" retrydelay="60000">
-								<exec executable="${mysql.executable}" input="${liferay.home}/${database.type}.sql">
-									<arg line="${arg.line}" />
-								</exec>
-							</retry>
 
-							<exec executable="mysql_upgrade" />
-						</else>
-					</if>
-				</then>
-			</elseif>
-			<elseif>
-				<equals arg1="${database.type}" arg2="oracle" />
-				<then>
-					<if>
-						<equals arg1="${env.DOCKER_ENABLED}" arg2="true" />
+							<property name="docker.database.dest.path" value="/tmp/data_pump_dir/${database.type}.dmp" />
+							<property name="import.database.src.path" value="${liferay.home}/${database.type}.dmp" />
+						</then>
+					</elseif>
+					<elseif>
+						<equals arg1="${database.type}" arg2="postgresql" />
 						<then>
 							<antcall target="rebuild-database">
 								<param name="database.type" value="${database.type}" />
@@ -10207,36 +10601,160 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 								<param name="sql.file" value="create-bare-${database.type}.sql" />
 							</antcall>
 
-							<property location="${project.dir}/setup_data_pump.sql" name="oracle.setup.file.path" />
-
-							<echo file="${oracle.setup.file.path}">
+							<echo file="${import.database.sh.file.path}">
 								<![CDATA[
-									create or replace directory DATA_PUMP_DIR as '/tmp/data_pump_dir';
+									#!/bin/bash
 
-									quit;
+									export PGPASSWORD=${database.password}
+
+									psql --dbname=${database.schema} --file=/tmp/postgresql.sql --username=${database.username}
 								]]>
 							</echo>
 
-							<get-database-property property.name="database.host" />
-
-							<property location="${liferay.home}/oracle.dmp" name="oracle.dump.file.path" />
-
-							<execute failonerror="false">
+							<property name="docker.database.dest.path" value="/tmp/${database.type}.sql" />
+							<property name="import.database.src.path" value="${liferay.home}/${database.type}.sql" />
+						</then>
+					</elseif>
+					<elseif>
+						<equals arg1="${database.type}" arg2="sybase" />
+						<then>
+							<echo file="${import.database.sh.file.path}">
 								<![CDATA[
-									docker exec ${database.host} mkdir -p /tmp/data_pump_dir
+									#!/bin/bash
 
-									docker cp ${oracle.dump.file.path} ${database.host}:/tmp/data_pump_dir/oracle.dmp
-									docker cp ${oracle.setup.file.path} ${database.host}:/tmp/setup_data_pump.sql
+									export SYBASE_ASE=${env.SYBASE_ASE}
 
-									docker exec ${database.host} chown -R oracle:oracle /tmp/data_pump_dir
+									${env.SYBASE}/${env.SYBASE_ASE}/bin/backupserver -Slportal_BS &>/dev/null &
 
-									docker exec ${database.host} sqlplus ${oracle.admin.user}/${oracle.admin.password} @/tmp/setup_data_pump.sql
+									while ! echo exit | nc ${database.host} 5001; do sleep 60; done
 
-									docker exec ${database.host} impdp ${oracle.admin.user}/${oracle.admin.password} dumpfile=oracle.dmp table_exists_action=replace
+									cat /tmp/sybase.sql
+
+									cat lportal__srv.log
+
+									${sybase.executable} -P ${database.password} -S ${database.schema} -U ${database.username} -i /tmp/sybase.sql --retserverror
+								]]>
+							</echo>
+
+							<property location="import-database.sql" name="import.database.sql.file.path" />
+
+							<echo file="import-database.sql">load database lportal from "/tmp/sybase.dmp"
+go
+online database lportal
+go</echo>
+
+							<execute>
+								<![CDATA[
+									docker cp ${import.database.sql.file.path} ${database.host}:/tmp/import-database.sql
 								]]>
 							</execute>
+
+							<property name="docker.database.dest.path" value="/tmp/${database.type}.dmp" />
+							<property name="import.database.src.path" value="${liferay.home}/${database.type}.dmp" />
 						</then>
-						<else>
+					</elseif>
+				</if>
+
+				<execute>
+					<![CDATA[
+						docker cp ${import.database.sh.file.path} ${database.host}:/tmp/import-database.sh
+						docker cp ${import.database.src.path} ${database.host}:${docker.database.dest.path}
+
+						docker exec ${database.host} /bin/bash /tmp/import-database.sh
+					]]>
+				</execute>
+			</then>
+			<else>
+				<if>
+					<equals arg1="${database.type}" arg2="db2" />
+					<then>
+						<echo>chmod -v 777 ${liferay.home}</echo>
+
+						<chmod
+							file="${liferay.home}"
+							perm="777"
+							type="dir"
+							verbose="true"
+						/>
+
+						<echo>${db2.executable} restore database lportal from ${liferay.home} replace existing</echo>
+
+						<exec executable="${db2.executable}" outputproperty="db2.executable.output">
+							<arg line="restore database lportal from ${liferay.home} replace existing" />
+						</exec>
+
+						<echo>${db2.executable.output}</echo>
+					</then>
+					<elseif>
+						<equals arg1="${database.type}" arg2="mariadb" />
+						<then>
+							<antcall target="rebuild-database">
+								<param name="database.type" value="${database.type}" />
+								<param name="sql.dir" value="sql/create-bare/" />
+								<param name="sql.file" value="create-bare-mysql.sql" />
+							</antcall>
+
+							<get-database-property property.name="database.password" />
+							<get-database-property property.name="database.schema" />
+							<get-database-property property.name="database.username" />
+
+							<exec executable="${mariadb.executable}" input="${liferay.home}/${database.type}.sql">
+								<arg value="--database=${database.schema}" />
+								<arg value="--password=${database.password}" />
+								<arg value="--user=${database.username}" />
+							</exec>
+						</then>
+					</elseif>
+					<elseif>
+						<equals arg1="${database.type}" arg2="mysql" />
+						<then>
+							<antcall target="rebuild-database">
+								<param name="database.type" value="${database.type}" />
+								<param name="sql.dir" value="sql/create-bare/" />
+								<param name="sql.file" value="create-bare-mysql.sql" />
+							</antcall>
+
+							<var name="arg.line" value="" />
+
+							<get-database-property property.name="database.host" />
+
+							<local name="mysql.host" />
+
+							<if>
+								<and>
+									<equals arg1="${database.host}" arg2="localhost" />
+									<istrue value="${test.docker.environment}" />
+								</and>
+								<then>
+									<property name="mysql.host" value="127.0.0.1" />
+								</then>
+								<else>
+									<property name="mysql.host" value="" />
+								</else>
+							</if>
+
+							<var name="arg.line" unless:blank="${mysql.host}" value="${arg.line} --host=${mysql.host}" />
+
+							<get-database-property property.name="database.password" />
+							<get-database-property property.name="database.schema" />
+							<get-database-property property.name="database.username" />
+
+							<var name="arg.line" unless:blank="${database.password}" value="${arg.line} --password=${database.password}" />
+							<var name="arg.line" unless:blank="${database.schema}" value="${arg.line} --database=${database.schema}" />
+							<var name="arg.line" unless:blank="${database.username}" value="${arg.line} --user=${database.username}" />
+
+							<retry retrycount="3" retrydelay="60000">
+								<exec executable="${mysql.executable}" input="${liferay.home}/${database.type}.sql">
+									<arg line="${arg.line}" />
+								</exec>
+							</retry>
+
+							<exec executable="mysql_upgrade" />
+						</then>
+					</elseif>
+					<elseif>
+						<equals arg1="${database.type}" arg2="oracle" />
+						<then>
 							<sql classpath="${app.server.lib.global.dir}/${jdbc.oracle.driver}" driver="oracle.jdbc.OracleDriver" onerror="continue" output="data.pump.log" password="${oracle.admin.password}" print="true" url="${database.oracle.url}" userid="${oracle.admin.user}">
 								<![CDATA[
 									drop user lportal cascade;
@@ -10272,24 +10790,10 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 							</exec>
 
 							<delete file="${data.pump.dir}/${database.type}.dmp" />
-						</else>
-					</if>
-				</then>
-			</elseif>
-			<elseif>
-				<equals arg1="${database.type}" arg2="postgresql" />
-				<then>
-					<antcall target="rebuild-database">
-						<param name="database.type" value="${database.type}" />
-						<param name="sql.dir" value="sql/create-bare/" />
-						<param name="sql.file" value="create-bare-${database.type}.sql" />
-					</antcall>
-
-					<get-database-property property.name="database.schema" />
-					<get-database-property property.name="database.username" />
-
-					<if>
-						<equals arg1="${env.DOCKER_ENABLED}" arg2="true" />
+						</then>
+					</elseif>
+					<elseif>
+						<equals arg1="${database.type}" arg2="postgresql" />
 						<then>
 							<antcall target="rebuild-database">
 								<param name="database.type" value="${database.type}" />
@@ -10297,97 +10801,77 @@ cluster.link.bind.addr["cluster-link-udp"]=127.0.0.1</echo>
 								<param name="sql.file" value="create-bare-${database.type}.sql" />
 							</antcall>
 
-							<get-database-property property.name="database.password" />
+							<get-database-property property.name="database.schema" />
+							<get-database-property property.name="database.username" />
 
-							<property location="postgresql.sh" name="postgresql.sh.file.path" />
-
-							<echo file="${postgresql.sh.file.path}">
-								<![CDATA[
-									#!/bin/bash
-
-									export PGPASSWORD=${database.password}
-
-									psql --dbname=${database.schema} --file=/tmp/postgresql.sql --username=${database.username}
-								]]>
-							</echo>
-
-							<get-database-property property.name="database.host" />
-
-							<property location="${liferay.home}/postgresql.sql" name="postgresql.sql.file.path" />
-
-							<execute failonerror="false">
-								<![CDATA[
-									docker cp ${postgresql.sh.file.path} ${database.host}:/tmp/postgresql.sh
-									docker cp ${postgresql.sql.file.path} ${database.host}:/tmp/postgresql.sql
-
-									docker exec ${database.host} /bin/bash /tmp/postgresql.sh
-								]]>
-							</execute>
-						</then>
-						<else>
 							<exec executable="${postgresql.executable}" failonerror="true">
 								<arg value="--dbname=${database.schema}" />
 								<arg value="--file=${liferay.home}/${database.type}.sql" />
 								<arg value="--username=${database.username}" />
 							</exec>
-						</else>
-					</if>
-				</then>
-			</elseif>
-			<elseif>
-				<equals arg1="${database.type}" arg2="sybase" />
-				<then>
-					<echo file="import-sybase.sql">load database lportal from "${liferay.home}/${database.type}.dmp"
+						</then>
+					</elseif>
+					<elseif>
+						<equals arg1="${database.type}" arg2="sybase" />
+						<then>
+							<get-database-property property.name="database.host" />
+							<get-database-property property.name="database.schema" />
+							<get-database-property property.name="database.username" />
+							<get-database-property property.name="database.password" />
+
+							<echo file="import-sybase.sql">load database lportal from "${liferay.home}/${database.type}.dmp"
 go
 online database lportal
 go</echo>
 
-					<exec executable="${env.SYBASE}/${env.SYBASE_ASE}/bin/backupserver" spawn="true">
-						<arg value="-Slportal_BS" />
-					</exec>
+							<exec executable="${env.SYBASE}/${env.SYBASE_ASE}/bin/backupserver" spawn="true">
+								<arg value="-Slportal_BS" />
+							</exec>
 
-					<waitfor maxwait="60" maxwaitunit="second">
-						<socket port="5001" server="localhost" />
-					</waitfor>
+							<waitfor maxwait="60" maxwaitunit="second">
+								<socket port="5001" server="localhost" />
+							</waitfor>
 
-					<print-file file.name="import-sybase.sql" />
+							<print-file file.name="import-sybase.sql" />
 
-					<print-file file.name="lportal__srv.log" />
+							<print-file file.name="lportal__srv.log" />
 
-					<local name="output.content" />
+							<local name="output.content" />
 
-					<exec executable="${sybase.executable}" logError="true" outputproperty="output.content">
-						<arg value="-i" />
-						<arg value="import-sybase.sql" />
-						<arg value="-P" />
-						<arg value="${database.sybase.password}" />
-						<arg value="--retserverror" />
-						<arg value="-S" />
-						<arg value="${database.sybase.schema}" />
-						<arg value="-U" />
-						<arg value="${database.sybase.username}" />
-					</exec>
+							<exec executable="${sybase.executable}" logError="true" outputproperty="output.content">
+								<arg value="-i" />
+								<arg value="import-sybase.sql" />
+								<arg value="-P" />
+								<arg value="${database.password}" />
+								<arg value="--retserverror" />
+								<arg value="-S" />
+								<arg value="${database.schema}" />
+								<arg value="-U" />
+								<arg value="${database.username}" />
+							</exec>
 
-					<echo>${output.content}</echo>
+							<echo>${output.content}</echo>
 
-					<delete file="import-sybase.sql" />
-					<delete file="lportal__srv.log" />
+							<delete file="import-sybase.sql" />
+							<delete file="lportal__srv.log" />
 
-					<echo file="get-charset.sql">sp_helpsort
+							<echo file="get-charset.sql">sp_helpsort
 go</echo>
 
-					<print-file file.name="get-charset.sql" />
+							<print-file file.name="get-charset.sql" />
 
-					<exec executable="${sybase.executable}">
-						<arg value="-P${database.sybase.password}" />
-						<arg value="-S${database.sybase.schema}" />
-						<arg value="-U${database.sybase.username}" />
-						<arg line="-i get-charset.sql" />
-					</exec>
+							<exec executable="${sybase.executable}">
+								<arg value="-P${database.password}" />
+								<arg value="-S${database.schema}" />
+								<arg value="-U${database.username}" />
+								<arg line="-i get-charset.sql" />
+							</exec>
 
-					<delete file="get-charset.sql" />
-				</then>
-			</elseif>
+							<delete file="get-charset.sql" />
+						</then>
+					</elseif>
+				</if>
+			</else>
 		</if>
 	</target>
 
@@ -10667,7 +11151,15 @@ if (ppstate.equals("normal")) {
 
 				Job job = JobFactory.newJob(project.getProperty("top.level.job.name"), project.getProperty("env.CI_TEST_SUITE"), project.getProperty("portal.branch.name"));
 
-				BatchTestClassGroup batchTestClassGroup = TestClassGroupFactory.newBatchTestClassGroup(project.getProperty("test.batch.name"), job);
+				BatchTestClassGroup.BuildProfile buildProfile = BatchTestClassGroup.BuildProfile.PORTAL;
+
+				String testPortalBuildProfile = project.getProperty("build.profile");
+
+				if ((testPortalBuildProfile != null) && testPortalBuildProfile.equals("dxp")) {
+					buildProfile = BatchTestClassGroup.BuildProfile.DXP;
+				}
+
+				BatchTestClassGroup batchTestClassGroup = TestClassGroupFactory.newBatchTestClassGroup(project.getProperty("test.batch.name"), buildProfile, job);
 
 				int axisCount = batchTestClassGroup.getAxisCount();
 
@@ -11075,6 +11567,8 @@ module.framework.properties.blacklist.portal.profile.names=${blacklist.portal.pr
 			</else>
 		</if>
 
+		<antcall target="prepare-ip-address-update" />
+
 		<antcall target="check-inet-address" />
 
 		<get-testcase-property property.name="database.jndi.enabled" />
@@ -11293,6 +11787,15 @@ module.framework.properties.blacklist.portal.profile.names=${blacklist.portal.pr
 			</then>
 		</if>
 
+		<get-testcase-property property.name="cas.enabled" />
+
+		<if>
+			<equals arg1="${cas.enabled}" arg2="true" />
+			<then>
+				<ant antfile="build-test-authentication.xml" target="setup-cas" />
+			</then>
+		</if>
+
 		<get-testcase-property property.name="openam.enabled" />
 
 		<if>
@@ -11437,6 +11940,8 @@ module.framework.properties.blacklist.portal.profile.names=${blacklist.portal.pr
 
 		<antcall target="deploy-osgi-apps" />
 
+		<antcall target="hot-deploy-osgi-apps" />
+
 		<antcall target="deploy-osgi-modules" />
 
 		<antcall target="deploy-specified-plugins">
@@ -11484,6 +11989,19 @@ module.framework.properties.blacklist.portal.profile.names=${blacklist.portal.pr
 			<equals arg1="${blacklist.saml.algorithms}" arg2="true" />
 			<then>
 				<prepare-saml-algorithm-blacklists />
+			</then>
+		</if>
+
+		<get-testcase-property property.name="elastic.xpack.enabled" />
+		<get-testcase-property property.name="remote.elasticsearch.enabled" />
+
+		<if>
+			<and>
+				<equals arg1="${elastic.xpack.enabled}" arg2="true" />
+				<equals arg1="${remote.elasticsearch.enabled}" arg2="true" />
+			</and>
+			<then>
+				<prepare-elasticsearch-connection-config />
 			</then>
 		</if>
 
@@ -11625,7 +12143,66 @@ module.framework.properties.blacklist.portal.profile.names=${blacklist.portal.pr
 			</then>
 		</if>
 
-		<antcall target="run-selenium-test" />
+		<if>
+			<equals arg1="${functional.test.type}" arg2="analytics-cloud" />
+			<then>
+				<trycatch property="analytics.cloud.error">
+					<try>
+						<ant antfile="build-test-analytics-cloud.xml" target="start-analytics-cloud" />
+
+						<property location="${analytics.cloud.faro.dir}/osb-faro-functional-test/test_analytics_cloud.sh" name="analytics.cloud.test.sh" />
+
+						<property location="${basedir.unix}/portal-web/${selenium.executable.dir.name}" name="selenium.executable.dir.path" />
+
+						<propertycopy from="browser.chrome.bin.file[${browser.chrome.version}]" name="browser.chrome.bin.file" override="true" />
+
+						<get-ip-address />
+
+						<echo file="${analytics.cloud.faro.dir}/osb-faro-functional-test/src/testIntegration/resources/ngrok.properties">
+ip=${ip.address}
+url=${env.HOSTNAME}:8080</echo>
+
+						<prepare-chrome-driver />
+
+						<echo file="${analytics.cloud.test.sh}">
+							#!/bin/bash
+
+							../gradlew \
+								-Danalytics.cloud.url=${analytics.cloud.faro.frontend.url} \
+								-Dbrowser.chrome.bin.args=${browser.chrome.bin.args} \
+								-Dbrowser.chrome.bin.file=${browser.chrome.bin.file} \
+								-Dbrowser.type=chrome \
+								-Dchrome.driver.version=${selenium.chrome.driver.version} \
+								-Dcucumber.options='${analytics.cloud.cucumber.options}' \
+								-Dliferay.ci=true \
+								-Dportal.url=http://${env.HOSTNAME}:8080 \
+								-Dselenium.chrome.driver.executable=${selenium.chrome.driver.executable} \
+								-Dselenium.executable.dir.name=${selenium.executable.dir.path}/ \
+								-Dwebdriver.chrome.driver=${selenium.executable.dir.path}/${selenium.chrome.driver.executable} \
+								\
+								testIntegration
+						</echo>
+
+						<exec dir="${analytics.cloud.faro.dir}/osb-faro-functional-test" executable="/bin/bash" failonerror="true">
+							<arg value="${analytics.cloud.test.sh}" />
+						</exec>
+
+						<delete file="${analytics.cloud.test.sh}" />
+					</try>
+					<catch>
+						<fail message="${analytics.cloud.error}" />
+					</catch>
+					<finally>
+						<ant antfile="build-test-analytics-cloud.xml" target="stop-analytics-cloud" />
+
+						<stop-chrome-driver />
+					</finally>
+				</trycatch>
+			</then>
+			<else>
+				<antcall target="run-selenium-test" />
+			</else>
+		</if>
 
 		<get-testcase-property property.name="cmis.repository.type" />
 
@@ -11671,6 +12248,114 @@ module.framework.properties.blacklist.portal.profile.names=${blacklist.portal.pr
 
 		<trycatch property="shutdown.error">
 			<try>
+				<get-testcase-property property.name="solr.enabled" />
+
+				<if>
+					<not>
+						<equals arg1="${solr.enabled}" arg2="true" />
+					</not>
+					<then>
+						<get-testcase-property property.name="test.name.skip.portal.instance" />
+
+						<if>
+							<and>
+								<not>
+									<isset property="test.name.skip.portal.instance" />
+								</not>
+								<equals arg1="test.portal.instance" arg2="true" />
+							</and>
+							<then>
+								<var name="portalInstanceName" value="${env.HOSTNAME}" />
+							</then>
+							<else>
+								<var name="portalInstanceName" value="localhost" />
+							</else>
+						</if>
+
+						<exec executable="curl" outputproperty="companyId">
+							<arg value="http://localhost:8080/api/jsonws/company/get-company-by-virtual-host/virtual-host/${portalInstanceName}" />
+							<arg value="-u" />
+							<arg value="test@liferay.com:test" />
+						</exec>
+
+						<propertyregex
+							input="${companyId}"
+							override="true"
+							property="companyId"
+							regexp="(?&lt;=companyId&quot;:&quot;)(.*)(?=&quot;,&quot;home)"
+							select="\1"
+						/>
+
+						<get-testcase-property property.name="portal.suite.search.engine" />
+						<get-testcase-property property.name="remote.elasticsearch.enabled" />
+
+						<if>
+							<contains string="${env.CI_TEST_SUITE}" substring="search" />
+							<then>
+								<propertycopy from="search.engine[${env.CI_TEST_SUITE}]" name="suite.search.engine" silent="true" />
+
+								<if>
+									<and>
+										<not>
+											<isset property="remote.elasticsearch.enabled" />
+										</not>
+										<equals arg1="${suite.search.engine}" arg2="elasticsearch7" />
+									</and>
+									<then>
+										<ant antfile="build-test-elasticsearch7.xml" target="print-elasticsearch-indices" />
+									</then>
+									<elseif>
+										<not>
+											<equals arg1="${suite.search.engine}" arg2="solr" />
+										</not>
+										<then>
+											<ant antfile="build-test-elasticsearch6.xml" target="print-elasticsearch-indices" />
+										</then>
+									</elseif>
+								</if>
+							</then>
+							<else>
+								<if>
+									<and>
+										<not>
+											<isset property="remote.elasticsearch.enabled" />
+										</not>
+										<equals arg1="${portal.suite.search.engine}" arg2="elasticsearch7" />
+									</and>
+									<then>
+										<ant antfile="build-test-elasticsearch7.xml" target="print-elasticsearch-indices" />
+									</then>
+									<else>
+										<ant antfile="build-test-elasticsearch6.xml" target="print-elasticsearch-indices" />
+									</else>
+								</if>
+							</else>
+						</if>
+					</then>
+				</if>
+
+				<get-testcase-property property.name="solr.enabled" />
+
+				<if>
+					<equals arg1="${solr.enabled}" arg2="true" />
+					<then>
+						<ant antfile="build-test-solr.xml" target="print-solr-indices" />
+					</then>
+					<elseif>
+						<isset property="env.CI_TEST_SUITE" />
+						<then>
+							<propertycopy from="search.engine[${env.CI_TEST_SUITE}]" name="suite.search.engine" silent="true" />
+
+							<if>
+								<equals arg1="${suite.search.engine}" arg2="solr" />
+								<then>
+									<ant antfile="build-test-solr.xml" target="print-solr-indices" />
+								</then>
+							</if>
+						</then>
+					</elseif>
+				</if>
+
 				<antcall target="clean-up-logs" />
 
 				<record action="start" name="${project.dir}/console-shut-down" />
@@ -11818,6 +12503,10 @@ module.framework.properties.blacklist.portal.profile.names=${blacklist.portal.pr
 		/>
 	</target>
 
+	<target name="start-docker-database">
+		<start-docker-database />
+	</target>
+
 	<target name="start-lcs-server">
 		<start-lcs-app-server
 			app.server.bin.dir="${app.server.parent.dir}/gateway/tomcat-${app.server.tomcat.version}/bin"
@@ -11851,6 +12540,10 @@ module.framework.properties.blacklist.portal.profile.names=${blacklist.portal.pr
 		<stop-app-server
 			app.server.bundle.index="${app.server.bundle.index}"
 		/>
+	</target>
+
+	<target name="stop-docker-database">
+		<stop-docker-database />
 	</target>
 
 	<target name="stop-lcs-server">

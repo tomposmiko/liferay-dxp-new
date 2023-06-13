@@ -48,13 +48,6 @@ import org.osgi.service.component.annotations.Modified;
 )
 public class DLFileRankLocalServiceImpl extends DLFileRankLocalServiceBaseImpl {
 
-	@Activate
-	@Modified
-	public void activate(Map<String, Object> properties) {
-		_dlFileRankServiceConfiguration = ConfigurableUtil.createConfigurable(
-			DLFileRankServiceConfiguration.class, properties);
-	}
-
 	@Override
 	public DLFileRank addFileRank(
 		long groupId, long companyId, long userId, long fileEntryId,
@@ -72,9 +65,9 @@ public class DLFileRankLocalServiceImpl extends DLFileRankLocalServiceBaseImpl {
 		dlFileRank.setActive(true);
 
 		try {
-			dlFileRankPersistence.update(dlFileRank);
+			dlFileRank = dlFileRankPersistence.update(dlFileRank);
 		}
-		catch (SystemException se) {
+		catch (SystemException systemException) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
 					StringBundler.concat(
@@ -86,7 +79,7 @@ public class DLFileRankLocalServiceImpl extends DLFileRankLocalServiceBaseImpl {
 				companyId, userId, fileEntryId, false);
 
 			if (dlFileRank == null) {
-				throw se;
+				throw systemException;
 			}
 		}
 
@@ -114,7 +107,7 @@ public class DLFileRankLocalServiceImpl extends DLFileRankLocalServiceBaseImpl {
 				try {
 					dlFileRankPersistence.remove(dlFileRank);
 				}
-				catch (Exception e) {
+				catch (Exception exception) {
 					if (_log.isWarnEnabled()) {
 						_log.warn("Unable to remove file rank " + fileRankId);
 					}
@@ -216,9 +209,9 @@ public class DLFileRankLocalServiceImpl extends DLFileRankLocalServiceBaseImpl {
 			dlFileRank.setCreateDate(serviceContext.getCreateDate(null));
 
 			try {
-				dlFileRankPersistence.update(dlFileRank);
+				dlFileRank = dlFileRankPersistence.update(dlFileRank);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (_log.isWarnEnabled()) {
 					_log.warn(
 						StringBundler.concat(
@@ -234,6 +227,13 @@ public class DLFileRankLocalServiceImpl extends DLFileRankLocalServiceBaseImpl {
 		}
 
 		return dlFileRank;
+	}
+
+	@Activate
+	@Modified
+	protected void activate(Map<String, Object> properties) {
+		_dlFileRankServiceConfiguration = ConfigurableUtil.createConfigurable(
+			DLFileRankServiceConfiguration.class, properties);
 	}
 
 	protected void updateFileRanks(DLFolder dlFolder, boolean active) {

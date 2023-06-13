@@ -98,7 +98,7 @@ public class KBCommentLocalServiceImpl extends KBCommentLocalServiceBaseImpl {
 		kbComment.setUserRating(userRating);
 		kbComment.setStatus(KBCommentConstants.STATUS_NEW);
 
-		kbCommentPersistence.update(kbComment);
+		kbComment = kbCommentPersistence.update(kbComment);
 
 		// Social
 
@@ -297,7 +297,7 @@ public class KBCommentLocalServiceImpl extends KBCommentLocalServiceBaseImpl {
 		kbComment.setUserRating(userRating);
 		kbComment.setStatus(status);
 
-		kbCommentPersistence.update(kbComment);
+		kbComment = kbCommentPersistence.update(kbComment);
 
 		// Social
 
@@ -339,7 +339,7 @@ public class KBCommentLocalServiceImpl extends KBCommentLocalServiceBaseImpl {
 
 		kbComment.setStatus(status);
 
-		kbCommentPersistence.update(kbComment);
+		kbComment = kbCommentPersistence.update(kbComment);
 
 		notifySubscribers(userId, kbComment, serviceContext);
 
@@ -519,8 +519,8 @@ public class KBCommentLocalServiceImpl extends KBCommentLocalServiceBaseImpl {
 				jsonObject.put("title", kbTemplate.getTitle());
 			}
 		}
-		catch (Exception e) {
-			_log.error("Unable to put title", e);
+		catch (Exception exception) {
+			_log.error("Unable to put title", exception);
 		}
 	}
 

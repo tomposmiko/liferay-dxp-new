@@ -64,9 +64,19 @@ public class OpenAPIResourceImpl {
 
 	private final Set<Class<?>> _resourceClasses = new HashSet<Class<?>>() {
 		{
+			add(AssigneeResourceImpl.class);
+
+			add(TransitionResourceImpl.class);
+
+			add(WorkflowDefinitionResourceImpl.class);
+
+			add(WorkflowInstanceResourceImpl.class);
+
 			add(WorkflowLogResourceImpl.class);
 
 			add(WorkflowTaskResourceImpl.class);
+
+			add(WorkflowTaskAssignableUsersResourceImpl.class);
 
 			add(OpenAPIResourceImpl.class);
 		}

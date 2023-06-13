@@ -129,10 +129,11 @@ public class PreviewSegmentsEntryUsersDisplayContext {
 				);
 			}
 		}
-		catch (PortalException pe) {
+		catch (PortalException portalException) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
-					"Unable to obtain a preview of the segment users", pe);
+					"Unable to obtain a preview of the segment users",
+					portalException);
 			}
 		}
 
@@ -147,8 +148,13 @@ public class PreviewSegmentsEntryUsersDisplayContext {
 	protected Criteria getCriteriaFromSession() {
 		PortletSession portletSession = _renderRequest.getPortletSession();
 
-		return (Criteria)portletSession.getAttribute(
+		Criteria criteria = (Criteria)portletSession.getAttribute(
 			SegmentsWebKeys.PREVIEW_SEGMENTS_ENTRY_CRITERIA);
+
+		portletSession.removeAttribute(
+			SegmentsWebKeys.PREVIEW_SEGMENTS_ENTRY_CRITERIA);
+
+		return criteria;
 	}
 
 	protected PortletURL getPortletURL() {
@@ -181,9 +187,10 @@ public class PreviewSegmentsEntryUsersDisplayContext {
 				_segmentsEntry = _segmentsEntryService.getSegmentsEntry(
 					segmentsEntryId);
 			}
-			catch (PortalException pe) {
+			catch (PortalException portalException) {
 				_log.error(
-					"Unable to get segment entry " + segmentsEntryId, pe);
+					"Unable to get segment entry " + segmentsEntryId,
+					portalException);
 
 				return null;
 			}

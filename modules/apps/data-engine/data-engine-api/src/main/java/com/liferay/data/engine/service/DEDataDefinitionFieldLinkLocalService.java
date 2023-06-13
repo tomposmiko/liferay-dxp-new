@@ -55,7 +55,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface DEDataDefinitionFieldLinkLocalService
 	extends BaseLocalService, PersistedModelLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link DEDataDefinitionFieldLinkLocalServiceUtil} to access the de data definition field link local service. Add custom service methods to <code>com.liferay.data.engine.service.impl.DEDataDefinitionFieldLinkLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -106,6 +106,14 @@ public interface DEDataDefinitionFieldLinkLocalService
 	public DEDataDefinitionFieldLink deleteDEDataDefinitionFieldLink(
 			long deDataDefinitionFieldLinkId)
 		throws PortalException;
+
+	public void deleteDEDataDefinitionFieldLinks(long ddmStructureId);
+
+	public void deleteDEDataDefinitionFieldLinks(
+		long classNameId, long classPK);
+
+	public void deleteDEDataDefinitionFieldLinks(
+		long classNameId, long ddmStructureId, String fieldName);
 
 	/**
 	 * @throws PortalException
@@ -239,6 +247,38 @@ public interface DEDataDefinitionFieldLinkLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<DEDataDefinitionFieldLink> getDEDataDefinitionFieldLinks(
 		int start, int end);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<DEDataDefinitionFieldLink> getDEDataDefinitionFieldLinks(
+		long classNameId, long ddmStructureId, String fieldName);
+
+	/**
+	 * Returns all the de data definition field links matching the UUID and company.
+	 *
+	 * @param uuid the UUID of the de data definition field links
+	 * @param companyId the primary key of the company
+	 * @return the matching de data definition field links, or an empty list if no matches were found
+	 */
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<DEDataDefinitionFieldLink>
+		getDEDataDefinitionFieldLinksByUuidAndCompanyId(
+			String uuid, long companyId);
+
+	/**
+	 * Returns a range of de data definition field links matching the UUID and company.
+	 *
+	 * @param uuid the UUID of the de data definition field links
+	 * @param companyId the primary key of the company
+	 * @param start the lower bound of the range of de data definition field links
+	 * @param end the upper bound of the range of de data definition field links (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the range of matching de data definition field links, or an empty list if no matches were found
+	 */
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<DEDataDefinitionFieldLink>
+		getDEDataDefinitionFieldLinksByUuidAndCompanyId(
+			String uuid, long companyId, int start, int end,
+			OrderByComparator<DEDataDefinitionFieldLink> orderByComparator);
 
 	/**
 	 * Returns the number of de data definition field links.

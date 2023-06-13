@@ -33,7 +33,7 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface DDMStructure extends DDMStructureModel, PersistedModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.dynamic.data.mapping.model.impl.DDMStructureImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -60,6 +60,8 @@ public interface DDMStructure extends DDMStructureModel, PersistedModel {
 
 	public DDMForm createFullHierarchyDDMForm()
 		throws com.liferay.portal.kernel.exception.PortalException;
+
+	public DDMStructureLayout fetchDDMStructureLayout();
 
 	public java.util.List<String> getChildrenFieldNames(String fieldName)
 		throws com.liferay.portal.kernel.exception.PortalException;

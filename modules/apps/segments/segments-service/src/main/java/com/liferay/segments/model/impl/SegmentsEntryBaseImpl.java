@@ -32,7 +32,7 @@ import com.liferay.segments.service.SegmentsEntryLocalServiceUtil;
 public abstract class SegmentsEntryBaseImpl
 	extends SegmentsEntryModelImpl implements SegmentsEntry {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. All methods that expect a segments entry model instance should use the <code>SegmentsEntry</code> interface instead.

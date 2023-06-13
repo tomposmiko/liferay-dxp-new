@@ -45,7 +45,7 @@ public interface MDRActionModel
 	extends AttachedModel, BaseModel<MDRAction>, LocalizedModel, MVCCModel,
 			ShardedModel, StagedGroupedModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a mdr action model instance should use the {@link MDRAction} interface instead.

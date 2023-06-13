@@ -16,7 +16,6 @@ import Component from 'metal-component';
 import Soy from 'metal-soy';
 import {Config} from 'metal-state';
 
-import '../fragments/FragmentsEditorSidebarCard.es';
 import {removeFragmentEntryLinkAction} from '../../../actions/removeFragmentEntryLinks.es';
 import {removeRowAction} from '../../../actions/removeRow.es';
 import {getConnectedComponent} from '../../../store/ConnectedComponent.es';
@@ -29,8 +28,10 @@ import {
 	EDITABLE_FRAGMENT_ENTRY_PROCESSOR,
 	FRAGMENTS_EDITOR_ITEM_TYPES,
 	FRAGMENTS_EDITOR_ROW_TYPES,
-	BACKGROUND_IMAGE_FRAGMENT_ENTRY_PROCESSOR
+	BACKGROUND_IMAGE_FRAGMENT_ENTRY_PROCESSOR,
+	PAGE_TYPES
 } from '../../../utils/constants';
+import {isDropZoneFragment} from '../../../utils/isDropZoneFragment.es';
 import templates from './SidebarPageStructurePanel.soy';
 
 /**
@@ -164,7 +165,11 @@ class SidebarPageStructurePanel extends Component {
 				elementType: FRAGMENTS_EDITOR_ITEM_TYPES.row,
 				key: `${FRAGMENTS_EDITOR_ITEM_TYPES.row}-${row.rowId}`,
 				label: Liferay.Language.get('section'),
-				removable: true
+				removable:
+					state.pageType !== PAGE_TYPES.master ||
+					!row.columns.some(column =>
+						column.fragmentEntryLinkIds.some(isDropZoneFragment)
+					)
 			});
 		}
 
@@ -263,12 +268,12 @@ class SidebarPageStructurePanel extends Component {
 			const nodeKeyIndex = this._expandedNodes.indexOf(nodeKey);
 
 			if (nodeKeyIndex === -1) {
-				this._expandedNodes.push(nodeKey);
+				this._expandedNodes = [...this._expandedNodes, nodeKey];
 			} else {
-				this._expandedNodes.splice(nodeKeyIndex, 1);
+				this._expandedNodes = this._expandedNodes.filter(
+					node => node != nodeKey
+				);
 			}
-
-			this._expandedNodes = this._expandedNodes;
 		}
 
 		if (elementId && elementType) {
@@ -289,6 +294,8 @@ class SidebarPageStructurePanel extends Component {
 	 * @review
 	 */
 	_handleElementRemoveButtonClick(event) {
+		event.stopPropagation();
+
 		const itemId = event.delegateTarget.dataset.elementId;
 		const itemType = event.delegateTarget.dataset.elementType;
 
@@ -335,6 +342,7 @@ const ConnectedSidebarPageStructurePanel = getConnectedComponent(
 		'hoveredItemId',
 		'hoveredItemType',
 		'layoutData',
+		'pageType',
 		'selectedItems',
 		'spritemap'
 	]

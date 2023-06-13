@@ -91,8 +91,8 @@ public class CustomizationSettingsProductNavigationControlMenuEntry
 				CUSTOMIZATION_SETTINGS_LAYOUT_UPDATE_PERMISSION,
 				hasUpdateLayoutPermission(themeDisplay));
 		}
-		catch (PortalException pe) {
-			_log.error(pe, pe);
+		catch (PortalException portalException) {
+			_log.error(portalException, portalException);
 		}
 
 		return super.includeIcon(httpServletRequest, httpServletResponse);
@@ -174,6 +174,10 @@ public class CustomizationSettingsProductNavigationControlMenuEntry
 		Layout layout = themeDisplay.getLayout();
 
 		if (layout.isTypeControlPanel()) {
+			return false;
+		}
+
+		if (layout.isTypeContent()) {
 			return false;
 		}
 

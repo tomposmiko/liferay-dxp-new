@@ -17,6 +17,7 @@ package com.liferay.headless.admin.user.resource.v1_0.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.headless.admin.user.client.dto.v1_0.SegmentUser;
 import com.liferay.headless.admin.user.client.pagination.Page;
+import com.liferay.headless.admin.user.client.problem.Problem;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.User;
@@ -31,11 +32,9 @@ import com.liferay.segments.model.SegmentsEntry;
 import com.liferay.segments.test.util.SegmentsTestUtil;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -55,48 +54,7 @@ public class SegmentUserResourceTest extends BaseSegmentUserResourceTestCase {
 		Assert.assertEquals(0, page.getTotalCount());
 	}
 
-	@Override
-	@Test
-	public void testGetSegmentUserAccountsPage() throws Exception {
-		Page<SegmentUser> page = segmentUserResource.getSegmentUserAccountsPage(
-			testGetSegmentUserAccountsPage_getSegmentId(), null);
-
-		Assert.assertEquals(1, page.getTotalCount());
-
-		Long segmentId = testGetSegmentUserAccountsPage_getSegmentId();
-
-		Long irrelevantSegmentId =
-			testGetSegmentUserAccountsPage_getIrrelevantSegmentId();
-
-		if (irrelevantSegmentId != null) {
-			SegmentUser irrelevantSegmentUser =
-				testGetSegmentUserAccountsPage_addSegmentUser(
-					irrelevantSegmentId, randomIrrelevantSegmentUser());
-
-			page = segmentUserResource.getSegmentUserAccountsPage(
-				irrelevantSegmentId, null);
-
-			Assert.assertEquals(1, page.getTotalCount());
-
-			assertEquals(
-				Arrays.asList(irrelevantSegmentUser),
-				(List<SegmentUser>)page.getItems());
-			assertValid(page);
-		}
-
-		testGetSegmentUserAccountsPage_addSegmentUser(
-			segmentId, randomSegmentUser());
-		testGetSegmentUserAccountsPage_addSegmentUser(
-			segmentId, randomSegmentUser());
-
-		page = segmentUserResource.getSegmentUserAccountsPage(segmentId, null);
-
-		Assert.assertEquals(3, page.getTotalCount());
-
-		assertValid(page);
-	}
-
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = Problem.ProblemException.class)
 	public void testGetSegmentUserAccountsPageWithNonexistingSegmentId()
 		throws Exception {
 
@@ -104,13 +62,8 @@ public class SegmentUserResourceTest extends BaseSegmentUserResourceTestCase {
 			RandomTestUtil.randomLong(), null);
 	}
 
-	@Ignore
-	@Test
-	public void testGetSegmentUserAccountsPageWithPagination() {
-	}
-
 	@Override
-	protected SegmentUser randomSegmentUser() throws Exception {
+	protected SegmentUser randomSegmentUser() {
 		return new SegmentUser() {
 			{
 				emailAddress = RandomTestUtil.randomString() + "@liferay.com";
@@ -167,7 +120,9 @@ public class SegmentUserResourceTest extends BaseSegmentUserResourceTestCase {
 		};
 	}
 
-	private String _filterString = "(contains(emailAddress, 'liferay'))";
+	private String _filterString =
+		"(contains(emailAddress, 'liferay') and (not (emailAddress eq " +
+			"'test@liferay.com')))";
 
 	@DeleteAfterTestRun
 	private final List<User> _users = new ArrayList<>();

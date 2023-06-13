@@ -31,7 +31,7 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface BlogsEntry extends BlogsEntryModel, PersistedModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this interface directly. Add methods to <code>com.liferay.blogs.model.impl.BlogsEntryImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -58,21 +58,6 @@ public interface BlogsEntry extends BlogsEntryModel, PersistedModel {
 
 	public String getCoverImageURL(
 			com.liferay.portal.kernel.theme.ThemeDisplay themeDisplay)
-		throws com.liferay.portal.kernel.exception.PortalException;
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 #getSmallImageURL(ThemeDisplay)}
-	 */
-	@Deprecated
-	public String getEntryImageURL(
-		com.liferay.portal.kernel.theme.ThemeDisplay themeDisplay);
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public String getSmallImageType()
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public String getSmallImageURL(

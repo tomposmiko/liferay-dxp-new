@@ -81,7 +81,7 @@ if (selLayout != null) {
 }
 %>
 
-<aui:script use="aui-base,liferay-item-selector-dialog,node-event-simulate">
+<aui:script use="aui-base,node-event-simulate">
 	var groupId = A.one('#<portlet:namespace />groupId');
 	var layoutItemRemove = A.one('#<portlet:namespace />layoutItemRemove');
 	var layoutNameInput = A.one('#<portlet:namespace />layoutNameInput');
@@ -89,11 +89,17 @@ if (selLayout != null) {
 	var privateLayout = A.one('#<portlet:namespace />privateLayout');
 
 	A.one('#<portlet:namespace />chooseLayout').on('click', function(event) {
-		var itemSelectorDialog = new A.LiferayItemSelectorDialog({
-			eventName: '<%= eventName %>',
-			on: {
-				selectedItemChange: function(event) {
-					var selectedItem = event.newVal;
+		Liferay.Loader.require(
+			'frontend-js-web/liferay/ItemSelectorDialog.es',
+			function(ItemSelectorDialog) {
+				var itemSelectorDialog = new ItemSelectorDialog.default({
+					eventName: '<%= eventName %>',
+					title: '<liferay-ui:message key="select-layout" />',
+					url: '<%= itemSelectorURL.toString() %>'
+				});
+
+				itemSelectorDialog.on('selectedItemChange', function(event) {
+					var selectedItem = event.selectedItem;
 
 					if (selectedItem) {
 						groupId.val(selectedItem.groupId);
@@ -107,14 +113,11 @@ if (selLayout != null) {
 
 						layoutItemRemove.removeClass('hide');
 					}
-				}
-			},
-			'strings.add': '<liferay-ui:message key="done" />',
-			title: '<liferay-ui:message key="select-layout" />',
-			url: '<%= itemSelectorURL.toString() %>'
-		});
+				});
 
-		itemSelectorDialog.open();
+				itemSelectorDialog.open();
+			}
+		);
 	});
 
 	layoutItemRemove.on('click', function(event) {

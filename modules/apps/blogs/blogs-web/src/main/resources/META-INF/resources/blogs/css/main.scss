@@ -239,7 +239,7 @@
 				right: 35px;
 				top: 0;
 
-				&:not(.pull-right) {
+				&:not(.float-right) {
 					position: absolute;
 				}
 			}
@@ -320,7 +320,7 @@
 	margin-left: 2em;
 }
 
-/* ---------- Skin ---------- */
+// ---------- Skin ----------
 
 .portlet-blogs {
 	.border-top {

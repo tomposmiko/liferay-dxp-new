@@ -49,12 +49,12 @@ import javax.servlet.http.HttpServletRequest;
 public class AssetCategoriesSelectorDisplayContext {
 
 	public AssetCategoriesSelectorDisplayContext(
-		RenderRequest renderRequest, RenderResponse renderResponse,
-		HttpServletRequest httpServletRequest) {
+		HttpServletRequest httpServletRequest, RenderRequest renderRequest,
+		RenderResponse renderResponse) {
 
+		_httpServletRequest = httpServletRequest;
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
-		_httpServletRequest = httpServletRequest;
 	}
 
 	public JSONArray getCategoriesJSONArray() throws Exception {
@@ -209,6 +209,8 @@ public class AssetCategoriesSelectorDisplayContext {
 				"id", category.getCategoryId()
 			).put(
 				"name", category.getTitle(themeDisplay.getLocale())
+			).put(
+				"nodePath", category.getPath(themeDisplay.getLocale(), true)
 			);
 
 			if (getSelectedCategories().contains(

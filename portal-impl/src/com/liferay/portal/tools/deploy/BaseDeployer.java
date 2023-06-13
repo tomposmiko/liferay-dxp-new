@@ -39,6 +39,7 @@ import com.liferay.portal.kernel.servlet.filters.invoker.InvokerFilter;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropertiesUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -77,7 +78,6 @@ import java.nio.file.Paths;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -117,9 +117,9 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 
 		try (BaseDeployer baseDeployer = new BaseDeployer(wars, jars)) {
 		}
-		catch (IOException ioe) {
+		catch (IOException ioException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(ioe, ioe);
+				_log.warn(ioException, ioException);
 			}
 		}
 	}
@@ -165,8 +165,8 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 		try {
 			deploy(context);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 	}
 
@@ -233,8 +233,8 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 		try {
 			return deployFile(autoDeploymentContext);
 		}
-		catch (Exception e) {
-			throw new AutoDeployException(e);
+		catch (Exception exception) {
+			throw new AutoDeployException(exception);
 		}
 	}
 
@@ -304,8 +304,8 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 
 			return (AutoDeployer)baseDeployer;
 		}
-		catch (Exception e) {
-			throw new AutoDeployException(e);
+		catch (Exception exception) {
+			throw new AutoDeployException(exception);
 		}
 	}
 
@@ -386,8 +386,8 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 				FileUtil.copyFile(
 					portalJarPath, srcFile + "/WEB-INF/lib/" + portalJar, true);
 			}
-			catch (Exception e) {
-				_log.error("Unable to copy portal JAR " + portalJar, e);
+			catch (Exception exception) {
+				_log.error("Unable to copy portal JAR " + portalJar, exception);
 			}
 		}
 
@@ -412,8 +412,8 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 				FileUtil.copyFile(
 					portalTldPath, srcFile + "/WEB-INF/tld/" + portalTld, true);
 			}
-			catch (Exception e) {
-				_log.error("Unable to copy portal TLD " + portalTld, e);
+			catch (Exception exception) {
+				_log.error("Unable to copy portal TLD " + portalTld, exception);
 			}
 		}
 
@@ -644,8 +644,8 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 				}
 			}
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 	}
 
@@ -732,7 +732,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 
 				excludes += "**/WEB-INF/lib/el-api.jar,";
 			}
-			catch (ClassNotFoundException cnfe) {
+			catch (ClassNotFoundException classNotFoundException) {
 			}
 		}
 
@@ -1023,13 +1023,13 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 
 			return AutoDeployer.CODE_DEFAULT;
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			if (pluginPackage != null) {
 				PluginPackageUtil.endPluginPackageInstallation(
 					pluginPackage.getContext());
 			}
 
-			throw e;
+			throw exception;
 		}
 	}
 
@@ -1045,7 +1045,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 				PropsKeys.HOT_UNDEPLOY_ON_REDEPLOY,
 				PropsValues.HOT_UNDEPLOY_ON_REDEPLOY);
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 
 			// This will only happen when running the deploy tool in Ant in the
 			// classical way where the WAR file is actually massaged and
@@ -1503,41 +1503,45 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 			return null;
 		}
 
-		Map<String, String> filterMap = new HashMap<>();
-
-		filterMap.put("author", wrapCDATA(pluginPackage.getAuthor()));
-		filterMap.put("change_log", wrapCDATA(pluginPackage.getChangeLog()));
-		filterMap.put(
-			"licenses",
-			getPluginPackageLicensesXml(pluginPackage.getLicenses()));
-		filterMap.put(
+		return HashMapBuilder.put(
+			"author", wrapCDATA(pluginPackage.getAuthor())
+		).put(
+			"change_log", wrapCDATA(pluginPackage.getChangeLog())
+		).put(
+			"licenses", getPluginPackageLicensesXml(pluginPackage.getLicenses())
+		).put(
 			"liferay_versions",
 			getPluginPackageLiferayVersionsXml(
-				pluginPackage.getLiferayVersions()));
-		filterMap.put(
-			"long_description", wrapCDATA(pluginPackage.getLongDescription()));
-		filterMap.put("module_artifact_id", pluginPackage.getArtifactId());
-		filterMap.put("module_group_id", pluginPackage.getGroupId());
-		filterMap.put("module_version", pluginPackage.getVersion());
-		filterMap.put("page_url", pluginPackage.getPageURL());
-		filterMap.put("plugin_name", wrapCDATA(pluginPackage.getName()));
-		filterMap.put("plugin_type", pluginType);
-		filterMap.put(
+				pluginPackage.getLiferayVersions())
+		).put(
+			"long_description", wrapCDATA(pluginPackage.getLongDescription())
+		).put(
+			"module_artifact_id", pluginPackage.getArtifactId()
+		).put(
+			"module_group_id", pluginPackage.getGroupId()
+		).put(
+			"module_version", pluginPackage.getVersion()
+		).put(
+			"page_url", pluginPackage.getPageURL()
+		).put(
+			"plugin_name", wrapCDATA(pluginPackage.getName())
+		).put(
+			"plugin_type", pluginType
+		).put(
 			"plugin_type_name",
-			TextFormatter.format(pluginType, TextFormatter.J));
-		filterMap.put(
+			TextFormatter.format(pluginType, TextFormatter.J)
+		).put(
 			"recommended_deployment_context",
-			pluginPackage.getRecommendedDeploymentContext());
-		filterMap.put(
+			pluginPackage.getRecommendedDeploymentContext()
+		).put(
 			"required_deployment_contexts",
 			getPluginPackageRequiredDeploymentContextsXml(
-				pluginPackage.getRequiredDeploymentContexts()));
-		filterMap.put(
-			"short_description",
-			wrapCDATA(pluginPackage.getShortDescription()));
-		filterMap.put("tags", getPluginPackageTagsXml(pluginPackage.getTags()));
-
-		return filterMap;
+				pluginPackage.getRequiredDeploymentContexts())
+		).put(
+			"short_description", wrapCDATA(pluginPackage.getShortDescription())
+		).put(
+			"tags", getPluginPackageTagsXml(pluginPackage.getTags())
+		).build();
 	}
 
 	public String getPluginType() {
@@ -1801,15 +1805,15 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 
 			return PluginPackageUtil.readPluginPackageXml(xml);
 		}
-		catch (Exception e) {
-			_log.error(file.getPath() + ": " + e.toString(), e);
+		catch (Exception exception) {
+			_log.error(file.getPath() + ": " + exception.toString(), exception);
 		}
 		finally {
 			if (is != null) {
 				try {
 					is.close();
 				}
-				catch (IOException ioe) {
+				catch (IOException ioException) {
 				}
 			}
 
@@ -1817,7 +1821,7 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 				try {
 					zipFile.close();
 				}
-				catch (IOException ioe) {
+				catch (IOException ioException) {
 				}
 			}
 		}
@@ -1856,11 +1860,12 @@ public class BaseDeployer implements AutoDeployer, Deployer {
 
 				FileUtil.write(file, content);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (_log.isWarnEnabled()) {
 					_log.warn(
 						StringBundler.concat(
-							"Unable to format ", file, ": ", e.getMessage()));
+							"Unable to format ", file, ": ",
+							exception.getMessage()));
 				}
 			}
 		}

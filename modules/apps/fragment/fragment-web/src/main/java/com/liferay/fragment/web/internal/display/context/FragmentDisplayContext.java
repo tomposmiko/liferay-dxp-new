@@ -15,7 +15,6 @@
 package com.liferay.fragment.web.internal.display.context;
 
 import com.liferay.fragment.constants.FragmentActionKeys;
-import com.liferay.fragment.constants.FragmentConstants;
 import com.liferay.fragment.contributor.FragmentCollectionContributor;
 import com.liferay.fragment.contributor.FragmentCollectionContributorTracker;
 import com.liferay.fragment.model.FragmentCollection;
@@ -36,11 +35,13 @@ import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -49,9 +50,9 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.util.PortalInstances;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -70,13 +71,12 @@ import javax.servlet.http.HttpServletRequest;
 public class FragmentDisplayContext {
 
 	public FragmentDisplayContext(
-		RenderRequest renderRequest, RenderResponse renderResponse,
-		HttpServletRequest httpServletRequest) {
-
-		_renderRequest = renderRequest;
-		_renderResponse = renderResponse;
+		HttpServletRequest httpServletRequest, RenderRequest renderRequest,
+		RenderResponse renderResponse) {
 
 		_httpServletRequest = httpServletRequest;
+		_renderRequest = renderRequest;
+		_renderResponse = renderResponse;
 
 		_fragmentCollectionContributorTracker =
 			(FragmentCollectionContributorTracker)
@@ -159,30 +159,12 @@ public class FragmentDisplayContext {
 		contributedFragmentEntriesSearchContainer.setId(
 			"fragmentEntries" + getFragmentCollectionKey());
 
-		List<FragmentEntry> fragmentEntries = null;
-
 		FragmentCollectionContributor fragmentCollectionContributor =
 			_getFragmentCollectionContributor();
 
-		if (isNavigationComponents() || isNavigationSections()) {
-			int type = FragmentConstants.TYPE_SECTION;
-
-			if (isNavigationComponents()) {
-				type = FragmentConstants.TYPE_COMPONENT;
-			}
-
-			fragmentEntries = fragmentCollectionContributor.getFragmentEntries(
-				type, _themeDisplay.getLocale());
-		}
-		else {
-			fragmentEntries = fragmentCollectionContributor.getFragmentEntries(
-				FragmentConstants.TYPE_SECTION, _themeDisplay.getLocale());
-
-			fragmentEntries.addAll(
-				fragmentCollectionContributor.getFragmentEntries(
-					FragmentConstants.TYPE_COMPONENT,
-					_themeDisplay.getLocale()));
-		}
+		List<FragmentEntry> fragmentEntries =
+			fragmentCollectionContributor.getFragmentEntries(
+				_themeDisplay.getLocale());
 
 		contributedFragmentEntriesSearchContainer.setResults(
 			ListUtil.subList(
@@ -273,11 +255,18 @@ public class FragmentDisplayContext {
 		String fragmentCollectionName = fragmentCollection.getName();
 
 		if (!_isScopeGroup()) {
-			Group group = GroupLocalServiceUtil.getGroup(
+			Group group = GroupLocalServiceUtil.fetchGroup(
 				fragmentCollection.getGroupId());
 
+			String groupName = LanguageUtil.get(
+				_themeDisplay.getLocale(), "system");
+
+			if (group != null) {
+				groupName = getGroupName(group.getGroupId());
+			}
+
 			fragmentCollectionName = StringUtil.appendParentheticalSuffix(
-				fragmentCollectionName, getGroupName(group.getGroupId()));
+				fragmentCollectionName, groupName);
 		}
 
 		return HtmlUtil.escape(fragmentCollectionName);
@@ -286,65 +275,76 @@ public class FragmentDisplayContext {
 	public Map<String, Object> getFragmentCollectionsViewContext()
 		throws Exception {
 
-		Map<String, Object> context = new HashMap<>();
-
-		LiferayPortletURL deleteFragmentCollectionURL =
-			_renderResponse.createActionURL();
-
-		deleteFragmentCollectionURL.setCopyCurrentRenderParameters(false);
-		deleteFragmentCollectionURL.setParameter(
-			ActionRequest.ACTION_NAME, "/fragment/delete_fragment_collection");
-
-		context.put(
+		return HashMapBuilder.<String, Object>put(
 			"deleteFragmentCollectionURL",
-			deleteFragmentCollectionURL.toString());
+			() -> {
+				LiferayPortletURL deleteFragmentCollectionURL =
+					_renderResponse.createActionURL();
 
-		LiferayPortletURL exportFragmentCollectionsURL =
-			(LiferayPortletURL)_renderResponse.createResourceURL();
+				deleteFragmentCollectionURL.setCopyCurrentRenderParameters(
+					false);
+				deleteFragmentCollectionURL.setParameter(
+					ActionRequest.ACTION_NAME,
+					"/fragment/delete_fragment_collection");
 
-		exportFragmentCollectionsURL.setCopyCurrentRenderParameters(false);
-		exportFragmentCollectionsURL.setResourceID(
-			"/fragment/export_fragment_collections");
-
-		context.put(
+				return deleteFragmentCollectionURL.toString();
+			}
+		).put(
 			"exportFragmentCollectionsURL",
-			exportFragmentCollectionsURL.toString());
+			() -> {
+				LiferayPortletURL exportFragmentCollectionsURL =
+					(LiferayPortletURL)_renderResponse.createResourceURL();
 
-		PortletURL viewExportFragmentCollectionsURL =
-			_renderResponse.createRenderURL();
+				exportFragmentCollectionsURL.setCopyCurrentRenderParameters(
+					false);
+				exportFragmentCollectionsURL.setResourceID(
+					"/fragment/export_fragment_collections");
 
-		viewExportFragmentCollectionsURL.setParameter(
-			"mvcRenderCommandName", "/fragment/view_fragment_collections");
-		viewExportFragmentCollectionsURL.setParameter(
-			"includeGlobalFragmentCollections", Boolean.TRUE.toString());
-		viewExportFragmentCollectionsURL.setWindowState(
-			LiferayWindowState.POP_UP);
-
-		context.put(
-			"viewExportFragmentCollectionsURL",
-			viewExportFragmentCollectionsURL.toString());
-
-		PortletURL viewDeleteFragmentCollectionsURL =
-			_renderResponse.createRenderURL();
-
-		viewDeleteFragmentCollectionsURL.setParameter(
-			"mvcRenderCommandName", "/fragment/view_fragment_collections");
-		viewDeleteFragmentCollectionsURL.setWindowState(
-			LiferayWindowState.POP_UP);
-
-		context.put(
+				return exportFragmentCollectionsURL.toString();
+			}
+		).put(
 			"viewDeleteFragmentCollectionsURL",
-			viewDeleteFragmentCollectionsURL.toString());
+			() -> {
+				PortletURL viewDeleteFragmentCollectionsURL =
+					_renderResponse.createRenderURL();
 
-		PortletURL viewImportURL = _renderResponse.createRenderURL();
+				viewDeleteFragmentCollectionsURL.setParameter(
+					"mvcRenderCommandName",
+					"/fragment/view_fragment_collections");
+				viewDeleteFragmentCollectionsURL.setWindowState(
+					LiferayWindowState.POP_UP);
 
-		viewImportURL.setParameter(
-			"mvcRenderCommandName", "/fragment/view_import");
-		viewImportURL.setWindowState(LiferayWindowState.POP_UP);
+				return viewDeleteFragmentCollectionsURL.toString();
+			}
+		).put(
+			"viewExportFragmentCollectionsURL",
+			() -> {
+				PortletURL viewExportFragmentCollectionsURL =
+					_renderResponse.createRenderURL();
 
-		context.put("viewImportURL", viewImportURL.toString());
+				viewExportFragmentCollectionsURL.setParameter(
+					"mvcRenderCommandName",
+					"/fragment/view_fragment_collections");
+				viewExportFragmentCollectionsURL.setParameter(
+					"includeGlobalFragmentCollections",
+					Boolean.TRUE.toString());
+				viewExportFragmentCollectionsURL.setWindowState(
+					LiferayWindowState.POP_UP);
 
-		return context;
+				return viewExportFragmentCollectionsURL.toString();
+			}
+		).put(
+			"viewImportURL",
+			() -> {
+				PortletURL viewImportURL = _renderResponse.createRenderURL();
+
+				viewImportURL.setParameter(
+					"mvcRenderCommandName", "/fragment/view_import");
+				viewImportURL.setWindowState(LiferayWindowState.POP_UP);
+
+				return viewImportURL.toString();
+			}
+		).build();
 	}
 
 	public SearchContainer getFragmentEntriesSearchContainer() {
@@ -382,26 +382,7 @@ public class FragmentDisplayContext {
 			status = WorkflowConstants.STATUS_APPROVED;
 		}
 
-		if (isNavigationComponents() || isNavigationSections()) {
-			int type = FragmentConstants.TYPE_SECTION;
-
-			if (isNavigationComponents()) {
-				type = FragmentConstants.TYPE_COMPONENT;
-			}
-
-			fragmentEntries =
-				FragmentEntryServiceUtil.getFragmentEntriesByTypeAndStatus(
-					fragmentCollection.getGroupId(),
-					fragmentCollection.getFragmentCollectionId(), type, status,
-					fragmentEntriesSearchContainer.getStart(),
-					fragmentEntriesSearchContainer.getEnd(), orderByComparator);
-
-			fragmentEntriesCount =
-				FragmentEntryServiceUtil.getFragmentEntriesCountByTypeAndStatus(
-					fragmentCollection.getGroupId(),
-					fragmentCollection.getFragmentCollectionId(), type, status);
-		}
-		else if (isSearch()) {
+		if (isSearch()) {
 			fragmentEntries =
 				FragmentEntryServiceUtil.getFragmentEntriesByNameAndStatus(
 					fragmentCollection.getGroupId(),
@@ -524,6 +505,23 @@ public class FragmentDisplayContext {
 		return portletURL.toString();
 	}
 
+	public boolean hasDeletePermission() {
+		if (hasUpdatePermission()) {
+			return true;
+		}
+
+		if (FragmentPermission.contains(
+				_themeDisplay.getPermissionChecker(),
+				_themeDisplay.getScopeGroupId(),
+				FragmentActionKeys.MANAGE_FRAGMENT_ENTRIES) &&
+			!isLocked(getFragmentCollection())) {
+
+			return true;
+		}
+
+		return false;
+	}
+
 	public boolean hasUpdatePermission() {
 		if (_updatePermission != null) {
 			return _updatePermission;
@@ -543,16 +541,21 @@ public class FragmentDisplayContext {
 		return _updatePermission;
 	}
 
-	public boolean isNavigationComponents() {
-		if (Objects.equals(getNavigation(), "components")) {
+	public boolean isLocked(FragmentCollection fragmentCollection) {
+		if ((fragmentCollection.getGroupId() != CompanyConstants.SYSTEM) &&
+			(fragmentCollection.getGroupId() !=
+				_themeDisplay.getScopeGroupId())) {
+
 			return true;
 		}
 
-		return false;
-	}
+		Group scopeGroup = _themeDisplay.getScopeGroup();
 
-	public boolean isNavigationSections() {
-		if (Objects.equals(getNavigation(), "sections")) {
+		if ((fragmentCollection.getGroupId() == CompanyConstants.SYSTEM) &&
+			((_themeDisplay.getCompanyId() !=
+				PortalInstances.getDefaultCompanyId()) ||
+			 !scopeGroup.isCompany())) {
+
 			return true;
 		}
 

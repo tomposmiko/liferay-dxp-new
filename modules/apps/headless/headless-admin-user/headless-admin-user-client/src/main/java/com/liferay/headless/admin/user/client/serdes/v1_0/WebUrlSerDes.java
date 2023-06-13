@@ -63,6 +63,16 @@ public class WebUrlSerDes {
 			sb.append(webUrl.getId());
 		}
 
+		if (webUrl.getPrimary() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"primary\": ");
+
+			sb.append(webUrl.getPrimary());
+		}
+
 		if (webUrl.getUrl() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -116,6 +126,13 @@ public class WebUrlSerDes {
 			map.put("id", String.valueOf(webUrl.getId()));
 		}
 
+		if (webUrl.getPrimary() == null) {
+			map.put("primary", null);
+		}
+		else {
+			map.put("primary", String.valueOf(webUrl.getPrimary()));
+		}
+
 		if (webUrl.getUrl() == null) {
 			map.put("url", null);
 		}
@@ -155,6 +172,11 @@ public class WebUrlSerDes {
 					webUrl.setId(Long.valueOf((String)jsonParserFieldValue));
 				}
 			}
+			else if (Objects.equals(jsonParserFieldName, "primary")) {
+				if (jsonParserFieldValue != null) {
+					webUrl.setPrimary((Boolean)jsonParserFieldValue);
+				}
+			}
 			else if (Objects.equals(jsonParserFieldName, "url")) {
 				if (jsonParserFieldValue != null) {
 					webUrl.setUrl((String)jsonParserFieldValue);
@@ -176,9 +198,11 @@ public class WebUrlSerDes {
 	private static String _escape(Object object) {
 		String string = String.valueOf(object);
 
-		string = string.replace("\\", "\\\\");
+		for (String[] strings : BaseJSONParser.JSON_ESCAPE_STRINGS) {
+			string = string.replace(strings[0], strings[1]);
+		}
 
-		return string.replace("\"", "\\\"");
+		return string;
 	}
 
 	private static String _toJSON(Map<String, ?> map) {

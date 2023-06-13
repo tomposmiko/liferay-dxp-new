@@ -70,7 +70,7 @@ public abstract class AppLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
 	implements AopService, AppLocalService, IdentifiableOSGiService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>AppLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.marketplace.service.AppLocalServiceUtil</code>.
@@ -465,8 +465,8 @@ public abstract class AppLocalServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 

@@ -30,7 +30,7 @@ import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
  */
 public class AssetLinkLocalServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.portlet.asset.service.impl.AssetLinkLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
@@ -344,18 +344,6 @@ public class AssetLinkLocalServiceUtil {
 
 		return getService().getDirectLinks(
 			entryId, typeId, excludeInvisibleLinks);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public static com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery
-		getExportActionbleDynamicQuery(
-			com.liferay.exportimport.kernel.lar.PortletDataContext
-				portletDataContext) {
-
-		return getService().getExportActionbleDynamicQuery(portletDataContext);
 	}
 
 	public static

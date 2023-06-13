@@ -27,12 +27,6 @@
 	<bean class="com.liferay.mail.util.DummyHook" id="com.liferay.mail.util.DummyHook" />
 	<bean class="com.liferay.portal.convert.documentlibrary.DocumentLibraryConvertProcess" />
 	<bean class="com.liferay.portal.convert.documentlibrary.DocumentLibraryExtraSettingsConvertProcess" />
-	<bean class="com.liferay.portal.deploy.auto.ExtAutoDeployListener" />
-	<bean class="com.liferay.portal.events.StartupHelperUtil" id="com.liferay.portal.events.StartupHelperUtil">
-		<property name="startupHelper">
-			<bean class="com.liferay.portal.events.StartupHelper" />
-		</property>
-	</bean>
 	<bean class="com.liferay.portal.format.IdenticalPhoneNumberFormatImpl" id="com.liferay.portal.format.IdenticalPhoneNumberFormatImpl" />
 	<bean class="com.liferay.portal.internal.increment.BufferedIncrementProcessorUtil" />
 	<bean factory-bean="com.liferay.portal.kernel.json.JSONFactory" factory-method="getLiferayJSONDeserializationWhitelist" id="com.liferay.portal.json.jabsorb.serializer.LiferayJSONDeserializationWhitelist" />
@@ -349,11 +343,6 @@
 	<bean class="com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil" id="com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil">
 		<property name="friendlyURLNormalizer" ref="com.liferay.portal.kernel.util.FriendlyURLNormalizer" />
 	</bean>
-	<bean class="com.liferay.portal.kernel.util.HashCodeFactoryUtil" id="com.liferay.portal.kernel.util.HashCodeFactoryUtil">
-		<property name="hashCodeFactory">
-			<bean class="com.liferay.portal.util.HashCodeFactoryImpl" />
-		</property>
-	</bean>
 	<bean class="com.liferay.portal.kernel.util.HtmlUtil" id="com.liferay.portal.kernel.util.HtmlUtil">
 		<property name="html" ref="com.liferay.portal.util.HtmlImpl" />
 	</bean>
@@ -473,7 +462,6 @@
 	<bean class="com.liferay.portal.verify.model.AssetTagVerifiableModel" />
 	<bean class="com.liferay.portal.verify.model.GroupVerifiableResourcedModel" />
 	<bean class="com.liferay.portal.verify.model.LayoutBranchVerifiableModel" />
-	<bean class="com.liferay.portal.verify.model.LayoutFriendlyURLAuditedModel" />
 	<bean class="com.liferay.portal.verify.model.LayoutPrototypeVerifiableModel" />
 	<bean class="com.liferay.portal.verify.model.LayoutSetPrototypeVerifiableModel" />
 	<bean class="com.liferay.portal.verify.model.RatingsEntryVerifiableModel" />

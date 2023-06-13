@@ -17,6 +17,7 @@ package com.liferay.layout.page.template.service.impl;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
+import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructureRel;
@@ -36,6 +37,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.segments.constants.SegmentsExperienceConstants;
 
 import java.util.Date;
@@ -82,8 +84,9 @@ public class LayoutPageTemplateStructureLocalServiceImpl
 		layoutPageTemplateStructure.setClassNameId(classNameId);
 		layoutPageTemplateStructure.setClassPK(classPK);
 
-		layoutPageTemplateStructurePersistence.update(
-			layoutPageTemplateStructure);
+		layoutPageTemplateStructure =
+			layoutPageTemplateStructurePersistence.update(
+				layoutPageTemplateStructure);
 
 		int count =
 			_fragmentEntryLinkLocalService.
@@ -188,7 +191,10 @@ public class LayoutPageTemplateStructureLocalServiceImpl
 
 		JSONObject jsonObject =
 			LayoutPageTemplateStructureHelperUtil.
-				generateContentLayoutStructure(fragmentEntryLinks);
+				generateContentLayoutStructure(
+					fragmentEntryLinks,
+					_getLayoutPageTemplateEntryType(
+						_layoutLocalService.getLayout(classPK)));
 
 		LayoutPageTemplateStructure layoutPageTemplateStructure =
 			fetchLayoutPageTemplateStructure(groupId, classNameId, classPK);
@@ -218,8 +224,9 @@ public class LayoutPageTemplateStructureLocalServiceImpl
 
 		layoutPageTemplateStructure.setModifiedDate(new Date());
 
-		layoutPageTemplateStructurePersistence.update(
-			layoutPageTemplateStructure);
+		layoutPageTemplateStructure =
+			layoutPageTemplateStructurePersistence.update(
+				layoutPageTemplateStructure);
 
 		// Layout page template structure rel
 
@@ -263,15 +270,41 @@ public class LayoutPageTemplateStructureLocalServiceImpl
 				SegmentsExperienceConstants.ID_DEFAULT, data);
 	}
 
+	private int _getLayoutPageTemplateEntryType(Layout layout) {
+		LayoutPageTemplateEntry layoutPageTemplateEntry =
+			_layoutPageTemplateEntryLocalService.
+				fetchLayoutPageTemplateEntryByPlid(layout.getClassPK());
+
+		if (layoutPageTemplateEntry != null) {
+			return layoutPageTemplateEntry.getType();
+		}
+
+		Layout draftLayout = _layoutLocalService.fetchLayout(
+			_portal.getClassNameId(Layout.class), layout.getPlid());
+
+		if (draftLayout != null) {
+			LayoutPageTemplateEntry draftLayoutPageTemplateEntry =
+				_layoutPageTemplateEntryLocalService.
+					fetchLayoutPageTemplateEntryByPlid(
+						draftLayout.getClassPK());
+
+			if (draftLayoutPageTemplateEntry != null) {
+				return draftLayoutPageTemplateEntry.getType();
+			}
+		}
+
+		return LayoutPageTemplateEntryTypeConstants.TYPE_BASIC;
+	}
+
 	private void _updateClassedModel(long classNameId, long classPK)
 		throws PortalException {
 
 		if (classNameId == _portal.getClassNameId(Layout.class)) {
 			Layout layout = _layoutLocalService.getLayout(classPK);
 
-			_layoutLocalService.updateLayout(
-				layout.getGroupId(), layout.isPrivateLayout(),
-				layout.getLayoutId(), layout.getTypeSettings());
+			layout.setStatus(WorkflowConstants.STATUS_DRAFT);
+
+			_layoutLocalService.updateLayout(layout);
 		}
 		else if (classNameId == _portal.getClassNameId(
 					LayoutPageTemplateEntry.class)) {

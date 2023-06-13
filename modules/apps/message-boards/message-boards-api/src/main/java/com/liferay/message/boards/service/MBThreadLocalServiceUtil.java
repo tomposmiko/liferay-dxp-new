@@ -32,7 +32,7 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public class MBThreadLocalServiceUtil {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify this class directly. Add custom service methods to <code>com.liferay.message.boards.service.impl.MBThreadLocalServiceImpl</code> and rerun ServiceBuilder to regenerate this class.
@@ -434,16 +434,6 @@ public class MBThreadLocalServiceUtil {
 	}
 
 	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	public static java.util.List<com.liferay.message.boards.model.MBThread>
-		getNoAssetThreads() {
-
-		return getService().getNoAssetThreads();
-	}
-
-	/**
 	 * Returns the OSGi service identifier.
 	 *
 	 * @return the OSGi service identifier
@@ -498,9 +488,7 @@ public class MBThreadLocalServiceUtil {
 		return getService().hasAnswerMessage(threadId);
 	}
 
-	public static void incrementViewCounter(long threadId, int increment)
-		throws com.liferay.portal.kernel.exception.PortalException {
-
+	public static void incrementViewCounter(long threadId, int increment) {
 		getService().incrementViewCounter(threadId, increment);
 	}
 

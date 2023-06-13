@@ -28,11 +28,6 @@ public class TicketLocalServiceWrapper
 		_ticketLocalService = ticketLocalService;
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link TicketLocalServiceUtil} to access the ticket local service. Add custom service methods to <code>com.liferay.portal.service.impl.TicketLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
-	 */
 	@Override
 	public com.liferay.portal.kernel.model.Ticket addDistinctTicket(
 		long companyId, java.lang.String className, long classPK, int type,

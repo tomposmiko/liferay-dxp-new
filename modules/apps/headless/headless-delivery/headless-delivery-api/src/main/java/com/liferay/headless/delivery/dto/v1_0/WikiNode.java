@@ -86,6 +86,35 @@ public class WikiNode {
 
 	}
 
+	@Schema
+	@Valid
+	public Map<String, Map> getActions() {
+		return actions;
+	}
+
+	public void setActions(Map<String, Map> actions) {
+		this.actions = actions;
+	}
+
+	@JsonIgnore
+	public void setActions(
+		UnsafeSupplier<Map<String, Map>, Exception> actionsUnsafeSupplier) {
+
+		try {
+			actions = actionsUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	protected Map<String, Map> actions;
+
 	@Schema(description = "The wiki node's creator.")
 	@Valid
 	public Creator getCreator() {
@@ -111,7 +140,7 @@ public class WikiNode {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The wiki node's creator.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Creator creator;
 
@@ -139,7 +168,7 @@ public class WikiNode {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The date the wiki node was created.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateCreated;
 
@@ -169,7 +198,9 @@ public class WikiNode {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The last time any of the wiki node's fields changed."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Date dateModified;
 
@@ -197,7 +228,7 @@ public class WikiNode {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The wiki node's description.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String description;
 
@@ -223,7 +254,7 @@ public class WikiNode {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The wiki node's ID.")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long id;
 
@@ -249,7 +280,7 @@ public class WikiNode {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(description = "The wiki node's name.")
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
 	protected String name;
 
@@ -277,7 +308,9 @@ public class WikiNode {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The number of child wiki page on this wiki node."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Integer numberOfWikiPages;
 
@@ -307,7 +340,9 @@ public class WikiNode {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "The ID of the site to which this wiki node is scoped."
+	)
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long siteId;
 
@@ -375,7 +410,9 @@ public class WikiNode {
 		}
 	}
 
-	@GraphQLField
+	@GraphQLField(
+		description = "A write-only property that specifies the default permissions."
+	)
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	protected ViewableBy viewableBy;
 
@@ -408,6 +445,16 @@ public class WikiNode {
 
 		DateFormat liferayToJSONDateFormat = new SimpleDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+		if (actions != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"actions\": ");
+
+			sb.append(_toJSON(actions));
+		}
 
 		if (creator != null) {
 			if (sb.length() > 1) {

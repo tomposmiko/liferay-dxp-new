@@ -49,8 +49,8 @@ public class ComponentTag extends ParamAndPropertyAncestorTagImpl {
 		try {
 			_renderJavaScript();
 		}
-		catch (Exception e) {
-			throw new JspException(e);
+		catch (Exception exception) {
+			throw new JspException(exception);
 		}
 		finally {
 			cleanUp();
@@ -85,6 +85,10 @@ public class ComponentTag extends ParamAndPropertyAncestorTagImpl {
 		return namespace + "/" + _module;
 	}
 
+	public boolean isDestroyOnNavigate() {
+		return _destroyOnNavigate;
+	}
+
 	@Override
 	public void release() {
 		super.release();
@@ -104,6 +108,10 @@ public class ComponentTag extends ParamAndPropertyAncestorTagImpl {
 		_context = context;
 	}
 
+	public void setDestroyOnNavigate(boolean destroyOnNavigate) {
+		_destroyOnNavigate = destroyOnNavigate;
+	}
+
 	public void setModule(String module) {
 		_module = module;
 	}
@@ -119,7 +127,9 @@ public class ComponentTag extends ParamAndPropertyAncestorTagImpl {
 		_componentId = null;
 		_containerId = null;
 		_context = null;
+		_destroyOnNavigate = true;
 		_module = null;
+		_setServletContext = false;
 	}
 
 	protected Map<String, Object> getContext() {
@@ -174,7 +184,7 @@ public class ComponentTag extends ParamAndPropertyAncestorTagImpl {
 	}
 
 	private void _renderJavaScript() throws IOException {
-		StringBundler sb = new StringBundler(12);
+		StringBundler sb = new StringBundler(14);
 
 		sb.append("Liferay.component('");
 		sb.append(getComponentId());
@@ -215,7 +225,9 @@ public class ComponentTag extends ParamAndPropertyAncestorTagImpl {
 			sb.append("'");
 		}
 
-		sb.append("), { portletId: '");
+		sb.append("), { destroyOnNavigate: ");
+		sb.append(_destroyOnNavigate);
+		sb.append(", portletId: '");
 		sb.append(portletDisplay.getId());
 		sb.append("'});");
 
@@ -254,6 +266,7 @@ public class ComponentTag extends ParamAndPropertyAncestorTagImpl {
 	private String _componentId;
 	private String _containerId;
 	private Map<String, Object> _context;
+	private boolean _destroyOnNavigate = true;
 	private final JSONSerializer _jsonSerializer =
 		JSONFactoryUtil.createJSONSerializer();
 	private String _module;

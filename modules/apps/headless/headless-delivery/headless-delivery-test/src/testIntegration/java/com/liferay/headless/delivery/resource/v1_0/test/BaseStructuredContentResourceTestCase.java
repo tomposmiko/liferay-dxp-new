@@ -27,6 +27,7 @@ import com.liferay.headless.delivery.client.dto.v1_0.StructuredContent;
 import com.liferay.headless.delivery.client.http.HttpInvoker;
 import com.liferay.headless.delivery.client.pagination.Page;
 import com.liferay.headless.delivery.client.pagination.Pagination;
+import com.liferay.headless.delivery.client.permission.Permission;
 import com.liferay.headless.delivery.client.resource.v1_0.StructuredContentResource;
 import com.liferay.headless.delivery.client.serdes.v1_0.StructuredContentSerDes;
 import com.liferay.petra.function.UnsafeTriConsumer;
@@ -856,7 +857,7 @@ public abstract class BaseStructuredContentResourceTestCase {
 					{
 						put("page", 1);
 						put("pageSize", 2);
-						put("siteId", testGroup.getGroupId());
+						put("siteKey", "\"" + testGroup.getGroupId() + "\"");
 					}
 				},
 				graphQLFields.toArray(new GraphQLField[0])));
@@ -1029,6 +1030,49 @@ public abstract class BaseStructuredContentResourceTestCase {
 			equalsJSONObject(
 				structuredContent,
 				dataJSONObject.getJSONObject("structuredContentByUuid")));
+	}
+
+	@Test
+	public void testPutSiteStructuredContentPermission() throws Exception {
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		StructuredContent structuredContent =
+			testPutSiteStructuredContentPermission_addStructuredContent();
+
+		assertHttpResponseStatusCode(
+			204,
+			structuredContentResource.
+				putSiteStructuredContentPermissionHttpResponse(
+					testGroup.getGroupId(),
+					new Permission[] {
+						new Permission() {
+							{
+								setActionIds(new String[] {"VIEW"});
+								setRoleName("Guest");
+							}
+						}
+					}));
+
+		assertHttpResponseStatusCode(
+			404,
+			structuredContentResource.
+				putSiteStructuredContentPermissionHttpResponse(
+					testGroup.getGroupId(),
+					new Permission[] {
+						new Permission() {
+							{
+								setActionIds(new String[] {"-"});
+								setRoleName("-");
+							}
+						}
+					}));
+	}
+
+	protected StructuredContent
+			testPutSiteStructuredContentPermission_addStructuredContent()
+		throws Exception {
+
+		return structuredContentResource.postSiteStructuredContent(
+			testGroup.getGroupId(), randomStructuredContent());
 	}
 
 	@Test
@@ -1392,57 +1436,6 @@ public abstract class BaseStructuredContentResourceTestCase {
 	}
 
 	@Test
-	public void testPutStructuredContentSubscribe() throws Exception {
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		StructuredContent structuredContent =
-			testPutStructuredContentSubscribe_addStructuredContent();
-
-		assertHttpResponseStatusCode(
-			204,
-			structuredContentResource.putStructuredContentSubscribeHttpResponse(
-				structuredContent.getId()));
-
-		assertHttpResponseStatusCode(
-			404,
-			structuredContentResource.putStructuredContentSubscribeHttpResponse(
-				0L));
-	}
-
-	protected StructuredContent
-			testPutStructuredContentSubscribe_addStructuredContent()
-		throws Exception {
-
-		return structuredContentResource.postSiteStructuredContent(
-			testGroup.getGroupId(), randomStructuredContent());
-	}
-
-	@Test
-	public void testPutStructuredContentUnsubscribe() throws Exception {
-		@SuppressWarnings("PMD.UnusedLocalVariable")
-		StructuredContent structuredContent =
-			testPutStructuredContentUnsubscribe_addStructuredContent();
-
-		assertHttpResponseStatusCode(
-			204,
-			structuredContentResource.
-				putStructuredContentUnsubscribeHttpResponse(
-					structuredContent.getId()));
-
-		assertHttpResponseStatusCode(
-			404,
-			structuredContentResource.
-				putStructuredContentUnsubscribeHttpResponse(0L));
-	}
-
-	protected StructuredContent
-			testPutStructuredContentUnsubscribe_addStructuredContent()
-		throws Exception {
-
-		return structuredContentResource.postSiteStructuredContent(
-			testGroup.getGroupId(), randomStructuredContent());
-	}
-
-	@Test
 	public void testDeleteStructuredContent() throws Exception {
 		StructuredContent structuredContent =
 			testDeleteStructuredContent_addStructuredContent();
@@ -1662,10 +1655,104 @@ public abstract class BaseStructuredContentResourceTestCase {
 	}
 
 	@Test
+	public void testPutStructuredContentPermission() throws Exception {
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		StructuredContent structuredContent =
+			testPutStructuredContentPermission_addStructuredContent();
+
+		assertHttpResponseStatusCode(
+			204,
+			structuredContentResource.
+				putStructuredContentPermissionHttpResponse(
+					structuredContent.getId(),
+					new Permission[] {
+						new Permission() {
+							{
+								setActionIds(new String[] {"VIEW"});
+								setRoleName("Guest");
+							}
+						}
+					}));
+
+		assertHttpResponseStatusCode(
+			404,
+			structuredContentResource.
+				putStructuredContentPermissionHttpResponse(
+					0L,
+					new Permission[] {
+						new Permission() {
+							{
+								setActionIds(new String[] {"-"});
+								setRoleName("-");
+							}
+						}
+					}));
+	}
+
+	protected StructuredContent
+			testPutStructuredContentPermission_addStructuredContent()
+		throws Exception {
+
+		return structuredContentResource.postSiteStructuredContent(
+			testGroup.getGroupId(), randomStructuredContent());
+	}
+
+	@Test
 	public void testGetStructuredContentRenderedContentTemplate()
 		throws Exception {
 
 		Assert.assertTrue(false);
+	}
+
+	@Test
+	public void testPutStructuredContentSubscribe() throws Exception {
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		StructuredContent structuredContent =
+			testPutStructuredContentSubscribe_addStructuredContent();
+
+		assertHttpResponseStatusCode(
+			204,
+			structuredContentResource.putStructuredContentSubscribeHttpResponse(
+				structuredContent.getId()));
+
+		assertHttpResponseStatusCode(
+			404,
+			structuredContentResource.putStructuredContentSubscribeHttpResponse(
+				0L));
+	}
+
+	protected StructuredContent
+			testPutStructuredContentSubscribe_addStructuredContent()
+		throws Exception {
+
+		return structuredContentResource.postSiteStructuredContent(
+			testGroup.getGroupId(), randomStructuredContent());
+	}
+
+	@Test
+	public void testPutStructuredContentUnsubscribe() throws Exception {
+		@SuppressWarnings("PMD.UnusedLocalVariable")
+		StructuredContent structuredContent =
+			testPutStructuredContentUnsubscribe_addStructuredContent();
+
+		assertHttpResponseStatusCode(
+			204,
+			structuredContentResource.
+				putStructuredContentUnsubscribeHttpResponse(
+					structuredContent.getId()));
+
+		assertHttpResponseStatusCode(
+			404,
+			structuredContentResource.
+				putStructuredContentUnsubscribeHttpResponse(0L));
+	}
+
+	protected StructuredContent
+			testPutStructuredContentUnsubscribe_addStructuredContent()
+		throws Exception {
+
+		return structuredContentResource.postSiteStructuredContent(
+			testGroup.getGroupId(), randomStructuredContent());
 	}
 
 	@Test
@@ -1936,7 +2023,7 @@ public abstract class BaseStructuredContentResourceTestCase {
 				"createSiteStructuredContent",
 				new HashMap<String, Object>() {
 					{
-						put("siteId", testGroup.getGroupId());
+						put("siteKey", "\"" + testGroup.getGroupId() + "\"");
 						put("structuredContent", sb.toString());
 					}
 				},
@@ -2061,6 +2148,14 @@ public abstract class BaseStructuredContentResourceTestCase {
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
 
+			if (Objects.equals("actions", additionalAssertFieldName)) {
+				if (structuredContent.getActions() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("aggregateRating", additionalAssertFieldName)) {
 				if (structuredContent.getAggregateRating() == null) {
 					valid = false;
@@ -2129,8 +2224,26 @@ public abstract class BaseStructuredContentResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("description_i18n", additionalAssertFieldName)) {
+				if (structuredContent.getDescription_i18n() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("friendlyUrlPath", additionalAssertFieldName)) {
 				if (structuredContent.getFriendlyUrlPath() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"friendlyUrlPath_i18n", additionalAssertFieldName)) {
+
+				if (structuredContent.getFriendlyUrlPath_i18n() == null) {
 					valid = false;
 				}
 
@@ -2213,6 +2326,14 @@ public abstract class BaseStructuredContentResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("title_i18n", additionalAssertFieldName)) {
+				if (structuredContent.getTitle_i18n() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("uuid", additionalAssertFieldName)) {
 				if (structuredContent.getUuid() == null) {
 					valid = false;
@@ -2272,6 +2393,14 @@ public abstract class BaseStructuredContentResourceTestCase {
 
 		for (String additionalAssertFieldName :
 				getAdditionalRatingAssertFieldNames()) {
+
+			if (Objects.equals("actions", additionalAssertFieldName)) {
+				if (rating.getActions() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
 
 			if (Objects.equals("bestRating", additionalAssertFieldName)) {
 				if (rating.getBestRating() == null) {
@@ -2354,6 +2483,17 @@ public abstract class BaseStructuredContentResourceTestCase {
 
 		for (String additionalAssertFieldName :
 				getAdditionalAssertFieldNames()) {
+
+			if (Objects.equals("actions", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						structuredContent1.getActions(),
+						structuredContent2.getActions())) {
+
+					return false;
+				}
+
+				continue;
+			}
 
 			if (Objects.equals("aggregateRating", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
@@ -2469,10 +2609,34 @@ public abstract class BaseStructuredContentResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("description_i18n", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						structuredContent1.getDescription_i18n(),
+						structuredContent2.getDescription_i18n())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("friendlyUrlPath", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						structuredContent1.getFriendlyUrlPath(),
 						structuredContent2.getFriendlyUrlPath())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"friendlyUrlPath_i18n", additionalAssertFieldName)) {
+
+				if (!Objects.deepEquals(
+						structuredContent1.getFriendlyUrlPath_i18n(),
+						structuredContent2.getFriendlyUrlPath_i18n())) {
 
 					return false;
 				}
@@ -2594,6 +2758,17 @@ public abstract class BaseStructuredContentResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("title_i18n", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						structuredContent1.getTitle_i18n(),
+						structuredContent2.getTitle_i18n())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("uuid", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						structuredContent1.getUuid(),
@@ -2631,6 +2806,16 @@ public abstract class BaseStructuredContentResourceTestCase {
 
 		for (String additionalAssertFieldName :
 				getAdditionalRatingAssertFieldNames()) {
+
+			if (Objects.equals("actions", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						rating1.getActions(), rating2.getActions())) {
+
+					return false;
+				}
+
+				continue;
+			}
 
 			if (Objects.equals("bestRating", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
@@ -2868,6 +3053,11 @@ public abstract class BaseStructuredContentResourceTestCase {
 		sb.append(operator);
 		sb.append(" ");
 
+		if (entityFieldName.equals("actions")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
 		if (entityFieldName.equals("aggregateRating")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
@@ -3008,12 +3198,22 @@ public abstract class BaseStructuredContentResourceTestCase {
 			return sb.toString();
 		}
 
+		if (entityFieldName.equals("description_i18n")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
 		if (entityFieldName.equals("friendlyUrlPath")) {
 			sb.append("'");
 			sb.append(String.valueOf(structuredContent.getFriendlyUrlPath()));
 			sb.append("'");
 
 			return sb.toString();
+		}
+
+		if (entityFieldName.equals("friendlyUrlPath_i18n")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("id")) {
@@ -3075,6 +3275,11 @@ public abstract class BaseStructuredContentResourceTestCase {
 			sb.append("'");
 
 			return sb.toString();
+		}
+
+		if (entityFieldName.equals("title_i18n")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("uuid")) {

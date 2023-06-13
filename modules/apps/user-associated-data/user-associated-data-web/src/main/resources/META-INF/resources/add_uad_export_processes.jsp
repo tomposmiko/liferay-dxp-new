@@ -28,14 +28,14 @@ renderResponse.setTitle(StringBundler.concat(selectedUser.getFullName(), " - ", 
 %>
 
 <portlet:renderURL var="viewUADExportProcesses">
-	<portlet:param name="mvcRenderCommandName" value="/view_uad_export_processes" />
 	<portlet:param name="p_u_i_d" value="<%= String.valueOf(selectedUser.getUserId()) %>" />
+	<portlet:param name="mvcRenderCommandName" value="/view_uad_export_processes" />
 </portlet:renderURL>
 
 <div class="container-fluid container-fluid-max-xl container-form-lg">
 	<aui:form method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "exportApplicationData();" %>'>
-		<aui:input name="redirect" type="hidden" value="<%= viewUADExportProcesses.toString() %>" />
 		<aui:input name="p_u_i_d" type="hidden" value="<%= String.valueOf(selectedUser.getUserId()) %>" />
+		<aui:input name="redirect" type="hidden" value="<%= viewUADExportProcesses.toString() %>" />
 		<aui:input name="applicationKeys" type="hidden" />
 
 		<div class="sheet sheet-lg">

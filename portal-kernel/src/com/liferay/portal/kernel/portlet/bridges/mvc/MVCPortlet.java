@@ -240,18 +240,6 @@ public class MVCPortlet extends LiferayPortlet {
 		_initValidPaths(templatePath);
 	}
 
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), with no direct replacement
-	 */
-	@Deprecated
-	public void invokeTaglibDiscussionPagination(
-			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
-		throws IOException, PortletException {
-
-		PortalUtil.invokeTaglibDiscussionPagination(
-			getPortletConfig(), resourceRequest, resourceResponse);
-	}
-
 	@Override
 	public void processAction(
 			ActionRequest actionRequest, ActionResponse actionResponse)
@@ -331,15 +319,7 @@ public class MVCPortlet extends LiferayPortlet {
 				PortletRequest.RESOURCE_PHASE);
 		}
 
-		boolean invokeTaglibDiscussion = GetterUtil.getBoolean(
-			resourceRequest.getParameter("invokeTaglibDiscussion"));
-
-		if (invokeTaglibDiscussion) {
-			invokeTaglibDiscussionPagination(resourceRequest, resourceResponse);
-		}
-		else {
-			super.serveResource(resourceRequest, resourceResponse);
-		}
+		super.serveResource(resourceRequest, resourceResponse);
 	}
 
 	@Override
@@ -350,8 +330,8 @@ public class MVCPortlet extends LiferayPortlet {
 		try {
 			checkPermissions(actionRequest);
 		}
-		catch (Exception e) {
-			throw new PortletException(e);
+		catch (Exception exception) {
+			throw new PortletException(exception);
 		}
 
 		String[] actionNames = ParamUtil.getParameterValues(
@@ -423,8 +403,8 @@ public class MVCPortlet extends LiferayPortlet {
 		try {
 			checkPermissions(resourceRequest);
 		}
-		catch (Exception e) {
-			throw new PortletException(e);
+		catch (Exception exception) {
+			throw new PortletException(exception);
 		}
 
 		String resourceID = GetterUtil.getString(

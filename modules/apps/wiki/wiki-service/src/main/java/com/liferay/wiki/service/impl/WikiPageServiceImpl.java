@@ -57,6 +57,8 @@ import com.liferay.wiki.util.comparator.PageCreateDateComparator;
 import java.io.File;
 import java.io.InputStream;
 
+import java.sql.Timestamp;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -167,21 +169,6 @@ public class WikiPageServiceImpl extends WikiPageServiceBaseImpl {
 		return wikiPageLocalService.addTempFileEntry(
 			node.getGroupId(), getUserId(), folderName, fileName, inputStream,
 			mimeType);
-	}
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             #addTempFileEntry(long, String, String, InputStream, String)}
-	 */
-	@Deprecated
-	@Override
-	public void addTempPageAttachment(
-			long nodeId, String fileName, String tempFolderName,
-			InputStream inputStream, String mimeType)
-		throws PortalException {
-
-		addTempFileEntry(
-			nodeId, tempFolderName, fileName, inputStream, mimeType);
 	}
 
 	@Override
@@ -391,18 +378,6 @@ public class WikiPageServiceImpl extends WikiPageServiceBaseImpl {
 		return exportToRSS(
 			node.getName(), node.getDescription(), type, version, displayStyle,
 			feedURL, entryURL, attachmentURLPrefix, pages, false, null);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #getOrphans(WikiNode)}
-	 */
-	@Deprecated
-	@Override
-	public List<WikiPage> getOrphans(long groupId, long nodeId)
-		throws PortalException {
-
-		return getOrphans(wikiNodePersistence.findByPrimaryKey(nodeId));
 	}
 
 	@Override
@@ -623,7 +598,8 @@ public class WikiPageServiceImpl extends WikiPageServiceBaseImpl {
 		calendar.add(Calendar.WEEK_OF_YEAR, -1);
 
 		return wikiPageFinder.findByModifiedDate(
-			groupId, nodeId, calendar.getTime(), false, start, end);
+			groupId, nodeId, new Timestamp(calendar.getTimeInMillis()), false,
+			start, end);
 	}
 
 	@Override
@@ -863,14 +839,14 @@ public class WikiPageServiceImpl extends WikiPageServiceBaseImpl {
 								latestPage, page, null, null,
 								attachmentURLPrefix);
 						}
-						catch (PortalException pe) {
-							throw pe;
+						catch (PortalException portalException) {
+							throw portalException;
 						}
-						catch (SystemException se) {
-							throw se;
+						catch (SystemException systemException) {
+							throw systemException;
 						}
-						catch (Exception e) {
-							throw new SystemException(e);
+						catch (Exception exception) {
+							throw new SystemException(exception);
 						}
 					}
 

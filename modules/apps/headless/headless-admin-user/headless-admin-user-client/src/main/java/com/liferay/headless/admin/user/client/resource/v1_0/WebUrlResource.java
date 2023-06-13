@@ -17,6 +17,7 @@ package com.liferay.headless.admin.user.client.resource.v1_0;
 import com.liferay.headless.admin.user.client.dto.v1_0.WebUrl;
 import com.liferay.headless.admin.user.client.http.HttpInvoker;
 import com.liferay.headless.admin.user.client.pagination.Page;
+import com.liferay.headless.admin.user.client.problem.Problem;
 import com.liferay.headless.admin.user.client.serdes.v1_0.WebUrlSerDes;
 
 import java.util.LinkedHashMap;
@@ -38,11 +39,11 @@ public interface WebUrlResource {
 		return new Builder();
 	}
 
-	public Page<WebUrl> getOrganizationWebUrlsPage(Long organizationId)
+	public Page<WebUrl> getOrganizationWebUrlsPage(String organizationId)
 		throws Exception;
 
 	public HttpInvoker.HttpResponse getOrganizationWebUrlsPageHttpResponse(
-			Long organizationId)
+			String organizationId)
 		throws Exception;
 
 	public Page<WebUrl> getUserAccountWebUrlsPage(Long userAccountId)
@@ -112,7 +113,7 @@ public interface WebUrlResource {
 
 	public static class WebUrlResourceImpl implements WebUrlResource {
 
-		public Page<WebUrl> getOrganizationWebUrlsPage(Long organizationId)
+		public Page<WebUrl> getOrganizationWebUrlsPage(String organizationId)
 			throws Exception {
 
 			HttpInvoker.HttpResponse httpResponse =
@@ -126,11 +127,20 @@ public interface WebUrlResource {
 			_logger.fine(
 				"HTTP response status code: " + httpResponse.getStatusCode());
 
-			return Page.of(content, WebUrlSerDes::toDTO);
+			try {
+				return Page.of(content, WebUrlSerDes::toDTO);
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
 		}
 
 		public HttpInvoker.HttpResponse getOrganizationWebUrlsPageHttpResponse(
-				Long organizationId)
+				String organizationId)
 			throws Exception {
 
 			HttpInvoker httpInvoker = HttpInvoker.newHttpInvoker();
@@ -180,7 +190,16 @@ public interface WebUrlResource {
 			_logger.fine(
 				"HTTP response status code: " + httpResponse.getStatusCode());
 
-			return Page.of(content, WebUrlSerDes::toDTO);
+			try {
+				return Page.of(content, WebUrlSerDes::toDTO);
+			}
+			catch (Exception e) {
+				_logger.log(
+					Level.WARNING,
+					"Unable to process HTTP response: " + content, e);
+
+				throw new Problem.ProblemException(Problem.toDTO(content));
+			}
 		}
 
 		public HttpInvoker.HttpResponse getUserAccountWebUrlsPageHttpResponse(
@@ -240,7 +259,7 @@ public interface WebUrlResource {
 					Level.WARNING,
 					"Unable to process HTTP response: " + content, e);
 
-				throw e;
+				throw new Problem.ProblemException(Problem.toDTO(content));
 			}
 		}
 

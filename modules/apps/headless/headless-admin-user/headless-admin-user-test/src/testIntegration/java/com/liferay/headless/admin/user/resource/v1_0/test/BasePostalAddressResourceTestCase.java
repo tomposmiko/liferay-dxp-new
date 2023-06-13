@@ -208,9 +208,9 @@ public abstract class BasePostalAddressResourceTestCase {
 
 		Assert.assertEquals(0, page.getTotalCount());
 
-		Long organizationId =
+		String organizationId =
 			testGetOrganizationPostalAddressesPage_getOrganizationId();
-		Long irrelevantOrganizationId =
+		String irrelevantOrganizationId =
 			testGetOrganizationPostalAddressesPage_getIrrelevantOrganizationId();
 
 		if ((irrelevantOrganizationId != null)) {
@@ -250,21 +250,21 @@ public abstract class BasePostalAddressResourceTestCase {
 
 	protected PostalAddress
 			testGetOrganizationPostalAddressesPage_addPostalAddress(
-				Long organizationId, PostalAddress postalAddress)
+				String organizationId, PostalAddress postalAddress)
 		throws Exception {
 
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
 	}
 
-	protected Long testGetOrganizationPostalAddressesPage_getOrganizationId()
+	protected String testGetOrganizationPostalAddressesPage_getOrganizationId()
 		throws Exception {
 
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
 	}
 
-	protected Long
+	protected String
 			testGetOrganizationPostalAddressesPage_getIrrelevantOrganizationId()
 		throws Exception {
 
@@ -486,6 +486,16 @@ public abstract class BasePostalAddressResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals(
+					"addressCountry_i18n", additionalAssertFieldName)) {
+
+				if (postalAddress.getAddressCountry_i18n() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("addressLocality", additionalAssertFieldName)) {
 				if (postalAddress.getAddressLocality() == null) {
 					valid = false;
@@ -615,6 +625,19 @@ public abstract class BasePostalAddressResourceTestCase {
 				if (!Objects.deepEquals(
 						postalAddress1.getAddressCountry(),
 						postalAddress2.getAddressCountry())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals(
+					"addressCountry_i18n", additionalAssertFieldName)) {
+
+				if (!Objects.deepEquals(
+						postalAddress1.getAddressCountry_i18n(),
+						postalAddress2.getAddressCountry_i18n())) {
 
 					return false;
 				}
@@ -910,6 +933,11 @@ public abstract class BasePostalAddressResourceTestCase {
 			sb.append("'");
 
 			return sb.toString();
+		}
+
+		if (entityFieldName.equals("addressCountry_i18n")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
 		}
 
 		if (entityFieldName.equals("addressLocality")) {

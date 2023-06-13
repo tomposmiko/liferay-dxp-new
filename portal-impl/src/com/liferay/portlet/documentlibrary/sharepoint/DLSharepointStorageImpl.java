@@ -19,6 +19,7 @@ import com.liferay.document.library.kernel.exception.NoSuchFileEntryException;
 import com.liferay.document.library.kernel.exception.NoSuchFolderException;
 import com.liferay.document.library.kernel.model.DLFileEntryConstants;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
+import com.liferay.document.library.kernel.model.DLVersionNumberIncrease;
 import com.liferay.document.library.kernel.service.DLAppServiceUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
@@ -239,12 +240,12 @@ public class DLSharepointStorageImpl extends BaseSharepointStorageImpl {
 
 			folder = DLAppServiceUtil.getFolder(parentFolderId);
 		}
-		catch (Exception e1) {
-			if (e1 instanceof NoSuchFolderException) {
+		catch (Exception exception1) {
+			if (exception1 instanceof NoSuchFolderException) {
 				try {
 					fileEntry = getFileEntry(sharepointRequest);
 				}
-				catch (Exception e2) {
+				catch (Exception exception2) {
 				}
 			}
 		}
@@ -289,7 +290,8 @@ public class DLSharepointStorageImpl extends BaseSharepointStorageImpl {
 
 				fileEntry = DLAppServiceUtil.updateFileEntry(
 					fileEntryId, newName, mimeType, newName, description,
-					changeLog, false, file, serviceContext);
+					changeLog, DLVersionNumberIncrease.fromMajorVersion(false),
+					file, serviceContext);
 
 				if (folderId != newParentFolderId) {
 					fileEntry = DLAppServiceUtil.moveFileEntry(
@@ -386,11 +388,13 @@ public class DLSharepointStorageImpl extends BaseSharepointStorageImpl {
 
 				DLAppServiceUtil.updateFileEntry(
 					fileEntryId, title, contentType, title, description,
-					changeLog, false, file, serviceContext);
+					changeLog, DLVersionNumberIncrease.fromMajorVersion(false),
+					file, serviceContext);
 			}
-			catch (NoSuchFileEntryException nsfee) {
+			catch (NoSuchFileEntryException noSuchFileEntryException) {
 				if (_log.isDebugEnabled()) {
-					_log.debug(nsfee, nsfee);
+					_log.debug(
+						noSuchFileEntryException, noSuchFileEntryException);
 				}
 
 				DLAppServiceUtil.addFileEntry(
@@ -419,12 +423,12 @@ public class DLSharepointStorageImpl extends BaseSharepointStorageImpl {
 
 			folder = DLAppServiceUtil.getFolder(parentFolderId);
 		}
-		catch (Exception e1) {
-			if (e1 instanceof NoSuchFolderException) {
+		catch (Exception exception1) {
+			if (exception1 instanceof NoSuchFolderException) {
 				try {
 					fileEntry = getFileEntry(sharepointRequest);
 				}
-				catch (Exception e2) {
+				catch (Exception exception2) {
 				}
 			}
 		}
@@ -447,11 +451,11 @@ public class DLSharepointStorageImpl extends BaseSharepointStorageImpl {
 
 				removedDocsTree.addChild(documentTree);
 			}
-			catch (Exception e1) {
+			catch (Exception exception1) {
 				try {
 					failedDocsTree.addChild(documentTree);
 				}
-				catch (Exception e2) {
+				catch (Exception exception2) {
 				}
 			}
 		}
@@ -463,11 +467,11 @@ public class DLSharepointStorageImpl extends BaseSharepointStorageImpl {
 
 				removedDirsTree.addChild(folderTree);
 			}
-			catch (Exception e1) {
+			catch (Exception exception1) {
 				try {
 					failedDirsTree.addChild(folderTree);
 				}
-				catch (Exception e2) {
+				catch (Exception exception2) {
 				}
 			}
 		}

@@ -211,8 +211,8 @@ public class PortletRenderer {
 
 			return bufferCacheServletResponse.getStringBundler();
 		}
-		catch (IOException ioe) {
-			throw new PortletContainerException(ioe);
+		catch (IOException ioException) {
+			throw new PortletContainerException(ioException);
 		}
 		finally {
 			httpServletRequest.setAttribute(
@@ -250,13 +250,13 @@ public class PortletRenderer {
 			if (readOnly) {
 				_longLivedThreadLocals = Collections.unmodifiableMap(
 					CentralizedThreadLocal.getLongLivedThreadLocals());
-				_shortLivedlThreadLocals = Collections.unmodifiableMap(
+				_shortLivedThreadLocals = Collections.unmodifiableMap(
 					CentralizedThreadLocal.getShortLivedThreadLocals());
 			}
 			else {
 				_longLivedThreadLocals =
 					CentralizedThreadLocal.getLongLivedThreadLocals();
-				_shortLivedlThreadLocals =
+				_shortLivedThreadLocals =
 					CentralizedThreadLocal.getShortLivedThreadLocals();
 			}
 
@@ -266,7 +266,7 @@ public class PortletRenderer {
 		@Override
 		public final T call() throws Exception {
 			CentralizedThreadLocal.setThreadLocals(
-				_longLivedThreadLocals, _shortLivedlThreadLocals);
+				_longLivedThreadLocals, _shortLivedThreadLocals);
 
 			if (_threadLocalBinder != null) {
 				_threadLocalBinder.bind();
@@ -293,7 +293,7 @@ public class PortletRenderer {
 		private final Map<CentralizedThreadLocal<?>, Object>
 			_longLivedThreadLocals;
 		private final Map<CentralizedThreadLocal<?>, Object>
-			_shortLivedlThreadLocals;
+			_shortLivedThreadLocals;
 		private final ThreadLocalBinder _threadLocalBinder;
 
 	}
@@ -333,7 +333,7 @@ public class PortletRenderer {
 
 				return _render(httpServletRequest, _httpServletResponse);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 
 				// Under parallel rendering context. An interrupted state means
 				// the call was cancelled and so we should not rethrow the
@@ -342,7 +342,7 @@ public class PortletRenderer {
 				Thread currentThread = Thread.currentThread();
 
 				if (!currentThread.isInterrupted()) {
-					throw e;
+					throw exception;
 				}
 
 				return null;

@@ -186,6 +186,71 @@ out.println(PortalUtil.escapeRedirect("/"));
 			locator1 = "Home#PAGE");
 	}
 
+	@description = "This is a use case for LPS-57776."
+	@priority = "5"
+	test ValidateNoLARRemoteCodeExecution {
+		ProductMenu.gotoPortlet(
+			category = "Content &amp; Data",
+			panel = "Site Administration",
+			portlet = "Blogs");
+
+		LAR.importPortlet(
+			failureExpected = "true",
+			larFileName = "blogs-remote-code-execution.lar",
+			portletName = "Blogs",
+			uploadFrom = "dependencies");
+
+		AssertConsoleTextPresent(value1 = "com.thoughtworks.xstream.security.ForbiddenClassException");
+
+		AssertConsoleTextNotPresent(value1 = "Remote_Code_Execution_vulnerability_is_present");
+	}
+
+	@description = "This is a use case for LPS-85112."
+	@priority = "5"
+	test ValidateViewPermissionCanNotUpdateOtherUsersPassword {
+		property test.name.skip.portal.instance = "SecurityUsecase#ValidateViewPermissionCanNotUpdateOtherUsersPassword";
+
+		ProductMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Roles");
+
+		Role.definePermissionCmdCP(
+			permissionDefinitionKeys = "CONTROL_PANEL_USERS_USERS_AND_ORGANIZATIONS_RESOURCE_PERMISSIONS_USER_VIEW_CHECKBOX",
+			permissionDefinitionValue = "View",
+			roleTitle = "User");
+
+		ProductMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		User.addCP(
+			userEmailAddress = "userea@liferay.com",
+			userFirstName = "userfn",
+			userLastName = "userln",
+			userScreenName = "usersn");
+
+		ProductMenu.gotoPortlet(
+			category = "Users",
+			panel = "Control Panel",
+			portlet = "Users and Organizations");
+
+		User.editPasswordCP(
+			userEmailAddress = "userea@liferay.com",
+			userScreenName = "usersn");
+
+		User.logoutPG();
+
+		User.loginUserPG(
+			password = "test",
+			userEmailAddress = "userea@liferay.com");
+
+		UserBar.openUserOrganizations();
+
+		Alert.viewInfoMessageSpecific(infoMessage = "You do not belong to an organization and are not allowed to view other organizations.");
+	}
+
 	@description = "This is a use case for LPS-73595."
 	@priority = "5"
 	test ViewJSLoaderModulesURLNoWiki {

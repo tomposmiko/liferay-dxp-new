@@ -1,13 +1,16 @@
 Bundle-Name: Liferay Portal Vulcan API
 Bundle-SymbolicName: com.liferay.portal.vulcan.api
-Bundle-Version: 3.9.2
+Bundle-Version: 7.1.1
 Export-Package:\
 	com.liferay.portal.vulcan.accept.language,\
+	com.liferay.portal.vulcan.dto.converter,\
 	com.liferay.portal.vulcan.fields,\
 	com.liferay.portal.vulcan.graphql.annotation,\
 	com.liferay.portal.vulcan.graphql.servlet,\
+	com.liferay.portal.vulcan.jaxrs.exception.mapper,\
 	com.liferay.portal.vulcan.multipart,\
 	com.liferay.portal.vulcan.pagination,\
+	com.liferay.portal.vulcan.permission,\
 	com.liferay.portal.vulcan.resource,\
 	com.liferay.portal.vulcan.status,\
 	com.liferay.portal.vulcan.util,\
@@ -22,6 +25,9 @@ Import-Package:\
 	!graphql.annotations.typeResolvers.*,\
 	\
 	!graphql.schema.*,\
+	\
+	com.liferay.oauth2.provider.scope.liferay.*;resolution:=optional,\
+	com.liferay.oauth2.provider.scope.*;resolution:=optional,\
 	\
 	*
 -includeresource: @graphql-java-annotations-[0-9.]*.jar!/graphql/annotations/annotationTypes/*

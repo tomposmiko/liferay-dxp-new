@@ -17,9 +17,9 @@
 <%@ include file="/init.jsp" %>
 
 <%
-SelectFragmentCollectionDisplayContext selectFragmentCollectionDisplayContext = new SelectFragmentCollectionDisplayContext(renderRequest, renderResponse, request);
+SelectFragmentCollectionDisplayContext selectFragmentCollectionDisplayContext = new SelectFragmentCollectionDisplayContext(request, renderRequest, renderResponse);
 
-SelectFragmentCollectionManagementToolbarDisplayContext selectFragmentCollectionManagementToolbarDisplayContext = new SelectFragmentCollectionManagementToolbarDisplayContext(liferayPortletRequest, liferayPortletResponse, request, selectFragmentCollectionDisplayContext.getFragmentCollectionsSearchContainer());
+SelectFragmentCollectionManagementToolbarDisplayContext selectFragmentCollectionManagementToolbarDisplayContext = new SelectFragmentCollectionManagementToolbarDisplayContext(request, liferayPortletRequest, liferayPortletResponse, selectFragmentCollectionDisplayContext.getFragmentCollectionsSearchContainer());
 %>
 
 <clay:management-toolbar

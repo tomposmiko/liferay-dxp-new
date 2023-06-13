@@ -1,6 +1,6 @@
 Bundle-Name: Liferay Layout Admin Web
 Bundle-SymbolicName: com.liferay.layout.admin.web
-Bundle-Version: 3.0.47
+Bundle-Version: 4.0.8
 Liferay-JS-Config: /META-INF/resources/js/config.js
 Provide-Capability:\
 	soy;\
@@ -10,8 +10,6 @@ Require-Capability:\
 	liferay.resource.bundle;\
 		filter:="(bundle.symbolic.name=com.liferay.frontend.editor.lang)",\
 	osgi.extender;\
-		filter:="(&(osgi.extender=jsp.taglib)(uri=http://liferay.com/tld/soy))",\
-	soy;\
-		filter:="(type=layout-taglib)"
+		filter:="(&(osgi.extender=jsp.taglib)(uri=http://liferay.com/tld/soy))"
 Web-ContextPath: /layout-admin-web
 -dsannotations-options: inherit

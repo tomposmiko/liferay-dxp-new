@@ -67,7 +67,7 @@
 		font-size: 14px;
 	}
 
-	.help-block {
+	.form-feedback-item {
 		font-size: 14px;
 	}
 
@@ -83,6 +83,10 @@
 	}
 
 	.liferay-ddm-form-field-paragraph {
+		blockquote {
+			margin: 1em 40px;
+		}
+
 		p {
 			margin-top: 14px;
 			word-wrap: break-word;

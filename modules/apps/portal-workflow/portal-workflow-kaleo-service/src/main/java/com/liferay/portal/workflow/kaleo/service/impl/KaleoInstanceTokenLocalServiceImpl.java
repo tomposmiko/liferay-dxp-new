@@ -110,9 +110,7 @@ public class KaleoInstanceTokenLocalServiceImpl
 
 		kaleoInstanceToken.setCompleted(false);
 
-		kaleoInstanceTokenPersistence.update(kaleoInstanceToken);
-
-		return kaleoInstanceToken;
+		return kaleoInstanceTokenPersistence.update(kaleoInstanceToken);
 	}
 
 	@Override
@@ -147,9 +145,7 @@ public class KaleoInstanceTokenLocalServiceImpl
 		kaleoInstanceToken.setCompleted(true);
 		kaleoInstanceToken.setCompletionDate(new Date());
 
-		kaleoInstanceTokenPersistence.update(kaleoInstanceToken);
-
-		return kaleoInstanceToken;
+		return kaleoInstanceTokenPersistence.update(kaleoInstanceToken);
 	}
 
 	@Override
@@ -288,8 +284,8 @@ public class KaleoInstanceTokenLocalServiceImpl
 
 			return indexer.search(searchContext);
 		}
-		catch (SearchException se) {
-			throw new SystemException(se);
+		catch (SearchException searchException) {
+			throw new SystemException(searchException);
 		}
 	}
 
@@ -322,8 +318,8 @@ public class KaleoInstanceTokenLocalServiceImpl
 
 			return (int)indexer.searchCount(searchContext);
 		}
-		catch (SearchException se) {
-			throw new SystemException(se);
+		catch (SearchException searchException) {
+			throw new SystemException(searchException);
 		}
 	}
 

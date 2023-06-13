@@ -16,14 +16,13 @@ package com.liferay.asset.kernel.service;
 
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.service.persistence.AssetEntryQuery;
+import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.increment.BufferedIncrement;
-import com.liferay.portal.kernel.increment.NumberIncrement;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexable;
@@ -31,6 +30,8 @@ import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.service.BaseLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
+import com.liferay.portal.kernel.service.change.tracking.CTService;
+import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
@@ -59,9 +60,10 @@ import org.osgi.annotation.versioning.ProviderType;
 	rollbackFor = {PortalException.class, SystemException.class}
 )
 public interface AssetEntryLocalService
-	extends BaseLocalService, PersistedModelLocalService {
+	extends BaseLocalService, CTService<AssetEntry>,
+			PersistedModelLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. Always use {@link AssetEntryLocalServiceUtil} to access the asset entry local service. Add custom service methods to <code>com.liferay.portlet.asset.service.impl.AssetEntryLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
@@ -444,14 +446,13 @@ public interface AssetEntryLocalService
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public AssetEntry incrementViewCounter(
-			long userId, String className, long classPK)
+			long companyId, long userId, String className, long classPK)
 		throws PortalException;
 
-	@BufferedIncrement(
-		configuration = "AssetEntry", incrementClass = NumberIncrement.class
-	)
+	@Transactional(enabled = false)
 	public void incrementViewCounter(
-		long userId, String className, long classPK, int increment);
+		long companyId, long userId, String className, long classPK,
+		int increment);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public void reindex(List<AssetEntry> entries) throws PortalException;
@@ -574,63 +575,9 @@ public interface AssetEntryLocalService
 			int height, int width, Double priority)
 		throws PortalException;
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link #updateEntry(long,
-	 long, Date, Date, String, long, String, long, long[],
-	 String[], boolean, boolean, Date, Date, Date, Date, String,
-	 String, String, String, String, String, int, int, Double)}
-	 */
-	@Deprecated
-	public AssetEntry updateEntry(
-			long userId, long groupId, Date createDate, Date modifiedDate,
-			String className, long classPK, String classUuid, long classTypeId,
-			long[] categoryIds, String[] tagNames, boolean listable,
-			boolean visible, Date startDate, Date endDate, Date expirationDate,
-			String mimeType, String title, String description, String summary,
-			String url, String layoutUuid, int height, int width,
-			Double priority)
-		throws PortalException;
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 #updateEntry(long, long, Date, Date, String, long, String,
-	 long, long[], String[], boolean, boolean, Date, Date, Date,
-	 Date, String, String, String, String, String, String, int,
-	 int, Double)}
-	 */
-	@Deprecated
-	public AssetEntry updateEntry(
-			long userId, long groupId, Date createDate, Date modifiedDate,
-			String className, long classPK, String classUuid, long classTypeId,
-			long[] categoryIds, String[] tagNames, boolean visible,
-			Date startDate, Date endDate, Date expirationDate, String mimeType,
-			String title, String description, String summary, String url,
-			String layoutUuid, int height, int width, Integer priority,
-			boolean sync)
-		throws PortalException;
-
 	public AssetEntry updateEntry(
 			long userId, long groupId, String className, long classPK,
 			long[] categoryIds, String[] tagNames)
-		throws PortalException;
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 #updateEntry(String, long, Date, Date, boolean, boolean)}
-	 */
-	@Deprecated
-	public AssetEntry updateEntry(
-			String className, long classPK, Date publishDate, boolean visible)
-		throws PortalException;
-
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 #updateEntry(String, long, Date, Date, boolean, boolean)}
-	 */
-	@Deprecated
-	public AssetEntry updateEntry(
-			String className, long classPK, Date publishDate,
-			Date expirationDate, boolean visible)
 		throws PortalException;
 
 	public AssetEntry updateEntry(
@@ -655,14 +602,19 @@ public interface AssetEntryLocalService
 			long[] categoryIds, String[] tagNames)
 		throws PortalException;
 
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link #validate(long,
-	 String, long, long[], String[])}
-	 */
-	@Deprecated
-	public void validate(
-			long groupId, String className, long[] categoryIds,
-			String[] tagNames)
-		throws PortalException;
+	@Override
+	@Transactional(enabled = false)
+	public CTPersistence<AssetEntry> getCTPersistence();
+
+	@Override
+	@Transactional(enabled = false)
+	public Class<AssetEntry> getModelClass();
+
+	@Override
+	@Transactional(rollbackFor = Throwable.class)
+	public <R, E extends Throwable> R updateWithUnsafeFunction(
+			UnsafeFunction<CTPersistence<AssetEntry>, R, E>
+				updateUnsafeFunction)
+		throws E;
 
 }

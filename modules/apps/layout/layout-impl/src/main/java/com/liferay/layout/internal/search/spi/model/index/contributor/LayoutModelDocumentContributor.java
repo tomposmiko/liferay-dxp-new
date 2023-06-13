@@ -77,7 +77,6 @@ public class LayoutModelDocumentContributor
 			return;
 		}
 
-		document.addUID(CLASS_NAME, layout.getPlid());
 		document.addText(
 			Field.DEFAULT_LANGUAGE_ID, layout.getDefaultLanguageId());
 		document.addLocalizedText(Field.NAME, layout.getNameMap());
@@ -148,8 +147,8 @@ public class LayoutModelDocumentContributor
 				document.addText(
 					Field.getLocalizedName(locale, Field.CONTENT), content);
 			}
-			catch (PortalException pe) {
-				throw new SystemException(pe);
+			catch (PortalException portalException) {
+				throw new SystemException(portalException);
 			}
 		}
 	}

@@ -19,6 +19,7 @@
 <%
 String redirect = ParamUtil.getString(request, "redirect");
 
+String portletResource = ParamUtil.getString(request, "portletResource");
 String referringPortletResource = ParamUtil.getString(request, "referringPortletResource");
 
 BlogsEntry entry = (BlogsEntry)request.getAttribute(WebKeys.BLOGS_ENTRY);
@@ -47,11 +48,7 @@ long smallImageFileEntryId = BeanParamUtil.getLong(entry, request, "smallImageFi
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(redirect);
 
-boolean portletTitleBasedNavigation = GetterUtil.getBoolean(portletConfig.getInitParameter("portlet-title-based-navigation"));
-
-if (portletTitleBasedNavigation) {
-	renderResponse.setTitle((entry != null) ? BlogsEntryUtil.getDisplayTitle(resourceBundle, entry) : LanguageUtil.get(request, "new-blog-entry"));
-}
+renderResponse.setTitle((entry != null) ? BlogsEntryUtil.getDisplayTitle(resourceBundle, entry) : LanguageUtil.get(request, "new-blog-entry"));
 
 BlogsGroupServiceSettings blogsGroupServiceSettings = BlogsGroupServiceSettings.getInstance(scopeGroupId);
 
@@ -89,14 +86,12 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 	</c:if>
 </liferay-util:buffer>
 
-<c:if test="<%= portletTitleBasedNavigation %>">
-	<liferay-frontend:info-bar
-		fixed="<%= true %>"
-	>
-		<%= saveStatus %>
-		<%= readingTime %>
-	</liferay-frontend:info-bar>
-</c:if>
+<liferay-frontend:info-bar
+	fixed="<%= true %>"
+>
+	<%= saveStatus %>
+	<%= readingTime %>
+</liferay-frontend:info-bar>
 
 <portlet:actionURL name="/blogs/edit_entry" var="editEntryURL" />
 
@@ -104,18 +99,10 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 	<aui:form action="<%= editEntryURL %>" cssClass="edit-entry" enctype="multipart/form-data" method="post" name="fm" onSubmit="event.preventDefault();">
 		<aui:input name="<%= Constants.CMD %>" type="hidden" />
 		<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
+		<aui:input name="portletResource" type="hidden" value="<%= portletResource %>" />
 		<aui:input name="referringPortletResource" type="hidden" value="<%= referringPortletResource %>" />
 		<aui:input name="entryId" type="hidden" value="<%= entryId %>" />
 		<aui:input name="workflowAction" type="hidden" value="<%= WorkflowConstants.ACTION_PUBLISH %>" />
-
-		<c:if test="<%= !portletTitleBasedNavigation %>">
-			<div class="entry-options">
-				<div class="status">
-					<%= saveStatus %>
-					<%= readingTime %>
-				</div>
-			</div>
-		</c:if>
 
 		<div class="lfr-form-content">
 			<liferay-ui:error exception="<%= DuplicateFriendlyURLEntryException.class %>" message="the-url-title-is-already-in-use-please-enter-a-unique-url-title" />
@@ -193,7 +180,7 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 								contents="<%= HtmlUtil.escape(title) %>"
 								editorName="alloyeditor"
 								name="titleEditor"
-								onChangeMethod="OnChangeTitle"
+								onChangeMethod="onChangeTitle"
 								placeholder="title"
 								required="<%= true %>"
 								showSource="<%= false %>"
@@ -221,7 +208,7 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 								contents="<%= content %>"
 								editorName='<%= PropsUtil.get("editor.wysiwyg.portal-web.docroot.html.portlet.blogs.edit_entry.jsp") %>'
 								name="contentEditor"
-								onChangeMethod="OnChangeEditor"
+								onChangeMethod="onChangeEditor"
 								placeholder="content"
 								required="<%= true %>"
 							>
@@ -308,7 +295,7 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 						</div>
 
 						<div class="entry-description form-group">
-							<aui:input disabled="<%= !customAbstract %>" label="description" name="description" type="text" value="<%= description %>">
+							<aui:input disabled="<%= !customAbstract %>" label="description" name="description" onChange='<%= renderResponse.getNamespace() + "setCustomDescription(this.value);" %>' type="text" value="<%= description %>">
 								<aui:validator name="required" />
 							</aui:input>
 						</div>
@@ -393,7 +380,7 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 							classNameId="<%= PortalUtil.getClassNameId(BlogsEntry.class) %>"
 							classPK="<%= (entry != null) ? entry.getEntryId() : 0 %>"
 							groupId="<%= scopeGroupId %>"
-							showPortletLayouts="<%= true %>"
+							showPortletLayouts="<%= false %>"
 							showViewInContextLink="<%= true %>"
 						/>
 					</aui:fieldset>
@@ -472,7 +459,7 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 </portlet:actionURL>
 
 <aui:script>
-	function <portlet:namespace />OnChangeEditor(html) {
+	function <portlet:namespace />onChangeEditor(html) {
 		var blogs = Liferay.component('<portlet:namespace />Blogs');
 
 		if (blogs) {
@@ -480,11 +467,19 @@ BlogsPortletInstanceConfiguration blogsPortletInstanceConfiguration = BlogsPortl
 		}
 	}
 
-	function <portlet:namespace />OnChangeTitle(title) {
+	function <portlet:namespace />onChangeTitle(title) {
 		var blogs = Liferay.component('<portlet:namespace />Blogs');
 
 		if (blogs) {
 			blogs.updateFriendlyURL(title);
+		}
+	}
+
+	function <portlet:namespace />setCustomDescription(text) {
+		var blogs = Liferay.component('<portlet:namespace />Blogs');
+
+		if (blogs) {
+			blogs.setCustomDescription(text);
 		}
 	}
 

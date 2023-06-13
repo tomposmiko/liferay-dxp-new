@@ -15,8 +15,6 @@
 package com.liferay.headless.admin.taxonomy.resource.v1_0;
 
 import com.liferay.headless.admin.taxonomy.dto.v1_0.TaxonomyCategory;
-import com.liferay.portal.kernel.model.Company;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
@@ -45,26 +43,26 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface TaxonomyCategoryResource {
 
 	public Page<TaxonomyCategory> getTaxonomyCategoryTaxonomyCategoriesPage(
-			Long parentTaxonomyCategoryId, String search, Filter filter,
+			String parentTaxonomyCategoryId, String search, Filter filter,
 			Pagination pagination, Sort[] sorts)
 		throws Exception;
 
 	public TaxonomyCategory postTaxonomyCategoryTaxonomyCategory(
-			Long parentTaxonomyCategoryId, TaxonomyCategory taxonomyCategory)
+			String parentTaxonomyCategoryId, TaxonomyCategory taxonomyCategory)
 		throws Exception;
 
-	public void deleteTaxonomyCategory(Long taxonomyCategoryId)
+	public void deleteTaxonomyCategory(String taxonomyCategoryId)
 		throws Exception;
 
-	public TaxonomyCategory getTaxonomyCategory(Long taxonomyCategoryId)
+	public TaxonomyCategory getTaxonomyCategory(String taxonomyCategoryId)
 		throws Exception;
 
 	public TaxonomyCategory patchTaxonomyCategory(
-			Long taxonomyCategoryId, TaxonomyCategory taxonomyCategory)
+			String taxonomyCategoryId, TaxonomyCategory taxonomyCategory)
 		throws Exception;
 
 	public TaxonomyCategory putTaxonomyCategory(
-			Long taxonomyCategoryId, TaxonomyCategory taxonomyCategory)
+			String taxonomyCategoryId, TaxonomyCategory taxonomyCategory)
 		throws Exception;
 
 	public Page<TaxonomyCategory> getTaxonomyVocabularyTaxonomyCategoriesPage(
@@ -80,7 +78,8 @@ public interface TaxonomyCategoryResource {
 		AcceptLanguage contextAcceptLanguage) {
 	}
 
-	public void setContextCompany(Company contextCompany);
+	public void setContextCompany(
+		com.liferay.portal.kernel.model.Company contextCompany);
 
 	public default void setContextHttpServletRequest(
 		HttpServletRequest contextHttpServletRequest) {
@@ -93,6 +92,7 @@ public interface TaxonomyCategoryResource {
 	public default void setContextUriInfo(UriInfo contextUriInfo) {
 	}
 
-	public void setContextUser(User contextUser);
+	public void setContextUser(
+		com.liferay.portal.kernel.model.User contextUser);
 
 }

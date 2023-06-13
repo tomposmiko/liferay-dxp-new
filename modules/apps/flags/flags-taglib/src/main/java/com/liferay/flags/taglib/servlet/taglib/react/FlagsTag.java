@@ -26,14 +26,15 @@ import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.AggregateResourceBundle;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.taglib.util.IncludeTag;
+import com.liferay.taglib.util.TagResourceBundleUtil;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -160,54 +161,61 @@ public class FlagsTag extends IncludeTag {
 			httpServletRequest.setAttribute(
 				"liferay-flags:flags:onlyIcon", !_label);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 	}
 
 	private Map<String, Object> _getData(String message)
 		throws PortalException {
 
-		Map<String, Object> data = new HashMap<>();
+		return HashMapBuilder.<String, Object>put(
+			"context",
+			HashMapBuilder.<String, Object>put(
+				"namespace", PortalUtil.getPortletNamespace(PortletKeys.FLAGS)
+			).build()
+		).put(
+			"props",
+			() -> {
+				HttpServletRequest httpServletRequest = getRequest();
 
-		Map<String, Object> context = new HashMap<>();
+				ThemeDisplay themeDisplay =
+					(ThemeDisplay)httpServletRequest.getAttribute(
+						WebKeys.THEME_DISPLAY);
 
-		context.put(
-			"namespace", PortalUtil.getPortletNamespace(PortletKeys.FLAGS));
+				Map<String, Object> props = HashMapBuilder.<String, Object>put(
+					"baseData", _getDataJSONObject(themeDisplay)
+				).put(
+					"companyName",
+					() -> {
+						Company company = themeDisplay.getCompany();
 
-		data.put("context", context);
+						return company.getName();
+					}
+				).put(
+					"disabled", !_enabled
+				).put(
+					"forceLogin", !FlagsTagUtil.isFlagsEnabled(themeDisplay)
+				).build();
 
-		Map<String, Object> props = new HashMap<>();
+				if (Validator.isNotNull(message)) {
+					props.put("message", message);
+				}
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+				props.put("onlyIcon", !_label);
+				props.put(
+					"pathTermsOfUse",
+					PortalUtil.getPathMain() + "/portal/terms_of_use");
+				props.put(
+					"reasons",
+					FlagsTagUtil.getReasons(
+						themeDisplay.getCompanyId(), httpServletRequest));
+				props.put("signedIn", themeDisplay.isSignedIn());
+				props.put("uri", FlagsTagUtil.getURI(httpServletRequest));
 
-		props.put("baseData", _getDataJSONObject(themeDisplay));
-
-		Company company = themeDisplay.getCompany();
-
-		props.put("companyName", company.getName());
-
-		props.put("disabled", !_enabled);
-		props.put("forceLogin", !FlagsTagUtil.isFlagsEnabled(themeDisplay));
-
-		if (Validator.isNotNull(message)) {
-			props.put("message", message);
-		}
-
-		props.put("onlyIcon", !_label);
-		props.put(
-			"pathTermsOfUse",
-			PortalUtil.getPathMain() + "/portal/terms_of_use");
-		props.put(
-			"reasons",
-			FlagsTagUtil.getReasons(themeDisplay.getCompanyId(), request));
-		props.put("signedIn", themeDisplay.isSignedIn());
-		props.put("uri", FlagsTagUtil.getURI(request));
-
-		data.put("props", props);
-
-		return data;
+				return props;
+			}
+		).build();
 	}
 
 	private JSONObject _getDataJSONObject(ThemeDisplay themeDisplay) {
@@ -216,7 +224,7 @@ public class FlagsTag extends IncludeTag {
 		String contentURL = _contentURL;
 
 		if (Validator.isNull(contentURL)) {
-			contentURL = FlagsTagUtil.getCurrentURL(request);
+			contentURL = FlagsTagUtil.getCurrentURL(getRequest());
 		}
 
 		JSONObject dataJSONObject = JSONUtil.put(
@@ -247,9 +255,10 @@ public class FlagsTag extends IncludeTag {
 
 	private String _getMessage() {
 		ResourceBundle resourceBundle = new AggregateResourceBundle(
-			(ResourceBundle)pageContext.getAttribute("resourceBundle"),
+			TagResourceBundleUtil.getResourceBundle(pageContext),
 			ResourceBundleUtil.getBundle(
-				PortalUtil.getLocale(request), "com.liferay.flags.taglib"));
+				PortalUtil.getLocale(getRequest()),
+				"com.liferay.flags.taglib"));
 
 		if (Validator.isNotNull(_message)) {
 			return LanguageUtil.get(resourceBundle, _message);

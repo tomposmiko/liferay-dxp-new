@@ -28,11 +28,6 @@ public class RoleLocalServiceWrapper
 		_roleLocalService = roleLocalService;
 	}
 
-	/**
-	 * NOTE FOR DEVELOPERS:
-	 *
-	 * Never modify or reference this interface directly. Always use {@link RoleLocalServiceUtil} to access the role local service. Add custom service methods to <code>com.liferay.portal.service.impl.RoleLocalServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
-	 */
 	@Override
 	public void addGroupRole(long groupId, long roleId) {
 		_roleLocalService.addGroupRole(groupId, roleId);
@@ -579,20 +574,6 @@ public class RoleLocalServiceWrapper
 	}
 
 	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	@Override
-	public java.util.List<com.liferay.portal.kernel.model.Role>
-		getResourceBlockRoles(
-			long resourceBlockId, java.lang.String className,
-			java.lang.String actionId) {
-
-		return _roleLocalService.getResourceBlockRoles(
-			resourceBlockId, className, actionId);
-	}
-
-	/**
 	 * Returns a map of role names to associated action IDs for the named
 	 * resource in the company within the permission scope.
 	 *
@@ -744,6 +725,14 @@ public class RoleLocalServiceWrapper
 		long companyId, int[] types) {
 
 		return _roleLocalService.getRoles(companyId, types);
+	}
+
+	@Override
+	public java.util.List<com.liferay.portal.kernel.model.Role> getRoles(
+		long companyId, long classNameId, long[] classPKs, int type) {
+
+		return _roleLocalService.getRoles(
+			companyId, classNameId, classPKs, type);
 	}
 
 	/**

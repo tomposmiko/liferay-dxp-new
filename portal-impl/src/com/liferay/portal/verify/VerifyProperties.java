@@ -60,9 +60,10 @@ public class VerifyProperties extends VerifyProcess {
 		try {
 			return classLoader.getResourceAsStream(resourceName);
 		}
-		catch (RuntimeException re) {
+		catch (RuntimeException runtimeException) {
 			if (_log.isWarnEnabled()) {
-				_log.warn("Unable to get resource " + resourceName, re);
+				_log.warn(
+					"Unable to get resource " + resourceName, runtimeException);
 			}
 
 			return null;
@@ -91,9 +92,10 @@ public class VerifyProperties extends VerifyProcess {
 					properties.load(inputStream);
 				}
 			}
-			catch (IOException ioe) {
+			catch (IOException ioException) {
 				_log.error(
-					"Unable to load property " + propertyResourceName, ioe);
+					"Unable to load property " + propertyResourceName,
+					ioException);
 			}
 		}
 
@@ -1687,7 +1689,10 @@ public class VerifyProperties extends VerifyProcess {
 			"configuration.jsp",
 		"editor.wysiwyg.portal-web.docroot.html.portlet.portal_settings." +
 			"email_notifications.jsp",
+		"ehcache.bootstrap.cache.loader.enabled",
 		"ehcache.bootstrap.cache.loader.factory",
+		"ehcache.bootstrap.cache.loader.properties",
+		"ehcache.bootstrap.cache.loader.properties.default",
 		"ehcache.cache.event.listener.factory",
 		"ehcache.cache.manager.peer.listener.factory",
 		"ehcache.cache.manager.peer.provider.factory",
@@ -1730,24 +1735,37 @@ public class VerifyProperties extends VerifyProcess {
 		"jpa.provider.property.eclipselink.logging.level",
 		"jpa.provider.property.eclipselink.logging.timestamp",
 		"language.display.style.options",
+		"layout.configuration.action.update[embedded]",
 		"layout.configuration.action.update[link_to_layout]",
+		"layout.configuration.action.update[url]",
+		"layout.configuration.action.delete[embedded]",
 		"layout.configuration.action.delete[link_to_layout]",
-		"layout.edit.page[control_panel]", "layout.edit.page[link_to_layout]",
-		"layout.first.pageable[control_panel]",
-		"layout.first.pageable[link_to_layout]", "layout.form.add",
-		"layout.form.update",
+		"layout.configuration.action.delete[url]",
+		"layout.edit.page[control_panel]", "layout.edit.page[embedded]",
+		"layout.edit.page[link_to_layout]", "layout.edit.page[panel]",
+		"layout.edit.page[url]", "layout.first.pageable[control_panel]",
+		"layout.first.pageable[embedded]",
+		"layout.first.pageable[link_to_layout]", "layout.first.pageable[panel]",
+		"layout.first.pageable[url]", "layout.form.add", "layout.form.update",
 		"layout.parallel.render.thread.pool.allow.core.thread.timeout",
-		"layout.parentable[control_panel]", "layout.parentable[link_to_layout]",
-		"layout.reset.portlet.ids", "layout.set.form.update",
-		"layout.sitemapable[link_to_layout]", "layout.types",
-		"layout.url[control_panel]", "layout.url[link_to_layout]",
+		"layout.parentable[control_panel]", "layout.parentable[embedded]",
+		"layout.parentable[link_to_layout]", "layout.parentable[panel]",
+		"layout.parentable[url]", "layout.reset.portlet.ids",
+		"layout.set.form.update", "layout.sitemapable[embedded]",
+		"layout.sitemapable[link_to_layout]", "layout.sitemapable[url]",
+		"layout.types", "layout.url[control_panel]", "layout.url[embedded]",
+		"layout.url[link_to_layout]", "layout.url[panel]", "layout.url[url]",
 		"layout.url.friendliable[control_panel]",
+		"layout.url.friendliable[embedded]",
 		"layout.url.friendliable[link_to_layout]",
-		"layout.view.page[control_panel]", "layout.view.page[link_to_layout]",
-		"library.download.url.resin.jar", "library.download.url.script-10.jar",
-		"lucene.analyzer", "lucene.cluster.index.loading.sync.timeout",
-		"lucene.file.extractor", "lucene.file.extractor.regexp.strip",
-		"lucene.replicate.write", "lucene.store.jdbc.auto.clean.up",
+		"layout.url.friendliable[panel]", "layout.url.friendliable[url]",
+		"layout.view.page[control_panel]", "layout.view.page[embedded]",
+		"layout.view.page[link_to_layout]", "layout.view.page[panel]",
+		"layout.view.page[url]", "library.download.url.resin.jar",
+		"library.download.url.script-10.jar", "lucene.analyzer",
+		"lucene.cluster.index.loading.sync.timeout", "lucene.file.extractor",
+		"lucene.file.extractor.regexp.strip", "lucene.replicate.write",
+		"lucene.store.jdbc.auto.clean.up",
 		"lucene.store.jdbc.auto.clean.up.enabled",
 		"lucene.store.jdbc.auto.clean.up.interval",
 		"lucene.store.jdbc.dialect.db2", "lucene.store.jdbc.dialect.derby",
@@ -1814,11 +1832,12 @@ public class VerifyProperties extends VerifyProcess {
 		"struts.portlet.ignored.parameters.regexp",
 		"struts.portlet.request.processor",
 		"table.mapper.cache.mapping.table.names", "tck.url",
-		"transaction.manager.impl", "user.groups.indexer.enabled",
-		"users.form.add.identification", "users.indexer.enabled",
-		"users.form.add.main", "users.form.add.miscellaneous",
-		"users.form.my.account.identification", "users.form.my.account.main",
-		"users.form.my.account.miscellaneous",
+		"transaction.manager.impl",
+		"user.groups.copy.layouts.to.user.personal.site",
+		"user.groups.indexer.enabled", "users.form.add.identification",
+		"users.indexer.enabled", "users.form.add.main",
+		"users.form.add.miscellaneous", "users.form.my.account.identification",
+		"users.form.my.account.main", "users.form.my.account.miscellaneous",
 		"users.form.update.identification", "users.form.update.main",
 		"users.form.update.miscellaneous", "users.image.check.token",
 		"users.image.default.use.initials", "users.image.max.height",

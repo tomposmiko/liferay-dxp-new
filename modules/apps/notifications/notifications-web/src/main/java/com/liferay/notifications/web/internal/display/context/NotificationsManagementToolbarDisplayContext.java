@@ -42,13 +42,14 @@ import javax.servlet.http.HttpServletRequest;
 public class NotificationsManagementToolbarDisplayContext {
 
 	public NotificationsManagementToolbarDisplayContext(
+		HttpServletRequest httpServletRequest,
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
-		HttpServletRequest httpServletRequest, PortletURL currentURLObj) {
+		PortletURL currentURLObj) {
 
+		_httpServletRequest = httpServletRequest;
 		_liferayPortletRequest = liferayPortletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
-		_httpServletRequest = httpServletRequest;
 		_currentURLObj = currentURLObj;
 	}
 

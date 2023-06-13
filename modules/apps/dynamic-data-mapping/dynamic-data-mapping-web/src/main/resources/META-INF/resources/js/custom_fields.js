@@ -44,15 +44,17 @@ AUI.add(
 		var isValue = Lang.isValue;
 
 		var structureFieldIndexEnable = function() {
-			var indexTypeNode = A.one(
-				'#_' + Liferay.Portlet.list[0] + '_indexable'
-			);
+			for (var i = 0; i < Liferay.Portlet.list.length; i++) {
+				var indexableNode = A.one(
+					'#_' + Liferay.Portlet.list[i] + '_indexable'
+				);
 
-			if (indexTypeNode) {
-				var indexable = indexTypeNode.getAttribute('value');
+				if (indexableNode) {
+					var indexable = indexableNode.getAttribute('value');
 
-				if (indexable === 'false') {
-					return false;
+					if (indexable === 'false') {
+						return false;
+					}
 				}
 			}
 
@@ -99,7 +101,7 @@ AUI.add(
 			'<div class="form-group">' +
 			'<input class="field form-control" type="text" value="" readonly="readonly">' +
 			'<div class="button-holder">' +
-			'<button class="btn select-button btn-default" type="button">' +
+			'<button class="btn btn-secondary select-button" type="button">' +
 			'<span class="lfr-btn-label">' +
 			A.Escape.html(Liferay.Language.get('select')) +
 			'</span>' +
@@ -135,7 +137,7 @@ AUI.add(
 			'<div class="form-group">' +
 			'<input class="field form-control" type="text" value="" readonly="readonly">' +
 			'<div class="button-holder">' +
-			'<button class="btn select-button btn-default" type="button">' +
+			'<button class="btn btn-secondary select-button" type="button">' +
 			'<span class="lfr-btn-label">' +
 			A.Escape.html(Liferay.Language.get('select')) +
 			'</span>' +
@@ -400,29 +402,41 @@ AUI.add(
 
 					var portletNamespace = instance.get('portletNamespace');
 
-					var itemSelectorDialog = new A.LiferayItemSelectorDialog({
-						eventName: portletNamespace + 'selectDocumentLibrary',
-						on: {
-							selectedItemChange(event) {
-								var selectedItem = event.newVal;
-
-								if (selectedItem) {
-									var itemValue = JSON.parse(
-										selectedItem.value
-									);
-
-									instance._selectFileEntry(
-										itemValue.groupId,
-										itemValue.title,
-										itemValue.uuid
-									);
+					Liferay.Loader.require(
+						'frontend-js-web/liferay/ItemSelectorDialog.es',
+						ItemSelectorDialog => {
+							var itemSelectorDialog = new ItemSelectorDialog.default(
+								{
+									eventName:
+										portletNamespace +
+										'selectDocumentLibrary',
+									singleSelect: true,
+									url: instance._getDocumentLibrarySelectorURL()
 								}
-							}
-						},
-						url: instance._getDocumentLibrarySelectorURL()
-					});
+							);
 
-					itemSelectorDialog.open();
+							itemSelectorDialog.on(
+								'selectedItemChange',
+								event => {
+									var selectedItem = event.selectedItem;
+
+									if (selectedItem) {
+										var itemValue = JSON.parse(
+											selectedItem.value
+										);
+
+										instance._selectFileEntry(
+											itemValue.groupId,
+											itemValue.title,
+											itemValue.uuid
+										);
+									}
+								}
+							);
+
+							itemSelectorDialog.open();
+						}
+					);
 				},
 
 				_onClickClear() {
@@ -559,18 +573,25 @@ AUI.add(
 				},
 
 				_getWebContentSelectorURL() {
+					var instance = this;
+
+					var portletNamespace = instance.get('portletNamespace');
+
+					var criterionJSON = {
+						desiredItemSelectorReturnTypes:
+							'com.liferay.item.selector.criteria.JournalArticleItemSelectorReturnType'
+					};
+
 					var webContentSelectorParameters = {
-						eventName: 'selectContent',
-						groupId: themeDisplay.getScopeGroupId(),
+						'0_json': JSON.stringify(criterionJSON),
+						criteria:
+							'com.liferay.item.selector.criteria.info.item.criterion.InfoItemItemSelectorCriterion',
+						itemSelectedEventName:
+							portletNamespace + 'selectContent',
 						p_auth: Liferay.authToken,
-						p_p_id:
-							'com_liferay_asset_browser_web_portlet_AssetBrowserPortlet',
-						p_p_state: 'pop_up',
-						selectedGroupId: themeDisplay.getScopeGroupId(),
-						showNonindexable: true,
-						showScheduled: true,
-						typeSelection:
-							'com.liferay.journal.model.JournalArticle'
+						p_p_id: Liferay.PortletKeys.ITEM_SELECTOR,
+						p_p_mode: 'view',
+						p_p_state: 'pop_up'
 					};
 
 					var webContentSelectorURL = Liferay.Util.PortletURL.createRenderURL(
@@ -601,29 +622,43 @@ AUI.add(
 				_onClickChoose() {
 					var instance = this;
 
-					Liferay.Util.selectEntity(
-						{
-							dialog: {
-								constrain: true,
-								destroyOnHide: true,
-								modal: true
-							},
-							eventName: 'selectContent',
-							id: 'selectContent',
-							title: Liferay.Language.get('journal-article'),
-							uri: instance._getWebContentSelectorURL()
-						},
-						event => {
-							if (event.details.length > 0) {
-								var selectedWebContent = event.details[0];
+					var portletNamespace = instance.get('portletNamespace');
 
-								instance.setValue({
-									className:
-										selectedWebContent.assetclassname,
-									classPK: selectedWebContent.assetclasspk,
-									title: selectedWebContent.assettitle
-								});
-							}
+					Liferay.Loader.require(
+						'frontend-js-web/liferay/ItemSelectorDialog.es',
+						ItemSelectorDialog => {
+							var itemSelectorDialog = new ItemSelectorDialog.default(
+								{
+									eventName:
+										portletNamespace + 'selectContent',
+									singleSelect: true,
+									title: Liferay.Language.get(
+										'journal-article'
+									),
+									url: instance._getWebContentSelectorURL()
+								}
+							);
+
+							itemSelectorDialog.on(
+								'selectedItemChange',
+								event => {
+									var selectedItem = event.selectedItem;
+
+									if (selectedItem) {
+										var itemValue = JSON.parse(
+											selectedItem.value
+										);
+
+										instance.setValue({
+											className: itemValue.className,
+											classPK: itemValue.classPK,
+											title: itemValue.title
+										});
+									}
+								}
+							);
+
+							itemSelectorDialog.open();
 						}
 					);
 				},
@@ -1087,6 +1122,14 @@ AUI.add(
 			var fieldOptions = [];
 
 			if (options) {
+				var builder = instance.get('builder');
+
+				var translationManager = builder.translationManager;
+
+				var availableLocales = translationManager.get(
+					'availableLocales'
+				);
+
 				options.forEach(option => {
 					var fieldOption = {};
 
@@ -1095,10 +1138,16 @@ AUI.add(
 					fieldOption.value = option.value;
 					fieldOption.label = {};
 
-					A.each(localizationMap, (item, index) => {
+					availableLocales.forEach(locale => {
+						var label = instance._getValue(
+							'label',
+							locale,
+							localizationMap
+						);
+
 						fieldOption.label[
-							index
-						] = LiferayFormBuilderUtil.normalizeValue(item.label);
+							locale
+						] = LiferayFormBuilderUtil.normalizeValue(label);
 					});
 
 					fieldOptions.push(fieldOption);
@@ -1137,44 +1186,55 @@ AUI.add(
 
 			var translationManager = builder.translationManager;
 
-			var defaultLocale = translationManager.get('defaultLocale');
-
 			translationManager.get('availableLocales').forEach(locale => {
-				var value = A.Object.getValue(localizationMap, [
-					locale,
-					attribute
-				]);
-
-				if (!isValue(value)) {
-					value = A.Object.getValue(localizationMap, [
-						defaultLocale,
-						attribute
-					]);
-
-					if (!isValue(value)) {
-						for (var localizationMapLocale in localizationMap) {
-							value = A.Object.getValue(localizationMap, [
-								localizationMapLocale,
-								attribute
-							]);
-
-							if (isValue(value)) {
-								break;
-							}
-						}
-					}
-
-					if (!isValue(value)) {
-						value = STR_BLANK;
-					}
-				}
-
 				localizedValue[locale] = LiferayFormBuilderUtil.normalizeValue(
-					value
+					instance._getValue(attribute, locale, localizationMap)
 				);
 			});
 
 			return localizedValue;
+		};
+
+		SerializableFieldSupport.prototype._getValue = function(
+			attribute,
+			locale,
+			localizationMap
+		) {
+			var instance = this;
+
+			var builder = instance.get('builder');
+
+			var translationManager = builder.translationManager;
+
+			var defaultLocale = translationManager.get('defaultLocale');
+
+			var value = A.Object.getValue(localizationMap, [locale, attribute]);
+
+			if (isValue(value)) {
+				return value;
+			}
+
+			value = A.Object.getValue(localizationMap, [
+				defaultLocale,
+				attribute
+			]);
+
+			if (isValue(value)) {
+				return value;
+			}
+
+			for (var localizationMapLocale in localizationMap) {
+				value = A.Object.getValue(localizationMap, [
+					localizationMapLocale,
+					attribute
+				]);
+
+				if (isValue(value)) {
+					return value;
+				}
+			}
+
+			return STR_BLANK;
 		};
 
 		SerializableFieldSupport.prototype.serialize = function() {

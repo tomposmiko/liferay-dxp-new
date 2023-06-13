@@ -36,6 +36,7 @@ import com.liferay.portal.template.soy.util.SoyContextFactoryUtil;
 
 import java.util.List;
 
+import javax.portlet.PortletRequest;
 import javax.portlet.RenderResponse;
 
 import javax.servlet.http.HttpServletRequest;
@@ -50,11 +51,13 @@ public class ContentPageEditorLayoutPageTemplateDisplayContext
 		HttpServletRequest httpServletRequest, RenderResponse renderResponse,
 		boolean pageIsDisplayPage, CommentManager commentManager,
 		List<ContentPageEditorSidebarPanel> contentPageEditorSidebarPanels,
-		FragmentRendererController fragmentRendererController) {
+		FragmentRendererController fragmentRendererController,
+		PortletRequest portletRequest) {
 
 		super(
 			httpServletRequest, renderResponse, commentManager,
-			contentPageEditorSidebarPanels, fragmentRendererController);
+			contentPageEditorSidebarPanels, fragmentRendererController,
+			portletRequest);
 
 		_pageIsDisplayPage = pageIsDisplayPage;
 	}
@@ -98,8 +101,11 @@ public class ContentPageEditorLayoutPageTemplateDisplayContext
 			String statusLabel = WorkflowConstants.getStatusLabel(
 				layoutPageTemplateEntry.getStatus());
 
-			soyContext.put("status", LanguageUtil.get(request, statusLabel));
+			soyContext.put(
+				"status", LanguageUtil.get(httpServletRequest, statusLabel));
 		}
+
+		soyContext.put("workflowEnabled", false);
 
 		_editorSoyContext = soyContext;
 

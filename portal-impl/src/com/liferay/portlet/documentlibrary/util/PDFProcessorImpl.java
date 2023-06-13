@@ -42,6 +42,7 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ServerDetector;
@@ -50,7 +51,6 @@ import com.liferay.portal.kernel.util.SystemEnv;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.log.Log4jLogFactoryImpl;
-import com.liferay.portal.repository.liferayrepository.model.LiferayFileVersion;
 import com.liferay.portal.util.PortalClassPathUtil;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
@@ -61,7 +61,6 @@ import java.io.InputStream;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -122,8 +121,8 @@ public class PDFProcessorImpl
 		try {
 			return doGetPreviewFileCount(fileVersion);
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 
 		return 0;
@@ -166,8 +165,8 @@ public class PDFProcessorImpl
 				_queueGeneration(null, fileVersion);
 			}
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 
 		return hasImages;
@@ -249,8 +248,8 @@ public class PDFProcessorImpl
 				}
 			}
 		}
-		catch (Exception e) {
-			_log.error(e, e);
+		catch (Exception exception) {
+			_log.error(exception, exception);
 		}
 	}
 
@@ -420,21 +419,6 @@ public class PDFProcessorImpl
 			String extension = destinationFileVersion.getExtension();
 
 			if (extension.equals("pdf")) {
-				if (destinationFileVersion instanceof LiferayFileVersion) {
-					try {
-						LiferayFileVersion liferayFileVersion =
-							(LiferayFileVersion)destinationFileVersion;
-
-						File file = liferayFileVersion.getFile(false);
-
-						_generateImages(destinationFileVersion, file);
-
-						return;
-					}
-					catch (UnsupportedOperationException uoe) {
-					}
-				}
-
 				try (InputStream inputStream =
 						destinationFileVersion.getContentStream(false)) {
 
@@ -467,9 +451,9 @@ public class PDFProcessorImpl
 				}
 			}
 		}
-		catch (NoSuchFileEntryException nsfee) {
+		catch (NoSuchFileEntryException noSuchFileEntryException) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(nsfee, nsfee);
+				_log.debug(noSuchFileEntryException, noSuchFileEntryException);
 			}
 		}
 		finally {
@@ -586,7 +570,7 @@ public class PDFProcessorImpl
 
 			futures.put(processIdentity, future);
 		}
-		catch (TimeoutException te) {
+		catch (TimeoutException timeoutException) {
 			String errorMessage =
 				"Timeout when generating preview for " + file.getPath();
 
@@ -603,14 +587,14 @@ public class PDFProcessorImpl
 
 			_log.error(errorMessage);
 
-			throw te;
+			throw timeoutException;
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 			_fileVersionPreviewEventListener.onFailure(fileVersion);
 
-			_log.error(e, e);
+			_log.error(exception, exception);
 
-			throw e;
+			throw exception;
 		}
 
 		// Store images
@@ -753,7 +737,7 @@ public class PDFProcessorImpl
 
 				futures.put(processIdentity, future);
 			}
-			catch (TimeoutException te) {
+			catch (TimeoutException timeoutException) {
 				String errorMessage = null;
 
 				if (generateThumbnail && generatePreview) {
@@ -784,14 +768,14 @@ public class PDFProcessorImpl
 
 				_fileVersionPreviewEventListener.onFailure(fileVersion);
 
-				throw te;
+				throw timeoutException;
 			}
-			catch (Exception e) {
-				_log.error(e, e);
+			catch (Exception exception) {
+				_log.error(exception, exception);
 
 				_fileVersionPreviewEventListener.onFailure(fileVersion);
 
-				throw e;
+				throw exception;
 			}
 		}
 		else {
@@ -901,9 +885,9 @@ public class PDFProcessorImpl
 
 				return pdDocument.getNumberOfPages();
 			}
-			catch (IOException ioe) {
-				if (!(ioe instanceof InvalidPasswordException)) {
-					_log.error(ioe, ioe);
+			catch (IOException ioException) {
+				if (!(ioException instanceof InvalidPasswordException)) {
+					_log.error(ioException, ioException);
 				}
 			}
 		}
@@ -915,8 +899,6 @@ public class PDFProcessorImpl
 		throws Exception {
 
 		try (PDDocument pdDocument = PDDocument.load(file)) {
-			Map<String, Integer> scaledDimensions = new HashMap<>();
-
 			PDDocumentCatalog pdDocumentCatalog =
 				pdDocument.getDocumentCatalog();
 
@@ -926,27 +908,32 @@ public class PDFProcessorImpl
 
 			PDRectangle pdRectangle = pdPage.getMediaBox();
 
+			float height = pdRectangle.getHeight();
 			float width = pdRectangle.getWidth();
 
-			double widthFactor =
-				(double)PropsValues.DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_WIDTH /
-					width;
+			return HashMapBuilder.put(
+				"height",
+				() -> {
+					double widthFactor =
+						(double)
+							PropsValues.
+								DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_WIDTH /
+									width;
 
-			float height = pdRectangle.getHeight();
+					return (int)Math.round(widthFactor * height);
+				}
+			).put(
+				"width",
+				() -> {
+					double heightFactor =
+						(double)
+							PropsValues.
+								DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_HEIGHT /
+									height;
 
-			int scaledHeight = (int)Math.round(widthFactor * height);
-
-			scaledDimensions.put("height", scaledHeight);
-
-			double heightFactor =
-				(double)PropsValues.DL_FILE_ENTRY_PREVIEW_DOCUMENT_MAX_HEIGHT /
-					height;
-
-			int scaledWidth = (int)Math.round(heightFactor * width);
-
-			scaledDimensions.put("width", scaledWidth);
-
-			return scaledDimensions;
+					return (int)Math.round(heightFactor * width);
+				}
+			).build();
 		}
 	}
 
@@ -1082,8 +1069,8 @@ public class PDFProcessorImpl
 
 				liferayConverter.generateImagesPB();
 			}
-			catch (Exception e) {
-				throw new ProcessException(e);
+			catch (Exception exception) {
+				throw new ProcessException(exception);
 			}
 
 			return StringPool.BLANK;

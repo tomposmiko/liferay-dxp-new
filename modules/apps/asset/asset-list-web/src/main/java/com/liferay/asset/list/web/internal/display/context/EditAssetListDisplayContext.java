@@ -38,6 +38,8 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.ItemSelectorCriterion;
+import com.liferay.item.selector.criteria.GroupItemSelectorReturnType;
+import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
@@ -61,6 +63,8 @@ import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -73,7 +77,6 @@ import com.liferay.segments.constants.SegmentsEntryConstants;
 import com.liferay.segments.model.SegmentsEntry;
 import com.liferay.segments.service.SegmentsEntryLocalServiceUtil;
 import com.liferay.segments.service.SegmentsEntryServiceUtil;
-import com.liferay.site.item.selector.criteria.SiteItemSelectorReturnType;
 import com.liferay.site.item.selector.criterion.SiteItemSelectorCriterion;
 
 import java.util.ArrayList;
@@ -266,15 +269,44 @@ public class EditAssetListDisplayContext {
 				List<Map<String, String>> selectedItems = new ArrayList<>();
 
 				for (String tagName : tagNames) {
-					Map<String, String> item = new HashMap<>();
-
-					item.put("label", tagName);
-					item.put("value", tagName);
+					Map<String, String> item = HashMapBuilder.put(
+						"label", tagName
+					).put(
+						"value", tagName
+					).build();
 
 					selectedItems.add(item);
 				}
 
 				ruleJSONObject.put("selectedItems", selectedItems);
+			}
+			else if (Objects.equals(queryName, "keywords")) {
+				queryValues = ParamUtil.getString(
+					_httpServletRequest, "keywords" + queryLogicIndex,
+					queryValues);
+
+				String[] keywords = StringUtil.split(queryValues, ",");
+
+				if (ArrayUtil.isEmpty(keywords)) {
+					continue;
+				}
+
+				List<String> items = new ArrayList<>();
+
+				for (String keyword : keywords) {
+					if (keyword.contains(" ")) {
+						keyword = StringUtil.quote(keyword, CharPool.QUOTE);
+					}
+
+					items.add(keyword);
+				}
+
+				Stream<String> stream = items.stream();
+
+				queryValues = stream.collect(
+					Collectors.joining(StringPool.SPACE));
+
+				ruleJSONObject.put("selectedItems", queryValues);
 			}
 			else {
 				queryValues = ParamUtil.getString(
@@ -291,11 +323,13 @@ public class EditAssetListDisplayContext {
 				List<HashMap<String, Object>> selectedItems = new ArrayList<>();
 
 				for (AssetCategory category : categories) {
-					HashMap<String, Object> selectedCategory = new HashMap<>();
-
-					selectedCategory.put(
-						"label", category.getTitle(_themeDisplay.getLocale()));
-					selectedCategory.put("value", category.getCategoryId());
+					HashMap<String, Object> selectedCategory =
+						HashMapBuilder.<String, Object>put(
+							"label",
+							category.getTitle(_themeDisplay.getLocale())
+						).put(
+							"value", category.getCategoryId()
+						).build();
 
 					selectedItems.add(selectedCategory);
 				}
@@ -408,7 +442,7 @@ public class EditAssetListDisplayContext {
 
 			return portletURL.toString();
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 		}
 
 		return null;
@@ -554,7 +588,7 @@ public class EditAssetListDisplayContext {
 			new SiteItemSelectorCriterion();
 
 		itemSelectorCriterion.setDesiredItemSelectorReturnTypes(
-			new SiteItemSelectorReturnType());
+			new GroupItemSelectorReturnType());
 
 		PortletURL itemSelectorURL = itemSelector.getItemSelectorURL(
 			RequestBackedPortletURLFactoryUtil.create(_httpServletRequest),
@@ -611,21 +645,23 @@ public class EditAssetListDisplayContext {
 			assetBrowserURL.setWindowState(LiferayWindowState.POP_UP);
 
 			if (!curRendererFactory.isSupportsClassTypes()) {
-				Map<String, Object> data = new HashMap<>();
-
-				data.put("destroyOnHide", true);
-				data.put(
-					"groupid", String.valueOf(_themeDisplay.getScopeGroupId()));
-				data.put("href", assetBrowserURL.toString());
-
 				String type = curRendererFactory.getTypeName(
 					_themeDisplay.getLocale());
 
-				data.put(
+				Map<String, Object> data = HashMapBuilder.<String, Object>put(
+					"destroyOnHide", true
+				).put(
+					"groupid", String.valueOf(_themeDisplay.getScopeGroupId())
+				).put(
+					"href", assetBrowserURL.toString()
+				).put(
 					"title",
-					LanguageUtil.format(
-						_httpServletRequest, "select-x", type, false));
-				data.put("type", type);
+					HtmlUtil.escape(
+						LanguageUtil.format(
+							_httpServletRequest, "select-x", type, false))
+				).put(
+					"type", type
+				).build();
 
 				manualAddIconDataMap.put(type, data);
 
@@ -642,25 +678,25 @@ public class EditAssetListDisplayContext {
 					_themeDisplay.getLocale());
 
 			for (ClassType assetAvailableClassType : assetAvailableClassTypes) {
-				Map<String, Object> data = new HashMap<>();
-
-				data.put("destroyOnHide", true);
-				data.put(
-					"groupid", String.valueOf(_themeDisplay.getScopeGroupId()));
-
 				assetBrowserURL.setParameter(
 					"subtypeSelectionId",
 					String.valueOf(assetAvailableClassType.getClassTypeId()));
 
-				data.put("href", assetBrowserURL.toString());
-
 				String type = assetAvailableClassType.getName();
 
-				data.put(
+				Map<String, Object> data = HashMapBuilder.<String, Object>put(
+					"destroyOnHide", true
+				).put(
+					"groupid", String.valueOf(_themeDisplay.getScopeGroupId())
+				).put(
+					"href", assetBrowserURL.toString()
+				).put(
 					"title",
 					LanguageUtil.format(
-						_httpServletRequest, "select-x", type, false));
-				data.put("type", type);
+						_httpServletRequest, "select-x", type, false)
+				).put(
+					"type", type
+				).build();
 
 				manualAddIconDataMap.put(type, data);
 			}
@@ -908,7 +944,6 @@ public class EditAssetListDisplayContext {
 
 			portletURL.setParameter(
 				"groupIds", String.valueOf(_themeDisplay.getScopeGroupId()));
-
 			portletURL.setParameter(
 				"eventName", _portletResponse.getNamespace() + "selectTag");
 			portletURL.setParameter("selectedTagNames", "{selectedTagNames}");
@@ -916,7 +951,7 @@ public class EditAssetListDisplayContext {
 
 			return portletURL.toString();
 		}
-		catch (Exception e) {
+		catch (Exception exception) {
 		}
 
 		return null;
@@ -928,6 +963,28 @@ public class EditAssetListDisplayContext {
 
 		List<AssetVocabulary> vocabularies =
 			AssetVocabularyServiceUtil.getGroupsVocabularies(groupIds);
+
+		vocabularies = ListUtil.filter(
+			vocabularies,
+			vocabulary -> {
+				long[] classNameIds = vocabulary.getSelectedClassNameIds();
+
+				for (long classNameId : classNameIds) {
+					if (classNameId == 0) {
+						continue;
+					}
+
+					AssetRendererFactory assetRendererFactory =
+						AssetRendererFactoryRegistryUtil.
+							getAssetRendererFactoryByClassNameId(classNameId);
+
+					if (!assetRendererFactory.isSelectable()) {
+						return false;
+					}
+				}
+
+				return true;
+			});
 
 		return ListUtil.toList(
 			vocabularies, AssetVocabulary.VOCABULARY_ID_ACCESSOR);

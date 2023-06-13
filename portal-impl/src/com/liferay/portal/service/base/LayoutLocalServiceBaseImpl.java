@@ -20,17 +20,23 @@ import com.liferay.expando.kernel.service.persistence.ExpandoRowPersistence;
 import com.liferay.exportimport.kernel.lar.ExportImportHelperUtil;
 import com.liferay.exportimport.kernel.lar.ManifestSummary;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
+import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
+import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerRegistryUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.exportimport.kernel.service.persistence.ExportImportConfigurationFinder;
 import com.liferay.exportimport.kernel.service.persistence.ExportImportConfigurationPersistence;
+import com.liferay.petra.function.UnsafeFunction;
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.db.DB;
 import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdate;
 import com.liferay.portal.kernel.dao.jdbc.SqlUpdateFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.Conjunction;
+import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
+import com.liferay.portal.kernel.dao.orm.Disjunction;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
@@ -38,10 +44,10 @@ import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.model.LayoutVersion;
 import com.liferay.portal.kernel.model.PersistedModel;
 import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
 import com.liferay.portal.kernel.search.Indexable;
@@ -59,7 +65,6 @@ import com.liferay.portal.kernel.service.persistence.LayoutPersistence;
 import com.liferay.portal.kernel.service.persistence.LayoutPrototypePersistence;
 import com.liferay.portal.kernel.service.persistence.LayoutSetPersistence;
 import com.liferay.portal.kernel.service.persistence.LayoutSetPrototypePersistence;
-import com.liferay.portal.kernel.service.persistence.LayoutVersionPersistence;
 import com.liferay.portal.kernel.service.persistence.PluginSettingPersistence;
 import com.liferay.portal.kernel.service.persistence.PortalPreferencesPersistence;
 import com.liferay.portal.kernel.service.persistence.PortletPreferencesFinder;
@@ -70,20 +75,17 @@ import com.liferay.portal.kernel.service.persistence.UserFinder;
 import com.liferay.portal.kernel.service.persistence.UserGroupFinder;
 import com.liferay.portal.kernel.service.persistence.UserGroupPersistence;
 import com.liferay.portal.kernel.service.persistence.UserPersistence;
-import com.liferay.portal.kernel.service.version.VersionService;
-import com.liferay.portal.kernel.service.version.VersionServiceListener;
+import com.liferay.portal.kernel.service.persistence.WorkflowDefinitionLinkPersistence;
+import com.liferay.portal.kernel.service.persistence.change.tracking.CTPersistence;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.ratings.kernel.service.persistence.RatingsStatsFinder;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.ratings.kernel.service.persistence.RatingsStatsPersistence;
 
 import java.io.Serializable;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
@@ -100,10 +102,9 @@ import javax.sql.DataSource;
  */
 public abstract class LayoutLocalServiceBaseImpl
 	extends BaseLocalServiceImpl
-	implements IdentifiableOSGiService, LayoutLocalService,
-			   VersionService<Layout, LayoutVersion> {
+	implements IdentifiableOSGiService, LayoutLocalService {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this class directly. Use <code>LayoutLocalService</code> via injection or a <code>org.osgi.util.tracker.ServiceTracker</code> or use <code>com.liferay.portal.kernel.service.LayoutLocalServiceUtil</code>.
@@ -124,20 +125,15 @@ public abstract class LayoutLocalServiceBaseImpl
 	}
 
 	/**
-	 * Creates a new layout. Does not add the layout to the database.
+	 * Creates a new layout with the primary key. Does not add the layout to the database.
 	 *
+	 * @param plid the primary key for the new layout
 	 * @return the new layout
 	 */
 	@Override
 	@Transactional(enabled = false)
-	public Layout create() {
-		long primaryKey = counterLocalService.increment(Layout.class.getName());
-
-		Layout draftLayout = layoutPersistence.create(primaryKey);
-
-		draftLayout.setHeadId(primaryKey);
-
-		return draftLayout;
+	public Layout createLayout(long plid) {
+		return layoutPersistence.create(plid);
 	}
 
 	/**
@@ -150,13 +146,7 @@ public abstract class LayoutLocalServiceBaseImpl
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public Layout deleteLayout(long plid) throws PortalException {
-		Layout layout = layoutPersistence.fetchByPrimaryKey(plid);
-
-		if (layout != null) {
-			delete(layout);
-		}
-
-		return layout;
+		return layoutPersistence.remove(plid);
 	}
 
 	/**
@@ -169,9 +159,7 @@ public abstract class LayoutLocalServiceBaseImpl
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public Layout deleteLayout(Layout layout) throws PortalException {
-		delete(layout);
-
-		return layout;
+		return layoutPersistence.remove(layout);
 	}
 
 	@Override
@@ -266,6 +254,21 @@ public abstract class LayoutLocalServiceBaseImpl
 	}
 
 	/**
+	 * Returns the layout matching the UUID, group, and privacy.
+	 *
+	 * @param uuid the layout's UUID
+	 * @param groupId the primary key of the group
+	 * @param privateLayout whether the layout is private to the group
+	 * @return the matching layout, or <code>null</code> if a matching layout could not be found
+	 */
+	@Override
+	public Layout fetchLayoutByUuidAndGroupId(
+		String uuid, long groupId, boolean privateLayout) {
+
+		return layoutPersistence.fetchByUUID_G_P(uuid, groupId, privateLayout);
+	}
+
+	/**
 	 * Returns the layout with the primary key.
 	 *
 	 * @param plid the primary key of the layout
@@ -355,8 +358,46 @@ public abstract class LayoutLocalServiceBaseImpl
 
 				@Override
 				public void addCriteria(DynamicQuery dynamicQuery) {
-					portletDataContext.addDateRangeCriteria(
-						dynamicQuery, "modifiedDate");
+					Criterion modifiedDateCriterion =
+						portletDataContext.getDateRangeCriteria("modifiedDate");
+
+					if (modifiedDateCriterion != null) {
+						Conjunction conjunction =
+							RestrictionsFactoryUtil.conjunction();
+
+						conjunction.add(modifiedDateCriterion);
+
+						Disjunction disjunction =
+							RestrictionsFactoryUtil.disjunction();
+
+						disjunction.add(
+							RestrictionsFactoryUtil.gtProperty(
+								"modifiedDate", "lastPublishDate"));
+
+						Property lastPublishDateProperty =
+							PropertyFactoryUtil.forName("lastPublishDate");
+
+						disjunction.add(lastPublishDateProperty.isNull());
+
+						conjunction.add(disjunction);
+
+						modifiedDateCriterion = conjunction;
+					}
+
+					Criterion statusDateCriterion =
+						portletDataContext.getDateRangeCriteria("statusDate");
+
+					if ((modifiedDateCriterion != null) &&
+						(statusDateCriterion != null)) {
+
+						Disjunction disjunction =
+							RestrictionsFactoryUtil.disjunction();
+
+						disjunction.add(modifiedDateCriterion);
+						disjunction.add(statusDateCriterion);
+
+						dynamicQuery.add(disjunction);
+					}
 
 					StagedModelType stagedModelType =
 						exportActionableDynamicQuery.getStagedModelType();
@@ -380,6 +421,26 @@ public abstract class LayoutLocalServiceBaseImpl
 								StagedModelType.REFERRER_CLASS_NAME_ID_ANY) {
 
 						dynamicQuery.add(classNameIdProperty.isNotNull());
+					}
+
+					Property workflowStatusProperty =
+						PropertyFactoryUtil.forName("status");
+
+					if (portletDataContext.isInitialPublication()) {
+						dynamicQuery.add(
+							workflowStatusProperty.ne(
+								WorkflowConstants.STATUS_IN_TRASH));
+					}
+					else {
+						StagedModelDataHandler<?> stagedModelDataHandler =
+							StagedModelDataHandlerRegistryUtil.
+								getStagedModelDataHandler(
+									Layout.class.getName());
+
+						dynamicQuery.add(
+							workflowStatusProperty.in(
+								stagedModelDataHandler.
+									getExportableStatuses()));
 					}
 				}
 
@@ -429,6 +490,56 @@ public abstract class LayoutLocalServiceBaseImpl
 	}
 
 	/**
+	 * Returns all the layouts matching the UUID and company.
+	 *
+	 * @param uuid the UUID of the layouts
+	 * @param companyId the primary key of the company
+	 * @return the matching layouts, or an empty list if no matches were found
+	 */
+	@Override
+	public List<Layout> getLayoutsByUuidAndCompanyId(
+		String uuid, long companyId) {
+
+		return layoutPersistence.findByUuid_C(uuid, companyId);
+	}
+
+	/**
+	 * Returns a range of layouts matching the UUID and company.
+	 *
+	 * @param uuid the UUID of the layouts
+	 * @param companyId the primary key of the company
+	 * @param start the lower bound of the range of layouts
+	 * @param end the upper bound of the range of layouts (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
+	 * @return the range of matching layouts, or an empty list if no matches were found
+	 */
+	@Override
+	public List<Layout> getLayoutsByUuidAndCompanyId(
+		String uuid, long companyId, int start, int end,
+		OrderByComparator<Layout> orderByComparator) {
+
+		return layoutPersistence.findByUuid_C(
+			uuid, companyId, start, end, orderByComparator);
+	}
+
+	/**
+	 * Returns the layout matching the UUID, group, and privacy.
+	 *
+	 * @param uuid the layout's UUID
+	 * @param groupId the primary key of the group
+	 * @param privateLayout whether the layout is private to the group
+	 * @return the matching layout
+	 * @throws PortalException if a matching layout could not be found
+	 */
+	@Override
+	public Layout getLayoutByUuidAndGroupId(
+			String uuid, long groupId, boolean privateLayout)
+		throws PortalException {
+
+		return layoutPersistence.findByUUID_G_P(uuid, groupId, privateLayout);
+	}
+
+	/**
 	 * Returns a range of all the layouts.
 	 *
 	 * <p>
@@ -459,12 +570,11 @@ public abstract class LayoutLocalServiceBaseImpl
 	 *
 	 * @param layout the layout
 	 * @return the layout that was updated
-	 * @throws PortalException
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
-	public Layout updateLayout(Layout draftLayout) throws PortalException {
-		return updateDraft(draftLayout);
+	public Layout updateLayout(Layout layout) {
+		return layoutPersistence.update(layout);
 	}
 
 	/**
@@ -902,44 +1012,6 @@ public abstract class LayoutLocalServiceBaseImpl
 		RatingsStatsPersistence ratingsStatsPersistence) {
 
 		this.ratingsStatsPersistence = ratingsStatsPersistence;
-	}
-
-	/**
-	 * Returns the ratings stats finder.
-	 *
-	 * @return the ratings stats finder
-	 */
-	public RatingsStatsFinder getRatingsStatsFinder() {
-		return ratingsStatsFinder;
-	}
-
-	/**
-	 * Sets the ratings stats finder.
-	 *
-	 * @param ratingsStatsFinder the ratings stats finder
-	 */
-	public void setRatingsStatsFinder(RatingsStatsFinder ratingsStatsFinder) {
-		this.ratingsStatsFinder = ratingsStatsFinder;
-	}
-
-	/**
-	 * Returns the layout version persistence.
-	 *
-	 * @return the layout version persistence
-	 */
-	public LayoutVersionPersistence getLayoutVersionPersistence() {
-		return layoutVersionPersistence;
-	}
-
-	/**
-	 * Sets the layout version persistence.
-	 *
-	 * @param layoutVersionPersistence the layout version persistence
-	 */
-	public void setLayoutVersionPersistence(
-		LayoutVersionPersistence layoutVersionPersistence) {
-
-		this.layoutVersionPersistence = layoutVersionPersistence;
 	}
 
 	/**
@@ -1468,6 +1540,53 @@ public abstract class LayoutLocalServiceBaseImpl
 		this.userGroupFinder = userGroupFinder;
 	}
 
+	/**
+	 * Returns the workflow definition link local service.
+	 *
+	 * @return the workflow definition link local service
+	 */
+	public com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService
+		getWorkflowDefinitionLinkLocalService() {
+
+		return workflowDefinitionLinkLocalService;
+	}
+
+	/**
+	 * Sets the workflow definition link local service.
+	 *
+	 * @param workflowDefinitionLinkLocalService the workflow definition link local service
+	 */
+	public void setWorkflowDefinitionLinkLocalService(
+		com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService
+			workflowDefinitionLinkLocalService) {
+
+		this.workflowDefinitionLinkLocalService =
+			workflowDefinitionLinkLocalService;
+	}
+
+	/**
+	 * Returns the workflow definition link persistence.
+	 *
+	 * @return the workflow definition link persistence
+	 */
+	public WorkflowDefinitionLinkPersistence
+		getWorkflowDefinitionLinkPersistence() {
+
+		return workflowDefinitionLinkPersistence;
+	}
+
+	/**
+	 * Sets the workflow definition link persistence.
+	 *
+	 * @param workflowDefinitionLinkPersistence the workflow definition link persistence
+	 */
+	public void setWorkflowDefinitionLinkPersistence(
+		WorkflowDefinitionLinkPersistence workflowDefinitionLinkPersistence) {
+
+		this.workflowDefinitionLinkPersistence =
+			workflowDefinitionLinkPersistence;
+	}
+
 	public void afterPropertiesSet() {
 		persistedModelLocalServiceRegistry.register(
 			"com.liferay.portal.kernel.model.Layout", layoutLocalService);
@@ -1477,376 +1596,6 @@ public abstract class LayoutLocalServiceBaseImpl
 		persistedModelLocalServiceRegistry.unregister(
 			"com.liferay.portal.kernel.model.Layout");
 	}
-
-	@Indexable(type = IndexableType.REINDEX)
-	@Override
-	public Layout checkout(Layout publishedLayout, int version)
-		throws PortalException {
-
-		if (!publishedLayout.isHead()) {
-			throw new IllegalArgumentException(
-				"Unable to checkout with unpublished changes " +
-					publishedLayout.getHeadId());
-		}
-
-		Layout draftLayout = layoutPersistence.fetchByHeadId(
-			publishedLayout.getPrimaryKey());
-
-		if (draftLayout != null) {
-			throw new IllegalArgumentException(
-				"Unable to checkout with unpublished changes " +
-					publishedLayout.getPrimaryKey());
-		}
-
-		LayoutVersion layoutVersion = getVersion(publishedLayout, version);
-
-		draftLayout = _createDraft(publishedLayout);
-
-		layoutVersion.populateVersionedModel(draftLayout);
-
-		draftLayout = layoutPersistence.update(draftLayout);
-
-		for (VersionServiceListener<Layout, LayoutVersion>
-				versionServiceListener : _versionServiceListeners) {
-
-			versionServiceListener.afterCheckout(draftLayout, version);
-		}
-
-		return draftLayout;
-	}
-
-	@Indexable(type = IndexableType.DELETE)
-	@Override
-	public Layout delete(Layout publishedLayout) throws PortalException {
-		if (!publishedLayout.isHead()) {
-			throw new IllegalArgumentException(
-				"Layout is a draft " + publishedLayout.getPrimaryKey());
-		}
-
-		Layout draftLayout = layoutPersistence.fetchByHeadId(
-			publishedLayout.getPrimaryKey());
-
-		if (draftLayout != null) {
-			deleteDraft(draftLayout);
-		}
-
-		for (LayoutVersion layoutVersion : getVersions(publishedLayout)) {
-			layoutVersionPersistence.remove(layoutVersion);
-		}
-
-		layoutPersistence.remove(publishedLayout);
-
-		for (VersionServiceListener<Layout, LayoutVersion>
-				versionServiceListener : _versionServiceListeners) {
-
-			versionServiceListener.afterDelete(publishedLayout);
-		}
-
-		return publishedLayout;
-	}
-
-	@Indexable(type = IndexableType.DELETE)
-	@Override
-	public Layout deleteDraft(Layout draftLayout) throws PortalException {
-		if (draftLayout.isHead()) {
-			throw new IllegalArgumentException(
-				"Layout is not a draft " + draftLayout.getPrimaryKey());
-		}
-
-		layoutPersistence.remove(draftLayout);
-
-		for (VersionServiceListener<Layout, LayoutVersion>
-				versionServiceListener : _versionServiceListeners) {
-
-			versionServiceListener.afterDeleteDraft(draftLayout);
-		}
-
-		return draftLayout;
-	}
-
-	@Override
-	public LayoutVersion deleteVersion(LayoutVersion layoutVersion)
-		throws PortalException {
-
-		LayoutVersion latestLayoutVersion =
-			layoutVersionPersistence.findByPlid_First(
-				layoutVersion.getVersionedModelId(), null);
-
-		if (latestLayoutVersion.getVersion() == layoutVersion.getVersion()) {
-			throw new IllegalArgumentException(
-				"Unable to delete latest version " +
-					layoutVersion.getVersion());
-		}
-
-		layoutVersion = layoutVersionPersistence.remove(layoutVersion);
-
-		for (VersionServiceListener<Layout, LayoutVersion>
-				versionServiceListener : _versionServiceListeners) {
-
-			versionServiceListener.afterDeleteVersion(layoutVersion);
-		}
-
-		return layoutVersion;
-	}
-
-	@Override
-	public Layout fetchDraft(Layout layout) {
-		if (layout.isHead()) {
-			return layoutPersistence.fetchByHeadId(layout.getPrimaryKey());
-		}
-
-		return layout;
-	}
-
-	@Override
-	public Layout fetchDraft(long primaryKey) {
-		return layoutPersistence.fetchByHeadId(primaryKey);
-	}
-
-	@Override
-	public LayoutVersion fetchLatestVersion(Layout layout) {
-		long primaryKey = layout.getHeadId();
-
-		if (layout.isHead()) {
-			primaryKey = layout.getPrimaryKey();
-		}
-
-		return layoutVersionPersistence.fetchByPlid_First(primaryKey, null);
-	}
-
-	@Override
-	public Layout fetchPublished(Layout layout) {
-		if (layout.isHead()) {
-			return layout;
-		}
-
-		if (layout.getHeadId() == layout.getPrimaryKey()) {
-			return null;
-		}
-
-		return layoutPersistence.fetchByPrimaryKey(layout.getHeadId());
-	}
-
-	@Override
-	public Layout fetchPublished(long primaryKey) {
-		Layout layout = layoutPersistence.fetchByPrimaryKey(primaryKey);
-
-		if ((layout == null) ||
-			(layout.getHeadId() == layout.getPrimaryKey())) {
-
-			return null;
-		}
-
-		return layout;
-	}
-
-	@Override
-	public Layout getDraft(Layout layout) throws PortalException {
-		if (!layout.isHead()) {
-			return layout;
-		}
-
-		Layout draftLayout = layoutPersistence.fetchByHeadId(
-			layout.getPrimaryKey());
-
-		if (draftLayout == null) {
-			draftLayout = layoutLocalService.updateDraft(_createDraft(layout));
-		}
-
-		return draftLayout;
-	}
-
-	@Override
-	public Layout getDraft(long primaryKey) throws PortalException {
-		Layout draftLayout = layoutPersistence.fetchByHeadId(primaryKey);
-
-		if (draftLayout == null) {
-			Layout layout = layoutPersistence.findByPrimaryKey(primaryKey);
-
-			draftLayout = layoutLocalService.updateDraft(_createDraft(layout));
-		}
-
-		return draftLayout;
-	}
-
-	@Override
-	public LayoutVersion getVersion(Layout layout, int version)
-		throws PortalException {
-
-		long primaryKey = layout.getHeadId();
-
-		if (layout.isHead()) {
-			primaryKey = layout.getPrimaryKey();
-		}
-
-		return layoutVersionPersistence.findByPlid_Version(primaryKey, version);
-	}
-
-	@Override
-	public List<LayoutVersion> getVersions(Layout layout) {
-		long primaryKey = layout.getPrimaryKey();
-
-		if (!layout.isHead()) {
-			if (layout.getHeadId() == layout.getPrimaryKey()) {
-				return Collections.emptyList();
-			}
-
-			primaryKey = layout.getHeadId();
-		}
-
-		return layoutVersionPersistence.findByPlid(primaryKey);
-	}
-
-	@Indexable(type = IndexableType.REINDEX)
-	@Override
-	public Layout publishDraft(Layout draftLayout) throws PortalException {
-		if (draftLayout.isHead()) {
-			throw new IllegalArgumentException(
-				"Can only publish drafts " + draftLayout.getPrimaryKey());
-		}
-
-		Layout headLayout = null;
-
-		int version = 1;
-
-		if (draftLayout.getHeadId() == draftLayout.getPrimaryKey()) {
-			headLayout = create();
-
-			draftLayout.setHeadId(headLayout.getPrimaryKey());
-		}
-		else {
-			headLayout = layoutPersistence.findByPrimaryKey(
-				draftLayout.getHeadId());
-
-			LayoutVersion latestLayoutVersion =
-				layoutVersionPersistence.findByPlid_First(
-					draftLayout.getHeadId(), null);
-
-			version = latestLayoutVersion.getVersion() + 1;
-		}
-
-		LayoutVersion layoutVersion = layoutVersionPersistence.create(
-			counterLocalService.increment(LayoutVersion.class.getName()));
-
-		layoutVersion.setVersion(version);
-		layoutVersion.setVersionedModelId(headLayout.getPrimaryKey());
-
-		draftLayout.populateVersionModel(layoutVersion);
-
-		layoutVersionPersistence.update(layoutVersion);
-
-		layoutVersion.populateVersionedModel(headLayout);
-
-		headLayout.setHeadId(-headLayout.getPrimaryKey());
-
-		headLayout = layoutPersistence.update(headLayout);
-
-		for (VersionServiceListener<Layout, LayoutVersion>
-				versionServiceListener : _versionServiceListeners) {
-
-			versionServiceListener.afterPublishDraft(draftLayout, version);
-		}
-
-		deleteDraft(draftLayout);
-
-		return headLayout;
-	}
-
-	@Override
-	public void registerListener(
-		VersionServiceListener<Layout, LayoutVersion> versionServiceListener) {
-
-		_versionServiceListeners.add(versionServiceListener);
-	}
-
-	@Override
-	public void unregisterListener(
-		VersionServiceListener<Layout, LayoutVersion> versionServiceListener) {
-
-		_versionServiceListeners.remove(versionServiceListener);
-	}
-
-	@Indexable(type = IndexableType.REINDEX)
-	@Override
-	public Layout updateDraft(Layout draftLayout) throws PortalException {
-		if (draftLayout.isHead()) {
-			throw new IllegalArgumentException(
-				"Can only update draft entries " + draftLayout.getPrimaryKey());
-		}
-
-		Layout previousLayout = layoutPersistence.fetchByPrimaryKey(
-			draftLayout.getPrimaryKey());
-
-		draftLayout = layoutPersistence.update(draftLayout);
-
-		if (previousLayout == null) {
-			for (VersionServiceListener<Layout, LayoutVersion>
-					versionServiceListener : _versionServiceListeners) {
-
-				versionServiceListener.afterCreateDraft(draftLayout);
-			}
-		}
-		else {
-			for (VersionServiceListener<Layout, LayoutVersion>
-					versionServiceListener : _versionServiceListeners) {
-
-				versionServiceListener.afterUpdateDraft(draftLayout);
-			}
-		}
-
-		return draftLayout;
-	}
-
-	private Layout _createDraft(Layout publishedLayout) throws PortalException {
-		Layout draftLayout = create();
-
-		draftLayout.setUuid(publishedLayout.getUuid());
-		draftLayout.setHeadId(publishedLayout.getPrimaryKey());
-		draftLayout.setGroupId(publishedLayout.getGroupId());
-		draftLayout.setCompanyId(publishedLayout.getCompanyId());
-		draftLayout.setUserId(publishedLayout.getUserId());
-		draftLayout.setUserName(publishedLayout.getUserName());
-		draftLayout.setCreateDate(publishedLayout.getCreateDate());
-		draftLayout.setModifiedDate(publishedLayout.getModifiedDate());
-		draftLayout.setParentPlid(publishedLayout.getParentPlid());
-		draftLayout.setPrivateLayout(publishedLayout.getPrivateLayout());
-		draftLayout.setLayoutId(publishedLayout.getLayoutId());
-		draftLayout.setParentLayoutId(publishedLayout.getParentLayoutId());
-		draftLayout.setClassNameId(publishedLayout.getClassNameId());
-		draftLayout.setClassPK(publishedLayout.getClassPK());
-		draftLayout.setName(publishedLayout.getName());
-		draftLayout.setTitle(publishedLayout.getTitle());
-		draftLayout.setDescription(publishedLayout.getDescription());
-		draftLayout.setKeywords(publishedLayout.getKeywords());
-		draftLayout.setRobots(publishedLayout.getRobots());
-		draftLayout.setType(publishedLayout.getType());
-		draftLayout.setTypeSettings(publishedLayout.getTypeSettings());
-		draftLayout.setHidden(publishedLayout.getHidden());
-		draftLayout.setSystem(publishedLayout.getSystem());
-		draftLayout.setFriendlyURL(publishedLayout.getFriendlyURL());
-		draftLayout.setIconImageId(publishedLayout.getIconImageId());
-		draftLayout.setThemeId(publishedLayout.getThemeId());
-		draftLayout.setColorSchemeId(publishedLayout.getColorSchemeId());
-		draftLayout.setCss(publishedLayout.getCss());
-		draftLayout.setPriority(publishedLayout.getPriority());
-		draftLayout.setLayoutPrototypeUuid(
-			publishedLayout.getLayoutPrototypeUuid());
-		draftLayout.setLayoutPrototypeLinkEnabled(
-			publishedLayout.getLayoutPrototypeLinkEnabled());
-		draftLayout.setSourcePrototypeLayoutUuid(
-			publishedLayout.getSourcePrototypeLayoutUuid());
-		draftLayout.setPublishDate(publishedLayout.getPublishDate());
-		draftLayout.setLastPublishDate(publishedLayout.getLastPublishDate());
-
-		draftLayout.resetOriginalValues();
-
-		return draftLayout;
-	}
-
-	private final Set<VersionServiceListener<Layout, LayoutVersion>>
-		_versionServiceListeners = Collections.newSetFromMap(
-			new ConcurrentHashMap
-				<VersionServiceListener<Layout, LayoutVersion>, Boolean>());
 
 	/**
 	 * Returns the OSGi service identifier.
@@ -1858,8 +1607,22 @@ public abstract class LayoutLocalServiceBaseImpl
 		return LayoutLocalService.class.getName();
 	}
 
-	protected Class<?> getModelClass() {
+	@Override
+	public CTPersistence<Layout> getCTPersistence() {
+		return layoutPersistence;
+	}
+
+	@Override
+	public Class<Layout> getModelClass() {
 		return Layout.class;
+	}
+
+	@Override
+	public <R, E extends Throwable> R updateWithUnsafeFunction(
+			UnsafeFunction<CTPersistence<Layout>, R, E> updateUnsafeFunction)
+		throws E {
+
+		return updateUnsafeFunction.apply(layoutPersistence);
 	}
 
 	protected String getModelClassName() {
@@ -1885,8 +1648,8 @@ public abstract class LayoutLocalServiceBaseImpl
 
 			sqlUpdate.update();
 		}
-		catch (Exception e) {
-			throw new SystemException(e);
+		catch (Exception exception) {
+			throw new SystemException(exception);
 		}
 	}
 
@@ -1978,12 +1741,6 @@ public abstract class LayoutLocalServiceBaseImpl
 
 	@BeanReference(type = RatingsStatsPersistence.class)
 	protected RatingsStatsPersistence ratingsStatsPersistence;
-
-	@BeanReference(type = RatingsStatsFinder.class)
-	protected RatingsStatsFinder ratingsStatsFinder;
-
-	@BeanReference(type = LayoutVersionPersistence.class)
-	protected LayoutVersionPersistence layoutVersionPersistence;
 
 	@BeanReference(
 		type = com.liferay.portal.kernel.service.LayoutFriendlyURLLocalService.class
@@ -2092,6 +1849,17 @@ public abstract class LayoutLocalServiceBaseImpl
 
 	@BeanReference(type = UserGroupFinder.class)
 	protected UserGroupFinder userGroupFinder;
+
+	@BeanReference(
+		type = com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService.class
+	)
+	protected
+		com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService
+			workflowDefinitionLinkLocalService;
+
+	@BeanReference(type = WorkflowDefinitionLinkPersistence.class)
+	protected WorkflowDefinitionLinkPersistence
+		workflowDefinitionLinkPersistence;
 
 	@BeanReference(type = PersistedModelLocalServiceRegistry.class)
 	protected PersistedModelLocalServiceRegistry

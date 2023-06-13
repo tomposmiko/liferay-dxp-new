@@ -23,6 +23,7 @@ import com.liferay.asset.list.asset.entry.provider.AssetListAssetEntryProvider;
 import com.liferay.asset.publisher.constants.AssetPublisherPortletKeys;
 import com.liferay.asset.publisher.constants.AssetPublisherWebKeys;
 import com.liferay.asset.publisher.util.AssetPublisherHelper;
+import com.liferay.asset.publisher.util.AssetQueryRule;
 import com.liferay.asset.publisher.web.internal.action.AssetEntryActionRegistry;
 import com.liferay.asset.publisher.web.internal.configuration.AssetPublisherPortletInstanceConfiguration;
 import com.liferay.asset.publisher.web.internal.configuration.AssetPublisherWebConfiguration;
@@ -30,7 +31,6 @@ import com.liferay.asset.publisher.web.internal.display.context.AssetPublisherDi
 import com.liferay.asset.publisher.web.internal.util.AssetPublisherCustomizer;
 import com.liferay.asset.publisher.web.internal.util.AssetPublisherCustomizerRegistry;
 import com.liferay.asset.publisher.web.internal.util.AssetPublisherWebUtil;
-import com.liferay.asset.publisher.web.internal.util.AssetQueryRule;
 import com.liferay.asset.util.AssetHelper;
 import com.liferay.exportimport.kernel.staging.LayoutStagingUtil;
 import com.liferay.exportimport.kernel.staging.Staging;
@@ -87,6 +87,9 @@ import javax.portlet.RenderResponse;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang.text.StrMatcher;
+import org.apache.commons.lang.text.StrTokenizer;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -247,14 +250,15 @@ public class AssetPublisherConfigurationAction
 				super.processAction(
 					portletConfig, actionRequest, actionResponse);
 			}
-			catch (Exception e) {
-				if (e instanceof AssetTagException ||
-					e instanceof DuplicateQueryRuleException) {
+			catch (Exception exception) {
+				if (exception instanceof AssetTagException ||
+					exception instanceof DuplicateQueryRuleException) {
 
-					SessionErrors.add(actionRequest, e.getClass(), e);
+					SessionErrors.add(
+						actionRequest, exception.getClass(), exception);
 				}
 				else {
-					throw e;
+					throw exception;
 				}
 			}
 		}
@@ -463,6 +467,16 @@ public class AssetPublisherConfigurationAction
 			values = ParamUtil.getStringValues(
 				actionRequest, "queryTagNames" + index);
 		}
+		else if (name.equals("keywords")) {
+			StrTokenizer strTokenizer = new StrTokenizer(
+				ParamUtil.getString(actionRequest, "keywords" + index));
+
+			strTokenizer.setQuoteMatcher(StrMatcher.quoteMatcher());
+
+			List<String> valuesList = (List<String>)strTokenizer.getTokenList();
+
+			values = valuesList.toArray(new String[0]);
+		}
 		else {
 			values = ParamUtil.getStringValues(
 				actionRequest, "queryCategoryIds" + index);
@@ -471,7 +485,7 @@ public class AssetPublisherConfigurationAction
 		return new AssetQueryRule(contains, andOperator, name, values);
 	}
 
-	protected boolean getSubtypesFieldsFilterEnabled(
+	protected boolean getSubtypeFieldsFilterEnabled(
 		ActionRequest actionRequest, String[] classNameIds) {
 
 		String assetClassName = getAssetClassName(actionRequest, classNameIds);
@@ -708,7 +722,7 @@ public class AssetPublisherConfigurationAction
 			extensions = new String[0];
 		}
 
-		boolean subtypeFieldsFilterEnabled = getSubtypesFieldsFilterEnabled(
+		boolean subtypeFieldsFilterEnabled = getSubtypeFieldsFilterEnabled(
 			actionRequest, classNameIds);
 
 		setPreference(actionRequest, "classNameIds", classNameIds);

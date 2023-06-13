@@ -22,6 +22,12 @@ class SharedAssets extends PortletBase {
 		this._viewAssetTypeURL = config.viewAssetTypeURL;
 	}
 
+	attached() {
+		Liferay.on('sharing:changed', () =>
+			Liferay.Portlet.refresh('#p_p_id' + this.namespace)
+		);
+	}
+
 	handleFilterItemClicked(event) {
 		const itemData = event.data.item.data;
 		const namespace = this.namespace;
@@ -29,8 +35,8 @@ class SharedAssets extends PortletBase {
 
 		if (itemData.action === 'openAssetTypesSelector') {
 			const itemSelectorDialog = new ItemSelectorDialog({
-				buttonAddLabel: Liferay.Language.get('select'),
 				eventName: namespace + 'selectAssetType',
+				singleSelect: true,
 				title: Liferay.Language.get('select-asset-type'),
 				url: this._selectAssetTypeURL
 			});
@@ -44,7 +50,7 @@ class SharedAssets extends PortletBase {
 					let uri = viewAssetTypeURL;
 
 					uri = Liferay.Util.addParams(
-						namespace + 'className=' + selectedItem,
+						namespace + 'className=' + selectedItem.value,
 						uri
 					);
 

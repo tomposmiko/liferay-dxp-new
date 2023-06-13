@@ -40,7 +40,7 @@ public interface AssetListEntryAssetEntryRelModel
 	extends BaseModel<AssetListEntryAssetEntryRel>, MVCCModel, ShardedModel,
 			StagedGroupedModel {
 
-	/**
+	/*
 	 * NOTE FOR DEVELOPERS:
 	 *
 	 * Never modify or reference this interface directly. All methods that expect a asset list entry asset entry rel model instance should use the {@link AssetListEntryAssetEntryRel} interface instead.

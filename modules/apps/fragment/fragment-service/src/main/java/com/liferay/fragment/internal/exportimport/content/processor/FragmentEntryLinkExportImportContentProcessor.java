@@ -23,6 +23,7 @@ import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService;
 import com.liferay.exportimport.content.processor.ExportImportContentProcessor;
+import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.fragment.model.FragmentEntryLink;
@@ -339,7 +340,8 @@ public class FragmentEntryLinkExportImportContentProcessor
 		StagingGroupHelper stagingGroupHelper =
 			StagingGroupHelperUtil.getStagingGroupHelper();
 
-		if (!stagingGroupHelper.isStagedPortlet(
+		if (ExportImportThreadLocal.isStagingInProcess() &&
+			!stagingGroupHelper.isStagedPortlet(
 				portletDataContext.getScopeGroupId(),
 				assetRendererFactory.getPortletId())) {
 
@@ -355,7 +357,7 @@ public class FragmentEntryLinkExportImportContentProcessor
 					(StagedModel)assetRenderer.getAssetObject(),
 					PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
 			}
-			catch (Exception e) {
+			catch (Exception exception) {
 				if (_log.isDebugEnabled()) {
 					StringBundler messageSB = new StringBundler(11);
 
@@ -369,16 +371,16 @@ public class FragmentEntryLinkExportImportContentProcessor
 					messageSB.append(" and class name ");
 					messageSB.append(_portal.getClassName(classNameId));
 					messageSB.append(" that could not be exported due to ");
-					messageSB.append(e);
+					messageSB.append(exception);
 
 					String errorMessage = messageSB.toString();
 
-					if (Validator.isNotNull(e.getMessage())) {
+					if (Validator.isNotNull(exception.getMessage())) {
 						errorMessage = StringBundler.concat(
-							errorMessage, ": ", e.getMessage());
+							errorMessage, ": ", exception.getMessage());
 					}
 
-					_log.debug(errorMessage, e);
+					_log.debug(errorMessage, exception);
 				}
 			}
 		}
@@ -434,7 +436,8 @@ public class FragmentEntryLinkExportImportContentProcessor
 		StagingGroupHelper stagingGroupHelper =
 			StagingGroupHelperUtil.getStagingGroupHelper();
 
-		if (!stagingGroupHelper.isStagedPortlet(
+		if (ExportImportThreadLocal.isStagingInProcess() &&
+			!stagingGroupHelper.isStagedPortlet(
 				portletDataContext.getScopeGroupId(),
 				assetRendererFactory.getPortletId())) {
 
